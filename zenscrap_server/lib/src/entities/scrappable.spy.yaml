@@ -1,0 +1,13 @@
+class: Scrappable
+table: scrappable
+fields:
+  name: String
+  description: String
+  isActive: bool
+  scrappingRules: String
+  targetRequest: ScrappableTargetRequestStructure?, relation(name=target_scrappable, field=targetRequestId)
+  targetRequestId: int
+indexes:
+  scrappable_target_request_unique_idx:
+    fields: targetRequestId
+    unique: true

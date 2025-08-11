@@ -1,0 +1,7 @@
+class: ScrappableTargetRequestStructure
+table: scrappable_target_request
+fields:
+  url: String # Dynamic path fields are saved as {PATH_PARAM_NAME}. Example: www.mySocialMedia.com/posts/{postId}/comments/{commentsId}
+  queryParams: Map<String, String> # The query parameters for the request
+  pathParams: List<String> # The name of the paths params, Example: [postId, commentsId]
+  scrappable: Scrappable?, relation(name=target_scrappable)
