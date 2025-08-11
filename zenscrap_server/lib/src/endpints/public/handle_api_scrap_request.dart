@@ -1,11 +1,9 @@
-import 'dart:convert';
-
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/generated/entities/scrappable.dart';
 import 'package:zenscrap_server/src/generated/entities/scrappable_target_request.dart';
 
-class HandleApiScrapRequest extends Endpoint {
+class HandleApiScrapRequestEndpoint extends Endpoint {
   Future<Map<String, dynamic>> call(
     Session session, {
     required int scrappableId,
@@ -28,7 +26,13 @@ class HandleApiScrapRequest extends Endpoint {
     String targetUrl = targetRequest.url;
     // First, add the path parameters
     for (final String pathParam in targetRequest.pathParams) {
-      targetUrl = targetUrl.replaceAll('{$pathParam}', pathParam);
+      final String? payloadParam = payload[pathParam];
+      if (payloadParam == null) {
+        throw Exception(
+          'Missing required path parameter: $pathParam',
+        );
+      }
+      targetUrl = targetUrl.replaceAll('{$pathParam}', payloadParam);
     }
     // Now, let's add query parameters
     final Map<String, String> queryParams = {};
@@ -53,7 +57,8 @@ class HandleApiScrapRequest extends Endpoint {
       throw Exception('ScrapingBee API key not configured');
     }
 
-    final Uri scrapingBeeUrl = Uri.parse('https://app.scrapingbee.com/api/v1/');
+    final Dio dio = Dio();
+    final String scrapingBeeUrl = 'https://app.scrapingbee.com/api/v1/';
     final Map<String, String> queryParameters = {
       'api_key': scrapingBeeApi,
       'url': targetUrl,
@@ -64,12 +69,15 @@ class HandleApiScrapRequest extends Endpoint {
     };
 
     try {
-      final Uri requestUrl =
-          scrapingBeeUrl.replace(queryParameters: queryParameters);
-      final http.Response response = await http.get(requestUrl);
+      final Response<dynamic> response = await dio.get(
+        scrapingBeeUrl,
+        queryParameters: queryParameters,
+      );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = json.decode(response.body);
+        final Map<String, dynamic> responseData = response.data is String
+            ? Map<String, dynamic>.from(response.data as Map)
+            : response.data as Map<String, dynamic>;
 
         if (responseData.containsKey('extract_rules')) {
           final dynamic extractedData = responseData['extract_rules'];
@@ -84,14 +92,22 @@ class HandleApiScrapRequest extends Endpoint {
 
         return responseData;
       } else {
-        final Map<String, dynamic> errorResponse = json.decode(response.body);
+        final Map<String, dynamic> errorResponse = response.data is String
+            ? Map<String, dynamic>.from(response.data as Map)
+            : response.data as Map<String, dynamic>;
         throw Exception(
             'ScrapingBee API error: ${errorResponse['message'] ?? 'Unknown error'} (Status: ${response.statusCode})');
       }
-    } catch (e) {
-      if (e is Exception) {
-        rethrow;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        final Map<String, dynamic> errorResponse = e.response!.data is String
+            ? Map<String, dynamic>.from(e.response!.data as Map)
+            : e.response!.data as Map<String, dynamic>;
+        throw Exception(
+            'ScrapingBee API error: ${errorResponse['message'] ?? 'Unknown error'} (Status: ${e.response!.statusCode})');
       }
+      throw Exception('Failed to scrape data: ${e.message}');
+    } catch (e) {
       throw Exception('Failed to scrape data: $e');
     }
   }
