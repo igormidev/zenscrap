@@ -25,7 +25,7 @@ abstract class ScrappableTargetRequestStructure
   factory ScrappableTargetRequestStructure({
     int? id,
     required String url,
-    required Map<String, String> queryParams,
+    required Map<String, String?> queryParams,
     required List<String> pathParams,
     _i2.Scrappable? scrappable,
   }) = _ScrappableTargetRequestStructureImpl;
@@ -38,7 +38,7 @@ abstract class ScrappableTargetRequestStructure
       queryParams:
           (jsonSerialization['queryParams'] as Map).map((k, v) => MapEntry(
                 k as String,
-                v as String,
+                v as String?,
               )),
       pathParams: (jsonSerialization['pathParams'] as List)
           .map((e) => e as String)
@@ -57,7 +57,7 @@ abstract class ScrappableTargetRequestStructure
 
   String url;
 
-  Map<String, String> queryParams;
+  Map<String, String?> queryParams;
 
   List<String> pathParams;
 
@@ -69,7 +69,7 @@ abstract class ScrappableTargetRequestStructure
   ScrappableTargetRequestStructure copyWith({
     int? id,
     String? url,
-    Map<String, String>? queryParams,
+    Map<String, String?>? queryParams,
     List<String>? pathParams,
     _i2.Scrappable? scrappable,
   });
@@ -97,7 +97,7 @@ class _ScrappableTargetRequestStructureImpl
   _ScrappableTargetRequestStructureImpl({
     int? id,
     required String url,
-    required Map<String, String> queryParams,
+    required Map<String, String?> queryParams,
     required List<String> pathParams,
     _i2.Scrappable? scrappable,
   }) : super._(
@@ -115,7 +115,7 @@ class _ScrappableTargetRequestStructureImpl
   ScrappableTargetRequestStructure copyWith({
     Object? id = _Undefined,
     String? url,
-    Map<String, String>? queryParams,
+    Map<String, String?>? queryParams,
     List<String>? pathParams,
     Object? scrappable = _Undefined,
   }) {
