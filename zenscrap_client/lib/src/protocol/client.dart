@@ -10,7 +10,50 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
-import 'protocol.dart' as _i2;
+import 'dart:async' as _i2;
+import 'protocol.dart' as _i3;
+
+/// {@category Endpoint}
+class EndpointCreateScrapChatSession extends _i1.EndpointRef {
+  EndpointCreateScrapChatSession(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'createScrapChatSession';
+
+  _i2.Future<void> call({required String targetUrl}) =>
+      caller.callServerEndpoint<void>(
+        'createScrapChatSession',
+        'call',
+        {'targetUrl': targetUrl},
+      );
+
+  _i2.Future<void> createSession() => caller.callServerEndpoint<void>(
+        'createScrapChatSession',
+        'createSession',
+        {},
+      );
+}
+
+/// {@category Endpoint}
+class EndpointHandleApiScrapRequest extends _i1.EndpointRef {
+  EndpointHandleApiScrapRequest(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'handleApiScrapRequest';
+
+  _i2.Future<Map<String, dynamic>> call({
+    required int scrappableId,
+    required Map<String, dynamic> payload,
+  }) =>
+      caller.callServerEndpoint<Map<String, dynamic>>(
+        'handleApiScrapRequest',
+        'call',
+        {
+          'scrappableId': scrappableId,
+          'payload': payload,
+        },
+      );
+}
 
 class Client extends _i1.ServerpodClientShared {
   Client(
@@ -28,7 +71,7 @@ class Client extends _i1.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
           host,
-          _i2.Protocol(),
+          _i3.Protocol(),
           securityContext: securityContext,
           authenticationKeyManager: authenticationKeyManager,
           streamingConnectionTimeout: streamingConnectionTimeout,
@@ -37,10 +80,20 @@ class Client extends _i1.ServerpodClientShared {
           onSucceededCall: onSucceededCall,
           disconnectStreamsOnLostInternetConnection:
               disconnectStreamsOnLostInternetConnection,
-        ) {}
+        ) {
+    createScrapChatSession = EndpointCreateScrapChatSession(this);
+    handleApiScrapRequest = EndpointHandleApiScrapRequest(this);
+  }
+
+  late final EndpointCreateScrapChatSession createScrapChatSession;
+
+  late final EndpointHandleApiScrapRequest handleApiScrapRequest;
 
   @override
-  Map<String, _i1.EndpointRef> get endpointRefLookup => {};
+  Map<String, _i1.EndpointRef> get endpointRefLookup => {
+        'createScrapChatSession': createScrapChatSession,
+        'handleApiScrapRequest': handleApiScrapRequest,
+      };
 
   @override
   Map<String, _i1.ModuleEndpointCaller> get moduleLookup => {};

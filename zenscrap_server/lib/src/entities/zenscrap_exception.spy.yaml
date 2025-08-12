@@ -1,0 +1,4 @@
+exception: ZenScrapException
+fields:
+  title: String
+  description: String
