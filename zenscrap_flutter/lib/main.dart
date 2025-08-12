@@ -1,16 +1,22 @@
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:serverpod_auth_shared_flutter/serverpod_auth_shared_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:talker_riverpod_logger/talker_riverpod_logger_observer.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:flutter/material.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
+import 'package:zenscrap_flutter/src/core/utils/devide_utils.dart';
 import 'package:zenscrap_flutter/src/core/utils/talker.dart';
+import 'package:zenscrap_flutter/src/core/web/url_strategy.dart';
 import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 import 'package:zenscrap_flutter/src/providers/go_router_providers.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
+import 'package:zenscrap_flutter/src/providers/shared_preferences_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
@@ -30,26 +36,98 @@ late String serverUrl;
                                                                            | $$      
                                                                            |__/      
 */
-void main() {
+void main() async {
+  // Need to call this as we are using Flutter bindings before runApp is called.
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Configure URL strategy for web (removes the # from URLs)
+  configureUrlStrategy();
+
   const serverUrlFromEnv = String.fromEnvironment('SERVER_URL');
   final serverUrl =
       serverUrlFromEnv.isEmpty ? 'http://$localhost:8080/' : serverUrlFromEnv;
 
-  client = Client(serverUrl)
-    ..connectivityMonitor = FlutterConnectivityMonitor();
+  client = Client(
+    serverUrl,
+    authenticationKeyManager: FlutterAuthenticationKeyManager(),
+    connectionTimeout: Duration(minutes: 3),
+  )..connectivityMonitor = FlutterConnectivityMonitor();
+
+  AdaptiveDialog.instance.updateConfiguration(
+    defaultStyle:
+        DeviceUtils.isApple ? AdaptiveStyle.iOS : AdaptiveStyle.material,
+  );
+
+  final sessionManager = SessionManager(caller: client.modules.auth);
+  await sessionManager.initialize();
+
+  final pref = await SharedPreferences.getInstance();
 
   runApp(
-    TalkerWrapper(
+    RestartableApp(
+      key: restartableAppKey, // Use the GlobalKey here
+      client: client,
+      sessionManager: sessionManager,
+      sharedPreferences: pref,
+    ),
+  );
+}
+
+// Add a GlobalKey for the RestartableApp's state
+final GlobalKey<RestartableAppState> restartableAppKey =
+    GlobalKey<RestartableAppState>();
+
+class RestartableApp extends StatefulWidget {
+  final Client client;
+  final SessionManager sessionManager;
+  final SharedPreferences sharedPreferences;
+
+  const RestartableApp({
+    super.key, // Pass the key to the StatefulWidget
+    required this.client,
+    required this.sessionManager,
+    required this.sharedPreferences,
+  });
+
+  static void restart() {
+    // Using GlobalKey is robust for calling restart from anywhere.
+    restartableAppKey.currentState?.restartApp();
+  }
+
+  @override
+  State<RestartableApp> createState() => RestartableAppState();
+}
+
+class RestartableAppState extends State<RestartableApp> {
+  Key _key = UniqueKey();
+
+  void restartApp() {
+    setState(() {
+      _key = UniqueKey();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TalkerWrapper(
       talker: talker,
       options: const TalkerWrapperOptions(
         enableErrorAlerts: kDebugMode,
         enableExceptionAlerts: kDebugMode,
       ),
-      child: ProviderScope(observers: [
-        TalkerRiverpodObserver(),
-      ], child: const MyApp()),
-    ),
-  );
+      child: ProviderScope(
+        key:
+            _key, // This key change will re-create ProviderScope and its children
+        observers: [if (kDebugMode) TalkerRiverpodObserver(talker: talker)],
+        overrides: [
+          clientProvider.overrideWithValue(widget.client),
+          sessionManagerProvider.overrideWithValue(widget.sessionManager),
+          sharedPreferencesProvider.overrideWithValue(widget.sharedPreferences),
+        ],
+        child: const MyApp(), // MyApp and its providers will be reset
+      ),
+    );
+  }
 }
 
 class MyApp extends ConsumerStatefulWidget {
