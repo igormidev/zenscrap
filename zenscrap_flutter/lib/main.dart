@@ -79,10 +79,10 @@ class _MyAppState extends ConsumerState<MyApp> {
 
         next.mapOrNull(
           logged: (value) {
-            ref.read(routerProvider).go('/labels');
+            ref.read(routerProvider).go('/dashboard');
           },
           notSignedIn: (_) {
-            ref.read(routerProvider).go('/auth');
+            ref.read(routerProvider).go('/create-scrappable');
           },
         );
       });

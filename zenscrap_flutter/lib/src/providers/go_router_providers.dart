@@ -7,6 +7,7 @@ import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/splash_view.dart';
+import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/view/initial_chat_view.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -46,13 +47,14 @@ final routerProvider = StateProvider((ref) {
       if (haveUser == false) {
         // Allow unauthenticated access to auth, splash, and review session routes
         // The review route is public so anyone can help review hardcoded strings
-        if (path.contains('/auth') == false &&
+        if (path.contains('/create-scrappable') == false &&
             path.contains('/splash') == false) {
           return '/splash';
         }
       } else {
         // If user is authenticated and trying to access auth page, redirect to labels
-        if (path == '/auth' || path.contains('/auth')) {
+        if (path == '/create-scrappable' ||
+            path.contains('/create-scrappable')) {
           return '/create-scrappable';
         }
       }
@@ -71,6 +73,12 @@ final routerProvider = StateProvider((ref) {
         path: '/create-scrappable',
         builder: (context, state) {
           return InitialChatView();
+        },
+      ),
+      GoRoute(
+        path: '/dashboard',
+        builder: (context, state) {
+          return ScrappablesDashboard();
         },
       ),
     ],
