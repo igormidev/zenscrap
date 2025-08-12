@@ -1,4 +1,6 @@
+import 'package:openai_dart/openai_dart.dart';
 import 'package:serverpod/serverpod.dart';
+import 'package:zenscrap_server/src/core/scraping_bee.dart';
 
 import 'package:zenscrap_server/src/web/routes/root.dart';
 
@@ -22,6 +24,14 @@ void run(List<String> args) async {
     '/*',
   );
 
+  final String? scrapingBeeApiKey = pod.getPassword('scrapingBeeApiKey');
+  ScrapingBee.initialize(scrapingBeeApiKey ?? '');
+  final String? openAiApiKey = pod.getPassword('openAiApiKey');
+  openAiClient = OpenAIClient(apiKey: openAiApiKey);
+
   // Start the server.
   await pod.start();
 }
+
+final ScrapingBee scrapingBee = ScrapingBee();
+late final OpenAIClient openAiClient;

@@ -51,16 +51,16 @@ class HandleApiScrapRequestEndpoint extends Endpoint {
     }
 
     final String scrapExtractRules = scrappable.scrappingRules;
-    final String? scrapingBeeApi = session.passwords['scrapingBeeApi'];
+    final String? scrapingBeeApiKey = session.passwords['scrapingBeeApiKey'];
 
-    if (scrapingBeeApi == null) {
+    if (scrapingBeeApiKey == null) {
       throw Exception('ScrapingBee API key not configured');
     }
 
     final Dio dio = Dio();
     final String scrapingBeeUrl = 'https://app.scrapingbee.com/api/v1/';
     final Map<String, String> queryParameters = {
-      'api_key': scrapingBeeApi,
+      'api_key': scrapingBeeApiKey,
       'url': targetUrl,
       'extract_rules': scrapExtractRules,
       'render_js': 'true',

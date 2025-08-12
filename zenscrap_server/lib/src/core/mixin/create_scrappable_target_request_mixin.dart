@@ -1,9 +1,105 @@
+import 'dart:convert';
+
+import 'package:openai_dart/openai_dart.dart';
+import 'package:zenscrap_server/server.dart';
 import 'package:zenscrap_server/src/generated/entities/scrappable_target_request.dart';
 
 mixin CreateScrappableTargetRequestMixin {
   Future<ScrappableTargetRequestStructure> createMixinProvider({
     required String targetUrl,
-  }) async {}
+  }) async {
+    try {
+      final prompt = getPromptToGenerateScrappableTargetRequest(targetUrl);
+
+      final response = await openAiClient.createChatCompletion(
+        request: CreateChatCompletionRequest(
+          model:
+              const ChatCompletionModel.model(ChatCompletionModels.gpt4oMini),
+          messages: [
+            ChatCompletionMessage.system(
+              content:
+                  'You are a helpful assistant that analyzes URLs and converts them into structured data for API request handling.',
+            ),
+            ChatCompletionMessage.user(
+              content: ChatCompletionUserMessageContent.string(prompt),
+            ),
+          ],
+          responseFormat: ResponseFormat.jsonSchema(
+            jsonSchema: JsonSchemaObject(
+              name: 'ScrappableTargetRequest',
+              description:
+                  'Structured representation of a URL with path and query parameters',
+              strict: true,
+              schema: {
+                'type': 'object',
+                'properties': {
+                  'url': {
+                    'type': 'string',
+                    'description':
+                        'URL with path parameters replaced by placeholders in {param} format',
+                  },
+                  'queryParams': {
+                    'type': 'object',
+                    'description':
+                        'Map of query parameter names to their default values',
+                    'additionalProperties': {
+                      'type': ['string', 'null'],
+                    },
+                  },
+                  'pathParams': {
+                    'type': 'array',
+                    'description':
+                        'List of path parameter names found in the URL',
+                    'items': {
+                      'type': 'string',
+                    },
+                  },
+                },
+                'required': ['url', 'queryParams', 'pathParams'],
+                'additionalProperties': false,
+              },
+            ),
+          ),
+          temperature: 0.1,
+        ),
+      );
+
+      final content = response.choices.first.message.content;
+      if (content == null) {
+        throw Exception('OpenAI returned empty response');
+      }
+
+      final String jsonString = content.toString();
+
+      final Map<String, dynamic> jsonData = json.decode(jsonString);
+
+      final Map<String, String?> queryParams = {};
+      if (jsonData['queryParams'] != null) {
+        final dynamic queryParamsData = jsonData['queryParams'];
+        if (queryParamsData is Map) {
+          queryParamsData.forEach((key, value) {
+            queryParams[key.toString()] = value?.toString();
+          });
+        }
+      }
+
+      final List<String> pathParams = [];
+      if (jsonData['pathParams'] != null) {
+        final dynamic pathParamsData = jsonData['pathParams'];
+        if (pathParamsData is List) {
+          pathParams.addAll(pathParamsData.map((e) => e.toString()));
+        }
+      }
+
+      return ScrappableTargetRequestStructure(
+        url: jsonData['url']?.toString() ?? targetUrl,
+        queryParams: queryParams,
+        pathParams: pathParams,
+      );
+    } catch (e) {
+      throw Exception('Failed to generate structured URL data: $e');
+    }
+  }
 }
 
 String getPromptToGenerateScrappableTargetRequest(String url) =>

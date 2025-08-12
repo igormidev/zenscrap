@@ -6,7 +6,9 @@ import 'package:dio/dio.dart';
 class ScrapingBee {
   ScrapingBee()
       : _dio = Dio(BaseOptions(baseUrl: 'https://app.scrapingbee.com/api/v1/'));
-  String get apiKey => 'https://app.scrapingbee.com/api/v1/';
+  static String _apiKey = '';
+  static void initialize(String apiKey) => _apiKey = apiKey;
+
   final Dio _dio;
 
   /// Get the (optionally JS-rendered) HTML of a page
@@ -18,7 +20,7 @@ class ScrapingBee {
     Map<String, String>? headers,
   }) async {
     final query = <String, dynamic>{
-      'api_key': apiKey,
+      'api_key': _apiKey,
       'url': targetUrl,
       if (renderJs) 'render_js': 'true',
       if (waitMs != null) 'wait': waitMs,
@@ -50,7 +52,7 @@ class ScrapingBee {
     int? windowHeight, // e.g., 1080
   }) async {
     final query = <String, dynamic>{
-      'api_key': apiKey,
+      'api_key': _apiKey,
       'url': targetUrl,
       'render_js': 'true', // screenshots require JS rendering
       'screenshot': 'true',
@@ -73,7 +75,7 @@ class ScrapingBee {
   Future<({String html, Uint8List screenshot})> fetchHtmlAndScreenshot(
       String targetUrl) async {
     final query = <String, dynamic>{
-      'api_key': apiKey,
+      'api_key': _apiKey,
       'url': targetUrl,
       'render_js': 'true',
       'screenshot': 'true',
