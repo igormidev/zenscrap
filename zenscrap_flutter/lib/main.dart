@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +8,7 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:flutter/material.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
 import 'package:zenscrap_flutter/src/core/utils/talker.dart';
+import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 import 'package:zenscrap_flutter/src/providers/go_router_providers.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
@@ -103,7 +105,35 @@ class _MyAppState extends ConsumerState<MyApp> {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.cyanAccent),
+        cupertinoOverrideTheme: const CupertinoThemeData(
+          textTheme: CupertinoTextThemeData(),
+        ),
+        useMaterial3: true,
+        filledButtonTheme: FilledButtonThemeData(
+          style: FilledButton.styleFrom(
+            minimumSize: const Size(20, 50),
+            maximumSize: const Size(double.infinity, 50),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            textStyle: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ),
+      builder: (context, child) {
+        return Consumer(
+          child: child,
+          builder: (context, ref, child) {
+            final isGlobalLoading = ref.watch(isGlobalLoadingProvider);
+            return IgnorePointer(ignoring: isGlobalLoading, child: child);
+          },
+        );
+      },
     );
   }
 }

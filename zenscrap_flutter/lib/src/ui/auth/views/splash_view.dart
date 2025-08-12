@@ -47,6 +47,6 @@ class _SplashViewState extends ConsumerState<SplashView> {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold();
   }
 }
