@@ -13,8 +13,7 @@ mixin CreateScrappableTargetRequestMixin {
 
       final response = await openAiClient.createChatCompletion(
         request: CreateChatCompletionRequest(
-          model:
-              const ChatCompletionModel.model(ChatCompletionModels.gpt4oMini),
+          model: const ChatCompletionModel.model(ChatCompletionModels.gpt5),
           messages: [
             ChatCompletionMessage.system(
               content:

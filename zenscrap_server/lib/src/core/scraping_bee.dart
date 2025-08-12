@@ -72,7 +72,8 @@ class ScrapingBee {
   }
 
   /// One-call: get HTML + screenshot (base64) together using json_response
-  Future<({String html, Uint8List screenshot})> fetchHtmlAndScreenshot(
+  /// Ps: the image is in png format
+  Future<(String html, Uint8List screenshot)> fetchHtmlAndScreenshot(
       String targetUrl) async {
     final query = <String, dynamic>{
       'api_key': _apiKey,
@@ -90,6 +91,7 @@ class ScrapingBee {
 
     final body = (res.data?['body'] as String?) ?? '';
     final b64 = (res.data?['screenshot'] as String?) ?? '';
-    return (html: body, screenshot: base64Decode(b64));
+    return (body, base64Decode(b64));
+    // return (html: body, screenshot: base64Decode(b64));
   }
 }
