@@ -154,7 +154,7 @@ class _MyAppState extends ConsumerState<MyApp> {
   @override
   Widget build(BuildContext context) {
     ref.listen(sessionProvider, (previous, next) {
-      Future.delayed(const Duration(milliseconds: 100), () {
+      Future.delayed(const Duration(milliseconds: 300), () {
         ref.read(accountProvider.notifier).logOut();
 
         next.mapOrNull(
@@ -184,7 +184,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         GlobalCupertinoLocalizations.delegate,
       ],
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.cyanAccent),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         cupertinoOverrideTheme: const CupertinoThemeData(
           textTheme: CupertinoTextThemeData(),
         ),
@@ -204,6 +204,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         ),
       ),
       builder: (context, child) {
+        return child!;
         return Consumer(
           child: child,
           builder: (context, ref, child) {

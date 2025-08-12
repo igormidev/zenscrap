@@ -61,7 +61,8 @@ final routerProvider = StateProvider((ref) {
 
       return null;
     },
-    initialLocation: '/splash',
+    initialLocation: '/create-scrappable',
+    // initialLocation: '/splash',
     routes: [
       GoRoute(
         path: '/splash',
