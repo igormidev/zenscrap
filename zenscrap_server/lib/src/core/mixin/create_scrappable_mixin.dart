@@ -62,7 +62,6 @@ mixin CreateScrappableMixin {
             },
           ),
         ),
-        temperature: 0.7,
       ),
     );
 

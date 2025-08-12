@@ -59,7 +59,6 @@ mixin CreateScrappableTargetRequestMixin {
               },
             ),
           ),
-          temperature: 0.1,
         ),
       );
 
@@ -131,7 +130,7 @@ So I need you to return for me a json like:
 So, for example, if the user inputs the following example url:
 www.mySocialMedia.com/posts/123/comments/3854?sort=asc&filter=all
 
-Then your output should be (note that in this example you will need to deduce that 123 and 3854 are the postId and commentsId respectively):
+Then your output should be:
 ```json
 {
   "url": "www.mySocialMedia.com/posts/{postId}/comments/{commentsId}",
@@ -146,7 +145,11 @@ Then your output should be (note that in this example you will need to deduce th
 }
 ```
 
+
 With that example you can now understand what I want you to do with the url inputed by the user that I mentioned above.
+
+Ps: Note that in this example you will need to deduce that 123 and 3854 are the postId and commentsId respectively
+This is a thing we will need you will need to do, deduce the path params by the context of the rest of the url... If it is wrong the user will be able to correct it in the app later.
 
 Don't forget to return only the raw json without anything more, not even "```" in the beginning or the end, only the pure raw json because I will directly call jsonDecode on it in my dart code.
 Ultra think in the response so you generate a correct json and think in good path parameters names.
