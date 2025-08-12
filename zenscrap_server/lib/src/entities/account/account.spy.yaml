@@ -1,0 +1,9 @@
+class: AccountInfo
+table: account_info
+fields:
+  userInfo: module:auth:UserInfo?, relation
+  accountApiKey: AccountApiKey?, relation
+indexes:
+  user_info_id_unique_idx:  
+    fields: userInfoId  
+    unique: true

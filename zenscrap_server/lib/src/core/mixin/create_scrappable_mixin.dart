@@ -2,11 +2,13 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:openai_dart/openai_dart.dart';
+import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/server.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 mixin CreateScrappableMixin {
   Future<Scrappable> createScrappable({
+    required Session session,
     required ScrappableTargetRequestStructure requestStrcture,
     required String referenceUrl,
     required String userPrompt,
@@ -75,20 +77,38 @@ mixin CreateScrappableMixin {
     final String description =
         metadata['description'] ?? 'No description provided';
 
-    // Step 2: Generate scrapping rules using Gemini (existing method)
-    final String scrappingRules = await generateScrappingExtractRules(
-      requestStrcture: requestStrcture,
-      referenceUrl: referenceUrl,
-      userPrompt: userPrompt,
-    );
+    return session.db.transaction(
+      (transaction) async {
+        final ScrappableTargetRequestStructure insertedStructure =
+            await ScrappableTargetRequestStructure.db
+                .insertRow(session, requestStrcture, transaction: transaction);
 
-    // Step 3: Create and return the Scrappable model (not saved to database)
-    return Scrappable(
-      name: name,
-      description: description,
-      scrappingRules: scrappingRules,
-      isActive: true,
-      targetRequestId: 0, // Will be set when actually saving to database
+        // Step 2: Generate scrapping rules using Gemini (existing method)
+        final String scrappingRules = await generateScrappingExtractRules(
+          requestStrcture: requestStrcture,
+          referenceUrl: referenceUrl,
+          userPrompt: userPrompt,
+        );
+
+        // Step 3: Create and return the Scrappable model (not saved to database)
+        final insertedScrappable = await Scrappable.db.insertRow(
+            session,
+            Scrappable(
+              name: name,
+              description: description,
+              scrappingRules: scrappingRules,
+              isActive: true,
+              targetRequestId: insertedStructure.id!,
+              targetRequest: insertedStructure,
+            ),
+            transaction: transaction);
+
+        await Scrappable.db.attachRow.targetRequest(
+            session, insertedScrappable, insertedStructure,
+            transaction: transaction);
+
+        return insertedScrappable;
+      },
     );
   }
 

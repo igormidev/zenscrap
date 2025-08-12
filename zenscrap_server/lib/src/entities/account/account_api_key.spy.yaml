@@ -1,0 +1,4 @@
+class: AccountApiKey
+table: account_api_key
+fields:
+  apiKey: String

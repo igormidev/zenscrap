@@ -10,26 +10,50 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
-import '../endpoints/public/create_scrap_chat_session.dart' as _i2;
-import '../endpoints/public/handle_api_scrap_request.dart' as _i3;
+import '../endpoints/private/private_account_endpoint.dart' as _i2;
+import '../endpoints/public/create_scrap_chat_session.dart' as _i3;
+import '../endpoints/public/handle_api_scrap_request.dart' as _i4;
+import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i5;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
   void initializeEndpoints(_i1.Server server) {
     var endpoints = <String, _i1.Endpoint>{
-      'createScrapChatSession': _i2.CreateScrapChatSessionEndpoint()
+      'privateAccount': _i2.PrivateAccountEndpoint()
+        ..initialize(
+          server,
+          'privateAccount',
+          null,
+        ),
+      'createScrapChatSession': _i3.CreateScrapChatSessionEndpoint()
         ..initialize(
           server,
           'createScrapChatSession',
           null,
         ),
-      'handleApiScrapRequest': _i3.HandleApiScrapRequestEndpoint()
+      'handleApiScrapRequest': _i4.HandleApiScrapRequestEndpoint()
         ..initialize(
           server,
           'handleApiScrapRequest',
           null,
         ),
     };
+    connectors['privateAccount'] = _i1.EndpointConnector(
+      name: 'privateAccount',
+      endpoint: endpoints['privateAccount']!,
+      methodConnectors: {
+        'getAccountInfo': _i1.MethodConnector(
+          name: 'getAccountInfo',
+          params: {},
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['privateAccount'] as _i2.PrivateAccountEndpoint)
+                  .getAccountInfo(session),
+        )
+      },
+    );
     connectors['createScrapChatSession'] = _i1.EndpointConnector(
       name: 'createScrapChatSession',
       endpoint: endpoints['createScrapChatSession']!,
@@ -41,17 +65,23 @@ class Endpoints extends _i1.EndpointDispatch {
               name: 'targetUrl',
               type: _i1.getType<String>(),
               nullable: false,
-            )
+            ),
+            'userPrompt': _i1.ParameterDescription(
+              name: 'userPrompt',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
           },
           call: (
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
               (endpoints['createScrapChatSession']
-                      as _i2.CreateScrapChatSessionEndpoint)
+                      as _i3.CreateScrapChatSessionEndpoint)
                   .call(
             session,
             targetUrl: params['targetUrl'],
+            userPrompt: params['userPrompt'],
           ),
         ),
         'createSession': _i1.MethodConnector(
@@ -62,7 +92,7 @@ class Endpoints extends _i1.EndpointDispatch {
             Map<String, dynamic> params,
           ) async =>
               (endpoints['createScrapChatSession']
-                      as _i2.CreateScrapChatSessionEndpoint)
+                      as _i3.CreateScrapChatSessionEndpoint)
                   .createSession(session),
         ),
       },
@@ -90,7 +120,7 @@ class Endpoints extends _i1.EndpointDispatch {
             Map<String, dynamic> params,
           ) async =>
               (endpoints['handleApiScrapRequest']
-                      as _i3.HandleApiScrapRequestEndpoint)
+                      as _i4.HandleApiScrapRequestEndpoint)
                   .call(
             session,
             scrappableId: params['scrappableId'],
@@ -99,5 +129,6 @@ class Endpoints extends _i1.EndpointDispatch {
         )
       },
     );
+    modules['serverpod_auth'] = _i5.Endpoints()..initializeEndpoints(server);
   }
 }

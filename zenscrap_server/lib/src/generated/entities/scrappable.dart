@@ -20,8 +20,8 @@ abstract class Scrappable
     this.id,
     required this.name,
     required this.description,
-    required this.isActive,
     required this.scrappingRules,
+    required this.isActive,
     this.targetRequest,
     required this.targetRequestId,
   });
@@ -30,8 +30,8 @@ abstract class Scrappable
     int? id,
     required String name,
     required String description,
-    required bool isActive,
     required String scrappingRules,
+    required bool isActive,
     _i2.ScrappableTargetRequestStructure? targetRequest,
     required int targetRequestId,
   }) = _ScrappableImpl;
@@ -41,8 +41,8 @@ abstract class Scrappable
       id: jsonSerialization['id'] as int?,
       name: jsonSerialization['name'] as String,
       description: jsonSerialization['description'] as String,
-      isActive: jsonSerialization['isActive'] as bool,
       scrappingRules: jsonSerialization['scrappingRules'] as String,
+      isActive: jsonSerialization['isActive'] as bool,
       targetRequest: jsonSerialization['targetRequest'] == null
           ? null
           : _i2.ScrappableTargetRequestStructure.fromJson(
@@ -62,9 +62,9 @@ abstract class Scrappable
 
   String description;
 
-  bool isActive;
-
   String scrappingRules;
+
+  bool isActive;
 
   _i2.ScrappableTargetRequestStructure? targetRequest;
 
@@ -80,8 +80,8 @@ abstract class Scrappable
     int? id,
     String? name,
     String? description,
-    bool? isActive,
     String? scrappingRules,
+    bool? isActive,
     _i2.ScrappableTargetRequestStructure? targetRequest,
     int? targetRequestId,
   });
@@ -91,8 +91,8 @@ abstract class Scrappable
       if (id != null) 'id': id,
       'name': name,
       'description': description,
-      'isActive': isActive,
       'scrappingRules': scrappingRules,
+      'isActive': isActive,
       if (targetRequest != null) 'targetRequest': targetRequest?.toJson(),
       'targetRequestId': targetRequestId,
     };
@@ -104,8 +104,8 @@ abstract class Scrappable
       if (id != null) 'id': id,
       'name': name,
       'description': description,
-      'isActive': isActive,
       'scrappingRules': scrappingRules,
+      'isActive': isActive,
       if (targetRequest != null)
         'targetRequest': targetRequest?.toJsonForProtocol(),
       'targetRequestId': targetRequestId,
@@ -150,16 +150,16 @@ class _ScrappableImpl extends Scrappable {
     int? id,
     required String name,
     required String description,
-    required bool isActive,
     required String scrappingRules,
+    required bool isActive,
     _i2.ScrappableTargetRequestStructure? targetRequest,
     required int targetRequestId,
   }) : super._(
           id: id,
           name: name,
           description: description,
-          isActive: isActive,
           scrappingRules: scrappingRules,
+          isActive: isActive,
           targetRequest: targetRequest,
           targetRequestId: targetRequestId,
         );
@@ -172,8 +172,8 @@ class _ScrappableImpl extends Scrappable {
     Object? id = _Undefined,
     String? name,
     String? description,
-    bool? isActive,
     String? scrappingRules,
+    bool? isActive,
     Object? targetRequest = _Undefined,
     int? targetRequestId,
   }) {
@@ -181,8 +181,8 @@ class _ScrappableImpl extends Scrappable {
       id: id is int? ? id : this.id,
       name: name ?? this.name,
       description: description ?? this.description,
-      isActive: isActive ?? this.isActive,
       scrappingRules: scrappingRules ?? this.scrappingRules,
+      isActive: isActive ?? this.isActive,
       targetRequest: targetRequest is _i2.ScrappableTargetRequestStructure?
           ? targetRequest
           : this.targetRequest?.copyWith(),
@@ -201,12 +201,12 @@ class ScrappableTable extends _i1.Table<int?> {
       'description',
       this,
     );
-    isActive = _i1.ColumnBool(
-      'isActive',
-      this,
-    );
     scrappingRules = _i1.ColumnString(
       'scrappingRules',
+      this,
+    );
+    isActive = _i1.ColumnBool(
+      'isActive',
       this,
     );
     targetRequestId = _i1.ColumnInt(
@@ -219,9 +219,9 @@ class ScrappableTable extends _i1.Table<int?> {
 
   late final _i1.ColumnString description;
 
-  late final _i1.ColumnBool isActive;
-
   late final _i1.ColumnString scrappingRules;
+
+  late final _i1.ColumnBool isActive;
 
   _i2.ScrappableTargetRequestStructureTable? _targetRequest;
 
@@ -246,8 +246,8 @@ class ScrappableTable extends _i1.Table<int?> {
         id,
         name,
         description,
-        isActive,
         scrappingRules,
+        isActive,
         targetRequestId,
       ];
 

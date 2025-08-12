@@ -11,9 +11,14 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import 'package:serverpod/protocol.dart' as _i2;
-import 'entities/scrappable.dart' as _i3;
-import 'entities/scrappable_target_request.dart' as _i4;
-import 'entities/zenscrap_exception.dart' as _i5;
+import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i3;
+import 'entities/account/account.dart' as _i4;
+import 'entities/account/account_api_key.dart' as _i5;
+import 'entities/scrappable.dart' as _i6;
+import 'entities/scrappable_target_request.dart' as _i7;
+import 'entities/zenscrap_exception.dart' as _i8;
+export 'entities/account/account.dart';
+export 'entities/account/account_api_key.dart';
 export 'entities/scrappable.dart';
 export 'entities/scrappable_target_request.dart';
 export 'entities/zenscrap_exception.dart';
@@ -26,6 +31,122 @@ class Protocol extends _i1.SerializationManagerServer {
   static final Protocol _instance = Protocol._();
 
   static final List<_i2.TableDefinition> targetTableDefinitions = [
+    _i2.TableDefinition(
+      name: 'account_api_key',
+      dartName: 'AccountApiKey',
+      schema: 'public',
+      module: 'zenscrap',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'nextval(\'account_api_key_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'apiKey',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'account_api_key_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            )
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        )
+      ],
+      managed: true,
+    ),
+    _i2.TableDefinition(
+      name: 'account_info',
+      dartName: 'AccountInfo',
+      schema: 'public',
+      module: 'zenscrap',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'nextval(\'account_info_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'userInfoId',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _i2.ColumnDefinition(
+          name: 'accountApiKeyId',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+      ],
+      foreignKeys: [
+        _i2.ForeignKeyDefinition(
+          constraintName: 'account_info_fk_0',
+          columns: ['userInfoId'],
+          referenceTable: 'serverpod_user_info',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _i2.ForeignKeyAction.noAction,
+          onDelete: _i2.ForeignKeyAction.noAction,
+          matchType: null,
+        ),
+        _i2.ForeignKeyDefinition(
+          constraintName: 'account_info_fk_1',
+          columns: ['accountApiKeyId'],
+          referenceTable: 'account_api_key',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _i2.ForeignKeyAction.noAction,
+          onDelete: _i2.ForeignKeyAction.noAction,
+          matchType: null,
+        ),
+      ],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'account_info_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            )
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        ),
+        _i2.IndexDefinition(
+          indexName: 'user_info_id_unique_idx',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'userInfoId',
+            )
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
     _i2.TableDefinition(
       name: 'scrappable',
       dartName: 'Scrappable',
@@ -52,16 +173,16 @@ class Protocol extends _i1.SerializationManagerServer {
           dartType: 'String',
         ),
         _i2.ColumnDefinition(
-          name: 'isActive',
-          columnType: _i2.ColumnType.boolean,
-          isNullable: false,
-          dartType: 'bool',
-        ),
-        _i2.ColumnDefinition(
           name: 'scrappingRules',
           columnType: _i2.ColumnType.text,
           isNullable: false,
           dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'isActive',
+          columnType: _i2.ColumnType.boolean,
+          isNullable: false,
+          dartType: 'bool',
         ),
         _i2.ColumnDefinition(
           name: 'targetRequestId',
@@ -163,6 +284,7 @@ class Protocol extends _i1.SerializationManagerServer {
       ],
       managed: true,
     ),
+    ..._i3.Protocol.targetTableDefinitions,
     ..._i2.Protocol.targetTableDefinitions,
   ];
 
@@ -172,25 +294,37 @@ class Protocol extends _i1.SerializationManagerServer {
     Type? t,
   ]) {
     t ??= T;
-    if (t == _i3.Scrappable) {
-      return _i3.Scrappable.fromJson(data) as T;
+    if (t == _i4.AccountInfo) {
+      return _i4.AccountInfo.fromJson(data) as T;
     }
-    if (t == _i4.ScrappableTargetRequestStructure) {
-      return _i4.ScrappableTargetRequestStructure.fromJson(data) as T;
+    if (t == _i5.AccountApiKey) {
+      return _i5.AccountApiKey.fromJson(data) as T;
     }
-    if (t == _i5.ZenScrapException) {
-      return _i5.ZenScrapException.fromJson(data) as T;
+    if (t == _i6.Scrappable) {
+      return _i6.Scrappable.fromJson(data) as T;
     }
-    if (t == _i1.getType<_i3.Scrappable?>()) {
-      return (data != null ? _i3.Scrappable.fromJson(data) : null) as T;
+    if (t == _i7.ScrappableTargetRequestStructure) {
+      return _i7.ScrappableTargetRequestStructure.fromJson(data) as T;
     }
-    if (t == _i1.getType<_i4.ScrappableTargetRequestStructure?>()) {
+    if (t == _i8.ZenScrapException) {
+      return _i8.ZenScrapException.fromJson(data) as T;
+    }
+    if (t == _i1.getType<_i4.AccountInfo?>()) {
+      return (data != null ? _i4.AccountInfo.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i5.AccountApiKey?>()) {
+      return (data != null ? _i5.AccountApiKey.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i6.Scrappable?>()) {
+      return (data != null ? _i6.Scrappable.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i7.ScrappableTargetRequestStructure?>()) {
       return (data != null
-          ? _i4.ScrappableTargetRequestStructure.fromJson(data)
+          ? _i7.ScrappableTargetRequestStructure.fromJson(data)
           : null) as T;
     }
-    if (t == _i1.getType<_i5.ZenScrapException?>()) {
-      return (data != null ? _i5.ZenScrapException.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i8.ZenScrapException?>()) {
+      return (data != null ? _i8.ZenScrapException.fromJson(data) : null) as T;
     }
     if (t == Map<String, String?>) {
       return (data as Map).map((k, v) =>
@@ -204,6 +338,9 @@ class Protocol extends _i1.SerializationManagerServer {
           MapEntry(deserialize<String>(k), deserialize<dynamic>(v))) as T;
     }
     try {
+      return _i3.Protocol().deserialize<T>(data, t);
+    } on _i1.DeserializationTypeNotFoundException catch (_) {}
+    try {
       return _i2.Protocol().deserialize<T>(data, t);
     } on _i1.DeserializationTypeNotFoundException catch (_) {}
     return super.deserialize<T>(data, t);
@@ -213,18 +350,28 @@ class Protocol extends _i1.SerializationManagerServer {
   String? getClassNameForObject(Object? data) {
     String? className = super.getClassNameForObject(data);
     if (className != null) return className;
-    if (data is _i3.Scrappable) {
+    if (data is _i4.AccountInfo) {
+      return 'AccountInfo';
+    }
+    if (data is _i5.AccountApiKey) {
+      return 'AccountApiKey';
+    }
+    if (data is _i6.Scrappable) {
       return 'Scrappable';
     }
-    if (data is _i4.ScrappableTargetRequestStructure) {
+    if (data is _i7.ScrappableTargetRequestStructure) {
       return 'ScrappableTargetRequestStructure';
     }
-    if (data is _i5.ZenScrapException) {
+    if (data is _i8.ZenScrapException) {
       return 'ZenScrapException';
     }
     className = _i2.Protocol().getClassNameForObject(data);
     if (className != null) {
       return 'serverpod.$className';
+    }
+    className = _i3.Protocol().getClassNameForObject(data);
+    if (className != null) {
+      return 'serverpod_auth.$className';
     }
     return null;
   }
@@ -235,18 +382,28 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName is! String) {
       return super.deserializeByClassName(data);
     }
+    if (dataClassName == 'AccountInfo') {
+      return deserialize<_i4.AccountInfo>(data['data']);
+    }
+    if (dataClassName == 'AccountApiKey') {
+      return deserialize<_i5.AccountApiKey>(data['data']);
+    }
     if (dataClassName == 'Scrappable') {
-      return deserialize<_i3.Scrappable>(data['data']);
+      return deserialize<_i6.Scrappable>(data['data']);
     }
     if (dataClassName == 'ScrappableTargetRequestStructure') {
-      return deserialize<_i4.ScrappableTargetRequestStructure>(data['data']);
+      return deserialize<_i7.ScrappableTargetRequestStructure>(data['data']);
     }
     if (dataClassName == 'ZenScrapException') {
-      return deserialize<_i5.ZenScrapException>(data['data']);
+      return deserialize<_i8.ZenScrapException>(data['data']);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);
       return _i2.Protocol().deserializeByClassName(data);
+    }
+    if (dataClassName.startsWith('serverpod_auth.')) {
+      data['className'] = dataClassName.substring(15);
+      return _i3.Protocol().deserializeByClassName(data);
     }
     return super.deserializeByClassName(data);
   }
@@ -254,16 +411,26 @@ class Protocol extends _i1.SerializationManagerServer {
   @override
   _i1.Table? getTableForType(Type t) {
     {
+      var table = _i3.Protocol().getTableForType(t);
+      if (table != null) {
+        return table;
+      }
+    }
+    {
       var table = _i2.Protocol().getTableForType(t);
       if (table != null) {
         return table;
       }
     }
     switch (t) {
-      case _i3.Scrappable:
-        return _i3.Scrappable.t;
-      case _i4.ScrappableTargetRequestStructure:
-        return _i4.ScrappableTargetRequestStructure.t;
+      case _i4.AccountInfo:
+        return _i4.AccountInfo.t;
+      case _i5.AccountApiKey:
+        return _i5.AccountApiKey.t;
+      case _i6.Scrappable:
+        return _i6.Scrappable.t;
+      case _i7.ScrappableTargetRequestStructure:
+        return _i7.ScrappableTargetRequestStructure.t;
     }
     return null;
   }

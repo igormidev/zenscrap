@@ -1,3 +1,5 @@
+privateAccount:
+  - getAccountInfo:
 createScrapChatSession:
   - call:
   - createSession:

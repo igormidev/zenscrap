@@ -1,7 +1,10 @@
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:openai_dart/openai_dart.dart';
 import 'package:serverpod/serverpod.dart';
+import 'package:zenscrap_server/src/auth/handlers/on_send_reset_email.dart';
+import 'package:zenscrap_server/src/auth/handlers/on_send_validation_email.dart';
 import 'package:zenscrap_server/src/core/scraping_bee.dart';
+import 'package:serverpod_auth_server/serverpod_auth_server.dart' as auth;
 
 import 'package:zenscrap_server/src/web/routes/root.dart';
 
@@ -14,7 +17,12 @@ import 'src/generated/endpoints.dart';
 
 void run(List<String> args) async {
   // Initialize Serverpod and connect it with your generated code.
-  final pod = Serverpod(args, Protocol(), Endpoints());
+  final pod = Serverpod(
+    args,
+    Protocol(),
+    Endpoints(),
+    authenticationHandler: auth.authenticationHandler,
+  );
 
   // Setup a default page at the web root.
   pod.webServer.addRoute(RouteRoot(), '/');
@@ -24,6 +32,11 @@ void run(List<String> args) async {
     RouteStaticDirectory(serverDirectory: 'static', basePath: '/'),
     '/*',
   );
+
+  auth.AuthConfig.set(auth.AuthConfig(
+    sendValidationEmail: onSendValidationEmail,
+    sendPasswordResetEmail: onSendResetEmail,
+  ));
 
   final String? scrapingBeeApiKey = pod.getPassword('scrapingBeeApiKey');
   ScrapingBee.initialize(scrapingBeeApiKey ?? '');
