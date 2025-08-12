@@ -5,7 +5,7 @@ import 'package:zenscrap_server/src/generated/entities/scrappable_target_request
 
 (String, int) getNameAndAge() => ('Alice', 30);
 mixin CreateScrappableMixin {
-  Future<void> createInitialScrappableMixin({
+  Future<ScrappingRulesEncoded> createInitialScrappableMixin({
     required ScrappableTargetRequestStructure requestStrcture,
     required String referenceUrl,
     required String userPrompt,
@@ -23,7 +23,7 @@ mixin CreateScrappableMixin {
           ),
           ChatCompletionMessage.user(
             content: ChatCompletionUserMessageContent.string(
-              getPromptToGenerateScrappableTargetRequest(
+              getPromptToGenerateScrappableExtractRules(
                 requestStrcture: requestStrcture,
                 referenceUrl: referenceUrl,
                 userPrompt: userPrompt,
@@ -37,7 +37,10 @@ mixin CreateScrappableMixin {
   }
 }
 
-String getPromptToGenerateScrappableTargetRequest({
+typedef ScrappingRulesJson = Map<String, dynamic>;
+typedef ScrappingRulesEncoded = String;
+
+String getPromptToGenerateScrappableExtractRules({
   required ScrappableTargetRequestStructure requestStrcture,
   required String referenceUrl,
   required String userPrompt,
@@ -82,6 +85,7 @@ I need you to create that extraction rules (extract_rules) for me.
 I will attach bellow the HTML of a reference page that the user gived me and asked to use it as a reference to create the extraction rules.
 The link of the reference page is: "$referenceUrl".
 The html resulted of this link attached bellow, use it to build the rules that will return exactly the data the user asked for.
+I will also attach a print of the site so you can see the layout and design for a better overall understanding/context.
 
 I need to you double check that you are not hallucinating and creating rules to path that don't exist. By the way, ultra think in your response and think for a long time.
 ''';
