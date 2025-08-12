@@ -3,8 +3,8 @@ table: scrappable
 fields:
   name: String
   description: String
-  isActive: bool
   scrappingRules: String
+  isActive: bool
   targetRequest: ScrappableTargetRequestStructure?, relation(name=target_scrappable, field=targetRequestId)
   targetRequestId: int
 indexes:

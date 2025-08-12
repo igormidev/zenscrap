@@ -1,0 +1,5 @@
+createScrapChatSession:
+  - call:
+  - createSession:
+handleApiScrapRequest:
+  - call:

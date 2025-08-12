@@ -9,7 +9,7 @@ environment:
 dependencies:
   serverpod: 2.9.1
   openai_dart: ^0.5.4
-  dart_openai: ^5.1.0
+  google_generative_ai: ^0.4.6
   dio: ^5.9.0
   http: ^1.5.0
   http_parser: ^4.1.2

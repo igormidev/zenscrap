@@ -13,8 +13,10 @@ import 'package:serverpod/serverpod.dart' as _i1;
 import 'package:serverpod/protocol.dart' as _i2;
 import 'entities/scrappable.dart' as _i3;
 import 'entities/scrappable_target_request.dart' as _i4;
+import 'entities/zenscrap_exception.dart' as _i5;
 export 'entities/scrappable.dart';
 export 'entities/scrappable_target_request.dart';
+export 'entities/zenscrap_exception.dart';
 
 class Protocol extends _i1.SerializationManagerServer {
   Protocol._();
@@ -176,6 +178,9 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i4.ScrappableTargetRequestStructure) {
       return _i4.ScrappableTargetRequestStructure.fromJson(data) as T;
     }
+    if (t == _i5.ZenScrapException) {
+      return _i5.ZenScrapException.fromJson(data) as T;
+    }
     if (t == _i1.getType<_i3.Scrappable?>()) {
       return (data != null ? _i3.Scrappable.fromJson(data) : null) as T;
     }
@@ -184,12 +189,19 @@ class Protocol extends _i1.SerializationManagerServer {
           ? _i4.ScrappableTargetRequestStructure.fromJson(data)
           : null) as T;
     }
+    if (t == _i1.getType<_i5.ZenScrapException?>()) {
+      return (data != null ? _i5.ZenScrapException.fromJson(data) : null) as T;
+    }
     if (t == Map<String, String?>) {
       return (data as Map).map((k, v) =>
           MapEntry(deserialize<String>(k), deserialize<String?>(v))) as T;
     }
     if (t == List<String>) {
       return (data as List).map((e) => deserialize<String>(e)).toList() as T;
+    }
+    if (t == Map<String, dynamic>) {
+      return (data as Map).map((k, v) =>
+          MapEntry(deserialize<String>(k), deserialize<dynamic>(v))) as T;
     }
     try {
       return _i2.Protocol().deserialize<T>(data, t);
@@ -206,6 +218,9 @@ class Protocol extends _i1.SerializationManagerServer {
     }
     if (data is _i4.ScrappableTargetRequestStructure) {
       return 'ScrappableTargetRequestStructure';
+    }
+    if (data is _i5.ZenScrapException) {
+      return 'ZenScrapException';
     }
     className = _i2.Protocol().getClassNameForObject(data);
     if (className != null) {
@@ -225,6 +240,9 @@ class Protocol extends _i1.SerializationManagerServer {
     }
     if (dataClassName == 'ScrappableTargetRequestStructure') {
       return deserialize<_i4.ScrappableTargetRequestStructure>(data['data']);
+    }
+    if (dataClassName == 'ZenScrapException') {
+      return deserialize<_i5.ZenScrapException>(data['data']);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);
