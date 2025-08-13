@@ -41,8 +41,9 @@ mixin CreateScrappableTargetRequestMixin {
                     'type': 'object',
                     'description':
                         'Map of query parameter names to their default values',
+                    'properties': {},
                     'additionalProperties': {
-                      'type': ['string', 'null'],
+                      'type': 'string',
                     },
                   },
                   'pathParams': {
