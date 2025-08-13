@@ -1,4 +1,0 @@
-class: PromptAiErrorResponse
-extends: ZenScrapRedraftState
-fields:
-    aiGeneratedErrorMessage: String

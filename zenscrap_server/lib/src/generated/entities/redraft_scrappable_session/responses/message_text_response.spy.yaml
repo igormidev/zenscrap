@@ -1,0 +1,4 @@
+class: MessageTextResponse
+extends: ZenScrapRedraftState
+fields:
+    messageText: String

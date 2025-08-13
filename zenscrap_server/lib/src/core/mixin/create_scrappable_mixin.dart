@@ -32,9 +32,6 @@ mixin CreateScrappableMixin {
           ChatCompletionMessage.user(
             content: ChatCompletionUserMessageContent.string(
                 nameAndDescriptionPrompt),
-            // content: ChatCompletionUserMessageContent.parts([
-            //   ChatCompletionMessageContentPart.image(imageUrl: ),
-            // ]),
           ),
         ],
         responseFormat: ResponseFormat.jsonSchema(
@@ -84,6 +81,7 @@ mixin CreateScrappableMixin {
 
         // Step 2: Generate scrapping rules using Gemini (existing method)
         final String scrappingRules = await generateScrappingExtractRules(
+          session: session,
           requestStrcture: requestStrcture,
           referenceUrl: referenceUrl,
           userPrompt: userPrompt,
@@ -112,6 +110,7 @@ mixin CreateScrappableMixin {
   }
 
   Future<ScrappingRulesEncoded> generateScrappingExtractRules({
+    required Session session,
     required ScrappableTargetRequestStructure requestStrcture,
     required String referenceUrl,
     required String userPrompt,
@@ -129,6 +128,18 @@ mixin CreateScrappableMixin {
     // Convert HTML to bytes for file-like upload
     final Uint8List htmlBytes = utf8.encode(html);
 
+    final String? geminiApiKey = session.passwords['geminiApiKey'];
+    if (geminiApiKey == null) {
+      throw ZenScrapException(
+        title: 'Gemini API Key Not Found',
+        description: 'Please configure the Gemini API key in the serverpod.',
+      );
+    }
+
+    final geminiModel = GenerativeModel(
+      model: 'gemini-2.5-pro',
+      apiKey: geminiApiKey,
+    );
     // Create multimodal content with text prompt, HTML file, and image
     final response = await geminiModel.generateContent([
       Content.multi([

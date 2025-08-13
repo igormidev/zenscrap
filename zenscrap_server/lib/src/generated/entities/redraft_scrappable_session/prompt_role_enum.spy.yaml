@@ -1,0 +1,6 @@
+enum: PromptRole
+serialized: byName
+values:
+  - system
+  - user
+  - model

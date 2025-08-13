@@ -1,5 +1,0 @@
-class: PromptAiTextAndNewExtractRulesResponse
-extends: ZenScrapRedraftState
-fields:
-    aiGeneratedTextMessage: String
-    newExtractRules: String

@@ -37,3 +37,4 @@ fields:
     referenceHtmlPage: String
     referenceLink: String
     referenceQueryParametersJson: String
+    extractedRulesUsed: String

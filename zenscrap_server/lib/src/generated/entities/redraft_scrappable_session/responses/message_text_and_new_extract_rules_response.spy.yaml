@@ -1,0 +1,5 @@
+class: MessageTextAndNewExtractRulesResponse
+extends: ZenScrapRedraftState
+fields:
+    messageText: String
+    newExtractRules: String

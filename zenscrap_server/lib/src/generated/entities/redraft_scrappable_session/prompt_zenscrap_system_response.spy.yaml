@@ -1,4 +1,0 @@
-class: PromptZenScrapSystemResponse
-extends: ZenScrapRedraftState
-fields:
-    automaticSystemTextMessage: String

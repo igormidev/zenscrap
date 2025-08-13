@@ -11,13 +11,13 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import '../../../protocol.dart' as _i1;
 import 'package:serverpod_client/serverpod_client.dart' as _i2;
-part 'prompt_ai_error_response.dart';
-part 'prompt_ai_only_test_response.dart';
-part 'prompt_ai_text_and_new_extract_rule_response.dart';
-part 'prompt_zenscrap_system_response.dart';
+import 'prompt_role_enum.dart' as _i3;
+part 'responses/error_text_response.dart';
+part 'responses/message_text_and_new_extract_rules_response.dart';
+part 'responses/message_text_response.dart';
 
 sealed class ZenScrapRedraftState implements _i2.SerializableModel {
-  ZenScrapRedraftState({required this.name});
+  ZenScrapRedraftState({required this.role});
 
-  String name;
+  _i3.PromptRole role;
 }

@@ -1,4 +1,4 @@
 class: ZenScrapRedraftState
 sealed: true
 fields:
-    name: String
+    role: PromptRole

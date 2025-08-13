@@ -10,7 +10,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
-import '../entities/scrappable.dart' as _i2;
+import '../../entities/scrappable/scrappable.dart' as _i2;
 
 abstract class ScrappableTargetRequestStructure
     implements _i1.SerializableModel {

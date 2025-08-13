@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:openai_dart/openai_dart.dart';
 import 'package:zenscrap_server/server.dart';
-import 'package:zenscrap_server/src/generated/entities/scrappable_target_request.dart';
+import 'package:zenscrap_server/src/generated/protocol.dart';
 
 mixin CreateScrappableTargetRequestMixin {
   Future<ScrappableTargetRequestStructure> createMixinProvider({

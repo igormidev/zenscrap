@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:serverpod/serverpod.dart';
-import 'package:zenscrap_server/src/generated/entities/scrappable.dart';
-import 'package:zenscrap_server/src/generated/entities/scrappable_target_request.dart';
+import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class HandleApiScrapRequestEndpoint extends Endpoint {
   Future<Map<String, dynamic>> call(

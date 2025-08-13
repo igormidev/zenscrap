@@ -1,0 +1,7 @@
+class: ReferenceTestData
+fields:
+    referenceHtmlPage: String
+    referenceLink: String
+    referenceQueryParametersJson: String
+    referenceSiteScreenshot: ByteData
+    extractedRulesUsed: String

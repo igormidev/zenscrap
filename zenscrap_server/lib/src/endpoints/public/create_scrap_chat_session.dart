@@ -1,7 +1,7 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/core/mixin/create_scrappable_mixin.dart';
 import 'package:zenscrap_server/src/core/mixin/create_scrappable_target_request_mixin.dart';
-import 'package:zenscrap_server/src/generated/entities/scrappable.dart';
+import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class CreateScrapChatSessionEndpoint extends Endpoint
     with CreateScrappableTargetRequestMixin, CreateScrappableMixin {
