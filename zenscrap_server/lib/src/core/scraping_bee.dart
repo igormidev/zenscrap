@@ -83,6 +83,7 @@ class ScrapingBee {
       'url': targetUrl,
       'render_js': 'true',
       'screenshot': 'true',
+      'wait': 3000.toString(),
       'screenshot_full_page': 'true',
       'json_response': 'true',
     };
@@ -141,7 +142,8 @@ class ScrapingBee {
             ? Map<String, dynamic>.from(response.data as Map)
             : response.data as Map<String, dynamic>;
         return ExtractDataByRule.erorr(
-          errorMessage: 'ScrapingBee API error: ${errorResponse['message'] ?? 'Unknown error'} (Status: ${response.statusCode})',
+          errorMessage:
+              'ScrapingBee API error: ${errorResponse['message'] ?? 'Unknown error'} (Status: ${response.statusCode})',
         );
       }
     } on DioException catch (e) {
@@ -150,7 +152,8 @@ class ScrapingBee {
             ? Map<String, dynamic>.from(e.response!.data as Map)
             : e.response!.data as Map<String, dynamic>;
         return ExtractDataByRule.erorr(
-          errorMessage: 'ScrapingBee API error: ${errorResponse['message'] ?? 'Unknown error'} (Status: ${e.response!.statusCode})',
+          errorMessage:
+              'ScrapingBee API error: ${errorResponse['message'] ?? 'Unknown error'} (Status: ${e.response!.statusCode})',
         );
       }
       return ExtractDataByRule.erorr(
@@ -167,7 +170,7 @@ class ScrapingBee {
 @freezed
 class ExtractDataByRule with _$ExtractDataByRule {
   const ExtractDataByRule._();
-  
+
   const factory ExtractDataByRule.withData({
     required Map<String, dynamic> result,
   }) = _ExtractDataByRuleWithData;

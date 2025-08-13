@@ -1,4 +1,3 @@
-import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:openai_dart/openai_dart.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/auth/handlers/on_send_reset_email.dart';
@@ -43,20 +42,9 @@ void run(List<String> args) async {
   final String? openAiApiKey = pod.getPassword('openAiApiKey');
   openAiClient = OpenAIClient(apiKey: openAiApiKey);
 
-  // Initialize Gemini
-  final String? geminiApiKey = pod.getPassword('geminiApiKey');
-  if (geminiApiKey != null) {
-    geminiModel = GenerativeModel(
-      model: 'gemini-2.5-pro',
-      // model: 'gemini-1.5-flash',
-      apiKey: geminiApiKey,
-    );
-  }
-
   // Start the server.
   await pod.start();
 }
 
 final ScrapingBee scrapingBee = ScrapingBee();
 late final OpenAIClient openAiClient;
-late final GenerativeModel geminiModel;

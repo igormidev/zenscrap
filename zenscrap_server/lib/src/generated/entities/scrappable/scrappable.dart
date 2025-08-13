@@ -13,6 +13,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../entities/scrappable/scrappable_target_request.dart' as _i2;
+import '../../entities/scrappable/reference_test_data.dart' as _i3;
 
 abstract class Scrappable
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -24,6 +25,7 @@ abstract class Scrappable
     required this.isActive,
     this.targetRequest,
     required this.targetRequestId,
+    required this.testData,
   });
 
   factory Scrappable({
@@ -34,6 +36,7 @@ abstract class Scrappable
     required bool isActive,
     _i2.ScrappableTargetRequestStructure? targetRequest,
     required int targetRequestId,
+    required _i3.ReferenceTestData testData,
   }) = _ScrappableImpl;
 
   factory Scrappable.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -48,6 +51,8 @@ abstract class Scrappable
           : _i2.ScrappableTargetRequestStructure.fromJson(
               (jsonSerialization['targetRequest'] as Map<String, dynamic>)),
       targetRequestId: jsonSerialization['targetRequestId'] as int,
+      testData: _i3.ReferenceTestData.fromJson(
+          (jsonSerialization['testData'] as Map<String, dynamic>)),
     );
   }
 
@@ -70,6 +75,8 @@ abstract class Scrappable
 
   int targetRequestId;
 
+  _i3.ReferenceTestData testData;
+
   @override
   _i1.Table<int?> get table => t;
 
@@ -84,6 +91,7 @@ abstract class Scrappable
     bool? isActive,
     _i2.ScrappableTargetRequestStructure? targetRequest,
     int? targetRequestId,
+    _i3.ReferenceTestData? testData,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -95,6 +103,7 @@ abstract class Scrappable
       'isActive': isActive,
       if (targetRequest != null) 'targetRequest': targetRequest?.toJson(),
       'targetRequestId': targetRequestId,
+      'testData': testData.toJson(),
     };
   }
 
@@ -109,6 +118,7 @@ abstract class Scrappable
       if (targetRequest != null)
         'targetRequest': targetRequest?.toJsonForProtocol(),
       'targetRequestId': targetRequestId,
+      'testData': testData.toJsonForProtocol(),
     };
   }
 
@@ -154,6 +164,7 @@ class _ScrappableImpl extends Scrappable {
     required bool isActive,
     _i2.ScrappableTargetRequestStructure? targetRequest,
     required int targetRequestId,
+    required _i3.ReferenceTestData testData,
   }) : super._(
           id: id,
           name: name,
@@ -162,6 +173,7 @@ class _ScrappableImpl extends Scrappable {
           isActive: isActive,
           targetRequest: targetRequest,
           targetRequestId: targetRequestId,
+          testData: testData,
         );
 
   /// Returns a shallow copy of this [Scrappable]
@@ -176,6 +188,7 @@ class _ScrappableImpl extends Scrappable {
     bool? isActive,
     Object? targetRequest = _Undefined,
     int? targetRequestId,
+    _i3.ReferenceTestData? testData,
   }) {
     return Scrappable(
       id: id is int? ? id : this.id,
@@ -187,6 +200,7 @@ class _ScrappableImpl extends Scrappable {
           ? targetRequest
           : this.targetRequest?.copyWith(),
       targetRequestId: targetRequestId ?? this.targetRequestId,
+      testData: testData ?? this.testData.copyWith(),
     );
   }
 }
@@ -213,6 +227,10 @@ class ScrappableTable extends _i1.Table<int?> {
       'targetRequestId',
       this,
     );
+    testData = _i1.ColumnSerializable(
+      'testData',
+      this,
+    );
   }
 
   late final _i1.ColumnString name;
@@ -226,6 +244,8 @@ class ScrappableTable extends _i1.Table<int?> {
   _i2.ScrappableTargetRequestStructureTable? _targetRequest;
 
   late final _i1.ColumnInt targetRequestId;
+
+  late final _i1.ColumnSerializable testData;
 
   _i2.ScrappableTargetRequestStructureTable get targetRequest {
     if (_targetRequest != null) return _targetRequest!;
@@ -249,6 +269,7 @@ class ScrappableTable extends _i1.Table<int?> {
         scrappingRules,
         isActive,
         targetRequestId,
+        testData,
       ];
 
   @override

@@ -4,6 +4,7 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:openai_dart/openai_dart.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/server.dart';
+import 'package:zenscrap_server/src/core/scraping_bee.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 mixin CreateScrappableMixin {
@@ -115,15 +116,9 @@ mixin CreateScrappableMixin {
     required String referenceUrl,
     required String userPrompt,
   }) async {
+    // Fetch page content
     var (String html, Uint8List pageFullscreenScreenshot) =
         await scrapingBee.fetchHtmlAndScreenshot(referenceUrl);
-
-    // Create the prompt with all context
-    final String fullPrompt = getPromptToGenerateScrappableExtractRules(
-      requestStrcture: requestStrcture,
-      referenceUrl: referenceUrl,
-      userPrompt: userPrompt,
-    );
 
     // Convert HTML to bytes for file-like upload
     final Uint8List htmlBytes = utf8.encode(html);
@@ -139,40 +134,172 @@ mixin CreateScrappableMixin {
     final geminiModel = GenerativeModel(
       model: 'gemini-2.5-pro',
       apiKey: geminiApiKey,
+      generationConfig: GenerationConfig(
+        responseMimeType: 'application/json',
+        responseSchema: Schema(
+          SchemaType.object,
+          properties: {
+            'rules': Schema(
+              SchemaType.object,
+              description:
+                  'CSS selectors or XPath expressions for data extraction. Each key is the data field name and value is the CSS selector.',
+            ),
+          },
+          requiredProperties: ['rules'],
+        ),
+      ),
     );
-    // Create multimodal content with text prompt, HTML file, and image
-    final response = await geminiModel.generateContent([
-      Content.multi([
-        // Main prompt
-        TextPart(fullPrompt),
-        // HTML as a file data part
-        DataPart('text/html', htmlBytes),
-        // Screenshot as image data
-        DataPart('image/png', pageFullscreenScreenshot),
-      ])
-    ]);
 
-    final responseText = response.text;
-    if (responseText == null || responseText.isEmpty) {
-      throw Exception('Gemini returned empty response');
-    }
+    // Start a chat session with system context
+    final chat = geminiModel.startChat(
+      history: [
+        Content.system(
+            '''You are an expert at creating web scraping extraction rules that are compliant with "extract rules" feature of ScrapingBee
+The overall documentation of ScrapingBee is: "https://www.scrapingbee.com/documentation/data-extraction/#basic-usage", you can web research and read it if needed to understand how it works if needed.
 
-    // Parse the JSON response
-    try {
-      // Clean the response in case it has markdown formatting
-      String cleanJson = responseText;
-      if (cleanJson.contains('```json')) {
-        cleanJson = cleanJson.split('```json')[1].split('```')[0].trim();
-      } else if (cleanJson.contains('```')) {
-        cleanJson = cleanJson.split('```')[1].split('```')[0].trim();
+You analyze HTML and screenshots to generate precise CSS selectors that will extract the requested data.
+Always return valid JSON with a "rules" object containing field names as keys and CSS selectors as values.
+Be extremely precise with your selectors to ensure they work correctly.
+Think step-by-step through the HTML structure to find the exact elements needed.'''),
+      ],
+    );
+
+    // Initial prompt content
+    final String initialPrompt = getPromptToGenerateScrappableExtractRules(
+      requestStrcture: requestStrcture,
+      referenceUrl: referenceUrl,
+      userPrompt: userPrompt,
+    );
+
+    // Try up to 3 times
+    String? lastError;
+    for (int attempt = 1; attempt <= 3; attempt++) {
+      try {
+        // Prepare the message content based on attempt
+        final Content messageContent;
+
+        if (attempt == 1) {
+          // First attempt: send initial prompt with HTML and screenshot
+          messageContent = Content.multi([
+            TextPart(initialPrompt),
+            DataPart('text/html', htmlBytes),
+            DataPart('image/png', pageFullscreenScreenshot),
+          ]);
+        } else {
+          // For retries, send the retry prompt with error context
+          messageContent = Content.text(
+            _getRetryPrompt(
+                attempt - 1, lastError ?? 'Previous attempt failed'),
+          );
+        }
+
+        // Send message and collect stream response
+        final responseStream = chat.sendMessageStream(messageContent);
+
+        // Accumulate the streaming response
+        final StringBuffer responseBuffer = StringBuffer();
+        await for (final chunk in responseStream) {
+          final text = chunk.text;
+          if (text != null && text.isNotEmpty) {
+            responseBuffer.write(text);
+          }
+        }
+
+        final String responseText = responseBuffer.toString();
+        if (responseText.isEmpty) {
+          throw Exception('Gemini returned empty response');
+        }
+
+        // Parse the JSON response directly (schema ensures it's valid JSON)
+        Map<String, dynamic> parsedResponse;
+        try {
+          parsedResponse = json.decode(responseText);
+        } catch (e) {
+          throw Exception('Failed to parse AI response as JSON: $e');
+        }
+
+        // Extract the rules from the response
+        final Map<String, dynamic> extractionRules = parsedResponse['rules']!;
+        // parsedResponse['rules'] ?? parsedResponse;
+        final String encodedRules = json.encode(extractionRules);
+
+        // Validate the rules using extractByRules
+        final ExtractDataByRule validationResult =
+            await scrapingBee.extractByRules(
+          targetUrl: referenceUrl,
+          extractRules: encodedRules,
+        );
+
+        // Check if validation was successful
+        final bool isSuccess = validationResult.when(
+          withData: (data) => data.isNotEmpty,
+          erorr: (_) => false,
+        );
+
+        if (isSuccess) {
+          return encodedRules;
+        }
+
+        // If validation failed, store error for next retry
+        lastError = validationResult.when(
+          withData: (_) => 'Validation succeeded but no data was extracted',
+          erorr: (error) => error,
+        );
+
+        // If this was the last attempt, throw exception
+        if (attempt == 3) {
+          throw ZenScrapException(
+            title: 'Failed to generate valid extraction rules',
+            description:
+                'After 3 attempts, the extraction rules could not be validated. Last error: $lastError',
+          );
+        }
+      } catch (e) {
+        // Store error for next retry
+        lastError = e.toString();
+
+        // If this was the last attempt, throw exception
+        if (attempt == 3) {
+          throw ZenScrapException(
+            title: 'Failed to generate extraction rules',
+            description:
+                'After 3 attempts, extraction rules could not be generated. Error: $e',
+          );
+        }
       }
-
-      final Map<String, dynamic> extractionRules = json.decode(cleanJson);
-      return json.encode(extractionRules);
-    } catch (e) {
-      throw Exception(
-          'Failed to parse Gemini response as JSON: $e\nResponse: $responseText');
     }
+
+    // This should never be reached, but just in case
+    throw Exception('Unexpected error in generateScrappingExtractRules');
+  }
+
+  String _getRetryPrompt(int attemptNumber, String errorMessage) {
+    return '''
+## Attempt ${attemptNumber + 1}
+
+The previous extraction rules failed validation with the following error:
+```
+$errorMessage
+```
+
+**CRITICAL ANALYSIS REQUIRED:**
+1. The selectors you provided are likely incorrect or don't match actual elements in the HTML
+2. Please carefully re-examine the HTML structure provided
+3. Verify that each selector path actually exists in the HTML document
+4. Consider using more specific or alternative selectors
+5. Think step-by-step through the HTML hierarchy to ensure accuracy
+6. Double-check for typos in class names, IDs, or element tags
+7. Consider if the elements might be dynamically loaded (look for data attributes or JS-rendered content markers)
+
+**Common issues to check:**
+- Incorrect class names (check for exact matches including hyphens/underscores)
+- Missing parent elements in selector chains
+- Using IDs that don't exist
+- Assuming structure that isn't present in the actual HTML
+
+Please generate new extraction rules with extreme attention to detail. Take your time to think through each selector carefully. The HTML content and screenshot remain the same as provided initially.
+
+**ULTRA THINK:** Analyze the HTML structure methodically, verify each selector component exists, and ensure the extraction rules will successfully capture the requested data.''';
   }
 }
 

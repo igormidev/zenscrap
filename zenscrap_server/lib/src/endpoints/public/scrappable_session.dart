@@ -81,9 +81,117 @@ class ScrappableSessionEndpoint extends Endpoint {
     final geminiModel = GenerativeModel(
       model: 'gemini-2.5-pro',
       apiKey: geminiApiKey,
+      generationConfig: GenerationConfig(
+        responseSchema: Schema(
+          SchemaType.object,
+          properties: {
+            'message': Schema(
+              SchemaType.string,
+              nullable: true,
+              description:
+                  '''Message from the AI assistant for better context for what was done.
+This could be a quick short resume of what was done to generate the extraction rules or even a question for clarification (in case of questions, send the newExtractedRules as null).
+
+Better understanding of a question:
+You can ask, for example, a question like: "I found two information about <something>, one in the the user header and the other in the footer, which one do you want to extract?".
+In that case you are making a question, the "newExtractRules" field of the schema will be null (the "errorMessage" as well).
+After the question, the user will give his response and you can then continue to process a extract rule.
+
+This should be null if there is a errorMessage''',
+            ),
+            'errorMessage': Schema(
+              SchemaType.string,
+              nullable: true,
+              description:
+                  '''Error message if there was an error during the generation process to get extract rules.
+In the error message please explain what happened any why you where not able to complete the task.
+
+Example things that could cause error:
+- Example 1: The html is of a 404 page, you can respond with a message indicating that the page was not found.
+- Example 2: The user provided invalid input, you can respond with a message asking them to correct it.
+
+In any case that the errorMessage exists, the "newExtractRules" and "message" fields should be null.
+
+This field should be null if there is no error.''',
+            ),
+            'newExtractRules': Schema(
+              SchemaType.object,
+              description:
+                  '''New extraction rules that are compliant with ScrapingBee extract rules feature.
+If you have any doubts about how to generate the rules, you can web research the ScrapingBee documentation at "https://www.scrapingbee.com/documentation/data-extraction/#basic-usage".''',
+            ),
+          },
+        ),
+      ),
     );
 
-    final aiResponse = await geminiModel.generateContent(contents);
+    final chat = geminiModel.generateContentStream(contents);
+    final StringBuffer responseBuffer = StringBuffer();
+    await for (final GenerateContentResponse response in chat) {
+      if (response.text != null) {
+        responseBuffer.write(response.text);
+      }
+    }
+
+    final String responseText = responseBuffer.toString();
+    if (responseText.isEmpty) {
+      scrapRedraftSessions[sessionId]?.add(
+        ErrorTextResponse(
+          role: PromptRole.system,
+          errorMessage: 'Error. Gemini returned empty response.',
+        ),
+      );
+    }
+    // Parse the JSON response directly (schema ensures it's valid JSON)
+    Map<String, dynamic> parsedResponse;
+    try {
+      parsedResponse = json.decode(responseText);
+    } catch (e) {
+      scrapRedraftSessions[sessionId]?.add(
+        ErrorTextResponse(
+          role: PromptRole.system,
+          errorMessage: 'Failed to parse AI response as JSON:\n$e',
+        ),
+      );
+      return;
+    }
+    final String? message = parsedResponse['message'] as String?;
+    final String? errorMessage = parsedResponse['errorMessage'] as String?;
+    final Map<String, dynamic>? newExtractRules =
+        parsedResponse['newExtractRules'] as Map<String, dynamic>?;
+
+    ZenScrapRedraftState? newState;
+
+    if (message != null && newExtractRules != null) {
+      newState = MessageTextAndNewExtractRulesResponse(
+        role: PromptRole.model,
+        messageText: message,
+        newExtractRules: jsonEncode(newExtractRules),
+      );
+    }
+    if (message != null && newExtractRules == null) {
+      newState = MessageTextResponse(
+        role: PromptRole.model,
+        messageText: message,
+      );
+    }
+    if (errorMessage != null) {
+      newState = ErrorTextResponse(
+        role: PromptRole.model,
+        errorMessage: errorMessage,
+      );
+    }
+
+    if (newState != null) {
+      scrapRedraftSessions[sessionId]?.add(newState);
+    } else {
+      scrapRedraftSessions[sessionId]?.add(
+        ErrorTextResponse(
+          role: PromptRole.model,
+          errorMessage: 'AI response did not contain valid data.',
+        ),
+      );
+    }
   }
 }
 

@@ -9,15 +9,14 @@
 // ignore_for_file: use_super_parameters
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import '../../../protocol.dart' as _i1;
-import 'package:serverpod/serverpod.dart' as _i2;
+import '../../protocol.dart' as _i1;
+import 'package:serverpod_client/serverpod_client.dart' as _i2;
 import 'prompt_role_enum.dart' as _i3;
 part 'responses/error_text_response.dart';
 part 'responses/message_text_and_new_extract_rules_response.dart';
 part 'responses/message_text_response.dart';
 
-sealed class ZenScrapRedraftState
-    implements _i2.SerializableModel, _i2.ProtocolSerialization {
+sealed class ZenScrapRedraftState implements _i2.SerializableModel {
   ZenScrapRedraftState({required this.role});
 
   _i3.PromptRole role;
