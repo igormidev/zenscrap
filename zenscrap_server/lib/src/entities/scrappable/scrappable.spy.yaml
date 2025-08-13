@@ -7,6 +7,7 @@ fields:
   isActive: bool
   targetRequest: ScrappableTargetRequestStructure?, relation(name=target_scrappable, field=targetRequestId)
   targetRequestId: int
+  testData: ReferenceTestData
 indexes:
   scrappable_target_request_unique_idx:
     fields: targetRequestId
