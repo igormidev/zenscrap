@@ -204,7 +204,6 @@ class _MyAppState extends ConsumerState<MyApp> {
         ),
       ),
       builder: (context, child) {
-        return child!;
         return Consumer(
           child: child,
           builder: (context, ref, child) {

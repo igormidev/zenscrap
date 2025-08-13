@@ -17,11 +17,14 @@ import 'entities/account/account_api_key.dart' as _i5;
 import 'entities/scrappable.dart' as _i6;
 import 'entities/scrappable_target_request.dart' as _i7;
 import 'entities/zenscrap_exception.dart' as _i8;
+import 'generated/entities/redraft_scrappable_session/zen_scrap_redraft_state.dart'
+    as _i9;
 export 'entities/account/account.dart';
 export 'entities/account/account_api_key.dart';
 export 'entities/scrappable.dart';
 export 'entities/scrappable_target_request.dart';
 export 'entities/zenscrap_exception.dart';
+export 'generated/entities/redraft_scrappable_session/zen_scrap_redraft_state.dart';
 
 class Protocol extends _i1.SerializationManagerServer {
   Protocol._();
@@ -309,6 +312,18 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i8.ZenScrapException) {
       return _i8.ZenScrapException.fromJson(data) as T;
     }
+    if (t == _i9.PromptAiErrorResponse) {
+      return _i9.PromptAiErrorResponse.fromJson(data) as T;
+    }
+    if (t == _i9.PromptAiOnlyTextResponse) {
+      return _i9.PromptAiOnlyTextResponse.fromJson(data) as T;
+    }
+    if (t == _i9.PromptAiTextAndNewExtractRulesResponse) {
+      return _i9.PromptAiTextAndNewExtractRulesResponse.fromJson(data) as T;
+    }
+    if (t == _i9.PromptZenScrapSystemResponse) {
+      return _i9.PromptZenScrapSystemResponse.fromJson(data) as T;
+    }
     if (t == _i1.getType<_i4.AccountInfo?>()) {
       return (data != null ? _i4.AccountInfo.fromJson(data) : null) as T;
     }
@@ -325,6 +340,24 @@ class Protocol extends _i1.SerializationManagerServer {
     }
     if (t == _i1.getType<_i8.ZenScrapException?>()) {
       return (data != null ? _i8.ZenScrapException.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i9.PromptAiErrorResponse?>()) {
+      return (data != null ? _i9.PromptAiErrorResponse.fromJson(data) : null)
+          as T;
+    }
+    if (t == _i1.getType<_i9.PromptAiOnlyTextResponse?>()) {
+      return (data != null ? _i9.PromptAiOnlyTextResponse.fromJson(data) : null)
+          as T;
+    }
+    if (t == _i1.getType<_i9.PromptAiTextAndNewExtractRulesResponse?>()) {
+      return (data != null
+          ? _i9.PromptAiTextAndNewExtractRulesResponse.fromJson(data)
+          : null) as T;
+    }
+    if (t == _i1.getType<_i9.PromptZenScrapSystemResponse?>()) {
+      return (data != null
+          ? _i9.PromptZenScrapSystemResponse.fromJson(data)
+          : null) as T;
     }
     if (t == Map<String, String?>) {
       return (data as Map).map((k, v) =>
@@ -365,6 +398,18 @@ class Protocol extends _i1.SerializationManagerServer {
     if (data is _i8.ZenScrapException) {
       return 'ZenScrapException';
     }
+    if (data is _i9.PromptAiErrorResponse) {
+      return 'PromptAiErrorResponse';
+    }
+    if (data is _i9.PromptAiOnlyTextResponse) {
+      return 'PromptAiOnlyTextResponse';
+    }
+    if (data is _i9.PromptAiTextAndNewExtractRulesResponse) {
+      return 'PromptAiTextAndNewExtractRulesResponse';
+    }
+    if (data is _i9.PromptZenScrapSystemResponse) {
+      return 'PromptZenScrapSystemResponse';
+    }
     className = _i2.Protocol().getClassNameForObject(data);
     if (className != null) {
       return 'serverpod.$className';
@@ -396,6 +441,19 @@ class Protocol extends _i1.SerializationManagerServer {
     }
     if (dataClassName == 'ZenScrapException') {
       return deserialize<_i8.ZenScrapException>(data['data']);
+    }
+    if (dataClassName == 'PromptAiErrorResponse') {
+      return deserialize<_i9.PromptAiErrorResponse>(data['data']);
+    }
+    if (dataClassName == 'PromptAiOnlyTextResponse') {
+      return deserialize<_i9.PromptAiOnlyTextResponse>(data['data']);
+    }
+    if (dataClassName == 'PromptAiTextAndNewExtractRulesResponse') {
+      return deserialize<_i9.PromptAiTextAndNewExtractRulesResponse>(
+          data['data']);
+    }
+    if (dataClassName == 'PromptZenScrapSystemResponse') {
+      return deserialize<_i9.PromptZenScrapSystemResponse>(data['data']);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);

@@ -15,12 +15,15 @@ import 'entities/account/account_api_key.dart' as _i3;
 import 'entities/scrappable.dart' as _i4;
 import 'entities/scrappable_target_request.dart' as _i5;
 import 'entities/zenscrap_exception.dart' as _i6;
-import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i7;
+import 'generated/entities/redraft_scrappable_session/zen_scrap_redraft_state.dart'
+    as _i7;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i8;
 export 'entities/account/account.dart';
 export 'entities/account/account_api_key.dart';
 export 'entities/scrappable.dart';
 export 'entities/scrappable_target_request.dart';
 export 'entities/zenscrap_exception.dart';
+export 'generated/entities/redraft_scrappable_session/zen_scrap_redraft_state.dart';
 export 'client.dart';
 
 class Protocol extends _i1.SerializationManager {
@@ -51,6 +54,18 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i6.ZenScrapException) {
       return _i6.ZenScrapException.fromJson(data) as T;
     }
+    if (t == _i7.PromptAiErrorResponse) {
+      return _i7.PromptAiErrorResponse.fromJson(data) as T;
+    }
+    if (t == _i7.PromptAiOnlyTextResponse) {
+      return _i7.PromptAiOnlyTextResponse.fromJson(data) as T;
+    }
+    if (t == _i7.PromptAiTextAndNewExtractRulesResponse) {
+      return _i7.PromptAiTextAndNewExtractRulesResponse.fromJson(data) as T;
+    }
+    if (t == _i7.PromptZenScrapSystemResponse) {
+      return _i7.PromptZenScrapSystemResponse.fromJson(data) as T;
+    }
     if (t == _i1.getType<_i2.AccountInfo?>()) {
       return (data != null ? _i2.AccountInfo.fromJson(data) : null) as T;
     }
@@ -68,6 +83,24 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i1.getType<_i6.ZenScrapException?>()) {
       return (data != null ? _i6.ZenScrapException.fromJson(data) : null) as T;
     }
+    if (t == _i1.getType<_i7.PromptAiErrorResponse?>()) {
+      return (data != null ? _i7.PromptAiErrorResponse.fromJson(data) : null)
+          as T;
+    }
+    if (t == _i1.getType<_i7.PromptAiOnlyTextResponse?>()) {
+      return (data != null ? _i7.PromptAiOnlyTextResponse.fromJson(data) : null)
+          as T;
+    }
+    if (t == _i1.getType<_i7.PromptAiTextAndNewExtractRulesResponse?>()) {
+      return (data != null
+          ? _i7.PromptAiTextAndNewExtractRulesResponse.fromJson(data)
+          : null) as T;
+    }
+    if (t == _i1.getType<_i7.PromptZenScrapSystemResponse?>()) {
+      return (data != null
+          ? _i7.PromptZenScrapSystemResponse.fromJson(data)
+          : null) as T;
+    }
     if (t == Map<String, String?>) {
       return (data as Map).map((k, v) =>
           MapEntry(deserialize<String>(k), deserialize<String?>(v))) as T;
@@ -80,7 +113,7 @@ class Protocol extends _i1.SerializationManager {
           MapEntry(deserialize<String>(k), deserialize<dynamic>(v))) as T;
     }
     try {
-      return _i7.Protocol().deserialize<T>(data, t);
+      return _i8.Protocol().deserialize<T>(data, t);
     } on _i1.DeserializationTypeNotFoundException catch (_) {}
     return super.deserialize<T>(data, t);
   }
@@ -104,7 +137,19 @@ class Protocol extends _i1.SerializationManager {
     if (data is _i6.ZenScrapException) {
       return 'ZenScrapException';
     }
-    className = _i7.Protocol().getClassNameForObject(data);
+    if (data is _i7.PromptAiErrorResponse) {
+      return 'PromptAiErrorResponse';
+    }
+    if (data is _i7.PromptAiOnlyTextResponse) {
+      return 'PromptAiOnlyTextResponse';
+    }
+    if (data is _i7.PromptAiTextAndNewExtractRulesResponse) {
+      return 'PromptAiTextAndNewExtractRulesResponse';
+    }
+    if (data is _i7.PromptZenScrapSystemResponse) {
+      return 'PromptZenScrapSystemResponse';
+    }
+    className = _i8.Protocol().getClassNameForObject(data);
     if (className != null) {
       return 'serverpod_auth.$className';
     }
@@ -132,9 +177,22 @@ class Protocol extends _i1.SerializationManager {
     if (dataClassName == 'ZenScrapException') {
       return deserialize<_i6.ZenScrapException>(data['data']);
     }
+    if (dataClassName == 'PromptAiErrorResponse') {
+      return deserialize<_i7.PromptAiErrorResponse>(data['data']);
+    }
+    if (dataClassName == 'PromptAiOnlyTextResponse') {
+      return deserialize<_i7.PromptAiOnlyTextResponse>(data['data']);
+    }
+    if (dataClassName == 'PromptAiTextAndNewExtractRulesResponse') {
+      return deserialize<_i7.PromptAiTextAndNewExtractRulesResponse>(
+          data['data']);
+    }
+    if (dataClassName == 'PromptZenScrapSystemResponse') {
+      return deserialize<_i7.PromptZenScrapSystemResponse>(data['data']);
+    }
     if (dataClassName.startsWith('serverpod_auth.')) {
       data['className'] = dataClassName.substring(15);
-      return _i7.Protocol().deserializeByClassName(data);
+      return _i8.Protocol().deserializeByClassName(data);
     }
     return super.deserializeByClassName(data);
   }

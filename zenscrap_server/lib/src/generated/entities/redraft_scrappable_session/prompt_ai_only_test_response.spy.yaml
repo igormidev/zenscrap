@@ -1,0 +1,4 @@
+class: PromptAiOnlyTextResponse
+extends: ZenScrapRedraftState
+fields:
+    aiGeneratedTextMessage: String
