@@ -1,12 +1,10 @@
-import 'dart:convert';
+// ignore_for_file: constant_identifier_names
 
+import 'dart:convert';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:zenscrap_server/server.dart';
 import 'package:zenscrap_server/src/core/scraping_bee.dart';
-import 'package:zenscrap_server/src/endpoints/public/scrappable_chat_session.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
-
-final Map<RedraftSrappableSessionId, ChatController> chatSessions = {};
 
 class ChatController {
   static late final GenerativeModel _geminiModel;
@@ -42,14 +40,42 @@ class ChatController {
       );
     }
 
-    final GenerateContentResponse response = await chatSession.sendMessage(
-      Content.text(userPromt),
-    );
+    final List<ChatResponse> chatResponse = [];
 
-    return await getChatResponses(
-      generatedContent: response,
-      testData: referenceTestData,
+    const int MAX_ATTEMPTS = 3;
+
+    for (int attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+      final GenerateContentResponse response = await chatSession.sendMessage(
+        Content.text(userPromt),
+      );
+      chatResponse.addAll(await getChatResponses(
+        generatedContent: response,
+        testData: referenceTestData,
+      ));
+
+      final ChatResponse lastChat = chatResponse.last;
+      final PromptRole role = lastChat.role;
+      bool shouldContinue = false;
+      if (role == PromptRole.system) {
+        if (lastChat is! NewExtractRuleResponse) {
+          shouldContinue = true;
+        }
+      }
+      if (shouldContinue) {
+        continue;
+      }
+
+      return chatResponse;
+    }
+
+    chatResponse.add(
+      ErrorTextResponse(
+        role: PromptRole.system,
+        errorMessage:
+            'Exceeded maximum attempts to generate extract rules. The AI is not collaborating at all...\nThe AI is generating extract rules that do not work or not even generating extract rules at all...',
+      ),
     );
+    return chatResponse;
   }
 }
 
@@ -126,6 +152,12 @@ Future<List<ChatResponse>> getChatResponses({
   }
 
   final extractedRules = newState.newExtractRules;
+  response.add(MessageTextResponse(
+    role: PromptRole.system,
+    messageText:
+        'Great, I will now test the extract rules you created to se if it works in the reference link we are using for testing.\n'
+        'Please wait a moment...',
+  ));
 
   // Needs to validate if the rules are working...
   final ExtractDataByRule extractResult = await scrapingBee.extractByRules(
@@ -137,6 +169,7 @@ Future<List<ChatResponse>> getChatResponses({
     withData: (result) {
       response.add(NewExtractRuleResponse(
         role: PromptRole.system,
+        messageText: 'New rules where tested and did not present any errors',
         referenceTestData: testData.copyWith(
           scrappableTestResult: ScrappableTestResult(
             extractJsonResult: jsonEncode(result),
@@ -160,7 +193,6 @@ Then, analyse the log and ultra think in a new extract rule file'''),
       );
     },
   );
-  newState.newExtractRules;
 
   return response;
 }

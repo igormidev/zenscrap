@@ -14,11 +14,13 @@ abstract class NewExtractRuleResponse extends _i1.ChatResponse
     implements _i2.SerializableModel, _i2.ProtocolSerialization {
   NewExtractRuleResponse._({
     required super.role,
+    required this.messageText,
     required this.referenceTestData,
   });
 
   factory NewExtractRuleResponse({
     required _i3.PromptRole role,
+    required String messageText,
     required _i4.ReferenceTestData referenceTestData,
   }) = _NewExtractRuleResponseImpl;
 
@@ -26,10 +28,13 @@ abstract class NewExtractRuleResponse extends _i1.ChatResponse
       Map<String, dynamic> jsonSerialization) {
     return NewExtractRuleResponse(
       role: _i3.PromptRole.fromJson((jsonSerialization['role'] as String)),
+      messageText: jsonSerialization['messageText'] as String,
       referenceTestData: _i4.ReferenceTestData.fromJson(
           (jsonSerialization['referenceTestData'] as Map<String, dynamic>)),
     );
   }
+
+  String messageText;
 
   _i4.ReferenceTestData referenceTestData;
 
@@ -38,12 +43,14 @@ abstract class NewExtractRuleResponse extends _i1.ChatResponse
   @_i2.useResult
   NewExtractRuleResponse copyWith({
     _i3.PromptRole? role,
+    String? messageText,
     _i4.ReferenceTestData? referenceTestData,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
       'role': role.toJson(),
+      'messageText': messageText,
       'referenceTestData': referenceTestData.toJson(),
     };
   }
@@ -52,6 +59,7 @@ abstract class NewExtractRuleResponse extends _i1.ChatResponse
   Map<String, dynamic> toJsonForProtocol() {
     return {
       'role': role.toJson(),
+      'messageText': messageText,
       'referenceTestData': referenceTestData.toJsonForProtocol(),
     };
   }
@@ -65,9 +73,11 @@ abstract class NewExtractRuleResponse extends _i1.ChatResponse
 class _NewExtractRuleResponseImpl extends NewExtractRuleResponse {
   _NewExtractRuleResponseImpl({
     required _i3.PromptRole role,
+    required String messageText,
     required _i4.ReferenceTestData referenceTestData,
   }) : super._(
           role: role,
+          messageText: messageText,
           referenceTestData: referenceTestData,
         );
 
@@ -77,10 +87,12 @@ class _NewExtractRuleResponseImpl extends NewExtractRuleResponse {
   @override
   NewExtractRuleResponse copyWith({
     _i3.PromptRole? role,
+    String? messageText,
     _i4.ReferenceTestData? referenceTestData,
   }) {
     return NewExtractRuleResponse(
       role: role ?? this.role,
+      messageText: messageText ?? this.messageText,
       referenceTestData: referenceTestData ?? this.referenceTestData.copyWith(),
     );
   }

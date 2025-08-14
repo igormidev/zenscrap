@@ -36,6 +36,14 @@ class EndpointPrivateAccount extends _i1.EndpointRef {
 }
 
 /// {@category Endpoint}
+class EndpointCreateScrappable extends _i1.EndpointRef {
+  EndpointCreateScrappable(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'createScrappable';
+}
+
+/// {@category Endpoint}
 class EndpointHandleApiScrapRequest extends _i1.EndpointRef {
   EndpointHandleApiScrapRequest(_i1.EndpointCaller caller) : super(caller);
 
@@ -123,12 +131,15 @@ class Client extends _i1.ServerpodClientShared {
               disconnectStreamsOnLostInternetConnection,
         ) {
     privateAccount = EndpointPrivateAccount(this);
+    createScrappable = EndpointCreateScrappable(this);
     handleApiScrapRequest = EndpointHandleApiScrapRequest(this);
     scrappableChatSession = EndpointScrappableChatSession(this);
     modules = Modules(this);
   }
 
   late final EndpointPrivateAccount privateAccount;
+
+  late final EndpointCreateScrappable createScrappable;
 
   late final EndpointHandleApiScrapRequest handleApiScrapRequest;
 
@@ -139,6 +150,7 @@ class Client extends _i1.ServerpodClientShared {
   @override
   Map<String, _i1.EndpointRef> get endpointRefLookup => {
         'privateAccount': privateAccount,
+        'createScrappable': createScrappable,
         'handleApiScrapRequest': handleApiScrapRequest,
         'scrappableChatSession': scrappableChatSession,
       };

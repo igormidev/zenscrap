@@ -1,4 +1,5 @@
 class: NewExtractRuleResponse
 extends: ChatResponse
 fields:
+  messageText: String
   referenceTestData: ReferenceTestData

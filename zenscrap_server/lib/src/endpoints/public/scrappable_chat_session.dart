@@ -1,10 +1,12 @@
 import 'package:rxdart/subjects.dart';
 import 'package:serverpod/serverpod.dart';
+import 'package:zenscrap_server/src/endpoints/public/chat_controller.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 typedef RedraftSrappableSessionId = String;
 final Map<RedraftSrappableSessionId, ReplaySubject<ChatResponse>>
     scrapRedraftSessions = {};
+final Map<RedraftSrappableSessionId, ChatController> chatSessions = {};
 
 class ScrappableChatSession extends Endpoint {
   final Uuid uuid = Uuid();
@@ -15,6 +17,7 @@ class ScrappableChatSession extends Endpoint {
   }) async {
     final RedraftSrappableSessionId sessionUuid = uuid.v4();
     scrapRedraftSessions[sessionUuid] = ReplaySubject<ChatResponse>();
+    chatSessions[sessionUuid] = ChatController.create();
   }
 
   Stream<ChatResponse> listenToScrappableRedraftSession(
@@ -34,5 +37,6 @@ class ScrappableChatSession extends Endpoint {
   Future<void> sendPromptMessage(
     Session session, {
     required RedraftSrappableSessionId sessionId,
+    required String userPrompt,
   }) async {}
 }
