@@ -82,6 +82,7 @@ class CreateScrappableEndpoint extends Endpoint {
           await ReferenceTestData.db.insertRow(
         session,
         ReferenceTestData(
+          referenceLinkUsed: referenceLink,
           referenceHtmlPage: htmlByteData,
           referenceSiteScreenshot: screenshotByteData,
           referenceQueryParametersJson: jsonEncode(referenceLinkPathParameters),

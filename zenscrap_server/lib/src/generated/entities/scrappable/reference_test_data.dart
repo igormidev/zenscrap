@@ -20,6 +20,7 @@ abstract class ReferenceTestData
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   ReferenceTestData._({
     this.id,
+    required this.referenceLinkUsed,
     required this.referenceQueryParametersJson,
     required this.referenceHtmlPage,
     required this.referenceSiteScreenshot,
@@ -29,6 +30,7 @@ abstract class ReferenceTestData
 
   factory ReferenceTestData({
     int? id,
+    required String referenceLinkUsed,
     required String referenceQueryParametersJson,
     required _i2.ByteData referenceHtmlPage,
     required _i2.ByteData referenceSiteScreenshot,
@@ -39,6 +41,7 @@ abstract class ReferenceTestData
   factory ReferenceTestData.fromJson(Map<String, dynamic> jsonSerialization) {
     return ReferenceTestData(
       id: jsonSerialization['id'] as int?,
+      referenceLinkUsed: jsonSerialization['referenceLinkUsed'] as String,
       referenceQueryParametersJson:
           jsonSerialization['referenceQueryParametersJson'] as String,
       referenceHtmlPage: _i1.ByteDataJsonExtension.fromJson(
@@ -64,6 +67,8 @@ abstract class ReferenceTestData
   @override
   int? id;
 
+  String referenceLinkUsed;
+
   String referenceQueryParametersJson;
 
   _i2.ByteData referenceHtmlPage;
@@ -82,6 +87,7 @@ abstract class ReferenceTestData
   @_i1.useResult
   ReferenceTestData copyWith({
     int? id,
+    String? referenceLinkUsed,
     String? referenceQueryParametersJson,
     _i2.ByteData? referenceHtmlPage,
     _i2.ByteData? referenceSiteScreenshot,
@@ -92,6 +98,7 @@ abstract class ReferenceTestData
   Map<String, dynamic> toJson() {
     return {
       if (id != null) 'id': id,
+      'referenceLinkUsed': referenceLinkUsed,
       'referenceQueryParametersJson': referenceQueryParametersJson,
       'referenceHtmlPage': referenceHtmlPage.toJson(),
       'referenceSiteScreenshot': referenceSiteScreenshot.toJson(),
@@ -105,6 +112,7 @@ abstract class ReferenceTestData
   Map<String, dynamic> toJsonForProtocol() {
     return {
       if (id != null) 'id': id,
+      'referenceLinkUsed': referenceLinkUsed,
       'referenceQueryParametersJson': referenceQueryParametersJson,
       'referenceHtmlPage': referenceHtmlPage.toJson(),
       'referenceSiteScreenshot': referenceSiteScreenshot.toJson(),
@@ -149,6 +157,7 @@ class _Undefined {}
 class _ReferenceTestDataImpl extends ReferenceTestData {
   _ReferenceTestDataImpl({
     int? id,
+    required String referenceLinkUsed,
     required String referenceQueryParametersJson,
     required _i2.ByteData referenceHtmlPage,
     required _i2.ByteData referenceSiteScreenshot,
@@ -156,6 +165,7 @@ class _ReferenceTestDataImpl extends ReferenceTestData {
     _i4.Scrappable? scrappable,
   }) : super._(
           id: id,
+          referenceLinkUsed: referenceLinkUsed,
           referenceQueryParametersJson: referenceQueryParametersJson,
           referenceHtmlPage: referenceHtmlPage,
           referenceSiteScreenshot: referenceSiteScreenshot,
@@ -169,6 +179,7 @@ class _ReferenceTestDataImpl extends ReferenceTestData {
   @override
   ReferenceTestData copyWith({
     Object? id = _Undefined,
+    String? referenceLinkUsed,
     String? referenceQueryParametersJson,
     _i2.ByteData? referenceHtmlPage,
     _i2.ByteData? referenceSiteScreenshot,
@@ -177,6 +188,7 @@ class _ReferenceTestDataImpl extends ReferenceTestData {
   }) {
     return ReferenceTestData(
       id: id is int? ? id : this.id,
+      referenceLinkUsed: referenceLinkUsed ?? this.referenceLinkUsed,
       referenceQueryParametersJson:
           referenceQueryParametersJson ?? this.referenceQueryParametersJson,
       referenceHtmlPage: referenceHtmlPage ?? this.referenceHtmlPage.clone(),
@@ -195,6 +207,10 @@ class _ReferenceTestDataImpl extends ReferenceTestData {
 class ReferenceTestDataTable extends _i1.Table<int?> {
   ReferenceTestDataTable({super.tableRelation})
       : super(tableName: 'scrappable_test_data') {
+    referenceLinkUsed = _i1.ColumnString(
+      'referenceLinkUsed',
+      this,
+    );
     referenceQueryParametersJson = _i1.ColumnString(
       'referenceQueryParametersJson',
       this,
@@ -212,6 +228,8 @@ class ReferenceTestDataTable extends _i1.Table<int?> {
       this,
     );
   }
+
+  late final _i1.ColumnString referenceLinkUsed;
 
   late final _i1.ColumnString referenceQueryParametersJson;
 
@@ -239,6 +257,7 @@ class ReferenceTestDataTable extends _i1.Table<int?> {
   @override
   List<_i1.Column> get columns => [
         id,
+        referenceLinkUsed,
         referenceQueryParametersJson,
         referenceHtmlPage,
         referenceSiteScreenshot,

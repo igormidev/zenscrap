@@ -29,24 +29,32 @@ class ChatController {
     return instance;
   }
 
-  Future<ChatResponse> sendMessage({
+  Future<List<ChatResponse>> sendMessage({
     required String userPromt,
-    required Scrappable scrappableUuid,
+    required Scrappable scrappable,
   }) async {
-    final GenerateContentResponse response = await chatSession.sendMessage(
-      Content.text('Please provide the necessary information.'),
-    );
-    if (response.text == null) {
+    final referenceTestData = scrappable.referenceTestData;
+    if (referenceTestData == null) {
       throw ZenScrapException(
-        title: 'AI Response Error',
-        description: 'The AI did not return a valid response.',
+        title: 'Reference Test Data Not Found',
+        description:
+            'No reference test data found for scrappable ${scrappable.id}.',
       );
     }
+
+    final GenerateContentResponse response = await chatSession.sendMessage(
+      Content.text(userPromt),
+    );
+
+    return await getChatResponses(
+      generatedContent: response,
+      testData: referenceTestData,
+    );
   }
 }
 
 Future<List<ChatResponse>> getChatResponses({
-  required String referenceUrl,
+  required ReferenceTestData testData,
   required GenerateContentResponse generatedContent,
 }) async {
   final List<ChatResponse> response = [];
@@ -117,17 +125,24 @@ Future<List<ChatResponse>> getChatResponses({
     return response;
   }
 
+  final extractedRules = newState.newExtractRules;
+
   // Needs to validate if the rules are working...
   final ExtractDataByRule extractResult = await scrapingBee.extractByRules(
-    targetUrl: referenceUrl,
-    extractRules: newState.newExtractRules,
+    targetUrl: testData.referenceLinkUsed,
+    extractRules: extractedRules,
   );
 
   extractResult.when(
     withData: (result) {
       response.add(NewExtractRuleResponse(
-        role: PromptRole.model,
-        referenceTestData: ReferenceTestData(),
+        role: PromptRole.system,
+        referenceTestData: testData.copyWith(
+          scrappableTestResult: ScrappableTestResult(
+            extractJsonResult: jsonEncode(result),
+            testExtractRule: extractedRules,
+          ),
+        ),
       ));
     },
     error: (String errorMessage) {

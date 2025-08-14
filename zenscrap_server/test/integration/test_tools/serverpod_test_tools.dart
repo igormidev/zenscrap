@@ -108,8 +108,6 @@ void withServerpod(
 class TestEndpoints {
   late final _PrivateAccountEndpoint privateAccount;
 
-  late final _CreateScrappableEndpoint createScrappable;
-
   late final _HandleApiScrapRequestEndpoint handleApiScrapRequest;
 
   late final _ScrappableChatSession scrappableChatSession;
@@ -123,10 +121,6 @@ class _InternalTestEndpoints extends TestEndpoints
     _i2.EndpointDispatch endpoints,
   ) {
     privateAccount = _PrivateAccountEndpoint(
-      endpoints,
-      serializationManager,
-    );
-    createScrappable = _CreateScrappableEndpoint(
       endpoints,
       serializationManager,
     );
@@ -177,13 +171,6 @@ class _PrivateAccountEndpoint {
       }
     });
   }
-}
-
-class _CreateScrappableEndpoint {
-  _CreateScrappableEndpoint(
-    _endpointDispatch,
-    _serializationManager,
-  );
 }
 
 class _HandleApiScrapRequestEndpoint {

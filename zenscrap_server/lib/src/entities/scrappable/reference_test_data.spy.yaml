@@ -1,6 +1,7 @@
 class: ReferenceTestData
 table: scrappable_test_data
 fields:
+    referenceLinkUsed: String
     referenceQueryParametersJson: String
     referenceHtmlPage: ByteData
     referenceSiteScreenshot: ByteData

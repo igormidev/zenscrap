@@ -1,6 +1,5 @@
 privateAccount:
   - getAccountInfo:
-createScrappable:
 handleApiScrapRequest:
   - call:
 scrappableChatSession:

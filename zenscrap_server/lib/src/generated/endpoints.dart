@@ -11,12 +11,11 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../endpoints/private/private_account_endpoint.dart' as _i2;
-import '../endpoints/public/create_scrappable.dart' as _i3;
-import '../endpoints/public/handle_api_scrap_request.dart' as _i4;
-import '../endpoints/public/scrappable_chat_session.dart' as _i5;
+import '../endpoints/public/handle_api_scrap_request.dart' as _i3;
+import '../endpoints/public/scrappable_chat_session.dart' as _i4;
 import 'package:zenscrap_server/src/generated/entities/scrappable/scrappable.dart'
-    as _i6;
-import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i7;
+    as _i5;
+import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i6;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -28,19 +27,13 @@ class Endpoints extends _i1.EndpointDispatch {
           'privateAccount',
           null,
         ),
-      'createScrappable': _i3.CreateScrappableEndpoint()
-        ..initialize(
-          server,
-          'createScrappable',
-          null,
-        ),
-      'handleApiScrapRequest': _i4.HandleApiScrapRequestEndpoint()
+      'handleApiScrapRequest': _i3.HandleApiScrapRequestEndpoint()
         ..initialize(
           server,
           'handleApiScrapRequest',
           null,
         ),
-      'scrappableChatSession': _i5.ScrappableChatSession()
+      'scrappableChatSession': _i4.ScrappableChatSession()
         ..initialize(
           server,
           'scrappableChatSession',
@@ -62,11 +55,6 @@ class Endpoints extends _i1.EndpointDispatch {
                   .getAccountInfo(session),
         )
       },
-    );
-    connectors['createScrappable'] = _i1.EndpointConnector(
-      name: 'createScrappable',
-      endpoint: endpoints['createScrappable']!,
-      methodConnectors: {},
     );
     connectors['handleApiScrapRequest'] = _i1.EndpointConnector(
       name: 'handleApiScrapRequest',
@@ -91,7 +79,7 @@ class Endpoints extends _i1.EndpointDispatch {
             Map<String, dynamic> params,
           ) async =>
               (endpoints['handleApiScrapRequest']
-                      as _i4.HandleApiScrapRequestEndpoint)
+                      as _i3.HandleApiScrapRequestEndpoint)
                   .call(
             session,
             scrappableId: params['scrappableId'],
@@ -109,7 +97,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'scrappable': _i1.ParameterDescription(
               name: 'scrappable',
-              type: _i1.getType<_i6.Scrappable>(),
+              type: _i1.getType<_i5.Scrappable>(),
               nullable: false,
             )
           },
@@ -117,7 +105,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['scrappableChatSession'] as _i5.ScrappableChatSession)
+              (endpoints['scrappableChatSession'] as _i4.ScrappableChatSession)
                   .createSession(
             session,
             scrappable: params['scrappable'],
@@ -136,7 +124,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['scrappableChatSession'] as _i5.ScrappableChatSession)
+              (endpoints['scrappableChatSession'] as _i4.ScrappableChatSession)
                   .sendPromptMessage(
             session,
             sessionId: params['sessionId'],
@@ -158,7 +146,7 @@ class Endpoints extends _i1.EndpointDispatch {
             Map<String, dynamic> params,
             Map<String, Stream> streamParams,
           ) =>
-              (endpoints['scrappableChatSession'] as _i5.ScrappableChatSession)
+              (endpoints['scrappableChatSession'] as _i4.ScrappableChatSession)
                   .listenToScrappableRedraftSession(
             session,
             sessionUuid: params['sessionUuid'],
@@ -166,6 +154,6 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
       },
     );
-    modules['serverpod_auth'] = _i7.Endpoints()..initializeEndpoints(server);
+    modules['serverpod_auth'] = _i6.Endpoints()..initializeEndpoints(server);
   }
 }
