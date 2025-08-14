@@ -7,13 +7,13 @@ import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 typedef RedraftSrappableSessionId = String;
-final Map<RedraftSrappableSessionId, ReplaySubject<ZenScrapRedraftState>>
+final Map<RedraftSrappableSessionId, ReplaySubject<ChatResponse>>
     scrapRedraftSessions = {};
 
 class ScrappableSessionEndpoint extends Endpoint {
   final Uuid uuid = Uuid();
 
-  Stream<ZenScrapRedraftState> listenToScrappableRedraftSession(
+  Stream<ChatResponse> listenToScrappableRedraftSession(
     Session session, {
     required RedraftSrappableSessionId sessionUuid,
   }) {
@@ -45,7 +45,7 @@ class ScrappableSessionEndpoint extends Endpoint {
     required Scrappable scrappable,
   }) async {
     final RedraftSrappableSessionId sessionUuid = uuid.v4();
-    scrapRedraftSessions[sessionUuid] = ReplaySubject<ZenScrapRedraftState>();
+    scrapRedraftSessions[sessionUuid] = ReplaySubject<ChatResponse>();
   }
 
   Future<void> _processRedraftCurrentState({
@@ -160,7 +160,7 @@ If you have any doubts about how to generate the rules, you can web research the
     final Map<String, dynamic>? newExtractRules =
         parsedResponse['newExtractRules'] as Map<String, dynamic>?;
 
-    ZenScrapRedraftState? newState;
+    ChatResponse? newState;
 
     if (message != null && newExtractRules != null) {
       newState = MessageTextAndNewExtractRulesResponse(
@@ -231,7 +231,7 @@ The next messages with be made by the role 'user' with a prompt asking for modif
   ]);
 }
 
-extension ZenScrapRedraftStateExtension on ZenScrapRedraftState {
+extension ZenScrapRedraftStateExtension on ChatResponse {
   Content get toContent {
     final roleText = role.roleText;
     return switch (this) {

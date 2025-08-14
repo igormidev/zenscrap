@@ -10,8 +10,8 @@
 
 part of '../zen_scrap_redraft_state.dart';
 
-abstract class MessageTextAndNewExtractRulesResponse
-    extends _i1.ZenScrapRedraftState implements _i2.SerializableModel {
+abstract class MessageTextAndNewExtractRulesResponse extends _i1.ChatResponse
+    implements _i2.SerializableModel {
   MessageTextAndNewExtractRulesResponse._({
     required super.role,
     required this.messageText,

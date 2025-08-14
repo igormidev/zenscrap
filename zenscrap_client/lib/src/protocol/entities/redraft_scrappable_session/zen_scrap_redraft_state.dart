@@ -16,8 +16,8 @@ part 'responses/error_text_response.dart';
 part 'responses/message_text_and_new_extract_rules_response.dart';
 part 'responses/message_text_response.dart';
 
-sealed class ZenScrapRedraftState implements _i2.SerializableModel {
-  ZenScrapRedraftState({required this.role});
+sealed class ChatResponse implements _i2.SerializableModel {
+  ChatResponse({required this.role});
 
   _i3.PromptRole role;
 }

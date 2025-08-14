@@ -1,4 +1,4 @@
-class: ZenScrapRedraftState
+class: ChatResponse
 sealed: true
 fields:
     role: PromptRole

@@ -61,6 +61,14 @@ class EndpointCreateScrapChatSession extends _i1.EndpointRef {
 }
 
 /// {@category Endpoint}
+class EndpointCreateScrappable extends _i1.EndpointRef {
+  EndpointCreateScrappable(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'createScrappable';
+}
+
+/// {@category Endpoint}
 class EndpointHandleApiScrapRequest extends _i1.EndpointRef {
   EndpointHandleApiScrapRequest(_i1.EndpointCaller caller) : super(caller);
 
@@ -117,6 +125,7 @@ class Client extends _i1.ServerpodClientShared {
         ) {
     privateAccount = EndpointPrivateAccount(this);
     createScrapChatSession = EndpointCreateScrapChatSession(this);
+    createScrappable = EndpointCreateScrappable(this);
     handleApiScrapRequest = EndpointHandleApiScrapRequest(this);
     modules = Modules(this);
   }
@@ -124,6 +133,8 @@ class Client extends _i1.ServerpodClientShared {
   late final EndpointPrivateAccount privateAccount;
 
   late final EndpointCreateScrapChatSession createScrapChatSession;
+
+  late final EndpointCreateScrappable createScrappable;
 
   late final EndpointHandleApiScrapRequest handleApiScrapRequest;
 
@@ -133,6 +144,7 @@ class Client extends _i1.ServerpodClientShared {
   Map<String, _i1.EndpointRef> get endpointRefLookup => {
         'privateAccount': privateAccount,
         'createScrapChatSession': createScrapChatSession,
+        'createScrappable': createScrappable,
         'handleApiScrapRequest': handleApiScrapRequest,
       };
 

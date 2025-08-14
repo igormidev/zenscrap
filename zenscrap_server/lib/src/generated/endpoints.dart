@@ -12,8 +12,9 @@
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../endpoints/private/private_account_endpoint.dart' as _i2;
 import '../endpoints/public/create_scrap_chat_session.dart' as _i3;
-import '../endpoints/public/handle_api_scrap_request.dart' as _i4;
-import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i5;
+import '../endpoints/public/create_scrappable.dart' as _i4;
+import '../endpoints/public/handle_api_scrap_request.dart' as _i5;
+import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i6;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -31,7 +32,13 @@ class Endpoints extends _i1.EndpointDispatch {
           'createScrapChatSession',
           null,
         ),
-      'handleApiScrapRequest': _i4.HandleApiScrapRequestEndpoint()
+      'createScrappable': _i4.CreateScrappableEndpoint()
+        ..initialize(
+          server,
+          'createScrappable',
+          null,
+        ),
+      'handleApiScrapRequest': _i5.HandleApiScrapRequestEndpoint()
         ..initialize(
           server,
           'handleApiScrapRequest',
@@ -97,6 +104,11 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
       },
     );
+    connectors['createScrappable'] = _i1.EndpointConnector(
+      name: 'createScrappable',
+      endpoint: endpoints['createScrappable']!,
+      methodConnectors: {},
+    );
     connectors['handleApiScrapRequest'] = _i1.EndpointConnector(
       name: 'handleApiScrapRequest',
       endpoint: endpoints['handleApiScrapRequest']!,
@@ -120,7 +132,7 @@ class Endpoints extends _i1.EndpointDispatch {
             Map<String, dynamic> params,
           ) async =>
               (endpoints['handleApiScrapRequest']
-                      as _i4.HandleApiScrapRequestEndpoint)
+                      as _i5.HandleApiScrapRequestEndpoint)
                   .call(
             session,
             scrappableId: params['scrappableId'],
@@ -129,6 +141,6 @@ class Endpoints extends _i1.EndpointDispatch {
         )
       },
     );
-    modules['serverpod_auth'] = _i5.Endpoints()..initializeEndpoints(server);
+    modules['serverpod_auth'] = _i6.Endpoints()..initializeEndpoints(server);
   }
 }

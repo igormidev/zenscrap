@@ -1,33 +1,33 @@
 Example of how could work state
 
-abstract: ZenScrapRedraftState
+abstract: ChatResponse
 sealed: true
 
 class: EditedReferenceData
-extends: ZenScrapRedraftState
+extends: ChatResponse
 fields:
     currentReferenceTestData: ReferenceTestData
 
 
 ### Prompt
 class: PromptAiErrorResponse
-extends: ZenScrapRedraftState
+extends: ChatResponse
 fields:
     aiGeneratedErrorMessage: String
 
 class: PromptAiOnlyTextResponse
-extends: ZenScrapRedraftState
+extends: ChatResponse
 fields:
     aiGeneratedTextMessage: String
 
 class: PromptAiTextAndNewExtractRulesResponse
-extends: ZenScrapRedraftState
+extends: ChatResponse
 fields:
     aiGeneratedTextMessage: String
     newExtractRules: String
 
 class: PromptZenScrapSystemResponse
-extends: ZenScrapRedraftState
+extends: ChatResponse
 fields:
     automaticSystemTextMessage: String
 

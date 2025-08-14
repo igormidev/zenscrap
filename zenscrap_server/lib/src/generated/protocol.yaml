@@ -3,5 +3,6 @@ privateAccount:
 createScrapChatSession:
   - call:
   - createSession:
+createScrappable:
 handleApiScrapRequest:
   - call:

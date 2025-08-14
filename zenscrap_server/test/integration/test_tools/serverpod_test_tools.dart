@@ -108,6 +108,8 @@ class TestEndpoints {
 
   late final _CreateScrapChatSessionEndpoint createScrapChatSession;
 
+  late final _CreateScrappableEndpoint createScrappable;
+
   late final _HandleApiScrapRequestEndpoint handleApiScrapRequest;
 }
 
@@ -123,6 +125,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     createScrapChatSession = _CreateScrapChatSessionEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    createScrappable = _CreateScrappableEndpoint(
       endpoints,
       serializationManager,
     );
@@ -239,6 +245,13 @@ class _CreateScrapChatSessionEndpoint {
       }
     });
   }
+}
+
+class _CreateScrappableEndpoint {
+  _CreateScrappableEndpoint(
+    _endpointDispatch,
+    _serializationManager,
+  );
 }
 
 class _HandleApiScrapRequestEndpoint {

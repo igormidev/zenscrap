@@ -1,4 +1,4 @@
 class: ErrorTextResponse
-extends: ZenScrapRedraftState
+extends: ChatResponse
 fields:
     errorMessage: String

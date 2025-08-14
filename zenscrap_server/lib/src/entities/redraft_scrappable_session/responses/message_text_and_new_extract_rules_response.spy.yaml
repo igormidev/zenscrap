@@ -1,5 +1,5 @@
 class: MessageTextAndNewExtractRulesResponse
-extends: ZenScrapRedraftState
+extends: ChatResponse
 fields:
     messageText: String
     newExtractRules: String

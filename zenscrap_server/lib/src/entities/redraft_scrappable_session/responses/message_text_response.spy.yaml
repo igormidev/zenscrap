@@ -1,4 +1,4 @@
 class: MessageTextResponse
-extends: ZenScrapRedraftState
+extends: ChatResponse
 fields:
     messageText: String
