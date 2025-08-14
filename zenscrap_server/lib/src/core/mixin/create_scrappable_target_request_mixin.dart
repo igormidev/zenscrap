@@ -4,6 +4,10 @@ import 'package:openai_dart/openai_dart.dart';
 import 'package:zenscrap_server/server.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
+class CreateScrappableTargetRequestResponse {
+  final ScrappableTargetRequestStructure structure;
+}
+
 mixin CreateScrappableTargetRequestMixin {
   Future<ScrappableTargetRequestStructure> createMixinProvider({
     required String targetUrl,

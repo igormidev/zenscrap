@@ -12,9 +12,8 @@
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import '../../entities/scrappable/scrappable.dart' as _i2;
 
-abstract class ScrappableTargetRequestStructure
-    implements _i1.SerializableModel {
-  ScrappableTargetRequestStructure._({
+abstract class ScrappableRequest implements _i1.SerializableModel {
+  ScrappableRequest._({
     this.id,
     required this.url,
     required this.queryParams,
@@ -22,17 +21,16 @@ abstract class ScrappableTargetRequestStructure
     this.scrappable,
   });
 
-  factory ScrappableTargetRequestStructure({
+  factory ScrappableRequest({
     int? id,
     required String url,
     required Map<String, String?> queryParams,
     required List<String> pathParams,
     _i2.Scrappable? scrappable,
-  }) = _ScrappableTargetRequestStructureImpl;
+  }) = _ScrappableRequestImpl;
 
-  factory ScrappableTargetRequestStructure.fromJson(
-      Map<String, dynamic> jsonSerialization) {
-    return ScrappableTargetRequestStructure(
+  factory ScrappableRequest.fromJson(Map<String, dynamic> jsonSerialization) {
+    return ScrappableRequest(
       id: jsonSerialization['id'] as int?,
       url: jsonSerialization['url'] as String,
       queryParams:
@@ -63,10 +61,10 @@ abstract class ScrappableTargetRequestStructure
 
   _i2.Scrappable? scrappable;
 
-  /// Returns a shallow copy of this [ScrappableTargetRequestStructure]
+  /// Returns a shallow copy of this [ScrappableRequest]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
-  ScrappableTargetRequestStructure copyWith({
+  ScrappableRequest copyWith({
     int? id,
     String? url,
     Map<String, String?>? queryParams,
@@ -92,9 +90,8 @@ abstract class ScrappableTargetRequestStructure
 
 class _Undefined {}
 
-class _ScrappableTargetRequestStructureImpl
-    extends ScrappableTargetRequestStructure {
-  _ScrappableTargetRequestStructureImpl({
+class _ScrappableRequestImpl extends ScrappableRequest {
+  _ScrappableRequestImpl({
     int? id,
     required String url,
     required Map<String, String?> queryParams,
@@ -108,18 +105,18 @@ class _ScrappableTargetRequestStructureImpl
           scrappable: scrappable,
         );
 
-  /// Returns a shallow copy of this [ScrappableTargetRequestStructure]
+  /// Returns a shallow copy of this [ScrappableRequest]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   @override
-  ScrappableTargetRequestStructure copyWith({
+  ScrappableRequest copyWith({
     Object? id = _Undefined,
     String? url,
     Map<String, String?>? queryParams,
     List<String>? pathParams,
     Object? scrappable = _Undefined,
   }) {
-    return ScrappableTargetRequestStructure(
+    return ScrappableRequest(
       id: id is int? ? id : this.id,
       url: url ?? this.url,
       queryParams: queryParams ??

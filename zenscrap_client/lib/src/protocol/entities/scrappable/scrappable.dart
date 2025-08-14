@@ -10,92 +10,117 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
-import '../../entities/scrappable/scrappable_target_request.dart' as _i2;
+import '../../entities/scrappable/scrappable_request.dart' as _i2;
 import '../../entities/scrappable/reference_test_data.dart' as _i3;
 
 abstract class Scrappable implements _i1.SerializableModel {
   Scrappable._({
-    this.id,
+    _i1.UuidValue? id,
+    required this.createdAt,
     required this.name,
     required this.description,
-    required this.scrappingRules,
+    this.scrappingRules,
+    this.testScrappingRules,
     required this.isActive,
-    this.targetRequest,
     required this.targetRequestId,
-    required this.testData,
-  });
+    this.targetRequest,
+    required this.referenceTestDataId,
+    this.referenceTestData,
+  }) : id = id ?? _i1.Uuid().v4obj();
 
   factory Scrappable({
-    int? id,
+    _i1.UuidValue? id,
+    required DateTime createdAt,
     required String name,
     required String description,
-    required String scrappingRules,
+    String? scrappingRules,
+    String? testScrappingRules,
     required bool isActive,
-    _i2.ScrappableTargetRequestStructure? targetRequest,
     required int targetRequestId,
-    required _i3.ReferenceTestData testData,
+    _i2.ScrappableRequest? targetRequest,
+    required int referenceTestDataId,
+    _i3.ReferenceTestData? referenceTestData,
   }) = _ScrappableImpl;
 
   factory Scrappable.fromJson(Map<String, dynamic> jsonSerialization) {
     return Scrappable(
-      id: jsonSerialization['id'] as int?,
+      id: _i1.UuidValueJsonExtension.fromJson(jsonSerialization['id']),
+      createdAt:
+          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
       name: jsonSerialization['name'] as String,
       description: jsonSerialization['description'] as String,
-      scrappingRules: jsonSerialization['scrappingRules'] as String,
+      scrappingRules: jsonSerialization['scrappingRules'] as String?,
+      testScrappingRules: jsonSerialization['testScrappingRules'] as String?,
       isActive: jsonSerialization['isActive'] as bool,
+      targetRequestId: jsonSerialization['targetRequestId'] as int,
       targetRequest: jsonSerialization['targetRequest'] == null
           ? null
-          : _i2.ScrappableTargetRequestStructure.fromJson(
+          : _i2.ScrappableRequest.fromJson(
               (jsonSerialization['targetRequest'] as Map<String, dynamic>)),
-      targetRequestId: jsonSerialization['targetRequestId'] as int,
-      testData: _i3.ReferenceTestData.fromJson(
-          (jsonSerialization['testData'] as Map<String, dynamic>)),
+      referenceTestDataId: jsonSerialization['referenceTestDataId'] as int,
+      referenceTestData: jsonSerialization['referenceTestData'] == null
+          ? null
+          : _i3.ReferenceTestData.fromJson(
+              (jsonSerialization['referenceTestData'] as Map<String, dynamic>)),
     );
   }
 
   /// The database id, set if the object has been inserted into the
   /// database or if it has been fetched from the database. Otherwise,
   /// the id will be null.
-  int? id;
+  _i1.UuidValue id;
+
+  DateTime createdAt;
 
   String name;
 
   String description;
 
-  String scrappingRules;
+  String? scrappingRules;
+
+  String? testScrappingRules;
 
   bool isActive;
 
-  _i2.ScrappableTargetRequestStructure? targetRequest;
-
   int targetRequestId;
 
-  _i3.ReferenceTestData testData;
+  _i2.ScrappableRequest? targetRequest;
+
+  int referenceTestDataId;
+
+  _i3.ReferenceTestData? referenceTestData;
 
   /// Returns a shallow copy of this [Scrappable]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   Scrappable copyWith({
-    int? id,
+    _i1.UuidValue? id,
+    DateTime? createdAt,
     String? name,
     String? description,
     String? scrappingRules,
+    String? testScrappingRules,
     bool? isActive,
-    _i2.ScrappableTargetRequestStructure? targetRequest,
     int? targetRequestId,
-    _i3.ReferenceTestData? testData,
+    _i2.ScrappableRequest? targetRequest,
+    int? referenceTestDataId,
+    _i3.ReferenceTestData? referenceTestData,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
-      if (id != null) 'id': id,
+      'id': id.toJson(),
+      'createdAt': createdAt.toJson(),
       'name': name,
       'description': description,
-      'scrappingRules': scrappingRules,
+      if (scrappingRules != null) 'scrappingRules': scrappingRules,
+      if (testScrappingRules != null) 'testScrappingRules': testScrappingRules,
       'isActive': isActive,
-      if (targetRequest != null) 'targetRequest': targetRequest?.toJson(),
       'targetRequestId': targetRequestId,
-      'testData': testData.toJson(),
+      if (targetRequest != null) 'targetRequest': targetRequest?.toJson(),
+      'referenceTestDataId': referenceTestDataId,
+      if (referenceTestData != null)
+        'referenceTestData': referenceTestData?.toJson(),
     };
   }
 
@@ -109,23 +134,29 @@ class _Undefined {}
 
 class _ScrappableImpl extends Scrappable {
   _ScrappableImpl({
-    int? id,
+    _i1.UuidValue? id,
+    required DateTime createdAt,
     required String name,
     required String description,
-    required String scrappingRules,
+    String? scrappingRules,
+    String? testScrappingRules,
     required bool isActive,
-    _i2.ScrappableTargetRequestStructure? targetRequest,
     required int targetRequestId,
-    required _i3.ReferenceTestData testData,
+    _i2.ScrappableRequest? targetRequest,
+    required int referenceTestDataId,
+    _i3.ReferenceTestData? referenceTestData,
   }) : super._(
           id: id,
+          createdAt: createdAt,
           name: name,
           description: description,
           scrappingRules: scrappingRules,
+          testScrappingRules: testScrappingRules,
           isActive: isActive,
-          targetRequest: targetRequest,
           targetRequestId: targetRequestId,
-          testData: testData,
+          targetRequest: targetRequest,
+          referenceTestDataId: referenceTestDataId,
+          referenceTestData: referenceTestData,
         );
 
   /// Returns a shallow copy of this [Scrappable]
@@ -133,26 +164,37 @@ class _ScrappableImpl extends Scrappable {
   @_i1.useResult
   @override
   Scrappable copyWith({
-    Object? id = _Undefined,
+    _i1.UuidValue? id,
+    DateTime? createdAt,
     String? name,
     String? description,
-    String? scrappingRules,
+    Object? scrappingRules = _Undefined,
+    Object? testScrappingRules = _Undefined,
     bool? isActive,
-    Object? targetRequest = _Undefined,
     int? targetRequestId,
-    _i3.ReferenceTestData? testData,
+    Object? targetRequest = _Undefined,
+    int? referenceTestDataId,
+    Object? referenceTestData = _Undefined,
   }) {
     return Scrappable(
-      id: id is int? ? id : this.id,
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
       name: name ?? this.name,
       description: description ?? this.description,
-      scrappingRules: scrappingRules ?? this.scrappingRules,
+      scrappingRules:
+          scrappingRules is String? ? scrappingRules : this.scrappingRules,
+      testScrappingRules: testScrappingRules is String?
+          ? testScrappingRules
+          : this.testScrappingRules,
       isActive: isActive ?? this.isActive,
-      targetRequest: targetRequest is _i2.ScrappableTargetRequestStructure?
+      targetRequestId: targetRequestId ?? this.targetRequestId,
+      targetRequest: targetRequest is _i2.ScrappableRequest?
           ? targetRequest
           : this.targetRequest?.copyWith(),
-      targetRequestId: targetRequestId ?? this.targetRequestId,
-      testData: testData ?? this.testData.copyWith(),
+      referenceTestDataId: referenceTestDataId ?? this.referenceTestDataId,
+      referenceTestData: referenceTestData is _i3.ReferenceTestData?
+          ? referenceTestData
+          : this.referenceTestData?.copyWith(),
     );
   }
 }

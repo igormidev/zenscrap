@@ -14,9 +14,9 @@
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../entities/scrappable/scrappable.dart' as _i2;
 
-abstract class ScrappableTargetRequestStructure
+abstract class ScrappableRequest
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
-  ScrappableTargetRequestStructure._({
+  ScrappableRequest._({
     this.id,
     required this.url,
     required this.queryParams,
@@ -24,17 +24,16 @@ abstract class ScrappableTargetRequestStructure
     this.scrappable,
   });
 
-  factory ScrappableTargetRequestStructure({
+  factory ScrappableRequest({
     int? id,
     required String url,
     required Map<String, String?> queryParams,
     required List<String> pathParams,
     _i2.Scrappable? scrappable,
-  }) = _ScrappableTargetRequestStructureImpl;
+  }) = _ScrappableRequestImpl;
 
-  factory ScrappableTargetRequestStructure.fromJson(
-      Map<String, dynamic> jsonSerialization) {
-    return ScrappableTargetRequestStructure(
+  factory ScrappableRequest.fromJson(Map<String, dynamic> jsonSerialization) {
+    return ScrappableRequest(
       id: jsonSerialization['id'] as int?,
       url: jsonSerialization['url'] as String,
       queryParams:
@@ -52,9 +51,9 @@ abstract class ScrappableTargetRequestStructure
     );
   }
 
-  static final t = ScrappableTargetRequestStructureTable();
+  static final t = ScrappableRequestTable();
 
-  static const db = ScrappableTargetRequestStructureRepository._();
+  static const db = ScrappableRequestRepository._();
 
   @override
   int? id;
@@ -70,10 +69,10 @@ abstract class ScrappableTargetRequestStructure
   @override
   _i1.Table<int?> get table => t;
 
-  /// Returns a shallow copy of this [ScrappableTargetRequestStructure]
+  /// Returns a shallow copy of this [ScrappableRequest]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
-  ScrappableTargetRequestStructure copyWith({
+  ScrappableRequest copyWith({
     int? id,
     String? url,
     Map<String, String?>? queryParams,
@@ -102,27 +101,26 @@ abstract class ScrappableTargetRequestStructure
     };
   }
 
-  static ScrappableTargetRequestStructureInclude include(
-      {_i2.ScrappableInclude? scrappable}) {
-    return ScrappableTargetRequestStructureInclude._(scrappable: scrappable);
+  static ScrappableRequestInclude include({_i2.ScrappableInclude? scrappable}) {
+    return ScrappableRequestInclude._(scrappable: scrappable);
   }
 
-  static ScrappableTargetRequestStructureIncludeList includeList({
-    _i1.WhereExpressionBuilder<ScrappableTargetRequestStructureTable>? where,
+  static ScrappableRequestIncludeList includeList({
+    _i1.WhereExpressionBuilder<ScrappableRequestTable>? where,
     int? limit,
     int? offset,
-    _i1.OrderByBuilder<ScrappableTargetRequestStructureTable>? orderBy,
+    _i1.OrderByBuilder<ScrappableRequestTable>? orderBy,
     bool orderDescending = false,
-    _i1.OrderByListBuilder<ScrappableTargetRequestStructureTable>? orderByList,
-    ScrappableTargetRequestStructureInclude? include,
+    _i1.OrderByListBuilder<ScrappableRequestTable>? orderByList,
+    ScrappableRequestInclude? include,
   }) {
-    return ScrappableTargetRequestStructureIncludeList._(
+    return ScrappableRequestIncludeList._(
       where: where,
       limit: limit,
       offset: offset,
-      orderBy: orderBy?.call(ScrappableTargetRequestStructure.t),
+      orderBy: orderBy?.call(ScrappableRequest.t),
       orderDescending: orderDescending,
-      orderByList: orderByList?.call(ScrappableTargetRequestStructure.t),
+      orderByList: orderByList?.call(ScrappableRequest.t),
       include: include,
     );
   }
@@ -135,9 +133,8 @@ abstract class ScrappableTargetRequestStructure
 
 class _Undefined {}
 
-class _ScrappableTargetRequestStructureImpl
-    extends ScrappableTargetRequestStructure {
-  _ScrappableTargetRequestStructureImpl({
+class _ScrappableRequestImpl extends ScrappableRequest {
+  _ScrappableRequestImpl({
     int? id,
     required String url,
     required Map<String, String?> queryParams,
@@ -151,18 +148,18 @@ class _ScrappableTargetRequestStructureImpl
           scrappable: scrappable,
         );
 
-  /// Returns a shallow copy of this [ScrappableTargetRequestStructure]
+  /// Returns a shallow copy of this [ScrappableRequest]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   @override
-  ScrappableTargetRequestStructure copyWith({
+  ScrappableRequest copyWith({
     Object? id = _Undefined,
     String? url,
     Map<String, String?>? queryParams,
     List<String>? pathParams,
     Object? scrappable = _Undefined,
   }) {
-    return ScrappableTargetRequestStructure(
+    return ScrappableRequest(
       id: id is int? ? id : this.id,
       url: url ?? this.url,
       queryParams: queryParams ??
@@ -182,8 +179,8 @@ class _ScrappableTargetRequestStructureImpl
   }
 }
 
-class ScrappableTargetRequestStructureTable extends _i1.Table<int?> {
-  ScrappableTargetRequestStructureTable({super.tableRelation})
+class ScrappableRequestTable extends _i1.Table<int?> {
+  ScrappableRequestTable({super.tableRelation})
       : super(tableName: 'scrappable_target_request') {
     url = _i1.ColumnString(
       'url',
@@ -211,7 +208,7 @@ class ScrappableTargetRequestStructureTable extends _i1.Table<int?> {
     if (_scrappable != null) return _scrappable!;
     _scrappable = _i1.createRelationTable(
       relationFieldName: 'scrappable',
-      field: ScrappableTargetRequestStructure.t.id,
+      field: ScrappableRequest.t.id,
       foreignField: _i2.Scrappable.t.targetRequestId,
       tableRelation: tableRelation,
       createTable: (foreignTableRelation) =>
@@ -237,9 +234,8 @@ class ScrappableTargetRequestStructureTable extends _i1.Table<int?> {
   }
 }
 
-class ScrappableTargetRequestStructureInclude extends _i1.IncludeObject {
-  ScrappableTargetRequestStructureInclude._(
-      {_i2.ScrappableInclude? scrappable}) {
+class ScrappableRequestInclude extends _i1.IncludeObject {
+  ScrappableRequestInclude._({_i2.ScrappableInclude? scrappable}) {
     _scrappable = scrappable;
   }
 
@@ -249,12 +245,12 @@ class ScrappableTargetRequestStructureInclude extends _i1.IncludeObject {
   Map<String, _i1.Include?> get includes => {'scrappable': _scrappable};
 
   @override
-  _i1.Table<int?> get table => ScrappableTargetRequestStructure.t;
+  _i1.Table<int?> get table => ScrappableRequest.t;
 }
 
-class ScrappableTargetRequestStructureIncludeList extends _i1.IncludeList {
-  ScrappableTargetRequestStructureIncludeList._({
-    _i1.WhereExpressionBuilder<ScrappableTargetRequestStructureTable>? where,
+class ScrappableRequestIncludeList extends _i1.IncludeList {
+  ScrappableRequestIncludeList._({
+    _i1.WhereExpressionBuilder<ScrappableRequestTable>? where,
     super.limit,
     super.offset,
     super.orderBy,
@@ -262,23 +258,22 @@ class ScrappableTargetRequestStructureIncludeList extends _i1.IncludeList {
     super.orderByList,
     super.include,
   }) {
-    super.where = where?.call(ScrappableTargetRequestStructure.t);
+    super.where = where?.call(ScrappableRequest.t);
   }
 
   @override
   Map<String, _i1.Include?> get includes => include?.includes ?? {};
 
   @override
-  _i1.Table<int?> get table => ScrappableTargetRequestStructure.t;
+  _i1.Table<int?> get table => ScrappableRequest.t;
 }
 
-class ScrappableTargetRequestStructureRepository {
-  const ScrappableTargetRequestStructureRepository._();
+class ScrappableRequestRepository {
+  const ScrappableRequestRepository._();
 
-  final attachRow =
-      const ScrappableTargetRequestStructureAttachRowRepository._();
+  final attachRow = const ScrappableRequestAttachRowRepository._();
 
-  /// Returns a list of [ScrappableTargetRequestStructure]s matching the given query parameters.
+  /// Returns a list of [ScrappableRequest]s matching the given query parameters.
   ///
   /// Use [where] to specify which items to include in the return value.
   /// If none is specified, all items will be returned.
@@ -300,21 +295,21 @@ class ScrappableTargetRequestStructureRepository {
   ///   limit: 100,
   /// );
   /// ```
-  Future<List<ScrappableTargetRequestStructure>> find(
+  Future<List<ScrappableRequest>> find(
     _i1.Session session, {
-    _i1.WhereExpressionBuilder<ScrappableTargetRequestStructureTable>? where,
+    _i1.WhereExpressionBuilder<ScrappableRequestTable>? where,
     int? limit,
     int? offset,
-    _i1.OrderByBuilder<ScrappableTargetRequestStructureTable>? orderBy,
+    _i1.OrderByBuilder<ScrappableRequestTable>? orderBy,
     bool orderDescending = false,
-    _i1.OrderByListBuilder<ScrappableTargetRequestStructureTable>? orderByList,
+    _i1.OrderByListBuilder<ScrappableRequestTable>? orderByList,
     _i1.Transaction? transaction,
-    ScrappableTargetRequestStructureInclude? include,
+    ScrappableRequestInclude? include,
   }) async {
-    return session.db.find<ScrappableTargetRequestStructure>(
-      where: where?.call(ScrappableTargetRequestStructure.t),
-      orderBy: orderBy?.call(ScrappableTargetRequestStructure.t),
-      orderByList: orderByList?.call(ScrappableTargetRequestStructure.t),
+    return session.db.find<ScrappableRequest>(
+      where: where?.call(ScrappableRequest.t),
+      orderBy: orderBy?.call(ScrappableRequest.t),
+      orderByList: orderByList?.call(ScrappableRequest.t),
       orderDescending: orderDescending,
       limit: limit,
       offset: offset,
@@ -323,7 +318,7 @@ class ScrappableTargetRequestStructureRepository {
     );
   }
 
-  /// Returns the first matching [ScrappableTargetRequestStructure] matching the given query parameters.
+  /// Returns the first matching [ScrappableRequest] matching the given query parameters.
   ///
   /// Use [where] to specify which items to include in the return value.
   /// If none is specified, all items will be returned.
@@ -340,20 +335,20 @@ class ScrappableTargetRequestStructureRepository {
   ///   orderBy: (t) => t.age,
   /// );
   /// ```
-  Future<ScrappableTargetRequestStructure?> findFirstRow(
+  Future<ScrappableRequest?> findFirstRow(
     _i1.Session session, {
-    _i1.WhereExpressionBuilder<ScrappableTargetRequestStructureTable>? where,
+    _i1.WhereExpressionBuilder<ScrappableRequestTable>? where,
     int? offset,
-    _i1.OrderByBuilder<ScrappableTargetRequestStructureTable>? orderBy,
+    _i1.OrderByBuilder<ScrappableRequestTable>? orderBy,
     bool orderDescending = false,
-    _i1.OrderByListBuilder<ScrappableTargetRequestStructureTable>? orderByList,
+    _i1.OrderByListBuilder<ScrappableRequestTable>? orderByList,
     _i1.Transaction? transaction,
-    ScrappableTargetRequestStructureInclude? include,
+    ScrappableRequestInclude? include,
   }) async {
-    return session.db.findFirstRow<ScrappableTargetRequestStructure>(
-      where: where?.call(ScrappableTargetRequestStructure.t),
-      orderBy: orderBy?.call(ScrappableTargetRequestStructure.t),
-      orderByList: orderByList?.call(ScrappableTargetRequestStructure.t),
+    return session.db.findFirstRow<ScrappableRequest>(
+      where: where?.call(ScrappableRequest.t),
+      orderBy: orderBy?.call(ScrappableRequest.t),
+      orderByList: orderByList?.call(ScrappableRequest.t),
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
@@ -361,120 +356,119 @@ class ScrappableTargetRequestStructureRepository {
     );
   }
 
-  /// Finds a single [ScrappableTargetRequestStructure] by its [id] or null if no such row exists.
-  Future<ScrappableTargetRequestStructure?> findById(
+  /// Finds a single [ScrappableRequest] by its [id] or null if no such row exists.
+  Future<ScrappableRequest?> findById(
     _i1.Session session,
     int id, {
     _i1.Transaction? transaction,
-    ScrappableTargetRequestStructureInclude? include,
+    ScrappableRequestInclude? include,
   }) async {
-    return session.db.findById<ScrappableTargetRequestStructure>(
+    return session.db.findById<ScrappableRequest>(
       id,
       transaction: transaction,
       include: include,
     );
   }
 
-  /// Inserts all [ScrappableTargetRequestStructure]s in the list and returns the inserted rows.
+  /// Inserts all [ScrappableRequest]s in the list and returns the inserted rows.
   ///
-  /// The returned [ScrappableTargetRequestStructure]s will have their `id` fields set.
+  /// The returned [ScrappableRequest]s will have their `id` fields set.
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
-  Future<List<ScrappableTargetRequestStructure>> insert(
+  Future<List<ScrappableRequest>> insert(
     _i1.Session session,
-    List<ScrappableTargetRequestStructure> rows, {
+    List<ScrappableRequest> rows, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.insert<ScrappableTargetRequestStructure>(
+    return session.db.insert<ScrappableRequest>(
       rows,
       transaction: transaction,
     );
   }
 
-  /// Inserts a single [ScrappableTargetRequestStructure] and returns the inserted row.
+  /// Inserts a single [ScrappableRequest] and returns the inserted row.
   ///
-  /// The returned [ScrappableTargetRequestStructure] will have its `id` field set.
-  Future<ScrappableTargetRequestStructure> insertRow(
+  /// The returned [ScrappableRequest] will have its `id` field set.
+  Future<ScrappableRequest> insertRow(
     _i1.Session session,
-    ScrappableTargetRequestStructure row, {
+    ScrappableRequest row, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.insertRow<ScrappableTargetRequestStructure>(
+    return session.db.insertRow<ScrappableRequest>(
       row,
       transaction: transaction,
     );
   }
 
-  /// Updates all [ScrappableTargetRequestStructure]s in the list and returns the updated rows. If
+  /// Updates all [ScrappableRequest]s in the list and returns the updated rows. If
   /// [columns] is provided, only those columns will be updated. Defaults to
   /// all columns.
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
-  Future<List<ScrappableTargetRequestStructure>> update(
+  Future<List<ScrappableRequest>> update(
     _i1.Session session,
-    List<ScrappableTargetRequestStructure> rows, {
-    _i1.ColumnSelections<ScrappableTargetRequestStructureTable>? columns,
+    List<ScrappableRequest> rows, {
+    _i1.ColumnSelections<ScrappableRequestTable>? columns,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.update<ScrappableTargetRequestStructure>(
+    return session.db.update<ScrappableRequest>(
       rows,
-      columns: columns?.call(ScrappableTargetRequestStructure.t),
+      columns: columns?.call(ScrappableRequest.t),
       transaction: transaction,
     );
   }
 
-  /// Updates a single [ScrappableTargetRequestStructure]. The row needs to have its id set.
+  /// Updates a single [ScrappableRequest]. The row needs to have its id set.
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
-  Future<ScrappableTargetRequestStructure> updateRow(
+  Future<ScrappableRequest> updateRow(
     _i1.Session session,
-    ScrappableTargetRequestStructure row, {
-    _i1.ColumnSelections<ScrappableTargetRequestStructureTable>? columns,
+    ScrappableRequest row, {
+    _i1.ColumnSelections<ScrappableRequestTable>? columns,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.updateRow<ScrappableTargetRequestStructure>(
+    return session.db.updateRow<ScrappableRequest>(
       row,
-      columns: columns?.call(ScrappableTargetRequestStructure.t),
+      columns: columns?.call(ScrappableRequest.t),
       transaction: transaction,
     );
   }
 
-  /// Deletes all [ScrappableTargetRequestStructure]s in the list and returns the deleted rows.
+  /// Deletes all [ScrappableRequest]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
-  Future<List<ScrappableTargetRequestStructure>> delete(
+  Future<List<ScrappableRequest>> delete(
     _i1.Session session,
-    List<ScrappableTargetRequestStructure> rows, {
+    List<ScrappableRequest> rows, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.delete<ScrappableTargetRequestStructure>(
+    return session.db.delete<ScrappableRequest>(
       rows,
       transaction: transaction,
     );
   }
 
-  /// Deletes a single [ScrappableTargetRequestStructure].
-  Future<ScrappableTargetRequestStructure> deleteRow(
+  /// Deletes a single [ScrappableRequest].
+  Future<ScrappableRequest> deleteRow(
     _i1.Session session,
-    ScrappableTargetRequestStructure row, {
+    ScrappableRequest row, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.deleteRow<ScrappableTargetRequestStructure>(
+    return session.db.deleteRow<ScrappableRequest>(
       row,
       transaction: transaction,
     );
   }
 
   /// Deletes all rows matching the [where] expression.
-  Future<List<ScrappableTargetRequestStructure>> deleteWhere(
+  Future<List<ScrappableRequest>> deleteWhere(
     _i1.Session session, {
-    required _i1.WhereExpressionBuilder<ScrappableTargetRequestStructureTable>
-        where,
+    required _i1.WhereExpressionBuilder<ScrappableRequestTable> where,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.deleteWhere<ScrappableTargetRequestStructure>(
-      where: where(ScrappableTargetRequestStructure.t),
+    return session.db.deleteWhere<ScrappableRequest>(
+      where: where(ScrappableRequest.t),
       transaction: transaction,
     );
   }
@@ -483,38 +477,38 @@ class ScrappableTargetRequestStructureRepository {
   /// will return the count of all rows in the table.
   Future<int> count(
     _i1.Session session, {
-    _i1.WhereExpressionBuilder<ScrappableTargetRequestStructureTable>? where,
+    _i1.WhereExpressionBuilder<ScrappableRequestTable>? where,
     int? limit,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.count<ScrappableTargetRequestStructure>(
-      where: where?.call(ScrappableTargetRequestStructure.t),
+    return session.db.count<ScrappableRequest>(
+      where: where?.call(ScrappableRequest.t),
       limit: limit,
       transaction: transaction,
     );
   }
 }
 
-class ScrappableTargetRequestStructureAttachRowRepository {
-  const ScrappableTargetRequestStructureAttachRowRepository._();
+class ScrappableRequestAttachRowRepository {
+  const ScrappableRequestAttachRowRepository._();
 
-  /// Creates a relation between the given [ScrappableTargetRequestStructure] and [Scrappable]
-  /// by setting the [ScrappableTargetRequestStructure]'s foreign key `id` to refer to the [Scrappable].
+  /// Creates a relation between the given [ScrappableRequest] and [Scrappable]
+  /// by setting the [ScrappableRequest]'s foreign key `id` to refer to the [Scrappable].
   Future<void> scrappable(
     _i1.Session session,
-    ScrappableTargetRequestStructure scrappableTargetRequestStructure,
+    ScrappableRequest scrappableRequest,
     _i2.Scrappable scrappable, {
     _i1.Transaction? transaction,
   }) async {
     if (scrappable.id == null) {
       throw ArgumentError.notNull('scrappable.id');
     }
-    if (scrappableTargetRequestStructure.id == null) {
-      throw ArgumentError.notNull('scrappableTargetRequestStructure.id');
+    if (scrappableRequest.id == null) {
+      throw ArgumentError.notNull('scrappableRequest.id');
     }
 
-    var $scrappable = scrappable.copyWith(
-        targetRequestId: scrappableTargetRequestStructure.id);
+    var $scrappable =
+        scrappable.copyWith(targetRequestId: scrappableRequest.id);
     await session.db.updateRow<_i2.Scrappable>(
       $scrappable,
       columns: [_i2.Scrappable.t.targetRequestId],

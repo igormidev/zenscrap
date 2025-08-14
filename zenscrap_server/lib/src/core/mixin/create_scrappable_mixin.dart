@@ -98,6 +98,13 @@ mixin CreateScrappableMixin {
               isActive: true,
               targetRequestId: insertedStructure.id!,
               targetRequest: insertedStructure,
+              testData: ReferenceTestData(
+                referenceHtmlPage: '',
+                referenceLink: '',
+                referenceQueryParametersJson: '',
+                referenceSiteScreenshot: ByteData(0),
+                extractedRulesUsed: '',
+              ),
             ),
             transaction: transaction);
 

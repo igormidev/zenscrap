@@ -19,7 +19,7 @@ import 'entities/redraft_scrappable_session/zen_scrap_redraft_state.dart'
     as _i7;
 import 'entities/scrappable/reference_test_data.dart' as _i8;
 import 'entities/scrappable/scrappable.dart' as _i9;
-import 'entities/scrappable/scrappable_target_request.dart' as _i10;
+import 'entities/scrappable/scrappable_request.dart' as _i10;
 import 'entities/zenscrap_exception.dart' as _i11;
 export 'entities/account/account.dart';
 export 'entities/account/account_api_key.dart';
@@ -27,7 +27,7 @@ export 'entities/redraft_scrappable_session/prompt_role_enum.dart';
 export 'entities/redraft_scrappable_session/zen_scrap_redraft_state.dart';
 export 'entities/scrappable/reference_test_data.dart';
 export 'entities/scrappable/scrappable.dart';
-export 'entities/scrappable/scrappable_target_request.dart';
+export 'entities/scrappable/scrappable_request.dart';
 export 'entities/zenscrap_exception.dart';
 
 class Protocol extends _i1.SerializationManagerServer {
@@ -162,10 +162,16 @@ class Protocol extends _i1.SerializationManagerServer {
       columns: [
         _i2.ColumnDefinition(
           name: 'id',
-          columnType: _i2.ColumnType.bigint,
+          columnType: _i2.ColumnType.uuid,
           isNullable: false,
-          dartType: 'int?',
-          columnDefault: 'nextval(\'scrappable_id_seq\'::regclass)',
+          dartType: 'UuidValue',
+          columnDefault: 'gen_random_uuid()',
+        ),
+        _i2.ColumnDefinition(
+          name: 'createdAt',
+          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
         ),
         _i2.ColumnDefinition(
           name: 'name',
@@ -182,8 +188,14 @@ class Protocol extends _i1.SerializationManagerServer {
         _i2.ColumnDefinition(
           name: 'scrappingRules',
           columnType: _i2.ColumnType.text,
-          isNullable: false,
-          dartType: 'String',
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'testScrappingRules',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
         ),
         _i2.ColumnDefinition(
           name: 'isActive',
@@ -198,10 +210,10 @@ class Protocol extends _i1.SerializationManagerServer {
           dartType: 'int',
         ),
         _i2.ColumnDefinition(
-          name: 'testData',
-          columnType: _i2.ColumnType.json,
+          name: 'referenceTestDataId',
+          columnType: _i2.ColumnType.bigint,
           isNullable: false,
-          dartType: 'protocol:ReferenceTestData',
+          dartType: 'int',
         ),
       ],
       foreignKeys: [
@@ -214,7 +226,17 @@ class Protocol extends _i1.SerializationManagerServer {
           onUpdate: _i2.ForeignKeyAction.noAction,
           onDelete: _i2.ForeignKeyAction.noAction,
           matchType: null,
-        )
+        ),
+        _i2.ForeignKeyDefinition(
+          constraintName: 'scrappable_fk_1',
+          columns: ['referenceTestDataId'],
+          referenceTable: 'scrappable_test_data',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _i2.ForeignKeyAction.noAction,
+          onDelete: _i2.ForeignKeyAction.noAction,
+          matchType: null,
+        ),
       ],
       indexes: [
         _i2.IndexDefinition(
@@ -243,12 +265,25 @@ class Protocol extends _i1.SerializationManagerServer {
           isUnique: true,
           isPrimary: false,
         ),
+        _i2.IndexDefinition(
+          indexName: 'scrappable_reference_test_data_unique_idx',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'referenceTestDataId',
+            )
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
       ],
       managed: true,
     ),
     _i2.TableDefinition(
       name: 'scrappable_target_request',
-      dartName: 'ScrappableTargetRequestStructure',
+      dartName: 'ScrappableRequest',
       schema: 'public',
       module: 'zenscrap',
       columns: [
@@ -297,6 +332,56 @@ class Protocol extends _i1.SerializationManagerServer {
       ],
       managed: true,
     ),
+    _i2.TableDefinition(
+      name: 'scrappable_test_data',
+      dartName: 'ReferenceTestData',
+      schema: 'public',
+      module: 'zenscrap',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'nextval(\'scrappable_test_data_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'referenceQueryParametersJson',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'referenceHtmlPage',
+          columnType: _i2.ColumnType.bytea,
+          isNullable: false,
+          dartType: 'dart:typed_data:ByteData',
+        ),
+        _i2.ColumnDefinition(
+          name: 'referenceSiteScreenshot',
+          columnType: _i2.ColumnType.bytea,
+          isNullable: false,
+          dartType: 'dart:typed_data:ByteData',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'scrappable_test_data_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            )
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        )
+      ],
+      managed: true,
+    ),
     ..._i3.Protocol.targetTableDefinitions,
     ..._i2.Protocol.targetTableDefinitions,
   ];
@@ -331,8 +416,8 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i9.Scrappable) {
       return _i9.Scrappable.fromJson(data) as T;
     }
-    if (t == _i10.ScrappableTargetRequestStructure) {
-      return _i10.ScrappableTargetRequestStructure.fromJson(data) as T;
+    if (t == _i10.ScrappableRequest) {
+      return _i10.ScrappableRequest.fromJson(data) as T;
     }
     if (t == _i11.ZenScrapException) {
       return _i11.ZenScrapException.fromJson(data) as T;
@@ -364,10 +449,8 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i1.getType<_i9.Scrappable?>()) {
       return (data != null ? _i9.Scrappable.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i10.ScrappableTargetRequestStructure?>()) {
-      return (data != null
-          ? _i10.ScrappableTargetRequestStructure.fromJson(data)
-          : null) as T;
+    if (t == _i1.getType<_i10.ScrappableRequest?>()) {
+      return (data != null ? _i10.ScrappableRequest.fromJson(data) : null) as T;
     }
     if (t == _i1.getType<_i11.ZenScrapException?>()) {
       return (data != null ? _i11.ZenScrapException.fromJson(data) : null) as T;
@@ -420,8 +503,8 @@ class Protocol extends _i1.SerializationManagerServer {
     if (data is _i9.Scrappable) {
       return 'Scrappable';
     }
-    if (data is _i10.ScrappableTargetRequestStructure) {
-      return 'ScrappableTargetRequestStructure';
+    if (data is _i10.ScrappableRequest) {
+      return 'ScrappableRequest';
     }
     if (data is _i11.ZenScrapException) {
       return 'ZenScrapException';
@@ -468,8 +551,8 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName == 'Scrappable') {
       return deserialize<_i9.Scrappable>(data['data']);
     }
-    if (dataClassName == 'ScrappableTargetRequestStructure') {
-      return deserialize<_i10.ScrappableTargetRequestStructure>(data['data']);
+    if (dataClassName == 'ScrappableRequest') {
+      return deserialize<_i10.ScrappableRequest>(data['data']);
     }
     if (dataClassName == 'ZenScrapException') {
       return deserialize<_i11.ZenScrapException>(data['data']);
@@ -504,10 +587,12 @@ class Protocol extends _i1.SerializationManagerServer {
         return _i4.AccountInfo.t;
       case _i5.AccountApiKey:
         return _i5.AccountApiKey.t;
+      case _i8.ReferenceTestData:
+        return _i8.ReferenceTestData.t;
       case _i9.Scrappable:
         return _i9.Scrappable.t;
-      case _i10.ScrappableTargetRequestStructure:
-        return _i10.ScrappableTargetRequestStructure.t;
+      case _i10.ScrappableRequest:
+        return _i10.ScrappableRequest.t;
     }
     return null;
   }

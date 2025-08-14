@@ -15,10 +15,8 @@ import 'package:zenscrap_client/src/protocol/entities/account/account.dart'
     as _i3;
 import 'package:zenscrap_client/src/protocol/entities/scrappable/scrappable.dart'
     as _i4;
-import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/zen_scrap_redraft_state.dart'
-    as _i5;
-import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i6;
-import 'protocol.dart' as _i7;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i5;
+import 'protocol.dart' as _i6;
 
 /// {@category Endpoint}
 class EndpointPrivateAccount extends _i1.EndpointRef {
@@ -70,7 +68,7 @@ class EndpointHandleApiScrapRequest extends _i1.EndpointRef {
   String get name => 'handleApiScrapRequest';
 
   _i2.Future<Map<String, dynamic>> call({
-    required int scrappableId,
+    required String scrappableId,
     required Map<String, dynamic> payload,
   }) =>
       caller.callServerEndpoint<Map<String, dynamic>>(
@@ -83,50 +81,12 @@ class EndpointHandleApiScrapRequest extends _i1.EndpointRef {
       );
 }
 
-/// {@category Endpoint}
-class EndpointScrappableSession extends _i1.EndpointRef {
-  EndpointScrappableSession(_i1.EndpointCaller caller) : super(caller);
-
-  @override
-  String get name => 'scrappableSession';
-
-  _i2.Stream<_i5.ZenScrapRedraftState> listenToScrappableRedraftSession(
-          {required String sessionUuid}) =>
-      caller.callStreamingServerEndpoint<_i2.Stream<_i5.ZenScrapRedraftState>,
-          _i5.ZenScrapRedraftState>(
-        'scrappableSession',
-        'listenToScrappableRedraftSession',
-        {'sessionUuid': sessionUuid},
-        {},
-      );
-
-  _i2.Future<void> sendRedraftPrompt({
-    required String sessionUuid,
-    required String prompt,
-  }) =>
-      caller.callServerEndpoint<void>(
-        'scrappableSession',
-        'sendRedraftPrompt',
-        {
-          'sessionUuid': sessionUuid,
-          'prompt': prompt,
-        },
-      );
-
-  _i2.Future<void> createPrompt({required _i4.Scrappable scrappable}) =>
-      caller.callServerEndpoint<void>(
-        'scrappableSession',
-        'createPrompt',
-        {'scrappable': scrappable},
-      );
-}
-
 class Modules {
   Modules(Client client) {
-    auth = _i6.Caller(client);
+    auth = _i5.Caller(client);
   }
 
-  late final _i6.Caller auth;
+  late final _i5.Caller auth;
 }
 
 class Client extends _i1.ServerpodClientShared {
@@ -145,7 +105,7 @@ class Client extends _i1.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
           host,
-          _i7.Protocol(),
+          _i6.Protocol(),
           securityContext: securityContext,
           authenticationKeyManager: authenticationKeyManager,
           streamingConnectionTimeout: streamingConnectionTimeout,
@@ -158,7 +118,6 @@ class Client extends _i1.ServerpodClientShared {
     privateAccount = EndpointPrivateAccount(this);
     createScrapChatSession = EndpointCreateScrapChatSession(this);
     handleApiScrapRequest = EndpointHandleApiScrapRequest(this);
-    scrappableSession = EndpointScrappableSession(this);
     modules = Modules(this);
   }
 
@@ -168,8 +127,6 @@ class Client extends _i1.ServerpodClientShared {
 
   late final EndpointHandleApiScrapRequest handleApiScrapRequest;
 
-  late final EndpointScrappableSession scrappableSession;
-
   late final Modules modules;
 
   @override
@@ -177,7 +134,6 @@ class Client extends _i1.ServerpodClientShared {
         'privateAccount': privateAccount,
         'createScrapChatSession': createScrapChatSession,
         'handleApiScrapRequest': handleApiScrapRequest,
-        'scrappableSession': scrappableSession,
       };
 
   @override

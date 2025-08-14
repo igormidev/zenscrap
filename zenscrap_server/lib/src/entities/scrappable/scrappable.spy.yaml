@@ -1,14 +1,21 @@
 class: Scrappable
 table: scrappable
 fields:
+  id: UuidValue, defaultModel=random
+  createdAt: DateTime
   name: String
   description: String
-  scrappingRules: String
+  scrappingRules: String?
+  testScrappingRules: String?
   isActive: bool
-  targetRequest: ScrappableTargetRequestStructure?, relation(name=target_scrappable, field=targetRequestId)
   targetRequestId: int
-  testData: ReferenceTestData
+  targetRequest: ScrappableRequest?, relation(name=request_scrappable, field=targetRequestId)
+  referenceTestDataId: int
+  referenceTestData: ReferenceTestData?, relation(name=test_scrappable, field=referenceTestDataId)
 indexes:
   scrappable_target_request_unique_idx:
     fields: targetRequestId
+    unique: true
+  scrappable_reference_test_data_unique_idx:
+    fields: referenceTestDataId
     unique: true

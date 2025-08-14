@@ -11,64 +11,72 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import 'dart:typed_data' as _i2;
+import '../../entities/scrappable/scrappable.dart' as _i3;
 
 abstract class ReferenceTestData implements _i1.SerializableModel {
   ReferenceTestData._({
-    required this.referenceHtmlPage,
-    required this.referenceLink,
+    this.id,
     required this.referenceQueryParametersJson,
+    required this.referenceHtmlPage,
     required this.referenceSiteScreenshot,
-    required this.extractedRulesUsed,
+    this.scrappable,
   });
 
   factory ReferenceTestData({
-    required String referenceHtmlPage,
-    required String referenceLink,
+    int? id,
     required String referenceQueryParametersJson,
+    required _i2.ByteData referenceHtmlPage,
     required _i2.ByteData referenceSiteScreenshot,
-    required String extractedRulesUsed,
+    _i3.Scrappable? scrappable,
   }) = _ReferenceTestDataImpl;
 
   factory ReferenceTestData.fromJson(Map<String, dynamic> jsonSerialization) {
     return ReferenceTestData(
-      referenceHtmlPage: jsonSerialization['referenceHtmlPage'] as String,
-      referenceLink: jsonSerialization['referenceLink'] as String,
+      id: jsonSerialization['id'] as int?,
       referenceQueryParametersJson:
           jsonSerialization['referenceQueryParametersJson'] as String,
+      referenceHtmlPage: _i1.ByteDataJsonExtension.fromJson(
+          jsonSerialization['referenceHtmlPage']),
       referenceSiteScreenshot: _i1.ByteDataJsonExtension.fromJson(
           jsonSerialization['referenceSiteScreenshot']),
-      extractedRulesUsed: jsonSerialization['extractedRulesUsed'] as String,
+      scrappable: jsonSerialization['scrappable'] == null
+          ? null
+          : _i3.Scrappable.fromJson(
+              (jsonSerialization['scrappable'] as Map<String, dynamic>)),
     );
   }
 
-  String referenceHtmlPage;
-
-  String referenceLink;
+  /// The database id, set if the object has been inserted into the
+  /// database or if it has been fetched from the database. Otherwise,
+  /// the id will be null.
+  int? id;
 
   String referenceQueryParametersJson;
 
+  _i2.ByteData referenceHtmlPage;
+
   _i2.ByteData referenceSiteScreenshot;
 
-  String extractedRulesUsed;
+  _i3.Scrappable? scrappable;
 
   /// Returns a shallow copy of this [ReferenceTestData]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   ReferenceTestData copyWith({
-    String? referenceHtmlPage,
-    String? referenceLink,
+    int? id,
     String? referenceQueryParametersJson,
+    _i2.ByteData? referenceHtmlPage,
     _i2.ByteData? referenceSiteScreenshot,
-    String? extractedRulesUsed,
+    _i3.Scrappable? scrappable,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
-      'referenceHtmlPage': referenceHtmlPage,
-      'referenceLink': referenceLink,
+      if (id != null) 'id': id,
       'referenceQueryParametersJson': referenceQueryParametersJson,
+      'referenceHtmlPage': referenceHtmlPage.toJson(),
       'referenceSiteScreenshot': referenceSiteScreenshot.toJson(),
-      'extractedRulesUsed': extractedRulesUsed,
+      if (scrappable != null) 'scrappable': scrappable?.toJson(),
     };
   }
 
@@ -78,19 +86,21 @@ abstract class ReferenceTestData implements _i1.SerializableModel {
   }
 }
 
+class _Undefined {}
+
 class _ReferenceTestDataImpl extends ReferenceTestData {
   _ReferenceTestDataImpl({
-    required String referenceHtmlPage,
-    required String referenceLink,
+    int? id,
     required String referenceQueryParametersJson,
+    required _i2.ByteData referenceHtmlPage,
     required _i2.ByteData referenceSiteScreenshot,
-    required String extractedRulesUsed,
+    _i3.Scrappable? scrappable,
   }) : super._(
-          referenceHtmlPage: referenceHtmlPage,
-          referenceLink: referenceLink,
+          id: id,
           referenceQueryParametersJson: referenceQueryParametersJson,
+          referenceHtmlPage: referenceHtmlPage,
           referenceSiteScreenshot: referenceSiteScreenshot,
-          extractedRulesUsed: extractedRulesUsed,
+          scrappable: scrappable,
         );
 
   /// Returns a shallow copy of this [ReferenceTestData]
@@ -98,20 +108,22 @@ class _ReferenceTestDataImpl extends ReferenceTestData {
   @_i1.useResult
   @override
   ReferenceTestData copyWith({
-    String? referenceHtmlPage,
-    String? referenceLink,
+    Object? id = _Undefined,
     String? referenceQueryParametersJson,
+    _i2.ByteData? referenceHtmlPage,
     _i2.ByteData? referenceSiteScreenshot,
-    String? extractedRulesUsed,
+    Object? scrappable = _Undefined,
   }) {
     return ReferenceTestData(
-      referenceHtmlPage: referenceHtmlPage ?? this.referenceHtmlPage,
-      referenceLink: referenceLink ?? this.referenceLink,
+      id: id is int? ? id : this.id,
       referenceQueryParametersJson:
           referenceQueryParametersJson ?? this.referenceQueryParametersJson,
+      referenceHtmlPage: referenceHtmlPage ?? this.referenceHtmlPage.clone(),
       referenceSiteScreenshot:
           referenceSiteScreenshot ?? this.referenceSiteScreenshot.clone(),
-      extractedRulesUsed: extractedRulesUsed ?? this.extractedRulesUsed,
+      scrappable: scrappable is _i3.Scrappable?
+          ? scrappable
+          : this.scrappable?.copyWith(),
     );
   }
 }

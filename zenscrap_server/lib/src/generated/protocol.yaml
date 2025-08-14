@@ -5,7 +5,3 @@ createScrapChatSession:
   - createSession:
 handleApiScrapRequest:
   - call:
-scrappableSession:
-  - listenToScrappableRedraftSession:
-  - sendRedraftPrompt:
-  - createPrompt:

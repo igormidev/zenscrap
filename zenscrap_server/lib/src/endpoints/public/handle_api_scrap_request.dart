@@ -6,16 +6,15 @@ import 'package:zenscrap_server/src/generated/protocol.dart';
 class HandleApiScrapRequestEndpoint extends Endpoint {
   Future<Map<String, dynamic>> call(
     Session session, {
-    required int scrappableId,
+    required String scrappableId,
     required Map<String, dynamic> payload,
   }) async {
     final Scrappable? scrappable =
-        await Scrappable.db.findById(session, scrappableId,
+        await Scrappable.db.findById(session, UuidValue.raw(scrappableId),
             include: Scrappable.include(
-              targetRequest: ScrappableTargetRequestStructure.include(),
+              targetRequest: ScrappableRequest.include(),
             ));
-    final ScrappableTargetRequestStructure? targetRequest =
-        scrappable?.targetRequest;
+    final ScrappableRequest? targetRequest = scrappable?.targetRequest;
     if (scrappable == null || targetRequest == null) {
       throw Exception('Scrappable not found');
     }
@@ -50,7 +49,10 @@ class HandleApiScrapRequestEndpoint extends Endpoint {
       targetUrl += '?${Uri(queryParameters: queryParams).query}';
     }
 
-    final String scrapExtractRules = scrappable.scrappingRules;
+    final String? scrapExtractRules = scrappable.scrappingRules;
+    if (scrapExtractRules == null || scrapExtractRules.isEmpty) {
+      throw Exception('No extract rules defined for this scrappable');
+    }
 
     final ExtractDataByRule result = await scrapingBee.extractByRules(
       targetUrl: targetUrl,

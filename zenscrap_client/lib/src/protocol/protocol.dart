@@ -17,7 +17,7 @@ import 'entities/redraft_scrappable_session/zen_scrap_redraft_state.dart'
     as _i5;
 import 'entities/scrappable/reference_test_data.dart' as _i6;
 import 'entities/scrappable/scrappable.dart' as _i7;
-import 'entities/scrappable/scrappable_target_request.dart' as _i8;
+import 'entities/scrappable/scrappable_request.dart' as _i8;
 import 'entities/zenscrap_exception.dart' as _i9;
 import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i10;
 export 'entities/account/account.dart';
@@ -26,7 +26,7 @@ export 'entities/redraft_scrappable_session/prompt_role_enum.dart';
 export 'entities/redraft_scrappable_session/zen_scrap_redraft_state.dart';
 export 'entities/scrappable/reference_test_data.dart';
 export 'entities/scrappable/scrappable.dart';
-export 'entities/scrappable/scrappable_target_request.dart';
+export 'entities/scrappable/scrappable_request.dart';
 export 'entities/zenscrap_exception.dart';
 export 'client.dart';
 
@@ -67,8 +67,8 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i7.Scrappable) {
       return _i7.Scrappable.fromJson(data) as T;
     }
-    if (t == _i8.ScrappableTargetRequestStructure) {
-      return _i8.ScrappableTargetRequestStructure.fromJson(data) as T;
+    if (t == _i8.ScrappableRequest) {
+      return _i8.ScrappableRequest.fromJson(data) as T;
     }
     if (t == _i9.ZenScrapException) {
       return _i9.ZenScrapException.fromJson(data) as T;
@@ -100,10 +100,8 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i1.getType<_i7.Scrappable?>()) {
       return (data != null ? _i7.Scrappable.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i8.ScrappableTargetRequestStructure?>()) {
-      return (data != null
-          ? _i8.ScrappableTargetRequestStructure.fromJson(data)
-          : null) as T;
+    if (t == _i1.getType<_i8.ScrappableRequest?>()) {
+      return (data != null ? _i8.ScrappableRequest.fromJson(data) : null) as T;
     }
     if (t == _i1.getType<_i9.ZenScrapException?>()) {
       return (data != null ? _i9.ZenScrapException.fromJson(data) : null) as T;
@@ -153,8 +151,8 @@ class Protocol extends _i1.SerializationManager {
     if (data is _i7.Scrappable) {
       return 'Scrappable';
     }
-    if (data is _i8.ScrappableTargetRequestStructure) {
-      return 'ScrappableTargetRequestStructure';
+    if (data is _i8.ScrappableRequest) {
+      return 'ScrappableRequest';
     }
     if (data is _i9.ZenScrapException) {
       return 'ZenScrapException';
@@ -197,8 +195,8 @@ class Protocol extends _i1.SerializationManager {
     if (dataClassName == 'Scrappable') {
       return deserialize<_i7.Scrappable>(data['data']);
     }
-    if (dataClassName == 'ScrappableTargetRequestStructure') {
-      return deserialize<_i8.ScrappableTargetRequestStructure>(data['data']);
+    if (dataClassName == 'ScrappableRequest') {
+      return deserialize<_i8.ScrappableRequest>(data['data']);
     }
     if (dataClassName == 'ZenScrapException') {
       return deserialize<_i9.ZenScrapException>(data['data']);
