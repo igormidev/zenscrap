@@ -29,17 +29,8 @@ class ChatController {
 
   Future<List<ChatResponse>> sendMessage({
     required String userPromt,
-    required Scrappable scrappable,
+    required ReferenceTestData referenceTestData,
   }) async {
-    final referenceTestData = scrappable.referenceTestData;
-    if (referenceTestData == null) {
-      throw ZenScrapException(
-        title: 'Reference Test Data Not Found',
-        description:
-            'No reference test data found for scrappable ${scrappable.id}.',
-      );
-    }
-
     final List<ChatResponse> chatResponse = [];
 
     const int MAX_ATTEMPTS = 3;

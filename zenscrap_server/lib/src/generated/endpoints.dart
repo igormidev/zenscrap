@@ -130,7 +130,12 @@ class Endpoints extends _i1.EndpointDispatch {
               name: 'sessionId',
               type: _i1.getType<String>(),
               nullable: false,
-            )
+            ),
+            'userPrompt': _i1.ParameterDescription(
+              name: 'userPrompt',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
           },
           call: (
             _i1.Session session,
@@ -140,6 +145,7 @@ class Endpoints extends _i1.EndpointDispatch {
                   .sendPromptMessage(
             session,
             sessionId: params['sessionId'],
+            userPrompt: params['userPrompt'],
           ),
         ),
         'listenToScrappableRedraftSession': _i1.MethodStreamConnector(

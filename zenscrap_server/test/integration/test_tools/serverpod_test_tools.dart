@@ -304,6 +304,7 @@ class _ScrappableChatSession {
   _i3.Future<void> sendPromptMessage(
     _i1.TestSessionBuilder sessionBuilder, {
     required String sessionId,
+    required String userPrompt,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -316,7 +317,10 @@ class _ScrappableChatSession {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'scrappableChatSession',
           methodName: 'sendPromptMessage',
-          parameters: _i1.testObjectToJson({'sessionId': sessionId}),
+          parameters: _i1.testObjectToJson({
+            'sessionId': sessionId,
+            'userPrompt': userPrompt,
+          }),
           serializationManager: _serializationManager,
         );
         var _localReturnValue = await (_localCallContext.method.call(

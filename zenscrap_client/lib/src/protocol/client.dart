@@ -88,11 +88,17 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
         {},
       );
 
-  _i2.Future<void> sendPromptMessage({required String sessionId}) =>
+  _i2.Future<void> sendPromptMessage({
+    required String sessionId,
+    required String userPrompt,
+  }) =>
       caller.callServerEndpoint<void>(
         'scrappableChatSession',
         'sendPromptMessage',
-        {'sessionId': sessionId},
+        {
+          'sessionId': sessionId,
+          'userPrompt': userPrompt,
+        },
       );
 }
 
