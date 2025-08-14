@@ -4,4 +4,5 @@ fields:
     referenceQueryParametersJson: String
     referenceHtmlPage: ByteData
     referenceSiteScreenshot: ByteData
+    scrappableTestResult: ScrappableTestResult?
     scrappable: Scrappable?, relation(name=test_scrappable)

@@ -1,0 +1,4 @@
+class: NewExtractRuleResponse
+extends: ChatResponse
+fields:
+  referenceTestData: ReferenceTestData

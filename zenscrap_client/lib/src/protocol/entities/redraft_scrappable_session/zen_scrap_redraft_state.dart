@@ -12,9 +12,11 @@
 import '../../protocol.dart' as _i1;
 import 'package:serverpod_client/serverpod_client.dart' as _i2;
 import 'prompt_role_enum.dart' as _i3;
+import '../scrappable/reference_test_data.dart' as _i4;
 part 'responses/error_text_response.dart';
 part 'responses/message_text_and_new_extract_rules_response.dart';
 part 'responses/message_text_response.dart';
+part 'responses/new_extract_rule_response.dart';
 
 sealed class ChatResponse implements _i2.SerializableModel {
   ChatResponse({required this.role});

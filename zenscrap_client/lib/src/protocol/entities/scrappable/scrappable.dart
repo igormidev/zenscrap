@@ -20,7 +20,6 @@ abstract class Scrappable implements _i1.SerializableModel {
     required this.name,
     required this.description,
     this.scrappingRules,
-    this.testScrappingRules,
     required this.isActive,
     required this.targetRequestId,
     this.targetRequest,
@@ -34,7 +33,6 @@ abstract class Scrappable implements _i1.SerializableModel {
     required String name,
     required String description,
     String? scrappingRules,
-    String? testScrappingRules,
     required bool isActive,
     required int targetRequestId,
     _i2.ScrappableRequest? targetRequest,
@@ -50,7 +48,6 @@ abstract class Scrappable implements _i1.SerializableModel {
       name: jsonSerialization['name'] as String,
       description: jsonSerialization['description'] as String,
       scrappingRules: jsonSerialization['scrappingRules'] as String?,
-      testScrappingRules: jsonSerialization['testScrappingRules'] as String?,
       isActive: jsonSerialization['isActive'] as bool,
       targetRequestId: jsonSerialization['targetRequestId'] as int,
       targetRequest: jsonSerialization['targetRequest'] == null
@@ -78,8 +75,6 @@ abstract class Scrappable implements _i1.SerializableModel {
 
   String? scrappingRules;
 
-  String? testScrappingRules;
-
   bool isActive;
 
   int targetRequestId;
@@ -99,7 +94,6 @@ abstract class Scrappable implements _i1.SerializableModel {
     String? name,
     String? description,
     String? scrappingRules,
-    String? testScrappingRules,
     bool? isActive,
     int? targetRequestId,
     _i2.ScrappableRequest? targetRequest,
@@ -114,7 +108,6 @@ abstract class Scrappable implements _i1.SerializableModel {
       'name': name,
       'description': description,
       if (scrappingRules != null) 'scrappingRules': scrappingRules,
-      if (testScrappingRules != null) 'testScrappingRules': testScrappingRules,
       'isActive': isActive,
       'targetRequestId': targetRequestId,
       if (targetRequest != null) 'targetRequest': targetRequest?.toJson(),
@@ -139,7 +132,6 @@ class _ScrappableImpl extends Scrappable {
     required String name,
     required String description,
     String? scrappingRules,
-    String? testScrappingRules,
     required bool isActive,
     required int targetRequestId,
     _i2.ScrappableRequest? targetRequest,
@@ -151,7 +143,6 @@ class _ScrappableImpl extends Scrappable {
           name: name,
           description: description,
           scrappingRules: scrappingRules,
-          testScrappingRules: testScrappingRules,
           isActive: isActive,
           targetRequestId: targetRequestId,
           targetRequest: targetRequest,
@@ -169,7 +160,6 @@ class _ScrappableImpl extends Scrappable {
     String? name,
     String? description,
     Object? scrappingRules = _Undefined,
-    Object? testScrappingRules = _Undefined,
     bool? isActive,
     int? targetRequestId,
     Object? targetRequest = _Undefined,
@@ -183,9 +173,6 @@ class _ScrappableImpl extends Scrappable {
       description: description ?? this.description,
       scrappingRules:
           scrappingRules is String? ? scrappingRules : this.scrappingRules,
-      testScrappingRules: testScrappingRules is String?
-          ? testScrappingRules
-          : this.testScrappingRules,
       isActive: isActive ?? this.isActive,
       targetRequestId: targetRequestId ?? this.targetRequestId,
       targetRequest: targetRequest is _i2.ScrappableRequest?

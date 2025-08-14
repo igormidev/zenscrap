@@ -61,7 +61,7 @@ class HandleApiScrapRequestEndpoint extends Endpoint {
 
     return result.when(
       withData: (result) => result,
-      erorr: (errorMessage) => throw Exception(errorMessage),
+      error: (errorMessage) => throw Exception(errorMessage),
     );
   }
 }

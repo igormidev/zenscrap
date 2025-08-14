@@ -20,7 +20,8 @@ import 'entities/redraft_scrappable_session/zen_scrap_redraft_state.dart'
 import 'entities/scrappable/reference_test_data.dart' as _i8;
 import 'entities/scrappable/scrappable.dart' as _i9;
 import 'entities/scrappable/scrappable_request.dart' as _i10;
-import 'entities/zenscrap_exception.dart' as _i11;
+import 'entities/scrappable/scrappable_test_result.dart' as _i11;
+import 'entities/zenscrap_exception.dart' as _i12;
 export 'entities/account/account.dart';
 export 'entities/account/account_api_key.dart';
 export 'entities/redraft_scrappable_session/prompt_role_enum.dart';
@@ -28,6 +29,7 @@ export 'entities/redraft_scrappable_session/zen_scrap_redraft_state.dart';
 export 'entities/scrappable/reference_test_data.dart';
 export 'entities/scrappable/scrappable.dart';
 export 'entities/scrappable/scrappable_request.dart';
+export 'entities/scrappable/scrappable_test_result.dart';
 export 'entities/zenscrap_exception.dart';
 
 class Protocol extends _i1.SerializationManagerServer {
@@ -187,12 +189,6 @@ class Protocol extends _i1.SerializationManagerServer {
         ),
         _i2.ColumnDefinition(
           name: 'scrappingRules',
-          columnType: _i2.ColumnType.text,
-          isNullable: true,
-          dartType: 'String?',
-        ),
-        _i2.ColumnDefinition(
-          name: 'testScrappingRules',
           columnType: _i2.ColumnType.text,
           isNullable: true,
           dartType: 'String?',
@@ -363,6 +359,12 @@ class Protocol extends _i1.SerializationManagerServer {
           isNullable: false,
           dartType: 'dart:typed_data:ByteData',
         ),
+        _i2.ColumnDefinition(
+          name: 'scrappableTestResult',
+          columnType: _i2.ColumnType.json,
+          isNullable: true,
+          dartType: 'protocol:ScrappableTestResult?',
+        ),
       ],
       foreignKeys: [],
       indexes: [
@@ -410,6 +412,9 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i7.MessageTextResponse) {
       return _i7.MessageTextResponse.fromJson(data) as T;
     }
+    if (t == _i7.NewExtractRuleResponse) {
+      return _i7.NewExtractRuleResponse.fromJson(data) as T;
+    }
     if (t == _i8.ReferenceTestData) {
       return _i8.ReferenceTestData.fromJson(data) as T;
     }
@@ -419,8 +424,11 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i10.ScrappableRequest) {
       return _i10.ScrappableRequest.fromJson(data) as T;
     }
-    if (t == _i11.ZenScrapException) {
-      return _i11.ZenScrapException.fromJson(data) as T;
+    if (t == _i11.ScrappableTestResult) {
+      return _i11.ScrappableTestResult.fromJson(data) as T;
+    }
+    if (t == _i12.ZenScrapException) {
+      return _i12.ZenScrapException.fromJson(data) as T;
     }
     if (t == _i1.getType<_i4.AccountInfo?>()) {
       return (data != null ? _i4.AccountInfo.fromJson(data) : null) as T;
@@ -443,6 +451,10 @@ class Protocol extends _i1.SerializationManagerServer {
       return (data != null ? _i7.MessageTextResponse.fromJson(data) : null)
           as T;
     }
+    if (t == _i1.getType<_i7.NewExtractRuleResponse?>()) {
+      return (data != null ? _i7.NewExtractRuleResponse.fromJson(data) : null)
+          as T;
+    }
     if (t == _i1.getType<_i8.ReferenceTestData?>()) {
       return (data != null ? _i8.ReferenceTestData.fromJson(data) : null) as T;
     }
@@ -452,8 +464,12 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i1.getType<_i10.ScrappableRequest?>()) {
       return (data != null ? _i10.ScrappableRequest.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i11.ZenScrapException?>()) {
-      return (data != null ? _i11.ZenScrapException.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i11.ScrappableTestResult?>()) {
+      return (data != null ? _i11.ScrappableTestResult.fromJson(data) : null)
+          as T;
+    }
+    if (t == _i1.getType<_i12.ZenScrapException?>()) {
+      return (data != null ? _i12.ZenScrapException.fromJson(data) : null) as T;
     }
     if (t == Map<String, String?>) {
       return (data as Map).map((k, v) =>
@@ -497,6 +513,9 @@ class Protocol extends _i1.SerializationManagerServer {
     if (data is _i7.MessageTextResponse) {
       return 'MessageTextResponse';
     }
+    if (data is _i7.NewExtractRuleResponse) {
+      return 'NewExtractRuleResponse';
+    }
     if (data is _i8.ReferenceTestData) {
       return 'ReferenceTestData';
     }
@@ -506,7 +525,10 @@ class Protocol extends _i1.SerializationManagerServer {
     if (data is _i10.ScrappableRequest) {
       return 'ScrappableRequest';
     }
-    if (data is _i11.ZenScrapException) {
+    if (data is _i11.ScrappableTestResult) {
+      return 'ScrappableTestResult';
+    }
+    if (data is _i12.ZenScrapException) {
       return 'ZenScrapException';
     }
     className = _i2.Protocol().getClassNameForObject(data);
@@ -545,6 +567,9 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName == 'MessageTextResponse') {
       return deserialize<_i7.MessageTextResponse>(data['data']);
     }
+    if (dataClassName == 'NewExtractRuleResponse') {
+      return deserialize<_i7.NewExtractRuleResponse>(data['data']);
+    }
     if (dataClassName == 'ReferenceTestData') {
       return deserialize<_i8.ReferenceTestData>(data['data']);
     }
@@ -554,8 +579,11 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName == 'ScrappableRequest') {
       return deserialize<_i10.ScrappableRequest>(data['data']);
     }
+    if (dataClassName == 'ScrappableTestResult') {
+      return deserialize<_i11.ScrappableTestResult>(data['data']);
+    }
     if (dataClassName == 'ZenScrapException') {
-      return deserialize<_i11.ZenScrapException>(data['data']);
+      return deserialize<_i12.ZenScrapException>(data['data']);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);

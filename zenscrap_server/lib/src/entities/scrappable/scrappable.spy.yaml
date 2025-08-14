@@ -6,7 +6,6 @@ fields:
   name: String
   description: String
   scrappingRules: String?
-  testScrappingRules: String?
   isActive: bool
   targetRequestId: int
   targetRequest: ScrappableRequest?, relation(name=request_scrappable, field=targetRequestId)

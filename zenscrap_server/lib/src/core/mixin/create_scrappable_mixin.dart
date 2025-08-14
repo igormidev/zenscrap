@@ -240,7 +240,7 @@ Think step-by-step through the HTML structure to find the exact elements needed.
         // Check if validation was successful
         final bool isSuccess = validationResult.when(
           withData: (data) => data.isNotEmpty,
-          erorr: (_) => false,
+          error: (_) => false,
         );
 
         if (isSuccess) {
@@ -250,7 +250,7 @@ Think step-by-step through the HTML structure to find the exact elements needed.
         // If validation failed, store error for next retry
         lastError = validationResult.when(
           withData: (_) => 'Validation succeeded but no data was extracted',
-          erorr: (error) => error,
+          error: (error) => error,
         );
 
         // If this was the last attempt, throw exception

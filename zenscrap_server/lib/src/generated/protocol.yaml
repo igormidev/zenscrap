@@ -1,8 +1,9 @@
 privateAccount:
   - getAccountInfo:
-createScrapChatSession:
-  - call:
-  - createSession:
 createScrappable:
 handleApiScrapRequest:
   - call:
+scrappableChatSession:
+  - createSession:
+  - listenToScrappableRedraftSession:
+  - sendPromptMessage:

@@ -15,8 +15,10 @@ import 'package:zenscrap_client/src/protocol/entities/account/account.dart'
     as _i3;
 import 'package:zenscrap_client/src/protocol/entities/scrappable/scrappable.dart'
     as _i4;
-import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i5;
-import 'protocol.dart' as _i6;
+import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/zen_scrap_redraft_state.dart'
+    as _i5;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i6;
+import 'protocol.dart' as _i7;
 
 /// {@category Endpoint}
 class EndpointPrivateAccount extends _i1.EndpointRef {
@@ -29,33 +31,6 @@ class EndpointPrivateAccount extends _i1.EndpointRef {
       caller.callServerEndpoint<_i3.AccountInfo>(
         'privateAccount',
         'getAccountInfo',
-        {},
-      );
-}
-
-/// {@category Endpoint}
-class EndpointCreateScrapChatSession extends _i1.EndpointRef {
-  EndpointCreateScrapChatSession(_i1.EndpointCaller caller) : super(caller);
-
-  @override
-  String get name => 'createScrapChatSession';
-
-  _i2.Future<_i4.Scrappable> call({
-    required String targetUrl,
-    required String userPrompt,
-  }) =>
-      caller.callServerEndpoint<_i4.Scrappable>(
-        'createScrapChatSession',
-        'call',
-        {
-          'targetUrl': targetUrl,
-          'userPrompt': userPrompt,
-        },
-      );
-
-  _i2.Future<void> createSession() => caller.callServerEndpoint<void>(
-        'createScrapChatSession',
-        'createSession',
         {},
       );
 }
@@ -89,12 +64,44 @@ class EndpointHandleApiScrapRequest extends _i1.EndpointRef {
       );
 }
 
+/// {@category Endpoint}
+class EndpointScrappableChatSession extends _i1.EndpointRef {
+  EndpointScrappableChatSession(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'scrappableChatSession';
+
+  _i2.Future<void> createSession({required _i4.Scrappable scrappable}) =>
+      caller.callServerEndpoint<void>(
+        'scrappableChatSession',
+        'createSession',
+        {'scrappable': scrappable},
+      );
+
+  _i2.Stream<_i5.ChatResponse> listenToScrappableRedraftSession(
+          {required String sessionUuid}) =>
+      caller.callStreamingServerEndpoint<_i2.Stream<_i5.ChatResponse>,
+          _i5.ChatResponse>(
+        'scrappableChatSession',
+        'listenToScrappableRedraftSession',
+        {'sessionUuid': sessionUuid},
+        {},
+      );
+
+  _i2.Future<void> sendPromptMessage({required String sessionId}) =>
+      caller.callServerEndpoint<void>(
+        'scrappableChatSession',
+        'sendPromptMessage',
+        {'sessionId': sessionId},
+      );
+}
+
 class Modules {
   Modules(Client client) {
-    auth = _i5.Caller(client);
+    auth = _i6.Caller(client);
   }
 
-  late final _i5.Caller auth;
+  late final _i6.Caller auth;
 }
 
 class Client extends _i1.ServerpodClientShared {
@@ -113,7 +120,7 @@ class Client extends _i1.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
           host,
-          _i6.Protocol(),
+          _i7.Protocol(),
           securityContext: securityContext,
           authenticationKeyManager: authenticationKeyManager,
           streamingConnectionTimeout: streamingConnectionTimeout,
@@ -124,28 +131,28 @@ class Client extends _i1.ServerpodClientShared {
               disconnectStreamsOnLostInternetConnection,
         ) {
     privateAccount = EndpointPrivateAccount(this);
-    createScrapChatSession = EndpointCreateScrapChatSession(this);
     createScrappable = EndpointCreateScrappable(this);
     handleApiScrapRequest = EndpointHandleApiScrapRequest(this);
+    scrappableChatSession = EndpointScrappableChatSession(this);
     modules = Modules(this);
   }
 
   late final EndpointPrivateAccount privateAccount;
 
-  late final EndpointCreateScrapChatSession createScrapChatSession;
-
   late final EndpointCreateScrappable createScrappable;
 
   late final EndpointHandleApiScrapRequest handleApiScrapRequest;
+
+  late final EndpointScrappableChatSession scrappableChatSession;
 
   late final Modules modules;
 
   @override
   Map<String, _i1.EndpointRef> get endpointRefLookup => {
         'privateAccount': privateAccount,
-        'createScrapChatSession': createScrapChatSession,
         'createScrappable': createScrappable,
         'handleApiScrapRequest': handleApiScrapRequest,
+        'scrappableChatSession': scrappableChatSession,
       };
 
   @override

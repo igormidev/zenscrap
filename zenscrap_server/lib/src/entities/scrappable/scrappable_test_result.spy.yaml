@@ -1,0 +1,4 @@
+class: ScrappableTestResult
+fields:
+    testExtractRule: String
+    extractJsonResult: String

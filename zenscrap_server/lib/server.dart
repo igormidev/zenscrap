@@ -4,6 +4,7 @@ import 'package:zenscrap_server/src/auth/handlers/on_send_reset_email.dart';
 import 'package:zenscrap_server/src/auth/handlers/on_send_validation_email.dart';
 import 'package:zenscrap_server/src/core/scraping_bee.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as auth;
+import 'package:zenscrap_server/src/endpoints/public/chat_controller.dart';
 
 import 'package:zenscrap_server/src/web/routes/root.dart';
 
@@ -41,6 +42,9 @@ void run(List<String> args) async {
   ScrapingBee.initialize(scrapingBeeApiKey ?? '');
   final String? openAiApiKey = pod.getPassword('openAiApiKey');
   openAiClient = OpenAIClient(apiKey: openAiApiKey);
+
+  ChatController.initialize(
+      geminiApiKey: pod.getPassword('geminiApiKey') ?? '');
 
   // Start the server.
   await pod.start();

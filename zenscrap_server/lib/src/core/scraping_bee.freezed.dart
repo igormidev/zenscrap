@@ -19,7 +19,7 @@ mixin _$ExtractDataByRule {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(Map<String, dynamic> result) withData,
-    required TResult Function(String errorMessage) erorr,
+    required TResult Function(String errorMessage) error,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -152,7 +152,7 @@ class _$ExtractDataByRuleWithDataImpl extends _ExtractDataByRuleWithData {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(Map<String, dynamic> result) withData,
-    required TResult Function(String errorMessage) erorr,
+    required TResult Function(String errorMessage) error,
   }) {
     return withData(result);
   }
@@ -294,9 +294,9 @@ class _$ExtractDataByRuleWithErrorImpl extends _ExtractDataByRuleWithError {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(Map<String, dynamic> result) withData,
-    required TResult Function(String errorMessage) erorr,
+    required TResult Function(String errorMessage) error,
   }) {
-    return erorr(errorMessage);
+    return error(errorMessage);
   }
 
   @override
@@ -355,8 +355,7 @@ class _$ExtractDataByRuleWithErrorImpl extends _ExtractDataByRuleWithError {
 
 abstract class _ExtractDataByRuleWithError extends ExtractDataByRule {
   const factory _ExtractDataByRuleWithError(
-          {required final String errorMessage}) =
-      _$ExtractDataByRuleWithErrorImpl;
+      {required final String errorMessage}) = _$ExtractDataByRuleWithErrorImpl;
   const _ExtractDataByRuleWithError._() : super._();
 
   String get errorMessage;
