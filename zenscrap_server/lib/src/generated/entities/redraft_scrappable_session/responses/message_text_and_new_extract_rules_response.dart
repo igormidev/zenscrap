@@ -8,7 +8,7 @@
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
 
-part of '../zen_scrap_redraft_state.dart';
+part of '../chat_response.dart';
 
 abstract class MessageTextAndNewExtractRulesResponse extends _i1.ChatResponse
     implements _i2.SerializableModel, _i2.ProtocolSerialization {

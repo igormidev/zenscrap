@@ -15,7 +15,7 @@ import 'package:zenscrap_client/src/protocol/entities/account/account.dart'
     as _i3;
 import 'package:zenscrap_client/src/protocol/entities/scrappable/scrappable.dart'
     as _i4;
-import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/zen_scrap_redraft_state.dart'
+import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/chat_response.dart'
     as _i5;
 import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i6;
 import 'protocol.dart' as _i7;

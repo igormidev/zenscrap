@@ -6,7 +6,7 @@ import 'package:zenscrap_server/src/generated/protocol.dart';
 
 typedef RedraftSrappableSessionId = String;
 final Map<RedraftSrappableSessionId, ReplaySubject<ChatResponse>>
-    scrapRedraftSessions = {};
+    _scrapRedraftSessions = {};
 final Map<RedraftSrappableSessionId, ChatController> chatSessions = {};
 final Map<RedraftSrappableSessionId, ReferenceTestData> _cacheTestData = {};
 
@@ -37,8 +37,11 @@ class ScrappableChatSession extends Endpoint {
       );
     }
     final RedraftSrappableSessionId sessionUuid = uuid.v4();
-    scrapRedraftSessions[sessionUuid] = ReplaySubject<ChatResponse>();
-    chatSessions[sessionUuid] = ChatController.create(referenceTestData);
+    _scrapRedraftSessions[sessionUuid] = ReplaySubject<ChatResponse>();
+    chatSessions[sessionUuid] = ChatController.create(
+      scrappableId: scrappable.id,
+      referenceTestData: referenceTestData,
+    );
     _cacheTestData[sessionUuid] = referenceTestData;
   }
 
@@ -49,7 +52,7 @@ class ScrappableChatSession extends Endpoint {
     session.addWillCloseListener((session) async {
       await _disposeSession(session, sessionId: sessionUuid);
     });
-    final subject = scrapRedraftSessions[sessionUuid];
+    final subject = _scrapRedraftSessions[sessionUuid];
     if (subject == null) {
       throw ZenScrapException(
         title: 'Session Not Found',
@@ -64,7 +67,7 @@ class ScrappableChatSession extends Endpoint {
     required RedraftSrappableSessionId sessionId,
   }) async {
     chatSessions.remove(sessionId);
-    final subject = scrapRedraftSessions.remove(sessionId);
+    final subject = _scrapRedraftSessions.remove(sessionId);
     await subject?.close();
     _cacheTestData.remove(sessionId);
   }
@@ -92,7 +95,14 @@ class ScrappableChatSession extends Endpoint {
     final StreamController<ChatResponse> chatSeason =
         StreamController<ChatResponse>();
     final StreamSubscription<ChatResponse> subscription =
-        chatSeason.stream.listen((ChatResponse chatResponse) {});
+        chatSeason.stream.listen((ChatResponse chatResponse) {
+      _scrapRedraftSessions[sessionId]?.add(chatResponse);
+      if (chatResponse is NewExtractRuleResponse) {
+        if (_cacheTestData.containsKey(sessionId)) {
+          _cacheTestData[sessionId] = chatResponse.referenceTestData;
+        }
+      }
+    });
     try {
       await chatController.sendMessage(
         session: session,
@@ -113,6 +123,7 @@ class ScrappableChatSession extends Endpoint {
       );
     } finally {
       if (!chatSeason.isClosed) {
+        await Future.delayed(const Duration(milliseconds: 300));
         await subscription.cancel();
         await chatSeason.close();
       }

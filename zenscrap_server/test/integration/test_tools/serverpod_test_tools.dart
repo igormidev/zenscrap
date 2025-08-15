@@ -18,7 +18,7 @@ import 'package:zenscrap_server/src/generated/entities/account/account.dart'
     as _i4;
 import 'package:zenscrap_server/src/generated/entities/scrappable/scrappable.dart'
     as _i5;
-import 'package:zenscrap_server/src/generated/entities/redraft_scrappable_session/zen_scrap_redraft_state.dart'
+import 'package:zenscrap_server/src/generated/entities/redraft_scrappable_session/chat_response.dart'
     as _i6;
 import 'package:zenscrap_server/src/generated/protocol.dart';
 import 'package:zenscrap_server/src/generated/endpoints.dart';

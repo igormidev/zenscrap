@@ -15,8 +15,7 @@ import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i3;
 import 'entities/account/account.dart' as _i4;
 import 'entities/account/account_api_key.dart' as _i5;
 import 'entities/redraft_scrappable_session/prompt_role_enum.dart' as _i6;
-import 'entities/redraft_scrappable_session/zen_scrap_redraft_state.dart'
-    as _i7;
+import 'entities/redraft_scrappable_session/chat_response.dart' as _i7;
 import 'entities/scrappable/reference_test_data.dart' as _i8;
 import 'entities/scrappable/scrappable.dart' as _i9;
 import 'entities/scrappable/scrappable_request.dart' as _i10;
@@ -24,8 +23,8 @@ import 'entities/scrappable/scrappable_test_result.dart' as _i11;
 import 'entities/zenscrap_exception.dart' as _i12;
 export 'entities/account/account.dart';
 export 'entities/account/account_api_key.dart';
+export 'entities/redraft_scrappable_session/chat_response.dart';
 export 'entities/redraft_scrappable_session/prompt_role_enum.dart';
-export 'entities/redraft_scrappable_session/zen_scrap_redraft_state.dart';
 export 'entities/scrappable/reference_test_data.dart';
 export 'entities/scrappable/scrappable.dart';
 export 'entities/scrappable/scrappable_request.dart';
@@ -365,12 +364,6 @@ class Protocol extends _i1.SerializationManagerServer {
           isNullable: false,
           dartType: 'dart:typed_data:ByteData',
         ),
-        _i2.ColumnDefinition(
-          name: 'scrappableTestResult',
-          columnType: _i2.ColumnType.json,
-          isNullable: true,
-          dartType: 'protocol:ScrappableTestResult?',
-        ),
       ],
       foreignKeys: [],
       indexes: [
@@ -387,6 +380,99 @@ class Protocol extends _i1.SerializationManagerServer {
           isUnique: true,
           isPrimary: true,
         )
+      ],
+      managed: true,
+    ),
+    _i2.TableDefinition(
+      name: 'scrappable_test_result',
+      dartName: 'ScrappableTestResult',
+      schema: 'public',
+      module: 'zenscrap',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'nextval(\'scrappable_test_result_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'testExtractRule',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'extractJsonResult',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'scrappableId',
+          columnType: _i2.ColumnType.uuid,
+          isNullable: false,
+          dartType: 'UuidValue',
+        ),
+        _i2.ColumnDefinition(
+          name: 'referenceTestDataId',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: true,
+          dartType: 'int?',
+        ),
+      ],
+      foreignKeys: [
+        _i2.ForeignKeyDefinition(
+          constraintName: 'scrappable_test_result_fk_0',
+          columns: ['referenceTestDataId'],
+          referenceTable: 'scrappable_test_data',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _i2.ForeignKeyAction.noAction,
+          onDelete: _i2.ForeignKeyAction.cascade,
+          matchType: null,
+        )
+      ],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'scrappable_test_result_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            )
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        ),
+        _i2.IndexDefinition(
+          indexName: 'scrappable_id_idx',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'scrappableId',
+            )
+          ],
+          type: 'btree',
+          isUnique: false,
+          isPrimary: false,
+        ),
+        _i2.IndexDefinition(
+          indexName: 'reference_test_data_unique_idx',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'referenceTestDataId',
+            )
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
       ],
       managed: true,
     ),
@@ -627,6 +713,8 @@ class Protocol extends _i1.SerializationManagerServer {
         return _i9.Scrappable.t;
       case _i10.ScrappableRequest:
         return _i10.ScrappableRequest.t;
+      case _i11.ScrappableTestResult:
+        return _i11.ScrappableTestResult.t;
     }
     return null;
   }

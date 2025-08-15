@@ -122,8 +122,14 @@ abstract class ReferenceTestData
     };
   }
 
-  static ReferenceTestDataInclude include({_i4.ScrappableInclude? scrappable}) {
-    return ReferenceTestDataInclude._(scrappable: scrappable);
+  static ReferenceTestDataInclude include({
+    _i3.ScrappableTestResultInclude? scrappableTestResult,
+    _i4.ScrappableInclude? scrappable,
+  }) {
+    return ReferenceTestDataInclude._(
+      scrappableTestResult: scrappableTestResult,
+      scrappable: scrappable,
+    );
   }
 
   static ReferenceTestDataIncludeList includeList({
@@ -223,10 +229,6 @@ class ReferenceTestDataTable extends _i1.Table<int?> {
       'referenceSiteScreenshot',
       this,
     );
-    scrappableTestResult = _i1.ColumnSerializable(
-      'scrappableTestResult',
-      this,
-    );
   }
 
   late final _i1.ColumnString referenceLinkUsed;
@@ -237,9 +239,22 @@ class ReferenceTestDataTable extends _i1.Table<int?> {
 
   late final _i1.ColumnByteData referenceSiteScreenshot;
 
-  late final _i1.ColumnSerializable scrappableTestResult;
+  _i3.ScrappableTestResultTable? _scrappableTestResult;
 
   _i4.ScrappableTable? _scrappable;
+
+  _i3.ScrappableTestResultTable get scrappableTestResult {
+    if (_scrappableTestResult != null) return _scrappableTestResult!;
+    _scrappableTestResult = _i1.createRelationTable(
+      relationFieldName: 'scrappableTestResult',
+      field: ReferenceTestData.t.id,
+      foreignField: _i3.ScrappableTestResult.t.referenceTestDataId,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _i3.ScrappableTestResultTable(tableRelation: foreignTableRelation),
+    );
+    return _scrappableTestResult!;
+  }
 
   _i4.ScrappableTable get scrappable {
     if (_scrappable != null) return _scrappable!;
@@ -261,11 +276,13 @@ class ReferenceTestDataTable extends _i1.Table<int?> {
         referenceQueryParametersJson,
         referenceHtmlPage,
         referenceSiteScreenshot,
-        scrappableTestResult,
       ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
+    if (relationField == 'scrappableTestResult') {
+      return scrappableTestResult;
+    }
     if (relationField == 'scrappable') {
       return scrappable;
     }
@@ -274,14 +291,23 @@ class ReferenceTestDataTable extends _i1.Table<int?> {
 }
 
 class ReferenceTestDataInclude extends _i1.IncludeObject {
-  ReferenceTestDataInclude._({_i4.ScrappableInclude? scrappable}) {
+  ReferenceTestDataInclude._({
+    _i3.ScrappableTestResultInclude? scrappableTestResult,
+    _i4.ScrappableInclude? scrappable,
+  }) {
+    _scrappableTestResult = scrappableTestResult;
     _scrappable = scrappable;
   }
+
+  _i3.ScrappableTestResultInclude? _scrappableTestResult;
 
   _i4.ScrappableInclude? _scrappable;
 
   @override
-  Map<String, _i1.Include?> get includes => {'scrappable': _scrappable};
+  Map<String, _i1.Include?> get includes => {
+        'scrappableTestResult': _scrappableTestResult,
+        'scrappable': _scrappable,
+      };
 
   @override
   _i1.Table<int?> get table => ReferenceTestData.t;
@@ -533,6 +559,30 @@ class ReferenceTestDataRepository {
 class ReferenceTestDataAttachRowRepository {
   const ReferenceTestDataAttachRowRepository._();
 
+  /// Creates a relation between the given [ReferenceTestData] and [ScrappableTestResult]
+  /// by setting the [ReferenceTestData]'s foreign key `id` to refer to the [ScrappableTestResult].
+  Future<void> scrappableTestResult(
+    _i1.Session session,
+    ReferenceTestData referenceTestData,
+    _i3.ScrappableTestResult scrappableTestResult, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (scrappableTestResult.id == null) {
+      throw ArgumentError.notNull('scrappableTestResult.id');
+    }
+    if (referenceTestData.id == null) {
+      throw ArgumentError.notNull('referenceTestData.id');
+    }
+
+    var $scrappableTestResult = scrappableTestResult.copyWith(
+        referenceTestDataId: referenceTestData.id);
+    await session.db.updateRow<_i3.ScrappableTestResult>(
+      $scrappableTestResult,
+      columns: [_i3.ScrappableTestResult.t.referenceTestDataId],
+      transaction: transaction,
+    );
+  }
+
   /// Creates a relation between the given [ReferenceTestData] and [Scrappable]
   /// by setting the [ReferenceTestData]'s foreign key `id` to refer to the [Scrappable].
   Future<void> scrappable(
@@ -560,6 +610,37 @@ class ReferenceTestDataAttachRowRepository {
 
 class ReferenceTestDataDetachRowRepository {
   const ReferenceTestDataDetachRowRepository._();
+
+  /// Detaches the relation between this [ReferenceTestData] and the [ScrappableTestResult] set in `scrappableTestResult`
+  /// by setting the [ReferenceTestData]'s foreign key `id` to `null`.
+  ///
+  /// This removes the association between the two models without deleting
+  /// the related record.
+  Future<void> scrappableTestResult(
+    _i1.Session session,
+    ReferenceTestData referencetestdata, {
+    _i1.Transaction? transaction,
+  }) async {
+    var $scrappableTestResult = referencetestdata.scrappableTestResult;
+
+    if ($scrappableTestResult == null) {
+      throw ArgumentError.notNull('referencetestdata.scrappableTestResult');
+    }
+    if ($scrappableTestResult.id == null) {
+      throw ArgumentError.notNull('referencetestdata.scrappableTestResult.id');
+    }
+    if (referencetestdata.id == null) {
+      throw ArgumentError.notNull('referencetestdata.id');
+    }
+
+    var $$scrappableTestResult =
+        $scrappableTestResult.copyWith(referenceTestDataId: null);
+    await session.db.updateRow<_i3.ScrappableTestResult>(
+      $$scrappableTestResult,
+      columns: [_i3.ScrappableTestResult.t.referenceTestDataId],
+      transaction: transaction,
+    );
+  }
 
   /// Detaches the relation between this [ReferenceTestData] and the [Scrappable] set in `scrappable`
   /// by setting the [ReferenceTestData]'s foreign key `id` to `null`.

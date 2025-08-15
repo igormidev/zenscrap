@@ -22,15 +22,22 @@ class ChatController {
     );
   }
 
-  ChatController._();
+  ChatController._({
+    required this.chatSession,
+    required this.scrappableId,
+  });
 
-  late final ChatSession chatSession;
-  static ChatController create(ReferenceTestData referenceTestData) {
-    final instance = ChatController._();
-    instance.chatSession = _geminiModel.startChat(
-      history: [
-        getSystemPrompt(referenceTestData: referenceTestData),
-      ],
+  final ChatSession chatSession;
+  final UuidValue scrappableId;
+  static ChatController create(
+      {required UuidValue scrappableId,
+      required ReferenceTestData referenceTestData}) {
+    final chat = _geminiModel.startChat(
+      history: [getSystemPrompt(referenceTestData: referenceTestData)],
+    );
+    final instance = ChatController._(
+      chatSession: chat,
+      scrappableId: scrappableId,
     );
     return instance;
   }
@@ -38,6 +45,7 @@ class ChatController {
   Future<void> sendMessage({
     required Session session,
     required String userPromt,
+    required,
     required ReferenceTestData referenceTestData,
     required StreamController<ChatResponse> chatSeason,
   }) async {
@@ -52,7 +60,7 @@ class ChatController {
             composeUserPromptIfNeeded(
                 referenceTestData: referenceTestData, userPrompt: userPromt),
       );
-      retryContent = await getChatResponses(
+      retryContent = await _getChatResponses(
         session: session,
         generatedContent: response,
         testData: referenceTestData,
@@ -71,6 +79,174 @@ class ChatController {
         errorMessage:
             'Exceeded maximum attempts to generate extract rules. The AI is not collaborating at all...\nThe AI is generating extract rules that do not work or not even generating extract rules at all...',
       ),
+    );
+  }
+
+  Future<RetryContent?> _getChatResponses({
+    required Session session,
+    required ReferenceTestData testData,
+    required int attemptNumber,
+    required GenerateContentResponse generatedContent,
+    required StreamController<ChatResponse> chatSeasonController,
+  }) async {
+    final String attempt =
+        attemptNumber > 1 ? '# Attempt $attemptNumber\n' : '';
+
+    final String? responseText = generatedContent.text;
+    if (responseText == null || responseText.isEmpty) {
+      chatSeasonController.add(ErrorTextResponse(
+        role: PromptRole.system,
+        errorMessage:
+            'The AI returned an empty response. We will ask it to try again...',
+      ));
+
+      return Content.text(
+          '${attempt}You returned a empty response. Please think harder and try again. Do not return a empty response.');
+    }
+
+    Map<String, dynamic> parsedResponse;
+    try {
+      parsedResponse = json.decode(responseText);
+    } catch (error) {
+      chatSeasonController.add(ErrorTextResponse(
+        role: PromptRole.system,
+        errorMessage:
+            'The ai returned a response that could not be parsed to a valid JSON object. We will ask it to try again...',
+      ));
+      return Content.text(
+          '${attempt}Failed to parse AI response as JSON. I called json.decode() in my dart code and received the following error:\n$error.\nUltra think in the reason for the error and try again, ensure you just return a json without anything more.');
+    }
+
+    // ignore: avoid_print
+    print(
+      'parsedResponse:\n\n${JsonEncoder.withIndent('  ').convert(parsedResponse)}\n--------------------------------------------------',
+    );
+
+    final String? message = parsedResponse['message'] as String?;
+    final String? errorMessage = parsedResponse['errorMessage'] as String?;
+    final Map<String, dynamic>? newExtractRules =
+        parsedResponse['newExtractRules'] as Map<String, dynamic>?;
+
+    ChatResponse? newState;
+
+    if (message != null && newExtractRules != null) {
+      newState = MessageTextAndNewExtractRulesResponse(
+        role: PromptRole.model,
+        messageText: message,
+        newExtractRules: jsonEncode(newExtractRules),
+      );
+    }
+    if (message != null && newExtractRules == null) {
+      newState = MessageTextResponse(
+        role: PromptRole.model,
+        messageText: message,
+      );
+    }
+    if (errorMessage != null) {
+      newState = ErrorTextResponse(
+        role: PromptRole.model,
+        errorMessage: errorMessage,
+      );
+    }
+
+    if (newState == null) {
+      chatSeasonController.add(
+        ErrorTextResponse(
+          role: PromptRole.system,
+          errorMessage:
+              'The AI returned a response that does not match the expected schema, so we cannot process it. We will ask it to try again...',
+        ),
+      );
+
+      return Content.text(
+          '${attempt}I encountered an error while trying to map your request. You should return a json with "newExtractRules", a "message" or a "errorMessage"');
+    } else {
+      chatSeasonController.add(newState);
+    }
+
+    if (newState is! MessageTextAndNewExtractRulesResponse) {
+      return null;
+    }
+
+    final extractedRules = newState.newExtractRules;
+    chatSeasonController.add(MessageTextResponse(
+      role: PromptRole.system,
+      messageText:
+          'Great, I will now test the extract rules you created to se if it works in the reference link we are using for testing.\n'
+          'Please wait a moment...',
+    ));
+
+    // Needs to validate if the rules are working...
+    final ExtractDataByRule extractResult = await scrapingBee.extractByRules(
+      targetUrl: testData.referenceLinkUsed,
+      extractRules: extractedRules,
+    );
+
+    return extractResult.when(
+      withData: (result) async {
+        chatSeasonController.add(MessageTextResponse(
+          role: PromptRole.system,
+          messageText:
+              'New rules where tested and did not present any errors! I\'ll update the test endpoint...',
+        ));
+        ScrappableTestResult? testResult = testData.scrappableTestResult;
+        if (testResult != null) {
+          testResult = await ScrappableTestResult.db.updateRow(
+            session,
+            testResult.copyWith(
+              extractJsonResult: jsonEncode(result),
+              testExtractRule: extractedRules,
+            ),
+          );
+        } else {
+          testResult = ScrappableTestResult(
+            scrappableId: scrappableId,
+            extractJsonResult: jsonEncode(result),
+            testExtractRule: extractedRules,
+          );
+        }
+        chatSeasonController.add(NewExtractRuleResponse(
+          role: PromptRole.system,
+          messageText: 'New rules where tested and did not present any errors',
+          referenceTestData: testData.copyWith(
+            scrappableTestResult: testResult,
+          ),
+        ));
+
+        return null;
+      },
+      error: (String errorMessage) {
+        chatSeasonController.add(
+          ErrorTextResponse(role: PromptRole.system, errorMessage: ''),
+        );
+
+        return Content.text(
+            '''${attempt}When I tried calling the scrapping bee API with the new extract rule that you just generated, I got the following error from the scrapping bee endpoint:
+```log
+\n$errorMessage
+```
+
+Please try again. Try to deeply understand how the scrapping bee rules creation works, see the documentation in https://www.scrapingbee.com/documentation/data-extraction/#basic-usage if needed.
+
+**CRITICAL ANALYSIS REQUIRED:**
+1. The selectors you provided are likely incorrect or don't match actual elements in the HTML
+2. Please carefully re-examine the HTML structure provided
+3. Verify that each selector path actually exists in the HTML document
+4. Consider using more specific or alternative selectors
+5. Think step-by-step through the HTML hierarchy to ensure accuracy
+6. Double-check for typos in class names, IDs, or element tags
+7. Consider if the elements might be dynamically loaded (look for data attributes or JS-rendered content markers)
+
+**Common issues to check:**
+- Incorrect class names (check for exact matches including hyphens/underscores)
+- Missing parent elements in selector chains
+- Using IDs that don't exist
+- Assuming structure that isn't present in the actual HTML
+
+Please generate new extraction rules with extreme attention to detail. Take your time to think through each selector carefully. The HTML content and screenshot remain the same as provided initially.
+
+**ULTRA THINK:** Analyze the HTML structure methodically, verify each selector component exists, and ensure the extraction rules will successfully capture the requested data.''');
+      },
     );
   }
 }
@@ -192,165 +368,6 @@ But before the interaction with the user, I'll attach the hmtl of the site and t
 }
 
 typedef RetryContent = Content;
-Future<RetryContent?> getChatResponses({
-  required Session session,
-  required ReferenceTestData testData,
-  required int attemptNumber,
-  required GenerateContentResponse generatedContent,
-  required StreamController<ChatResponse> chatSeasonController,
-}) async {
-  final String attempt = attemptNumber > 1 ? '# Attempt $attemptNumber\n' : '';
-
-  final String? responseText = generatedContent.text;
-  if (responseText == null || responseText.isEmpty) {
-    chatSeasonController.add(ErrorTextResponse(
-      role: PromptRole.system,
-      errorMessage:
-          'The AI returned an empty response. We will ask it to try again...',
-    ));
-
-    return Content.text(
-        '${attempt}You returned a empty response. Please think harder and try again. Do not return a empty response.');
-  }
-
-  Map<String, dynamic> parsedResponse;
-  try {
-    parsedResponse = json.decode(responseText);
-  } catch (error) {
-    chatSeasonController.add(ErrorTextResponse(
-      role: PromptRole.system,
-      errorMessage:
-          'The ai returned a response that could not be parsed to a valid JSON object. We will ask it to try again...',
-    ));
-    return Content.text(
-        '${attempt}Failed to parse AI response as JSON. I called json.decode() in my dart code and received the following error:\n$error.\nUltra think in the reason for the error and try again, ensure you just return a json without anything more.');
-  }
-
-  // ignore: avoid_print
-  print(
-    'parsedResponse:\n\n${JsonEncoder.withIndent('  ').convert(parsedResponse)}\n--------------------------------------------------',
-  );
-
-  final String? message = parsedResponse['message'] as String?;
-  final String? errorMessage = parsedResponse['errorMessage'] as String?;
-  final Map<String, dynamic>? newExtractRules =
-      parsedResponse['newExtractRules'] as Map<String, dynamic>?;
-
-  ChatResponse? newState;
-
-  if (message != null && newExtractRules != null) {
-    newState = MessageTextAndNewExtractRulesResponse(
-      role: PromptRole.model,
-      messageText: message,
-      newExtractRules: jsonEncode(newExtractRules),
-    );
-  }
-  if (message != null && newExtractRules == null) {
-    newState = MessageTextResponse(
-      role: PromptRole.model,
-      messageText: message,
-    );
-  }
-  if (errorMessage != null) {
-    newState = ErrorTextResponse(
-      role: PromptRole.model,
-      errorMessage: errorMessage,
-    );
-  }
-
-  if (newState == null) {
-    chatSeasonController.add(
-      ErrorTextResponse(
-        role: PromptRole.system,
-        errorMessage:
-            'The AI returned a response that does not match the expected schema, so we cannot process it. We will ask it to try again...',
-      ),
-    );
-
-    return Content.text(
-        '${attempt}I encountered an error while trying to map your request. You should return a json with "newExtractRules", a "message" or a "errorMessage"');
-  } else {
-    chatSeasonController.add(newState);
-  }
-
-  if (newState is! MessageTextAndNewExtractRulesResponse) {
-    return null;
-  }
-
-  final extractedRules = newState.newExtractRules;
-  chatSeasonController.add(MessageTextResponse(
-    role: PromptRole.system,
-    messageText:
-        'Great, I will now test the extract rules you created to se if it works in the reference link we are using for testing.\n'
-        'Please wait a moment...',
-  ));
-
-  // Needs to validate if the rules are working...
-  final ExtractDataByRule extractResult = await scrapingBee.extractByRules(
-    targetUrl: testData.referenceLinkUsed,
-    extractRules: extractedRules,
-  );
-
-  return extractResult.when(
-    withData: (result) async {
-      chatSeasonController.add(MessageTextResponse(
-        role: PromptRole.system,
-        messageText:
-            'New rules where tested and did not present any errors! I\'ll update the test endpoint...',
-      ));
-      final newTestData = testData.copyWith(
-        scrappableTestResult: ScrappableTestResult(
-          extractJsonResult: jsonEncode(result),
-          testExtractRule: extractedRules,
-        ),
-      );
-      await ReferenceTestData.db.updateRow(
-        session,
-        newTestData,
-      );
-      chatSeasonController.add(NewExtractRuleResponse(
-        role: PromptRole.system,
-        messageText: 'New rules where tested and did not present any errors',
-        referenceTestData: newTestData,
-      ));
-
-      return null;
-    },
-    error: (String errorMessage) {
-      chatSeasonController.add(
-        ErrorTextResponse(role: PromptRole.system, errorMessage: ''),
-      );
-
-      return Content.text(
-          '''${attempt}When I tried calling the scrapping bee API with the new extract rule that you just generated, I got the following error from the scrapping bee endpoint:
-```log
-\n$errorMessage
-```
-
-Please try again. Try to deeply understand how the scrapping bee rules creation works, see the documentation in https://www.scrapingbee.com/documentation/data-extraction/#basic-usage if needed.
-
-**CRITICAL ANALYSIS REQUIRED:**
-1. The selectors you provided are likely incorrect or don't match actual elements in the HTML
-2. Please carefully re-examine the HTML structure provided
-3. Verify that each selector path actually exists in the HTML document
-4. Consider using more specific or alternative selectors
-5. Think step-by-step through the HTML hierarchy to ensure accuracy
-6. Double-check for typos in class names, IDs, or element tags
-7. Consider if the elements might be dynamically loaded (look for data attributes or JS-rendered content markers)
-
-**Common issues to check:**
-- Incorrect class names (check for exact matches including hyphens/underscores)
-- Missing parent elements in selector chains
-- Using IDs that don't exist
-- Assuming structure that isn't present in the actual HTML
-
-Please generate new extraction rules with extreme attention to detail. Take your time to think through each selector carefully. The HTML content and screenshot remain the same as provided initially.
-
-**ULTRA THINK:** Analyze the HTML structure methodically, verify each selector component exists, and ensure the extraction rules will successfully capture the requested data.''');
-    },
-  );
-}
-
 final Schema generateExtractRulesSchema = Schema(
   SchemaType.object,
   nullable: false,
