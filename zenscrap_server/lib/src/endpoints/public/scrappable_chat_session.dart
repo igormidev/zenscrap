@@ -1,4 +1,4 @@
-import 'package:collection/collection.dart';
+import 'dart:async';
 import 'package:rxdart/subjects.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller.dart';
@@ -36,11 +36,25 @@ class ScrappableChatSession extends Endpoint {
     return subject.stream;
   }
 
+  Future<void> disposeSession(
+    Session session, {
+    required RedraftSrappableSessionId sessionId,
+  }) async {
+    chatSessions.remove(sessionId);
+    final subject = scrapRedraftSessions.remove(sessionId);
+    await subject?.close();
+    cacheTestData.remove(sessionId);
+  }
+
   Future<void> sendPromptMessage(
     Session session, {
     required RedraftSrappableSessionId sessionId,
     required String userPrompt,
   }) async {
+    session.addWillCloseListener((session) async {
+      await disposeSession(session, sessionId: sessionId);
+    });
+
     final chatController = chatSessions[sessionId];
     if (chatController == null) {
       throw ZenScrapException(
@@ -56,24 +70,35 @@ class ScrappableChatSession extends Endpoint {
       );
     }
 
-    final responses = await chatController.sendMessage(
-      userPromt: userPrompt,
-      referenceTestData: testData,
-    );
-
-    final NewExtractRuleResponse? lastChat = responses.lastWhereOrNull(
-      (response) => response is NewExtractRuleResponse,
-    ) as NewExtractRuleResponse?;
-
-    if (lastChat != null) {
-      await ReferenceTestData.db.updateRow(
-        session,
-        lastChat.referenceTestData,
+    final StreamController<ChatResponse> chatSeason =
+        StreamController<ChatResponse>();
+    final StreamSubscription<ChatResponse> subscription =
+        chatSeason.stream.listen((ChatResponse chatResponse) {});
+    try {
+      await chatController.sendMessage(
+        session: session,
+        chatSeason: chatSeason,
+        userPromt: userPrompt,
+        referenceTestData: testData,
       );
-    }
+    } catch (e, s) {
+      chatSeason.add(ErrorTextResponse(
+        role: PromptRole.system,
+        errorMessage: 'An error occurred while sending the message: $e',
+      ));
+      session.log(
+        'Error occurred while sending message: $e',
+        exception: e,
+        level: LogLevel.error,
+        stackTrace: s,
+      );
+    } finally {
+      if (!chatSeason.isClosed) {
+        await subscription.cancel();
+        await chatSeason.close();
+      }
 
-    for (final response in responses) {
-      scrapRedraftSessions[sessionId]!.add(response);
+      await disposeSession(session, sessionId: sessionId);
     }
   }
 }

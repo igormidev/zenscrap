@@ -1,7 +1,9 @@
 // ignore_for_file: constant_identifier_names
 
+import 'dart:async';
 import 'dart:convert';
 import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/server.dart';
 import 'package:zenscrap_server/src/core/scraping_bee.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
@@ -27,77 +29,83 @@ class ChatController {
     return instance;
   }
 
-  Future<List<ChatResponse>> sendMessage({
+  Future<void> sendMessage({
+    required Session session,
     required String userPromt,
     required ReferenceTestData referenceTestData,
+    required StreamController<ChatResponse> chatSeason,
   }) async {
-    final List<ChatResponse> chatResponse = [];
-
     const int MAX_ATTEMPTS = 3;
-
-    for (int attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+    int attempt = 0;
+    while (attempt >= MAX_ATTEMPTS) {
+      attempt++;
       final GenerateContentResponse response = await chatSession.sendMessage(
         Content.text(userPromt),
       );
-      chatResponse.addAll(await getChatResponses(
+      final RetryContent? retryContent = await getChatResponses(
+        session: session,
         generatedContent: response,
         testData: referenceTestData,
-      ));
-
-      final ChatResponse lastChat = chatResponse.last;
-      final PromptRole role = lastChat.role;
-      bool shouldContinue = false;
-      if (role == PromptRole.system) {
-        if (lastChat is! NewExtractRuleResponse) {
-          shouldContinue = true;
-        }
-      }
-      if (shouldContinue) {
+        chatSeasonController: chatSeason,
+        attemptNumber: attempt,
+      );
+      final bool hasARetryPrompt = retryContent != null;
+      if (hasARetryPrompt) {
         continue;
       }
 
-      return chatResponse;
+      return;
     }
 
-    chatResponse.add(
+    chatSeason.add(
       ErrorTextResponse(
         role: PromptRole.system,
         errorMessage:
             'Exceeded maximum attempts to generate extract rules. The AI is not collaborating at all...\nThe AI is generating extract rules that do not work or not even generating extract rules at all...',
       ),
     );
-    return chatResponse;
   }
 }
 
-Future<List<ChatResponse>> getChatResponses({
+typedef RetryContent = Content;
+Future<RetryContent?> getChatResponses({
+  required Session session,
   required ReferenceTestData testData,
+  required int attemptNumber,
   required GenerateContentResponse generatedContent,
+  required StreamController<ChatResponse> chatSeasonController,
 }) async {
-  final List<ChatResponse> response = [];
+  final String attempt = attemptNumber > 1 ? '# Attempt $attemptNumber\n' : '';
+
+  final String? responseText = generatedContent.text;
+  if (responseText == null || responseText.isEmpty) {
+    chatSeasonController.add(ErrorTextResponse(
+      role: PromptRole.system,
+      errorMessage:
+          'The AI returned an empty response. We will ask it to try again...',
+    ));
+
+    return Content.text(
+        '${attempt}You returned a empty response. Please think harder and try again. Do not return a empty response.');
+  }
 
   Map<String, dynamic> parsedResponse;
   try {
-    final String? responseText = generatedContent.text;
-    if (responseText == null || responseText.isEmpty) {
-      return [
-        ErrorTextResponse(
-          role: PromptRole.system,
-          errorMessage:
-              'You returned empty response. Please think harder and try again. Do not return a empty response.',
-        ),
-      ];
-    }
     parsedResponse = json.decode(responseText);
   } catch (error) {
-    return [
-      ErrorTextResponse(
-        role: PromptRole.system,
-        errorMessage:
-            'Failed to parse AI response as JSON:\n$error.\nUltra think in the reason for the error and try again.',
-      ),
-    ];
+    chatSeasonController.add(ErrorTextResponse(
+      role: PromptRole.system,
+      errorMessage:
+          'The ai returned a response that could not be parsed to a valid JSON object. We will ask it to try again...',
+    ));
+    return Content.text(
+        '${attempt}Failed to parse AI response as JSON. I called json.decode() in my dart code and received the following error:\n$error.\nUltra think in the reason for the error and try again, ensure you just return a json without anything more.');
   }
+
+  // ignore: avoid_print
+  print(
+    'parsedResponse:\n\n${JsonEncoder.withIndent('  ').convert(parsedResponse)}\n--------------------------------------------------',
+  );
 
   final String? message = parsedResponse['message'] as String?;
   final String? errorMessage = parsedResponse['errorMessage'] as String?;
@@ -127,23 +135,28 @@ Future<List<ChatResponse>> getChatResponses({
   }
 
   if (newState == null) {
-    return [
+    chatSeasonController.add(
       ErrorTextResponse(
         role: PromptRole.system,
         errorMessage:
-            'I encountered an error while processing your request. You should return a json with "newExtractRules", a "message" or a "errorMessage"',
+            'The AI returned a response that does not match the expected schema, so we cannot process it. We will ask it to try again...',
       ),
-    ];
+    );
+
+    return Content.text(
+        'I encountered an error while trying to map your request. You should return a json with "newExtractRules", a "message" or a "errorMessage"');
+  } else {
+    chatSeasonController.add(newState);
   }
 
-  response.add(newState);
+  // final List<Content> response = [];
 
   if (newState is! MessageTextAndNewExtractRulesResponse) {
-    return response;
+    return null;
   }
 
   final extractedRules = newState.newExtractRules;
-  response.add(MessageTextResponse(
+  chatSeasonController.add(MessageTextResponse(
     role: PromptRole.system,
     messageText:
         'Great, I will now test the extract rules you created to se if it works in the reference link we are using for testing.\n'
@@ -156,36 +169,41 @@ Future<List<ChatResponse>> getChatResponses({
     extractRules: extractedRules,
   );
 
-  extractResult.when(
-    withData: (result) {
-      response.add(NewExtractRuleResponse(
+  return extractResult.when(
+    withData: (result) async {
+      final newTestData = testData.copyWith(
+        scrappableTestResult: ScrappableTestResult(
+          extractJsonResult: jsonEncode(result),
+          testExtractRule: extractedRules,
+        ),
+      );
+      await ReferenceTestData.db.updateRow(
+        session,
+        newTestData,
+      );
+      chatSeasonController.add(NewExtractRuleResponse(
         role: PromptRole.system,
         messageText: 'New rules where tested and did not present any errors',
-        referenceTestData: testData.copyWith(
-          scrappableTestResult: ScrappableTestResult(
-            extractJsonResult: jsonEncode(result),
-            testExtractRule: extractedRules,
-          ),
-        ),
+        referenceTestData: newTestData,
       ));
+
+      return null;
     },
     error: (String errorMessage) {
-      response.add(
-        ErrorTextResponse(
-            role: PromptRole.system,
-            errorMessage:
-                '''When I tried calling the scrapping bee API with the new extract rule that you just generated, I got the following error from the scrapping bee endpoint:
+      chatSeasonController.add(
+        ErrorTextResponse(role: PromptRole.system, errorMessage: ''),
+      );
+
+      return Content.text(
+          '''When I tried calling the scrapping bee API with the new extract rule that you just generated, I got the following error from the scrapping bee endpoint:
 ```log
 \n$errorMessage
 ```
 
 Please try again. Try to deeply understand how the scrapping bee rules creation works, see the documentation in https://www.scrapingbee.com/documentation/data-extraction/#basic-usage if needed.
-Then, analyse the log and ultra think in a new extract rule file'''),
-      );
+Then, analyse the log and ultra think in a new extract rule file''');
     },
   );
-
-  return response;
 }
 
 final Schema generateExtractRulesSchema = Schema(

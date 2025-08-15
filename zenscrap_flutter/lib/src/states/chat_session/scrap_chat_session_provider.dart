@@ -16,6 +16,8 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
     required String userPrompt,
   }) async {
     state = ScrapChatSessionState.loading();
+    final s=  ref
+        .read(clientProvider).scrappableChatSession.listenToScrappableRedraftSession(sessionUuid: )
     final result = await ref
         .read(clientProvider)
         .createScrapChatSession(
