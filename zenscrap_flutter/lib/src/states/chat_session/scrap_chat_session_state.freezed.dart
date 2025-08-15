@@ -51,22 +51,24 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
 
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(_ScrapChatSessionStateInitial value)? initial,
-    TResult Function(_ScrapChatSessionStateLoading value)? loading,
+    TResult Function(_ScrapChatSessionStateBlank value)? blank,
+    TResult Function(_ScrapChatSessionStateCreatingSessionState value)?
+        creatingSessionState,
+    TResult Function(_ScrapChatSessionStateStandard value)? standard,
     TResult Function(_ScrapChatSessionStateWithError value)? withError,
-    TResult Function(_ScrapChatSessionStateWithData value)? withData,
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
-      case _ScrapChatSessionStateInitial() when initial != null:
-        return initial(_that);
-      case _ScrapChatSessionStateLoading() when loading != null:
-        return loading(_that);
+      case _ScrapChatSessionStateBlank() when blank != null:
+        return blank(_that);
+      case _ScrapChatSessionStateCreatingSessionState()
+          when creatingSessionState != null:
+        return creatingSessionState(_that);
+      case _ScrapChatSessionStateStandard() when standard != null:
+        return standard(_that);
       case _ScrapChatSessionStateWithError() when withError != null:
         return withError(_that);
-      case _ScrapChatSessionStateWithData() when withData != null:
-        return withData(_that);
       case _:
         return orElse();
     }
@@ -87,21 +89,22 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
 
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(_ScrapChatSessionStateInitial value) initial,
-    required TResult Function(_ScrapChatSessionStateLoading value) loading,
+    required TResult Function(_ScrapChatSessionStateBlank value) blank,
+    required TResult Function(_ScrapChatSessionStateCreatingSessionState value)
+        creatingSessionState,
+    required TResult Function(_ScrapChatSessionStateStandard value) standard,
     required TResult Function(_ScrapChatSessionStateWithError value) withError,
-    required TResult Function(_ScrapChatSessionStateWithData value) withData,
   }) {
     final _that = this;
     switch (_that) {
-      case _ScrapChatSessionStateInitial():
-        return initial(_that);
-      case _ScrapChatSessionStateLoading():
-        return loading(_that);
+      case _ScrapChatSessionStateBlank():
+        return blank(_that);
+      case _ScrapChatSessionStateCreatingSessionState():
+        return creatingSessionState(_that);
+      case _ScrapChatSessionStateStandard():
+        return standard(_that);
       case _ScrapChatSessionStateWithError():
         return withError(_that);
-      case _ScrapChatSessionStateWithData():
-        return withData(_that);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -121,21 +124,23 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
 
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(_ScrapChatSessionStateInitial value)? initial,
-    TResult? Function(_ScrapChatSessionStateLoading value)? loading,
+    TResult? Function(_ScrapChatSessionStateBlank value)? blank,
+    TResult? Function(_ScrapChatSessionStateCreatingSessionState value)?
+        creatingSessionState,
+    TResult? Function(_ScrapChatSessionStateStandard value)? standard,
     TResult? Function(_ScrapChatSessionStateWithError value)? withError,
-    TResult? Function(_ScrapChatSessionStateWithData value)? withData,
   }) {
     final _that = this;
     switch (_that) {
-      case _ScrapChatSessionStateInitial() when initial != null:
-        return initial(_that);
-      case _ScrapChatSessionStateLoading() when loading != null:
-        return loading(_that);
+      case _ScrapChatSessionStateBlank() when blank != null:
+        return blank(_that);
+      case _ScrapChatSessionStateCreatingSessionState()
+          when creatingSessionState != null:
+        return creatingSessionState(_that);
+      case _ScrapChatSessionStateStandard() when standard != null:
+        return standard(_that);
       case _ScrapChatSessionStateWithError() when withError != null:
         return withError(_that);
-      case _ScrapChatSessionStateWithData() when withData != null:
-        return withData(_that);
       case _:
         return null;
     }
@@ -155,22 +160,23 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? loading,
+    TResult Function()? blank,
+    TResult Function()? creatingSessionState,
+    TResult Function(Scrappable data, String sessionUuid)? standard,
     TResult Function(ZenScrapException error)? withError,
-    TResult Function(Scrappable data)? withData,
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
-      case _ScrapChatSessionStateInitial() when initial != null:
-        return initial();
-      case _ScrapChatSessionStateLoading() when loading != null:
-        return loading();
+      case _ScrapChatSessionStateBlank() when blank != null:
+        return blank();
+      case _ScrapChatSessionStateCreatingSessionState()
+          when creatingSessionState != null:
+        return creatingSessionState();
+      case _ScrapChatSessionStateStandard() when standard != null:
+        return standard(_that.data, _that.sessionUuid);
       case _ScrapChatSessionStateWithError() when withError != null:
         return withError(_that.error);
-      case _ScrapChatSessionStateWithData() when withData != null:
-        return withData(_that.data);
       case _:
         return orElse();
     }
@@ -191,21 +197,21 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() loading,
+    required TResult Function() blank,
+    required TResult Function() creatingSessionState,
+    required TResult Function(Scrappable data, String sessionUuid) standard,
     required TResult Function(ZenScrapException error) withError,
-    required TResult Function(Scrappable data) withData,
   }) {
     final _that = this;
     switch (_that) {
-      case _ScrapChatSessionStateInitial():
-        return initial();
-      case _ScrapChatSessionStateLoading():
-        return loading();
+      case _ScrapChatSessionStateBlank():
+        return blank();
+      case _ScrapChatSessionStateCreatingSessionState():
+        return creatingSessionState();
+      case _ScrapChatSessionStateStandard():
+        return standard(_that.data, _that.sessionUuid);
       case _ScrapChatSessionStateWithError():
         return withError(_that.error);
-      case _ScrapChatSessionStateWithData():
-        return withData(_that.data);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -225,21 +231,22 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
-    TResult? Function()? loading,
+    TResult? Function()? blank,
+    TResult? Function()? creatingSessionState,
+    TResult? Function(Scrappable data, String sessionUuid)? standard,
     TResult? Function(ZenScrapException error)? withError,
-    TResult? Function(Scrappable data)? withData,
   }) {
     final _that = this;
     switch (_that) {
-      case _ScrapChatSessionStateInitial() when initial != null:
-        return initial();
-      case _ScrapChatSessionStateLoading() when loading != null:
-        return loading();
+      case _ScrapChatSessionStateBlank() when blank != null:
+        return blank();
+      case _ScrapChatSessionStateCreatingSessionState()
+          when creatingSessionState != null:
+        return creatingSessionState();
+      case _ScrapChatSessionStateStandard() when standard != null:
+        return standard(_that.data, _that.sessionUuid);
       case _ScrapChatSessionStateWithError() when withError != null:
         return withError(_that.error);
-      case _ScrapChatSessionStateWithData() when withData != null:
-        return withData(_that.data);
       case _:
         return null;
     }
@@ -248,14 +255,14 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
 
 /// @nodoc
 
-class _ScrapChatSessionStateInitial implements ScrapChatSessionState {
-  _ScrapChatSessionStateInitial();
+class _ScrapChatSessionStateBlank implements ScrapChatSessionState {
+  _ScrapChatSessionStateBlank();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _ScrapChatSessionStateInitial);
+            other is _ScrapChatSessionStateBlank);
   }
 
   @override
@@ -263,20 +270,21 @@ class _ScrapChatSessionStateInitial implements ScrapChatSessionState {
 
   @override
   String toString() {
-    return 'ScrapChatSessionState.initial()';
+    return 'ScrapChatSessionState.blank()';
   }
 }
 
 /// @nodoc
 
-class _ScrapChatSessionStateLoading implements ScrapChatSessionState {
-  _ScrapChatSessionStateLoading();
+class _ScrapChatSessionStateCreatingSessionState
+    implements ScrapChatSessionState {
+  _ScrapChatSessionStateCreatingSessionState();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _ScrapChatSessionStateLoading);
+            other is _ScrapChatSessionStateCreatingSessionState);
   }
 
   @override
@@ -284,7 +292,82 @@ class _ScrapChatSessionStateLoading implements ScrapChatSessionState {
 
   @override
   String toString() {
-    return 'ScrapChatSessionState.loading()';
+    return 'ScrapChatSessionState.creatingSessionState()';
+  }
+}
+
+/// @nodoc
+
+class _ScrapChatSessionStateStandard implements ScrapChatSessionState {
+  _ScrapChatSessionStateStandard(
+      {required this.data, required this.sessionUuid});
+
+  final Scrappable data;
+  final String sessionUuid;
+
+  /// Create a copy of ScrapChatSessionState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$ScrapChatSessionStateStandardCopyWith<_ScrapChatSessionStateStandard>
+      get copyWith => __$ScrapChatSessionStateStandardCopyWithImpl<
+          _ScrapChatSessionStateStandard>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _ScrapChatSessionStateStandard &&
+            (identical(other.data, data) || other.data == data) &&
+            (identical(other.sessionUuid, sessionUuid) ||
+                other.sessionUuid == sessionUuid));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, data, sessionUuid);
+
+  @override
+  String toString() {
+    return 'ScrapChatSessionState.standard(data: $data, sessionUuid: $sessionUuid)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$ScrapChatSessionStateStandardCopyWith<$Res>
+    implements $ScrapChatSessionStateCopyWith<$Res> {
+  factory _$ScrapChatSessionStateStandardCopyWith(
+          _ScrapChatSessionStateStandard value,
+          $Res Function(_ScrapChatSessionStateStandard) _then) =
+      __$ScrapChatSessionStateStandardCopyWithImpl;
+  @useResult
+  $Res call({Scrappable data, String sessionUuid});
+}
+
+/// @nodoc
+class __$ScrapChatSessionStateStandardCopyWithImpl<$Res>
+    implements _$ScrapChatSessionStateStandardCopyWith<$Res> {
+  __$ScrapChatSessionStateStandardCopyWithImpl(this._self, this._then);
+
+  final _ScrapChatSessionStateStandard _self;
+  final $Res Function(_ScrapChatSessionStateStandard) _then;
+
+  /// Create a copy of ScrapChatSessionState
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? data = null,
+    Object? sessionUuid = null,
+  }) {
+    return _then(_ScrapChatSessionStateStandard(
+      data: null == data
+          ? _self.data
+          : data // ignore: cast_nullable_to_non_nullable
+              as Scrappable,
+      sessionUuid: null == sessionUuid
+          ? _self.sessionUuid
+          : sessionUuid // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
   }
 }
 
@@ -350,72 +433,6 @@ class __$ScrapChatSessionStateWithErrorCopyWithImpl<$Res>
           ? _self.error
           : error // ignore: cast_nullable_to_non_nullable
               as ZenScrapException,
-    ));
-  }
-}
-
-/// @nodoc
-
-class _ScrapChatSessionStateWithData implements ScrapChatSessionState {
-  _ScrapChatSessionStateWithData({required this.data});
-
-  final Scrappable data;
-
-  /// Create a copy of ScrapChatSessionState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  _$ScrapChatSessionStateWithDataCopyWith<_ScrapChatSessionStateWithData>
-      get copyWith => __$ScrapChatSessionStateWithDataCopyWithImpl<
-          _ScrapChatSessionStateWithData>(this, _$identity);
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _ScrapChatSessionStateWithData &&
-            (identical(other.data, data) || other.data == data));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, data);
-
-  @override
-  String toString() {
-    return 'ScrapChatSessionState.withData(data: $data)';
-  }
-}
-
-/// @nodoc
-abstract mixin class _$ScrapChatSessionStateWithDataCopyWith<$Res>
-    implements $ScrapChatSessionStateCopyWith<$Res> {
-  factory _$ScrapChatSessionStateWithDataCopyWith(
-          _ScrapChatSessionStateWithData value,
-          $Res Function(_ScrapChatSessionStateWithData) _then) =
-      __$ScrapChatSessionStateWithDataCopyWithImpl;
-  @useResult
-  $Res call({Scrappable data});
-}
-
-/// @nodoc
-class __$ScrapChatSessionStateWithDataCopyWithImpl<$Res>
-    implements _$ScrapChatSessionStateWithDataCopyWith<$Res> {
-  __$ScrapChatSessionStateWithDataCopyWithImpl(this._self, this._then);
-
-  final _ScrapChatSessionStateWithData _self;
-  final $Res Function(_ScrapChatSessionStateWithData) _then;
-
-  /// Create a copy of ScrapChatSessionState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? data = null,
-  }) {
-    return _then(_ScrapChatSessionStateWithData(
-      data: null == data
-          ? _self.data
-          : data // ignore: cast_nullable_to_non_nullable
-              as Scrappable,
     ));
   }
 }

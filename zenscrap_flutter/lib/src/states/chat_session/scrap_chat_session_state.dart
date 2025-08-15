@@ -5,10 +5,13 @@ part 'scrap_chat_session_state.freezed.dart';
 
 @freezed
 abstract class ScrapChatSessionState with _$ScrapChatSessionState {
-  factory ScrapChatSessionState.initial() = _ScrapChatSessionStateInitial;
-  factory ScrapChatSessionState.loading() = _ScrapChatSessionStateLoading;
+  factory ScrapChatSessionState.blank() = _ScrapChatSessionStateBlank;
+  factory ScrapChatSessionState.creatingSessionState() =
+      _ScrapChatSessionStateCreatingSessionState;
+  factory ScrapChatSessionState.standard({
+    required Scrappable data,
+    required String sessionUuid,
+  }) = _ScrapChatSessionStateStandard;
   factory ScrapChatSessionState.withError({required ZenScrapException error}) =
       _ScrapChatSessionStateWithError;
-  factory ScrapChatSessionState.withData({required Scrappable data}) =
-      _ScrapChatSessionStateWithData;
 }

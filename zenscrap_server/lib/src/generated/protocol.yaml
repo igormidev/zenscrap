@@ -1,6 +1,7 @@
 privateAccount:
   - getAccountInfo:
 createScrappable:
+  - call:
 handleApiScrapRequest:
   - call:
   - test:

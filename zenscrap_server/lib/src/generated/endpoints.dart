@@ -66,7 +66,27 @@ class Endpoints extends _i1.EndpointDispatch {
     connectors['createScrappable'] = _i1.EndpointConnector(
       name: 'createScrappable',
       endpoint: endpoints['createScrappable']!,
-      methodConnectors: {},
+      methodConnectors: {
+        'call': _i1.MethodConnector(
+          name: 'call',
+          params: {
+            'referenceLink': _i1.ParameterDescription(
+              name: 'referenceLink',
+              type: _i1.getType<String>(),
+              nullable: false,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['createScrappable'] as _i3.CreateScrappableEndpoint)
+                  .call(
+            session,
+            referenceLink: params['referenceLink'],
+          ),
+        )
+      },
     );
     connectors['handleApiScrapRequest'] = _i1.EndpointConnector(
       name: 'handleApiScrapRequest',

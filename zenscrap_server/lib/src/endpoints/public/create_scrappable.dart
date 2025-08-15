@@ -7,8 +7,8 @@ import 'package:zenscrap_server/server.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class CreateScrappableEndpoint extends Endpoint {
-  Future<Scrappable> createScrappable({
-    required Session session,
+  Future<Scrappable> call(
+    Session session, {
     required String referenceLink,
   }) async {
     final GenerativeModel geminiModel = GenerativeModel(

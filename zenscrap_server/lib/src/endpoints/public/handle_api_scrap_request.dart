@@ -77,7 +77,11 @@ class HandleApiScrapRequestEndpoint extends Endpoint {
     }
 
     final String? scrapExtractRules = isTest
-        ? (await ScrappableTestResult.db.findFirstRow(session))?.testExtractRule
+        ? (await ScrappableTestResult.db.findFirstRow(
+            session,
+            where: (p0) => p0.scrappableId.equals(scrappable.id),
+          ))
+            ?.testExtractRule
         : scrappable.scrappingRules;
     if (scrapExtractRules == null || scrapExtractRules.isEmpty) {
       throw Exception('No extract rules defined for this scrappable');

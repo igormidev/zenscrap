@@ -41,6 +41,13 @@ class EndpointCreateScrappable extends _i1.EndpointRef {
 
   @override
   String get name => 'createScrappable';
+
+  _i2.Future<_i4.Scrappable> call({required String referenceLink}) =>
+      caller.callServerEndpoint<_i4.Scrappable>(
+        'createScrappable',
+        'call',
+        {'referenceLink': referenceLink},
+      );
 }
 
 /// {@category Endpoint}
@@ -84,8 +91,8 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
   @override
   String get name => 'scrappableChatSession';
 
-  _i2.Future<void> createSession({required _i4.Scrappable scrappable}) =>
-      caller.callServerEndpoint<void>(
+  _i2.Future<String> createSession({required _i4.Scrappable scrappable}) =>
+      caller.callServerEndpoint<String>(
         'scrappableChatSession',
         'createSession',
         {'scrappable': scrappable},

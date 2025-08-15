@@ -13,7 +13,7 @@ final Map<RedraftSrappableSessionId, ReferenceTestData> _cacheTestData = {};
 class ScrappableChatSession extends Endpoint {
   final Uuid uuid = Uuid();
 
-  Future<void> createSession(
+  Future<RedraftSrappableSessionId> createSession(
     Session session, {
     required Scrappable scrappable,
   }) async {
@@ -43,6 +43,7 @@ class ScrappableChatSession extends Endpoint {
       referenceTestData: referenceTestData,
     );
     _cacheTestData[sessionUuid] = referenceTestData;
+    return sessionUuid;
   }
 
   Stream<ChatResponse> listenToScrappableRedraftSession(
