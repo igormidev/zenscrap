@@ -12,7 +12,7 @@ final scrapChatProvider =
 
 class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
   final Ref ref;
-  StreamSubscription<ChatResponse>? _chatResponseSubscription;
+  StreamSubscription<ChatResponse>? chatResponseSubscription;
   ScrapChatSessionNotifier(this.ref) : super(ScrapChatSessionState.blank());
 
   Future<void> createScrappable({
@@ -26,20 +26,24 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
 
     await result.fold(
       (scrappable) async {
-
         final sessionResult = await ref
             .read(clientProvider)
-            .scrappableChatSession.createSession(scrappable: scrappable).toResult;
-        sessionResult.fold((sessionUuid) {
-        state = ScrapChatSessionState.standard(data: scrappable, sessionUuid: sessionUuid,);
-        _chatResponseSubscription = ref
-            .read(clientProvider)
             .scrappableChatSession
-            .listenToScrappableRedraftSession(sessionUuid: sessionUuid)
-            .listen(onChange);
-          
-        }, (failure) => state = ScrapChatSessionState.withError(error: failure));
-
+            .createSession(scrappable: scrappable)
+            .toResult;
+        sessionResult.fold((sessionUuid) {
+          state = ScrapChatSessionState.standard(
+            data: scrappable,
+            sessionUuid: sessionUuid,
+          );
+          chatResponseSubscription = ref
+              .read(clientProvider)
+              .scrappableChatSession
+              .listenToScrappableRedraftSession(sessionUuid: sessionUuid)
+              .listen(onChange);
+        },
+            (failure) =>
+                state = ScrapChatSessionState.withError(error: failure));
       },
       (failure) {
         state = ScrapChatSessionState.withError(error: failure);
@@ -47,23 +51,36 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
     );
   }
 
+  Future<void> sendMessage(String userPrompt) async {
+    final sessionUuid = state.mapOrNull(standard: (value) => value.sessionUuid);
+    if (sessionUuid == null) return;
+
+    final sessionResult = await ref
+        .read(clientProvider)
+        .scrappableChatSession
+        .sendPromptMessage(sessionId: sessionUuid, userPrompt: userPrompt)
+        .toResult;
+
+    sessionResult.onFailure((failure) {
+      state = ScrapChatSessionState.withError(error: failure);
+    });
+  }
+
   @override
   void dispose() {
-    _chatResponseSubscription?.cancel();
+    chatResponseSubscription?.cancel();
     super.dispose();
   }
 
   void onChange(ChatResponse chatResponse) {
-    chatResponse;
-  }
-
-  Future<void> startSession({
-    required String targetUrl,
-    required String userPrompt,
-  }) async {
-    state = ScrapChatSessionState.loading();
-    final s=  ref
-        .read(clientProvider).scrappableChatSession.listenToScrappableRedraftSession(sessionUuid: )
-    
+    if (chatResponse is NewExtractRuleResponse) {
+      state.mapOrNull(
+        standard: (value) {
+          state = value.copyWith(
+              data: value.data
+                  .copyWith(referenceTestData: chatResponse.referenceTestData));
+        },
+      );
+    }
   }
 }
