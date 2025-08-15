@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:serverpod/serverpod.dart';
+import 'package:zenscrap_server/src/core/extension/uint8list.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 typedef RedraftSrappableSessionId = String;
@@ -201,13 +202,25 @@ Content getCommandPrompt({
 }) {
   final Uint8List imagePng =
       Uint8List.sublistView(testData.referenceSiteScreenshot);
-  final Uint8List htmlBytes = utf8.encode(testData.referenceHtmlPage);
+  final Uint8List htmlBytes = testData.referenceHtmlPage.asUint8List;
   final Uint8List jsonBytes = utf8.encode(
     jsonEncode(testData.referenceQueryParametersJson),
   );
   return Content(PromptRole.system.roleText, [
     TextPart(
-        '''I am a saas company that generates scrapping extract rules with ai.
+        '''I wan't you to create extraction rules so I can extract from a html page the data that I need.
+
+Context:
+I have a saas made in flutter with serverpod as my server. This saas will extract data that my clients need from the web.
+
+My client/user wan't a web scrapper for the site "${requestStrcture.url}". He wan't to extract data from that site.
+The scrapper api will run in my server, and I will give him a endpoint to access it.
+The user sent me a prompt of what data he wants to extract from the site. The prompt of the user was:
+```prompt
+$userPrompt
+```
+
+I am a saas company that generates scrapping extract rules with ai.
 My user wan't to extract data with of "${requestStructure.url}" with web scrapping.
 
 I wan't to use "extract rules" feature of ScrapingBee.

@@ -25,9 +25,13 @@ class ChatController {
   ChatController._();
 
   late final ChatSession chatSession;
-  static ChatController create() {
+  static ChatController create(ReferenceTestData referenceTestData) {
     final instance = ChatController._();
-    instance.chatSession = _geminiModel.startChat();
+    instance.chatSession = _geminiModel.startChat(
+      history: [
+        getSystemPrompt(referenceTestData: referenceTestData),
+      ],
+    );
     return instance;
   }
 
@@ -40,14 +44,13 @@ class ChatController {
     const int MAX_ATTEMPTS = 3;
     int attempt = 0;
     RetryContent? retryContent;
+
     while (attempt >= MAX_ATTEMPTS) {
       attempt++;
       final GenerateContentResponse response = await chatSession.sendMessage(
         retryContent ??
-            composeUserPrompt(
-              referenceTestData: referenceTestData,
-              userPrompt: userPromt,
-            ),
+            composeUserPromptIfNeeded(
+                referenceTestData: referenceTestData, userPrompt: userPromt),
       );
       retryContent = await getChatResponses(
         session: session,
@@ -56,10 +59,10 @@ class ChatController {
         chatSeasonController: chatSeason,
         attemptNumber: attempt,
       );
-      final bool hasARetryPrompt = retryContent != null;
-      if (hasARetryPrompt) continue;
-
-      return;
+      if (retryContent == null) {
+        // No retry needed.
+        return;
+      }
     }
 
     chatSeason.add(
@@ -72,9 +75,46 @@ class ChatController {
   }
 }
 
-Content composeUserPrompt({
+Content composeUserPromptIfNeeded({
   required ReferenceTestData referenceTestData,
   required String userPrompt,
+}) {
+  final bool neverGeneratedATestResultBefore =
+      referenceTestData.scrappableTestResult == null;
+
+  if (neverGeneratedATestResultBefore) {
+    return Content.multi([
+      TextPart(
+          '''I need you to ultra think in the response of the task prompt I will send bellow, so you don't generate a response that is not compliant with ScrapingBee extract rules feature so it will not return a error the tests I will do later with the link "${referenceTestData.referenceLinkUsed}"...
+Please deeply understand what I need so you can correctly build new extraction rules.
+
+My modification/task prompt is:'''),
+      TextPart(userPrompt),
+    ]);
+  }
+
+  final Uint8List jsonBytes = utf8.encode(
+    jsonEncode(referenceTestData.referenceQueryParametersJson),
+  );
+
+  return Content.multi([
+    TextPart(
+        'Hello, I wan\'t to iterate on the last extract rules I built. I will attach it bellow:'),
+    DataPart('application/json', jsonBytes),
+    TextPart('''It worked well, but I want to change it a little bit...
+I wan't you to modify it and create a new rules json, that are compliant with ScrapingBee extract rules feature, that resolves what I will ask in my message that will describe the modifications I wan't.
+
+I need you to ultra think in the response so you don't generate a response that is not compliant with ScrapingBee extract rules feature so it will not return a error the tests I will do later with the link "${referenceTestData.referenceLinkUsed}"...
+
+Please deeply understand what I need so you can correctly build new extraction rules.
+
+My modification/task prompt is:'''),
+    TextPart(userPrompt),
+  ]);
+}
+
+Content getSystemPrompt({
+  required ReferenceTestData referenceTestData,
 }) {
   final bool neverGeneratedATestResultBefore =
       referenceTestData.scrappableTestResult == null;
@@ -82,36 +122,72 @@ Content composeUserPrompt({
   final Uint8List imagePng =
       referenceTestData.referenceSiteScreenshot.asUint8List;
   final Uint8List htmlBytes = referenceTestData.referenceHtmlPage.asUint8List;
-  final Uint8List jsonBytes = utf8.encode(
-    jsonEncode(referenceTestData.referenceQueryParametersJson),
-  );
 
-  return Content.multi([
+  return Content('system', [
     TextPart(
         '''I am a saas company that generates scrapping extract rules with ai.
+The client of my saas is made in flutter with serverpod as my server. This saas will extract data that my clients need from the web.
 My user wan't to extract data with of "${referenceTestData.referenceLinkUsed}" with web scrapping.
 
-I wan't to use "extract rules" feature of ScrapingBee.
+I wan't to use "extract rules" feature of ScrapingBee. With this I'll have a deterministic way of scrapping the site.
 The overall documentation of ScrapingBee is: "https://www.scrapingbee.com/documentation/data-extraction/#basic-usage", you can web research and read it if needed to understand how it works if needed.
 
-Also using scrapping bee, I extracted the html that will be attached in the next message'''),
+I will expose an api where my users can send requests to get data from that site with the extracted rules you built.
+My ideia is to make a request in my serverpod server similar to this one:
+```dart
+/// Example of a extract rule - that you will generate
+final extractionRules = {
+  'title': 'h1',
+  'price': '.price',
+  'description': 'p.description'
+};
+  
+/// Example of a request
+final uri = Uri.parse('https://app.scrapingbee.com/api/v1/').replace(
+  queryParameters: {
+    'api_key': apiKey,
+    'url': targetUrl,
+    'extract_rules': jsonEncode(extractionRules),
+  },
+);
+```
+
+But of course, instead of that mocked extraction rules of the example I will use rules that will in fact get the data the user asked for in the prompt.
+I need you to create that extraction rules (extract_rules) for me.
+
+I am providing you with:
+1. The complete HTML content of the reference page (attached as an HTML file)
+2. A screenshot of the page (attached as an image file)
+
+Use both the HTML content and the screenshot to understand the page structure and create accurate extraction rules.
+
+IMPORTANT REQUIREMENTS:
+1. Analyze the HTML content thoroughly to understand the structure
+2. Use the screenshot to understand the visual layout and identify important elements
+3. Double check that you are not hallucinating and creating rules to paths that don't exist in the HTML
+4. Ultra think in your response and think for a long time about the correct selectors
+5. Your response should be a valid JSON object with extraction rules
+6. Each key should be the name of the data to extract, and the value should be the CSS selector or XPath to extract that data
+7. Test your selectors mentally against the provided HTML to ensure they match elements
+
+Example response format:
+{
+  "product_name": "h1.product-title",
+  "price": "span.price-now",
+  "description": "div.product-description",
+  "availability": "span.stock-status"
+}
+
+But before the interaction with the user, I'll attach the hmtl of the site and the screenshot as well'''),
+    TextPart(
+        'The html that you should use as base to create the extract rules json:'),
     DataPart('text/html', htmlBytes),
     TextPart(
-        'Also, I will attach a print of the site so you can have a better understanding of how it looks:'),
+        'Now, I will attach a print of the site so you can have a better understanding of how it looks:'),
     DataPart('image/png', imagePng),
-    if (neverGeneratedATestResultBefore)
-      ...[
-    ] else ...[
-      TextPart(
-          'And with that html and using the site as referencce, she successfully generated the following extraction rules:'),
-    ],
-    DataPart('application/json', jsonBytes),
-    TextPart(
-        '''It worked well, my user want's to change it a little bit, so you should to create new rules that are compliant with ScrapingBee extract rules feature (as I said above, web research the documentation if needed).
-I need you to allways ultra think in the response so you don't generate a response that is not compliant with ScrapingBee extract rules feature and that will return me a error.
-
-The next messages with be made by the role 'user' with a prompt asking for modifications, please deeply understand what the user needs and so you can correctly build new extraction rules.
-'''),
+    TextPart(neverGeneratedATestResultBefore
+        ? 'Now, the user will start sending prompts to you for the creation of the first extraction rules and probably he will send more prompts for you to iterate on top of those rules to add more data, fix something, etc... Ultra think in each of your responses.'
+        : 'Now, the user will start sending prompts to you to modify a current extraction rule that he created in a previous AI talking session, you will need to iterate on top of those rules... Ultra think in each of your responses.'),
   ]);
 }
 
@@ -192,7 +268,7 @@ Future<RetryContent?> getChatResponses({
     );
 
     return Content.text(
-        'I encountered an error while trying to map your request. You should return a json with "newExtractRules", a "message" or a "errorMessage"');
+        '${attempt}I encountered an error while trying to map your request. You should return a json with "newExtractRules", a "message" or a "errorMessage"');
   } else {
     chatSeasonController.add(newState);
   }
@@ -217,6 +293,11 @@ Future<RetryContent?> getChatResponses({
 
   return extractResult.when(
     withData: (result) async {
+      chatSeasonController.add(MessageTextResponse(
+        role: PromptRole.system,
+        messageText:
+            'New rules where tested and did not present any errors! I\'ll update the test endpoint...',
+      ));
       final newTestData = testData.copyWith(
         scrappableTestResult: ScrappableTestResult(
           extractJsonResult: jsonEncode(result),
@@ -241,13 +322,31 @@ Future<RetryContent?> getChatResponses({
       );
 
       return Content.text(
-          '''When I tried calling the scrapping bee API with the new extract rule that you just generated, I got the following error from the scrapping bee endpoint:
+          '''${attempt}When I tried calling the scrapping bee API with the new extract rule that you just generated, I got the following error from the scrapping bee endpoint:
 ```log
 \n$errorMessage
 ```
 
 Please try again. Try to deeply understand how the scrapping bee rules creation works, see the documentation in https://www.scrapingbee.com/documentation/data-extraction/#basic-usage if needed.
-Then, analyse the log and ultra think in a new extract rule file''');
+
+**CRITICAL ANALYSIS REQUIRED:**
+1. The selectors you provided are likely incorrect or don't match actual elements in the HTML
+2. Please carefully re-examine the HTML structure provided
+3. Verify that each selector path actually exists in the HTML document
+4. Consider using more specific or alternative selectors
+5. Think step-by-step through the HTML hierarchy to ensure accuracy
+6. Double-check for typos in class names, IDs, or element tags
+7. Consider if the elements might be dynamically loaded (look for data attributes or JS-rendered content markers)
+
+**Common issues to check:**
+- Incorrect class names (check for exact matches including hyphens/underscores)
+- Missing parent elements in selector chains
+- Using IDs that don't exist
+- Assuming structure that isn't present in the actual HTML
+
+Please generate new extraction rules with extreme attention to detail. Take your time to think through each selector carefully. The HTML content and screenshot remain the same as provided initially.
+
+**ULTRA THINK:** Analyze the HTML structure methodically, verify each selector component exists, and ensure the extraction rules will successfully capture the requested data.''');
     },
   );
 }
