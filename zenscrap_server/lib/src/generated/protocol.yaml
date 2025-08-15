@@ -6,4 +6,5 @@ handleApiScrapRequest:
 scrappableChatSession:
   - createSession:
   - listenToScrappableRedraftSession:
+  - disposeSession:
   - sendPromptMessage:
