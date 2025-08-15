@@ -9,6 +9,33 @@ class HandleApiScrapRequestEndpoint extends Endpoint {
     required String scrappableId,
     required Map<String, dynamic> payload,
   }) async {
+    return _callFunc(
+      session: session,
+      isTest: false,
+      payload: payload,
+      scrappableId: scrappableId,
+    );
+  }
+
+  Future<Map<String, dynamic>> test(
+    Session session, {
+    required String scrappableId,
+    required Map<String, dynamic> payload,
+  }) async {
+    return _callFunc(
+      session: session,
+      isTest: true,
+      payload: payload,
+      scrappableId: scrappableId,
+    );
+  }
+
+  Future<Map<String, dynamic>> _callFunc({
+    required Session session,
+    required bool isTest,
+    required String scrappableId,
+    required Map<String, dynamic> payload,
+  }) async {
     final Scrappable? scrappable =
         await Scrappable.db.findById(session, UuidValue.raw(scrappableId),
             include: Scrappable.include(

@@ -3,8 +3,8 @@ privateAccount:
 createScrappable:
 handleApiScrapRequest:
   - call:
+  - test:
 scrappableChatSession:
   - createSession:
   - listenToScrappableRedraftSession:
-  - disposeSession:
   - sendPromptMessage:

@@ -8,7 +8,7 @@ typedef RedraftSrappableSessionId = String;
 final Map<RedraftSrappableSessionId, ReplaySubject<ChatResponse>>
     scrapRedraftSessions = {};
 final Map<RedraftSrappableSessionId, ChatController> chatSessions = {};
-final Map<RedraftSrappableSessionId, ReferenceTestData> cacheTestData = {};
+final Map<RedraftSrappableSessionId, ReferenceTestData> _cacheTestData = {};
 
 class ScrappableChatSession extends Endpoint {
   final Uuid uuid = Uuid();
@@ -17,15 +17,38 @@ class ScrappableChatSession extends Endpoint {
     Session session, {
     required Scrappable scrappable,
   }) async {
+    final ReferenceTestData? referenceTestData =
+        (scrappable.referenceTestData ??
+            await ReferenceTestData.db.findFirstRow(
+              session,
+              where: (p0) =>
+                  p0.scrappable.id.equals(scrappable.id) |
+                  p0.id.equals(scrappable.referenceTestDataId),
+            ));
+    if (referenceTestData == null) {
+      session.log(
+        'No reference test data found for scrappable with id ${scrappable.id}.',
+        level: LogLevel.error,
+      );
+      throw ZenScrapException(
+        title: 'Reference Test Data Not Found',
+        description:
+            'No reference test data found for scrappable with id ${scrappable.id}.',
+      );
+    }
     final RedraftSrappableSessionId sessionUuid = uuid.v4();
     scrapRedraftSessions[sessionUuid] = ReplaySubject<ChatResponse>();
-    chatSessions[sessionUuid] = ChatController.create();
+    chatSessions[sessionUuid] = ChatController.create(referenceTestData);
+    _cacheTestData[sessionUuid] = referenceTestData;
   }
 
   Stream<ChatResponse> listenToScrappableRedraftSession(
     Session session, {
     required RedraftSrappableSessionId sessionUuid,
   }) {
+    session.addWillCloseListener((session) async {
+      await _disposeSession(session, sessionId: sessionUuid);
+    });
     final subject = scrapRedraftSessions[sessionUuid];
     if (subject == null) {
       throw ZenScrapException(
@@ -36,14 +59,14 @@ class ScrappableChatSession extends Endpoint {
     return subject.stream;
   }
 
-  Future<void> disposeSession(
+  Future<void> _disposeSession(
     Session session, {
     required RedraftSrappableSessionId sessionId,
   }) async {
     chatSessions.remove(sessionId);
     final subject = scrapRedraftSessions.remove(sessionId);
     await subject?.close();
-    cacheTestData.remove(sessionId);
+    _cacheTestData.remove(sessionId);
   }
 
   Future<void> sendPromptMessage(
@@ -51,10 +74,6 @@ class ScrappableChatSession extends Endpoint {
     required RedraftSrappableSessionId sessionId,
     required String userPrompt,
   }) async {
-    session.addWillCloseListener((session) async {
-      await disposeSession(session, sessionId: sessionId);
-    });
-
     final chatController = chatSessions[sessionId];
     if (chatController == null) {
       throw ZenScrapException(
@@ -62,7 +81,7 @@ class ScrappableChatSession extends Endpoint {
         description: 'No active session found for uuid $sessionId.',
       );
     }
-    final testData = cacheTestData[sessionId];
+    final testData = _cacheTestData[sessionId];
     if (testData == null) {
       throw ZenScrapException(
         title: 'Cache Test Data Not Found',
@@ -97,8 +116,6 @@ class ScrappableChatSession extends Endpoint {
         await subscription.cancel();
         await chatSeason.close();
       }
-
-      await disposeSession(session, sessionId: sessionId);
     }
   }
 }

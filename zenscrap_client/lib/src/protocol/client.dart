@@ -62,6 +62,19 @@ class EndpointHandleApiScrapRequest extends _i1.EndpointRef {
           'payload': payload,
         },
       );
+
+  _i2.Future<Map<String, dynamic>> test({
+    required String scrappableId,
+    required Map<String, dynamic> payload,
+  }) =>
+      caller.callServerEndpoint<Map<String, dynamic>>(
+        'handleApiScrapRequest',
+        'test',
+        {
+          'scrappableId': scrappableId,
+          'payload': payload,
+        },
+      );
 }
 
 /// {@category Endpoint}
@@ -86,13 +99,6 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
         'listenToScrappableRedraftSession',
         {'sessionUuid': sessionUuid},
         {},
-      );
-
-  _i2.Future<void> disposeSession({required String sessionId}) =>
-      caller.callServerEndpoint<void>(
-        'scrappableChatSession',
-        'disposeSession',
-        {'sessionId': sessionId},
       );
 
   _i2.Future<void> sendPromptMessage({
