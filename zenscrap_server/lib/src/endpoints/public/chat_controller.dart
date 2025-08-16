@@ -29,11 +29,15 @@ class ChatController {
 
   final ChatSession chatSession;
   final UuidValue scrappableId;
-  static ChatController create(
-      {required UuidValue scrappableId,
-      required ReferenceTestData referenceTestData}) {
+  static ChatController create({
+    required UuidValue scrappableId,
+    required ReferenceTestData referenceTestData,
+  }) {
     final chat = _geminiModel.startChat(
       history: [getSystemPrompt(referenceTestData: referenceTestData)],
+      generationConfig: GenerationConfig(
+        responseSchema: generateExtractRulesSchema,
+      ),
     );
     final instance = ChatController._(
       chatSession: chat,
@@ -124,8 +128,14 @@ class ChatController {
 
     final String? message = parsedResponse['message'] as String?;
     final String? errorMessage = parsedResponse['errorMessage'] as String?;
-    final Map<String, dynamic>? newExtractRules =
+    Map<String, dynamic>? newExtractRules =
         parsedResponse['newExtractRules'] as Map<String, dynamic>?;
+    
+    // Remove the __example__ key if present (it's just for schema validation)
+    if (newExtractRules != null) {
+      newExtractRules = Map<String, dynamic>.from(newExtractRules);
+      newExtractRules.remove('__example__');
+    }
 
     ChatResponse? newState;
 
@@ -370,6 +380,14 @@ But before the interaction with the user, I'll attach the hmtl of the site and t
 typedef RetryContent = Content;
 final Schema generateExtractRulesSchema = Schema(
   SchemaType.object,
+  description: 'Schema for Gemini AI to generate ScrapingBee extraction rules from HTML content and user requirements. '
+      'This schema enforces structured responses for web scraping rule generation, allowing the AI to: '
+      '1) Create CSS selectors or XPath expressions that accurately target HTML elements, '
+      '2) Provide contextual messages about the rules or ask clarification questions, '
+      '3) Report errors when extraction is not possible (e.g., 404 pages, invalid HTML). '
+      'The AI analyzes both HTML content and screenshots to identify the correct selectors, '
+      'ensuring the extraction rules are valid for ScrapingBee\'s extract_rules API parameter. '
+      'The schema supports iterative refinement where users can modify existing rules based on feedback.',
   nullable: false,
   properties: {
     'message': Schema(
@@ -407,9 +425,23 @@ This field should be null if there is no error.''',
     ),
     'newExtractRules': Schema(
       SchemaType.object,
+      nullable: true,
       description:
           '''New extraction rules that are compliant with ScrapingBee extract rules feature.
-If you have any doubts about how to generate the rules, you can web research the ScrapingBee documentation at "https://www.scrapingbee.com/documentation/data-extraction/#basic-usage".''',
+This is a dynamic map where keys are the data field names to extract (e.g., "title", "price", "description") 
+and values are CSS selectors or XPath expressions that target those elements in the HTML.
+Example: {"product_name": "h1.title", "price": "span.price-value", "availability": "div.stock-status"}.
+If you have any doubts about how to generate the rules, you can web research the ScrapingBee documentation at "https://www.scrapingbee.com/documentation/data-extraction/#basic-usage".
+This field should be null when asking clarification questions (only 'message' should be set).''',
+      properties: {
+        '__example__': Schema(
+          SchemaType.string,
+          nullable: true,
+          description:
+              'This is just an example property to satisfy the Gemini API schema requirement that objects must have at least one property. '
+              'The actual properties will be dynamic based on what data the user wants to extract from the webpage.',
+        ),
+      },
     ),
   },
 );

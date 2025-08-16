@@ -44,9 +44,10 @@ class _ChatViewPageState extends ConsumerState<ChatViewPage>
 
   @override
   void dispose() {
-    super.dispose();
+    _controller.dispose();
     _referenceLinkEC.dispose();
     _promptEC.dispose();
+    super.dispose();
   }
 
   @override
@@ -82,7 +83,9 @@ class _ChatViewPageState extends ConsumerState<ChatViewPage>
                       decoder: customDecoder,
                     ),
                   ),
-                ),
+                ).animate().fadeIn(
+                    duration: const Duration(seconds: 1),
+                    delay: const Duration(milliseconds: 800)),
                 Transform.translate(
                   offset: const Offset(0, -20),
                   child: Text(
