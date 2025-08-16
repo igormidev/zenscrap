@@ -6,18 +6,17 @@ import 'package:zenscrap_flutter/src/ui/scrap_session/sections/scrappable_test_r
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/zen_chat_textfield.dart';
 
 class ScrappableEditSessionView extends StatelessWidget {
-  final String testLink;
-  final Map<String, dynamic> testJsonResponse;
-  final Scrappable? request;
+  final Scrappable scrappable;
   const ScrappableEditSessionView({
     super.key,
-    this.request,
-    required this.testLink,
-    required this.testJsonResponse,
+    required this.scrappable,
   });
 
   @override
   Widget build(BuildContext context) {
+    final ScrappableRequest? request = scrappable.targetRequest;
+    final ReferenceTestData? testData = scrappable.referenceTestData;
+    if (request == null) return SizedBox.fromSize();
     return Row(
       children: [
         Expanded(
@@ -30,13 +29,10 @@ class ScrappableEditSessionView extends StatelessWidget {
         ),
         Expanded(
           child: Column(children: [
-            ScrappableCurlSection(request: request!.targetRequest!),
+            ScrappableCurlSection(request: request),
             SizedBox(height: 20),
             Expanded(
-              child: ScrappableTestResponse(
-                testLink: testLink,
-                testJsonResponse: testJsonResponse,
-              ),
+              child: ScrappableTestResponse(testData: testData),
             ),
           ]),
         ),

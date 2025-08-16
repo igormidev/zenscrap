@@ -31,18 +31,21 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
             .scrappableChatSession
             .createSession(scrappable: scrappable)
             .toResult;
-        sessionResult.fold((sessionUuid) {
-          state = ScrapChatSessionState.standard(
-            data: scrappable,
-            sessionUuid: sessionUuid,
-          );
+
+        await sessionResult.fold((sessionUuid) async {
           chatResponseSubscription = ref
               .read(clientProvider)
               .scrappableChatSession
               .listenToScrappableRedraftSession(sessionUuid: sessionUuid)
               .listen(onChange);
+          state = ScrapChatSessionState.standard(
+            data: scrappable,
+            sessionUuid: sessionUuid,
+          );
+
+          await sendMessage(userPrompt);
         },
-            (failure) =>
+            (failure) async =>
                 state = ScrapChatSessionState.withError(error: failure));
       },
       (failure) {

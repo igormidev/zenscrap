@@ -4,7 +4,7 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/code_bloc.dart';
 
 class ScrappableCurlSection extends StatelessWidget {
-  final ScrappableTargetRequestStructure request;
+  final ScrappableRequest request;
   const ScrappableCurlSection({
     super.key,
     required this.request,
