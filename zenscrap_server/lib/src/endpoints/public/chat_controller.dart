@@ -96,7 +96,7 @@ class ChatController {
     final String attempt =
         attemptNumber > 1 ? '# Attempt $attemptNumber\n' : '';
 
-    final String? responseText = generatedContent.text;
+    var responseText = generatedContent.text;
     if (responseText == null || responseText.isEmpty) {
       chatSeasonController.add(ErrorTextResponse(
         role: PromptRole.system,
@@ -108,6 +108,18 @@ class ChatController {
           '${attempt}You returned a empty response. Please think harder and try again. Do not return a empty response.');
     }
 
+    // Clean up the response in case the AI wrapped it in markdown code blocks
+    responseText = responseText.trim();
+    if (responseText.startsWith('```json')) {
+      responseText = responseText.substring(7); // Remove ```json
+    } else if (responseText.startsWith('```')) {
+      responseText = responseText.substring(3); // Remove ```
+    }
+    if (responseText.endsWith('```')) {
+      responseText = responseText.substring(0, responseText.length - 3); // Remove trailing ```
+    }
+    responseText = responseText.trim();
+
     Map<String, dynamic> parsedResponse;
     try {
       parsedResponse = json.decode(responseText);
@@ -118,7 +130,7 @@ class ChatController {
             'The ai returned a response that could not be parsed to a valid JSON object. We will ask it to try again...',
       ));
       return Content.text(
-          '${attempt}Failed to parse AI response as JSON. I called json.decode() in my dart code and received the following error:\n$error.\nUltra think in the reason for the error and try again, ensure you just return a json without anything more.');
+          '${attempt}Failed to parse AI response as JSON. I called json.decode() in my dart code and received the following error:\n$error.\nUltra think in the reason for the error and try again. Return only raw JSON without anything more (not even markdown notations like "```" in the beginning or end).');
     }
 
     // ignore: avoid_print
@@ -169,7 +181,7 @@ class ChatController {
       );
 
       return Content.text(
-          '${attempt}I encountered an error while trying to map your request. You should return a json with "newExtractRules", a "message" or a "errorMessage"');
+          '${attempt}I encountered an error while trying to map your request. You should return a JSON with "newExtractRules", a "message" or a "errorMessage". Return only raw JSON without anything more (not even markdown notations like "```").');
     } else {
       chatSeasonController.add(newState);
     }
@@ -355,6 +367,7 @@ IMPORTANT REQUIREMENTS:
 5. Your response should be a valid JSON object with extraction rules
 6. Each key should be the name of the data to extract, and the value should be the CSS selector or XPath to extract that data
 7. Test your selectors mentally against the provided HTML to ensure they match elements
+8. Return only raw JSON, without anything more (not even markdown notations like "```" in the beginning or end... just the raw JSON)
 
 Example response format:
 {
