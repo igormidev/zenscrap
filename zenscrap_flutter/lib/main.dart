@@ -6,10 +6,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:serverpod_auth_shared_flutter/serverpod_auth_shared_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talker_flutter/talker_flutter.dart';
-import 'package:talker_riverpod_logger/talker_riverpod_logger_observer.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:flutter/material.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
+import 'package:zenscrap_flutter/src/core/utils/custom_talker_riverpod_observer.dart';
 import 'package:zenscrap_flutter/src/core/utils/devide_utils.dart';
 import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 import 'package:zenscrap_flutter/src/core/web/url_strategy.dart';
@@ -118,7 +118,7 @@ class RestartableAppState extends State<RestartableApp> {
       child: ProviderScope(
         key:
             _key, // This key change will re-create ProviderScope and its children
-        observers: [if (kDebugMode) TalkerRiverpodObserver(talker: talker)],
+        observers: [if (kDebugMode) CustomTalkerRiverpodObserver(talker: talker, maxStateLength: 500)],
         overrides: [
           clientProvider.overrideWithValue(widget.client),
           sessionManagerProvider.overrideWithValue(widget.sessionManager),

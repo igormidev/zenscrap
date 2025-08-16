@@ -122,6 +122,7 @@ class ScrappableChatSession extends Endpoint {
         level: LogLevel.error,
         stackTrace: s,
       );
+      rethrow;
     } finally {
       if (!chatSeason.isClosed) {
         await Future.delayed(const Duration(milliseconds: 300));
