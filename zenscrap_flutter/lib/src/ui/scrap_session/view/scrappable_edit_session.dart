@@ -20,11 +20,14 @@ class ScrappableEditSessionView extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: Column(
-            children: [
-              Expanded(child: ScrappableChatMessageStreamSection()),
-              ZenChatTextfield(),
-            ],
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 20, left: 20),
+            child: Column(
+              children: [
+                Expanded(child: ScrappableChatMessageStreamSection()),
+                ZenChatTextfield(),
+              ],
+            ),
           ),
         ),
         Expanded(

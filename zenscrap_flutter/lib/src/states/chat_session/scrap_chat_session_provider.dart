@@ -12,6 +12,7 @@ final scrapChatProvider =
 
 class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
   final Ref ref;
+  Stream<ChatResponse>? chatResponseStream;
   StreamSubscription<ChatResponse>? chatResponseSubscription;
   ScrapChatSessionNotifier(this.ref) : super(ScrapChatSessionState.blank());
 
@@ -33,11 +34,12 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
             .toResult;
 
         await sessionResult.fold((sessionUuid) async {
-          chatResponseSubscription = ref
+          chatResponseStream = ref
               .read(clientProvider)
               .scrappableChatSession
-              .listenToScrappableRedraftSession(sessionUuid: sessionUuid)
-              .listen(onChange);
+              .listenToScrappableRedraftSession(sessionUuid: sessionUuid);
+
+          chatResponseSubscription = chatResponseStream!.listen(onChange);
           state = ScrapChatSessionState.standard(
             data: scrappable,
             sessionUuid: sessionUuid,
