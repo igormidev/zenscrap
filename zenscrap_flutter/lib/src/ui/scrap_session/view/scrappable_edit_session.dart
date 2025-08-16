@@ -30,14 +30,21 @@ class ScrappableEditSessionView extends StatelessWidget {
             ),
           ),
         ),
+        SizedBox(width: 16),
         Expanded(
-          child: Column(children: [
-            ScrappableCurlSection(request: request),
-            SizedBox(height: 20),
-            Expanded(
-              child: ScrappableTestResponse(testData: testData),
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 20, right: 20, top: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ScrappableCurlSection(request: request),
+                SizedBox(height: 20),
+                Expanded(
+                  child: ScrappableTestResponse(testData: testData),
+                ),
+              ],
             ),
-          ]),
+          ),
         ),
       ],
     );

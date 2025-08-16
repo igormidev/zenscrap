@@ -14,7 +14,7 @@ class ScrappableTestJsonResponseViewer extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: context.c.surfaceContainerLowest,
-        border: Border.all(color: context.c.outline, width: 1),
+        border: Border.all(color: context.c.outline.withAlpha(80), width: 1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Builder(

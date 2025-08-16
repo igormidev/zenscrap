@@ -19,13 +19,15 @@ class ScrappableTestResponse extends StatelessWidget {
         testData.scrappableTestResult?.extractJsonResult;
     final Map<String, dynamic>? mappedResponse = tryDecode(extractedJsonResult);
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('Scrapper test response'),
         SizedBox(height: 8),
         TestLinkCard(testLink: testData.referenceLinkUsed),
         SizedBox(height: 8),
-        ScrappableTestJsonResponseViewer(
-          testResponse: mappedResponse,
+        Expanded(
+          child: ScrappableTestJsonResponseViewer(
+            testResponse: mappedResponse,
+          ),
         ),
       ],
     );
