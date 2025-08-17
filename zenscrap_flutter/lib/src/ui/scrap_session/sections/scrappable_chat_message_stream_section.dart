@@ -105,7 +105,7 @@ class _ScrappableChatMessageStreamSectionState
 
         return ListView.builder(
           controller: _scrollController,
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           itemCount: messages.length,
           itemBuilder: (context, index) {
             final message = messages[index];
@@ -139,32 +139,72 @@ class _ChatMessageBubble extends StatelessWidget {
 
     Color backgroundColor;
     Color textColor;
-    IconData? roleIcon;
-    String roleLabel;
-    CrossAxisAlignment alignment;
-    EdgeInsets margin;
+    IconData roleIcon;
+    Color iconBackgroundColor;
+    Color iconColor;
+    MainAxisAlignment rowAlignment;
+    BorderRadius messageBorderRadius;
+    EdgeInsetsGeometry messagePadding;
+    const double border = 22;
 
     if (isUserMessage) {
-      backgroundColor = colorScheme.primaryContainer;
-      textColor = colorScheme.onPrimaryContainer;
+      backgroundColor = colorScheme.primary;
+      textColor = colorScheme.onPrimary;
       roleIcon = Icons.person;
-      roleLabel = 'You';
-      alignment = CrossAxisAlignment.end;
-      margin = const EdgeInsets.only(left: 48, right: 0, bottom: 12);
+      iconBackgroundColor = colorScheme.primaryContainer;
+      iconColor = colorScheme.onPrimaryContainer;
+      rowAlignment = MainAxisAlignment.end;
+      messageBorderRadius = const BorderRadius.only(
+        topLeft: Radius.circular(border),
+        topRight: Radius.circular(0),
+        bottomLeft: Radius.circular(border),
+        bottomRight: Radius.circular(border),
+      );
+      messagePadding = const EdgeInsets.only(left: 56, right: 0);
     } else if (isSystemMessage) {
       backgroundColor = colorScheme.surfaceContainerHighest;
       textColor = colorScheme.onSurfaceVariant;
       roleIcon = Icons.info_outline;
-      roleLabel = 'System';
-      alignment = CrossAxisAlignment.center;
-      margin = const EdgeInsets.symmetric(horizontal: 24, vertical: 12);
+      iconBackgroundColor = colorScheme.surfaceContainerHigh;
+      iconColor = colorScheme.onSurfaceVariant;
+      rowAlignment = MainAxisAlignment.start;
+      messageBorderRadius = const BorderRadius.only(
+        topLeft: Radius.circular(0),
+        topRight: Radius.circular(border),
+        bottomLeft: Radius.circular(border),
+        bottomRight: Radius.circular(border),
+      );
+      messagePadding = const EdgeInsets.only(left: 0, right: 56);
     } else {
-      backgroundColor = colorScheme.secondaryContainer;
-      textColor = colorScheme.onSecondaryContainer;
+      // Model/AI message
+      backgroundColor = colorScheme.surfaceContainerHigh;
+      textColor = colorScheme.onSurface;
       roleIcon = Icons.smart_toy;
-      roleLabel = 'AI Assistant';
-      alignment = CrossAxisAlignment.start;
-      margin = const EdgeInsets.only(left: 0, right: 48, bottom: 12);
+      iconBackgroundColor = colorScheme.secondaryContainer;
+      iconColor = colorScheme.onSecondaryContainer;
+      rowAlignment = MainAxisAlignment.start;
+      messageBorderRadius = const BorderRadius.only(
+        topLeft: Radius.circular(0),
+        topRight: Radius.circular(border),
+        bottomLeft: Radius.circular(border),
+        bottomRight: Radius.circular(border),
+      );
+      messagePadding = const EdgeInsets.only(left: 0, right: 56);
+    }
+
+    // Override colors for specific message types
+    if (message is ErrorTextResponse) {
+      backgroundColor = colorScheme.errorContainer;
+      textColor = colorScheme.onErrorContainer;
+      roleIcon = Icons.error_outline;
+      iconBackgroundColor = colorScheme.error;
+      iconColor = colorScheme.onError;
+    } else if (message is NewExtractRuleResponse) {
+      backgroundColor = colorScheme.tertiaryContainer;
+      textColor = colorScheme.onTertiaryContainer;
+      roleIcon = Icons.check_circle;
+      iconBackgroundColor = colorScheme.tertiary;
+      iconColor = colorScheme.onTertiary;
     }
 
     Widget messageContent = const SizedBox.shrink();
@@ -176,9 +216,6 @@ class _ChatMessageBubble extends StatelessWidget {
       );
     } else if (message is ErrorTextResponse) {
       final errorMessage = message as ErrorTextResponse;
-      backgroundColor = colorScheme.errorContainer;
-      textColor = colorScheme.onErrorContainer;
-      roleIcon = Icons.error_outline;
       messageContent = _ErrorMessage(
         errorMessage: errorMessage.errorMessage,
         textColor: textColor,
@@ -193,67 +230,92 @@ class _ChatMessageBubble extends StatelessWidget {
       );
     } else if (message is NewExtractRuleResponse) {
       final newRuleMessage = message as NewExtractRuleResponse;
-      backgroundColor = colorScheme.tertiaryContainer;
-      textColor = colorScheme.onTertiaryContainer;
-      roleIcon = Icons.check_circle_outline;
       messageContent = _NewRuleMessage(
         messageText: newRuleMessage.messageText,
         textColor: textColor,
       );
     }
 
-    return Column(
-      crossAxisAlignment: alignment,
-      children: [
-        if (!isSystemMessage)
-          Padding(
-            padding: margin.copyWith(bottom: 4),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (!isUserMessage) ...[
-                  Icon(roleIcon,
-                      size: 16, color: textColor.withValues(alpha: 0.7)),
-                  const SizedBox(width: 4),
-                ],
-                Text(
-                  roleLabel,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: textColor.withValues(alpha: 0.7),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                if (isUserMessage) ...[
-                  const SizedBox(width: 4),
-                  Icon(roleIcon,
-                      size: 16, color: textColor.withValues(alpha: 0.7)),
-                ],
-              ],
+    return Padding(
+      padding: messagePadding.add(const EdgeInsets.symmetric(vertical: 4)),
+      child: Row(
+        mainAxisAlignment: rowAlignment,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (!isUserMessage) ...[
+            _MessageAvatar(
+              icon: roleIcon,
+              backgroundColor: iconBackgroundColor,
+              iconColor: iconColor,
             ),
-          ),
-        Container(
-          margin: margin,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(isUserMessage ? 16 : 4),
-              topRight: Radius.circular(isUserMessage ? 4 : 16),
-              bottomLeft: const Radius.circular(16),
-              bottomRight: const Radius.circular(16),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: colorScheme.shadow.withValues(alpha: 0.1),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
+            const SizedBox(width: 8),
+          ],
+          Flexible(
+            child: Container(
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * 0.75,
               ),
-            ],
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: backgroundColor,
+                borderRadius: messageBorderRadius,
+                boxShadow: [
+                  BoxShadow(
+                    color: colorScheme.shadow.withValues(alpha: 0.08),
+                    blurRadius: 3,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
+              child: messageContent,
+            ),
           ),
-          child: messageContent,
-        ),
-        if (isLastMessage) const SizedBox(height: 8),
-      ],
+          if (isUserMessage) ...[
+            const SizedBox(width: 8),
+            _MessageAvatar(
+              icon: roleIcon,
+              backgroundColor: iconBackgroundColor,
+              iconColor: iconColor,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _MessageAvatar extends StatelessWidget {
+  final IconData icon;
+  final Color backgroundColor;
+  final Color iconColor;
+
+  const _MessageAvatar({
+    required this.icon,
+    required this.backgroundColor,
+    required this.iconColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 32,
+      height: 32,
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 2,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Icon(
+        icon,
+        size: 18,
+        color: iconColor,
+      ),
     );
   }
 }
@@ -273,7 +335,8 @@ class _TextMessage extends StatelessWidget {
       text,
       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: textColor,
-            height: 1.5,
+            height: 1.4,
+            fontSize: 14,
           ),
     );
   }
@@ -292,30 +355,33 @@ class _ErrorMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              Icons.error_outline,
-              size: 20,
-              color: textColor,
+              Icons.warning_rounded,
+              size: 16,
+              color: textColor.withValues(alpha: 0.9),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 6),
             Text(
               'Error',
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
                     color: textColor,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                   ),
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 4),
         SelectableText(
           errorMessage,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: textColor,
-                height: 1.5,
+                color: textColor.withValues(alpha: 0.9),
+                height: 1.4,
+                fontSize: 14,
               ),
         ),
       ],
@@ -359,64 +425,71 @@ class _ExtractRulesMessageState extends State<_ExtractRulesMessage> {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         SelectableText(
           widget.messageText,
           style: theme.textTheme.bodyMedium?.copyWith(
             color: widget.textColor,
-            height: 1.5,
+            height: 1.4,
+            fontSize: 14,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            color: widget.backgroundColor.withValues(alpha: 0.3),
-            borderRadius: BorderRadius.circular(8),
+            color: widget.textColor.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: widget.textColor.withValues(alpha: 0.2),
+              color: widget.textColor.withValues(alpha: 0.15),
+              width: 0.5,
             ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
             children: [
               InkWell(
                 onTap: () => setState(() => _isExpanded = !_isExpanded),
                 borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(8)),
+                    const BorderRadius.vertical(top: Radius.circular(12)),
                 child: Padding(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   child: Row(
                     children: [
                       Icon(
-                        Icons.code,
-                        size: 18,
-                        color: widget.textColor.withValues(alpha: 0.7),
+                        Icons.code_rounded,
+                        size: 16,
+                        color: widget.textColor.withValues(alpha: 0.8),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 6),
                       Text(
                         'Extract Rules',
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          color: widget.textColor,
-                          fontWeight: FontWeight.w600,
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          color: widget.textColor.withValues(alpha: 0.9),
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                       const Spacer(),
-                      IconButton(
-                        onPressed: _copyToClipboard,
-                        icon: Icon(
-                          Icons.copy,
-                          size: 16,
-                          color: widget.textColor.withValues(alpha: 0.7),
+                      InkWell(
+                        onTap: _copyToClipboard,
+                        borderRadius: BorderRadius.circular(12),
+                        child: Padding(
+                          padding: const EdgeInsets.all(4),
+                          child: Icon(
+                            Icons.copy_rounded,
+                            size: 14,
+                            color: widget.textColor.withValues(alpha: 0.7),
+                          ),
                         ),
-                        tooltip: 'Copy to clipboard',
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 4),
                       Icon(
-                        _isExpanded ? Icons.expand_less : Icons.expand_more,
-                        size: 20,
+                        _isExpanded
+                            ? Icons.keyboard_arrow_up
+                            : Icons.keyboard_arrow_down,
+                        size: 18,
                         color: widget.textColor.withValues(alpha: 0.7),
                       ),
                     ],
@@ -424,17 +497,22 @@ class _ExtractRulesMessageState extends State<_ExtractRulesMessage> {
                 ),
               ),
               if (_isExpanded) ...[
-                const Divider(height: 1),
+                Divider(
+                  height: 0.5,
+                  thickness: 0.5,
+                  color: widget.textColor.withValues(alpha: 0.1),
+                ),
                 Container(
-                  constraints: const BoxConstraints(maxHeight: 300),
+                  constraints: const BoxConstraints(maxHeight: 200),
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(10),
                     child: SelectableText(
                       widget.extractRules,
                       style: theme.textTheme.bodySmall?.copyWith(
                         fontFamily: 'monospace',
-                        color: widget.textColor.withValues(alpha: 0.9),
-                        height: 1.4,
+                        color: widget.textColor.withValues(alpha: 0.85),
+                        height: 1.3,
+                        fontSize: 12,
                       ),
                     ),
                   ),
@@ -460,19 +538,25 @@ class _NewRuleMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(
-          Icons.check_circle,
-          size: 20,
-          color: textColor,
+        Padding(
+          padding: const EdgeInsets.only(top: 2),
+          child: Icon(
+            Icons.check_circle_rounded,
+            size: 16,
+            color: textColor.withValues(alpha: 0.9),
+          ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 6),
         Expanded(
           child: SelectableText(
             messageText,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: textColor,
-                  height: 1.5,
+                  height: 1.4,
+                  fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
           ),

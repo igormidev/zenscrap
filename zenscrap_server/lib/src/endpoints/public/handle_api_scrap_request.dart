@@ -4,7 +4,7 @@ import 'package:zenscrap_server/src/core/scraping_bee.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class HandleApiScrapRequestEndpoint extends Endpoint {
-  Future<Map<String, dynamic>> call(
+  Future<Map<String, dynamic>> prod(
     Session session, {
     required String scrappableId,
     required Map<String, dynamic> payload,
@@ -36,11 +36,11 @@ class HandleApiScrapRequestEndpoint extends Endpoint {
     required String scrappableId,
     required Map<String, dynamic> payload,
   }) async {
-    final Scrappable? scrappable =
-        await Scrappable.db.findById(session, UuidValue.raw(scrappableId),
-            include: Scrappable.include(
-              targetRequest: ScrappableRequest.include(),
-            ));
+    final request = ScrappableRequest.include();
+    final Scrappable? scrappable = await Scrappable.db.findById(
+        session, UuidValue.raw(scrappableId),
+        include: Scrappable.include(targetRequest: request));
+
     final ScrappableRequest? targetRequest = scrappable?.targetRequest;
     if (scrappable == null || targetRequest == null) {
       throw Exception('Scrappable not found');

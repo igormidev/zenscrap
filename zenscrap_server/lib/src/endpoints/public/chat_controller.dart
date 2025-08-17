@@ -71,6 +71,8 @@ class ChatController {
         chatSeasonController: chatSeason,
         attemptNumber: attempt,
       );
+      print(
+          'retryContent: $retryContent\n------------------------------------------------------------');
       if (retryContent == null) {
         // No retry needed.
         return;
@@ -96,7 +98,9 @@ class ChatController {
     final String attempt =
         attemptNumber > 1 ? '# Attempt $attemptNumber\n' : '';
 
-    var responseText = generatedContent.text;
+    String? responseText = generatedContent.text;
+    print(
+        'Raw AI response:\n$responseText\n--------------------------------------------------');
     if (responseText == null || responseText.isEmpty) {
       chatSeasonController.add(ErrorTextResponse(
         role: PromptRole.system,
@@ -116,7 +120,8 @@ class ChatController {
       responseText = responseText.substring(3); // Remove ```
     }
     if (responseText.endsWith('```')) {
-      responseText = responseText.substring(0, responseText.length - 3); // Remove trailing ```
+      responseText = responseText.substring(
+          0, responseText.length - 3); // Remove trailing ```
     }
     responseText = responseText.trim();
 
@@ -142,7 +147,7 @@ class ChatController {
     final String? errorMessage = parsedResponse['errorMessage'] as String?;
     Map<String, dynamic>? newExtractRules =
         parsedResponse['newExtractRules'] as Map<String, dynamic>?;
-    
+
     // Remove the __example__ key if present (it's just for schema validation)
     if (newExtractRules != null) {
       newExtractRules = Map<String, dynamic>.from(newExtractRules);
@@ -393,7 +398,8 @@ But before the interaction with the user, I'll attach the hmtl of the site and t
 typedef RetryContent = Content;
 final Schema generateExtractRulesSchema = Schema(
   SchemaType.object,
-  description: 'Schema for Gemini AI to generate ScrapingBee extraction rules from HTML content and user requirements. '
+  description:
+      'Schema for Gemini AI to generate ScrapingBee extraction rules from HTML content and user requirements. '
       'This schema enforces structured responses for web scraping rule generation, allowing the AI to: '
       '1) Create CSS selectors or XPath expressions that accurately target HTML elements, '
       '2) Provide contextual messages about the rules or ask clarification questions, '

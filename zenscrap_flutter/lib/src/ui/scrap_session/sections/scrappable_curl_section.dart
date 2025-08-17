@@ -31,10 +31,13 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection> {
     return CodeBlock(code: code);
   }
 
-  String? buildCurl(ReferenceTestData? testData,
-      {Map<String, String>? headers}) {
+  String? buildCurl(
+    ReferenceTestData? testData, {
+    Map<String, String>? headers,
+  }) {
     if (testData == null) return null;
-    final String url = ref.read(clientProvider).host;
+    final String url =
+        '${ref.read(clientProvider).host}handleApiScrapRequest/test/';
     final Map<String, dynamic> queryParams = {};
     final Map<String, dynamic>? payload =
         tryDecode(testData.referenceQueryParametersJson);

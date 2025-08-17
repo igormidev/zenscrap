@@ -23,7 +23,7 @@ class _ZenChatTextfieldState extends ConsumerState<ZenChatTextfield> {
   Widget build(BuildContext context) {
     return ZenTextfield(
       controller: _promptEC,
-      labelText: 'Enter your prompt',
+      labelText: 'Ask for any modification...',
       hintText: '',
       minLines: 1,
       maxLines: 5,
