@@ -83,7 +83,7 @@ class ScrapingBee {
       'url': targetUrl,
       'render_js': 'true',
       'screenshot': 'true',
-      'wait': 3000.toString(),
+      'wait': 4000.toString(),
       'screenshot_full_page': 'true',
       'json_response': 'true',
     };
@@ -103,7 +103,7 @@ class ScrapingBee {
     required String targetUrl,
     required String extractRules,
     bool renderJs = true,
-    int waitMs = 3000,
+    int waitMs = 4000,
   }) async {
     final Map<String, String> queryParameters = {
       'api_key': _apiKey,
