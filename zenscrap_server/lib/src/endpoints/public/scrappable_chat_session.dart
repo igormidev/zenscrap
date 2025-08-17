@@ -104,6 +104,12 @@ class ScrappableChatSession extends Endpoint {
         }
       }
     });
+
+    chatSeason.add(MessageTextResponse(
+      role: PromptRole.user,
+      messageText: userPrompt,
+    ));
+
     try {
       await chatController.sendMessage(
         session: session,

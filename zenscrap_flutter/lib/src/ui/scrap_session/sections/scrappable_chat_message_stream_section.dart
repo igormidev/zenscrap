@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_json_view/flutter_json_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/src/core/extensions/convert_extensions.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_messages_provider.dart';
 
 class ScrappableChatMessageStreamSection extends ConsumerStatefulWidget {
@@ -408,7 +412,20 @@ class _ExtractRulesMessageState extends State<_ExtractRulesMessage> {
   bool _isExpanded = false;
 
   void _copyToClipboard() {
-    Clipboard.setData(ClipboardData(text: widget.extractRules));
+    // Try to decode the JSON and format it properly
+    final decodedJson = tryDecode(widget.extractRules);
+    String textToCopy;
+    
+    if (decodedJson != null) {
+      // Format JSON with proper indentation
+      const encoder = JsonEncoder.withIndent('  ');
+      textToCopy = encoder.convert(decodedJson);
+    } else {
+      // If not valid JSON, copy as-is
+      textToCopy = widget.extractRules;
+    }
+    
+    Clipboard.setData(ClipboardData(text: textToCopy));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Extract rules copied to clipboard'),
@@ -420,6 +437,7 @@ class _ExtractRulesMessageState extends State<_ExtractRulesMessage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final decodedJson = tryDecode(widget.extractRules);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -501,19 +519,21 @@ class _ExtractRulesMessageState extends State<_ExtractRulesMessage> {
                   color: widget.textColor.withValues(alpha: 0.1),
                 ),
                 Container(
-                  constraints: const BoxConstraints(maxHeight: 200),
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(10),
-                    child: SelectableText(
-                      widget.extractRules,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        fontFamily: 'monospace',
-                        color: widget.textColor.withValues(alpha: 0.85),
-                        height: 1.3,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
+                  constraints: const BoxConstraints(maxHeight: 300),
+                  padding: const EdgeInsets.all(10),
+                  child: decodedJson != null
+                      ? JsonView.map(decodedJson)
+                      : SingleChildScrollView(
+                          child: SelectableText(
+                            widget.extractRules,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              fontFamily: 'monospace',
+                              color: widget.textColor.withValues(alpha: 0.85),
+                              height: 1.3,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
                 ),
               ],
             ],

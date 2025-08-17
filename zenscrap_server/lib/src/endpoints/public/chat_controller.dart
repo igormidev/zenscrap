@@ -75,8 +75,6 @@ class ChatController {
         return;
       }
     }
-    print('end');
-    session.log('end');
 
     chatSeason.add(
       ErrorTextResponse(
@@ -98,8 +96,8 @@ class ChatController {
         attemptNumber > 1 ? '# Attempt $attemptNumber\n' : '';
 
     String? responseText = generatedContent.text;
-    print(
-        'Raw AI response:\n$responseText\n--------------------------------------------------');
+    // print(
+    //     'Raw AI response:\n$responseText\n--------------------------------------------------');
     session.log(
         'Raw AI response:\n$responseText\n--------------------------------------------------');
     if (responseText == null || responseText.isEmpty) {
@@ -240,7 +238,11 @@ class ChatController {
       },
       error: (String errorMessage) {
         chatSeasonController.add(
-          ErrorTextResponse(role: PromptRole.system, errorMessage: ''),
+          ErrorTextResponse(
+            role: PromptRole.system,
+            errorMessage:
+                'The extraction rules failed in my quality-assurance test validation. I will ask the AI to fix the selectors and try again.',
+          ),
         );
 
         return Content.text(
