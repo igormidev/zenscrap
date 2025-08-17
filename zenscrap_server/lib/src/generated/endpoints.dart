@@ -92,8 +92,8 @@ class Endpoints extends _i1.EndpointDispatch {
       name: 'handleApiScrapRequest',
       endpoint: endpoints['handleApiScrapRequest']!,
       methodConnectors: {
-        'call': _i1.MethodConnector(
-          name: 'call',
+        'prod': _i1.MethodConnector(
+          name: 'prod',
           params: {
             'scrappableId': _i1.ParameterDescription(
               name: 'scrappableId',
@@ -112,7 +112,7 @@ class Endpoints extends _i1.EndpointDispatch {
           ) async =>
               (endpoints['handleApiScrapRequest']
                       as _i4.HandleApiScrapRequestEndpoint)
-                  .call(
+                  .prod(
             session,
             scrappableId: params['scrappableId'],
             payload: params['payload'],

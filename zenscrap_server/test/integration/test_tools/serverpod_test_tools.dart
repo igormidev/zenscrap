@@ -229,7 +229,7 @@ class _HandleApiScrapRequestEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<Map<String, dynamic>> call(
+  _i3.Future<Map<String, dynamic>> prod(
     _i1.TestSessionBuilder sessionBuilder, {
     required String scrappableId,
     required Map<String, dynamic> payload,
@@ -238,13 +238,13 @@ class _HandleApiScrapRequestEndpoint {
       var _localUniqueSession =
           (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
         endpoint: 'handleApiScrapRequest',
-        method: 'call',
+        method: 'prod',
       );
       try {
         var _localCallContext = await _endpointDispatch.getMethodCallContext(
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'handleApiScrapRequest',
-          methodName: 'call',
+          methodName: 'prod',
           parameters: _i1.testObjectToJson({
             'scrappableId': scrappableId,
             'payload': payload,

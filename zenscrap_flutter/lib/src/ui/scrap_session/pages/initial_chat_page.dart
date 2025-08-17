@@ -142,7 +142,16 @@ class _ChatViewPageState extends ConsumerState<ChatViewPage>
                       return const Icon(Icons.send);
                     },
                   ),
-                  label: Text('Create scrappable'),
+                  label: ValueListenableBuilder(
+                    valueListenable: _isLoading,
+                    builder: (context, isLoading, child) {
+                      if (isLoading) {
+                        return Text('Creating scrappable...');
+                      }
+
+                      return Text('Create scrappable');
+                    },
+                  ),
                 ),
                 Spacer(),
                 Text(

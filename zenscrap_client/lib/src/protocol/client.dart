@@ -57,13 +57,13 @@ class EndpointHandleApiScrapRequest extends _i1.EndpointRef {
   @override
   String get name => 'handleApiScrapRequest';
 
-  _i2.Future<Map<String, dynamic>> call({
+  _i2.Future<Map<String, dynamic>> prod({
     required String scrappableId,
     required Map<String, dynamic> payload,
   }) =>
       caller.callServerEndpoint<Map<String, dynamic>>(
         'handleApiScrapRequest',
-        'call',
+        'prod',
         {
           'scrappableId': scrappableId,
           'payload': payload,

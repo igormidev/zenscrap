@@ -105,7 +105,7 @@ class _ScrappableChatMessageStreamSectionState
 
         return ListView.builder(
           controller: _scrollController,
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 8),
           itemCount: messages.length,
           itemBuilder: (context, index) {
             final message = messages[index];
@@ -192,19 +192,17 @@ class _ChatMessageBubble extends StatelessWidget {
       messagePadding = const EdgeInsets.only(left: 0, right: 56);
     }
 
-    // Override colors for specific message types
+    // Override message bubble colors for specific message types (keep role icon unchanged)
     if (message is ErrorTextResponse) {
+      // Error messages get error-themed bubble but keep role icon
       backgroundColor = colorScheme.errorContainer;
       textColor = colorScheme.onErrorContainer;
-      roleIcon = Icons.error_outline;
-      iconBackgroundColor = colorScheme.error;
-      iconColor = colorScheme.onError;
+      // Do NOT change roleIcon - it should remain as the sender's role icon
     } else if (message is NewExtractRuleResponse) {
+      // Success messages get success-themed bubble
       backgroundColor = colorScheme.tertiaryContainer;
       textColor = colorScheme.onTertiaryContainer;
-      roleIcon = Icons.check_circle;
-      iconBackgroundColor = colorScheme.tertiary;
-      iconColor = colorScheme.onTertiary;
+      // Do NOT change roleIcon - it should remain as the sender's role icon
     }
 
     Widget messageContent = const SizedBox.shrink();

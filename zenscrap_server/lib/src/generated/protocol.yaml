@@ -3,7 +3,7 @@ privateAccount:
 createScrappable:
   - call:
 handleApiScrapRequest:
-  - call:
+  - prod:
   - test:
 scrappableChatSession:
   - createSession:

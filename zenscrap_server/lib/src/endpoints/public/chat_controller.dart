@@ -56,8 +56,7 @@ class ChatController {
     const int MAX_ATTEMPTS = 3;
     int attempt = 0;
     RetryContent? retryContent;
-
-    while (attempt >= MAX_ATTEMPTS) {
+    while (attempt < MAX_ATTEMPTS) {
       attempt++;
       final GenerateContentResponse response = await chatSession.sendMessage(
         retryContent ??
@@ -71,13 +70,13 @@ class ChatController {
         chatSeasonController: chatSeason,
         attemptNumber: attempt,
       );
-      print(
-          'retryContent: $retryContent\n------------------------------------------------------------');
       if (retryContent == null) {
         // No retry needed.
         return;
       }
     }
+    print('end');
+    session.log('end');
 
     chatSeason.add(
       ErrorTextResponse(
@@ -100,6 +99,8 @@ class ChatController {
 
     String? responseText = generatedContent.text;
     print(
+        'Raw AI response:\n$responseText\n--------------------------------------------------');
+    session.log(
         'Raw AI response:\n$responseText\n--------------------------------------------------');
     if (responseText == null || responseText.isEmpty) {
       chatSeasonController.add(ErrorTextResponse(
@@ -137,11 +138,6 @@ class ChatController {
       return Content.text(
           '${attempt}Failed to parse AI response as JSON. I called json.decode() in my dart code and received the following error:\n$error.\nUltra think in the reason for the error and try again. Return only raw JSON without anything more (not even markdown notations like "```" in the beginning or end).');
     }
-
-    // ignore: avoid_print
-    print(
-      'parsedResponse:\n\n${JsonEncoder.withIndent('  ').convert(parsedResponse)}\n--------------------------------------------------',
-    );
 
     final String? message = parsedResponse['message'] as String?;
     final String? errorMessage = parsedResponse['errorMessage'] as String?;
@@ -326,7 +322,7 @@ Content getSystemPrompt({
       referenceTestData.referenceSiteScreenshot.asUint8List;
   final Uint8List htmlBytes = referenceTestData.referenceHtmlPage.asUint8List;
 
-  return Content('system', [
+  return Content('user', [
     TextPart(
         '''I am a saas company that generates scrapping extract rules with ai.
 The client of my saas is made in flutter with serverpod as my server. This saas will extract data that my clients need from the web.
