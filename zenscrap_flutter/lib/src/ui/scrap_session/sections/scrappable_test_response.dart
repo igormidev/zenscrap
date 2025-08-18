@@ -17,6 +17,7 @@ class ScrappableTestResponse extends StatelessWidget {
     if (testData == null) return SizedBox.fromSize();
     final String? extractedJsonResult =
         testData.scrappableTestResult?.extractJsonResult;
+    // testData.scrappableTestResult?.testExtractRule;
     final Map<String, dynamic>? mappedResponse = tryDecode(extractedJsonResult);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

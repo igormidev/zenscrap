@@ -38,7 +38,7 @@ class ScrappableEditSessionView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 ScrappableCurlSection(testData: testData),
-                SizedBox(height: 20),
+                SizedBox(height: 8),
                 Expanded(
                   child: ScrappableTestResponse(testData: testData),
                 ),

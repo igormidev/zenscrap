@@ -115,9 +115,9 @@ class ScrapingBee {
     };
 
     try {
-      final Response<dynamic> response = await _dio.get(
-        '',
-        queryParameters: queryParameters,
+      final Response<dynamic> response = await _dio.getUri(
+        Uri.https('app.scrapingbee.com', '/api/v1/', queryParameters),
+        options: Options(responseType: ResponseType.json),
       );
 
       if (response.statusCode == 200) {
@@ -125,18 +125,7 @@ class ScrapingBee {
             ? Map<String, dynamic>.from(response.data as Map)
             : response.data as Map<String, dynamic>;
 
-        if (responseData.containsKey('extract_rules')) {
-          final dynamic extractedData = responseData['extract_rules'];
-          if (extractedData is Map<String, dynamic>) {
-            return ExtractDataByRule.withData(result: extractedData);
-          } else if (extractedData is List) {
-            return ExtractDataByRule.withData(result: {'data': extractedData});
-          } else {
-            return ExtractDataByRule.withData(result: {'data': extractedData});
-          }
-        }
-
-        return ExtractDataByRule.withData(result: responseData);
+        return ExtractDataByRule.withData(result: responseData['body']);
       } else {
         final Map<String, dynamic> errorResponse = response.data is String
             ? Map<String, dynamic>.from(response.data as Map)

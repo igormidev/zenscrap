@@ -1,13 +1,14 @@
 import 'dart:async';
 import 'package:rxdart/subjects.dart';
 import 'package:serverpod/serverpod.dart';
-import 'package:zenscrap_server/src/endpoints/public/chat_controller.dart';
+import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_gemini_api_impl.dart';
+import 'package:zenscrap_server/src/endpoints/public/chat_controller/i_chat_controller.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 typedef RedraftSrappableSessionId = String;
 final Map<RedraftSrappableSessionId, ReplaySubject<ChatResponse>>
     _scrapRedraftSessions = {};
-final Map<RedraftSrappableSessionId, ChatController> chatSessions = {};
+final Map<RedraftSrappableSessionId, IChatController> chatSessions = {};
 final Map<RedraftSrappableSessionId, ReferenceTestData> _cacheTestData = {};
 
 class ScrappableChatSession extends Endpoint {
@@ -38,7 +39,11 @@ class ScrappableChatSession extends Endpoint {
     }
     final RedraftSrappableSessionId sessionUuid = uuid.v4();
     _scrapRedraftSessions[sessionUuid] = ReplaySubject<ChatResponse>();
-    chatSessions[sessionUuid] = ChatController.create(
+    // chatSessions[sessionUuid] = ChatControllerClaudeSdkImpl.create(
+    //   scrappableId: scrappable.id,
+    //   referenceTestData: referenceTestData,
+    // );
+    chatSessions[sessionUuid] = ChatControllerGeminiApiImpl.create(
       scrappableId: scrappable.id,
       referenceTestData: referenceTestData,
     );
