@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_validator/form_validator.dart';
-import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/chat_scroll_controller_provider.dart';
-import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_messages_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/zen_textfield.dart';
 
@@ -50,25 +49,6 @@ class _ZenChatTextfieldState extends ConsumerState<ZenChatTextfield> {
       _isLoading = true;
     });
 
-    // Add user message to chat
-    final currentMessages = ref.read(chatMessagesProvider).valueOrNull ?? [];
-    final userMessage = MessageTextResponse(
-      role: PromptRole.user,
-      messageText: message,
-    );
-    
-    // Add thinking message
-    final thinkingMessage = MessageTextResponse(
-      role: PromptRole.system,
-      messageText: 'Thinking...',
-    );
-    
-    ref.read(chatMessagesProvider.notifier).state = AsyncValue.data([
-      ...currentMessages,
-      userMessage,
-      thinkingMessage,
-    ]);
-    
     _promptEC.clear();
     _formKey.currentState?.reset();
     ref.read(chatScrollHelperProvider).scrollToBottom();
@@ -77,28 +57,8 @@ class _ZenChatTextfieldState extends ConsumerState<ZenChatTextfield> {
       await ref.read(scrapChatProvider.notifier).sendMessage(message);
       // The thinking message will be automatically removed by onChange when the response arrives
       ref.read(chatScrollHelperProvider).scrollToBottom();
-    } catch (error) {
-      // Remove the thinking message if there's an error
-      final updatedMessages = ref.read(chatMessagesProvider).valueOrNull ?? [];
-      final filteredMessages = updatedMessages.where((msg) {
-        if (msg is MessageTextResponse && 
-            msg.role == PromptRole.system && 
-            msg.messageText == 'Thinking...') {
-          return false;
-        }
-        return true;
-      }).toList();
-      
-      // Add error message
-      final errorMessage = ErrorTextResponse(
-        role: PromptRole.system,
-        errorMessage: 'Failed to send message: $error',
-      );
-      
-      ref.read(chatMessagesProvider.notifier).state = AsyncValue.data([
-        ...filteredMessages,
-        errorMessage,
-      ]);
+    } catch (error, stackTrace) {
+      talker.error('Failed to send message', error, stackTrace);
       ref.read(chatScrollHelperProvider).scrollToBottom();
     } finally {
       setState(() {
@@ -130,36 +90,36 @@ class _ZenChatTextfieldState extends ConsumerState<ZenChatTextfield> {
                   .build(),
             ),
           ),
-        const SizedBox(width: 8),
-        Material(
-          borderRadius: BorderRadius.circular(12),
-          color: Theme.of(context).colorScheme.primary,
-          child: InkWell(
+          const SizedBox(width: 8),
+          Material(
             borderRadius: BorderRadius.circular(12),
-            onTap: _isLoading ? null : _sendMessage,
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              child: _isLoading
-                  ? SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          Theme.of(context).colorScheme.onPrimary,
+            color: Theme.of(context).colorScheme.primary,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(12),
+              onTap: _isLoading ? null : _sendMessage,
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                child: _isLoading
+                    ? SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Theme.of(context).colorScheme.onPrimary,
+                          ),
                         ),
+                      )
+                    : Icon(
+                        Icons.send_rounded,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                        size: 24,
                       ),
-                    )
-                  : Icon(
-                      Icons.send_rounded,
-                      color: Theme.of(context).colorScheme.onPrimary,
-                      size: 24,
-                    ),
+              ),
             ),
           ),
-        ),
-      ],
-    ),
+        ],
+      ),
     );
   }
 }

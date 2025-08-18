@@ -24,7 +24,7 @@ class ZenTextfield extends StatefulWidget {
     this.enabled = true,
     this.onSubmitted,
     this.validator,
-    this.autovalidateMode = AutovalidateMode.onUserInteraction,
+    this.autovalidateMode = AutovalidateMode.disabled,
     this.onChanged,
   });
 

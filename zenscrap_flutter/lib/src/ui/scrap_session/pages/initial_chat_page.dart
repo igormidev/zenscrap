@@ -43,6 +43,17 @@ class _ChatViewPageState extends ConsumerState<ChatViewPage>
         : null,
   );
 
+  Future<void> _submitForm() async {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    _isLoading.value = true;
+    await ref.read(scrapChatProvider.notifier).createScrappable(
+          targetUrl: _referenceLinkEC.text,
+          userPrompt: _promptEC.text,
+        );
+    _isLoading.value = false;
+  }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -105,6 +116,7 @@ class _ChatViewPageState extends ConsumerState<ChatViewPage>
                     controller: _referenceLinkEC,
                     labelText: 'Type a reference link',
                     hintText: 'E.g https://example.com/product/12345',
+                    onSubmitted: (_) => _submitForm(),
                     validator: ValidationBuilder()
                         .url('Please enter a valid URL')
                         .minLength(10, 'URL must be at least 10 characters')
@@ -118,6 +130,7 @@ class _ChatViewPageState extends ConsumerState<ChatViewPage>
                     hintText: 'E.g. Extract all product details from the page',
                     minLines: 1,
                     maxLines: 5,
+                    onSubmitted: (_) => _submitForm(),
                     validator: ValidationBuilder()
                         .minLength(10, 'Prompt must be at least 10 characters')
                         .maxLength(
@@ -126,18 +139,7 @@ class _ChatViewPageState extends ConsumerState<ChatViewPage>
                   ),
                   SizedBox(height: 32),
                   FilledButton.tonalIcon(
-                    onPressed: () async {
-                      if (!(_formKey.currentState?.validate() ?? false)) return;
-
-                      _isLoading.value = true;
-                      await ref
-                          .read(scrapChatProvider.notifier)
-                          .createScrappable(
-                            targetUrl: _referenceLinkEC.text,
-                            userPrompt: _promptEC.text,
-                          );
-                      _isLoading.value = false;
-                    },
+                    onPressed: _submitForm,
                     style: FilledButton.styleFrom(
                       iconAlignment: IconAlignment.end,
                     ),
