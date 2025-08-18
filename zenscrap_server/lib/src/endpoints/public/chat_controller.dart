@@ -404,12 +404,12 @@ When you generate extraction rules, you MUST test them immediately using Claude 
 
 ```bash
 # Example test request you should make
-curl -G "https://app.scrapingbee.com/api/v1/" \
-  --data-urlencode "api_key=${ChatController._scrapingBeeApiKey}" \
-  --data-urlencode "url=${referenceTestData.referenceLinkUsed}" \
-  --data-urlencode 'extract_rules={"title":"h1","price":".price"}' \
-  --data-urlencode "render_js=true" \
-  --data-urlencode "json_response=true" \
+curl -G "https://app.scrapingbee.com/api/v1/" 
+  --data-urlencode "api_key=${ChatController._scrapingBeeApiKey}" 
+  --data-urlencode "url=${referenceTestData.referenceLinkUsed}" 
+  --data-urlencode 'extract_rules={"title":"h1","price":".price"}' 
+  --data-urlencode "render_js=true" 
+  --data-urlencode "json_response=true" 
   --data-urlencode "wait=4000"
 ```
 
@@ -534,9 +534,7 @@ You have the capability and REQUIREMENT to test the extraction rules you generat
 
 🎯 Your success criteria: Only return extraction rules that you have personally tested and confirmed working with the ScrapingBee API.
 
-${neverGeneratedATestResultBefore
-        ? 'Now, the user will start sending prompts for the creation of the first extraction rules. You MUST test each rule before presenting it.'
-        : 'Now, the user will start sending prompts to modify existing extraction rules. You MUST test all modifications before presenting them.'}'''),
+${neverGeneratedATestResultBefore ? 'Now, the user will start sending prompts for the creation of the first extraction rules. You MUST test each rule before presenting it.' : 'Now, the user will start sending prompts to modify existing extraction rules. You MUST test all modifications before presenting them.'}'''),
   ];
 }
 
