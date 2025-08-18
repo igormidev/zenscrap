@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_json_view/flutter_json_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/convert_extensions.dart';
@@ -415,7 +414,7 @@ class _ExtractRulesMessageState extends State<_ExtractRulesMessage> {
     // Try to decode the JSON and format it properly
     final decodedJson = tryDecode(widget.extractRules);
     String textToCopy;
-    
+
     if (decodedJson != null) {
       // Format JSON with proper indentation
       const encoder = JsonEncoder.withIndent('  ');
@@ -424,7 +423,7 @@ class _ExtractRulesMessageState extends State<_ExtractRulesMessage> {
       // If not valid JSON, copy as-is
       textToCopy = widget.extractRules;
     }
-    
+
     Clipboard.setData(ClipboardData(text: textToCopy));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -522,7 +521,15 @@ class _ExtractRulesMessageState extends State<_ExtractRulesMessage> {
                   constraints: const BoxConstraints(maxHeight: 300),
                   padding: const EdgeInsets.all(10),
                   child: decodedJson != null
-                      ? JsonView.map(decodedJson)
+                      ? Text(
+                          JsonEncoder.withIndent('  ').convert(decodedJson),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            fontFamily: 'monospace',
+                            color: widget.textColor.withValues(alpha: 0.85),
+                            height: 1.3,
+                            fontSize: 14,
+                          ),
+                        )
                       : SingleChildScrollView(
                           child: SelectableText(
                             widget.extractRules,

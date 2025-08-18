@@ -27,6 +27,8 @@ class ScrappableTestResponse extends StatelessWidget {
         Expanded(
           child: ScrappableTestJsonResponseViewer(
             testResponse: mappedResponse,
+            htmlData: testData.referenceHtmlPage,
+            screenshotData: testData.referenceSiteScreenshot,
           ),
         ),
       ],

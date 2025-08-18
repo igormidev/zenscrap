@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/serverpod_to_result.dart';
+import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_messages_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_state.dart';
@@ -20,40 +21,42 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
     required String targetUrl,
     required String userPrompt,
   }) async {
-    final result = await ref
-        .read(clientProvider)
-        .createScrappable(referenceLink: targetUrl)
-        .toResult;
+    await ref.globalLoadingSetter(() async {
+      final result = await ref
+          .read(clientProvider)
+          .createScrappable(referenceLink: targetUrl)
+          .toResult;
 
-    await result.fold(
-      (scrappable) async {
-        final sessionResult = await ref
-            .read(clientProvider)
-            .scrappableChatSession
-            .createSession(scrappable: scrappable)
-            .toResult;
-
-        await sessionResult.fold((sessionUuid) async {
-          _chatResponseSubscription = ref
+      await result.fold(
+        (scrappable) async {
+          final sessionResult = await ref
               .read(clientProvider)
               .scrappableChatSession
-              .listenToScrappableRedraftSession(sessionUuid: sessionUuid)
-              .listen(onChange);
+              .createSession(scrappable: scrappable)
+              .toResult;
 
-          state = ScrapChatSessionState.standard(
-            data: scrappable,
-            sessionUuid: sessionUuid,
-          );
+          await sessionResult.fold((sessionUuid) async {
+            _chatResponseSubscription = ref
+                .read(clientProvider)
+                .scrappableChatSession
+                .listenToScrappableRedraftSession(sessionUuid: sessionUuid)
+                .listen(onChange);
 
-          await sendMessage(userPrompt);
+            state = ScrapChatSessionState.standard(
+              data: scrappable,
+              sessionUuid: sessionUuid,
+            );
+
+            await sendMessage(userPrompt);
+          },
+              (failure) async =>
+                  state = ScrapChatSessionState.withError(error: failure));
         },
-            (failure) async =>
-                state = ScrapChatSessionState.withError(error: failure));
-      },
-      (failure) {
-        state = ScrapChatSessionState.withError(error: failure);
-      },
-    );
+        (failure) {
+          state = ScrapChatSessionState.withError(error: failure);
+        },
+      );
+    });
   }
 
   Future<void> sendMessage(String userPrompt) async {

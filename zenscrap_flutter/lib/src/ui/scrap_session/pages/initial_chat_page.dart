@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 import 'package:zenscrap_flutter/src/design_system/components/adaptive_progress_indicator.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
-import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/zen_textfield.dart';
@@ -114,16 +113,12 @@ class _ChatViewPageState extends ConsumerState<ChatViewPage>
                 SizedBox(height: 32),
                 FilledButton.tonalIcon(
                   onPressed: () async {
-                    await ref.globalLoadingSetter(() async {
-                      _isLoading.value = true;
-                      await ref
-                          .read(scrapChatProvider.notifier)
-                          .createScrappable(
-                            targetUrl: _referenceLinkEC.text,
-                            userPrompt: _promptEC.text,
-                          );
-                      _isLoading.value = false;
-                    });
+                    _isLoading.value = true;
+                    await ref.read(scrapChatProvider.notifier).createScrappable(
+                          targetUrl: _referenceLinkEC.text,
+                          userPrompt: _promptEC.text,
+                        );
+                    _isLoading.value = false;
                   },
                   style: FilledButton.styleFrom(
                     iconAlignment: IconAlignment.end,

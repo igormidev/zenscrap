@@ -118,7 +118,10 @@ class RestartableAppState extends State<RestartableApp> {
       child: ProviderScope(
         key:
             _key, // This key change will re-create ProviderScope and its children
-        observers: [if (kDebugMode) CustomTalkerRiverpodObserver(talker: talker, maxStateLength: 500)],
+        observers: [
+          if (kDebugMode)
+            CustomTalkerRiverpodObserver(talker: talker, maxStateLength: 500)
+        ],
         overrides: [
           clientProvider.overrideWithValue(widget.client),
           sessionManagerProvider.overrideWithValue(widget.sessionManager),

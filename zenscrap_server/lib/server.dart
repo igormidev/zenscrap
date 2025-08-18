@@ -42,7 +42,9 @@ void run(List<String> args) async {
   openAiClient = OpenAIClient(apiKey: openAiApiKey);
 
   await ChatController.initialize(
-      claudeApiKey: pod.getPassword('claudeCodeApiKey') ?? '');
+    claudeApiKey: pod.getPassword('claudeCodeApiKey') ?? '',
+    scrapingBeeApiKey: scrapingBeeApiKey ?? '',
+  );
 
   // Start the server.
   await pod.start();
