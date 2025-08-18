@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/convert_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/states/chat_session/chat_scroll_controller_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_messages_provider.dart';
 
 class ScrappableChatMessageStreamSection extends ConsumerStatefulWidget {
@@ -18,30 +19,12 @@ class ScrappableChatMessageStreamSection extends ConsumerStatefulWidget {
 
 class _ScrappableChatMessageStreamSectionState
     extends ConsumerState<ScrappableChatMessageStreamSection> {
-  final ScrollController _scrollController = ScrollController();
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  void _scrollToBottom() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 800),
-          curve: Curves.easeOut,
-        );
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
+    final scrollController = ref.watch(chatScrollControllerProvider);
+    final scrollHelper = ref.watch(chatScrollHelperProvider);
     final messagesAsync = ref.watch(chatMessagesProvider);
-    ref.listen(chatMessagesProvider, (_, __) => _scrollToBottom());
+    ref.listen(chatMessagesProvider, (_, __) => scrollHelper.scrollToBottom());
 
     return messagesAsync.when(
       loading: () => const Center(
@@ -108,8 +91,8 @@ class _ScrappableChatMessageStreamSectionState
         }
 
         return ListView.builder(
-          controller: _scrollController,
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          controller: scrollController,
+          padding: const EdgeInsets.only(top: 20, bottom: 32),
           itemCount: messages.length,
           itemBuilder: (context, index) {
             final message = messages[index];

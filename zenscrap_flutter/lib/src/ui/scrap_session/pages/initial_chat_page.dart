@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:form_validator/form_validator.dart';
 import 'package:lottie/lottie.dart';
 import 'package:zenscrap_flutter/src/design_system/components/adaptive_progress_indicator.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
@@ -20,6 +21,7 @@ class _ChatViewPageState extends ConsumerState<ChatViewPage>
     with TickerProviderStateMixin {
   late AnimationController _controller;
   final ValueNotifier<bool> _isLoading = ValueNotifier(false);
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -70,8 +72,10 @@ class _ChatViewPageState extends ConsumerState<ChatViewPage>
         Center(
           child: ConstrainedBox(
             constraints: BoxConstraints(maxWidth: 600),
-            child: Column(
-              children: [
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
                 SizedBox(height: 20),
                 SizedBox(
                   height: 400,
@@ -101,6 +105,11 @@ class _ChatViewPageState extends ConsumerState<ChatViewPage>
                   controller: _referenceLinkEC,
                   labelText: 'Type a reference link',
                   hintText: 'E.g https://example.com/product/12345',
+                  validator: ValidationBuilder()
+                      .url('Please enter a valid URL')
+                      .minLength(10, 'URL must be at least 10 characters')
+                      .maxLength(500, 'URL must be less than 500 characters')
+                      .build(),
                 ),
                 SizedBox(height: 32),
                 ZenTextfield(
@@ -109,10 +118,16 @@ class _ChatViewPageState extends ConsumerState<ChatViewPage>
                   hintText: 'E.g. Extract all product details from the page',
                   minLines: 1,
                   maxLines: 5,
+                  validator: ValidationBuilder()
+                      .minLength(10, 'Prompt must be at least 10 characters')
+                      .maxLength(500, 'Prompt must be less than 500 characters')
+                      .build(),
                 ),
                 SizedBox(height: 32),
                 FilledButton.tonalIcon(
                   onPressed: () async {
+                    if (!(_formKey.currentState?.validate() ?? false)) return;
+                    
                     _isLoading.value = true;
                     await ref.read(scrapChatProvider.notifier).createScrappable(
                           targetUrl: _referenceLinkEC.text,
@@ -159,6 +174,7 @@ class _ChatViewPageState extends ConsumerState<ChatViewPage>
                 ),
                 SizedBox(height: 32)
               ],
+            ),
             ),
           ),
         )

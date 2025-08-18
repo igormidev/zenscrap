@@ -6,6 +6,13 @@ class ZenTextfield extends StatefulWidget {
   final String hintText;
   final int? minLines;
   final int? maxLines;
+  final FocusNode? focusNode;
+  final bool enabled;
+  final ValueChanged<String>? onSubmitted;
+  final String? Function(String?)? validator;
+  final AutovalidateMode autovalidateMode;
+  final ValueChanged<String>? onChanged;
+
   const ZenTextfield({
     super.key,
     required this.controller,
@@ -13,6 +20,12 @@ class ZenTextfield extends StatefulWidget {
     required this.hintText,
     this.minLines,
     this.maxLines,
+    this.focusNode,
+    this.enabled = true,
+    this.onSubmitted,
+    this.validator,
+    this.autovalidateMode = AutovalidateMode.onUserInteraction,
+    this.onChanged,
   });
 
   @override
@@ -21,11 +34,14 @@ class ZenTextfield extends StatefulWidget {
 
 class _ZenTextfieldState extends State<ZenTextfield> {
   final ValueNotifier<bool> _isOnTop = ValueNotifier(false);
-  final FocusNode _focusNode = FocusNode();
+  late final FocusNode _focusNode;
+
   @override
   void initState() {
     super.initState();
+    _focusNode = widget.focusNode ?? FocusNode();
     _focusNode.addListener(_setIsOnTop);
+    widget.controller.addListener(_setIsOnTop);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Set initial state based on focus and text
       _setIsOnTop();
@@ -35,6 +51,10 @@ class _ZenTextfieldState extends State<ZenTextfield> {
   @override
   void dispose() {
     _focusNode.removeListener(_setIsOnTop);
+    widget.controller.removeListener(_setIsOnTop);
+    if (widget.focusNode == null) {
+      _focusNode.dispose();
+    }
     super.dispose();
   }
 
@@ -53,6 +73,11 @@ class _ZenTextfieldState extends State<ZenTextfield> {
         focusNode: _focusNode,
         minLines: widget.minLines,
         maxLines: widget.maxLines,
+        enabled: widget.enabled,
+        onFieldSubmitted: widget.onSubmitted,
+        validator: widget.validator,
+        autovalidateMode: widget.autovalidateMode,
+        onChanged: widget.onChanged,
         decoration: InputDecoration(
           contentPadding: EdgeInsets.only(left: 16, top: 16, bottom: 16),
           label: ValueListenableBuilder(

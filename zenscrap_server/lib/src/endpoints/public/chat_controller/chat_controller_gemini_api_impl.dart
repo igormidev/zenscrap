@@ -180,7 +180,11 @@ class ChatControllerGeminiApiImpl extends IChatController {
       );
 
       return Content.text(
-          '${attempt}I encountered an error while trying to map your request. You should return a JSON with "newExtractRules", a "message" or a "errorMessage". Return only raw JSON without anything more (not even markdown notations like "```").');
+          '${attempt}Your response didn\'t match the required format. You must use ONE of these three patterns:\n'
+          '1) {"message": "...", "newExtractRules": {...}} - for providing extraction rules\n'
+          '2) {"message": "..."} - for questions or information\n'
+          '3) {"errorMessage": "..."} - for errors\n'
+          'Return only raw JSON without markdown notations.');
     } else {
       chatSeasonController.add(newState);
     }
@@ -286,10 +290,16 @@ Content composeUserPromptIfNeeded({
   if (neverGeneratedATestResultBefore) {
     return Content.multi([
       TextPart(
-          '''I need you to ultra think in the response of the task prompt I will send bellow, so you don't generate a response that is not compliant with ScrapingBee extract rules feature so it will not return a error the tests I will do later with the link "${referenceTestData.referenceLinkUsed}"...
-Please deeply understand what I need so you can correctly build new extraction rules.
+          '''I need you to create extraction rules based on my request.
 
-My modification/task prompt is:'''),
+**RESPONSE FORMAT - Use ONE of these three patterns:**
+1) Success with rules: {"message": "Description of what was created", "newExtractRules": {...}}
+2) Question/Information: {"message": "Your question or information"}
+3) Error: {"errorMessage": "What went wrong"}
+
+When providing extraction rules, ALWAYS include a message describing what you created.
+
+My task prompt is:'''),
       TextPart(userPrompt),
     ]);
   }
@@ -302,14 +312,16 @@ My modification/task prompt is:'''),
     TextPart(
         'Hello, I wan\'t to iterate on the last extract rules I built. I will attach it bellow:'),
     DataPart('application/json', jsonBytes),
-    TextPart('''It worked well, but I want to change it a little bit...
-I wan't you to modify it and create a new rules json, that are compliant with ScrapingBee extract rules feature, that resolves what I will ask in my message that will describe the modifications I wan't.
+    TextPart('''It worked well, but I want to modify it.
 
-I need you to ultra think in the response so you don't generate a response that is not compliant with ScrapingBee extract rules feature so it will not return a error the tests I will do later with the link "${referenceTestData.referenceLinkUsed}"...
+**RESPONSE FORMAT - Use ONE of these three patterns:**
+1) Updated rules: {"message": "Description of changes", "newExtractRules": {...}}
+2) Question/Info: {"message": "Your question or information"}
+3) Error: {"errorMessage": "What went wrong"}
 
-Please deeply understand what I need so you can correctly build new extraction rules.
+When providing updated extraction rules, ALWAYS include a message describing your changes.
 
-My modification/task prompt is:'''),
+My modification request is:'''),
     TextPart(userPrompt),
   ]);
 }
@@ -370,14 +382,19 @@ IMPORTANT REQUIREMENTS:
 5. Your response should be a valid JSON object with extraction rules
 6. Each key should be the name of the data to extract, and the value should be the CSS selector or XPath to extract that data
 7. Test your selectors mentally against the provided HTML to ensure they match elements
-8. Return only raw JSON, without anything more (not even markdown notations like "```" in the beginning or end... just the raw JSON)
+8. Return only raw JSON, without markdown notations
+9. Use ONE of three valid response patterns:
+   - Success: {"message": "...", "newExtractRules": {...}}
+   - Question/Info: {"message": "..."}
+   - Error: {"errorMessage": "..."}
 
-Example response format:
+Example success response:
 {
-  "product_name": "h1.product-title",
-  "price": "span.price-now",
-  "description": "div.product-description",
-  "availability": "span.stock-status"
+  "message": "Created extraction rules for product details",
+  "newExtractRules": {
+    "product_name": "h1.product-title",
+    "price": "span.price-now"
+  }
 }
 
 But before the interaction with the user, I'll attach the hmtl of the site and the screenshot as well'''),
@@ -388,8 +405,22 @@ But before the interaction with the user, I'll attach the hmtl of the site and t
         'Now, I will attach a print of the site so you can have a better understanding of how it looks:'),
     DataPart('image/png', imagePng),
     TextPart(neverGeneratedATestResultBefore
-        ? 'Now, the user will start sending prompts to you for the creation of the first extraction rules and probably he will send more prompts for you to iterate on top of those rules to add more data, fix something, etc... Ultra think in each of your responses.'
-        : 'Now, the user will start sending prompts to you to modify a current extraction rule that he created in a previous AI talking session, you will need to iterate on top of those rules... Ultra think in each of your responses.'),
+        ? '''The user will now send prompts for creating extraction rules.
+
+**VALID RESPONSE PATTERNS:**
+1) {"message": "Created...", "newExtractRules": {...}} - when providing rules
+2) {"message": "Question..."} - when asking for clarification
+3) {"errorMessage": "Error..."} - when something goes wrong
+
+Ultra think before responding.'''
+        : '''The user will now send prompts to modify extraction rules.
+
+**VALID RESPONSE PATTERNS:**
+1) {"message": "Updated...", "newExtractRules": {...}} - when modifying rules
+2) {"message": "Question..."} - when needing clarification
+3) {"errorMessage": "Error..."} - when something fails
+
+Ultra think before responding.'''),
   ]);
 }
 
@@ -397,59 +428,56 @@ typedef RetryContent = Content;
 final Schema generateExtractRulesSchema = Schema(
   SchemaType.object,
   description:
-      'Schema for Gemini AI to generate ScrapingBee extraction rules from HTML content and user requirements. '
-      'This schema enforces structured responses for web scraping rule generation, allowing the AI to: '
-      '1) Create CSS selectors or XPath expressions that accurately target HTML elements, '
-      '2) Provide contextual messages about the rules or ask clarification questions, '
-      '3) Report errors when extraction is not possible (e.g., 404 pages, invalid HTML). '
-      'The AI analyzes both HTML content and screenshots to identify the correct selectors, '
-      'ensuring the extraction rules are valid for ScrapingBee\'s extract_rules API parameter. '
-      'The schema supports iterative refinement where users can modify existing rules based on feedback.',
+      'Schema for Gemini AI responses. There are exactly THREE valid response patterns:\n'
+      '1) SUCCESS: Both "message" AND "newExtractRules" (describing what was created/modified and the extraction rules)\n'
+      '2) QUESTION/INFO: Only "message" (for clarification questions or information)\n'
+      '3) ERROR: Only "errorMessage" (when something went wrong)\n\n'
+      'NEVER mix these patterns. For example:\n'
+      '- If providing newExtractRules, MUST include message\n'
+      '- If providing errorMessage, MUST NOT include message or newExtractRules\n'
+      '- If asking a question, only include message (no newExtractRules or errorMessage)',
   nullable: false,
   properties: {
     'message': Schema(
       SchemaType.string,
       nullable: true,
       description:
-          '''Message from the AI assistant for better context for what was done.
-This could be a quick short resume of what was done to generate the extraction rules or even a question for clarification (in case of questions, send the "newExtractRulesnewExtractRules" as null).
+          '''Message from the AI assistant. Used in two scenarios:
 
-Better understanding of a question:
-You can ask, for example, a question like: "I found two information about <something>, one in the the user header and the other in the footer, which one do you want to extract?".
-In that case you are making a question, the "newExtractRulesnewExtractRules" field of the schema will be null (the "errorMessage" as well).
-After the question, the user will give his response and you can then continue to process a extract rule.
+1. WITH newExtractRules (REQUIRED): Describe what extraction rules were created/modified
+   Example: "Created extraction rules for coach name, club, and image"
 
-This should be null if there is a errorMessage''',
+2. ALONE (for questions/info): Ask clarification or provide information
+   Example: "I found two locations for this data, which one should I extract?"
+
+MUST be null if errorMessage is present.
+MUST be present if newExtractRules is present.''',
     ),
     'errorMessage': Schema(
       SchemaType.string,
       nullable: true,
       description:
-          '''Error message if there was an error during the generation process to get extract rules.
-In the error message please explain what happened any why you where not able to complete the task.
+          '''Error message when unable to complete the task.
 
-Example things that could cause error:
-- Example 1: The html is of a 404 page, you can respond with a message indicating that the page was not found.
-- Example 2: The user provided invalid input, you can respond with a message asking them to correct it.
-- Example 3: It is a bug that you as an AI can not solve, you can respond with a message why you cant fix it. Examples of this case:
-  - Example 3.1:
-      The bug is on the scrapping bee endpoint since its error log is indicating that the route is not available or something like that.
-      But note, if the error is with invalid rules you should respond with a new extract rules that should solve the problem and not a error message.
-      
-In any case that the errorMessage exists, the "newExtractRulesnewExtractRules" and "message" fields should be null.
+Examples:
+- 404 page detected
+- Invalid user input
+- Technical limitation
 
-This field should be null if there is no error.''',
+IMPORTANT: When errorMessage is present, both "message" and "newExtractRules" MUST be null.
+This creates an exclusive error state.''',
     ),
     'newExtractRules': Schema(
       SchemaType.object,
       nullable: true,
       description:
-          '''New extraction rules that are compliant with ScrapingBee extract rules feature.
-This is a dynamic map where keys are the data field names to extract (e.g., "title", "price", "description") 
-and values are CSS selectors or XPath expressions that target those elements in the HTML.
-Example: {"product_name": "h1.title", "price": "span.price-value", "availability": "div.stock-status"}.
-If you have any doubts about how to generate the rules, you can web research the ScrapingBee documentation at "https://www.scrapingbee.com/documentation/data-extraction/#basic-usage".
-This field should be null when asking clarification questions (only 'message' should be set).''',
+          '''ScrapingBee-compliant extraction rules.
+
+Keys: field names to extract (e.g., "title", "price")
+Values: CSS selectors or XPath expressions
+
+REQUIRES: When present, "message" MUST also be present to describe the rules.
+MUST be null when errorMessage is present or when only providing information/questions.''',
       properties: {
         '__example__': Schema(
           SchemaType.string,

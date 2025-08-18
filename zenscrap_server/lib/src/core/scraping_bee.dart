@@ -125,8 +125,7 @@ class ScrapingBee {
         // Handle different response formats from ScrapingBee
         try {
           Map<String, dynamic>? resultData = tryDecode(response.data);
-          print('Extracted data: $resultData');
-
+          
           return ExtractDataByRule.withData(result: resultData?['body'] ?? {});
         } catch (e) {
           return ExtractDataByRule.erorr(
