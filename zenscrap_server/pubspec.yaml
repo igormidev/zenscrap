@@ -20,6 +20,8 @@ dependencies:
   freezed_annotation: ^2.4.4
   json_annotation: ^4.9.0
   collection: ^1.19.1
+  claude_code_sdk:
+    path: ../claude_code_sdk
 
 dev_dependencies:
   lints: '>=3.0.0 <7.0.0'

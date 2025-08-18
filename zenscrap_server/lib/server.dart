@@ -43,8 +43,8 @@ void run(List<String> args) async {
   final String? openAiApiKey = pod.getPassword('openAiApiKey');
   openAiClient = OpenAIClient(apiKey: openAiApiKey);
 
-  ChatController.initialize(
-      geminiApiKey: pod.getPassword('geminiApiKey') ?? '');
+  // ChatController.initialize(
+  //     claudeApiKey: pod.getPassword('claudeCodeApiKey') ?? '');
 
   // Start the server.
   await pod.start();
