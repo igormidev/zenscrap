@@ -37,12 +37,14 @@ class SchemaResult {
 class SchemaObject {
   final String type;
   final Map<String, SchemaProperty> properties;
+  /// @Deprecated('Use nullable property on SchemaProperty instead')
   final List<String>? required;
   final String? description;
 
   const SchemaObject({
     this.type = 'object',
     required this.properties,
+    @Deprecated('Use nullable property on SchemaProperty instead. This parameter is now automatically derived from nullable properties.')
     this.required,
     this.description,
   });
@@ -54,8 +56,21 @@ class SchemaObject {
       'properties': properties.map((key, value) => MapEntry(key, value.toJson())),
     };
 
+    // Generate required array from nullable properties
+    // If 'required' was explicitly provided (legacy), use it
+    // Otherwise, derive from nullable properties
+    List<String> requiredFields;
     if (required != null && required!.isNotEmpty) {
-      json['required'] = required;
+      requiredFields = required!;
+    } else {
+      requiredFields = properties.entries
+          .where((entry) => entry.value.nullable == false)
+          .map((entry) => entry.key)
+          .toList();
+    }
+    
+    if (requiredFields.isNotEmpty) {
+      json['required'] = requiredFields;
     }
 
     if (description != null) {
@@ -74,6 +89,7 @@ class SchemaProperty {
   final List<dynamic>? enumValues;
   final SchemaProperty? items; // For array types
   final Map<String, SchemaProperty>? properties; // For object types
+  final bool nullable;
 
   const SchemaProperty({
     required this.type,
@@ -82,6 +98,7 @@ class SchemaProperty {
     this.enumValues,
     this.items,
     this.properties,
+    this.nullable = true,
   });
 
   /// Creates a string property
@@ -89,12 +106,14 @@ class SchemaProperty {
     String? description,
     String? defaultValue,
     List<String>? enumValues,
+    bool nullable = true,
   }) {
     return SchemaProperty(
       type: 'string',
       description: description,
       defaultValue: defaultValue,
       enumValues: enumValues,
+      nullable: nullable,
     );
   }
 
@@ -102,11 +121,13 @@ class SchemaProperty {
   factory SchemaProperty.number({
     String? description,
     num? defaultValue,
+    bool nullable = true,
   }) {
     return SchemaProperty(
       type: 'number',
       description: description,
       defaultValue: defaultValue,
+      nullable: nullable,
     );
   }
 
@@ -114,11 +135,13 @@ class SchemaProperty {
   factory SchemaProperty.boolean({
     String? description,
     bool? defaultValue,
+    bool nullable = true,
   }) {
     return SchemaProperty(
       type: 'boolean',
       description: description,
       defaultValue: defaultValue,
+      nullable: nullable,
     );
   }
 
@@ -126,11 +149,13 @@ class SchemaProperty {
   factory SchemaProperty.array({
     required SchemaProperty items,
     String? description,
+    bool nullable = true,
   }) {
     return SchemaProperty(
       type: 'array',
       description: description,
       items: items,
+      nullable: nullable,
     );
   }
 
@@ -138,11 +163,13 @@ class SchemaProperty {
   factory SchemaProperty.object({
     required Map<String, SchemaProperty> properties,
     String? description,
+    bool nullable = true,
   }) {
     return SchemaProperty(
       type: 'object',
       description: description,
       properties: properties,
+      nullable: nullable,
     );
   }
 

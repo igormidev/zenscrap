@@ -11,7 +11,7 @@ export 'src/claude_chat.dart' show ClaudeChat;
 // Models
 export 'src/models/chat_options.dart' show ClaudeChatOptions;
 export 'src/models/claude_sdk_content.dart'
-    show ClaudeSdkContent, TextContent, FileContent;
+    show ClaudeSdkContent, TextContent, FileContent, BytesContent;
 export 'src/models/schema_models.dart'
     show SchemaResult, SchemaObject, SchemaProperty;
 

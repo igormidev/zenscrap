@@ -40,7 +40,7 @@ void main() async {
     ]);
     print('Response: $response2');
 
-    // Example with schema
+    // Example with schema using new nullable pattern
     print('\nSending message with schema...');
     final schemaResult = await chat.sendMessageWithSchema(
       messages: [
@@ -48,10 +48,19 @@ void main() async {
       ],
       schema: SchemaObject(
         properties: {
-          'apples': SchemaProperty.number(description: 'Number of apples'),
-          'oranges': SchemaProperty.number(description: 'Number of oranges'),
+          'apples': SchemaProperty.number(
+            description: 'Number of apples',
+            nullable: false, // Required field
+          ),
+          'oranges': SchemaProperty.number(
+            description: 'Number of oranges',
+            nullable: false, // Required field
+          ),
+          'bananas': SchemaProperty.number(
+            description: 'Number of bananas if mentioned',
+            nullable: true, // Optional field
+          ),
         },
-        required: ['apples', 'oranges'],
       ),
     );
     print('Schema result data: ${schemaResult.data}');

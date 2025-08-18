@@ -6,11 +6,13 @@ A powerful Dart SDK for interacting with Claude Code, providing seamless integra
 
 - 🚀 **Easy Integration**: Simple API for creating chat sessions with Claude
 - 📁 **File Support**: Send files along with text prompts for context-aware responses
+- 💾 **Bytes Support**: Send in-memory data as temporary files (auto-cleanup on dispose)
 - 📋 **Schema Support**: Get structured responses using JSON schemas
-- 🔄 **Streaming**: Real-time streaming of Claude's responses
+- 🔄 **Session Management**: Automatic conversation continuity with --resume flag
 - 🛠️ **Auto-Installation**: Built-in methods to check and install Claude Code SDK
-- 🧹 **Resource Management**: Proper cleanup and disposal of chat sessions
+- 🧹 **Resource Management**: Proper cleanup and disposal of chat sessions and temp files
 - 🔐 **Secure**: API key management with environment variable support
+- ⚡ **Reliable**: Simple Process.run based implementation (no streaming complexity)
 
 ## Prerequisites
 
@@ -93,6 +95,50 @@ void main() async {
 }
 ```
 
+### Sending Bytes as Temporary Files
+
+You can send in-memory data (like images, documents, or any binary data) without creating permanent files:
+
+```dart
+import 'dart:typed_data';
+import 'package:claude_code_sdk/claude_code_sdk.dart';
+
+void main() async {
+  final claudeSDK = Claude('YOUR_API_KEY');
+  final claudeChat = claudeSDK.createNewChat();
+  
+  try {
+    // Example 1: Send image bytes
+    final imageBytes = await File('photo.jpg').readAsBytes();
+    final result = await claudeChat.sendMessage([
+      ClaudeSdkContent.text('What is in this image?'),
+      ClaudeSdkContent.bytes(
+        data: imageBytes,
+        fileExtension: 'jpg',
+      ),
+    ]);
+    
+    // Example 2: Send text as bytes
+    final textContent = 'Hello, this is dynamic content!';
+    final textBytes = Uint8List.fromList(textContent.codeUnits);
+    final result2 = await claudeChat.sendMessage([
+      ClaudeSdkContent.text('Read this text:'),
+      ClaudeSdkContent.bytes(
+        data: textBytes,
+        fileExtension: 'txt',
+      ),
+    ]);
+    
+    print('Result: $result2');
+  } finally {
+    // Temporary files are automatically deleted when disposed
+    await claudeChat.dispose();
+  }
+}
+```
+
+**Note:** Temporary files created from bytes are automatically cleaned up when you call `dispose()` on the chat session.
+
 ### Using Schemas for Structured Responses
 
 ```dart
@@ -104,20 +150,23 @@ void main() async {
   final claudeChat = claudeSDK.createNewChat();
   
   try {
-    // Define a schema for the response
+    // Define a schema with nullable properties
     final schema = SchemaObject(
       properties: {
         'userName': SchemaProperty.string(
           description: 'The name of the user found in the HTML',
+          nullable: false, // Required field
         ),
         'userEmail': SchemaProperty.string(
           description: 'The email of the user if found',
+          nullable: true, // Optional field
         ),
         'userRole': SchemaProperty.string(
           description: 'The role or title of the user',
+          nullable: true, // Optional field
         ),
       },
-      required: ['userName'],
+      // No need to specify 'required' array - it's automatically derived from nullable properties
     );
     
     // Send message with schema
@@ -215,7 +264,7 @@ void main() async {
 
 ## Schema Building
 
-The SDK provides convenient factory methods for building schemas:
+The SDK provides convenient factory methods for building schemas with nullable control:
 
 ```dart
 final schema = SchemaObject(
@@ -223,30 +272,46 @@ final schema = SchemaObject(
     'name': SchemaProperty.string(
       description: 'User name',
       defaultValue: 'Anonymous',
+      nullable: false, // Required field
     ),
     'age': SchemaProperty.number(
       description: 'User age',
+      nullable: false, // Required field
+    ),
+    'email': SchemaProperty.string(
+      description: 'User email',
+      nullable: true, // Optional field (default)
     ),
     'isActive': SchemaProperty.boolean(
       description: 'Whether the user is active',
       defaultValue: true,
+      nullable: false, // Required with default value
     ),
     'tags': SchemaProperty.array(
       items: SchemaProperty.string(),
       description: 'List of tags',
+      nullable: true, // Optional array
     ),
     'metadata': SchemaProperty.object(
       properties: {
-        'created': SchemaProperty.string(),
-        'updated': SchemaProperty.string(),
+        'created': SchemaProperty.string(nullable: false),
+        'updated': SchemaProperty.string(nullable: true),
       },
       description: 'Metadata object',
+      nullable: true, // Optional nested object
     ),
   },
-  required: ['name', 'age'],
+  // The 'required' array is automatically generated from nullable: false properties
   description: 'User information schema',
 );
 ```
+
+### Nullable Property Behavior
+
+- `nullable: false` - The property is required and must be present in the response
+- `nullable: true` (default) - The property is optional and may be omitted or null
+- Properties with `nullable: false` are automatically added to the JSON schema's `required` array
+- You can still use the legacy `required` parameter on SchemaObject for backward compatibility
 
 ## Error Handling
 
@@ -324,13 +389,15 @@ await claudeSDK.dispose(); // Disposes all active sessions
 
 - `sendMessage(List<ClaudeSdkContent> contents)` - Sends a message and returns the response
 - `sendMessageWithSchema({messages, schema})` - Sends a message with a schema for structured response
-- `streamResponse(List<ClaudeSdkContent> contents)` - Streams the response
-- `dispose()` - Disposes the chat session and cleans up resources
+- `get sessionId` - Gets the current session ID (null until first message)
+- `resetConversation()` - Resets the conversation, starting a new session
+- `dispose()` - Disposes the chat session and cleans up resources (including temp files)
 
 ### ClaudeSdkContent
 
 - `ClaudeSdkContent.text(String text)` - Creates text content
 - `ClaudeSdkContent.file(File file)` - Creates file content
+- `ClaudeSdkContent.bytes({data, fileExtension})` - Creates content from bytes (temporary file)
 
 ## Environment Variables
 

@@ -3,7 +3,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:claude_code_sdk/claude_code_sdk.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/server.dart';
 import 'package:zenscrap_server/src/core/extension/uint8list.dart';
@@ -11,15 +11,14 @@ import 'package:zenscrap_server/src/core/scraping_bee.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class ChatController {
-  static late final GenerativeModel _geminiModel;
-  static void initialize({required String geminiApiKey}) {
-    _geminiModel = GenerativeModel(
-      model: 'gemini-2.5-pro',
-      apiKey: geminiApiKey,
-      generationConfig: GenerationConfig(
-        responseSchema: generateExtractRulesSchema,
-      ),
-    );
+  static late final Claude _claudeModel;
+  static Future<void> initialize({required String claudeApiKey}) async {
+    final claude = Claude(claudeApiKey);
+    final isClaudeCodeSDKInstalled = await claude.isClaudeCodeSDKInstalled();
+    if (isClaudeCodeSDKInstalled) {
+      await claude.installClaudeCodeSDK();
+    }
+    _claudeModel = Claude(claudeApiKey);
   }
 
   ChatController._({
@@ -27,16 +26,17 @@ class ChatController {
     required this.scrappableId,
   });
 
-  final ChatSession chatSession;
+  final ClaudeChat chatSession;
   final UuidValue scrappableId;
+
   static ChatController create({
     required UuidValue scrappableId,
     required ReferenceTestData referenceTestData,
   }) {
-    final chat = _geminiModel.startChat(
-      history: [getSystemPrompt(referenceTestData: referenceTestData)],
-      generationConfig: GenerationConfig(
-        responseSchema: generateExtractRulesSchema,
+    final chat = _claudeModel.createNewChat(
+      options: ClaudeChatOptions(
+        systemPrompt: systemPrompt,
+        timeoutMs: 90000,
       ),
     );
     final instance = ChatController._(
@@ -45,6 +45,8 @@ class ChatController {
     );
     return instance;
   }
+
+  bool _isFirstTime = true;
 
   Future<void> sendMessage({
     required Session session,
@@ -58,14 +60,23 @@ class ChatController {
     RetryContent? retryContent;
     while (attempt < MAX_ATTEMPTS) {
       attempt++;
-      final GenerateContentResponse response = await chatSession.sendMessage(
-        retryContent ??
-            composeUserPromptIfNeeded(
-                referenceTestData: referenceTestData, userPrompt: userPromt),
+      List<ClaudeSdkContent>? initialItems;
+      if (_isFirstTime && attempt == 1) {
+        initialItems = getSystemPrompt(referenceTestData: referenceTestData);
+        _isFirstTime = false;
+      }
+      final String response = await chatSession.sendMessage(
+        <ClaudeSdkContent>[
+          ...?initialItems,
+          if (retryContent != null) retryContent,
+          if (retryContent == null)
+            ...composeUserPromptIfNeeded(
+                referenceTestData: referenceTestData, userPrompt: userPromt)
+        ],
       );
       retryContent = await _getChatResponses(
         session: session,
-        generatedContent: response,
+        responseText: response,
         testData: referenceTestData,
         chatSeasonController: chatSeason,
         attemptNumber: attempt,
@@ -89,25 +100,23 @@ class ChatController {
     required Session session,
     required ReferenceTestData testData,
     required int attemptNumber,
-    required GenerateContentResponse generatedContent,
+    required String responseText,
     required StreamController<ChatResponse> chatSeasonController,
   }) async {
     final String attempt =
         attemptNumber > 1 ? '# Attempt $attemptNumber\n' : '';
-
-    String? responseText = generatedContent.text;
     // print(
     //     'Raw AI response:\n$responseText\n--------------------------------------------------');
     session.log(
         'Raw AI response:\n$responseText\n--------------------------------------------------');
-    if (responseText == null || responseText.isEmpty) {
+    if (responseText.isEmpty) {
       chatSeasonController.add(ErrorTextResponse(
         role: PromptRole.system,
         errorMessage:
             'The AI returned an empty response. We will ask it to try again...',
       ));
 
-      return Content.text(
+      return ClaudeSdkContent.text(
           '${attempt}You returned a empty response. Please think harder and try again. Do not return a empty response.');
     }
 
@@ -133,7 +142,7 @@ class ChatController {
         errorMessage:
             'The ai returned a response that could not be parsed to a valid JSON object. We will ask it to try again...',
       ));
-      return Content.text(
+      return ClaudeSdkContent.text(
           '${attempt}Failed to parse AI response as JSON. I called json.decode() in my dart code and received the following error:\n$error.\nUltra think in the reason for the error and try again. Return only raw JSON without anything more (not even markdown notations like "```" in the beginning or end).');
     }
 
@@ -179,7 +188,7 @@ class ChatController {
         ),
       );
 
-      return Content.text(
+      return ClaudeSdkContent.text(
           '${attempt}I encountered an error while trying to map your request. You should return a JSON with "newExtractRules", a "message" or a "errorMessage". Return only raw JSON without anything more (not even markdown notations like "```").');
     } else {
       chatSeasonController.add(newState);
@@ -245,7 +254,7 @@ class ChatController {
           ),
         );
 
-        return Content.text(
+        return ClaudeSdkContent.text(
             '''${attempt}When I tried calling the scrapping bee API with the new extract rule that you just generated, I got the following error from the scrapping bee endpoint:
 ```log
 \n$errorMessage
@@ -276,7 +285,7 @@ Please generate new extraction rules with extreme attention to detail. Take your
   }
 }
 
-Content composeUserPromptIfNeeded({
+List<ClaudeSdkContent> composeUserPromptIfNeeded({
   required ReferenceTestData referenceTestData,
   required String userPrompt,
 }) {
@@ -284,25 +293,26 @@ Content composeUserPromptIfNeeded({
       referenceTestData.scrappableTestResult == null;
 
   if (neverGeneratedATestResultBefore) {
-    return Content.multi([
-      TextPart(
+    return [
+      ClaudeSdkContent.text(
           '''I need you to ultra think in the response of the task prompt I will send bellow, so you don't generate a response that is not compliant with ScrapingBee extract rules feature so it will not return a error the tests I will do later with the link "${referenceTestData.referenceLinkUsed}"...
 Please deeply understand what I need so you can correctly build new extraction rules.
 
 My modification/task prompt is:'''),
-      TextPart(userPrompt),
-    ]);
+      ClaudeSdkContent.text(userPrompt),
+    ];
   }
 
   final Uint8List jsonBytes = utf8.encode(
     jsonEncode(referenceTestData.referenceQueryParametersJson),
   );
 
-  return Content.multi([
-    TextPart(
+  return [
+    ClaudeSdkContent.text(
         'Hello, I wan\'t to iterate on the last extract rules I built. I will attach it bellow:'),
-    DataPart('application/json', jsonBytes),
-    TextPart('''It worked well, but I want to change it a little bit...
+    ClaudeSdkContent.bytes(data: jsonBytes, fileExtension: 'json'),
+    ClaudeSdkContent.text(
+        '''It worked well, but I want to change it a little bit...
 I wan't you to modify it and create a new rules json, that are compliant with ScrapingBee extract rules feature, that resolves what I will ask in my message that will describe the modifications I wan't.
 
 I need you to ultra think in the response so you don't generate a response that is not compliant with ScrapingBee extract rules feature so it will not return a error the tests I will do later with the link "${referenceTestData.referenceLinkUsed}"...
@@ -310,11 +320,11 @@ I need you to ultra think in the response so you don't generate a response that 
 Please deeply understand what I need so you can correctly build new extraction rules.
 
 My modification/task prompt is:'''),
-    TextPart(userPrompt),
-  ]);
+    ClaudeSdkContent.text(userPrompt),
+  ];
 }
 
-Content getSystemPrompt({
+List<ClaudeSdkContent> getSystemPrompt({
   required ReferenceTestData referenceTestData,
 }) {
   final bool neverGeneratedATestResultBefore =
@@ -324,8 +334,8 @@ Content getSystemPrompt({
       referenceTestData.referenceSiteScreenshot.asUint8List;
   final Uint8List htmlBytes = referenceTestData.referenceHtmlPage.asUint8List;
 
-  return Content('user', [
-    TextPart(
+  return [
+    ClaudeSdkContent.text(
         '''I am a saas company that generates scrapping extract rules with ai.
 The client of my saas is made in flutter with serverpod as my server. This saas will extract data that my clients need from the web.
 My user wan't to extract data with of "${referenceTestData.referenceLinkUsed}" with web scrapping.
@@ -381,21 +391,20 @@ Example response format:
 }
 
 But before the interaction with the user, I'll attach the hmtl of the site and the screenshot as well'''),
-    TextPart(
+    ClaudeSdkContent.text(
         'The html that you should use as base to create the extract rules json:'),
-    DataPart('text/html', htmlBytes),
-    TextPart(
+    ClaudeSdkContent.bytes(data: htmlBytes, fileExtension: 'html'),
+    ClaudeSdkContent.text(
         'Now, I will attach a print of the site so you can have a better understanding of how it looks:'),
-    DataPart('image/png', imagePng),
-    TextPart(neverGeneratedATestResultBefore
+    ClaudeSdkContent.bytes(data: imagePng, fileExtension: 'png'),
+    ClaudeSdkContent.text(neverGeneratedATestResultBefore
         ? 'Now, the user will start sending prompts to you for the creation of the first extraction rules and probably he will send more prompts for you to iterate on top of those rules to add more data, fix something, etc... Ultra think in each of your responses.'
         : 'Now, the user will start sending prompts to you to modify a current extraction rule that he created in a previous AI talking session, you will need to iterate on top of those rules... Ultra think in each of your responses.'),
-  ]);
+  ];
 }
 
-typedef RetryContent = Content;
-final Schema generateExtractRulesSchema = Schema(
-  SchemaType.object,
+typedef RetryContent = ClaudeSdkContent;
+final SchemaObject generateExtractRulesSchema = SchemaObject(
   description:
       'Schema for Gemini AI to generate ScrapingBee extraction rules from HTML content and user requirements. '
       'This schema enforces structured responses for web scraping rule generation, allowing the AI to: '
@@ -405,10 +414,8 @@ final Schema generateExtractRulesSchema = Schema(
       'The AI analyzes both HTML content and screenshots to identify the correct selectors, '
       'ensuring the extraction rules are valid for ScrapingBee\'s extract_rules API parameter. '
       'The schema supports iterative refinement where users can modify existing rules based on feedback.',
-  nullable: false,
   properties: {
-    'message': Schema(
-      SchemaType.string,
+    'message': SchemaProperty.string(
       nullable: true,
       description:
           '''Message from the AI assistant for better context for what was done.
@@ -421,8 +428,7 @@ After the question, the user will give his response and you can then continue to
 
 This should be null if there is a errorMessage''',
     ),
-    'errorMessage': Schema(
-      SchemaType.string,
+    'errorMessage': SchemaProperty.string(
       nullable: true,
       description:
           '''Error message if there was an error during the generation process to get extract rules.
@@ -440,8 +446,7 @@ In any case that the errorMessage exists, the "newExtractRulesnewExtractRules" a
 
 This field should be null if there is no error.''',
     ),
-    'newExtractRules': Schema(
-      SchemaType.object,
+    'newExtractRules': SchemaProperty.object(
       nullable: true,
       description:
           '''New extraction rules that are compliant with ScrapingBee extract rules feature.
@@ -451,8 +456,7 @@ Example: {"product_name": "h1.title", "price": "span.price-value", "availability
 If you have any doubts about how to generate the rules, you can web research the ScrapingBee documentation at "https://www.scrapingbee.com/documentation/data-extraction/#basic-usage".
 This field should be null when asking clarification questions (only 'message' should be set).''',
       properties: {
-        '__example__': Schema(
-          SchemaType.string,
+        '__example__': SchemaProperty.string(
           nullable: true,
           description:
               'This is just an example property to satisfy the Gemini API schema requirement that objects must have at least one property. '
@@ -462,3 +466,6 @@ This field should be null when asking clarification questions (only 'message' sh
     ),
   },
 );
+
+final String systemPrompt =
+    '''You are a web scraping assistant. Your task is to generate ScrapingBee extract rules based on the provided HTML content and user requirements. Analyze the HTML structure and create accurate extraction rules that can be used with ScrapingBee's extract_rules feature.''';

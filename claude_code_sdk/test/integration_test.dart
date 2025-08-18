@@ -4,6 +4,7 @@
 // Usage: dart test test/integration_test.dart --api-key=YOUR_API_KEY
 
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:test/test.dart';
 import 'package:claude_code_sdk/claude_code_sdk.dart';
 
@@ -126,6 +127,36 @@ void main() {
       }
     });
 
+    test('should handle bytes content', () async {
+      final isInstalled = await claude.isClaudeCodeSDKInstalled();
+      if (!isInstalled) {
+        print('Skipping test - Claude Code SDK not installed');
+        return;
+      }
+
+      final chat = claude.createNewChat();
+
+      try {
+        // Create some test data
+        final testData = 'This is test data in bytes format'.codeUnits;
+        final bytes = Uint8List.fromList(testData);
+        
+        final response = await chat.sendMessage([
+          ClaudeSdkContent.text('Can you read this file?'),
+          ClaudeSdkContent.bytes(
+            data: bytes,
+            fileExtension: 'txt',
+          ),
+        ]);
+        
+        print('Response to bytes content: $response');
+        expect(response, isNotEmpty);
+        
+      } finally {
+        await chat.dispose();
+      }
+    });
+    
     test('should handle schema-based messages', () async {
       final isInstalled = await claude.isClaudeCodeSDKInstalled();
       if (!isInstalled) {

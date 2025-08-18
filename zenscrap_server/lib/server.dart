@@ -5,9 +5,7 @@ import 'package:zenscrap_server/src/auth/handlers/on_send_validation_email.dart'
 import 'package:zenscrap_server/src/core/scraping_bee.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as auth;
 import 'package:zenscrap_server/src/endpoints/public/chat_controller.dart';
-
 import 'package:zenscrap_server/src/web/routes/root.dart';
-
 import 'src/generated/protocol.dart';
 import 'src/generated/endpoints.dart';
 
@@ -43,8 +41,8 @@ void run(List<String> args) async {
   final String? openAiApiKey = pod.getPassword('openAiApiKey');
   openAiClient = OpenAIClient(apiKey: openAiApiKey);
 
-  // ChatController.initialize(
-  //     claudeApiKey: pod.getPassword('claudeCodeApiKey') ?? '');
+  await ChatController.initialize(
+      claudeApiKey: pod.getPassword('claudeCodeApiKey') ?? '');
 
   // Start the server.
   await pod.start();
