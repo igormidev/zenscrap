@@ -91,9 +91,22 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
       );
     }
 
+    // Remove "Thinking..." message if it exists and add the new response
     ref.read(chatMessagesProvider.notifier).state =
         ref.read(chatMessagesProvider).maybeMap(
-              data: (data) => AsyncValue.data([...data.value, chatResponse]),
+              data: (data) {
+                final messages = [...data.value];
+                // Remove the last "Thinking..." message if it exists
+                if (messages.isNotEmpty) {
+                  final lastMessage = messages.last;
+                  if (lastMessage is MessageTextResponse &&
+                      lastMessage.role == PromptRole.system &&
+                      lastMessage.messageText == 'Thinking...') {
+                    messages.removeLast();
+                  }
+                }
+                return AsyncValue.data([...messages, chatResponse]);
+              },
               orElse: () => AsyncValue.data([chatResponse]),
             );
   }

@@ -76,105 +76,108 @@ class _ChatViewPageState extends ConsumerState<ChatViewPage>
               key: _formKey,
               child: Column(
                 children: [
-                SizedBox(height: 20),
-                SizedBox(
-                  height: 400,
-                  child: Transform.scale(
-                    scale: 1.3,
-                    child: Lottie.network(
-                      'https://lottie.host/5f15ff4c-0e86-4f26-9bbc-29afbf753eb0/okRB2OAoWp.lottie',
-                      decoder: customDecoder,
+                  SizedBox(height: 20),
+                  SizedBox(
+                    height: 400,
+                    child: Transform.scale(
+                      scale: 1.3,
+                      child: Lottie.network(
+                        'https://lottie.host/5f15ff4c-0e86-4f26-9bbc-29afbf753eb0/okRB2OAoWp.lottie',
+                        decoder: customDecoder,
+                      ),
+                    ),
+                  ).animate().fadeIn(
+                      duration: const Duration(seconds: 1),
+                      delay: const Duration(milliseconds: 300)),
+                  Transform.translate(
+                    offset: const Offset(0, -20),
+                    child: Text(
+                      'Vibe scrap any site',
+                      style: context.t.displayMedium?.copyWith(
+                        fontStyle: FontStyle.italic,
+                        height: 1,
+                        color: context.c.primary,
+                      ),
                     ),
                   ),
-                ).animate().fadeIn(
-                    duration: const Duration(seconds: 1),
-                    delay: const Duration(milliseconds: 800)),
-                Transform.translate(
-                  offset: const Offset(0, -20),
-                  child: Text(
-                    'Vibe scrap any site',
-                    style: context.t.displayMedium?.copyWith(
-                      fontStyle: FontStyle.italic,
-                      height: 1,
-                      color: context.c.primary,
+                  SizedBox(height: 40),
+                  ZenTextfield(
+                    controller: _referenceLinkEC,
+                    labelText: 'Type a reference link',
+                    hintText: 'E.g https://example.com/product/12345',
+                    validator: ValidationBuilder()
+                        .url('Please enter a valid URL')
+                        .minLength(10, 'URL must be at least 10 characters')
+                        .maxLength(500, 'URL must be less than 500 characters')
+                        .build(),
+                  ),
+                  SizedBox(height: 32),
+                  ZenTextfield(
+                    controller: _promptEC,
+                    labelText: 'What do you wan\'t to extract from that link?',
+                    hintText: 'E.g. Extract all product details from the page',
+                    minLines: 1,
+                    maxLines: 5,
+                    validator: ValidationBuilder()
+                        .minLength(10, 'Prompt must be at least 10 characters')
+                        .maxLength(
+                            500, 'Prompt must be less than 500 characters')
+                        .build(),
+                  ),
+                  SizedBox(height: 32),
+                  FilledButton.tonalIcon(
+                    onPressed: () async {
+                      if (!(_formKey.currentState?.validate() ?? false)) return;
+
+                      _isLoading.value = true;
+                      await ref
+                          .read(scrapChatProvider.notifier)
+                          .createScrappable(
+                            targetUrl: _referenceLinkEC.text,
+                            userPrompt: _promptEC.text,
+                          );
+                      _isLoading.value = false;
+                    },
+                    style: FilledButton.styleFrom(
+                      iconAlignment: IconAlignment.end,
+                    ),
+                    // icon: const Icon(Icons.send),
+                    icon: ValueListenableBuilder(
+                      valueListenable: _isLoading,
+                      builder: (context, isLoading, child) {
+                        if (isLoading) {
+                          return const SizedBox(
+                            height: 20,
+                            child: AdaptiveProgressIndicator(),
+                          );
+                        }
+
+                        return const Icon(Icons.send);
+                      },
+                    ),
+                    label: ValueListenableBuilder(
+                      valueListenable: _isLoading,
+                      builder: (context, isLoading, child) {
+                        if (isLoading) {
+                          return Text('Creating scrappable...');
+                        }
+
+                        return Text('Create scrappable');
+                      },
                     ),
                   ),
-                ),
-                SizedBox(height: 40),
-                ZenTextfield(
-                  controller: _referenceLinkEC,
-                  labelText: 'Type a reference link',
-                  hintText: 'E.g https://example.com/product/12345',
-                  validator: ValidationBuilder()
-                      .url('Please enter a valid URL')
-                      .minLength(10, 'URL must be at least 10 characters')
-                      .maxLength(500, 'URL must be less than 500 characters')
-                      .build(),
-                ),
-                SizedBox(height: 32),
-                ZenTextfield(
-                  controller: _promptEC,
-                  labelText: 'What do you wan\'t to extract from that link?',
-                  hintText: 'E.g. Extract all product details from the page',
-                  minLines: 1,
-                  maxLines: 5,
-                  validator: ValidationBuilder()
-                      .minLength(10, 'Prompt must be at least 10 characters')
-                      .maxLength(500, 'Prompt must be less than 500 characters')
-                      .build(),
-                ),
-                SizedBox(height: 32),
-                FilledButton.tonalIcon(
-                  onPressed: () async {
-                    if (!(_formKey.currentState?.validate() ?? false)) return;
-                    
-                    _isLoading.value = true;
-                    await ref.read(scrapChatProvider.notifier).createScrappable(
-                          targetUrl: _referenceLinkEC.text,
-                          userPrompt: _promptEC.text,
-                        );
-                    _isLoading.value = false;
-                  },
-                  style: FilledButton.styleFrom(
-                    iconAlignment: IconAlignment.end,
+                  Spacer(),
+                  Text(
+                    'Test the platform easily'
+                    '\nNo login required to test your scrap endpoint',
+                    style: context.t.bodyMedium?.copyWith(
+                      color: context.c.outline,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  // icon: const Icon(Icons.send),
-                  icon: ValueListenableBuilder(
-                    valueListenable: _isLoading,
-                    builder: (context, isLoading, child) {
-                      if (isLoading) {
-                        return const SizedBox(
-                          height: 20,
-                          child: AdaptiveProgressIndicator(),
-                        );
-                      }
-
-                      return const Icon(Icons.send);
-                    },
-                  ),
-                  label: ValueListenableBuilder(
-                    valueListenable: _isLoading,
-                    builder: (context, isLoading, child) {
-                      if (isLoading) {
-                        return Text('Creating scrappable...');
-                      }
-
-                      return Text('Create scrappable');
-                    },
-                  ),
-                ),
-                Spacer(),
-                Text(
-                  'Test the platform easily'
-                  '\nNo login required to test your scrap endpoint',
-                  style: context.t.bodyMedium?.copyWith(
-                    color: context.c.outline,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 32)
-              ],
-            ),
+                  SizedBox(height: 32)
+                ],
+              ),
             ),
           ),
         )

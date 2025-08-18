@@ -8,6 +8,7 @@ import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/server.dart';
 import 'package:zenscrap_server/src/core/extension/uint8list.dart';
 import 'package:zenscrap_server/src/core/scraping_bee.dart';
+import 'package:zenscrap_server/src/core/scrapping_bee_extract_rule_context.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/i_chat_controller.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
@@ -289,8 +290,7 @@ Content composeUserPromptIfNeeded({
 
   if (neverGeneratedATestResultBefore) {
     return Content.multi([
-      TextPart(
-          '''I need you to create extraction rules based on my request.
+      TextPart('''I need you to create extraction rules based on my request.
 
 **RESPONSE FORMAT - Use ONE of these three patterns:**
 1) Success with rules: {"message": "Description of what was created", "newExtractRules": {...}}
@@ -350,9 +350,8 @@ My ideia is to make a request in my serverpod server similar to this one:
 ```dart
 /// Example of a extract rule - that you will generate
 final extractionRules = {
-  'title': 'h1',
-  'price': '.price',
-  'description': 'p.description'
+  "coach_name": "h1.data-header__headline-wrapper",
+  "current_club_name": ".data-header__club a",
 };
   
 /// Example of a request
@@ -404,6 +403,9 @@ But before the interaction with the user, I'll attach the hmtl of the site and t
     TextPart(
         'Now, I will attach a print of the site so you can have a better understanding of how it looks:'),
     DataPart('image/png', imagePng),
+    TextPart(
+        'I will attach a md file of how to create the extract rules as well:'),
+    DataPart('text/markdown', utf8.encode(scrappingBeeExtractRuleContext)),
     TextPart(neverGeneratedATestResultBefore
         ? '''The user will now send prompts for creating extraction rules.
 
@@ -441,8 +443,7 @@ final Schema generateExtractRulesSchema = Schema(
     'message': Schema(
       SchemaType.string,
       nullable: true,
-      description:
-          '''Message from the AI assistant. Used in two scenarios:
+      description: '''Message from the AI assistant. Used in two scenarios:
 
 1. WITH newExtractRules (REQUIRED): Describe what extraction rules were created/modified
    Example: "Created extraction rules for coach name, club, and image"
@@ -456,8 +457,7 @@ MUST be present if newExtractRules is present.''',
     'errorMessage': Schema(
       SchemaType.string,
       nullable: true,
-      description:
-          '''Error message when unable to complete the task.
+      description: '''Error message when unable to complete the task.
 
 Examples:
 - 404 page detected
@@ -470,8 +470,7 @@ This creates an exclusive error state.''',
     'newExtractRules': Schema(
       SchemaType.object,
       nullable: true,
-      description:
-          '''ScrapingBee-compliant extraction rules.
+      description: '''ScrapingBee-compliant extraction rules.
 
 Keys: field names to extract (e.g., "title", "price")
 Values: CSS selectors or XPath expressions
