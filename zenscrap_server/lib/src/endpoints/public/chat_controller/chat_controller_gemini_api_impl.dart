@@ -98,9 +98,7 @@ class ChatControllerGeminiApiImpl extends IChatController {
         attemptNumber > 1 ? '# Attempt $attemptNumber\n' : '';
 
     String? responseText = generatedContent.text;
-    // print(
-    //     'Raw AI response:\n$responseText\n--------------------------------------------------');
-    session.log(
+    print(
         'Raw AI response:\n$responseText\n--------------------------------------------------');
     if (responseText == null || responseText.isEmpty) {
       chatSeasonController.add(ErrorTextResponse(

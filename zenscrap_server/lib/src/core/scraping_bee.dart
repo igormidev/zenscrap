@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:zenscrap_server/src/core/extension/convert_extensions.dart';
 
 part 'scraping_bee.freezed.dart';
 
@@ -121,29 +122,71 @@ class ScrapingBee {
       );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = response.data is String
-            ? Map<String, dynamic>.from(response.data as Map)
-            : response.data as Map<String, dynamic>;
+        // Handle different response formats from ScrapingBee
+        try {
+          Map<String, dynamic>? resultData = tryDecode(response.data);
+          print('Extracted data: $resultData');
 
-        return ExtractDataByRule.withData(result: responseData['body']);
+          return ExtractDataByRule.withData(result: resultData?['body'] ?? {});
+        } catch (e) {
+          return ExtractDataByRule.erorr(
+            errorMessage: 'Failed to parse response: $e',
+          );
+        }
       } else {
-        final Map<String, dynamic> errorResponse = response.data is String
-            ? Map<String, dynamic>.from(response.data as Map)
-            : response.data as Map<String, dynamic>;
-        return ExtractDataByRule.erorr(
-          errorMessage:
-              'ScrapingBee API error: ${errorResponse['message'] ?? 'Unknown error'} (Status: ${response.statusCode})',
-        );
+        try {
+          final Map<String, dynamic> errorResponse;
+          if (response.data is String) {
+            try {
+              errorResponse =
+                  jsonDecode(response.data as String) as Map<String, dynamic>;
+            } catch (_) {
+              return ExtractDataByRule.erorr(
+                errorMessage:
+                    'ScrapingBee API error: ${response.data} (Status: ${response.statusCode})',
+              );
+            }
+          } else {
+            errorResponse = response.data as Map<String, dynamic>;
+          }
+          return ExtractDataByRule.erorr(
+            errorMessage:
+                'ScrapingBee API error: ${errorResponse['message'] ?? 'Unknown error'} (Status: ${response.statusCode})',
+          );
+        } catch (e) {
+          return ExtractDataByRule.erorr(
+            errorMessage:
+                'ScrapingBee API error (Status: ${response.statusCode})',
+          );
+        }
       }
     } on DioException catch (e) {
       if (e.response != null) {
-        final Map<String, dynamic> errorResponse = e.response!.data is String
-            ? Map<String, dynamic>.from(e.response!.data as Map)
-            : e.response!.data as Map<String, dynamic>;
-        return ExtractDataByRule.erorr(
-          errorMessage:
-              'ScrapingBee API error: ${errorResponse['message'] ?? 'Unknown error'} (Status: ${e.response!.statusCode})',
-        );
+        try {
+          final Map<String, dynamic> errorResponse;
+          if (e.response!.data is String) {
+            try {
+              errorResponse = jsonDecode(e.response!.data as String)
+                  as Map<String, dynamic>;
+            } catch (_) {
+              return ExtractDataByRule.erorr(
+                errorMessage:
+                    'ScrapingBee API error: ${e.response!.data} (Status: ${e.response!.statusCode})',
+              );
+            }
+          } else {
+            errorResponse = e.response!.data as Map<String, dynamic>;
+          }
+          return ExtractDataByRule.erorr(
+            errorMessage:
+                'ScrapingBee API error: ${errorResponse['message'] ?? 'Unknown error'} (Status: ${e.response!.statusCode})',
+          );
+        } catch (_) {
+          return ExtractDataByRule.erorr(
+            errorMessage:
+                'ScrapingBee API error (Status: ${e.response!.statusCode})',
+          );
+        }
       }
       return ExtractDataByRule.erorr(
         errorMessage: 'Failed to scrape data: ${e.message}',

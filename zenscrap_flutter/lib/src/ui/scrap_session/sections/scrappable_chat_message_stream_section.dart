@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/convert_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_messages_provider.dart';
 
 class ScrappableChatMessageStreamSection extends ConsumerStatefulWidget {
@@ -149,8 +150,10 @@ class _ChatMessageBubble extends StatelessWidget {
     BorderRadius messageBorderRadius;
     EdgeInsetsGeometry messagePadding;
     const double border = 22;
+    String userName;
 
     if (isUserMessage) {
+      userName = "You";
       backgroundColor = colorScheme.primary;
       textColor = colorScheme.onPrimary;
       roleIcon = Icons.person;
@@ -165,9 +168,10 @@ class _ChatMessageBubble extends StatelessWidget {
       );
       messagePadding = const EdgeInsets.only(left: 56, right: 0);
     } else if (isSystemMessage) {
+      userName = "ZenBot";
       backgroundColor = colorScheme.surfaceContainerHighest;
       textColor = colorScheme.onSurfaceVariant;
-      roleIcon = Icons.info_outline;
+      roleIcon = Icons.spa;
       iconBackgroundColor = colorScheme.surfaceContainerHigh;
       iconColor = colorScheme.onSurfaceVariant;
       rowAlignment = MainAxisAlignment.start;
@@ -180,6 +184,7 @@ class _ChatMessageBubble extends StatelessWidget {
       messagePadding = const EdgeInsets.only(left: 0, right: 56);
     } else {
       // Model/AI message
+      userName = "AI (GEMINI)";
       backgroundColor = colorScheme.surfaceContainerHigh;
       textColor = colorScheme.onSurface;
       roleIcon = Icons.smart_toy;
@@ -203,8 +208,10 @@ class _ChatMessageBubble extends StatelessWidget {
       // Do NOT change roleIcon - it should remain as the sender's role icon
     } else if (message is NewExtractRuleResponse) {
       // Success messages get success-themed bubble
-      backgroundColor = colorScheme.tertiaryContainer;
-      textColor = colorScheme.onTertiaryContainer;
+      // backgroundColor = colorScheme.tertiaryContainer;
+      // textColor = colorScheme.onTertiaryContainer;
+      backgroundColor = const Color.fromARGB(255, 211, 245, 188);
+      textColor = Colors.green[800]!;
       // Do NOT change roleIcon - it should remain as the sender's role icon
     }
 
@@ -252,23 +259,42 @@ class _ChatMessageBubble extends StatelessWidget {
             const SizedBox(width: 8),
           ],
           Flexible(
-            child: Container(
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.75,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: backgroundColor,
-                borderRadius: messageBorderRadius,
-                boxShadow: [
-                  BoxShadow(
-                    color: colorScheme.shadow.withValues(alpha: 0.08),
-                    blurRadius: 3,
-                    offset: const Offset(0, 1),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Align(
+                  alignment: isUserMessage
+                      ? Alignment.centerRight
+                      : Alignment.centerLeft,
+                  child: Text(
+                    userName,
+                    style: context.t.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'monospace',
+                    ),
                   ),
-                ],
-              ),
-              child: messageContent,
+                ),
+                SizedBox(height: 4),
+                Container(
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * 0.75,
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: backgroundColor,
+                    borderRadius: messageBorderRadius,
+                    boxShadow: [
+                      BoxShadow(
+                        color: colorScheme.shadow.withValues(alpha: 0.08),
+                        blurRadius: 3,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: messageContent,
+                ),
+              ],
             ),
           ),
           if (isUserMessage) ...[
