@@ -56,6 +56,11 @@ class ScrappableChatSession extends Endpoint {
       response,
       duration + Duration(minutes: 1),
     );
+    await Scrappable.db.updateRow(
+        session,
+        scrappable.copyWith(
+          testEndpointAvailableUntil: DateTime.now().add(duration),
+        ));
     return response;
   }
 

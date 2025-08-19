@@ -6,6 +6,7 @@ fields:
   createdAt: DateTime
   name: String
   description: String
+  testEndpointAvailableUntil: DateTime?
   scrappingRules: String?
   isActive: bool
   targetRequestId: int

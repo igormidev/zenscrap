@@ -25,8 +25,10 @@ class _InitialChatViewState extends ConsumerState<InitialChatView> {
         withError: ZenErrorTab.new,
         creatingSessionState: () => ChatViewPage(),
         blank: () => ChatViewPage(),
-        standard: (Scrappable scrappable, String sessionUuid) {
+        standard: (Scrappable scrappable, DateTime testExpirationDate,
+            String sessionUuid) {
           return ScrappableEditSessionView(
+            testExpirationDate: testExpirationDate,
             scrappable: scrappable,
           );
         },

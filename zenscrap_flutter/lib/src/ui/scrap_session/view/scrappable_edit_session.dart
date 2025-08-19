@@ -3,14 +3,16 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/sections/scrappable_chat_message_stream_section.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/sections/scrappable_curl_section.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/sections/scrappable_test_response.dart';
-import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/CTA_continue_flow.dart';
+import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/cta_continue_flow.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/zen_chat_textfield.dart';
 
 class ScrappableEditSessionView extends StatelessWidget {
   final Scrappable scrappable;
+  final DateTime testExpirationDate;
   const ScrappableEditSessionView({
     super.key,
     required this.scrappable,
+    required this.testExpirationDate,
   });
 
   @override
@@ -39,6 +41,7 @@ class ScrappableEditSessionView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 CTAContinueFlow(
+                  targetTime: testExpirationDate,
                   scrappable: scrappable,
                 ),
                 SizedBox(height: 8),

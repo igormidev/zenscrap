@@ -93,11 +93,13 @@ class _ScrappableChatMessageStreamSectionState
           );
         }
         final ChatResponse lastItem = messages.last;
+        final bool hasOnlyUserMessage = messages.length == 1;
         final bool willHideLoading = lastItem.role == PromptRole.user ||
             lastItem is ErrorTextResponse ||
             lastItem is NewExtractRuleResponse ||
             (lastItem is MessageTextResponse &&
-                lastItem.role == PromptRole.model);
+                lastItem.role == PromptRole.model) ||
+            hasOnlyUserMessage;
 
         return ListView.builder(
           controller: scrollController,

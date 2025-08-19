@@ -35,16 +35,21 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
               .createSession(scrappable: scrappable)
               .toResult;
 
-          await sessionResult.fold((sessionUuid) async {
+          await sessionResult.fold((createdSessionResponse) async {
             _chatResponseSubscription = ref
                 .read(clientProvider)
                 .scrappableChatSession
-                .listenToScrappableRedraftSession(sessionUuid: sessionUuid)
+                .listenToScrappableRedraftSession(
+                    sessionUuid: createdSessionResponse.sessionId)
                 .listen(onChange);
+
+            final Duration timeUntilExpire = createdSessionResponse.expiresIn;
+            final DateTime expirationDate = DateTime.now().add(timeUntilExpire);
 
             state = ScrapChatSessionState.standard(
               data: scrappable,
-              sessionUuid: sessionUuid,
+              sessionUuid: createdSessionResponse.sessionId,
+              testExpirationDate: expirationDate,
             );
 
             await sendMessage(userPrompt);

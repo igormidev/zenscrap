@@ -23,6 +23,7 @@ abstract class Scrappable
     required this.createdAt,
     required this.name,
     required this.description,
+    this.testEndpointAvailableUntil,
     this.scrappingRules,
     required this.isActive,
     required this.targetRequestId,
@@ -37,6 +38,7 @@ abstract class Scrappable
     required DateTime createdAt,
     required String name,
     required String description,
+    DateTime? testEndpointAvailableUntil,
     String? scrappingRules,
     required bool isActive,
     required int targetRequestId,
@@ -53,6 +55,11 @@ abstract class Scrappable
           _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
       name: jsonSerialization['name'] as String,
       description: jsonSerialization['description'] as String,
+      testEndpointAvailableUntil:
+          jsonSerialization['testEndpointAvailableUntil'] == null
+              ? null
+              : _i1.DateTimeJsonExtension.fromJson(
+                  jsonSerialization['testEndpointAvailableUntil']),
       scrappingRules: jsonSerialization['scrappingRules'] as String?,
       isActive: jsonSerialization['isActive'] as bool,
       targetRequestId: jsonSerialization['targetRequestId'] as int,
@@ -83,6 +90,8 @@ abstract class Scrappable
 
   String description;
 
+  DateTime? testEndpointAvailableUntil;
+
   String? scrappingRules;
 
   bool isActive;
@@ -107,6 +116,7 @@ abstract class Scrappable
     DateTime? createdAt,
     String? name,
     String? description,
+    DateTime? testEndpointAvailableUntil,
     String? scrappingRules,
     bool? isActive,
     int? targetRequestId,
@@ -122,6 +132,8 @@ abstract class Scrappable
       'createdAt': createdAt.toJson(),
       'name': name,
       'description': description,
+      if (testEndpointAvailableUntil != null)
+        'testEndpointAvailableUntil': testEndpointAvailableUntil?.toJson(),
       if (scrappingRules != null) 'scrappingRules': scrappingRules,
       'isActive': isActive,
       'targetRequestId': targetRequestId,
@@ -140,6 +152,8 @@ abstract class Scrappable
       'createdAt': createdAt.toJson(),
       'name': name,
       'description': description,
+      if (testEndpointAvailableUntil != null)
+        'testEndpointAvailableUntil': testEndpointAvailableUntil?.toJson(),
       if (scrappingRules != null) 'scrappingRules': scrappingRules,
       'isActive': isActive,
       'targetRequestId': targetRequestId,
@@ -196,6 +210,7 @@ class _ScrappableImpl extends Scrappable {
     required DateTime createdAt,
     required String name,
     required String description,
+    DateTime? testEndpointAvailableUntil,
     String? scrappingRules,
     required bool isActive,
     required int targetRequestId,
@@ -208,6 +223,7 @@ class _ScrappableImpl extends Scrappable {
           createdAt: createdAt,
           name: name,
           description: description,
+          testEndpointAvailableUntil: testEndpointAvailableUntil,
           scrappingRules: scrappingRules,
           isActive: isActive,
           targetRequestId: targetRequestId,
@@ -226,6 +242,7 @@ class _ScrappableImpl extends Scrappable {
     DateTime? createdAt,
     String? name,
     String? description,
+    Object? testEndpointAvailableUntil = _Undefined,
     Object? scrappingRules = _Undefined,
     bool? isActive,
     int? targetRequestId,
@@ -239,6 +256,9 @@ class _ScrappableImpl extends Scrappable {
       createdAt: createdAt ?? this.createdAt,
       name: name ?? this.name,
       description: description ?? this.description,
+      testEndpointAvailableUntil: testEndpointAvailableUntil is DateTime?
+          ? testEndpointAvailableUntil
+          : this.testEndpointAvailableUntil,
       scrappingRules:
           scrappingRules is String? ? scrappingRules : this.scrappingRules,
       isActive: isActive ?? this.isActive,
@@ -272,6 +292,10 @@ class ScrappableTable extends _i1.Table<_i1.UuidValue> {
       'description',
       this,
     );
+    testEndpointAvailableUntil = _i1.ColumnDateTime(
+      'testEndpointAvailableUntil',
+      this,
+    );
     scrappingRules = _i1.ColumnString(
       'scrappingRules',
       this,
@@ -297,6 +321,8 @@ class ScrappableTable extends _i1.Table<_i1.UuidValue> {
   late final _i1.ColumnString name;
 
   late final _i1.ColumnString description;
+
+  late final _i1.ColumnDateTime testEndpointAvailableUntil;
 
   late final _i1.ColumnString scrappingRules;
 
@@ -343,6 +369,7 @@ class ScrappableTable extends _i1.Table<_i1.UuidValue> {
         createdAt,
         name,
         description,
+        testEndpointAvailableUntil,
         scrappingRules,
         isActive,
         targetRequestId,

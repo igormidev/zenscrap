@@ -162,7 +162,9 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? blank,
     TResult Function()? creatingSessionState,
-    TResult Function(Scrappable data, String sessionUuid)? standard,
+    TResult Function(
+            Scrappable data, DateTime testExpirationDate, String sessionUuid)?
+        standard,
     TResult Function(ZenScrapException error)? withError,
     required TResult orElse(),
   }) {
@@ -174,7 +176,8 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
           when creatingSessionState != null:
         return creatingSessionState();
       case _ScrapChatSessionStateStandard() when standard != null:
-        return standard(_that.data, _that.sessionUuid);
+        return standard(
+            _that.data, _that.testExpirationDate, _that.sessionUuid);
       case _ScrapChatSessionStateWithError() when withError != null:
         return withError(_that.error);
       case _:
@@ -199,7 +202,9 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
   TResult when<TResult extends Object?>({
     required TResult Function() blank,
     required TResult Function() creatingSessionState,
-    required TResult Function(Scrappable data, String sessionUuid) standard,
+    required TResult Function(
+            Scrappable data, DateTime testExpirationDate, String sessionUuid)
+        standard,
     required TResult Function(ZenScrapException error) withError,
   }) {
     final _that = this;
@@ -209,7 +214,8 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
       case _ScrapChatSessionStateCreatingSessionState():
         return creatingSessionState();
       case _ScrapChatSessionStateStandard():
-        return standard(_that.data, _that.sessionUuid);
+        return standard(
+            _that.data, _that.testExpirationDate, _that.sessionUuid);
       case _ScrapChatSessionStateWithError():
         return withError(_that.error);
       case _:
@@ -233,7 +239,9 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? blank,
     TResult? Function()? creatingSessionState,
-    TResult? Function(Scrappable data, String sessionUuid)? standard,
+    TResult? Function(
+            Scrappable data, DateTime testExpirationDate, String sessionUuid)?
+        standard,
     TResult? Function(ZenScrapException error)? withError,
   }) {
     final _that = this;
@@ -244,7 +252,8 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
           when creatingSessionState != null:
         return creatingSessionState();
       case _ScrapChatSessionStateStandard() when standard != null:
-        return standard(_that.data, _that.sessionUuid);
+        return standard(
+            _that.data, _that.testExpirationDate, _that.sessionUuid);
       case _ScrapChatSessionStateWithError() when withError != null:
         return withError(_that.error);
       case _:
@@ -300,9 +309,12 @@ class _ScrapChatSessionStateCreatingSessionState
 
 class _ScrapChatSessionStateStandard implements ScrapChatSessionState {
   _ScrapChatSessionStateStandard(
-      {required this.data, required this.sessionUuid});
+      {required this.data,
+      required this.testExpirationDate,
+      required this.sessionUuid});
 
   final Scrappable data;
+  final DateTime testExpirationDate;
   final String sessionUuid;
 
   /// Create a copy of ScrapChatSessionState
@@ -319,16 +331,19 @@ class _ScrapChatSessionStateStandard implements ScrapChatSessionState {
         (other.runtimeType == runtimeType &&
             other is _ScrapChatSessionStateStandard &&
             (identical(other.data, data) || other.data == data) &&
+            (identical(other.testExpirationDate, testExpirationDate) ||
+                other.testExpirationDate == testExpirationDate) &&
             (identical(other.sessionUuid, sessionUuid) ||
                 other.sessionUuid == sessionUuid));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, data, sessionUuid);
+  int get hashCode =>
+      Object.hash(runtimeType, data, testExpirationDate, sessionUuid);
 
   @override
   String toString() {
-    return 'ScrapChatSessionState.standard(data: $data, sessionUuid: $sessionUuid)';
+    return 'ScrapChatSessionState.standard(data: $data, testExpirationDate: $testExpirationDate, sessionUuid: $sessionUuid)';
   }
 }
 
@@ -340,7 +355,7 @@ abstract mixin class _$ScrapChatSessionStateStandardCopyWith<$Res>
           $Res Function(_ScrapChatSessionStateStandard) _then) =
       __$ScrapChatSessionStateStandardCopyWithImpl;
   @useResult
-  $Res call({Scrappable data, String sessionUuid});
+  $Res call({Scrappable data, DateTime testExpirationDate, String sessionUuid});
 }
 
 /// @nodoc
@@ -356,6 +371,7 @@ class __$ScrapChatSessionStateStandardCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? data = null,
+    Object? testExpirationDate = null,
     Object? sessionUuid = null,
   }) {
     return _then(_ScrapChatSessionStateStandard(
@@ -363,6 +379,10 @@ class __$ScrapChatSessionStateStandardCopyWithImpl<$Res>
           ? _self.data
           : data // ignore: cast_nullable_to_non_nullable
               as Scrappable,
+      testExpirationDate: null == testExpirationDate
+          ? _self.testExpirationDate
+          : testExpirationDate // ignore: cast_nullable_to_non_nullable
+              as DateTime,
       sessionUuid: null == sessionUuid
           ? _self.sessionUuid
           : sessionUuid // ignore: cast_nullable_to_non_nullable

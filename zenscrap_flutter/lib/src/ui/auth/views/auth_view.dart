@@ -13,6 +13,7 @@ import 'package:zenscrap_flutter/src/ui/auth/pages/login_page.dart';
 import 'package:zenscrap_flutter/src/ui/auth/pages/password_reset_page.dart';
 import 'package:zenscrap_flutter/src/ui/auth/pages/password_reset_validate_code_page.dart';
 import 'package:zenscrap_flutter/src/ui/auth/pages/sign_in_page.dart';
+import 'package:zenscrap_flutter/src/ui/auth/widgets/initial_scrappable_card_indicator.dart';
 
 class AuthView extends ConsumerStatefulWidget {
   final Scrappable? scrappable;
@@ -176,6 +177,12 @@ class _AuthViewState extends ConsumerState<AuthView>
                                     ),
                                   ),
                                 ),
+                                if (widget.scrappable != null) ...[
+                                  const SizedBox(height: 16),
+                                  InitialScrappableCardIndicator(
+                                    scrappable: widget.scrappable!,
+                                  ),
+                                ],
                                 const SizedBox(height: 16),
                                 const ContactSupportButton(),
                               ],
@@ -244,6 +251,7 @@ class _AuthViewState extends ConsumerState<AuthView>
                                     ),
                                     child: Lottie.network(
                                       'https://lottie.host/6778c6b9-32ee-401c-bc8f-97eea151b1df/U3LT3t31Wa.lottie',
+                                      decoder: customDecoder,
                                       width: double.maxFinite,
                                       fit: BoxFit.fitWidth,
                                     ),

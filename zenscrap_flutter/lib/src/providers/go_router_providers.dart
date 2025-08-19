@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:talker_flutter/talker_flutter.dart';
+import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
@@ -86,7 +87,9 @@ final routerProvider = StateProvider((ref) {
       GoRoute(
         path: '/auth',
         builder: (context, state) {
-          return AuthView();
+          return AuthView(
+            scrappable: state.extra as Scrappable?,
+          );
         },
       ),
     ],

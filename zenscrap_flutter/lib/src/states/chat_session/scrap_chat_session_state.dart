@@ -10,6 +10,7 @@ abstract class ScrapChatSessionState with _$ScrapChatSessionState {
       _ScrapChatSessionStateCreatingSessionState;
   factory ScrapChatSessionState.standard({
     required Scrappable data,
+    required DateTime testExpirationDate,
     required String sessionUuid,
   }) = _ScrapChatSessionStateStandard;
   factory ScrapChatSessionState.withError({required ZenScrapException error}) =

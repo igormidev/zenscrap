@@ -45,8 +45,15 @@ class HandleApiScrapRequestEndpoint extends Endpoint {
     if (scrappable == null || targetRequest == null) {
       throw Exception('Scrappable not found');
     }
-    if (scrappable.isActive == false) {
+    if (scrappable.isActive == false && isTest == false) {
       throw Exception('This scrappable is no longer active');
+    }
+    final isTestExpirated = isTest &&
+        scrappable.testEndpointAvailableUntil != null &&
+        scrappable.testEndpointAvailableUntil!.isBefore(DateTime.now());
+
+    if (isTestExpirated) {
+      throw Exception('This scrappable test endpoint is no longer available');
     }
 
     String targetUrl = targetRequest.url;

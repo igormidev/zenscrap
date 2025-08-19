@@ -18,8 +18,10 @@ import 'package:zenscrap_server/src/generated/entities/account/account.dart'
     as _i4;
 import 'package:zenscrap_server/src/generated/entities/scrappable/scrappable.dart'
     as _i5;
-import 'package:zenscrap_server/src/generated/entities/redraft_scrappable_session/chat_response.dart'
+import 'package:zenscrap_server/src/generated/entities/redraft_scrappable_session/create_session_response.dart'
     as _i6;
+import 'package:zenscrap_server/src/generated/entities/redraft_scrappable_session/chat_response.dart'
+    as _i7;
 import 'package:zenscrap_server/src/generated/protocol.dart';
 import 'package:zenscrap_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -309,7 +311,7 @@ class _ScrappableChatSession {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<String> createSession(
+  _i3.Future<_i6.CreateSessionResponse> createSession(
     _i1.TestSessionBuilder sessionBuilder, {
     required _i5.Scrappable scrappable,
   }) async {
@@ -330,7 +332,7 @@ class _ScrappableChatSession {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<String>);
+        ) as _i3.Future<_i6.CreateSessionResponse>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -338,11 +340,11 @@ class _ScrappableChatSession {
     });
   }
 
-  _i3.Stream<_i6.ChatResponse> listenToScrappableRedraftSession(
+  _i3.Stream<_i7.ChatResponse> listenToScrappableRedraftSession(
     _i1.TestSessionBuilder sessionBuilder, {
     required String sessionUuid,
   }) {
-    var _localTestStreamManager = _i1.TestStreamManager<_i6.ChatResponse>();
+    var _localTestStreamManager = _i1.TestStreamManager<_i7.ChatResponse>();
     _i1.callStreamFunctionAndHandleExceptions(
       () async {
         var _localUniqueSession =
