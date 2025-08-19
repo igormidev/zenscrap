@@ -54,8 +54,21 @@ class PrivateAccountEndpoint extends Endpoint {
             accountApiKey: apiKey,
           );
 
-          return await AccountInfo.db
+          final newAccountInfo = await AccountInfo.db
               .insertRow(session, accountInfo, transaction: transaction);
+          if (initialScrappableIfNewUser != null) {
+            await Scrappable.db.updateRow(
+                session,
+                initialScrappableIfNewUser.copyWith(
+                  account: newAccountInfo.id,
+                ),
+                transaction: transaction);
+            await AccountInfo.db.attachRow.scrappables(
+                session, accountInfo, initialScrappableIfNewUser,
+                transaction: transaction);
+          }
+
+          return newAccountInfo;
         });
       } catch (e) {
         throw ZenScrapException(
