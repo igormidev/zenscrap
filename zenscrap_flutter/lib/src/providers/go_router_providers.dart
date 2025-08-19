@@ -6,6 +6,7 @@ import 'package:talker_flutter/talker_flutter.dart';
 import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
+import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/splash_view.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/view/initial_chat_view.dart';
@@ -80,6 +81,12 @@ final routerProvider = StateProvider((ref) {
         path: '/dashboard',
         builder: (context, state) {
           return ScrappablesDashboard();
+        },
+      ),
+      GoRoute(
+        path: '/auth',
+        builder: (context, state) {
+          return AuthView();
         },
       ),
     ],

@@ -12,13 +12,15 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
-import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i2;
-import '../../entities/account/account_api_key.dart' as _i3;
+import '../../entities/scrappable/scrappable.dart' as _i2;
+import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i3;
+import '../../entities/account/account_api_key.dart' as _i4;
 
 abstract class AccountInfo
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   AccountInfo._({
     this.id,
+    this.scrappables,
     required this.userInfoId,
     this.userInfo,
     required this.accountApiKeyId,
@@ -27,24 +29,28 @@ abstract class AccountInfo
 
   factory AccountInfo({
     int? id,
+    List<_i2.Scrappable>? scrappables,
     required int userInfoId,
-    _i2.UserInfo? userInfo,
+    _i3.UserInfo? userInfo,
     required int accountApiKeyId,
-    _i3.AccountApiKey? accountApiKey,
+    _i4.AccountApiKey? accountApiKey,
   }) = _AccountInfoImpl;
 
   factory AccountInfo.fromJson(Map<String, dynamic> jsonSerialization) {
     return AccountInfo(
       id: jsonSerialization['id'] as int?,
+      scrappables: (jsonSerialization['scrappables'] as List?)
+          ?.map((e) => _i2.Scrappable.fromJson((e as Map<String, dynamic>)))
+          .toList(),
       userInfoId: jsonSerialization['userInfoId'] as int,
       userInfo: jsonSerialization['userInfo'] == null
           ? null
-          : _i2.UserInfo.fromJson(
+          : _i3.UserInfo.fromJson(
               (jsonSerialization['userInfo'] as Map<String, dynamic>)),
       accountApiKeyId: jsonSerialization['accountApiKeyId'] as int,
       accountApiKey: jsonSerialization['accountApiKey'] == null
           ? null
-          : _i3.AccountApiKey.fromJson(
+          : _i4.AccountApiKey.fromJson(
               (jsonSerialization['accountApiKey'] as Map<String, dynamic>)),
     );
   }
@@ -56,13 +62,15 @@ abstract class AccountInfo
   @override
   int? id;
 
+  List<_i2.Scrappable>? scrappables;
+
   int userInfoId;
 
-  _i2.UserInfo? userInfo;
+  _i3.UserInfo? userInfo;
 
   int accountApiKeyId;
 
-  _i3.AccountApiKey? accountApiKey;
+  _i4.AccountApiKey? accountApiKey;
 
   @override
   _i1.Table<int?> get table => t;
@@ -72,15 +80,18 @@ abstract class AccountInfo
   @_i1.useResult
   AccountInfo copyWith({
     int? id,
+    List<_i2.Scrappable>? scrappables,
     int? userInfoId,
-    _i2.UserInfo? userInfo,
+    _i3.UserInfo? userInfo,
     int? accountApiKeyId,
-    _i3.AccountApiKey? accountApiKey,
+    _i4.AccountApiKey? accountApiKey,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
       if (id != null) 'id': id,
+      if (scrappables != null)
+        'scrappables': scrappables?.toJson(valueToJson: (v) => v.toJson()),
       'userInfoId': userInfoId,
       if (userInfo != null) 'userInfo': userInfo?.toJson(),
       'accountApiKeyId': accountApiKeyId,
@@ -92,6 +103,9 @@ abstract class AccountInfo
   Map<String, dynamic> toJsonForProtocol() {
     return {
       if (id != null) 'id': id,
+      if (scrappables != null)
+        'scrappables':
+            scrappables?.toJson(valueToJson: (v) => v.toJsonForProtocol()),
       'userInfoId': userInfoId,
       if (userInfo != null) 'userInfo': userInfo?.toJsonForProtocol(),
       'accountApiKeyId': accountApiKeyId,
@@ -101,10 +115,12 @@ abstract class AccountInfo
   }
 
   static AccountInfoInclude include({
-    _i2.UserInfoInclude? userInfo,
-    _i3.AccountApiKeyInclude? accountApiKey,
+    _i2.ScrappableIncludeList? scrappables,
+    _i3.UserInfoInclude? userInfo,
+    _i4.AccountApiKeyInclude? accountApiKey,
   }) {
     return AccountInfoInclude._(
+      scrappables: scrappables,
       userInfo: userInfo,
       accountApiKey: accountApiKey,
     );
@@ -141,12 +157,14 @@ class _Undefined {}
 class _AccountInfoImpl extends AccountInfo {
   _AccountInfoImpl({
     int? id,
+    List<_i2.Scrappable>? scrappables,
     required int userInfoId,
-    _i2.UserInfo? userInfo,
+    _i3.UserInfo? userInfo,
     required int accountApiKeyId,
-    _i3.AccountApiKey? accountApiKey,
+    _i4.AccountApiKey? accountApiKey,
   }) : super._(
           id: id,
+          scrappables: scrappables,
           userInfoId: userInfoId,
           userInfo: userInfo,
           accountApiKeyId: accountApiKeyId,
@@ -159,6 +177,7 @@ class _AccountInfoImpl extends AccountInfo {
   @override
   AccountInfo copyWith({
     Object? id = _Undefined,
+    Object? scrappables = _Undefined,
     int? userInfoId,
     Object? userInfo = _Undefined,
     int? accountApiKeyId,
@@ -166,11 +185,14 @@ class _AccountInfoImpl extends AccountInfo {
   }) {
     return AccountInfo(
       id: id is int? ? id : this.id,
+      scrappables: scrappables is List<_i2.Scrappable>?
+          ? scrappables
+          : this.scrappables?.map((e0) => e0.copyWith()).toList(),
       userInfoId: userInfoId ?? this.userInfoId,
       userInfo:
-          userInfo is _i2.UserInfo? ? userInfo : this.userInfo?.copyWith(),
+          userInfo is _i3.UserInfo? ? userInfo : this.userInfo?.copyWith(),
       accountApiKeyId: accountApiKeyId ?? this.accountApiKeyId,
-      accountApiKey: accountApiKey is _i3.AccountApiKey?
+      accountApiKey: accountApiKey is _i4.AccountApiKey?
           ? accountApiKey
           : this.accountApiKey?.copyWith(),
     );
@@ -189,38 +211,73 @@ class AccountInfoTable extends _i1.Table<int?> {
     );
   }
 
+  _i2.ScrappableTable? ___scrappables;
+
+  _i1.ManyRelation<_i2.ScrappableTable>? _scrappables;
+
   late final _i1.ColumnInt userInfoId;
 
-  _i2.UserInfoTable? _userInfo;
+  _i3.UserInfoTable? _userInfo;
 
   late final _i1.ColumnInt accountApiKeyId;
 
-  _i3.AccountApiKeyTable? _accountApiKey;
+  _i4.AccountApiKeyTable? _accountApiKey;
 
-  _i2.UserInfoTable get userInfo {
+  _i2.ScrappableTable get __scrappables {
+    if (___scrappables != null) return ___scrappables!;
+    ___scrappables = _i1.createRelationTable(
+      relationFieldName: '__scrappables',
+      field: AccountInfo.t.id,
+      foreignField: _i2.Scrappable.t.account,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _i2.ScrappableTable(tableRelation: foreignTableRelation),
+    );
+    return ___scrappables!;
+  }
+
+  _i3.UserInfoTable get userInfo {
     if (_userInfo != null) return _userInfo!;
     _userInfo = _i1.createRelationTable(
       relationFieldName: 'userInfo',
       field: AccountInfo.t.userInfoId,
-      foreignField: _i2.UserInfo.t.id,
+      foreignField: _i3.UserInfo.t.id,
       tableRelation: tableRelation,
       createTable: (foreignTableRelation) =>
-          _i2.UserInfoTable(tableRelation: foreignTableRelation),
+          _i3.UserInfoTable(tableRelation: foreignTableRelation),
     );
     return _userInfo!;
   }
 
-  _i3.AccountApiKeyTable get accountApiKey {
+  _i4.AccountApiKeyTable get accountApiKey {
     if (_accountApiKey != null) return _accountApiKey!;
     _accountApiKey = _i1.createRelationTable(
       relationFieldName: 'accountApiKey',
       field: AccountInfo.t.accountApiKeyId,
-      foreignField: _i3.AccountApiKey.t.id,
+      foreignField: _i4.AccountApiKey.t.id,
       tableRelation: tableRelation,
       createTable: (foreignTableRelation) =>
-          _i3.AccountApiKeyTable(tableRelation: foreignTableRelation),
+          _i4.AccountApiKeyTable(tableRelation: foreignTableRelation),
     );
     return _accountApiKey!;
+  }
+
+  _i1.ManyRelation<_i2.ScrappableTable> get scrappables {
+    if (_scrappables != null) return _scrappables!;
+    var relationTable = _i1.createRelationTable(
+      relationFieldName: 'scrappables',
+      field: AccountInfo.t.id,
+      foreignField: _i2.Scrappable.t.account,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _i2.ScrappableTable(tableRelation: foreignTableRelation),
+    );
+    _scrappables = _i1.ManyRelation<_i2.ScrappableTable>(
+      tableWithRelations: relationTable,
+      table: _i2.ScrappableTable(
+          tableRelation: relationTable.tableRelation!.lastRelation),
+    );
+    return _scrappables!;
   }
 
   @override
@@ -232,6 +289,9 @@ class AccountInfoTable extends _i1.Table<int?> {
 
   @override
   _i1.Table? getRelationTable(String relationField) {
+    if (relationField == 'scrappables') {
+      return __scrappables;
+    }
     if (relationField == 'userInfo') {
       return userInfo;
     }
@@ -244,19 +304,24 @@ class AccountInfoTable extends _i1.Table<int?> {
 
 class AccountInfoInclude extends _i1.IncludeObject {
   AccountInfoInclude._({
-    _i2.UserInfoInclude? userInfo,
-    _i3.AccountApiKeyInclude? accountApiKey,
+    _i2.ScrappableIncludeList? scrappables,
+    _i3.UserInfoInclude? userInfo,
+    _i4.AccountApiKeyInclude? accountApiKey,
   }) {
+    _scrappables = scrappables;
     _userInfo = userInfo;
     _accountApiKey = accountApiKey;
   }
 
-  _i2.UserInfoInclude? _userInfo;
+  _i2.ScrappableIncludeList? _scrappables;
 
-  _i3.AccountApiKeyInclude? _accountApiKey;
+  _i3.UserInfoInclude? _userInfo;
+
+  _i4.AccountApiKeyInclude? _accountApiKey;
 
   @override
   Map<String, _i1.Include?> get includes => {
+        'scrappables': _scrappables,
         'userInfo': _userInfo,
         'accountApiKey': _accountApiKey,
       };
@@ -288,7 +353,13 @@ class AccountInfoIncludeList extends _i1.IncludeList {
 class AccountInfoRepository {
   const AccountInfoRepository._();
 
+  final attach = const AccountInfoAttachRepository._();
+
   final attachRow = const AccountInfoAttachRowRepository._();
+
+  final detach = const AccountInfoDetachRepository._();
+
+  final detachRow = const AccountInfoDetachRowRepository._();
 
   /// Returns a list of [AccountInfo]s matching the given query parameters.
   ///
@@ -506,6 +577,34 @@ class AccountInfoRepository {
   }
 }
 
+class AccountInfoAttachRepository {
+  const AccountInfoAttachRepository._();
+
+  /// Creates a relation between this [AccountInfo] and the given [Scrappable]s
+  /// by setting each [Scrappable]'s foreign key `account` to refer to this [AccountInfo].
+  Future<void> scrappables(
+    _i1.Session session,
+    AccountInfo accountInfo,
+    List<_i2.Scrappable> scrappable, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (scrappable.any((e) => e.id == null)) {
+      throw ArgumentError.notNull('scrappable.id');
+    }
+    if (accountInfo.id == null) {
+      throw ArgumentError.notNull('accountInfo.id');
+    }
+
+    var $scrappable =
+        scrappable.map((e) => e.copyWith(account: accountInfo.id)).toList();
+    await session.db.update<_i2.Scrappable>(
+      $scrappable,
+      columns: [_i2.Scrappable.t.account],
+      transaction: transaction,
+    );
+  }
+}
+
 class AccountInfoAttachRowRepository {
   const AccountInfoAttachRowRepository._();
 
@@ -514,7 +613,7 @@ class AccountInfoAttachRowRepository {
   Future<void> userInfo(
     _i1.Session session,
     AccountInfo accountInfo,
-    _i2.UserInfo userInfo, {
+    _i3.UserInfo userInfo, {
     _i1.Transaction? transaction,
   }) async {
     if (accountInfo.id == null) {
@@ -537,7 +636,7 @@ class AccountInfoAttachRowRepository {
   Future<void> accountApiKey(
     _i1.Session session,
     AccountInfo accountInfo,
-    _i3.AccountApiKey accountApiKey, {
+    _i4.AccountApiKey accountApiKey, {
     _i1.Transaction? transaction,
   }) async {
     if (accountInfo.id == null) {
@@ -551,6 +650,81 @@ class AccountInfoAttachRowRepository {
     await session.db.updateRow<AccountInfo>(
       $accountInfo,
       columns: [AccountInfo.t.accountApiKeyId],
+      transaction: transaction,
+    );
+  }
+
+  /// Creates a relation between this [AccountInfo] and the given [Scrappable]
+  /// by setting the [Scrappable]'s foreign key `account` to refer to this [AccountInfo].
+  Future<void> scrappables(
+    _i1.Session session,
+    AccountInfo accountInfo,
+    _i2.Scrappable scrappable, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (scrappable.id == null) {
+      throw ArgumentError.notNull('scrappable.id');
+    }
+    if (accountInfo.id == null) {
+      throw ArgumentError.notNull('accountInfo.id');
+    }
+
+    var $scrappable = scrappable.copyWith(account: accountInfo.id);
+    await session.db.updateRow<_i2.Scrappable>(
+      $scrappable,
+      columns: [_i2.Scrappable.t.account],
+      transaction: transaction,
+    );
+  }
+}
+
+class AccountInfoDetachRepository {
+  const AccountInfoDetachRepository._();
+
+  /// Detaches the relation between this [AccountInfo] and the given [Scrappable]
+  /// by setting the [Scrappable]'s foreign key `account` to `null`.
+  ///
+  /// This removes the association between the two models without deleting
+  /// the related record.
+  Future<void> scrappables(
+    _i1.Session session,
+    List<_i2.Scrappable> scrappable, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (scrappable.any((e) => e.id == null)) {
+      throw ArgumentError.notNull('scrappable.id');
+    }
+
+    var $scrappable = scrappable.map((e) => e.copyWith(account: null)).toList();
+    await session.db.update<_i2.Scrappable>(
+      $scrappable,
+      columns: [_i2.Scrappable.t.account],
+      transaction: transaction,
+    );
+  }
+}
+
+class AccountInfoDetachRowRepository {
+  const AccountInfoDetachRowRepository._();
+
+  /// Detaches the relation between this [AccountInfo] and the given [Scrappable]
+  /// by setting the [Scrappable]'s foreign key `account` to `null`.
+  ///
+  /// This removes the association between the two models without deleting
+  /// the related record.
+  Future<void> scrappables(
+    _i1.Session session,
+    _i2.Scrappable scrappable, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (scrappable.id == null) {
+      throw ArgumentError.notNull('scrappable.id');
+    }
+
+    var $scrappable = scrappable.copyWith(account: null);
+    await session.db.updateRow<_i2.Scrappable>(
+      $scrappable,
+      columns: [_i2.Scrappable.t.account],
       transaction: transaction,
     );
   }

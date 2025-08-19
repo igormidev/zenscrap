@@ -77,27 +77,36 @@ class ScrapingBee {
 
   /// One-call: get HTML + screenshot (base64) together using json_response
   /// Ps: the image is in png format
-  Future<(String html, Uint8List screenshot)> fetchHtmlAndScreenshot(
-      String targetUrl) async {
-    final query = <String, dynamic>{
-      'api_key': _apiKey,
-      'url': targetUrl,
-      'render_js': 'true',
-      'screenshot': 'true',
-      'wait': 4000.toString(),
-      'screenshot_full_page': 'true',
-      'json_response': 'true',
-    };
+  Future<(String html, Uint8List screenshot)?> fetchHtmlAndScreenshot(
+    String targetUrl,
+  ) async {
+    try {
+      final query = <String, dynamic>{
+        'api_key': _apiKey,
+        'url': targetUrl,
+        'render_js': 'true',
+        'screenshot': 'true',
+        'wait': 4000.toString(),
+        'screenshot_full_page': 'true',
+        'json_response': 'true',
+      };
 
-    final res = await _dio.getUri<Map<String, dynamic>>(
-      Uri.https('app.scrapingbee.com', '/api/v1/', query),
-      options: Options(responseType: ResponseType.json),
-    );
+      final res = await _dio.getUri<Map<String, dynamic>>(
+        Uri.https('app.scrapingbee.com', '/api/v1/', query),
+        options: Options(responseType: ResponseType.json),
+      );
 
-    final body = (res.data?['body'] as String?) ?? '';
-    final b64 = (res.data?['screenshot'] as String?) ?? '';
-    return (body, base64Decode(b64));
-    // return (html: body, screenshot: base64Decode(b64));
+      final body = (res.data?['body'] as String?) ?? '';
+      final b64 = (res.data?['screenshot'] as String?) ?? '';
+      return (body, base64Decode(b64));
+      // return (html: body, screenshot: base64Decode(b64));
+    } on DioException catch (_) {
+      // Return null for any Dio errors (including 500 status codes)
+      return null;
+    } catch (_) {
+      // Return null for any other unexpected errors
+      return null;
+    }
   }
 
   Future<ExtractDataByRule> extractByRules({
@@ -125,7 +134,7 @@ class ScrapingBee {
         // Handle different response formats from ScrapingBee
         try {
           Map<String, dynamic>? resultData = tryDecode(response.data);
-          
+
           return ExtractDataByRule.withData(result: resultData?['body'] ?? {});
         } catch (e) {
           return ExtractDataByRule.erorr(

@@ -121,6 +121,11 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i1.getType<_i10.ZenScrapException?>()) {
       return (data != null ? _i10.ZenScrapException.fromJson(data) : null) as T;
     }
+    if (t == _i1.getType<List<_i7.Scrappable>?>()) {
+      return (data != null
+          ? (data as List).map((e) => deserialize<_i7.Scrappable>(e)).toList()
+          : null) as T;
+    }
     if (t == Map<String, String?>) {
       return (data as Map).map((k, v) =>
           MapEntry(deserialize<String>(k), deserialize<String?>(v))) as T;

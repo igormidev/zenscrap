@@ -7,9 +7,11 @@ import 'package:zenscrap_flutter/src/design_system/widgets/code_bloc.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 
 class ScrappableCurlSection extends ConsumerStatefulWidget {
+  final UuidValue scrappableId;
   final ReferenceTestData? testData;
   const ScrappableCurlSection({
     super.key,
+    required this.scrappableId,
     required this.testData,
   });
 
@@ -39,8 +41,10 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection> {
     final String url =
         '${ref.read(clientProvider).host}handleApiScrapRequest/test/';
     final Map<String, dynamic> queryParams = {};
-    final Map<String, dynamic>? payload =
-        tryDecode(testData.referenceQueryParametersJson);
+    final Map<String, dynamic> payload = {
+      'scrappableId': widget.scrappableId.toString(),
+      ...?tryDecode(testData.referenceQueryParametersJson)
+    };
     final encoder = const JsonEncoder.withIndent('  ');
 
     // Build full URL with query parameters
@@ -56,19 +60,16 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection> {
     });
 
     // Add Content-Type if not provided and payload exists
-    if (payload != null &&
-        !(headers?.keys.any((h) => h.toLowerCase() == 'content-type') ??
-            false)) {
+    if (!(headers?.keys.any((h) => h.toLowerCase() == 'content-type') ??
+        false)) {
       buffer.write(' \\\n  -H "Content-Type: application/json"');
     }
 
     // Payload
-    if (payload != null) {
-      final jsonPayload = encoder.convert(payload);
-      // Escape quotes for shell safety
-      final escapedPayload = jsonPayload.replaceAll('"', '\\"');
-      buffer.write(' \\\n  -d "$escapedPayload"');
-    }
+    final jsonPayload = encoder.convert(payload);
+    // Escape quotes for shell safety
+    final escapedPayload = jsonPayload.replaceAll('"', '\\"');
+    buffer.write(' \\\n  -d "$escapedPayload"');
 
     return buffer.toString();
   }

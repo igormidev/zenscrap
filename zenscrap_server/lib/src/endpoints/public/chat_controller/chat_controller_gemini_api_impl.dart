@@ -201,6 +201,7 @@ class ChatControllerGeminiApiImpl extends IChatController {
           'Great, I will now test the extract rules you created to se if it works in the reference link we are using for testing.\n'
           'Please wait a moment...',
     ));
+    await Future.delayed(const Duration(milliseconds: 400));
 
     // Needs to validate if the rules are working...
     final ExtractDataByRule extractResult = await scrapingBee.extractByRules(
@@ -215,6 +216,7 @@ class ChatControllerGeminiApiImpl extends IChatController {
           messageText:
               'New rules where tested and did not present any errors! I\'ll update the test endpoint...',
         ));
+        await Future.delayed(const Duration(milliseconds: 400));
         ScrappableTestResult? testResult = testData.scrappableTestResult;
         if (testResult != null) {
           testResult = await ScrappableTestResult.db.updateRow(
@@ -305,12 +307,12 @@ My task prompt is:'''),
   }
 
   final Uint8List jsonBytes = utf8.encode(
-    jsonEncode(referenceTestData.referenceQueryParametersJson),
+    referenceTestData.scrappableTestResult!.testExtractRule,
   );
 
   return Content.multi([
     TextPart(
-        'Hello, I wan\'t to iterate on the last extract rules I built. I will attach it bellow:'),
+        'I wan\'t to iterate on the last extract rules I built. I will attach it bellow:'),
     DataPart('application/json', jsonBytes),
     TextPart('''It worked well, but I want to modify it.
 

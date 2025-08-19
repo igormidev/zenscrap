@@ -5,6 +5,7 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/serverpod_to_result.dart';
 import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
+import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_messages_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_state.dart';
 
 final scrapChatProvider =
@@ -89,5 +90,12 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
         },
       );
     }
+    ref.read(chatMessagesProvider.notifier).state =
+        ref.read(chatMessagesProvider).maybeMap(
+              data: (data) => AsyncValue.data(
+                [...data.value, chatResponse],
+              ),
+              orElse: () => AsyncValue.data([chatResponse]),
+            );
   }
 }

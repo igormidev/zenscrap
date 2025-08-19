@@ -1,0 +1,71 @@
+{
+  "actions": [
+    {
+      "type": "alterTable",
+      "alterTable": {
+        "name": "scrappable",
+        "schema": "public",
+        "addColumns": [
+          {
+            "name": "account",
+            "columnType": 6,
+            "isNullable": true,
+            "dartType": "int?"
+          }
+        ],
+        "deleteColumns": [],
+        "modifyColumns": [],
+        "addIndexes": [],
+        "deleteIndexes": [],
+        "addForeignKeys": [
+          {
+            "constraintName": "scrappable_fk_2",
+            "columns": [
+              "referenceTestDataId"
+            ],
+            "referenceTable": "scrappable_test_data",
+            "referenceTableSchema": "public",
+            "referenceColumns": [
+              "id"
+            ],
+            "onUpdate": 3,
+            "onDelete": 3
+          },
+          {
+            "constraintName": "scrappable_fk_0",
+            "columns": [
+              "account"
+            ],
+            "referenceTable": "account_info",
+            "referenceTableSchema": "public",
+            "referenceColumns": [
+              "id"
+            ],
+            "onUpdate": 3,
+            "onDelete": 3
+          },
+          {
+            "constraintName": "scrappable_fk_1",
+            "columns": [
+              "targetRequestId"
+            ],
+            "referenceTable": "scrappable_target_request",
+            "referenceTableSchema": "public",
+            "referenceColumns": [
+              "id"
+            ],
+            "onUpdate": 3,
+            "onDelete": 3
+          }
+        ],
+        "deleteForeignKeys": [
+          "scrappable_fk_0",
+          "scrappable_fk_1"
+        ],
+        "warnings": []
+      }
+    }
+  ],
+  "warnings": [],
+  "migrationApiVersion": 1
+}

@@ -3,6 +3,7 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/sections/scrappable_chat_message_stream_section.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/sections/scrappable_curl_section.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/sections/scrappable_test_response.dart';
+import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/CTA_continue_flow.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/zen_chat_textfield.dart';
 
 class ScrappableEditSessionView extends StatelessWidget {
@@ -37,7 +38,16 @@ class ScrappableEditSessionView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                ScrappableCurlSection(testData: testData),
+                CTAContinueFlow(
+                  scrappable: scrappable,
+                ),
+                SizedBox(height: 8),
+                Divider(height: 8),
+                SizedBox(height: 8),
+                ScrappableCurlSection(
+                  scrappableId: scrappable.id,
+                  testData: testData,
+                ),
                 SizedBox(height: 8),
                 Expanded(
                   child: ScrappableTestResponse(testData: testData),

@@ -17,7 +17,8 @@ class CreateScrappableEndpoint extends Endpoint {
       systemInstruction: Content.system(
           'You are a helpful assistant that analyzes URLs and converts them into structured data for API request handling. '
           'Always return valid JSON with exactly the fields requested, nothing more, nothing less.'),
-      generationConfig: GenerationConfig(responseSchema: createScrappableSchema),
+      generationConfig:
+          GenerationConfig(responseSchema: createScrappableSchema),
     );
 
     final ChatSession chat = geminiModel.startChat();
@@ -50,8 +51,17 @@ class CreateScrappableEndpoint extends Endpoint {
     late final List<String> pathParams;
     late final Map<String, String> referenceLinkPathParameters;
 
-    var (String html, Uint8List pageFullscreenScreenshot) =
-        await scrapingBee.fetchHtmlAndScreenshot(referenceLink);
+    final scrapingResult = await scrapingBee.fetchHtmlAndScreenshot(referenceLink);
+    
+    if (scrapingResult == null) {
+      // Handle the error case - throw an exception
+      throw ZenScrapException(
+        title: 'Failed to fetch webpage',
+        description: 'Could not retrieve webpage content from ScrapingBee API. The service may be temporarily unavailable.',
+      );
+    }
+    
+    var (String html, Uint8List pageFullscreenScreenshot) = scrapingResult;
 
     // Convert HTML to bytes for file-like upload
     final Uint8List htmlBytes = utf8.encode(html);

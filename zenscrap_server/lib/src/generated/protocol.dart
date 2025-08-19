@@ -169,6 +169,12 @@ class Protocol extends _i1.SerializationManagerServer {
           columnDefault: 'gen_random_uuid()',
         ),
         _i2.ColumnDefinition(
+          name: 'account',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: true,
+          dartType: 'int?',
+        ),
+        _i2.ColumnDefinition(
           name: 'createdAt',
           columnType: _i2.ColumnType.timestampWithoutTimeZone,
           isNullable: false,
@@ -214,6 +220,16 @@ class Protocol extends _i1.SerializationManagerServer {
       foreignKeys: [
         _i2.ForeignKeyDefinition(
           constraintName: 'scrappable_fk_0',
+          columns: ['account'],
+          referenceTable: 'account_info',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _i2.ForeignKeyAction.noAction,
+          onDelete: _i2.ForeignKeyAction.noAction,
+          matchType: null,
+        ),
+        _i2.ForeignKeyDefinition(
+          constraintName: 'scrappable_fk_1',
           columns: ['targetRequestId'],
           referenceTable: 'scrappable_target_request',
           referenceTableSchema: 'public',
@@ -223,7 +239,7 @@ class Protocol extends _i1.SerializationManagerServer {
           matchType: null,
         ),
         _i2.ForeignKeyDefinition(
-          constraintName: 'scrappable_fk_1',
+          constraintName: 'scrappable_fk_2',
           columns: ['referenceTestDataId'],
           referenceTable: 'scrappable_test_data',
           referenceTableSchema: 'public',
@@ -562,6 +578,11 @@ class Protocol extends _i1.SerializationManagerServer {
     }
     if (t == _i1.getType<_i12.ZenScrapException?>()) {
       return (data != null ? _i12.ZenScrapException.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<List<_i9.Scrappable>?>()) {
+      return (data != null
+          ? (data as List).map((e) => deserialize<_i9.Scrappable>(e)).toList()
+          : null) as T;
     }
     if (t == Map<String, String?>) {
       return (data as Map).map((k, v) =>

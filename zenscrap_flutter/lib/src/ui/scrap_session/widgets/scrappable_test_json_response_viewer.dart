@@ -84,7 +84,7 @@ class _ScrappableTestJsonResponseViewerState
                 indicatorColor: context.c.primary,
                 indicatorWeight: 3,
                 tabs: const [
-                  Tab(text: 'JSON'),
+                  Tab(text: 'RESULT'),
                   Tab(text: 'HTML'),
                   Tab(text: 'Screenshot'),
                 ],

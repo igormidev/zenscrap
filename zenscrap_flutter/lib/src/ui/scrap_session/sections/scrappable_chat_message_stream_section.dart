@@ -2,12 +2,15 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lottie/lottie.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/convert_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/chat_scroll_controller_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_messages_provider.dart';
+import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
 
 class ScrappableChatMessageStreamSection extends ConsumerStatefulWidget {
   const ScrappableChatMessageStreamSection({super.key});
@@ -89,12 +92,35 @@ class _ScrappableChatMessageStreamSectionState
             ),
           );
         }
+        final ChatResponse lastItem = messages.last;
+        final bool willHideLoading = lastItem.role == PromptRole.user ||
+            lastItem is ErrorTextResponse ||
+            lastItem is NewExtractRuleResponse ||
+            (lastItem is MessageTextResponse &&
+                lastItem.role == PromptRole.model);
 
         return ListView.builder(
           controller: scrollController,
           padding: const EdgeInsets.only(top: 20, bottom: 32),
-          itemCount: messages.length,
+          itemCount: messages.length + (willHideLoading ? 0 : 1),
           itemBuilder: (context, index) {
+            final bool isLastIndex = index == messages.length;
+            if (isLastIndex && !willHideLoading) {
+              return Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 36),
+                  child: Transform.scale(
+                    scale: 1.41,
+                    child: Lottie.network(
+                      'https://lottie.host/dfab8b34-c79f-4d84-9e3d-d866b2096c74/zPpMTjtNaK.lottie',
+                      decoder: customDecoder,
+                      width: 60,
+                    ),
+                  ).animate().fadeIn(),
+                ),
+              );
+            }
             final message = messages[index];
             return _ChatMessageBubble(
               message: message,
