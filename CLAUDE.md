@@ -2,6 +2,12 @@
 
 ## Flutter Best Practices
 
+### Theme and Color Access
+- **Text Theme**: Access text theme using `context.t`
+- **Color Scheme**: Access color scheme using `context.c`
+- **Opacity**: NEVER use `withOpacity()` as it is deprecated - always use `withAlpha()` instead
+  - Example: `context.c.primary.withAlpha(128)` instead of `context.c.primary.withOpacity(0.5)`
+
 ### Widget Creation Guidelines
 
 #### ✅ DO: Use Widget Classes

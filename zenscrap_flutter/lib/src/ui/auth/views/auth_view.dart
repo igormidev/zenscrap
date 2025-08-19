@@ -177,6 +177,7 @@ class _AuthViewState extends ConsumerState<AuthView>
                                     ),
                                   ),
                                 ),
+                                const SizedBox(height: 16),
                                 if (widget.scrappable != null) ...[
                                   const SizedBox(height: 16),
                                   InitialScrappableCardIndicator(
@@ -233,6 +234,12 @@ class _AuthViewState extends ConsumerState<AuthView>
                                         _onSuccessChangePassword,
                                   ),
                                 ),
+                                if (widget.scrappable != null) ...[
+                                  const SizedBox(height: 16),
+                                  InitialScrappableCardIndicator(
+                                    scrappable: widget.scrappable!,
+                                  ),
+                                ],
                                 const SizedBox(height: 16),
                                 const ContactSupportButton(),
                               ],
