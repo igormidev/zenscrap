@@ -41,9 +41,10 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection> {
     final String url =
         '${ref.read(clientProvider).host}handleApiScrapRequest/test/';
     final Map<String, dynamic> queryParams = {};
+    final examplePayload = tryDecode(testData.referenceQueryParametersJson);
     final Map<String, dynamic> payload = {
       'scrappableId': widget.scrappableId.toString(),
-      ...?tryDecode(testData.referenceQueryParametersJson)
+      if (examplePayload != null) 'payload': examplePayload,
     };
     final encoder = const JsonEncoder.withIndent('  ');
 

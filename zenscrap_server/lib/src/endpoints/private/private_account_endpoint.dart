@@ -8,7 +8,10 @@ class PrivateAccountEndpoint extends Endpoint {
   @override
   bool get requireLogin => true;
 
-  Future<AccountInfo> getAccountInfo(Session session) async {
+  Future<AccountInfo> getAccountInfo(
+    Session session, {
+    required Scrappable? initialScrappableIfNewUser,
+  }) async {
     final authenticationInfo = await session.authenticated;
     if (authenticationInfo == null) {
       throw defaultAuthenticationException;

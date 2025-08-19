@@ -14,7 +14,7 @@ final Map<RedraftSrappableSessionId, ReferenceTestData> _cacheTestData = {};
 class ScrappableChatSession extends Endpoint {
   final Uuid uuid = Uuid();
 
-  Future<RedraftSrappableSessionId> createSession(
+  Future<CreateSessionResponse> createSession(
     Session session, {
     required Scrappable scrappable,
   }) async {
@@ -48,7 +48,15 @@ class ScrappableChatSession extends Endpoint {
       referenceTestData: referenceTestData,
     );
     _cacheTestData[sessionUuid] = referenceTestData;
-    return sessionUuid;
+    final duration = const Duration(hours: 1);
+    final response =
+        CreateSessionResponse(expiresIn: duration, sessionId: sessionUuid);
+    await session.serverpod.futureCallWithDelay(
+      'dispose_temporary_scrappable',
+      response,
+      duration + Duration(minutes: 1),
+    );
+    return response;
   }
 
   Stream<ChatResponse> listenToScrappableRedraftSession(
@@ -56,7 +64,7 @@ class ScrappableChatSession extends Endpoint {
     required RedraftSrappableSessionId sessionUuid,
   }) {
     session.addWillCloseListener((session) async {
-      await _disposeSession(session, sessionId: sessionUuid);
+      await _disposeSession(sessionId: sessionUuid);
     });
     final subject = _scrapRedraftSessions[sessionUuid];
     if (subject == null) {
@@ -66,16 +74,6 @@ class ScrappableChatSession extends Endpoint {
       );
     }
     return subject.stream;
-  }
-
-  Future<void> _disposeSession(
-    Session session, {
-    required RedraftSrappableSessionId sessionId,
-  }) async {
-    chatSessions.remove(sessionId);
-    final subject = _scrapRedraftSessions.remove(sessionId);
-    await subject?.close();
-    _cacheTestData.remove(sessionId);
   }
 
   Future<void> sendPromptMessage(
@@ -141,5 +139,26 @@ class ScrappableChatSession extends Endpoint {
         await chatSeason.close();
       }
     }
+  }
+}
+
+Future<void> _disposeSession({
+  required RedraftSrappableSessionId sessionId,
+}) async {
+  chatSessions.remove(sessionId);
+  final subject = _scrapRedraftSessions.remove(sessionId);
+  await subject?.close();
+  _cacheTestData.remove(sessionId);
+}
+
+class TestScrappableDisposeFutureCall
+    extends FutureCall<CreateSessionResponse> {
+  @override
+  Future<void> invoke(
+    Session session,
+    CreateSessionResponse? object,
+  ) async {
+    if (object == null) return;
+    await _disposeSession(sessionId: object.sessionId);
   }
 }

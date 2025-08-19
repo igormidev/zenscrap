@@ -152,7 +152,9 @@ class _PrivateAccountEndpoint {
   final _i2.SerializationManager _serializationManager;
 
   _i3.Future<_i4.AccountInfo> getAccountInfo(
-      _i1.TestSessionBuilder sessionBuilder) async {
+    _i1.TestSessionBuilder sessionBuilder, {
+    required _i5.Scrappable? initialScrappableIfNewUser,
+  }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
@@ -164,7 +166,8 @@ class _PrivateAccountEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'privateAccount',
           methodName: 'getAccountInfo',
-          parameters: _i1.testObjectToJson({}),
+          parameters: _i1.testObjectToJson(
+              {'initialScrappableIfNewUser': initialScrappableIfNewUser}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue = await (_localCallContext.method.call(

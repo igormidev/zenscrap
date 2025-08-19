@@ -53,13 +53,22 @@ class Endpoints extends _i1.EndpointDispatch {
       methodConnectors: {
         'getAccountInfo': _i1.MethodConnector(
           name: 'getAccountInfo',
-          params: {},
+          params: {
+            'initialScrappableIfNewUser': _i1.ParameterDescription(
+              name: 'initialScrappableIfNewUser',
+              type: _i1.getType<_i6.Scrappable?>(),
+              nullable: true,
+            )
+          },
           call: (
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
               (endpoints['privateAccount'] as _i2.PrivateAccountEndpoint)
-                  .getAccountInfo(session),
+                  .getAccountInfo(
+            session,
+            initialScrappableIfNewUser: params['initialScrappableIfNewUser'],
+          ),
         )
       },
     );

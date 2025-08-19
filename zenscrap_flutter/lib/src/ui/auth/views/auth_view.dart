@@ -5,6 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 import 'package:serverpod_auth_email_flutter/serverpod_auth_email_flutter.dart';
+import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/contact_support_button.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/ui/auth/pages/confirm_email_page.dart';
@@ -14,7 +15,8 @@ import 'package:zenscrap_flutter/src/ui/auth/pages/password_reset_validate_code_
 import 'package:zenscrap_flutter/src/ui/auth/pages/sign_in_page.dart';
 
 class AuthView extends ConsumerStatefulWidget {
-  const AuthView({super.key});
+  final Scrappable? scrappable;
+  const AuthView({super.key, this.scrappable});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _AuthViewState();
@@ -137,7 +139,6 @@ class _AuthViewState extends ConsumerState<AuthView>
                             height: 280,
                           ),
                         ),
-
                         // Form section for compact size
                         Expanded(
                           child: Padding(
@@ -241,12 +242,16 @@ class _AuthViewState extends ConsumerState<AuthView>
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 20,
                                     ),
-                                    child: Image.asset(
-                                      'assets/design_system/gobabel_display_image_raw.PNG',
+                                    child: Lottie.network(
+                                      'https://lottie.host/6778c6b9-32ee-401c-bc8f-97eea151b1df/U3LT3t31Wa.lottie',
                                       width: double.maxFinite,
                                       fit: BoxFit.fitWidth,
                                     ),
-                                  ),
+                                  ).animate().fadeIn(
+                                        duration: const Duration(seconds: 1),
+                                        delay:
+                                            const Duration(milliseconds: 200),
+                                      ),
                                 ],
                               ),
                             ),

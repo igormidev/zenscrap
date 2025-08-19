@@ -1,0 +1,4 @@
+class: CreateSessionResponse
+fields:
+  sessionId: String
+  expiresIn: Duration

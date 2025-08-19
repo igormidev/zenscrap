@@ -3,6 +3,8 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/serverpod_to_result.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/account/account_state.dart';
+import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
+import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_state.dart';
 
 final accountProvider =
     StateNotifierProvider<AccountStateNotifier, AccountState>((ref) {
@@ -27,8 +29,17 @@ class AccountStateNotifier extends StateNotifier<AccountState> {
     }
 
     state = AccountState.loading();
-    final result =
-        await ref.read(clientProvider).privateAccount.getAccountInfo().toResult;
+
+    final scrappable = ref.read(scrapChatProvider).mapOrNull(
+          standard: (value) => value.data,
+        );
+    final result = await ref
+        .read(clientProvider)
+        .privateAccount
+        .getAccountInfo(
+          initialScrappableIfNewUser: scrappable,
+        )
+        .toResult;
 
     result.fold(
       (accountInfo) {
@@ -41,7 +52,10 @@ class AccountStateNotifier extends StateNotifier<AccountState> {
   }
 
   Future<AccountInfo> getUser() async {
-    return await ref.read(clientProvider).privateAccount.getAccountInfo();
+    return await ref
+        .read(clientProvider)
+        .privateAccount
+        .getAccountInfo(initialScrappableIfNewUser: null);
   }
 
   void setUser(AccountInfo accountInfo) {

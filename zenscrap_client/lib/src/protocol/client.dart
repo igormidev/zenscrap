@@ -27,11 +27,12 @@ class EndpointPrivateAccount extends _i1.EndpointRef {
   @override
   String get name => 'privateAccount';
 
-  _i2.Future<_i3.AccountInfo> getAccountInfo() =>
+  _i2.Future<_i3.AccountInfo> getAccountInfo(
+          {required _i4.Scrappable? initialScrappableIfNewUser}) =>
       caller.callServerEndpoint<_i3.AccountInfo>(
         'privateAccount',
         'getAccountInfo',
-        {},
+        {'initialScrappableIfNewUser': initialScrappableIfNewUser},
       );
 }
 

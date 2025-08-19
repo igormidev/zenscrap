@@ -12,17 +12,20 @@
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import 'entities/account/account.dart' as _i2;
 import 'entities/account/account_api_key.dart' as _i3;
-import 'entities/redraft_scrappable_session/prompt_role_enum.dart' as _i4;
-import 'entities/redraft_scrappable_session/chat_response.dart' as _i5;
-import 'entities/scrappable/reference_test_data.dart' as _i6;
-import 'entities/scrappable/scrappable.dart' as _i7;
-import 'entities/scrappable/scrappable_request.dart' as _i8;
-import 'entities/scrappable/scrappable_test_result.dart' as _i9;
-import 'entities/zenscrap_exception.dart' as _i10;
-import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i11;
+import 'entities/redraft_scrappable_session/create_session_response.dart'
+    as _i4;
+import 'entities/redraft_scrappable_session/prompt_role_enum.dart' as _i5;
+import 'entities/redraft_scrappable_session/chat_response.dart' as _i6;
+import 'entities/scrappable/reference_test_data.dart' as _i7;
+import 'entities/scrappable/scrappable.dart' as _i8;
+import 'entities/scrappable/scrappable_request.dart' as _i9;
+import 'entities/scrappable/scrappable_test_result.dart' as _i10;
+import 'entities/zenscrap_exception.dart' as _i11;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i12;
 export 'entities/account/account.dart';
 export 'entities/account/account_api_key.dart';
 export 'entities/redraft_scrappable_session/chat_response.dart';
+export 'entities/redraft_scrappable_session/create_session_response.dart';
 export 'entities/redraft_scrappable_session/prompt_role_enum.dart';
 export 'entities/scrappable/reference_test_data.dart';
 export 'entities/scrappable/scrappable.dart';
@@ -50,35 +53,38 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i3.AccountApiKey) {
       return _i3.AccountApiKey.fromJson(data) as T;
     }
-    if (t == _i4.PromptRole) {
-      return _i4.PromptRole.fromJson(data) as T;
+    if (t == _i4.CreateSessionResponse) {
+      return _i4.CreateSessionResponse.fromJson(data) as T;
     }
-    if (t == _i5.ErrorTextResponse) {
-      return _i5.ErrorTextResponse.fromJson(data) as T;
+    if (t == _i5.PromptRole) {
+      return _i5.PromptRole.fromJson(data) as T;
     }
-    if (t == _i5.MessageTextAndNewExtractRulesResponse) {
-      return _i5.MessageTextAndNewExtractRulesResponse.fromJson(data) as T;
+    if (t == _i6.ErrorTextResponse) {
+      return _i6.ErrorTextResponse.fromJson(data) as T;
     }
-    if (t == _i5.MessageTextResponse) {
-      return _i5.MessageTextResponse.fromJson(data) as T;
+    if (t == _i6.MessageTextAndNewExtractRulesResponse) {
+      return _i6.MessageTextAndNewExtractRulesResponse.fromJson(data) as T;
     }
-    if (t == _i5.NewExtractRuleResponse) {
-      return _i5.NewExtractRuleResponse.fromJson(data) as T;
+    if (t == _i6.MessageTextResponse) {
+      return _i6.MessageTextResponse.fromJson(data) as T;
     }
-    if (t == _i6.ReferenceTestData) {
-      return _i6.ReferenceTestData.fromJson(data) as T;
+    if (t == _i6.NewExtractRuleResponse) {
+      return _i6.NewExtractRuleResponse.fromJson(data) as T;
     }
-    if (t == _i7.Scrappable) {
-      return _i7.Scrappable.fromJson(data) as T;
+    if (t == _i7.ReferenceTestData) {
+      return _i7.ReferenceTestData.fromJson(data) as T;
     }
-    if (t == _i8.ScrappableRequest) {
-      return _i8.ScrappableRequest.fromJson(data) as T;
+    if (t == _i8.Scrappable) {
+      return _i8.Scrappable.fromJson(data) as T;
     }
-    if (t == _i9.ScrappableTestResult) {
-      return _i9.ScrappableTestResult.fromJson(data) as T;
+    if (t == _i9.ScrappableRequest) {
+      return _i9.ScrappableRequest.fromJson(data) as T;
     }
-    if (t == _i10.ZenScrapException) {
-      return _i10.ZenScrapException.fromJson(data) as T;
+    if (t == _i10.ScrappableTestResult) {
+      return _i10.ScrappableTestResult.fromJson(data) as T;
+    }
+    if (t == _i11.ZenScrapException) {
+      return _i11.ZenScrapException.fromJson(data) as T;
     }
     if (t == _i1.getType<_i2.AccountInfo?>()) {
       return (data != null ? _i2.AccountInfo.fromJson(data) : null) as T;
@@ -86,44 +92,48 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i1.getType<_i3.AccountApiKey?>()) {
       return (data != null ? _i3.AccountApiKey.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i4.PromptRole?>()) {
-      return (data != null ? _i4.PromptRole.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i4.CreateSessionResponse?>()) {
+      return (data != null ? _i4.CreateSessionResponse.fromJson(data) : null)
+          as T;
     }
-    if (t == _i1.getType<_i5.ErrorTextResponse?>()) {
-      return (data != null ? _i5.ErrorTextResponse.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i5.PromptRole?>()) {
+      return (data != null ? _i5.PromptRole.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i5.MessageTextAndNewExtractRulesResponse?>()) {
+    if (t == _i1.getType<_i6.ErrorTextResponse?>()) {
+      return (data != null ? _i6.ErrorTextResponse.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i6.MessageTextAndNewExtractRulesResponse?>()) {
       return (data != null
-          ? _i5.MessageTextAndNewExtractRulesResponse.fromJson(data)
+          ? _i6.MessageTextAndNewExtractRulesResponse.fromJson(data)
           : null) as T;
     }
-    if (t == _i1.getType<_i5.MessageTextResponse?>()) {
-      return (data != null ? _i5.MessageTextResponse.fromJson(data) : null)
+    if (t == _i1.getType<_i6.MessageTextResponse?>()) {
+      return (data != null ? _i6.MessageTextResponse.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i5.NewExtractRuleResponse?>()) {
-      return (data != null ? _i5.NewExtractRuleResponse.fromJson(data) : null)
+    if (t == _i1.getType<_i6.NewExtractRuleResponse?>()) {
+      return (data != null ? _i6.NewExtractRuleResponse.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i6.ReferenceTestData?>()) {
-      return (data != null ? _i6.ReferenceTestData.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i7.ReferenceTestData?>()) {
+      return (data != null ? _i7.ReferenceTestData.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i7.Scrappable?>()) {
-      return (data != null ? _i7.Scrappable.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i8.Scrappable?>()) {
+      return (data != null ? _i8.Scrappable.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i8.ScrappableRequest?>()) {
-      return (data != null ? _i8.ScrappableRequest.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i9.ScrappableRequest?>()) {
+      return (data != null ? _i9.ScrappableRequest.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i9.ScrappableTestResult?>()) {
-      return (data != null ? _i9.ScrappableTestResult.fromJson(data) : null)
+    if (t == _i1.getType<_i10.ScrappableTestResult?>()) {
+      return (data != null ? _i10.ScrappableTestResult.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i10.ZenScrapException?>()) {
-      return (data != null ? _i10.ZenScrapException.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i11.ZenScrapException?>()) {
+      return (data != null ? _i11.ZenScrapException.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<List<_i7.Scrappable>?>()) {
+    if (t == _i1.getType<List<_i8.Scrappable>?>()) {
       return (data != null
-          ? (data as List).map((e) => deserialize<_i7.Scrappable>(e)).toList()
+          ? (data as List).map((e) => deserialize<_i8.Scrappable>(e)).toList()
           : null) as T;
     }
     if (t == Map<String, String?>) {
@@ -138,7 +148,7 @@ class Protocol extends _i1.SerializationManager {
           MapEntry(deserialize<String>(k), deserialize<dynamic>(v))) as T;
     }
     try {
-      return _i11.Protocol().deserialize<T>(data, t);
+      return _i12.Protocol().deserialize<T>(data, t);
     } on _i1.DeserializationTypeNotFoundException catch (_) {}
     return super.deserialize<T>(data, t);
   }
@@ -153,37 +163,40 @@ class Protocol extends _i1.SerializationManager {
     if (data is _i3.AccountApiKey) {
       return 'AccountApiKey';
     }
-    if (data is _i4.PromptRole) {
+    if (data is _i4.CreateSessionResponse) {
+      return 'CreateSessionResponse';
+    }
+    if (data is _i5.PromptRole) {
       return 'PromptRole';
     }
-    if (data is _i5.ErrorTextResponse) {
+    if (data is _i6.ErrorTextResponse) {
       return 'ErrorTextResponse';
     }
-    if (data is _i5.MessageTextAndNewExtractRulesResponse) {
+    if (data is _i6.MessageTextAndNewExtractRulesResponse) {
       return 'MessageTextAndNewExtractRulesResponse';
     }
-    if (data is _i5.MessageTextResponse) {
+    if (data is _i6.MessageTextResponse) {
       return 'MessageTextResponse';
     }
-    if (data is _i5.NewExtractRuleResponse) {
+    if (data is _i6.NewExtractRuleResponse) {
       return 'NewExtractRuleResponse';
     }
-    if (data is _i6.ReferenceTestData) {
+    if (data is _i7.ReferenceTestData) {
       return 'ReferenceTestData';
     }
-    if (data is _i7.Scrappable) {
+    if (data is _i8.Scrappable) {
       return 'Scrappable';
     }
-    if (data is _i8.ScrappableRequest) {
+    if (data is _i9.ScrappableRequest) {
       return 'ScrappableRequest';
     }
-    if (data is _i9.ScrappableTestResult) {
+    if (data is _i10.ScrappableTestResult) {
       return 'ScrappableTestResult';
     }
-    if (data is _i10.ZenScrapException) {
+    if (data is _i11.ZenScrapException) {
       return 'ZenScrapException';
     }
-    className = _i11.Protocol().getClassNameForObject(data);
+    className = _i12.Protocol().getClassNameForObject(data);
     if (className != null) {
       return 'serverpod_auth.$className';
     }
@@ -202,40 +215,43 @@ class Protocol extends _i1.SerializationManager {
     if (dataClassName == 'AccountApiKey') {
       return deserialize<_i3.AccountApiKey>(data['data']);
     }
+    if (dataClassName == 'CreateSessionResponse') {
+      return deserialize<_i4.CreateSessionResponse>(data['data']);
+    }
     if (dataClassName == 'PromptRole') {
-      return deserialize<_i4.PromptRole>(data['data']);
+      return deserialize<_i5.PromptRole>(data['data']);
     }
     if (dataClassName == 'ErrorTextResponse') {
-      return deserialize<_i5.ErrorTextResponse>(data['data']);
+      return deserialize<_i6.ErrorTextResponse>(data['data']);
     }
     if (dataClassName == 'MessageTextAndNewExtractRulesResponse') {
-      return deserialize<_i5.MessageTextAndNewExtractRulesResponse>(
+      return deserialize<_i6.MessageTextAndNewExtractRulesResponse>(
           data['data']);
     }
     if (dataClassName == 'MessageTextResponse') {
-      return deserialize<_i5.MessageTextResponse>(data['data']);
+      return deserialize<_i6.MessageTextResponse>(data['data']);
     }
     if (dataClassName == 'NewExtractRuleResponse') {
-      return deserialize<_i5.NewExtractRuleResponse>(data['data']);
+      return deserialize<_i6.NewExtractRuleResponse>(data['data']);
     }
     if (dataClassName == 'ReferenceTestData') {
-      return deserialize<_i6.ReferenceTestData>(data['data']);
+      return deserialize<_i7.ReferenceTestData>(data['data']);
     }
     if (dataClassName == 'Scrappable') {
-      return deserialize<_i7.Scrappable>(data['data']);
+      return deserialize<_i8.Scrappable>(data['data']);
     }
     if (dataClassName == 'ScrappableRequest') {
-      return deserialize<_i8.ScrappableRequest>(data['data']);
+      return deserialize<_i9.ScrappableRequest>(data['data']);
     }
     if (dataClassName == 'ScrappableTestResult') {
-      return deserialize<_i9.ScrappableTestResult>(data['data']);
+      return deserialize<_i10.ScrappableTestResult>(data['data']);
     }
     if (dataClassName == 'ZenScrapException') {
-      return deserialize<_i10.ZenScrapException>(data['data']);
+      return deserialize<_i11.ZenScrapException>(data['data']);
     }
     if (dataClassName.startsWith('serverpod_auth.')) {
       data['className'] = dataClassName.substring(15);
-      return _i11.Protocol().deserializeByClassName(data);
+      return _i12.Protocol().deserializeByClassName(data);
     }
     return super.deserializeByClassName(data);
   }
