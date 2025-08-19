@@ -28,6 +28,9 @@ dependencies:
     path: ../zenscrap_client
   dio: ^5.9.0
   collection: ^1.19.1
+  dart_debouncer: ^1.1.1
+  pricing_page: ^1.1.0
+  package_info_plus: ^8.3.1
   shared_preferences: ^2.5.3
   simple_platform: ^1.0.1
   adaptive_dialog: ^2.4.2

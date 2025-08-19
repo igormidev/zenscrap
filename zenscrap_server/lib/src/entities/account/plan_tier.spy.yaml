@@ -1,0 +1,7 @@
+enum: PlanTier
+serialized: byIndex
+values:
+  - none
+  - base
+  - pro
+  - unlimited

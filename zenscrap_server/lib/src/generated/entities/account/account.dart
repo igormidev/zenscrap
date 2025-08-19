@@ -15,6 +15,7 @@ import 'package:serverpod/serverpod.dart' as _i1;
 import '../../entities/scrappable/scrappable.dart' as _i2;
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i3;
 import '../../entities/account/account_api_key.dart' as _i4;
+import '../../entities/account/plan_tier.dart' as _i5;
 
 abstract class AccountInfo
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -25,6 +26,7 @@ abstract class AccountInfo
     this.userInfo,
     required this.accountApiKeyId,
     this.accountApiKey,
+    required this.planTier,
   });
 
   factory AccountInfo({
@@ -34,6 +36,7 @@ abstract class AccountInfo
     _i3.UserInfo? userInfo,
     required int accountApiKeyId,
     _i4.AccountApiKey? accountApiKey,
+    required _i5.PlanTier planTier,
   }) = _AccountInfoImpl;
 
   factory AccountInfo.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -52,6 +55,7 @@ abstract class AccountInfo
           ? null
           : _i4.AccountApiKey.fromJson(
               (jsonSerialization['accountApiKey'] as Map<String, dynamic>)),
+      planTier: _i5.PlanTier.fromJson((jsonSerialization['planTier'] as int)),
     );
   }
 
@@ -72,6 +76,8 @@ abstract class AccountInfo
 
   _i4.AccountApiKey? accountApiKey;
 
+  _i5.PlanTier planTier;
+
   @override
   _i1.Table<int?> get table => t;
 
@@ -85,6 +91,7 @@ abstract class AccountInfo
     _i3.UserInfo? userInfo,
     int? accountApiKeyId,
     _i4.AccountApiKey? accountApiKey,
+    _i5.PlanTier? planTier,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -96,6 +103,7 @@ abstract class AccountInfo
       if (userInfo != null) 'userInfo': userInfo?.toJson(),
       'accountApiKeyId': accountApiKeyId,
       if (accountApiKey != null) 'accountApiKey': accountApiKey?.toJson(),
+      'planTier': planTier.toJson(),
     };
   }
 
@@ -111,6 +119,7 @@ abstract class AccountInfo
       'accountApiKeyId': accountApiKeyId,
       if (accountApiKey != null)
         'accountApiKey': accountApiKey?.toJsonForProtocol(),
+      'planTier': planTier.toJson(),
     };
   }
 
@@ -162,6 +171,7 @@ class _AccountInfoImpl extends AccountInfo {
     _i3.UserInfo? userInfo,
     required int accountApiKeyId,
     _i4.AccountApiKey? accountApiKey,
+    required _i5.PlanTier planTier,
   }) : super._(
           id: id,
           scrappables: scrappables,
@@ -169,6 +179,7 @@ class _AccountInfoImpl extends AccountInfo {
           userInfo: userInfo,
           accountApiKeyId: accountApiKeyId,
           accountApiKey: accountApiKey,
+          planTier: planTier,
         );
 
   /// Returns a shallow copy of this [AccountInfo]
@@ -182,6 +193,7 @@ class _AccountInfoImpl extends AccountInfo {
     Object? userInfo = _Undefined,
     int? accountApiKeyId,
     Object? accountApiKey = _Undefined,
+    _i5.PlanTier? planTier,
   }) {
     return AccountInfo(
       id: id is int? ? id : this.id,
@@ -195,6 +207,7 @@ class _AccountInfoImpl extends AccountInfo {
       accountApiKey: accountApiKey is _i4.AccountApiKey?
           ? accountApiKey
           : this.accountApiKey?.copyWith(),
+      planTier: planTier ?? this.planTier,
     );
   }
 }
@@ -209,6 +222,11 @@ class AccountInfoTable extends _i1.Table<int?> {
       'accountApiKeyId',
       this,
     );
+    planTier = _i1.ColumnEnum(
+      'planTier',
+      this,
+      _i1.EnumSerialization.byIndex,
+    );
   }
 
   _i2.ScrappableTable? ___scrappables;
@@ -222,6 +240,8 @@ class AccountInfoTable extends _i1.Table<int?> {
   late final _i1.ColumnInt accountApiKeyId;
 
   _i4.AccountApiKeyTable? _accountApiKey;
+
+  late final _i1.ColumnEnum<_i5.PlanTier> planTier;
 
   _i2.ScrappableTable get __scrappables {
     if (___scrappables != null) return ___scrappables!;
@@ -285,6 +305,7 @@ class AccountInfoTable extends _i1.Table<int?> {
         id,
         userInfoId,
         accountApiKeyId,
+        planTier,
       ];
 
   @override

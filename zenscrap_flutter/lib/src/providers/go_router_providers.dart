@@ -13,7 +13,7 @@ import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.da
 import 'package:zenscrap_flutter/src/ui/scrap_session/view/initial_chat_view.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
-// final _shellNavigatorKey = GlobalKey<NavigatorState>();
+final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
 final routerProvider = StateProvider((ref) {
   final sessionState = ref.watch(sessionProvider);
@@ -78,10 +78,18 @@ final routerProvider = StateProvider((ref) {
           return InitialChatView();
         },
       ),
-      GoRoute(
-        path: '/dashboard',
-        builder: (context, state) {
-          return ScrappablesDashboard();
+      ShellRoute(
+        navigatorKey: _shellNavigatorKey,
+        routes: [
+          GoRoute(
+            path: '/create-scrappable',
+            builder: (context, state) {
+              return InitialChatView();
+            },
+          ),
+        ],
+        builder: (context, state, child) {
+          return DashboardView(child: child);
         },
       ),
       GoRoute(

@@ -52,6 +52,7 @@ class PrivateAccountEndpoint extends Endpoint {
             userInfoId: userId,
             accountApiKeyId: userId,
             accountApiKey: apiKey,
+            planTier: PlanTier.none,
           );
 
           final newAccountInfo = await AccountInfo.db
