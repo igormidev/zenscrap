@@ -6,7 +6,7 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/elements/zen_tab.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_state.dart';
-import 'package:zenscrap_flutter/src/ui/dashboard/pages/dashboard_loading_page.dart';
+import 'package:zenscrap_flutter/src/design_system/widgets/fullscreen_loading_page.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/pages/initial_chat_page.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/view/scrappable_edit_session.dart';
 
@@ -50,7 +50,9 @@ class _InitialChatViewState extends ConsumerState<InitialChatView> {
             final isLoading =
                 asyncSnapshot.connectionState == ConnectionState.waiting;
             if (isLoading) {
-              return const FullpageLoadingPage();
+              return FullpageLoadingPage(
+                loadingMessage: 'Creating session...',
+              );
             }
 
             return scrapChatState.when(

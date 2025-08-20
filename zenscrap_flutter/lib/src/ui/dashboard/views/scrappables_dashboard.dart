@@ -11,7 +11,7 @@ import 'package:zenscrap_flutter/src/states/dashboard/dashboard_error_provider.d
 import 'package:zenscrap_flutter/src/states/dashboard/dashboard_loading_provider.dart';
 import 'package:zenscrap_flutter/src/states/dashboard/onboarding_flow_provider.dart';
 import 'package:zenscrap_flutter/src/states/dashboard/onboarding_flow_state.dart';
-import 'package:zenscrap_flutter/src/ui/dashboard/pages/dashboard_loading_page.dart';
+import 'package:zenscrap_flutter/src/design_system/widgets/fullscreen_loading_page.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/pages/pricing_page.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/widgets/compact_dashboard_appbar.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/widgets/navigation/dashboard_drawer.dart';
