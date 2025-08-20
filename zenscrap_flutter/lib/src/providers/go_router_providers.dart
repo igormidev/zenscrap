@@ -16,7 +16,7 @@ import 'package:zenscrap_flutter/src/ui/scrappables/view/user_scrappables_listag
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
-final routerProvider = StateProvider((ref) {
+final StateProvider routerProvider = StateProvider((ref) {
   final sessionState = ref.watch(sessionProvider);
   final haveUser = sessionState.maybeMap(
     orElse: () => false,
@@ -87,6 +87,14 @@ final routerProvider = StateProvider((ref) {
           GoRoute(
             path: DashboardNavigationType.endpoints.routeOnClick!,
             builder: (context, state) => UserScrappablesListage(),
+          ),
+          GoRoute(
+            path: DashboardNavigationType.usage.routeOnClick!,
+            builder: (context, state) => Container(),
+          ),
+          GoRoute(
+            path: DashboardNavigationType.account.routeOnClick!,
+            builder: (context, state) => Container(),
           ),
         ],
         builder: (context, state, child) {
