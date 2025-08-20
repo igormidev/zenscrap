@@ -165,7 +165,7 @@ class _MyAppState extends ConsumerState<MyApp> {
             ref.read(routerProvider).go('/dashboard');
           },
           notSignedIn: (_) {
-            ref.read(routerProvider).go('/create-scrappable');
+            ref.read(routerProvider).go('/scrappable-form');
           },
         );
       });

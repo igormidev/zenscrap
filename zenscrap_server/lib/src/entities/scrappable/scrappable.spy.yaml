@@ -2,7 +2,7 @@ class: Scrappable
 table: scrappable
 fields:
   id: UuidValue, defaultModel=random
-  account: int?, relation(name=account_info_scrappable, parent=account_info)
+  accountId: int?, relation(name=account_info_scrappable, parent=account_info)
   createdAt: DateTime
   name: String
   description: String

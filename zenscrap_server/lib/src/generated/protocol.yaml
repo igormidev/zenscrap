@@ -1,10 +1,14 @@
 privateAccount:
   - getAccountInfo:
+privateUserScrappables:
+  - call:
 createScrappable:
   - call:
 handleApiScrapRequest:
   - prod:
   - test:
+publicTier:
+  - updatePlayerTier:
 scrappableChatSession:
   - createSession:
   - listenToScrappableRedraftSession:

@@ -22,7 +22,7 @@ final dashboardErrorProvider = Provider<ZenScrapException?>((ref) {
       switch (selectedPage) {
     DashboardNavigationType.endpoints => [],
     DashboardNavigationType.marketPlace => [],
-    DashboardNavigationType.languages => [],
+    DashboardNavigationType.usage => [],
     DashboardNavigationType.account => [],
     DashboardNavigationType.logOut => [],
   };

@@ -20,7 +20,7 @@ final dashboardLoadingProvider = Provider<HaveAnyActiveLoading>((ref) {
   final List<bool> pageDependenciesLoading = switch (selectedPage) {
     DashboardNavigationType.endpoints => [],
     DashboardNavigationType.marketPlace => [],
-    DashboardNavigationType.languages => [],
+    DashboardNavigationType.usage => [],
     DashboardNavigationType.account => [],
     DashboardNavigationType.logOut => [],
   };

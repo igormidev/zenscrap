@@ -24,6 +24,8 @@ import 'entities/scrappable/scrappable.dart' as _i11;
 import 'entities/scrappable/scrappable_request.dart' as _i12;
 import 'entities/scrappable/scrappable_test_result.dart' as _i13;
 import 'entities/zenscrap_exception.dart' as _i14;
+import 'package:zenscrap_server/src/generated/entities/scrappable/scrappable.dart'
+    as _i15;
 export 'entities/account/account.dart';
 export 'entities/account/account_api_key.dart';
 export 'entities/account/plan_tier.dart';
@@ -180,7 +182,7 @@ class Protocol extends _i1.SerializationManagerServer {
           columnDefault: 'gen_random_uuid()',
         ),
         _i2.ColumnDefinition(
-          name: 'account',
+          name: 'accountId',
           columnType: _i2.ColumnType.bigint,
           isNullable: true,
           dartType: 'int?',
@@ -237,7 +239,7 @@ class Protocol extends _i1.SerializationManagerServer {
       foreignKeys: [
         _i2.ForeignKeyDefinition(
           constraintName: 'scrappable_fk_0',
-          columns: ['account'],
+          columns: ['accountId'],
           referenceTable: 'account_info',
           referenceTableSchema: 'public',
           referenceColumns: ['id'],
@@ -620,6 +622,10 @@ class Protocol extends _i1.SerializationManagerServer {
     }
     if (t == List<String>) {
       return (data as List).map((e) => deserialize<String>(e)).toList() as T;
+    }
+    if (t == List<_i15.Scrappable>) {
+      return (data as List).map((e) => deserialize<_i15.Scrappable>(e)).toList()
+          as T;
     }
     if (t == Map<String, dynamic>) {
       return (data as Map).map((k, v) =>

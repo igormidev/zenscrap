@@ -1,14 +1,21 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/elements/zen_tab.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_state.dart';
+import 'package:zenscrap_flutter/src/ui/dashboard/pages/dashboard_loading_page.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/pages/initial_chat_page.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/view/scrappable_edit_session.dart';
 
 class InitialChatView extends ConsumerStatefulWidget {
-  const InitialChatView({super.key});
+  final Scrappable? scrappable;
+  const InitialChatView({
+    super.key,
+    required this.scrappable,
+  });
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -16,23 +23,49 @@ class InitialChatView extends ConsumerStatefulWidget {
 }
 
 class _InitialChatViewState extends ConsumerState<InitialChatView> {
+  final Completer<void> _initializationCompleter = Completer<void>();
+
+  @override
+  void initState() {
+    super.initState();
+    // WidgetsBinding.instance.addPostFrameCallback((_) async {
+    Future.delayed(const Duration(seconds: 3), () async {
+      if (widget.scrappable != null) {
+        await ref
+            .read(scrapChatProvider.notifier)
+            .createSessionWithScrappable(widget.scrappable!);
+        _initializationCompleter.complete();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final ScrapChatSessionState scrapChatState = ref.watch(scrapChatProvider);
 
     return Scaffold(
-      body: scrapChatState.when(
-        withError: ZenErrorTab.new,
-        creatingSessionState: () => ChatViewPage(),
-        blank: () => ChatViewPage(),
-        standard: (Scrappable scrappable, DateTime testExpirationDate,
-            String sessionUuid) {
-          return ScrappableEditSessionView(
-            testExpirationDate: testExpirationDate,
-            scrappable: scrappable,
-          );
-        },
-      ),
+      body: FutureBuilder(
+          future: _initializationCompleter.future,
+          builder: (context, asyncSnapshot) {
+            final isLoading =
+                asyncSnapshot.connectionState == ConnectionState.waiting;
+            if (isLoading) {
+              return const FullpageLoadingPage();
+            }
+
+            return scrapChatState.when(
+              withError: ZenErrorTab.new,
+              creatingSessionState: () => ChatViewPage(),
+              blank: () => ChatViewPage(),
+              standard: (Scrappable scrappable, DateTime testExpirationDate,
+                  String sessionUuid) {
+                return ScrappableEditSessionView(
+                  testExpirationDate: testExpirationDate,
+                  scrappable: scrappable,
+                );
+              },
+            );
+          }),
     );
   }
 }

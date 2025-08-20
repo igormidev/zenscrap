@@ -22,7 +22,9 @@ import 'entities/scrappable/scrappable.dart' as _i9;
 import 'entities/scrappable/scrappable_request.dart' as _i10;
 import 'entities/scrappable/scrappable_test_result.dart' as _i11;
 import 'entities/zenscrap_exception.dart' as _i12;
-import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i13;
+import 'package:zenscrap_client/src/protocol/entities/scrappable/scrappable.dart'
+    as _i13;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i14;
 export 'entities/account/account.dart';
 export 'entities/account/account_api_key.dart';
 export 'entities/account/plan_tier.dart';
@@ -151,12 +153,16 @@ class Protocol extends _i1.SerializationManager {
     if (t == List<String>) {
       return (data as List).map((e) => deserialize<String>(e)).toList() as T;
     }
+    if (t == List<_i13.Scrappable>) {
+      return (data as List).map((e) => deserialize<_i13.Scrappable>(e)).toList()
+          as T;
+    }
     if (t == Map<String, dynamic>) {
       return (data as Map).map((k, v) =>
           MapEntry(deserialize<String>(k), deserialize<dynamic>(v))) as T;
     }
     try {
-      return _i13.Protocol().deserialize<T>(data, t);
+      return _i14.Protocol().deserialize<T>(data, t);
     } on _i1.DeserializationTypeNotFoundException catch (_) {}
     return super.deserialize<T>(data, t);
   }
@@ -207,7 +213,7 @@ class Protocol extends _i1.SerializationManager {
     if (data is _i12.ZenScrapException) {
       return 'ZenScrapException';
     }
-    className = _i13.Protocol().getClassNameForObject(data);
+    className = _i14.Protocol().getClassNameForObject(data);
     if (className != null) {
       return 'serverpod_auth.$className';
     }
@@ -265,7 +271,7 @@ class Protocol extends _i1.SerializationManager {
     }
     if (dataClassName.startsWith('serverpod_auth.')) {
       data['className'] = dataClassName.substring(15);
-      return _i13.Protocol().deserializeByClassName(data);
+      return _i14.Protocol().deserializeByClassName(data);
     }
     return super.deserializeByClassName(data);
   }

@@ -87,7 +87,7 @@ class DashboardTemplateState extends ConsumerState<DashboardView> {
                 ),
               ),
             ),
-            if (isLoading && error == null) const DashboardLoadingPage(),
+            if (isLoading && error == null) const FullpageLoadingPage(),
             if (error != null) ZenErrorTab(error),
           ],
         );
@@ -156,7 +156,7 @@ enum DashboardNavigationType {
     inactiveIcon: Icons.hub_outlined,
     routeOnClick: '/marketplace',
   ),
-  languages(
+  usage(
     label: 'Api usage',
     activeIcon: Icons.language,
     inactiveIcon: Icons.language,

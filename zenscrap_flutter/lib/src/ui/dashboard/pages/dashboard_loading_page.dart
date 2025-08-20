@@ -4,16 +4,16 @@ import 'package:lottie/lottie.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
 
-class DashboardLoadingPage extends StatefulWidget {
+class FullpageLoadingPage extends StatefulWidget {
   final String? loadingMessage;
   final double? fontSize;
-  const DashboardLoadingPage({super.key, this.loadingMessage, this.fontSize});
+  const FullpageLoadingPage({super.key, this.loadingMessage, this.fontSize});
 
   @override
-  State<DashboardLoadingPage> createState() => _DashboardLoadingPageState();
+  State<FullpageLoadingPage> createState() => _FullpageLoadingPageState();
 }
 
-class _DashboardLoadingPageState extends State<DashboardLoadingPage> {
+class _FullpageLoadingPageState extends State<FullpageLoadingPage> {
   @override
   Widget build(BuildContext context) {
     return Stack(

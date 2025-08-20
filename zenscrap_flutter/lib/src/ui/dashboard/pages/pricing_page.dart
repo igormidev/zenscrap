@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pricing_page/pricing_page.dart';
+import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
+import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 
-class ZenScrapPricingPage extends StatelessWidget {
+class ZenScrapPricingPage extends ConsumerWidget {
   const ZenScrapPricingPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 224, 240, 255),
       body: PricingBackground(
@@ -21,39 +26,45 @@ class ZenScrapPricingPage extends StatelessWidget {
           },
           pricesList: [
             PricesModel(
-              title: 'BASE',
-              subTitle: 'SIDE-PROJECTS',
-              monthlyPrice: 80,
-              yearlyPrice: 850,
+              title: 'BASIC',
+              subTitle: 'FOR SIDE-PROJECTS',
+              monthlyPrice: 100,
+              yearlyPrice: 1050,
               advantagesListage: [
-                '<b><u><tC>2<tC><u><b> projects',
-                '<b><u><tC>4<tC><u><b> languages',
-                '<b><u><tC>1<tC><u><b> account',
+                '<b><u><tC>50.000<tC><u><b> api calls',
+                '<b><u><tC>10<tC><u><b> concurrent requests',
               ],
-              onTap: (bool isYearly) {},
+              onTap: (bool isYearly) async {
+                await ref.globalLoadingSetter(() async {
+                  await testSubscribePro(ref, context);
+                  context.go('/endpoints');
+                });
+              },
             ),
             PricesModel(
               title: 'PRO',
               subTitle: 'FOR STARTUP',
               emphasisText: 'MOST POPULAR',
-              monthlyPrice: 99,
-              yearlyPrice: 999,
+              monthlyPrice: 199,
+              yearlyPrice: 1999,
               advantagesListage: [
-                '<b><u><tC>10<tC><u><b> projects',
-                '<b><u><tC>10<tC><u><b> languages',
-                '<b><u><tC>5<tC><u><b> accounts',
+                '<b><u><tC>200.000<tC><u><b> api calls',
+                '<b><u><tC>30<tC><u><b> concurrent requests',
+                'Access to the best AI model (20 messages)',
               ],
               onTap: (bool isYearly) {},
             ),
             PricesModel(
-              title: 'UNLIMITED',
-              subTitle: 'ENTERPRISE',
-              monthlyPrice: 250,
-              yearlyPrice: 2500,
+              title: 'ULTRA',
+              subTitle: 'ENTERPRISE USAGE',
+              monthlyPrice: 500,
+              yearlyPrice: 5500,
               advantagesListage: [
-                '<b><u><tC>Unlimited<tC><u><b> projects',
-                '<b><u><tC>Unlimited<tC><u><b> languages',
-                '<b><u><tC>Unlimited<tC><u><b> accounts',
+                '<b><u><tC>1.000.000<tC><u><b> api calls',
+                '<b><u><tC>100<tC><u><b> concurrent requests',
+                'Access to the best AI model (100 messages)',
+                'Priority Support',
+                'Hide endpoints from marketplace',
               ],
               onTap: (bool isYearly) {},
             ),
@@ -61,5 +72,23 @@ class ZenScrapPricingPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> testSubscribePro(WidgetRef ref, BuildContext context) async {
+    final userInfo = ref.read(sessionManagerProvider).signedInUser;
+    final email = userInfo?.email;
+    if (email == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('User not found'),
+        ),
+      );
+      return;
+    }
+    await ref.read(clientProvider).publicTier.updatePlayerTier(
+          email: email,
+          tierManipulationKey: '0195744f-a23c-757e-9bf4-184f7ef3bb24',
+          planTier: PlanTier.pro,
+        );
   }
 }

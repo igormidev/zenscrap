@@ -248,7 +248,7 @@ class AccountInfoTable extends _i1.Table<int?> {
     ___scrappables = _i1.createRelationTable(
       relationFieldName: '__scrappables',
       field: AccountInfo.t.id,
-      foreignField: _i2.Scrappable.t.account,
+      foreignField: _i2.Scrappable.t.accountId,
       tableRelation: tableRelation,
       createTable: (foreignTableRelation) =>
           _i2.ScrappableTable(tableRelation: foreignTableRelation),
@@ -287,7 +287,7 @@ class AccountInfoTable extends _i1.Table<int?> {
     var relationTable = _i1.createRelationTable(
       relationFieldName: 'scrappables',
       field: AccountInfo.t.id,
-      foreignField: _i2.Scrappable.t.account,
+      foreignField: _i2.Scrappable.t.accountId,
       tableRelation: tableRelation,
       createTable: (foreignTableRelation) =>
           _i2.ScrappableTable(tableRelation: foreignTableRelation),
@@ -602,7 +602,7 @@ class AccountInfoAttachRepository {
   const AccountInfoAttachRepository._();
 
   /// Creates a relation between this [AccountInfo] and the given [Scrappable]s
-  /// by setting each [Scrappable]'s foreign key `account` to refer to this [AccountInfo].
+  /// by setting each [Scrappable]'s foreign key `accountId` to refer to this [AccountInfo].
   Future<void> scrappables(
     _i1.Session session,
     AccountInfo accountInfo,
@@ -617,10 +617,10 @@ class AccountInfoAttachRepository {
     }
 
     var $scrappable =
-        scrappable.map((e) => e.copyWith(account: accountInfo.id)).toList();
+        scrappable.map((e) => e.copyWith(accountId: accountInfo.id)).toList();
     await session.db.update<_i2.Scrappable>(
       $scrappable,
-      columns: [_i2.Scrappable.t.account],
+      columns: [_i2.Scrappable.t.accountId],
       transaction: transaction,
     );
   }
@@ -676,7 +676,7 @@ class AccountInfoAttachRowRepository {
   }
 
   /// Creates a relation between this [AccountInfo] and the given [Scrappable]
-  /// by setting the [Scrappable]'s foreign key `account` to refer to this [AccountInfo].
+  /// by setting the [Scrappable]'s foreign key `accountId` to refer to this [AccountInfo].
   Future<void> scrappables(
     _i1.Session session,
     AccountInfo accountInfo,
@@ -690,10 +690,10 @@ class AccountInfoAttachRowRepository {
       throw ArgumentError.notNull('accountInfo.id');
     }
 
-    var $scrappable = scrappable.copyWith(account: accountInfo.id);
+    var $scrappable = scrappable.copyWith(accountId: accountInfo.id);
     await session.db.updateRow<_i2.Scrappable>(
       $scrappable,
-      columns: [_i2.Scrappable.t.account],
+      columns: [_i2.Scrappable.t.accountId],
       transaction: transaction,
     );
   }
@@ -703,7 +703,7 @@ class AccountInfoDetachRepository {
   const AccountInfoDetachRepository._();
 
   /// Detaches the relation between this [AccountInfo] and the given [Scrappable]
-  /// by setting the [Scrappable]'s foreign key `account` to `null`.
+  /// by setting the [Scrappable]'s foreign key `accountId` to `null`.
   ///
   /// This removes the association between the two models without deleting
   /// the related record.
@@ -716,10 +716,11 @@ class AccountInfoDetachRepository {
       throw ArgumentError.notNull('scrappable.id');
     }
 
-    var $scrappable = scrappable.map((e) => e.copyWith(account: null)).toList();
+    var $scrappable =
+        scrappable.map((e) => e.copyWith(accountId: null)).toList();
     await session.db.update<_i2.Scrappable>(
       $scrappable,
-      columns: [_i2.Scrappable.t.account],
+      columns: [_i2.Scrappable.t.accountId],
       transaction: transaction,
     );
   }
@@ -729,7 +730,7 @@ class AccountInfoDetachRowRepository {
   const AccountInfoDetachRowRepository._();
 
   /// Detaches the relation between this [AccountInfo] and the given [Scrappable]
-  /// by setting the [Scrappable]'s foreign key `account` to `null`.
+  /// by setting the [Scrappable]'s foreign key `accountId` to `null`.
   ///
   /// This removes the association between the two models without deleting
   /// the related record.
@@ -742,10 +743,10 @@ class AccountInfoDetachRowRepository {
       throw ArgumentError.notNull('scrappable.id');
     }
 
-    var $scrappable = scrappable.copyWith(account: null);
+    var $scrappable = scrappable.copyWith(accountId: null);
     await session.db.updateRow<_i2.Scrappable>(
       $scrappable,
-      columns: [_i2.Scrappable.t.account],
+      columns: [_i2.Scrappable.t.accountId],
       transaction: transaction,
     );
   }

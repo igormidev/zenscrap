@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/serverpod_to_result.dart';
+import 'package:zenscrap_flutter/src/core/utils/talker.dart';
+import 'package:zenscrap_flutter/src/design_system/default_error_snackbar.dart';
 import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_messages_provider.dart';
@@ -28,34 +30,9 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
           .toResult;
 
       await result.fold(
-        (scrappable) async {
-          final sessionResult = await ref
-              .read(clientProvider)
-              .scrappableChatSession
-              .createSession(scrappable: scrappable)
-              .toResult;
-
-          await sessionResult.fold((createdSessionResponse) async {
-            _chatResponseSubscription = ref
-                .read(clientProvider)
-                .scrappableChatSession
-                .listenToScrappableRedraftSession(
-                    sessionUuid: createdSessionResponse.sessionId)
-                .listen(onChange);
-
-            final Duration timeUntilExpire = createdSessionResponse.expiresIn;
-            final DateTime expirationDate = DateTime.now().add(timeUntilExpire);
-
-            state = ScrapChatSessionState.standard(
-              data: scrappable,
-              sessionUuid: createdSessionResponse.sessionId,
-              testExpirationDate: expirationDate,
-            );
-
-            await sendMessage(userPrompt);
-          },
-              (failure) async =>
-                  state = ScrapChatSessionState.withError(error: failure));
+        (Scrappable scrappable) async {
+          await createSessionWithScrappable(scrappable);
+          await sendMessage(userPrompt);
         },
         (failure) {
           state = ScrapChatSessionState.withError(error: failure);
@@ -102,5 +79,42 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
               ),
               orElse: () => AsyncValue.data([chatResponse]),
             );
+  }
+
+  Future<void> createSessionWithScrappable(Scrappable scrappable) async {
+    final sessionResult = await ref
+        .read(clientProvider)
+        .scrappableChatSession
+        .createSession(scrappable: scrappable)
+        .toResult;
+
+    await sessionResult.fold((createdSessionResponse) async {
+      try {
+        _chatResponseSubscription = ref
+            .read(clientProvider)
+            .scrappableChatSession
+            .listenToScrappableRedraftSession(
+                sessionUuid: createdSessionResponse.sessionId)
+            .listen(onChange);
+
+        final Duration timeUntilExpire = createdSessionResponse.expiresIn;
+        final DateTime expirationDate = DateTime.now().add(timeUntilExpire);
+
+        state = ScrapChatSessionState.standard(
+          data: scrappable,
+          sessionUuid: createdSessionResponse.sessionId,
+          testExpirationDate: expirationDate,
+        );
+      } catch (error, stackTrace) {
+        talker.error(
+          'Error while creating session with scrappable',
+          error,
+          stackTrace,
+        );
+        state = ScrapChatSessionState.withError(error: defaultException);
+      }
+    },
+        (failure) async =>
+            state = ScrapChatSessionState.withError(error: failure));
   }
 }

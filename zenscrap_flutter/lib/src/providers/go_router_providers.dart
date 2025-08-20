@@ -11,6 +11,7 @@ import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/splash_view.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/view/initial_chat_view.dart';
+import 'package:zenscrap_flutter/src/ui/scrappables/view/user_scrappables_listage.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -49,21 +50,20 @@ final routerProvider = StateProvider((ref) {
       if (haveUser == false) {
         // Allow unauthenticated access to auth, splash, and review session routes
         // The review route is public so anyone can help review hardcoded strings
-        if (path.contains('/create-scrappable') == false &&
+        if (path.contains('/scrappable-form') == false &&
             path.contains('/splash') == false) {
           return '/splash';
         }
       } else {
         // If user is authenticated and trying to access auth page, redirect to labels
-        if (path == '/create-scrappable' ||
-            path.contains('/create-scrappable')) {
-          return '/create-scrappable';
+        if (path == '/scrappable-form' || path.contains('/scrappable-form')) {
+          return '/scrappable-form';
         }
       }
 
       return null;
     },
-    initialLocation: '/create-scrappable',
+    initialLocation: '/scrappable-form',
     // initialLocation: '/splash',
     routes: [
       GoRoute(
@@ -73,19 +73,20 @@ final routerProvider = StateProvider((ref) {
         },
       ),
       GoRoute(
-        path: '/create-scrappable',
+        path: '/scrappable-form',
         builder: (context, state) {
-          return InitialChatView();
+          final scrappable = state.extra as Scrappable?;
+          return InitialChatView(
+            scrappable: scrappable,
+          );
         },
       ),
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
         routes: [
           GoRoute(
-            path: '/create-scrappable',
-            builder: (context, state) {
-              return InitialChatView();
-            },
+            path: DashboardNavigationType.endpoints.routeOnClick!,
+            builder: (context, state) => UserScrappablesListage(),
           ),
         ],
         builder: (context, state, child) {

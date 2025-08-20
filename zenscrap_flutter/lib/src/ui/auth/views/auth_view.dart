@@ -3,6 +3,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 import 'package:serverpod_auth_email_flutter/serverpod_auth_email_flutter.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
@@ -13,7 +14,7 @@ import 'package:zenscrap_flutter/src/ui/auth/pages/login_page.dart';
 import 'package:zenscrap_flutter/src/ui/auth/pages/password_reset_page.dart';
 import 'package:zenscrap_flutter/src/ui/auth/pages/password_reset_validate_code_page.dart';
 import 'package:zenscrap_flutter/src/ui/auth/pages/sign_in_page.dart';
-import 'package:zenscrap_flutter/src/ui/auth/widgets/initial_scrappable_card_indicator.dart';
+import 'package:zenscrap_flutter/src/design_system/widgets/scrappable_card_indicator.dart';
 
 class AuthView extends ConsumerStatefulWidget {
   final Scrappable? scrappable;
@@ -180,8 +181,10 @@ class _AuthViewState extends ConsumerState<AuthView>
                                 const SizedBox(height: 16),
                                 if (widget.scrappable != null) ...[
                                   const SizedBox(height: 16),
-                                  InitialScrappableCardIndicator(
+                                  ScrappableCardIndicator(
+                                    isNew: true,
                                     scrappable: widget.scrappable!,
+                                    onTap: () => context.pop(),
                                   ),
                                 ],
                                 const SizedBox(height: 16),
@@ -236,7 +239,9 @@ class _AuthViewState extends ConsumerState<AuthView>
                                 ),
                                 if (widget.scrappable != null) ...[
                                   const SizedBox(height: 16),
-                                  InitialScrappableCardIndicator(
+                                  ScrappableCardIndicator(
+                                    isNew: true,
+                                    onTap: () => context.pop(),
                                     scrappable: widget.scrappable!,
                                   ),
                                 ],

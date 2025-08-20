@@ -61,7 +61,7 @@ class PrivateAccountEndpoint extends Endpoint {
             await Scrappable.db.updateRow(
                 session,
                 initialScrappableIfNewUser.copyWith(
-                  account: newAccountInfo.id,
+                  accountId: newAccountInfo.id,
                 ),
                 transaction: transaction);
             await AccountInfo.db.attachRow.scrappables(
