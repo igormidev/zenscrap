@@ -1,0 +1,5 @@
+class: CreditPackagePurchase
+table: credit_package_purchase
+fields:
+  value: double
+  stripePurchaseId: String?

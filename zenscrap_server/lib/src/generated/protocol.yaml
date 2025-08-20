@@ -1,5 +1,7 @@
 privateAccount:
   - getAccountInfo:
+privateApiUsage:
+  - getUsageInfo:
 privateUserScrappables:
   - call:
 createScrappable:
@@ -7,6 +9,8 @@ createScrappable:
 handleApiScrapRequest:
   - prod:
   - test:
+marketplace:
+  - getItems:
 publicTier:
   - updatePlayerTier:
 scrappableChatSession:

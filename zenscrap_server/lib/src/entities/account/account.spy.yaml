@@ -4,8 +4,13 @@ fields:
   scrappables: List<Scrappable>?, relation(name=account_info_scrappable)
   userInfo: module:auth:UserInfo?, relation
   accountApiKey: AccountApiKey?, relation
+  accountApiUsageId: int
+  accountApiUsage: AccountApiUsage?, relation(name=user_account_api_usage, field=accountApiUsageId)
   planTier: PlanTier
 indexes:
   user_info_id_unique_idx:  
     fields: userInfoId  
+    unique: true
+  account_api_usage_id_unique_idx:
+    fields: accountApiUsageId
     unique: true

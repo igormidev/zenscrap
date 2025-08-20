@@ -1,0 +1,4 @@
+class: MonthlySubscriptionCreditDeposit
+table: monthly_subscription_credit_deposit
+fields:
+  value: double

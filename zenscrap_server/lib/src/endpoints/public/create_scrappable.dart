@@ -51,16 +51,18 @@ class CreateScrappableEndpoint extends Endpoint {
     late final List<String> pathParams;
     late final Map<String, String> referenceLinkPathParameters;
 
-    final scrapingResult = await scrapingBee.fetchHtmlAndScreenshot(referenceLink);
-    
+    final scrapingResult =
+        await scrapingBee.fetchHtmlAndScreenshot(referenceLink);
+
     if (scrapingResult == null) {
       // Handle the error case - throw an exception
       throw ZenScrapException(
         title: 'Failed to fetch webpage',
-        description: 'Could not retrieve webpage content from ScrapingBee API. The service may be temporarily unavailable.',
+        description:
+            'Could not retrieve webpage content from ScrapingBee API. The service may be temporarily unavailable.',
       );
     }
-    
+
     var (String html, Uint8List pageFullscreenScreenshot) = scrapingResult;
 
     // Convert HTML to bytes for file-like upload
@@ -129,6 +131,7 @@ class CreateScrappableEndpoint extends Endpoint {
           description: description,
           createdAt: DateTime.now(),
           isActive: true,
+          isPrivate: true,
           targetRequestId: targetRequest.id!,
           referenceTestDataId: referenceTestData.id!,
           referenceTestData: referenceTestData,

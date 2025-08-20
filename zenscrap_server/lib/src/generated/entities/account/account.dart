@@ -15,7 +15,8 @@ import 'package:serverpod/serverpod.dart' as _i1;
 import '../../entities/scrappable/scrappable.dart' as _i2;
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i3;
 import '../../entities/account/account_api_key.dart' as _i4;
-import '../../entities/account/plan_tier.dart' as _i5;
+import '../../entities/account/api_usage/account_api_usage.dart' as _i5;
+import '../../entities/account/plan_tier.dart' as _i6;
 
 abstract class AccountInfo
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -26,6 +27,8 @@ abstract class AccountInfo
     this.userInfo,
     required this.accountApiKeyId,
     this.accountApiKey,
+    required this.accountApiUsageId,
+    this.accountApiUsage,
     required this.planTier,
   });
 
@@ -36,7 +39,9 @@ abstract class AccountInfo
     _i3.UserInfo? userInfo,
     required int accountApiKeyId,
     _i4.AccountApiKey? accountApiKey,
-    required _i5.PlanTier planTier,
+    required int accountApiUsageId,
+    _i5.AccountApiUsage? accountApiUsage,
+    required _i6.PlanTier planTier,
   }) = _AccountInfoImpl;
 
   factory AccountInfo.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -55,7 +60,12 @@ abstract class AccountInfo
           ? null
           : _i4.AccountApiKey.fromJson(
               (jsonSerialization['accountApiKey'] as Map<String, dynamic>)),
-      planTier: _i5.PlanTier.fromJson((jsonSerialization['planTier'] as int)),
+      accountApiUsageId: jsonSerialization['accountApiUsageId'] as int,
+      accountApiUsage: jsonSerialization['accountApiUsage'] == null
+          ? null
+          : _i5.AccountApiUsage.fromJson(
+              (jsonSerialization['accountApiUsage'] as Map<String, dynamic>)),
+      planTier: _i6.PlanTier.fromJson((jsonSerialization['planTier'] as int)),
     );
   }
 
@@ -76,7 +86,11 @@ abstract class AccountInfo
 
   _i4.AccountApiKey? accountApiKey;
 
-  _i5.PlanTier planTier;
+  int accountApiUsageId;
+
+  _i5.AccountApiUsage? accountApiUsage;
+
+  _i6.PlanTier planTier;
 
   @override
   _i1.Table<int?> get table => t;
@@ -91,7 +105,9 @@ abstract class AccountInfo
     _i3.UserInfo? userInfo,
     int? accountApiKeyId,
     _i4.AccountApiKey? accountApiKey,
-    _i5.PlanTier? planTier,
+    int? accountApiUsageId,
+    _i5.AccountApiUsage? accountApiUsage,
+    _i6.PlanTier? planTier,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -103,6 +119,8 @@ abstract class AccountInfo
       if (userInfo != null) 'userInfo': userInfo?.toJson(),
       'accountApiKeyId': accountApiKeyId,
       if (accountApiKey != null) 'accountApiKey': accountApiKey?.toJson(),
+      'accountApiUsageId': accountApiUsageId,
+      if (accountApiUsage != null) 'accountApiUsage': accountApiUsage?.toJson(),
       'planTier': planTier.toJson(),
     };
   }
@@ -119,6 +137,9 @@ abstract class AccountInfo
       'accountApiKeyId': accountApiKeyId,
       if (accountApiKey != null)
         'accountApiKey': accountApiKey?.toJsonForProtocol(),
+      'accountApiUsageId': accountApiUsageId,
+      if (accountApiUsage != null)
+        'accountApiUsage': accountApiUsage?.toJsonForProtocol(),
       'planTier': planTier.toJson(),
     };
   }
@@ -127,11 +148,13 @@ abstract class AccountInfo
     _i2.ScrappableIncludeList? scrappables,
     _i3.UserInfoInclude? userInfo,
     _i4.AccountApiKeyInclude? accountApiKey,
+    _i5.AccountApiUsageInclude? accountApiUsage,
   }) {
     return AccountInfoInclude._(
       scrappables: scrappables,
       userInfo: userInfo,
       accountApiKey: accountApiKey,
+      accountApiUsage: accountApiUsage,
     );
   }
 
@@ -171,7 +194,9 @@ class _AccountInfoImpl extends AccountInfo {
     _i3.UserInfo? userInfo,
     required int accountApiKeyId,
     _i4.AccountApiKey? accountApiKey,
-    required _i5.PlanTier planTier,
+    required int accountApiUsageId,
+    _i5.AccountApiUsage? accountApiUsage,
+    required _i6.PlanTier planTier,
   }) : super._(
           id: id,
           scrappables: scrappables,
@@ -179,6 +204,8 @@ class _AccountInfoImpl extends AccountInfo {
           userInfo: userInfo,
           accountApiKeyId: accountApiKeyId,
           accountApiKey: accountApiKey,
+          accountApiUsageId: accountApiUsageId,
+          accountApiUsage: accountApiUsage,
           planTier: planTier,
         );
 
@@ -193,7 +220,9 @@ class _AccountInfoImpl extends AccountInfo {
     Object? userInfo = _Undefined,
     int? accountApiKeyId,
     Object? accountApiKey = _Undefined,
-    _i5.PlanTier? planTier,
+    int? accountApiUsageId,
+    Object? accountApiUsage = _Undefined,
+    _i6.PlanTier? planTier,
   }) {
     return AccountInfo(
       id: id is int? ? id : this.id,
@@ -207,6 +236,10 @@ class _AccountInfoImpl extends AccountInfo {
       accountApiKey: accountApiKey is _i4.AccountApiKey?
           ? accountApiKey
           : this.accountApiKey?.copyWith(),
+      accountApiUsageId: accountApiUsageId ?? this.accountApiUsageId,
+      accountApiUsage: accountApiUsage is _i5.AccountApiUsage?
+          ? accountApiUsage
+          : this.accountApiUsage?.copyWith(),
       planTier: planTier ?? this.planTier,
     );
   }
@@ -220,6 +253,10 @@ class AccountInfoTable extends _i1.Table<int?> {
     );
     accountApiKeyId = _i1.ColumnInt(
       'accountApiKeyId',
+      this,
+    );
+    accountApiUsageId = _i1.ColumnInt(
+      'accountApiUsageId',
       this,
     );
     planTier = _i1.ColumnEnum(
@@ -241,7 +278,11 @@ class AccountInfoTable extends _i1.Table<int?> {
 
   _i4.AccountApiKeyTable? _accountApiKey;
 
-  late final _i1.ColumnEnum<_i5.PlanTier> planTier;
+  late final _i1.ColumnInt accountApiUsageId;
+
+  _i5.AccountApiUsageTable? _accountApiUsage;
+
+  late final _i1.ColumnEnum<_i6.PlanTier> planTier;
 
   _i2.ScrappableTable get __scrappables {
     if (___scrappables != null) return ___scrappables!;
@@ -282,6 +323,19 @@ class AccountInfoTable extends _i1.Table<int?> {
     return _accountApiKey!;
   }
 
+  _i5.AccountApiUsageTable get accountApiUsage {
+    if (_accountApiUsage != null) return _accountApiUsage!;
+    _accountApiUsage = _i1.createRelationTable(
+      relationFieldName: 'accountApiUsage',
+      field: AccountInfo.t.accountApiUsageId,
+      foreignField: _i5.AccountApiUsage.t.id,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _i5.AccountApiUsageTable(tableRelation: foreignTableRelation),
+    );
+    return _accountApiUsage!;
+  }
+
   _i1.ManyRelation<_i2.ScrappableTable> get scrappables {
     if (_scrappables != null) return _scrappables!;
     var relationTable = _i1.createRelationTable(
@@ -305,6 +359,7 @@ class AccountInfoTable extends _i1.Table<int?> {
         id,
         userInfoId,
         accountApiKeyId,
+        accountApiUsageId,
         planTier,
       ];
 
@@ -319,6 +374,9 @@ class AccountInfoTable extends _i1.Table<int?> {
     if (relationField == 'accountApiKey') {
       return accountApiKey;
     }
+    if (relationField == 'accountApiUsage') {
+      return accountApiUsage;
+    }
     return null;
   }
 }
@@ -328,10 +386,12 @@ class AccountInfoInclude extends _i1.IncludeObject {
     _i2.ScrappableIncludeList? scrappables,
     _i3.UserInfoInclude? userInfo,
     _i4.AccountApiKeyInclude? accountApiKey,
+    _i5.AccountApiUsageInclude? accountApiUsage,
   }) {
     _scrappables = scrappables;
     _userInfo = userInfo;
     _accountApiKey = accountApiKey;
+    _accountApiUsage = accountApiUsage;
   }
 
   _i2.ScrappableIncludeList? _scrappables;
@@ -340,11 +400,14 @@ class AccountInfoInclude extends _i1.IncludeObject {
 
   _i4.AccountApiKeyInclude? _accountApiKey;
 
+  _i5.AccountApiUsageInclude? _accountApiUsage;
+
   @override
   Map<String, _i1.Include?> get includes => {
         'scrappables': _scrappables,
         'userInfo': _userInfo,
         'accountApiKey': _accountApiKey,
+        'accountApiUsage': _accountApiUsage,
       };
 
   @override
@@ -671,6 +734,30 @@ class AccountInfoAttachRowRepository {
     await session.db.updateRow<AccountInfo>(
       $accountInfo,
       columns: [AccountInfo.t.accountApiKeyId],
+      transaction: transaction,
+    );
+  }
+
+  /// Creates a relation between the given [AccountInfo] and [AccountApiUsage]
+  /// by setting the [AccountInfo]'s foreign key `accountApiUsageId` to refer to the [AccountApiUsage].
+  Future<void> accountApiUsage(
+    _i1.Session session,
+    AccountInfo accountInfo,
+    _i5.AccountApiUsage accountApiUsage, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (accountInfo.id == null) {
+      throw ArgumentError.notNull('accountInfo.id');
+    }
+    if (accountApiUsage.id == null) {
+      throw ArgumentError.notNull('accountApiUsage.id');
+    }
+
+    var $accountInfo =
+        accountInfo.copyWith(accountApiUsageId: accountApiUsage.id);
+    await session.db.updateRow<AccountInfo>(
+      $accountInfo,
+      columns: [AccountInfo.t.accountApiUsageId],
       transaction: transaction,
     );
   }

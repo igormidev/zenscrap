@@ -14,20 +14,31 @@ import 'package:serverpod/protocol.dart' as _i2;
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i3;
 import 'entities/account/account.dart' as _i4;
 import 'entities/account/account_api_key.dart' as _i5;
-import 'entities/account/plan_tier.dart' as _i6;
-import 'entities/redraft_scrappable_session/create_session_response.dart'
+import 'entities/account/api_usage/account_api_usage.dart' as _i6;
+import 'entities/account/api_usage/api_creadit_history/api_creadit_history_item.dart'
     as _i7;
-import 'entities/redraft_scrappable_session/prompt_role_enum.dart' as _i8;
-import 'entities/redraft_scrappable_session/chat_response.dart' as _i9;
-import 'entities/scrappable/reference_test_data.dart' as _i10;
-import 'entities/scrappable/scrappable.dart' as _i11;
-import 'entities/scrappable/scrappable_request.dart' as _i12;
-import 'entities/scrappable/scrappable_test_result.dart' as _i13;
-import 'entities/zenscrap_exception.dart' as _i14;
+import 'entities/account/api_usage/api_creadit_history/credit_package_purchase.dart'
+    as _i8;
+import 'entities/account/api_usage/api_creadit_history/monthly_subscription_credit_deposit.dart'
+    as _i9;
+import 'entities/account/plan_tier.dart' as _i10;
+import 'entities/redraft_scrappable_session/create_session_response.dart'
+    as _i11;
+import 'entities/redraft_scrappable_session/prompt_role_enum.dart' as _i12;
+import 'entities/redraft_scrappable_session/chat_response.dart' as _i13;
+import 'entities/scrappable/reference_test_data.dart' as _i14;
+import 'entities/scrappable/scrappable.dart' as _i15;
+import 'entities/scrappable/scrappable_request.dart' as _i16;
+import 'entities/scrappable/scrappable_test_result.dart' as _i17;
+import 'entities/zenscrap_exception.dart' as _i18;
 import 'package:zenscrap_server/src/generated/entities/scrappable/scrappable.dart'
-    as _i15;
+    as _i19;
 export 'entities/account/account.dart';
 export 'entities/account/account_api_key.dart';
+export 'entities/account/api_usage/account_api_usage.dart';
+export 'entities/account/api_usage/api_creadit_history/api_creadit_history_item.dart';
+export 'entities/account/api_usage/api_creadit_history/credit_package_purchase.dart';
+export 'entities/account/api_usage/api_creadit_history/monthly_subscription_credit_deposit.dart';
 export 'entities/account/plan_tier.dart';
 export 'entities/redraft_scrappable_session/chat_response.dart';
 export 'entities/redraft_scrappable_session/create_session_response.dart';
@@ -85,6 +96,44 @@ class Protocol extends _i1.SerializationManagerServer {
       managed: true,
     ),
     _i2.TableDefinition(
+      name: 'account_api_usage',
+      dartName: 'AccountApiUsage',
+      schema: 'public',
+      module: 'zenscrap',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'nextval(\'account_api_usage_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'remainingCredits',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'account_api_usage_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            )
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        )
+      ],
+      managed: true,
+    ),
+    _i2.TableDefinition(
       name: 'account_info',
       dartName: 'AccountInfo',
       schema: 'public',
@@ -105,6 +154,12 @@ class Protocol extends _i1.SerializationManagerServer {
         ),
         _i2.ColumnDefinition(
           name: 'accountApiKeyId',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _i2.ColumnDefinition(
+          name: 'accountApiUsageId',
           columnType: _i2.ColumnType.bigint,
           isNullable: false,
           dartType: 'int',
@@ -131,6 +186,16 @@ class Protocol extends _i1.SerializationManagerServer {
           constraintName: 'account_info_fk_1',
           columns: ['accountApiKeyId'],
           referenceTable: 'account_api_key',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _i2.ForeignKeyAction.noAction,
+          onDelete: _i2.ForeignKeyAction.noAction,
+          matchType: null,
+        ),
+        _i2.ForeignKeyDefinition(
+          constraintName: 'account_info_fk_2',
+          columns: ['accountApiUsageId'],
+          referenceTable: 'account_api_usage',
           referenceTableSchema: 'public',
           referenceColumns: ['id'],
           onUpdate: _i2.ForeignKeyAction.noAction,
@@ -165,6 +230,184 @@ class Protocol extends _i1.SerializationManagerServer {
           isUnique: true,
           isPrimary: false,
         ),
+        _i2.IndexDefinition(
+          indexName: 'account_api_usage_id_unique_idx',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'accountApiUsageId',
+            )
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _i2.TableDefinition(
+      name: 'credit_history_item',
+      dartName: 'CreditHistoryItem',
+      schema: 'public',
+      module: 'zenscrap',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'nextval(\'credit_history_item_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'monthlySubscriptionCreditDepositId',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: true,
+          dartType: 'int?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'creaditPackagePurchaseId',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: true,
+          dartType: 'int?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'accountApiUsageId',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+      ],
+      foreignKeys: [
+        _i2.ForeignKeyDefinition(
+          constraintName: 'credit_history_item_fk_0',
+          columns: ['monthlySubscriptionCreditDepositId'],
+          referenceTable: 'monthly_subscription_credit_deposit',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _i2.ForeignKeyAction.noAction,
+          onDelete: _i2.ForeignKeyAction.noAction,
+          matchType: null,
+        ),
+        _i2.ForeignKeyDefinition(
+          constraintName: 'credit_history_item_fk_1',
+          columns: ['creaditPackagePurchaseId'],
+          referenceTable: 'credit_package_purchase',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _i2.ForeignKeyAction.noAction,
+          onDelete: _i2.ForeignKeyAction.noAction,
+          matchType: null,
+        ),
+        _i2.ForeignKeyDefinition(
+          constraintName: 'credit_history_item_fk_2',
+          columns: ['accountApiUsageId'],
+          referenceTable: 'account_api_usage',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _i2.ForeignKeyAction.noAction,
+          onDelete: _i2.ForeignKeyAction.noAction,
+          matchType: null,
+        ),
+      ],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'credit_history_item_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            )
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        )
+      ],
+      managed: true,
+    ),
+    _i2.TableDefinition(
+      name: 'credit_package_purchase',
+      dartName: 'CreditPackagePurchase',
+      schema: 'public',
+      module: 'zenscrap',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault:
+              'nextval(\'credit_package_purchase_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'value',
+          columnType: _i2.ColumnType.doublePrecision,
+          isNullable: false,
+          dartType: 'double',
+        ),
+        _i2.ColumnDefinition(
+          name: 'stripePurchaseId',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'credit_package_purchase_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            )
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        )
+      ],
+      managed: true,
+    ),
+    _i2.TableDefinition(
+      name: 'monthly_subscription_credit_deposit',
+      dartName: 'MonthlySubscriptionCreditDeposit',
+      schema: 'public',
+      module: 'zenscrap',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault:
+              'nextval(\'monthly_subscription_credit_deposit_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'value',
+          columnType: _i2.ColumnType.doublePrecision,
+          isNullable: false,
+          dartType: 'double',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'monthly_subscription_credit_deposit_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            )
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        )
       ],
       managed: true,
     ),
@@ -204,6 +447,12 @@ class Protocol extends _i1.SerializationManagerServer {
           columnType: _i2.ColumnType.text,
           isNullable: false,
           dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'isPrivate',
+          columnType: _i2.ColumnType.boolean,
+          isNullable: false,
+          dartType: 'bool',
         ),
         _i2.ColumnDefinition(
           name: 'testEndpointAvailableUntil',
@@ -527,41 +776,53 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i5.AccountApiKey) {
       return _i5.AccountApiKey.fromJson(data) as T;
     }
-    if (t == _i6.PlanTier) {
-      return _i6.PlanTier.fromJson(data) as T;
+    if (t == _i6.AccountApiUsage) {
+      return _i6.AccountApiUsage.fromJson(data) as T;
     }
-    if (t == _i7.CreateSessionResponse) {
-      return _i7.CreateSessionResponse.fromJson(data) as T;
+    if (t == _i7.CreditHistoryItem) {
+      return _i7.CreditHistoryItem.fromJson(data) as T;
     }
-    if (t == _i8.PromptRole) {
-      return _i8.PromptRole.fromJson(data) as T;
+    if (t == _i8.CreditPackagePurchase) {
+      return _i8.CreditPackagePurchase.fromJson(data) as T;
     }
-    if (t == _i9.ErrorTextResponse) {
-      return _i9.ErrorTextResponse.fromJson(data) as T;
+    if (t == _i9.MonthlySubscriptionCreditDeposit) {
+      return _i9.MonthlySubscriptionCreditDeposit.fromJson(data) as T;
     }
-    if (t == _i9.MessageTextAndNewExtractRulesResponse) {
-      return _i9.MessageTextAndNewExtractRulesResponse.fromJson(data) as T;
+    if (t == _i10.PlanTier) {
+      return _i10.PlanTier.fromJson(data) as T;
     }
-    if (t == _i9.MessageTextResponse) {
-      return _i9.MessageTextResponse.fromJson(data) as T;
+    if (t == _i11.CreateSessionResponse) {
+      return _i11.CreateSessionResponse.fromJson(data) as T;
     }
-    if (t == _i9.NewExtractRuleResponse) {
-      return _i9.NewExtractRuleResponse.fromJson(data) as T;
+    if (t == _i12.PromptRole) {
+      return _i12.PromptRole.fromJson(data) as T;
     }
-    if (t == _i10.ReferenceTestData) {
-      return _i10.ReferenceTestData.fromJson(data) as T;
+    if (t == _i13.ErrorTextResponse) {
+      return _i13.ErrorTextResponse.fromJson(data) as T;
     }
-    if (t == _i11.Scrappable) {
-      return _i11.Scrappable.fromJson(data) as T;
+    if (t == _i13.MessageTextAndNewExtractRulesResponse) {
+      return _i13.MessageTextAndNewExtractRulesResponse.fromJson(data) as T;
     }
-    if (t == _i12.ScrappableRequest) {
-      return _i12.ScrappableRequest.fromJson(data) as T;
+    if (t == _i13.MessageTextResponse) {
+      return _i13.MessageTextResponse.fromJson(data) as T;
     }
-    if (t == _i13.ScrappableTestResult) {
-      return _i13.ScrappableTestResult.fromJson(data) as T;
+    if (t == _i13.NewExtractRuleResponse) {
+      return _i13.NewExtractRuleResponse.fromJson(data) as T;
     }
-    if (t == _i14.ZenScrapException) {
-      return _i14.ZenScrapException.fromJson(data) as T;
+    if (t == _i14.ReferenceTestData) {
+      return _i14.ReferenceTestData.fromJson(data) as T;
+    }
+    if (t == _i15.Scrappable) {
+      return _i15.Scrappable.fromJson(data) as T;
+    }
+    if (t == _i16.ScrappableRequest) {
+      return _i16.ScrappableRequest.fromJson(data) as T;
+    }
+    if (t == _i17.ScrappableTestResult) {
+      return _i17.ScrappableTestResult.fromJson(data) as T;
+    }
+    if (t == _i18.ZenScrapException) {
+      return _i18.ZenScrapException.fromJson(data) as T;
     }
     if (t == _i1.getType<_i4.AccountInfo?>()) {
       return (data != null ? _i4.AccountInfo.fromJson(data) : null) as T;
@@ -569,51 +830,73 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i1.getType<_i5.AccountApiKey?>()) {
       return (data != null ? _i5.AccountApiKey.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i6.PlanTier?>()) {
-      return (data != null ? _i6.PlanTier.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i6.AccountApiUsage?>()) {
+      return (data != null ? _i6.AccountApiUsage.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i7.CreateSessionResponse?>()) {
-      return (data != null ? _i7.CreateSessionResponse.fromJson(data) : null)
+    if (t == _i1.getType<_i7.CreditHistoryItem?>()) {
+      return (data != null ? _i7.CreditHistoryItem.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i8.CreditPackagePurchase?>()) {
+      return (data != null ? _i8.CreditPackagePurchase.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i8.PromptRole?>()) {
-      return (data != null ? _i8.PromptRole.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i9.ErrorTextResponse?>()) {
-      return (data != null ? _i9.ErrorTextResponse.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i9.MessageTextAndNewExtractRulesResponse?>()) {
+    if (t == _i1.getType<_i9.MonthlySubscriptionCreditDeposit?>()) {
       return (data != null
-          ? _i9.MessageTextAndNewExtractRulesResponse.fromJson(data)
+          ? _i9.MonthlySubscriptionCreditDeposit.fromJson(data)
           : null) as T;
     }
-    if (t == _i1.getType<_i9.MessageTextResponse?>()) {
-      return (data != null ? _i9.MessageTextResponse.fromJson(data) : null)
+    if (t == _i1.getType<_i10.PlanTier?>()) {
+      return (data != null ? _i10.PlanTier.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i11.CreateSessionResponse?>()) {
+      return (data != null ? _i11.CreateSessionResponse.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i9.NewExtractRuleResponse?>()) {
-      return (data != null ? _i9.NewExtractRuleResponse.fromJson(data) : null)
-          as T;
+    if (t == _i1.getType<_i12.PromptRole?>()) {
+      return (data != null ? _i12.PromptRole.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i10.ReferenceTestData?>()) {
-      return (data != null ? _i10.ReferenceTestData.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i13.ErrorTextResponse?>()) {
+      return (data != null ? _i13.ErrorTextResponse.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i11.Scrappable?>()) {
-      return (data != null ? _i11.Scrappable.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i12.ScrappableRequest?>()) {
-      return (data != null ? _i12.ScrappableRequest.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i13.ScrappableTestResult?>()) {
-      return (data != null ? _i13.ScrappableTestResult.fromJson(data) : null)
-          as T;
-    }
-    if (t == _i1.getType<_i14.ZenScrapException?>()) {
-      return (data != null ? _i14.ZenScrapException.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<List<_i11.Scrappable>?>()) {
+    if (t == _i1.getType<_i13.MessageTextAndNewExtractRulesResponse?>()) {
       return (data != null
-          ? (data as List).map((e) => deserialize<_i11.Scrappable>(e)).toList()
+          ? _i13.MessageTextAndNewExtractRulesResponse.fromJson(data)
+          : null) as T;
+    }
+    if (t == _i1.getType<_i13.MessageTextResponse?>()) {
+      return (data != null ? _i13.MessageTextResponse.fromJson(data) : null)
+          as T;
+    }
+    if (t == _i1.getType<_i13.NewExtractRuleResponse?>()) {
+      return (data != null ? _i13.NewExtractRuleResponse.fromJson(data) : null)
+          as T;
+    }
+    if (t == _i1.getType<_i14.ReferenceTestData?>()) {
+      return (data != null ? _i14.ReferenceTestData.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i15.Scrappable?>()) {
+      return (data != null ? _i15.Scrappable.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i16.ScrappableRequest?>()) {
+      return (data != null ? _i16.ScrappableRequest.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i17.ScrappableTestResult?>()) {
+      return (data != null ? _i17.ScrappableTestResult.fromJson(data) : null)
+          as T;
+    }
+    if (t == _i1.getType<_i18.ZenScrapException?>()) {
+      return (data != null ? _i18.ZenScrapException.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<List<_i15.Scrappable>?>()) {
+      return (data != null
+          ? (data as List).map((e) => deserialize<_i15.Scrappable>(e)).toList()
+          : null) as T;
+    }
+    if (t == _i1.getType<List<_i7.CreditHistoryItem>?>()) {
+      return (data != null
+          ? (data as List)
+              .map((e) => deserialize<_i7.CreditHistoryItem>(e))
+              .toList()
           : null) as T;
     }
     if (t == Map<String, String?>) {
@@ -623,8 +906,8 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == List<String>) {
       return (data as List).map((e) => deserialize<String>(e)).toList() as T;
     }
-    if (t == List<_i15.Scrappable>) {
-      return (data as List).map((e) => deserialize<_i15.Scrappable>(e)).toList()
+    if (t == List<_i19.Scrappable>) {
+      return (data as List).map((e) => deserialize<_i19.Scrappable>(e)).toList()
           as T;
     }
     if (t == Map<String, dynamic>) {
@@ -650,40 +933,52 @@ class Protocol extends _i1.SerializationManagerServer {
     if (data is _i5.AccountApiKey) {
       return 'AccountApiKey';
     }
-    if (data is _i6.PlanTier) {
+    if (data is _i6.AccountApiUsage) {
+      return 'AccountApiUsage';
+    }
+    if (data is _i7.CreditHistoryItem) {
+      return 'CreditHistoryItem';
+    }
+    if (data is _i8.CreditPackagePurchase) {
+      return 'CreditPackagePurchase';
+    }
+    if (data is _i9.MonthlySubscriptionCreditDeposit) {
+      return 'MonthlySubscriptionCreditDeposit';
+    }
+    if (data is _i10.PlanTier) {
       return 'PlanTier';
     }
-    if (data is _i7.CreateSessionResponse) {
+    if (data is _i11.CreateSessionResponse) {
       return 'CreateSessionResponse';
     }
-    if (data is _i8.PromptRole) {
+    if (data is _i12.PromptRole) {
       return 'PromptRole';
     }
-    if (data is _i9.ErrorTextResponse) {
+    if (data is _i13.ErrorTextResponse) {
       return 'ErrorTextResponse';
     }
-    if (data is _i9.MessageTextAndNewExtractRulesResponse) {
+    if (data is _i13.MessageTextAndNewExtractRulesResponse) {
       return 'MessageTextAndNewExtractRulesResponse';
     }
-    if (data is _i9.MessageTextResponse) {
+    if (data is _i13.MessageTextResponse) {
       return 'MessageTextResponse';
     }
-    if (data is _i9.NewExtractRuleResponse) {
+    if (data is _i13.NewExtractRuleResponse) {
       return 'NewExtractRuleResponse';
     }
-    if (data is _i10.ReferenceTestData) {
+    if (data is _i14.ReferenceTestData) {
       return 'ReferenceTestData';
     }
-    if (data is _i11.Scrappable) {
+    if (data is _i15.Scrappable) {
       return 'Scrappable';
     }
-    if (data is _i12.ScrappableRequest) {
+    if (data is _i16.ScrappableRequest) {
       return 'ScrappableRequest';
     }
-    if (data is _i13.ScrappableTestResult) {
+    if (data is _i17.ScrappableTestResult) {
       return 'ScrappableTestResult';
     }
-    if (data is _i14.ZenScrapException) {
+    if (data is _i18.ZenScrapException) {
       return 'ZenScrapException';
     }
     className = _i2.Protocol().getClassNameForObject(data);
@@ -709,42 +1004,54 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName == 'AccountApiKey') {
       return deserialize<_i5.AccountApiKey>(data['data']);
     }
+    if (dataClassName == 'AccountApiUsage') {
+      return deserialize<_i6.AccountApiUsage>(data['data']);
+    }
+    if (dataClassName == 'CreditHistoryItem') {
+      return deserialize<_i7.CreditHistoryItem>(data['data']);
+    }
+    if (dataClassName == 'CreditPackagePurchase') {
+      return deserialize<_i8.CreditPackagePurchase>(data['data']);
+    }
+    if (dataClassName == 'MonthlySubscriptionCreditDeposit') {
+      return deserialize<_i9.MonthlySubscriptionCreditDeposit>(data['data']);
+    }
     if (dataClassName == 'PlanTier') {
-      return deserialize<_i6.PlanTier>(data['data']);
+      return deserialize<_i10.PlanTier>(data['data']);
     }
     if (dataClassName == 'CreateSessionResponse') {
-      return deserialize<_i7.CreateSessionResponse>(data['data']);
+      return deserialize<_i11.CreateSessionResponse>(data['data']);
     }
     if (dataClassName == 'PromptRole') {
-      return deserialize<_i8.PromptRole>(data['data']);
+      return deserialize<_i12.PromptRole>(data['data']);
     }
     if (dataClassName == 'ErrorTextResponse') {
-      return deserialize<_i9.ErrorTextResponse>(data['data']);
+      return deserialize<_i13.ErrorTextResponse>(data['data']);
     }
     if (dataClassName == 'MessageTextAndNewExtractRulesResponse') {
-      return deserialize<_i9.MessageTextAndNewExtractRulesResponse>(
+      return deserialize<_i13.MessageTextAndNewExtractRulesResponse>(
           data['data']);
     }
     if (dataClassName == 'MessageTextResponse') {
-      return deserialize<_i9.MessageTextResponse>(data['data']);
+      return deserialize<_i13.MessageTextResponse>(data['data']);
     }
     if (dataClassName == 'NewExtractRuleResponse') {
-      return deserialize<_i9.NewExtractRuleResponse>(data['data']);
+      return deserialize<_i13.NewExtractRuleResponse>(data['data']);
     }
     if (dataClassName == 'ReferenceTestData') {
-      return deserialize<_i10.ReferenceTestData>(data['data']);
+      return deserialize<_i14.ReferenceTestData>(data['data']);
     }
     if (dataClassName == 'Scrappable') {
-      return deserialize<_i11.Scrappable>(data['data']);
+      return deserialize<_i15.Scrappable>(data['data']);
     }
     if (dataClassName == 'ScrappableRequest') {
-      return deserialize<_i12.ScrappableRequest>(data['data']);
+      return deserialize<_i16.ScrappableRequest>(data['data']);
     }
     if (dataClassName == 'ScrappableTestResult') {
-      return deserialize<_i13.ScrappableTestResult>(data['data']);
+      return deserialize<_i17.ScrappableTestResult>(data['data']);
     }
     if (dataClassName == 'ZenScrapException') {
-      return deserialize<_i14.ZenScrapException>(data['data']);
+      return deserialize<_i18.ZenScrapException>(data['data']);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);
@@ -776,14 +1083,22 @@ class Protocol extends _i1.SerializationManagerServer {
         return _i4.AccountInfo.t;
       case _i5.AccountApiKey:
         return _i5.AccountApiKey.t;
-      case _i10.ReferenceTestData:
-        return _i10.ReferenceTestData.t;
-      case _i11.Scrappable:
-        return _i11.Scrappable.t;
-      case _i12.ScrappableRequest:
-        return _i12.ScrappableRequest.t;
-      case _i13.ScrappableTestResult:
-        return _i13.ScrappableTestResult.t;
+      case _i6.AccountApiUsage:
+        return _i6.AccountApiUsage.t;
+      case _i7.CreditHistoryItem:
+        return _i7.CreditHistoryItem.t;
+      case _i8.CreditPackagePurchase:
+        return _i8.CreditPackagePurchase.t;
+      case _i9.MonthlySubscriptionCreditDeposit:
+        return _i9.MonthlySubscriptionCreditDeposit.t;
+      case _i14.ReferenceTestData:
+        return _i14.ReferenceTestData.t;
+      case _i15.Scrappable:
+        return _i15.Scrappable.t;
+      case _i16.ScrappableRequest:
+        return _i16.ScrappableRequest.t;
+      case _i17.ScrappableTestResult:
+        return _i17.ScrappableTestResult.t;
     }
     return null;
   }

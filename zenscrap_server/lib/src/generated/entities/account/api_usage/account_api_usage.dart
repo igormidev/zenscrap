@@ -1,0 +1,654 @@
+/* AUTOMATICALLY GENERATED CODE DO NOT MODIFY */
+/*   To generate run: "serverpod generate"    */
+
+// ignore_for_file: implementation_imports
+// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: public_member_api_docs
+// ignore_for_file: type_literal_in_constant_pattern
+// ignore_for_file: use_super_parameters
+
+// ignore_for_file: unnecessary_null_comparison
+
+// ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:serverpod/serverpod.dart' as _i1;
+import '../../../entities/account/account.dart' as _i2;
+import '../../../entities/account/api_usage/api_creadit_history/api_creadit_history_item.dart'
+    as _i3;
+
+abstract class AccountApiUsage
+    implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
+  AccountApiUsage._({
+    this.id,
+    required this.remainingCredits,
+    this.accountInfo,
+    this.history,
+  });
+
+  factory AccountApiUsage({
+    int? id,
+    required int remainingCredits,
+    _i2.AccountInfo? accountInfo,
+    List<_i3.CreditHistoryItem>? history,
+  }) = _AccountApiUsageImpl;
+
+  factory AccountApiUsage.fromJson(Map<String, dynamic> jsonSerialization) {
+    return AccountApiUsage(
+      id: jsonSerialization['id'] as int?,
+      remainingCredits: jsonSerialization['remainingCredits'] as int,
+      accountInfo: jsonSerialization['accountInfo'] == null
+          ? null
+          : _i2.AccountInfo.fromJson(
+              (jsonSerialization['accountInfo'] as Map<String, dynamic>)),
+      history: (jsonSerialization['history'] as List?)
+          ?.map((e) =>
+              _i3.CreditHistoryItem.fromJson((e as Map<String, dynamic>)))
+          .toList(),
+    );
+  }
+
+  static final t = AccountApiUsageTable();
+
+  static const db = AccountApiUsageRepository._();
+
+  @override
+  int? id;
+
+  int remainingCredits;
+
+  _i2.AccountInfo? accountInfo;
+
+  List<_i3.CreditHistoryItem>? history;
+
+  @override
+  _i1.Table<int?> get table => t;
+
+  /// Returns a shallow copy of this [AccountApiUsage]
+  /// with some or all fields replaced by the given arguments.
+  @_i1.useResult
+  AccountApiUsage copyWith({
+    int? id,
+    int? remainingCredits,
+    _i2.AccountInfo? accountInfo,
+    List<_i3.CreditHistoryItem>? history,
+  });
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      if (id != null) 'id': id,
+      'remainingCredits': remainingCredits,
+      if (accountInfo != null) 'accountInfo': accountInfo?.toJson(),
+      if (history != null)
+        'history': history?.toJson(valueToJson: (v) => v.toJson()),
+    };
+  }
+
+  @override
+  Map<String, dynamic> toJsonForProtocol() {
+    return {
+      if (id != null) 'id': id,
+      'remainingCredits': remainingCredits,
+      if (accountInfo != null) 'accountInfo': accountInfo?.toJsonForProtocol(),
+      if (history != null)
+        'history': history?.toJson(valueToJson: (v) => v.toJsonForProtocol()),
+    };
+  }
+
+  static AccountApiUsageInclude include({
+    _i2.AccountInfoInclude? accountInfo,
+    _i3.CreditHistoryItemIncludeList? history,
+  }) {
+    return AccountApiUsageInclude._(
+      accountInfo: accountInfo,
+      history: history,
+    );
+  }
+
+  static AccountApiUsageIncludeList includeList({
+    _i1.WhereExpressionBuilder<AccountApiUsageTable>? where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<AccountApiUsageTable>? orderBy,
+    bool orderDescending = false,
+    _i1.OrderByListBuilder<AccountApiUsageTable>? orderByList,
+    AccountApiUsageInclude? include,
+  }) {
+    return AccountApiUsageIncludeList._(
+      where: where,
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(AccountApiUsage.t),
+      orderDescending: orderDescending,
+      orderByList: orderByList?.call(AccountApiUsage.t),
+      include: include,
+    );
+  }
+
+  @override
+  String toString() {
+    return _i1.SerializationManager.encode(this);
+  }
+}
+
+class _Undefined {}
+
+class _AccountApiUsageImpl extends AccountApiUsage {
+  _AccountApiUsageImpl({
+    int? id,
+    required int remainingCredits,
+    _i2.AccountInfo? accountInfo,
+    List<_i3.CreditHistoryItem>? history,
+  }) : super._(
+          id: id,
+          remainingCredits: remainingCredits,
+          accountInfo: accountInfo,
+          history: history,
+        );
+
+  /// Returns a shallow copy of this [AccountApiUsage]
+  /// with some or all fields replaced by the given arguments.
+  @_i1.useResult
+  @override
+  AccountApiUsage copyWith({
+    Object? id = _Undefined,
+    int? remainingCredits,
+    Object? accountInfo = _Undefined,
+    Object? history = _Undefined,
+  }) {
+    return AccountApiUsage(
+      id: id is int? ? id : this.id,
+      remainingCredits: remainingCredits ?? this.remainingCredits,
+      accountInfo: accountInfo is _i2.AccountInfo?
+          ? accountInfo
+          : this.accountInfo?.copyWith(),
+      history: history is List<_i3.CreditHistoryItem>?
+          ? history
+          : this.history?.map((e0) => e0.copyWith()).toList(),
+    );
+  }
+}
+
+class AccountApiUsageTable extends _i1.Table<int?> {
+  AccountApiUsageTable({super.tableRelation})
+      : super(tableName: 'account_api_usage') {
+    remainingCredits = _i1.ColumnInt(
+      'remainingCredits',
+      this,
+    );
+  }
+
+  late final _i1.ColumnInt remainingCredits;
+
+  _i2.AccountInfoTable? _accountInfo;
+
+  _i3.CreditHistoryItemTable? ___history;
+
+  _i1.ManyRelation<_i3.CreditHistoryItemTable>? _history;
+
+  _i2.AccountInfoTable get accountInfo {
+    if (_accountInfo != null) return _accountInfo!;
+    _accountInfo = _i1.createRelationTable(
+      relationFieldName: 'accountInfo',
+      field: AccountApiUsage.t.id,
+      foreignField: _i2.AccountInfo.t.accountApiUsageId,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _i2.AccountInfoTable(tableRelation: foreignTableRelation),
+    );
+    return _accountInfo!;
+  }
+
+  _i3.CreditHistoryItemTable get __history {
+    if (___history != null) return ___history!;
+    ___history = _i1.createRelationTable(
+      relationFieldName: '__history',
+      field: AccountApiUsage.t.id,
+      foreignField: _i3.CreditHistoryItem.t.accountApiUsageId,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _i3.CreditHistoryItemTable(tableRelation: foreignTableRelation),
+    );
+    return ___history!;
+  }
+
+  _i1.ManyRelation<_i3.CreditHistoryItemTable> get history {
+    if (_history != null) return _history!;
+    var relationTable = _i1.createRelationTable(
+      relationFieldName: 'history',
+      field: AccountApiUsage.t.id,
+      foreignField: _i3.CreditHistoryItem.t.accountApiUsageId,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _i3.CreditHistoryItemTable(tableRelation: foreignTableRelation),
+    );
+    _history = _i1.ManyRelation<_i3.CreditHistoryItemTable>(
+      tableWithRelations: relationTable,
+      table: _i3.CreditHistoryItemTable(
+          tableRelation: relationTable.tableRelation!.lastRelation),
+    );
+    return _history!;
+  }
+
+  @override
+  List<_i1.Column> get columns => [
+        id,
+        remainingCredits,
+      ];
+
+  @override
+  _i1.Table? getRelationTable(String relationField) {
+    if (relationField == 'accountInfo') {
+      return accountInfo;
+    }
+    if (relationField == 'history') {
+      return __history;
+    }
+    return null;
+  }
+}
+
+class AccountApiUsageInclude extends _i1.IncludeObject {
+  AccountApiUsageInclude._({
+    _i2.AccountInfoInclude? accountInfo,
+    _i3.CreditHistoryItemIncludeList? history,
+  }) {
+    _accountInfo = accountInfo;
+    _history = history;
+  }
+
+  _i2.AccountInfoInclude? _accountInfo;
+
+  _i3.CreditHistoryItemIncludeList? _history;
+
+  @override
+  Map<String, _i1.Include?> get includes => {
+        'accountInfo': _accountInfo,
+        'history': _history,
+      };
+
+  @override
+  _i1.Table<int?> get table => AccountApiUsage.t;
+}
+
+class AccountApiUsageIncludeList extends _i1.IncludeList {
+  AccountApiUsageIncludeList._({
+    _i1.WhereExpressionBuilder<AccountApiUsageTable>? where,
+    super.limit,
+    super.offset,
+    super.orderBy,
+    super.orderDescending,
+    super.orderByList,
+    super.include,
+  }) {
+    super.where = where?.call(AccountApiUsage.t);
+  }
+
+  @override
+  Map<String, _i1.Include?> get includes => include?.includes ?? {};
+
+  @override
+  _i1.Table<int?> get table => AccountApiUsage.t;
+}
+
+class AccountApiUsageRepository {
+  const AccountApiUsageRepository._();
+
+  final attach = const AccountApiUsageAttachRepository._();
+
+  final attachRow = const AccountApiUsageAttachRowRepository._();
+
+  final detach = const AccountApiUsageDetachRepository._();
+
+  final detachRow = const AccountApiUsageDetachRowRepository._();
+
+  /// Returns a list of [AccountApiUsage]s matching the given query parameters.
+  ///
+  /// Use [where] to specify which items to include in the return value.
+  /// If none is specified, all items will be returned.
+  ///
+  /// To specify the order of the items use [orderBy] or [orderByList]
+  /// when sorting by multiple columns.
+  ///
+  /// The maximum number of items can be set by [limit]. If no limit is set,
+  /// all items matching the query will be returned.
+  ///
+  /// [offset] defines how many items to skip, after which [limit] (or all)
+  /// items are read from the database.
+  ///
+  /// ```dart
+  /// var persons = await Persons.db.find(
+  ///   session,
+  ///   where: (t) => t.lastName.equals('Jones'),
+  ///   orderBy: (t) => t.firstName,
+  ///   limit: 100,
+  /// );
+  /// ```
+  Future<List<AccountApiUsage>> find(
+    _i1.Session session, {
+    _i1.WhereExpressionBuilder<AccountApiUsageTable>? where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<AccountApiUsageTable>? orderBy,
+    bool orderDescending = false,
+    _i1.OrderByListBuilder<AccountApiUsageTable>? orderByList,
+    _i1.Transaction? transaction,
+    AccountApiUsageInclude? include,
+  }) async {
+    return session.db.find<AccountApiUsage>(
+      where: where?.call(AccountApiUsage.t),
+      orderBy: orderBy?.call(AccountApiUsage.t),
+      orderByList: orderByList?.call(AccountApiUsage.t),
+      orderDescending: orderDescending,
+      limit: limit,
+      offset: offset,
+      transaction: transaction,
+      include: include,
+    );
+  }
+
+  /// Returns the first matching [AccountApiUsage] matching the given query parameters.
+  ///
+  /// Use [where] to specify which items to include in the return value.
+  /// If none is specified, all items will be returned.
+  ///
+  /// To specify the order use [orderBy] or [orderByList]
+  /// when sorting by multiple columns.
+  ///
+  /// [offset] defines how many items to skip, after which the next one will be picked.
+  ///
+  /// ```dart
+  /// var youngestPerson = await Persons.db.findFirstRow(
+  ///   session,
+  ///   where: (t) => t.lastName.equals('Jones'),
+  ///   orderBy: (t) => t.age,
+  /// );
+  /// ```
+  Future<AccountApiUsage?> findFirstRow(
+    _i1.Session session, {
+    _i1.WhereExpressionBuilder<AccountApiUsageTable>? where,
+    int? offset,
+    _i1.OrderByBuilder<AccountApiUsageTable>? orderBy,
+    bool orderDescending = false,
+    _i1.OrderByListBuilder<AccountApiUsageTable>? orderByList,
+    _i1.Transaction? transaction,
+    AccountApiUsageInclude? include,
+  }) async {
+    return session.db.findFirstRow<AccountApiUsage>(
+      where: where?.call(AccountApiUsage.t),
+      orderBy: orderBy?.call(AccountApiUsage.t),
+      orderByList: orderByList?.call(AccountApiUsage.t),
+      orderDescending: orderDescending,
+      offset: offset,
+      transaction: transaction,
+      include: include,
+    );
+  }
+
+  /// Finds a single [AccountApiUsage] by its [id] or null if no such row exists.
+  Future<AccountApiUsage?> findById(
+    _i1.Session session,
+    int id, {
+    _i1.Transaction? transaction,
+    AccountApiUsageInclude? include,
+  }) async {
+    return session.db.findById<AccountApiUsage>(
+      id,
+      transaction: transaction,
+      include: include,
+    );
+  }
+
+  /// Inserts all [AccountApiUsage]s in the list and returns the inserted rows.
+  ///
+  /// The returned [AccountApiUsage]s will have their `id` fields set.
+  ///
+  /// This is an atomic operation, meaning that if one of the rows fails to
+  /// insert, none of the rows will be inserted.
+  Future<List<AccountApiUsage>> insert(
+    _i1.Session session,
+    List<AccountApiUsage> rows, {
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.insert<AccountApiUsage>(
+      rows,
+      transaction: transaction,
+    );
+  }
+
+  /// Inserts a single [AccountApiUsage] and returns the inserted row.
+  ///
+  /// The returned [AccountApiUsage] will have its `id` field set.
+  Future<AccountApiUsage> insertRow(
+    _i1.Session session,
+    AccountApiUsage row, {
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.insertRow<AccountApiUsage>(
+      row,
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [AccountApiUsage]s in the list and returns the updated rows. If
+  /// [columns] is provided, only those columns will be updated. Defaults to
+  /// all columns.
+  /// This is an atomic operation, meaning that if one of the rows fails to
+  /// update, none of the rows will be updated.
+  Future<List<AccountApiUsage>> update(
+    _i1.Session session,
+    List<AccountApiUsage> rows, {
+    _i1.ColumnSelections<AccountApiUsageTable>? columns,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.update<AccountApiUsage>(
+      rows,
+      columns: columns?.call(AccountApiUsage.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [AccountApiUsage]. The row needs to have its id set.
+  /// Optionally, a list of [columns] can be provided to only update those
+  /// columns. Defaults to all columns.
+  Future<AccountApiUsage> updateRow(
+    _i1.Session session,
+    AccountApiUsage row, {
+    _i1.ColumnSelections<AccountApiUsageTable>? columns,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateRow<AccountApiUsage>(
+      row,
+      columns: columns?.call(AccountApiUsage.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Deletes all [AccountApiUsage]s in the list and returns the deleted rows.
+  /// This is an atomic operation, meaning that if one of the rows fail to
+  /// be deleted, none of the rows will be deleted.
+  Future<List<AccountApiUsage>> delete(
+    _i1.Session session,
+    List<AccountApiUsage> rows, {
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.delete<AccountApiUsage>(
+      rows,
+      transaction: transaction,
+    );
+  }
+
+  /// Deletes a single [AccountApiUsage].
+  Future<AccountApiUsage> deleteRow(
+    _i1.Session session,
+    AccountApiUsage row, {
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.deleteRow<AccountApiUsage>(
+      row,
+      transaction: transaction,
+    );
+  }
+
+  /// Deletes all rows matching the [where] expression.
+  Future<List<AccountApiUsage>> deleteWhere(
+    _i1.Session session, {
+    required _i1.WhereExpressionBuilder<AccountApiUsageTable> where,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.deleteWhere<AccountApiUsage>(
+      where: where(AccountApiUsage.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Counts the number of rows matching the [where] expression. If omitted,
+  /// will return the count of all rows in the table.
+  Future<int> count(
+    _i1.Session session, {
+    _i1.WhereExpressionBuilder<AccountApiUsageTable>? where,
+    int? limit,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.count<AccountApiUsage>(
+      where: where?.call(AccountApiUsage.t),
+      limit: limit,
+      transaction: transaction,
+    );
+  }
+}
+
+class AccountApiUsageAttachRepository {
+  const AccountApiUsageAttachRepository._();
+
+  /// Creates a relation between this [AccountApiUsage] and the given [CreditHistoryItem]s
+  /// by setting each [CreditHistoryItem]'s foreign key `accountApiUsageId` to refer to this [AccountApiUsage].
+  Future<void> history(
+    _i1.Session session,
+    AccountApiUsage accountApiUsage,
+    List<_i3.CreditHistoryItem> creditHistoryItem, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (creditHistoryItem.any((e) => e.id == null)) {
+      throw ArgumentError.notNull('creditHistoryItem.id');
+    }
+    if (accountApiUsage.id == null) {
+      throw ArgumentError.notNull('accountApiUsage.id');
+    }
+
+    var $creditHistoryItem = creditHistoryItem
+        .map((e) => e.copyWith(accountApiUsageId: accountApiUsage.id))
+        .toList();
+    await session.db.update<_i3.CreditHistoryItem>(
+      $creditHistoryItem,
+      columns: [_i3.CreditHistoryItem.t.accountApiUsageId],
+      transaction: transaction,
+    );
+  }
+}
+
+class AccountApiUsageAttachRowRepository {
+  const AccountApiUsageAttachRowRepository._();
+
+  /// Creates a relation between the given [AccountApiUsage] and [AccountInfo]
+  /// by setting the [AccountApiUsage]'s foreign key `id` to refer to the [AccountInfo].
+  Future<void> accountInfo(
+    _i1.Session session,
+    AccountApiUsage accountApiUsage,
+    _i2.AccountInfo accountInfo, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (accountInfo.id == null) {
+      throw ArgumentError.notNull('accountInfo.id');
+    }
+    if (accountApiUsage.id == null) {
+      throw ArgumentError.notNull('accountApiUsage.id');
+    }
+
+    var $accountInfo =
+        accountInfo.copyWith(accountApiUsageId: accountApiUsage.id);
+    await session.db.updateRow<_i2.AccountInfo>(
+      $accountInfo,
+      columns: [_i2.AccountInfo.t.accountApiUsageId],
+      transaction: transaction,
+    );
+  }
+
+  /// Creates a relation between this [AccountApiUsage] and the given [CreditHistoryItem]
+  /// by setting the [CreditHistoryItem]'s foreign key `accountApiUsageId` to refer to this [AccountApiUsage].
+  Future<void> history(
+    _i1.Session session,
+    AccountApiUsage accountApiUsage,
+    _i3.CreditHistoryItem creditHistoryItem, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (creditHistoryItem.id == null) {
+      throw ArgumentError.notNull('creditHistoryItem.id');
+    }
+    if (accountApiUsage.id == null) {
+      throw ArgumentError.notNull('accountApiUsage.id');
+    }
+
+    var $creditHistoryItem =
+        creditHistoryItem.copyWith(accountApiUsageId: accountApiUsage.id);
+    await session.db.updateRow<_i3.CreditHistoryItem>(
+      $creditHistoryItem,
+      columns: [_i3.CreditHistoryItem.t.accountApiUsageId],
+      transaction: transaction,
+    );
+  }
+}
+
+class AccountApiUsageDetachRepository {
+  const AccountApiUsageDetachRepository._();
+
+  /// Detaches the relation between this [AccountApiUsage] and the given [CreditHistoryItem]
+  /// by setting the [CreditHistoryItem]'s foreign key `accountApiUsageId` to `null`.
+  ///
+  /// This removes the association between the two models without deleting
+  /// the related record.
+  Future<void> history(
+    _i1.Session session,
+    List<_i3.CreditHistoryItem> creditHistoryItem, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (creditHistoryItem.any((e) => e.id == null)) {
+      throw ArgumentError.notNull('creditHistoryItem.id');
+    }
+
+    var $creditHistoryItem = creditHistoryItem
+        .map((e) => e.copyWith(accountApiUsageId: null))
+        .toList();
+    await session.db.update<_i3.CreditHistoryItem>(
+      $creditHistoryItem,
+      columns: [_i3.CreditHistoryItem.t.accountApiUsageId],
+      transaction: transaction,
+    );
+  }
+}
+
+class AccountApiUsageDetachRowRepository {
+  const AccountApiUsageDetachRowRepository._();
+
+  /// Detaches the relation between this [AccountApiUsage] and the given [CreditHistoryItem]
+  /// by setting the [CreditHistoryItem]'s foreign key `accountApiUsageId` to `null`.
+  ///
+  /// This removes the association between the two models without deleting
+  /// the related record.
+  Future<void> history(
+    _i1.Session session,
+    _i3.CreditHistoryItem creditHistoryItem, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (creditHistoryItem.id == null) {
+      throw ArgumentError.notNull('creditHistoryItem.id');
+    }
+
+    var $creditHistoryItem =
+        creditHistoryItem.copyWith(accountApiUsageId: null);
+    await session.db.updateRow<_i3.CreditHistoryItem>(
+      $creditHistoryItem,
+      columns: [_i3.CreditHistoryItem.t.accountApiUsageId],
+      transaction: transaction,
+    );
+  }
+}

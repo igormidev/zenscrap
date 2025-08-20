@@ -27,6 +27,7 @@ class PrivateAccountEndpoint extends Endpoint {
         include: AccountInfo.include(
           userInfo: UserInfo.include(),
           accountApiKey: AccountApiKey.include(),
+          accountApiUsage: AccountApiUsage.include(),
         ),
       );
     } catch (e) {
@@ -48,20 +49,27 @@ class PrivateAccountEndpoint extends Endpoint {
             ),
             transaction: transaction,
           );
-          final accountInfo = AccountInfo(
+          final accountApiUsage = await AccountApiUsage.db.insertRow(
+            session,
+            AccountApiUsage(remainingCredits: 0),
+            transaction: transaction,
+          );
+          AccountInfo accountInfo = AccountInfo(
             userInfoId: userId,
+            accountApiUsageId: accountApiUsage.id!,
+            accountApiUsage: accountApiUsage,
             accountApiKeyId: userId,
             accountApiKey: apiKey,
             planTier: PlanTier.none,
           );
 
-          final newAccountInfo = await AccountInfo.db
+          accountInfo = await AccountInfo.db
               .insertRow(session, accountInfo, transaction: transaction);
           if (initialScrappableIfNewUser != null) {
             await Scrappable.db.updateRow(
                 session,
                 initialScrappableIfNewUser.copyWith(
-                  accountId: newAccountInfo.id,
+                  accountId: accountInfo.id,
                 ),
                 transaction: transaction);
             await AccountInfo.db.attachRow.scrappables(
@@ -69,7 +77,22 @@ class PrivateAccountEndpoint extends Endpoint {
                 transaction: transaction);
           }
 
-          return newAccountInfo;
+          await AccountInfo.db.attachRow.accountApiUsage(
+              session, accountInfo, accountApiUsage,
+              transaction: transaction);
+          await AccountInfo.db.attachRow.accountApiUsage(
+              session, accountInfo, accountApiUsage,
+              transaction: transaction);
+
+          return accountInfo.copyWith(
+            accountApiKeyId: apiKey.id!,
+            accountApiKey: apiKey,
+            accountApiUsageId: accountApiUsage.id!,
+            accountApiUsage: accountApiUsage,
+            scrappables: initialScrappableIfNewUser != null
+                ? [initialScrappableIfNewUser]
+                : null,
+          );
         });
       } catch (e) {
         throw ZenScrapException(
