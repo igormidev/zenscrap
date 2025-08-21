@@ -1,3 +1,4 @@
+import 'package:nanoid2/nanoid2.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart';
 import 'package:zenscrap_server/src/core/default_classes.dart';
@@ -35,12 +36,16 @@ class PrivateAccountEndpoint extends Endpoint {
     }
 
     if (accountInfo == null) {
-      final acountApiKey = _uuid.v7();
+      final String nanoId = nanoid();
+      final acountApiKey = nanoId + _uuid.v7();
       try {
         return await session.db.transaction((transaction) async {
           final accountApiUsage = await AccountApiUsage.db.insertRow(
             session,
-            AccountApiUsage(remainingCredits: 0),
+            AccountApiUsage(
+              remainingCredits: 0,
+              nanoId: nanoId,
+            ),
             transaction: transaction,
           );
           final apiKey = await AccountApiKey.db.insertRow(

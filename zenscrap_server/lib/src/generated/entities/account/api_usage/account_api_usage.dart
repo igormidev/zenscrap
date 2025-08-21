@@ -21,6 +21,7 @@ abstract class AccountApiUsage
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   AccountApiUsage._({
     this.id,
+    required this.nanoId,
     required this.remainingCredits,
     this.accountInfo,
     this.history,
@@ -29,6 +30,7 @@ abstract class AccountApiUsage
 
   factory AccountApiUsage({
     int? id,
+    required String nanoId,
     required int remainingCredits,
     _i2.AccountInfo? accountInfo,
     List<_i3.CreditHistoryItem>? history,
@@ -38,6 +40,7 @@ abstract class AccountApiUsage
   factory AccountApiUsage.fromJson(Map<String, dynamic> jsonSerialization) {
     return AccountApiUsage(
       id: jsonSerialization['id'] as int?,
+      nanoId: jsonSerialization['nanoId'] as String,
       remainingCredits: jsonSerialization['remainingCredits'] as int,
       accountInfo: jsonSerialization['accountInfo'] == null
           ? null
@@ -60,6 +63,8 @@ abstract class AccountApiUsage
   @override
   int? id;
 
+  String nanoId;
+
   int remainingCredits;
 
   _i2.AccountInfo? accountInfo;
@@ -76,6 +81,7 @@ abstract class AccountApiUsage
   @_i1.useResult
   AccountApiUsage copyWith({
     int? id,
+    String? nanoId,
     int? remainingCredits,
     _i2.AccountInfo? accountInfo,
     List<_i3.CreditHistoryItem>? history,
@@ -85,6 +91,7 @@ abstract class AccountApiUsage
   Map<String, dynamic> toJson() {
     return {
       if (id != null) 'id': id,
+      'nanoId': nanoId,
       'remainingCredits': remainingCredits,
       if (accountInfo != null) 'accountInfo': accountInfo?.toJson(),
       if (history != null)
@@ -98,6 +105,7 @@ abstract class AccountApiUsage
   Map<String, dynamic> toJsonForProtocol() {
     return {
       if (id != null) 'id': id,
+      'nanoId': nanoId,
       'remainingCredits': remainingCredits,
       if (accountInfo != null) 'accountInfo': accountInfo?.toJsonForProtocol(),
       if (history != null)
@@ -150,12 +158,14 @@ class _Undefined {}
 class _AccountApiUsageImpl extends AccountApiUsage {
   _AccountApiUsageImpl({
     int? id,
+    required String nanoId,
     required int remainingCredits,
     _i2.AccountInfo? accountInfo,
     List<_i3.CreditHistoryItem>? history,
     List<_i4.AccountApiKey>? apiKeys,
   }) : super._(
           id: id,
+          nanoId: nanoId,
           remainingCredits: remainingCredits,
           accountInfo: accountInfo,
           history: history,
@@ -168,6 +178,7 @@ class _AccountApiUsageImpl extends AccountApiUsage {
   @override
   AccountApiUsage copyWith({
     Object? id = _Undefined,
+    String? nanoId,
     int? remainingCredits,
     Object? accountInfo = _Undefined,
     Object? history = _Undefined,
@@ -175,6 +186,7 @@ class _AccountApiUsageImpl extends AccountApiUsage {
   }) {
     return AccountApiUsage(
       id: id is int? ? id : this.id,
+      nanoId: nanoId ?? this.nanoId,
       remainingCredits: remainingCredits ?? this.remainingCredits,
       accountInfo: accountInfo is _i2.AccountInfo?
           ? accountInfo
@@ -192,11 +204,17 @@ class _AccountApiUsageImpl extends AccountApiUsage {
 class AccountApiUsageTable extends _i1.Table<int?> {
   AccountApiUsageTable({super.tableRelation})
       : super(tableName: 'account_api_usage') {
+    nanoId = _i1.ColumnString(
+      'nanoId',
+      this,
+    );
     remainingCredits = _i1.ColumnInt(
       'remainingCredits',
       this,
     );
   }
+
+  late final _i1.ColumnString nanoId;
 
   late final _i1.ColumnInt remainingCredits;
 
@@ -288,6 +306,7 @@ class AccountApiUsageTable extends _i1.Table<int?> {
   @override
   List<_i1.Column> get columns => [
         id,
+        nanoId,
         remainingCredits,
       ];
 

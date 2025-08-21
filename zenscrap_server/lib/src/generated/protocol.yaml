@@ -8,6 +8,9 @@ marketplace:
   - getItems:
 publicTier:
   - updatePlayerTier:
+scrappableApi:
+  - prod:
+  - test:
 scrappableChatSession:
   - createSession:
   - listenToScrappableRedraftSession:

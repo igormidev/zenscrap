@@ -15,7 +15,8 @@ enum RequestStatus implements _i1.SerializableModel {
   success,
   clientError,
   serverError,
-  insufficientCredits;
+  insufficientCredits,
+  maxConcurrencyExceeded;
 
   static RequestStatus fromJson(int index) {
     switch (index) {
@@ -27,6 +28,8 @@ enum RequestStatus implements _i1.SerializableModel {
         return RequestStatus.serverError;
       case 3:
         return RequestStatus.insufficientCredits;
+      case 4:
+        return RequestStatus.maxConcurrencyExceeded;
       default:
         throw ArgumentError(
             'Value "$index" cannot be converted to "RequestStatus"');

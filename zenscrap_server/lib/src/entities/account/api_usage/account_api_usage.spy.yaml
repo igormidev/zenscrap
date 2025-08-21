@@ -1,6 +1,7 @@
 class: AccountApiUsage
 table: account_api_usage
 fields:
+  nanoId: String
   remainingCredits: int
   accountInfo: AccountInfo?, relation(name=user_account_api_usage)
   history: List<CreditHistoryItem>?, relation(name=api_usage_history)

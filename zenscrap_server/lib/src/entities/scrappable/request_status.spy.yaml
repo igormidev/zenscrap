@@ -4,3 +4,4 @@ values:
   - clientError # 4xx
   - serverError # 5xx
   - insufficientCredits
+  - maxConcurrencyExceeded

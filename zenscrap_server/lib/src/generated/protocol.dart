@@ -155,6 +155,12 @@ class Protocol extends _i1.SerializationManagerServer {
           columnDefault: 'nextval(\'account_api_usage_id_seq\'::regclass)',
         ),
         _i2.ColumnDefinition(
+          name: 'nanoId',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
           name: 'remainingCredits',
           columnType: _i2.ColumnType.bigint,
           isNullable: false,
@@ -1027,6 +1033,10 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == List<_i21.Scrappable>) {
       return (data as List).map((e) => deserialize<_i21.Scrappable>(e)).toList()
           as T;
+    }
+    if (t == Map<String, dynamic>) {
+      return (data as Map).map((k, v) =>
+          MapEntry(deserialize<String>(k), deserialize<dynamic>(v))) as T;
     }
     try {
       return _i3.Protocol().deserialize<T>(data, t);

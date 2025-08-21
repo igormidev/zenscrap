@@ -1,8 +1,61 @@
 import 'package:serverpod/serverpod.dart';
+import 'package:zenscrap_server/src/core/extension/plan_tier.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 typedef ApiKey = String;
+typedef NanoId = String;
 mixin ApiHelperMixin {
+  final Map<ApiKey, int> _currentConcurrencyRequests = {};
+  final Map<ApiKey, PlanTier> _concurrencyMaxAmountTier = {};
+
+  Future<NanoId?> getNanoId(Session session, ApiKey? apikey) async {
+    if (apikey == null) return null;
+    final splitted = apikey.split('::');
+    if (splitted.length != 2) throw _invalidApiKeyFormat;
+    final nanoId = splitted[0];
+
+    final PlanTier? cachePlanTier = _concurrencyMaxAmountTier[nanoId];
+    if (cachePlanTier != null) {
+      if (cachePlanTier == PlanTier.none) throw _noActivePlan;
+      return nanoId;
+    }
+
+    final PlanTier? planTier = (await AccountInfo.db.findFirstRow(
+      session,
+      where: (p0) => p0.accountApiUsage.nanoId.equals(nanoId),
+    ))
+        ?.planTier;
+
+    if (planTier == null) throw _invalidApiKey;
+    if (cachePlanTier == PlanTier.none) throw _noActivePlan;
+    _concurrencyMaxAmountTier[nanoId] = planTier;
+
+    return nanoId;
+  }
+
+  void increaseConcurrency(NanoId? nanoId) {
+    if (nanoId == null) return;
+    final maxConcurrentRequests =
+        _concurrencyMaxAmountTier[nanoId]?.maxConcurrentRequests;
+    if (maxConcurrentRequests == null) throw _noActivePlan;
+
+    final canIncrease =
+        (_currentConcurrencyRequests[nanoId] ?? 0) + 1 <= maxConcurrentRequests;
+    if (!canIncrease) throw _maxConcurrency;
+
+    _currentConcurrencyRequests[nanoId] =
+        (_currentConcurrencyRequests[nanoId] ?? 0) + 1;
+  }
+
+  void decreaseConcurrency(NanoId? nanoId) {
+    if (nanoId == null) return;
+    _currentConcurrencyRequests[nanoId] =
+        (_currentConcurrencyRequests[nanoId] ?? 1) - 1;
+    if (_currentConcurrencyRequests[nanoId] == 0) {
+      _currentConcurrencyRequests.remove(nanoId);
+    }
+  }
+
   String composeUrl(
     Map<String, dynamic> payload,
     ScrappableRequest targetRequest,
@@ -104,10 +157,13 @@ mixin ApiHelperMixin {
 
   Future<T> wrapAnalytics<T>(
     Session session,
+    ApiKey? apiKey,
     Future<T> Function(void Function(Scrappable? scrappable) onSetScrapable)
         call,
   ) async {
     Scrappable? scrappable;
+    final NanoId? concurrencyId = await getNanoId(session, apiKey);
+    increaseConcurrency(apiKey);
     try {
       return await call((s) {
         scrappable = s;
@@ -134,6 +190,8 @@ mixin ApiHelperMixin {
         title: 'Unexpected Error',
         description: 'An unexpected error occurred: ${error.toString()}',
       );
+    } finally {
+      decreaseConcurrency(concurrencyId);
     }
   }
 
@@ -186,6 +244,28 @@ final _missingExtractRules = _ApiError(
       description:
           'No extract rules are defined for this scrappable. Please define extraction rules before invoking this endpoint.',
     ));
+final _invalidApiKey = _ApiError(
+  RequestStatus.clientError,
+  ZenScrapException(
+    title: 'Invalid API Key',
+    description: 'The provided API key does not have a user account.',
+  ),
+);
+final _noActivePlan = _ApiError(
+  RequestStatus.clientError,
+  ZenScrapException(
+    title: 'No Active Plan',
+    description:
+        'Your account does not have an active plan. Subscribe to a plan to access the API.',
+  ),
+);
+final _maxConcurrency = _ApiError(
+    RequestStatus.maxConcurrencyExceeded,
+    ZenScrapException(
+      title: 'Concurrency Limit Exceeded',
+      description:
+          'You have reached the maximum number of concurrent requests allowed for your plan tier.',
+    ));
 
 T scrappingError<T>(String errorMessage) => throw _ApiError(
     RequestStatus.serverError,
@@ -201,6 +281,14 @@ _ApiError _noScrappableFound(String scrappableId) => _ApiError(
       description:
           'The scrappable resource with id $scrappableId does not exist or has no target request configured.',
     ));
+
+final _invalidApiKeyFormat = _ApiError(
+  RequestStatus.clientError,
+  ZenScrapException(
+    title: 'Invalid API Key Format',
+    description: 'API Key must be in the format "nanoId::apiKey".',
+  ),
+);
 
 class _ApiError {
   final RequestStatus status;

@@ -27,7 +27,7 @@ class ScrappableApiEndpoint extends Endpoint with ApiHelperMixin {
     String? apiKey,
     required Map<String, dynamic> payload,
   }) async {
-    return wrapAnalytics(session, (setScrappableCallback) async {
+    return wrapAnalytics(session, apiKey, (setScrappableCallback) async {
       await discountApiTokens(session, apiKey: apiKey);
 
       final (Scrappable scrappable, ScrappableRequest targetRequest) =
