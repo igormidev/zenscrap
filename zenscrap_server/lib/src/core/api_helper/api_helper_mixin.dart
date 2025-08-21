@@ -1,6 +1,7 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
+typedef ApiKey = String;
 mixin ApiHelperMixin {
   String composeUrl(
     Map<String, dynamic> payload,
@@ -94,8 +95,9 @@ mixin ApiHelperMixin {
             ?.testExtractRule
         : scrappable.scrappingRules;
 
-    if (extractRules == null || extractRules.isEmpty)
+    if (extractRules == null || extractRules.isEmpty) {
       throw _missingExtractRules;
+    }
 
     return extractRules;
   }
@@ -111,25 +113,7 @@ mixin ApiHelperMixin {
         scrappable = s;
       });
     } on _ApiError catch (error, stackTrace) {
-      if (scrappable != null) {
-        await session.db.transaction((transaction) async {
-          final analytics = await ScrappableAnalytics.db.insertRow(
-              session,
-              ScrappableAnalytics(
-                requestStatus: error.status,
-                scrappableId: scrappable!.id,
-                scrappable: scrappable,
-                requestedAt: DateTime.now(),
-              ),
-              transaction: transaction);
-          await Scrappable.db.attachRow.scrappableAnalytics(
-            session,
-            scrappable!,
-            analytics,
-            transaction: transaction,
-          );
-        });
-      }
+      await _setScrappable(session, scrappable, error.status);
       session.log(
         '[${error.status.name.toUpperCase()}] ${_noApiFound.exception.title}',
         exception: error.exception,
@@ -138,6 +122,7 @@ mixin ApiHelperMixin {
       );
       throw error.exception;
     } catch (error, stackTrace) {
+      await _setScrappable(session, scrappable, RequestStatus.serverError);
       session.log(
         'An unknown error occurred in api',
         exception: error,
@@ -149,6 +134,32 @@ mixin ApiHelperMixin {
         title: 'Unexpected Error',
         description: 'An unexpected error occurred: ${error.toString()}',
       );
+    }
+  }
+
+  Future<void> _setScrappable(
+    Session session,
+    Scrappable? scrappable,
+    RequestStatus status,
+  ) async {
+    if (scrappable != null) {
+      await session.db.transaction((transaction) async {
+        final analytics = await ScrappableAnalytics.db.insertRow(
+            session,
+            ScrappableAnalytics(
+              requestStatus: status,
+              scrappableId: scrappable.id,
+              scrappable: scrappable,
+              requestedAt: DateTime.now(),
+            ),
+            transaction: transaction);
+        await Scrappable.db.attachRow.scrappableAnalytics(
+          session,
+          scrappable,
+          analytics,
+          transaction: transaction,
+        );
+      });
     }
   }
 }
