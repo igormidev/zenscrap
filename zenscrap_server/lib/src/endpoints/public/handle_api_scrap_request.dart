@@ -148,19 +148,8 @@ class HandleApiScrapRequestEndpoint extends Endpoint {
     Session session,
     Scrappable scrappable,
     RequestStatus requestStatus,
-    AccountApiUsage? apiUsage,
-    AccountApiKey? apiKey,
   ) async {
     await session.db.transaction((transaction) async {
-      if (apiUsage != null) {
-        await AccountApiUsage.db.updateRow(
-          session,
-          apiUsage.copyWith(
-            remainingCredits: apiUsage.remainingCredits - 1,
-          ),
-          transaction: transaction,
-        );
-      }
       final analytics = await ScrappableAnalytics.db.insertRow(
           session,
           ScrappableAnalytics(

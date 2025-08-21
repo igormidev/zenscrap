@@ -1,6 +1,6 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/server.dart';
-import 'package:zenscrap_server/src/core/api_helper_mixin.dart';
+import 'package:zenscrap_server/src/core/api_helper/api_helper_mixin.dart';
 import 'package:zenscrap_server/src/core/scraping_bee.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
@@ -27,18 +27,21 @@ class ScrappableApiEndpoint extends Endpoint with ApiHelperMixin {
     String? apiKey,
     required Map<String, dynamic> payload,
   }) async {
-    if (apiKey != null) await discountApiTokens(session, apiKey: apiKey);
+    return wrapAnalytics(session, (setScrappableCallback) async {
+      await discountApiTokens(session, apiKey: apiKey);
 
-    final (Scrappable scrappable, ScrappableRequest targetRequest) =
-        await getScrappableById(session, scrappableId);
-    final String targetUrl = composeUrl(payload, targetRequest);
-    final extractRules = await getExtractRules(session, scrappable, apiKey);
+      final (Scrappable scrappable, ScrappableRequest targetRequest) =
+          await getScrappableById(session, scrappableId);
+      setScrappableCallback(scrappable);
+      final String targetUrl = composeUrl(payload, targetRequest);
+      final extractRules = await getExtractRules(session, scrappable, apiKey);
 
-    final ExtractDataByRule result = await scrapingBee.extractByRules(
-      targetUrl: targetUrl,
-      extractRules: extractRules,
-    );
+      final ExtractDataByRule result = await scrapingBee.extractByRules(
+        targetUrl: targetUrl,
+        extractRules: extractRules,
+      );
 
-    return result.when(withData: (r) => r, error: scrappingError);
+      return result.when(withData: (r) => r, error: scrappingError);
+    });
   }
 }

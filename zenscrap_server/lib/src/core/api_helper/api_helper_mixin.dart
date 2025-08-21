@@ -42,8 +42,9 @@ mixin ApiHelperMixin {
 
   Future<void> discountApiTokens(
     Session session, {
-    required String apiKey,
+    required String? apiKey,
   }) async {
+    if (apiKey == null) return;
     final AccountApiKey? accountApiKey = await AccountApiKey.db.findFirstRow(
       session,
       where: (p0) => p0.apiKey.equals(apiKey),
@@ -54,9 +55,9 @@ mixin ApiHelperMixin {
       ),
     );
     final AccountApiUsage? accountApiUsage = accountApiKey?.accountApiUsage;
-    if (accountApiKey == null || accountApiUsage == null) throw noApiFound;
+    if (accountApiKey == null || accountApiUsage == null) throw _noApiFound;
 
-    if (accountApiUsage.remainingCredits <= 0) throw insufficientCredits;
+    if (accountApiUsage.remainingCredits <= 0) throw _insufficientCredits;
     await AccountApiUsage.db.updateRow(
       session,
       accountApiUsage.copyWith(
@@ -76,7 +77,7 @@ mixin ApiHelperMixin {
     final ScrappableRequest? targetRequest = scrappable?.targetRequest;
 
     if (scrappable == null || targetRequest == null) {
-      throw noScrappableFound(scrappableId);
+      throw _noScrappableFound(scrappableId);
     }
 
     return (scrappable, targetRequest);
@@ -93,16 +94,49 @@ mixin ApiHelperMixin {
             ?.testExtractRule
         : scrappable.scrappingRules;
 
-    if (extractRules == null || extractRules.isEmpty) throw missingExtractRules;
+    if (extractRules == null || extractRules.isEmpty)
+      throw _missingExtractRules;
 
     return extractRules;
   }
 
-  Future<T> wrapAnalytics<T>(Session session, Future<T> Function() call) async {
+  Future<T> wrapAnalytics<T>(
+    Session session,
+    Future<T> Function(void Function(Scrappable? scrappable) onSetScrapable)
+        call,
+  ) async {
+    Scrappable? scrappable;
     try {
-      return await call();
-    } on ZenScrapException catch (error, stackTrace) {
-      rethrow;
+      return await call((s) {
+        scrappable = s;
+      });
+    } on _ApiError catch (error, stackTrace) {
+      if (scrappable != null) {
+        await session.db.transaction((transaction) async {
+          final analytics = await ScrappableAnalytics.db.insertRow(
+              session,
+              ScrappableAnalytics(
+                requestStatus: error.status,
+                scrappableId: scrappable!.id,
+                scrappable: scrappable,
+                requestedAt: DateTime.now(),
+              ),
+              transaction: transaction);
+          await Scrappable.db.attachRow.scrappableAnalytics(
+            session,
+            scrappable!,
+            analytics,
+            transaction: transaction,
+          );
+        });
+      }
+      session.log(
+        '[${error.status.name.toUpperCase()}] ${_noApiFound.exception.title}',
+        exception: error.exception,
+        stackTrace: stackTrace,
+        level: LogLevel.error,
+      );
+      throw error.exception;
     } catch (error, stackTrace) {
       session.log(
         'An unknown error occurred in api',
@@ -119,29 +153,47 @@ mixin ApiHelperMixin {
   }
 }
 
-final noApiFound = ZenScrapException(
-  title: 'API Key Not Found',
-  description:
-      'No account API key matched the provided value (key not found in database).',
+final _noApiFound = _ApiError(
+  RequestStatus.clientError,
+  ZenScrapException(
+    title: 'API Key Not Found',
+    description:
+        'No account API key matched the provided value (key not found in database).',
+  ),
 );
-final insufficientCredits = throw ZenScrapException(
-  title: 'Insufficient Credits',
-  description:
-      'Your account has no remaining credits. Purchase or allocate more credits to continue making requests.',
-);
-final missingExtractRules = ZenScrapException(
-  title: 'Missing Extract Rules',
-  description:
-      'No extract rules are defined for this scrappable. Please define extraction rules before invoking this endpoint.',
-);
-T scrappingError<T>(String errorMessage) => throw ZenScrapException(
+final _insufficientCredits = _ApiError(
+    RequestStatus.insufficientCredits,
+    throw ZenScrapException(
+      title: 'Insufficient Credits',
+      description:
+          'Your account has no remaining credits. Purchase or allocate more credits to continue making requests.',
+    ));
+final _missingExtractRules = _ApiError(
+    RequestStatus.clientError,
+    ZenScrapException(
+      title: 'Missing Extract Rules',
+      description:
+          'No extract rules are defined for this scrappable. Please define extraction rules before invoking this endpoint.',
+    ));
+
+T scrappingError<T>(String errorMessage) => throw _ApiError(
+    RequestStatus.serverError,
+    ZenScrapException(
       title: 'Scraping Error',
       description: errorMessage,
-    );
+    ));
 
-ZenScrapException noScrappableFound(String scrappableId) =>
+_ApiError _noScrappableFound(String scrappableId) => _ApiError(
+    RequestStatus.clientError,
     throw ZenScrapException(
       title: 'Scrappable Not Found',
       description:
           'The scrappable resource with id $scrappableId does not exist or has no target request configured.',
-    );
+    ));
+
+class _ApiError {
+  final RequestStatus status;
+  final ZenScrapException exception;
+
+  _ApiError(this.status, this.exception);
+}
