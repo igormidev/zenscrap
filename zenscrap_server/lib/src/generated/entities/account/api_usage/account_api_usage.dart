@@ -15,6 +15,7 @@ import 'package:serverpod/serverpod.dart' as _i1;
 import '../../../entities/account/account.dart' as _i2;
 import '../../../entities/account/api_usage/api_creadit_history/api_creadit_history_item.dart'
     as _i3;
+import '../../../entities/account/account_api_key.dart' as _i4;
 
 abstract class AccountApiUsage
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -23,6 +24,7 @@ abstract class AccountApiUsage
     required this.remainingCredits,
     this.accountInfo,
     this.history,
+    this.apiKeys,
   });
 
   factory AccountApiUsage({
@@ -30,6 +32,7 @@ abstract class AccountApiUsage
     required int remainingCredits,
     _i2.AccountInfo? accountInfo,
     List<_i3.CreditHistoryItem>? history,
+    List<_i4.AccountApiKey>? apiKeys,
   }) = _AccountApiUsageImpl;
 
   factory AccountApiUsage.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -43,6 +46,9 @@ abstract class AccountApiUsage
       history: (jsonSerialization['history'] as List?)
           ?.map((e) =>
               _i3.CreditHistoryItem.fromJson((e as Map<String, dynamic>)))
+          .toList(),
+      apiKeys: (jsonSerialization['apiKeys'] as List?)
+          ?.map((e) => _i4.AccountApiKey.fromJson((e as Map<String, dynamic>)))
           .toList(),
     );
   }
@@ -60,6 +66,8 @@ abstract class AccountApiUsage
 
   List<_i3.CreditHistoryItem>? history;
 
+  List<_i4.AccountApiKey>? apiKeys;
+
   @override
   _i1.Table<int?> get table => t;
 
@@ -71,6 +79,7 @@ abstract class AccountApiUsage
     int? remainingCredits,
     _i2.AccountInfo? accountInfo,
     List<_i3.CreditHistoryItem>? history,
+    List<_i4.AccountApiKey>? apiKeys,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -80,6 +89,8 @@ abstract class AccountApiUsage
       if (accountInfo != null) 'accountInfo': accountInfo?.toJson(),
       if (history != null)
         'history': history?.toJson(valueToJson: (v) => v.toJson()),
+      if (apiKeys != null)
+        'apiKeys': apiKeys?.toJson(valueToJson: (v) => v.toJson()),
     };
   }
 
@@ -91,16 +102,20 @@ abstract class AccountApiUsage
       if (accountInfo != null) 'accountInfo': accountInfo?.toJsonForProtocol(),
       if (history != null)
         'history': history?.toJson(valueToJson: (v) => v.toJsonForProtocol()),
+      if (apiKeys != null)
+        'apiKeys': apiKeys?.toJson(valueToJson: (v) => v.toJsonForProtocol()),
     };
   }
 
   static AccountApiUsageInclude include({
     _i2.AccountInfoInclude? accountInfo,
     _i3.CreditHistoryItemIncludeList? history,
+    _i4.AccountApiKeyIncludeList? apiKeys,
   }) {
     return AccountApiUsageInclude._(
       accountInfo: accountInfo,
       history: history,
+      apiKeys: apiKeys,
     );
   }
 
@@ -138,11 +153,13 @@ class _AccountApiUsageImpl extends AccountApiUsage {
     required int remainingCredits,
     _i2.AccountInfo? accountInfo,
     List<_i3.CreditHistoryItem>? history,
+    List<_i4.AccountApiKey>? apiKeys,
   }) : super._(
           id: id,
           remainingCredits: remainingCredits,
           accountInfo: accountInfo,
           history: history,
+          apiKeys: apiKeys,
         );
 
   /// Returns a shallow copy of this [AccountApiUsage]
@@ -154,6 +171,7 @@ class _AccountApiUsageImpl extends AccountApiUsage {
     int? remainingCredits,
     Object? accountInfo = _Undefined,
     Object? history = _Undefined,
+    Object? apiKeys = _Undefined,
   }) {
     return AccountApiUsage(
       id: id is int? ? id : this.id,
@@ -164,6 +182,9 @@ class _AccountApiUsageImpl extends AccountApiUsage {
       history: history is List<_i3.CreditHistoryItem>?
           ? history
           : this.history?.map((e0) => e0.copyWith()).toList(),
+      apiKeys: apiKeys is List<_i4.AccountApiKey>?
+          ? apiKeys
+          : this.apiKeys?.map((e0) => e0.copyWith()).toList(),
     );
   }
 }
@@ -184,6 +205,10 @@ class AccountApiUsageTable extends _i1.Table<int?> {
   _i3.CreditHistoryItemTable? ___history;
 
   _i1.ManyRelation<_i3.CreditHistoryItemTable>? _history;
+
+  _i4.AccountApiKeyTable? ___apiKeys;
+
+  _i1.ManyRelation<_i4.AccountApiKeyTable>? _apiKeys;
 
   _i2.AccountInfoTable get accountInfo {
     if (_accountInfo != null) return _accountInfo!;
@@ -211,6 +236,19 @@ class AccountApiUsageTable extends _i1.Table<int?> {
     return ___history!;
   }
 
+  _i4.AccountApiKeyTable get __apiKeys {
+    if (___apiKeys != null) return ___apiKeys!;
+    ___apiKeys = _i1.createRelationTable(
+      relationFieldName: '__apiKeys',
+      field: AccountApiUsage.t.id,
+      foreignField: _i4.AccountApiKey.t.accountApiUsageId,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _i4.AccountApiKeyTable(tableRelation: foreignTableRelation),
+    );
+    return ___apiKeys!;
+  }
+
   _i1.ManyRelation<_i3.CreditHistoryItemTable> get history {
     if (_history != null) return _history!;
     var relationTable = _i1.createRelationTable(
@@ -229,6 +267,24 @@ class AccountApiUsageTable extends _i1.Table<int?> {
     return _history!;
   }
 
+  _i1.ManyRelation<_i4.AccountApiKeyTable> get apiKeys {
+    if (_apiKeys != null) return _apiKeys!;
+    var relationTable = _i1.createRelationTable(
+      relationFieldName: 'apiKeys',
+      field: AccountApiUsage.t.id,
+      foreignField: _i4.AccountApiKey.t.accountApiUsageId,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _i4.AccountApiKeyTable(tableRelation: foreignTableRelation),
+    );
+    _apiKeys = _i1.ManyRelation<_i4.AccountApiKeyTable>(
+      tableWithRelations: relationTable,
+      table: _i4.AccountApiKeyTable(
+          tableRelation: relationTable.tableRelation!.lastRelation),
+    );
+    return _apiKeys!;
+  }
+
   @override
   List<_i1.Column> get columns => [
         id,
@@ -243,6 +299,9 @@ class AccountApiUsageTable extends _i1.Table<int?> {
     if (relationField == 'history') {
       return __history;
     }
+    if (relationField == 'apiKeys') {
+      return __apiKeys;
+    }
     return null;
   }
 }
@@ -251,19 +310,24 @@ class AccountApiUsageInclude extends _i1.IncludeObject {
   AccountApiUsageInclude._({
     _i2.AccountInfoInclude? accountInfo,
     _i3.CreditHistoryItemIncludeList? history,
+    _i4.AccountApiKeyIncludeList? apiKeys,
   }) {
     _accountInfo = accountInfo;
     _history = history;
+    _apiKeys = apiKeys;
   }
 
   _i2.AccountInfoInclude? _accountInfo;
 
   _i3.CreditHistoryItemIncludeList? _history;
 
+  _i4.AccountApiKeyIncludeList? _apiKeys;
+
   @override
   Map<String, _i1.Include?> get includes => {
         'accountInfo': _accountInfo,
         'history': _history,
+        'apiKeys': _apiKeys,
       };
 
   @override
@@ -544,6 +608,31 @@ class AccountApiUsageAttachRepository {
       transaction: transaction,
     );
   }
+
+  /// Creates a relation between this [AccountApiUsage] and the given [AccountApiKey]s
+  /// by setting each [AccountApiKey]'s foreign key `accountApiUsageId` to refer to this [AccountApiUsage].
+  Future<void> apiKeys(
+    _i1.Session session,
+    AccountApiUsage accountApiUsage,
+    List<_i4.AccountApiKey> accountApiKey, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (accountApiKey.any((e) => e.id == null)) {
+      throw ArgumentError.notNull('accountApiKey.id');
+    }
+    if (accountApiUsage.id == null) {
+      throw ArgumentError.notNull('accountApiUsage.id');
+    }
+
+    var $accountApiKey = accountApiKey
+        .map((e) => e.copyWith(accountApiUsageId: accountApiUsage.id))
+        .toList();
+    await session.db.update<_i4.AccountApiKey>(
+      $accountApiKey,
+      columns: [_i4.AccountApiKey.t.accountApiUsageId],
+      transaction: transaction,
+    );
+  }
 }
 
 class AccountApiUsageAttachRowRepository {
@@ -593,6 +682,30 @@ class AccountApiUsageAttachRowRepository {
     await session.db.updateRow<_i3.CreditHistoryItem>(
       $creditHistoryItem,
       columns: [_i3.CreditHistoryItem.t.accountApiUsageId],
+      transaction: transaction,
+    );
+  }
+
+  /// Creates a relation between this [AccountApiUsage] and the given [AccountApiKey]
+  /// by setting the [AccountApiKey]'s foreign key `accountApiUsageId` to refer to this [AccountApiUsage].
+  Future<void> apiKeys(
+    _i1.Session session,
+    AccountApiUsage accountApiUsage,
+    _i4.AccountApiKey accountApiKey, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (accountApiKey.id == null) {
+      throw ArgumentError.notNull('accountApiKey.id');
+    }
+    if (accountApiUsage.id == null) {
+      throw ArgumentError.notNull('accountApiUsage.id');
+    }
+
+    var $accountApiKey =
+        accountApiKey.copyWith(accountApiUsageId: accountApiUsage.id);
+    await session.db.updateRow<_i4.AccountApiKey>(
+      $accountApiKey,
+      columns: [_i4.AccountApiKey.t.accountApiUsageId],
       transaction: transaction,
     );
   }

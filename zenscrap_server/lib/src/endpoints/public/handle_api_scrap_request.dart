@@ -7,11 +7,12 @@ class HandleApiScrapRequestEndpoint extends Endpoint {
   Future<Map<String, dynamic>> prod(
     Session session, {
     required String scrappableId,
+    required String accountApiKey,
     required Map<String, dynamic> payload,
   }) async {
     return _callFunc(
       session: session,
-      isTest: false,
+      accountApiKeyString: accountApiKey,
       payload: payload,
       scrappableId: scrappableId,
     );
@@ -24,7 +25,7 @@ class HandleApiScrapRequestEndpoint extends Endpoint {
   }) async {
     return _callFunc(
       session: session,
-      isTest: true,
+      accountApiKeyString: null,
       payload: payload,
       scrappableId: scrappableId,
     );
@@ -32,28 +33,84 @@ class HandleApiScrapRequestEndpoint extends Endpoint {
 
   Future<Map<String, dynamic>> _callFunc({
     required Session session,
-    required bool isTest,
     required String scrappableId,
+    required String? accountApiKeyString,
     required Map<String, dynamic> payload,
   }) async {
-    final request = ScrappableRequest.include();
-    final Scrappable? scrappable = await Scrappable.db.findById(
-        session, UuidValue.raw(scrappableId),
-        include: Scrappable.include(targetRequest: request));
+    final bool isTest = accountApiKeyString == null;
+    final AccountApiKey? accountApiKey = isTest
+        ? null
+        : await AccountApiKey.db.findFirstRow(
+            session,
+            where: (p0) => p0.apiKey.equals(accountApiKeyString),
+            include: AccountApiKey.include(
+              accountApiUsage: AccountApiUsage.include(
+                apiKeys: AccountApiKey.includeList(),
+              ),
+            ),
+          );
+    final AccountApiUsage? accountApiUsageData =
+        isTest ? null : accountApiKey?.accountApiUsage;
+
+    if (!isTest) {
+      if (accountApiKey == null) {
+        throw ZenScrapException(
+          title: 'API Key Not Found',
+          description:
+              'No account API key matched the provided value (key not found in database).',
+        );
+      }
+      if (accountApiUsageData == null) {
+        throw ZenScrapException(
+          title: 'Invalid API Key',
+          description:
+              'The provided API key is invalid or its usage record is missing. Please verify the key.',
+        );
+      }
+    }
+
+    final Scrappable? scrappable =
+        await Scrappable.db.findById(session, UuidValue.raw(scrappableId),
+            include: Scrappable.include(
+              targetRequest: ScrappableRequest.include(),
+            ));
 
     final ScrappableRequest? targetRequest = scrappable?.targetRequest;
+
+    if (!isTest) {
+      if (accountApiUsageData!.remainingCredits <= 0) {
+        throw ZenScrapException(
+          title: 'Insufficient Credits',
+          description:
+              'Your account has no remaining credits. Purchase or allocate more credits to continue making requests.',
+        );
+      }
+    }
+
     if (scrappable == null || targetRequest == null) {
-      throw Exception('Scrappable not found');
+      throw ZenScrapException(
+        title: 'Scrappable Not Found',
+        description:
+            'The scrappable resource with id $scrappableId does not exist or has no target request configured.',
+      );
     }
     if (scrappable.isActive == false && isTest == false) {
-      throw Exception('This scrappable is no longer active');
+      throw ZenScrapException(
+        title: 'Scrappable Inactive',
+        description:
+            'The scrappable resource is inactive and cannot be used for production requests. Reactivate it before retrying.',
+      );
     }
     final isTestExpirated = isTest &&
         scrappable.testEndpointAvailableUntil != null &&
         scrappable.testEndpointAvailableUntil!.isBefore(DateTime.now());
 
     if (isTestExpirated) {
-      throw Exception('This scrappable test endpoint is no longer available');
+      throw ZenScrapException(
+        title: 'Test Endpoint Expired',
+        description:
+            'The test endpoint for this scrappable expired on ${scrappable.testEndpointAvailableUntil}.',
+      );
     }
 
     String targetUrl = targetRequest.url;
@@ -61,8 +118,10 @@ class HandleApiScrapRequestEndpoint extends Endpoint {
     for (final String pathParam in targetRequest.pathParams) {
       final String? payloadParam = payload[pathParam];
       if (payloadParam == null) {
-        throw Exception(
-          'Missing required path parameter: $pathParam',
+        throw ZenScrapException(
+          title: 'Missing Path Parameter',
+          description:
+              'Required path parameter "$pathParam" was not provided in the payload.',
         );
       }
       targetUrl = targetUrl.replaceAll('{$pathParam}', payloadParam);
@@ -91,7 +150,11 @@ class HandleApiScrapRequestEndpoint extends Endpoint {
             ?.testExtractRule
         : scrappable.scrappingRules;
     if (scrapExtractRules == null || scrapExtractRules.isEmpty) {
-      throw Exception('No extract rules defined for this scrappable');
+      throw ZenScrapException(
+        title: 'Missing Extract Rules',
+        description:
+            'No extract rules are defined for this scrappable. Please define extraction rules before invoking this endpoint.',
+      );
     }
 
     final ExtractDataByRule result = await scrapingBee.extractByRules(
@@ -101,7 +164,45 @@ class HandleApiScrapRequestEndpoint extends Endpoint {
 
     return result.when(
       withData: (result) => result,
-      error: (errorMessage) => throw Exception(errorMessage),
+      error: (errorMessage) => throw ZenScrapException(
+        title: 'Scraping Error',
+        description: errorMessage,
+      ),
     );
+  }
+
+  Future<void> _logApiKeyUsage(
+    Session session,
+    Scrappable scrappable,
+    RequestStatus requestStatus,
+    AccountApiUsage? apiUsage,
+    AccountApiKey? apiKey,
+  ) async {
+    await session.db.transaction((transaction) async {
+      if (apiUsage != null) {
+        await AccountApiUsage.db.updateRow(
+          session,
+          apiUsage.copyWith(
+            remainingCredits: apiUsage.remainingCredits - 1,
+          ),
+          transaction: transaction,
+        );
+      }
+      final analytics = await ScrappableAnalytics.db.insertRow(
+          session,
+          ScrappableAnalytics(
+            requestStatus: requestStatus,
+            scrappableId: scrappable.id,
+            scrappable: scrappable,
+            requestedAt: DateTime.now(),
+          ),
+          transaction: transaction);
+      await Scrappable.db.attachRow.scrappableAnalytics(
+        session,
+        scrappable,
+        analytics,
+        transaction: transaction,
+      );
+    });
   }
 }

@@ -8,25 +8,44 @@
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
 
+// ignore_for_file: unnecessary_null_comparison
+
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
+import '../../entities/account/api_usage/account_api_usage.dart' as _i2;
 
 abstract class AccountApiKey
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   AccountApiKey._({
     this.id,
     required this.apiKey,
+    required this.name,
+    required this.createdAt,
+    required this.accountApiUsageId,
+    this.accountApiUsage,
   });
 
   factory AccountApiKey({
     int? id,
     required String apiKey,
+    required String name,
+    required DateTime createdAt,
+    required int accountApiUsageId,
+    _i2.AccountApiUsage? accountApiUsage,
   }) = _AccountApiKeyImpl;
 
   factory AccountApiKey.fromJson(Map<String, dynamic> jsonSerialization) {
     return AccountApiKey(
       id: jsonSerialization['id'] as int?,
       apiKey: jsonSerialization['apiKey'] as String,
+      name: jsonSerialization['name'] as String,
+      createdAt:
+          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
+      accountApiUsageId: jsonSerialization['accountApiUsageId'] as int,
+      accountApiUsage: jsonSerialization['accountApiUsage'] == null
+          ? null
+          : _i2.AccountApiUsage.fromJson(
+              (jsonSerialization['accountApiUsage'] as Map<String, dynamic>)),
     );
   }
 
@@ -39,6 +58,14 @@ abstract class AccountApiKey
 
   String apiKey;
 
+  String name;
+
+  DateTime createdAt;
+
+  int accountApiUsageId;
+
+  _i2.AccountApiUsage? accountApiUsage;
+
   @override
   _i1.Table<int?> get table => t;
 
@@ -48,12 +75,20 @@ abstract class AccountApiKey
   AccountApiKey copyWith({
     int? id,
     String? apiKey,
+    String? name,
+    DateTime? createdAt,
+    int? accountApiUsageId,
+    _i2.AccountApiUsage? accountApiUsage,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
       if (id != null) 'id': id,
       'apiKey': apiKey,
+      'name': name,
+      'createdAt': createdAt.toJson(),
+      'accountApiUsageId': accountApiUsageId,
+      if (accountApiUsage != null) 'accountApiUsage': accountApiUsage?.toJson(),
     };
   }
 
@@ -62,11 +97,17 @@ abstract class AccountApiKey
     return {
       if (id != null) 'id': id,
       'apiKey': apiKey,
+      'name': name,
+      'createdAt': createdAt.toJson(),
+      'accountApiUsageId': accountApiUsageId,
+      if (accountApiUsage != null)
+        'accountApiUsage': accountApiUsage?.toJsonForProtocol(),
     };
   }
 
-  static AccountApiKeyInclude include() {
-    return AccountApiKeyInclude._();
+  static AccountApiKeyInclude include(
+      {_i2.AccountApiUsageInclude? accountApiUsage}) {
+    return AccountApiKeyInclude._(accountApiUsage: accountApiUsage);
   }
 
   static AccountApiKeyIncludeList includeList({
@@ -101,9 +142,17 @@ class _AccountApiKeyImpl extends AccountApiKey {
   _AccountApiKeyImpl({
     int? id,
     required String apiKey,
+    required String name,
+    required DateTime createdAt,
+    required int accountApiUsageId,
+    _i2.AccountApiUsage? accountApiUsage,
   }) : super._(
           id: id,
           apiKey: apiKey,
+          name: name,
+          createdAt: createdAt,
+          accountApiUsageId: accountApiUsageId,
+          accountApiUsage: accountApiUsage,
         );
 
   /// Returns a shallow copy of this [AccountApiKey]
@@ -113,10 +162,20 @@ class _AccountApiKeyImpl extends AccountApiKey {
   AccountApiKey copyWith({
     Object? id = _Undefined,
     String? apiKey,
+    String? name,
+    DateTime? createdAt,
+    int? accountApiUsageId,
+    Object? accountApiUsage = _Undefined,
   }) {
     return AccountApiKey(
       id: id is int? ? id : this.id,
       apiKey: apiKey ?? this.apiKey,
+      name: name ?? this.name,
+      createdAt: createdAt ?? this.createdAt,
+      accountApiUsageId: accountApiUsageId ?? this.accountApiUsageId,
+      accountApiUsage: accountApiUsage is _i2.AccountApiUsage?
+          ? accountApiUsage
+          : this.accountApiUsage?.copyWith(),
     );
   }
 }
@@ -128,22 +187,71 @@ class AccountApiKeyTable extends _i1.Table<int?> {
       'apiKey',
       this,
     );
+    name = _i1.ColumnString(
+      'name',
+      this,
+    );
+    createdAt = _i1.ColumnDateTime(
+      'createdAt',
+      this,
+    );
+    accountApiUsageId = _i1.ColumnInt(
+      'accountApiUsageId',
+      this,
+    );
   }
 
   late final _i1.ColumnString apiKey;
+
+  late final _i1.ColumnString name;
+
+  late final _i1.ColumnDateTime createdAt;
+
+  late final _i1.ColumnInt accountApiUsageId;
+
+  _i2.AccountApiUsageTable? _accountApiUsage;
+
+  _i2.AccountApiUsageTable get accountApiUsage {
+    if (_accountApiUsage != null) return _accountApiUsage!;
+    _accountApiUsage = _i1.createRelationTable(
+      relationFieldName: 'accountApiUsage',
+      field: AccountApiKey.t.accountApiUsageId,
+      foreignField: _i2.AccountApiUsage.t.id,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _i2.AccountApiUsageTable(tableRelation: foreignTableRelation),
+    );
+    return _accountApiUsage!;
+  }
 
   @override
   List<_i1.Column> get columns => [
         id,
         apiKey,
+        name,
+        createdAt,
+        accountApiUsageId,
       ];
+
+  @override
+  _i1.Table? getRelationTable(String relationField) {
+    if (relationField == 'accountApiUsage') {
+      return accountApiUsage;
+    }
+    return null;
+  }
 }
 
 class AccountApiKeyInclude extends _i1.IncludeObject {
-  AccountApiKeyInclude._();
+  AccountApiKeyInclude._({_i2.AccountApiUsageInclude? accountApiUsage}) {
+    _accountApiUsage = accountApiUsage;
+  }
+
+  _i2.AccountApiUsageInclude? _accountApiUsage;
 
   @override
-  Map<String, _i1.Include?> get includes => {};
+  Map<String, _i1.Include?> get includes =>
+      {'accountApiUsage': _accountApiUsage};
 
   @override
   _i1.Table<int?> get table => AccountApiKey.t;
@@ -171,6 +279,8 @@ class AccountApiKeyIncludeList extends _i1.IncludeList {
 
 class AccountApiKeyRepository {
   const AccountApiKeyRepository._();
+
+  final attachRow = const AccountApiKeyAttachRowRepository._();
 
   /// Returns a list of [AccountApiKey]s matching the given query parameters.
   ///
@@ -203,6 +313,7 @@ class AccountApiKeyRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<AccountApiKeyTable>? orderByList,
     _i1.Transaction? transaction,
+    AccountApiKeyInclude? include,
   }) async {
     return session.db.find<AccountApiKey>(
       where: where?.call(AccountApiKey.t),
@@ -212,6 +323,7 @@ class AccountApiKeyRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      include: include,
     );
   }
 
@@ -240,6 +352,7 @@ class AccountApiKeyRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<AccountApiKeyTable>? orderByList,
     _i1.Transaction? transaction,
+    AccountApiKeyInclude? include,
   }) async {
     return session.db.findFirstRow<AccountApiKey>(
       where: where?.call(AccountApiKey.t),
@@ -248,6 +361,7 @@ class AccountApiKeyRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      include: include,
     );
   }
 
@@ -256,10 +370,12 @@ class AccountApiKeyRepository {
     _i1.Session session,
     int id, {
     _i1.Transaction? transaction,
+    AccountApiKeyInclude? include,
   }) async {
     return session.db.findById<AccountApiKey>(
       id,
       transaction: transaction,
+      include: include,
     );
   }
 
@@ -377,6 +493,34 @@ class AccountApiKeyRepository {
     return session.db.count<AccountApiKey>(
       where: where?.call(AccountApiKey.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+}
+
+class AccountApiKeyAttachRowRepository {
+  const AccountApiKeyAttachRowRepository._();
+
+  /// Creates a relation between the given [AccountApiKey] and [AccountApiUsage]
+  /// by setting the [AccountApiKey]'s foreign key `accountApiUsageId` to refer to the [AccountApiUsage].
+  Future<void> accountApiUsage(
+    _i1.Session session,
+    AccountApiKey accountApiKey,
+    _i2.AccountApiUsage accountApiUsage, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (accountApiKey.id == null) {
+      throw ArgumentError.notNull('accountApiKey.id');
+    }
+    if (accountApiUsage.id == null) {
+      throw ArgumentError.notNull('accountApiUsage.id');
+    }
+
+    var $accountApiKey =
+        accountApiKey.copyWith(accountApiUsageId: accountApiUsage.id);
+    await session.db.updateRow<AccountApiKey>(
+      $accountApiKey,
+      columns: [AccountApiKey.t.accountApiUsageId],
       transaction: transaction,
     );
   }

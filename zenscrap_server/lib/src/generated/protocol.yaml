@@ -1,14 +1,9 @@
-privateAccount:
-  - getAccountInfo:
 privateApiUsage:
   - getUsageInfo:
 privateUserScrappables:
   - call:
 createScrappable:
   - call:
-handleApiScrapRequest:
-  - prod:
-  - test:
 marketplace:
   - getItems:
 publicTier:

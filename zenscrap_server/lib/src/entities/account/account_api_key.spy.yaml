@@ -2,3 +2,11 @@ class: AccountApiKey
 table: account_api_key
 fields:
   apiKey: String
+  name: String
+  createdAt: DateTime
+  accountApiUsage: AccountApiUsage?, relation(name=api_usage_api_keys)
+
+indexes:
+  account_api_key_api_key_idx:
+    fields: apiKey
+    unique: true

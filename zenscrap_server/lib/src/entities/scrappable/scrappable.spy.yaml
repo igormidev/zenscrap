@@ -13,6 +13,7 @@ fields:
   targetRequestId: int
   targetRequest: ScrappableRequest?, relation(name=request_scrappable, field=targetRequestId)
   referenceTestDataId: int
+  scrappableAnalytics: List<ScrappableAnalytics>?, relation(name=scrappable_analytics)
   referenceTestData: ReferenceTestData?, relation(name=test_scrappable, field=referenceTestDataId)
 indexes:
   scrappable_target_request_unique_idx:

@@ -13,7 +13,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../entities/scrappable/scrappable_request.dart' as _i2;
-import '../../entities/scrappable/reference_test_data.dart' as _i3;
+import '../../entities/scrappable/scrappable_analytics.dart' as _i3;
+import '../../entities/scrappable/reference_test_data.dart' as _i4;
 
 abstract class Scrappable
     implements _i1.TableRow<_i1.UuidValue>, _i1.ProtocolSerialization {
@@ -30,6 +31,7 @@ abstract class Scrappable
     required this.targetRequestId,
     this.targetRequest,
     required this.referenceTestDataId,
+    this.scrappableAnalytics,
     this.referenceTestData,
   }) : id = id ?? _i1.Uuid().v4obj();
 
@@ -46,7 +48,8 @@ abstract class Scrappable
     required int targetRequestId,
     _i2.ScrappableRequest? targetRequest,
     required int referenceTestDataId,
-    _i3.ReferenceTestData? referenceTestData,
+    List<_i3.ScrappableAnalytics>? scrappableAnalytics,
+    _i4.ReferenceTestData? referenceTestData,
   }) = _ScrappableImpl;
 
   factory Scrappable.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -71,9 +74,13 @@ abstract class Scrappable
           : _i2.ScrappableRequest.fromJson(
               (jsonSerialization['targetRequest'] as Map<String, dynamic>)),
       referenceTestDataId: jsonSerialization['referenceTestDataId'] as int,
+      scrappableAnalytics: (jsonSerialization['scrappableAnalytics'] as List?)
+          ?.map((e) =>
+              _i3.ScrappableAnalytics.fromJson((e as Map<String, dynamic>)))
+          .toList(),
       referenceTestData: jsonSerialization['referenceTestData'] == null
           ? null
-          : _i3.ReferenceTestData.fromJson(
+          : _i4.ReferenceTestData.fromJson(
               (jsonSerialization['referenceTestData'] as Map<String, dynamic>)),
     );
   }
@@ -107,7 +114,9 @@ abstract class Scrappable
 
   int referenceTestDataId;
 
-  _i3.ReferenceTestData? referenceTestData;
+  List<_i3.ScrappableAnalytics>? scrappableAnalytics;
+
+  _i4.ReferenceTestData? referenceTestData;
 
   @override
   _i1.Table<_i1.UuidValue> get table => t;
@@ -128,7 +137,8 @@ abstract class Scrappable
     int? targetRequestId,
     _i2.ScrappableRequest? targetRequest,
     int? referenceTestDataId,
-    _i3.ReferenceTestData? referenceTestData,
+    List<_i3.ScrappableAnalytics>? scrappableAnalytics,
+    _i4.ReferenceTestData? referenceTestData,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -146,6 +156,9 @@ abstract class Scrappable
       'targetRequestId': targetRequestId,
       if (targetRequest != null) 'targetRequest': targetRequest?.toJson(),
       'referenceTestDataId': referenceTestDataId,
+      if (scrappableAnalytics != null)
+        'scrappableAnalytics':
+            scrappableAnalytics?.toJson(valueToJson: (v) => v.toJson()),
       if (referenceTestData != null)
         'referenceTestData': referenceTestData?.toJson(),
     };
@@ -168,6 +181,9 @@ abstract class Scrappable
       if (targetRequest != null)
         'targetRequest': targetRequest?.toJsonForProtocol(),
       'referenceTestDataId': referenceTestDataId,
+      if (scrappableAnalytics != null)
+        'scrappableAnalytics': scrappableAnalytics?.toJson(
+            valueToJson: (v) => v.toJsonForProtocol()),
       if (referenceTestData != null)
         'referenceTestData': referenceTestData?.toJsonForProtocol(),
     };
@@ -175,10 +191,12 @@ abstract class Scrappable
 
   static ScrappableInclude include({
     _i2.ScrappableRequestInclude? targetRequest,
-    _i3.ReferenceTestDataInclude? referenceTestData,
+    _i3.ScrappableAnalyticsIncludeList? scrappableAnalytics,
+    _i4.ReferenceTestDataInclude? referenceTestData,
   }) {
     return ScrappableInclude._(
       targetRequest: targetRequest,
+      scrappableAnalytics: scrappableAnalytics,
       referenceTestData: referenceTestData,
     );
   }
@@ -225,7 +243,8 @@ class _ScrappableImpl extends Scrappable {
     required int targetRequestId,
     _i2.ScrappableRequest? targetRequest,
     required int referenceTestDataId,
-    _i3.ReferenceTestData? referenceTestData,
+    List<_i3.ScrappableAnalytics>? scrappableAnalytics,
+    _i4.ReferenceTestData? referenceTestData,
   }) : super._(
           id: id,
           accountId: accountId,
@@ -239,6 +258,7 @@ class _ScrappableImpl extends Scrappable {
           targetRequestId: targetRequestId,
           targetRequest: targetRequest,
           referenceTestDataId: referenceTestDataId,
+          scrappableAnalytics: scrappableAnalytics,
           referenceTestData: referenceTestData,
         );
 
@@ -259,6 +279,7 @@ class _ScrappableImpl extends Scrappable {
     int? targetRequestId,
     Object? targetRequest = _Undefined,
     int? referenceTestDataId,
+    Object? scrappableAnalytics = _Undefined,
     Object? referenceTestData = _Undefined,
   }) {
     return Scrappable(
@@ -279,7 +300,10 @@ class _ScrappableImpl extends Scrappable {
           ? targetRequest
           : this.targetRequest?.copyWith(),
       referenceTestDataId: referenceTestDataId ?? this.referenceTestDataId,
-      referenceTestData: referenceTestData is _i3.ReferenceTestData?
+      scrappableAnalytics: scrappableAnalytics is List<_i3.ScrappableAnalytics>?
+          ? scrappableAnalytics
+          : this.scrappableAnalytics?.map((e0) => e0.copyWith()).toList(),
+      referenceTestData: referenceTestData is _i4.ReferenceTestData?
           ? referenceTestData
           : this.referenceTestData?.copyWith(),
     );
@@ -352,7 +376,11 @@ class ScrappableTable extends _i1.Table<_i1.UuidValue> {
 
   late final _i1.ColumnInt referenceTestDataId;
 
-  _i3.ReferenceTestDataTable? _referenceTestData;
+  _i3.ScrappableAnalyticsTable? ___scrappableAnalytics;
+
+  _i1.ManyRelation<_i3.ScrappableAnalyticsTable>? _scrappableAnalytics;
+
+  _i4.ReferenceTestDataTable? _referenceTestData;
 
   _i2.ScrappableRequestTable get targetRequest {
     if (_targetRequest != null) return _targetRequest!;
@@ -367,17 +395,48 @@ class ScrappableTable extends _i1.Table<_i1.UuidValue> {
     return _targetRequest!;
   }
 
-  _i3.ReferenceTestDataTable get referenceTestData {
+  _i3.ScrappableAnalyticsTable get __scrappableAnalytics {
+    if (___scrappableAnalytics != null) return ___scrappableAnalytics!;
+    ___scrappableAnalytics = _i1.createRelationTable(
+      relationFieldName: '__scrappableAnalytics',
+      field: Scrappable.t.id,
+      foreignField: _i3.ScrappableAnalytics.t.scrappableId,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _i3.ScrappableAnalyticsTable(tableRelation: foreignTableRelation),
+    );
+    return ___scrappableAnalytics!;
+  }
+
+  _i4.ReferenceTestDataTable get referenceTestData {
     if (_referenceTestData != null) return _referenceTestData!;
     _referenceTestData = _i1.createRelationTable(
       relationFieldName: 'referenceTestData',
       field: Scrappable.t.referenceTestDataId,
-      foreignField: _i3.ReferenceTestData.t.id,
+      foreignField: _i4.ReferenceTestData.t.id,
       tableRelation: tableRelation,
       createTable: (foreignTableRelation) =>
-          _i3.ReferenceTestDataTable(tableRelation: foreignTableRelation),
+          _i4.ReferenceTestDataTable(tableRelation: foreignTableRelation),
     );
     return _referenceTestData!;
+  }
+
+  _i1.ManyRelation<_i3.ScrappableAnalyticsTable> get scrappableAnalytics {
+    if (_scrappableAnalytics != null) return _scrappableAnalytics!;
+    var relationTable = _i1.createRelationTable(
+      relationFieldName: 'scrappableAnalytics',
+      field: Scrappable.t.id,
+      foreignField: _i3.ScrappableAnalytics.t.scrappableId,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _i3.ScrappableAnalyticsTable(tableRelation: foreignTableRelation),
+    );
+    _scrappableAnalytics = _i1.ManyRelation<_i3.ScrappableAnalyticsTable>(
+      tableWithRelations: relationTable,
+      table: _i3.ScrappableAnalyticsTable(
+          tableRelation: relationTable.tableRelation!.lastRelation),
+    );
+    return _scrappableAnalytics!;
   }
 
   @override
@@ -400,6 +459,9 @@ class ScrappableTable extends _i1.Table<_i1.UuidValue> {
     if (relationField == 'targetRequest') {
       return targetRequest;
     }
+    if (relationField == 'scrappableAnalytics') {
+      return __scrappableAnalytics;
+    }
     if (relationField == 'referenceTestData') {
       return referenceTestData;
     }
@@ -410,19 +472,24 @@ class ScrappableTable extends _i1.Table<_i1.UuidValue> {
 class ScrappableInclude extends _i1.IncludeObject {
   ScrappableInclude._({
     _i2.ScrappableRequestInclude? targetRequest,
-    _i3.ReferenceTestDataInclude? referenceTestData,
+    _i3.ScrappableAnalyticsIncludeList? scrappableAnalytics,
+    _i4.ReferenceTestDataInclude? referenceTestData,
   }) {
     _targetRequest = targetRequest;
+    _scrappableAnalytics = scrappableAnalytics;
     _referenceTestData = referenceTestData;
   }
 
   _i2.ScrappableRequestInclude? _targetRequest;
 
-  _i3.ReferenceTestDataInclude? _referenceTestData;
+  _i3.ScrappableAnalyticsIncludeList? _scrappableAnalytics;
+
+  _i4.ReferenceTestDataInclude? _referenceTestData;
 
   @override
   Map<String, _i1.Include?> get includes => {
         'targetRequest': _targetRequest,
+        'scrappableAnalytics': _scrappableAnalytics,
         'referenceTestData': _referenceTestData,
       };
 
@@ -453,7 +520,13 @@ class ScrappableIncludeList extends _i1.IncludeList {
 class ScrappableRepository {
   const ScrappableRepository._();
 
+  final attach = const ScrappableAttachRepository._();
+
   final attachRow = const ScrappableAttachRowRepository._();
+
+  final detach = const ScrappableDetachRepository._();
+
+  final detachRow = const ScrappableDetachRowRepository._();
 
   /// Returns a list of [Scrappable]s matching the given query parameters.
   ///
@@ -671,6 +744,35 @@ class ScrappableRepository {
   }
 }
 
+class ScrappableAttachRepository {
+  const ScrappableAttachRepository._();
+
+  /// Creates a relation between this [Scrappable] and the given [ScrappableAnalytics]s
+  /// by setting each [ScrappableAnalytics]'s foreign key `scrappableId` to refer to this [Scrappable].
+  Future<void> scrappableAnalytics(
+    _i1.Session session,
+    Scrappable scrappable,
+    List<_i3.ScrappableAnalytics> scrappableAnalytics, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (scrappableAnalytics.any((e) => e.id == null)) {
+      throw ArgumentError.notNull('scrappableAnalytics.id');
+    }
+    if (scrappable.id == null) {
+      throw ArgumentError.notNull('scrappable.id');
+    }
+
+    var $scrappableAnalytics = scrappableAnalytics
+        .map((e) => e.copyWith(scrappableId: scrappable.id))
+        .toList();
+    await session.db.update<_i3.ScrappableAnalytics>(
+      $scrappableAnalytics,
+      columns: [_i3.ScrappableAnalytics.t.scrappableId],
+      transaction: transaction,
+    );
+  }
+}
+
 class ScrappableAttachRowRepository {
   const ScrappableAttachRowRepository._();
 
@@ -702,7 +804,7 @@ class ScrappableAttachRowRepository {
   Future<void> referenceTestData(
     _i1.Session session,
     Scrappable scrappable,
-    _i3.ReferenceTestData referenceTestData, {
+    _i4.ReferenceTestData referenceTestData, {
     _i1.Transaction? transaction,
   }) async {
     if (scrappable.id == null) {
@@ -717,6 +819,83 @@ class ScrappableAttachRowRepository {
     await session.db.updateRow<Scrappable>(
       $scrappable,
       columns: [Scrappable.t.referenceTestDataId],
+      transaction: transaction,
+    );
+  }
+
+  /// Creates a relation between this [Scrappable] and the given [ScrappableAnalytics]
+  /// by setting the [ScrappableAnalytics]'s foreign key `scrappableId` to refer to this [Scrappable].
+  Future<void> scrappableAnalytics(
+    _i1.Session session,
+    Scrappable scrappable,
+    _i3.ScrappableAnalytics scrappableAnalytics, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (scrappableAnalytics.id == null) {
+      throw ArgumentError.notNull('scrappableAnalytics.id');
+    }
+    if (scrappable.id == null) {
+      throw ArgumentError.notNull('scrappable.id');
+    }
+
+    var $scrappableAnalytics =
+        scrappableAnalytics.copyWith(scrappableId: scrappable.id);
+    await session.db.updateRow<_i3.ScrappableAnalytics>(
+      $scrappableAnalytics,
+      columns: [_i3.ScrappableAnalytics.t.scrappableId],
+      transaction: transaction,
+    );
+  }
+}
+
+class ScrappableDetachRepository {
+  const ScrappableDetachRepository._();
+
+  /// Detaches the relation between this [Scrappable] and the given [ScrappableAnalytics]
+  /// by setting the [ScrappableAnalytics]'s foreign key `scrappableId` to `null`.
+  ///
+  /// This removes the association between the two models without deleting
+  /// the related record.
+  Future<void> scrappableAnalytics(
+    _i1.Session session,
+    List<_i3.ScrappableAnalytics> scrappableAnalytics, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (scrappableAnalytics.any((e) => e.id == null)) {
+      throw ArgumentError.notNull('scrappableAnalytics.id');
+    }
+
+    var $scrappableAnalytics =
+        scrappableAnalytics.map((e) => e.copyWith(scrappableId: null)).toList();
+    await session.db.update<_i3.ScrappableAnalytics>(
+      $scrappableAnalytics,
+      columns: [_i3.ScrappableAnalytics.t.scrappableId],
+      transaction: transaction,
+    );
+  }
+}
+
+class ScrappableDetachRowRepository {
+  const ScrappableDetachRowRepository._();
+
+  /// Detaches the relation between this [Scrappable] and the given [ScrappableAnalytics]
+  /// by setting the [ScrappableAnalytics]'s foreign key `scrappableId` to `null`.
+  ///
+  /// This removes the association between the two models without deleting
+  /// the related record.
+  Future<void> scrappableAnalytics(
+    _i1.Session session,
+    _i3.ScrappableAnalytics scrappableAnalytics, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (scrappableAnalytics.id == null) {
+      throw ArgumentError.notNull('scrappableAnalytics.id');
+    }
+
+    var $scrappableAnalytics = scrappableAnalytics.copyWith(scrappableId: null);
+    await session.db.updateRow<_i3.ScrappableAnalytics>(
+      $scrappableAnalytics,
+      columns: [_i3.ScrappableAnalytics.t.scrappableId],
       transaction: transaction,
     );
   }

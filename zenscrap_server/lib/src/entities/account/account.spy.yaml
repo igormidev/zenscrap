@@ -3,7 +3,6 @@ table: account_info
 fields:
   scrappables: List<Scrappable>?, relation(name=account_info_scrappable)
   userInfo: module:auth:UserInfo?, relation
-  accountApiKey: AccountApiKey?, relation
   accountApiUsageId: int
   accountApiUsage: AccountApiUsage?, relation(name=user_account_api_usage, field=accountApiUsageId)
   planTier: PlanTier

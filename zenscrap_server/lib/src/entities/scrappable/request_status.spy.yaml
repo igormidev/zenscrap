@@ -1,0 +1,6 @@
+enum: RequestStatus
+values:
+  - success # 2xx
+  - clientError # 4xx
+  - serverError # 5xx
+  - insufficientCredits

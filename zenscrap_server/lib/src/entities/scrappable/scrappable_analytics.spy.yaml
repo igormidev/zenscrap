@@ -1,0 +1,6 @@
+class: ScrappableAnalytics
+table: scrappable_analytics
+fields:
+  requestStatus: RequestStatus
+  requestedAt: DateTime
+  scrappable: Scrappable?, relation(name=scrappable_analytics)
