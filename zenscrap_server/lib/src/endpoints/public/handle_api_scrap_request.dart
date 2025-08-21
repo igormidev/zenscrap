@@ -114,33 +114,6 @@ class HandleApiScrapRequestEndpoint extends Endpoint {
     }
 
     String targetUrl = targetRequest.url;
-    // First, add the path parameters
-    for (final String pathParam in targetRequest.pathParams) {
-      final String? payloadParam = payload[pathParam];
-      if (payloadParam == null) {
-        throw ZenScrapException(
-          title: 'Missing Path Parameter',
-          description:
-              'Required path parameter "$pathParam" was not provided in the payload.',
-        );
-      }
-      targetUrl = targetUrl.replaceAll('{$pathParam}', payloadParam);
-    }
-    // Now, let's add query parameters
-    final Map<String, String> queryParams = {};
-    for (final MapEntry<String, String?> entry
-        in targetRequest.queryParams.entries) {
-      final String queryParamName = entry.key;
-      final String? defaultQueryParam = entry.value;
-      final String? payloadQueryParam = payload[queryParamName];
-      final String? queryParam = payloadQueryParam ?? defaultQueryParam;
-      if (queryParam != null) {
-        queryParams[queryParamName] = queryParam;
-      }
-    }
-    if (queryParams.isNotEmpty) {
-      targetUrl += '?${Uri(queryParameters: queryParams).query}';
-    }
 
     final String? scrapExtractRules = isTest
         ? (await ScrappableTestResult.db.findFirstRow(
