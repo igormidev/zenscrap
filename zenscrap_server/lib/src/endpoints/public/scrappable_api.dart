@@ -29,7 +29,7 @@ class ScrappableApiEndpoint extends Endpoint with ApiHelperMixin {
   }) async {
     return wrapAnalytics(session, apiKey,
         (setScrappableCallback, nanoId) async {
-      await discountApiTokens(session, apiKey: apiKey);
+      await discountApiTokens(session, nanoId: nanoId);
 
       final (Scrappable scrappable, ScrappableRequest targetRequest) =
           await getScrappableById(session, scrappableId, nanoId);

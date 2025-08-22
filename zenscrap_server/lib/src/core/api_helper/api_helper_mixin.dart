@@ -109,9 +109,12 @@ mixin ApiHelperMixin {
       final accountApiUsage = await AccountApiUsage.db.findFirstRow(
         session,
         where: (p0) => p0.nanoId.equals(nanoId),
+        include: AccountApiUsage.include(),
       );
       if (accountApiUsage == null) throw _noApiFound;
+
       cacheRemaining = accountApiUsage.remainingCredits;
+      remainingCredits[nanoId] = cacheRemaining;
     }
 
     final hasEnoughCredits = cacheRemaining > 0;
