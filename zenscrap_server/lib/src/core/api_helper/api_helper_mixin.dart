@@ -7,6 +7,7 @@ typedef NanoId = String;
 mixin ApiHelperMixin {
   static final Map<NanoId, int> currentConcurrencyRequests = {};
   static final Map<NanoId, PlanTier> concurrencyMaxAmountTier = {};
+  static final Map<NanoId, int> remainingCredits = {};
 
   Future<NanoId?> getNanoId(Session session, ApiKey? apikey) async {
     if (apikey == null) return null;
@@ -22,7 +23,9 @@ mixin ApiHelperMixin {
 
     final PlanTier? planTier = (await AccountInfo.db.findFirstRow(
       session,
-      where: (p0) => p0.accountApiUsage.nanoId.equals(nanoId),
+      where: (p0) =>
+          p0.accountApiUsage.nanoId.equals(nanoId) &
+          p0.accountApiUsage.apiKeys.any((key) => key.apiKey.equals(apikey)),
     ))
         ?.planTier;
 
@@ -96,28 +99,24 @@ mixin ApiHelperMixin {
 
   Future<void> discountApiTokens(
     Session session, {
-    required String? apiKey,
+    required NanoId? nanoId,
   }) async {
-    if (apiKey == null) return;
-    final AccountApiKey? accountApiKey = await AccountApiKey.db.findFirstRow(
-      session,
-      where: (p0) => p0.apiKey.equals(apiKey),
-      include: AccountApiKey.include(
-        accountApiUsage: AccountApiUsage.include(
-          apiKeys: AccountApiKey.includeList(),
-        ),
-      ),
-    );
-    final AccountApiUsage? accountApiUsage = accountApiKey?.accountApiUsage;
-    if (accountApiKey == null || accountApiUsage == null) throw _noApiFound;
+    if (nanoId == null) return;
+    int? cacheRemaining = remainingCredits[nanoId];
 
-    if (accountApiUsage.remainingCredits <= 0) throw _insufficientCredits;
-    await AccountApiUsage.db.updateRow(
-      session,
-      accountApiUsage.copyWith(
-        remainingCredits: accountApiUsage.remainingCredits - 1,
-      ),
-    );
+    if (cacheRemaining == null) {
+      // Let's get the most updated value from data base
+      final accountApiUsage = await AccountApiUsage.db.findFirstRow(
+        session,
+        where: (p0) => p0.nanoId.equals(nanoId),
+      );
+      if (accountApiUsage == null) throw _noApiFound;
+      cacheRemaining = accountApiUsage.remainingCredits;
+    }
+
+    final hasEnoughCredits = cacheRemaining > 0;
+    if (!hasEnoughCredits) throw _insufficientCredits;
+    remainingCredits[nanoId] = cacheRemaining - 1;
   }
 
   Future<(Scrappable, ScrappableRequest)> getScrappableById(
