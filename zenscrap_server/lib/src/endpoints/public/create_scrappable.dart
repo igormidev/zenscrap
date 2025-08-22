@@ -11,6 +11,8 @@ class CreateScrappableEndpoint extends Endpoint {
     Session session, {
     required String referenceLink,
   }) async {
+    final userId = (await session.authenticated)?.userId;
+
     final GenerativeModel geminiModel = GenerativeModel(
       model: 'gemini-2.5-pro',
       apiKey: session.passwords['geminiApiKey']!,
@@ -20,7 +22,6 @@ class CreateScrappableEndpoint extends Endpoint {
       generationConfig:
           GenerationConfig(responseSchema: createScrappableSchema),
     );
-
     final ChatSession chat = geminiModel.startChat();
     final GenerateContentResponse result = await chat.sendMessage(
       Content.text(getPromptToGenerateScrappableTargetRequest(referenceLink)),
@@ -102,6 +103,14 @@ class CreateScrappableEndpoint extends Endpoint {
     }
 
     return session.db.transaction((transaction) async {
+      final accountApiUsage = userId == null
+          ? null
+          : await AccountApiUsage.db.findFirstRow(session,
+              where: (p0) => p0.accountInfo.userInfoId.equals(userId),
+              include: AccountApiUsage.include(
+                accountInfo: AccountInfo.include(),
+              ),
+              transaction: transaction);
       final ScrappableRequest targetRequest =
           await ScrappableRequest.db.insertRow(
         session,
@@ -131,7 +140,9 @@ class CreateScrappableEndpoint extends Endpoint {
           description: description,
           createdAt: DateTime.now(),
           isActive: true,
-          isPrivate: true,
+          isPrivate: false,
+          accountId: accountApiUsage?.accountInfo?.id,
+          apiUsageOwnerNanoId: accountApiUsage?.nanoId,
           targetRequestId: targetRequest.id!,
           referenceTestDataId: referenceTestData.id!,
           referenceTestData: referenceTestData,

@@ -5,8 +5,8 @@ import 'package:zenscrap_server/src/generated/protocol.dart';
 typedef ApiKey = String;
 typedef NanoId = String;
 mixin ApiHelperMixin {
-  final Map<ApiKey, int> _currentConcurrencyRequests = {};
-  final Map<ApiKey, PlanTier> _concurrencyMaxAmountTier = {};
+  static final Map<NanoId, int> currentConcurrencyRequests = {};
+  static final Map<NanoId, PlanTier> concurrencyMaxAmountTier = {};
 
   Future<NanoId?> getNanoId(Session session, ApiKey? apikey) async {
     if (apikey == null) return null;
@@ -14,7 +14,7 @@ mixin ApiHelperMixin {
     if (splitted.length != 2) throw _invalidApiKeyFormat;
     final nanoId = splitted[0];
 
-    final PlanTier? cachePlanTier = _concurrencyMaxAmountTier[nanoId];
+    final PlanTier? cachePlanTier = concurrencyMaxAmountTier[nanoId];
     if (cachePlanTier != null) {
       if (cachePlanTier == PlanTier.none) throw _noActivePlan;
       return nanoId;
@@ -28,7 +28,7 @@ mixin ApiHelperMixin {
 
     if (planTier == null) throw _invalidApiKey;
     if (cachePlanTier == PlanTier.none) throw _noActivePlan;
-    _concurrencyMaxAmountTier[nanoId] = planTier;
+    concurrencyMaxAmountTier[nanoId] = planTier;
 
     return nanoId;
   }
@@ -36,23 +36,23 @@ mixin ApiHelperMixin {
   void increaseConcurrency(NanoId? nanoId) {
     if (nanoId == null) return;
     final maxConcurrentRequests =
-        _concurrencyMaxAmountTier[nanoId]?.maxConcurrentRequests;
+        concurrencyMaxAmountTier[nanoId]?.maxConcurrentRequests;
     if (maxConcurrentRequests == null) throw _noActivePlan;
 
     final canIncrease =
-        (_currentConcurrencyRequests[nanoId] ?? 0) + 1 <= maxConcurrentRequests;
+        (currentConcurrencyRequests[nanoId] ?? 0) + 1 <= maxConcurrentRequests;
     if (!canIncrease) throw _maxConcurrency;
 
-    _currentConcurrencyRequests[nanoId] =
-        (_currentConcurrencyRequests[nanoId] ?? 0) + 1;
+    currentConcurrencyRequests[nanoId] =
+        (currentConcurrencyRequests[nanoId] ?? 0) + 1;
   }
 
   void decreaseConcurrency(NanoId? nanoId) {
     if (nanoId == null) return;
-    _currentConcurrencyRequests[nanoId] =
-        (_currentConcurrencyRequests[nanoId] ?? 1) - 1;
-    if (_currentConcurrencyRequests[nanoId] == 0) {
-      _currentConcurrencyRequests.remove(nanoId);
+    currentConcurrencyRequests[nanoId] =
+        (currentConcurrencyRequests[nanoId] ?? 1) - 1;
+    if (currentConcurrencyRequests[nanoId] == 0) {
+      currentConcurrencyRequests.remove(nanoId);
     }
   }
 
@@ -121,12 +121,22 @@ mixin ApiHelperMixin {
   }
 
   Future<(Scrappable, ScrappableRequest)> getScrappableById(
-      Session session, String scrappableId) async {
-    final Scrappable? scrappable =
-        await Scrappable.db.findById(session, UuidValue.raw(scrappableId),
-            include: Scrappable.include(
-              targetRequest: ScrappableRequest.include(),
-            ));
+      Session session, String scrappableId, NanoId? nanoId) async {
+    final Scrappable? scrappable = await Scrappable.db.findFirstRow(
+      session,
+      where: (t) =>
+          t.id.equals(UuidValue.fromString(scrappableId)) &
+          ( // If not private, allow all
+              t.isPrivate.equals(false) |
+
+                  // If private, allow only if the nanoId matches
+                  (t.isPrivate.equals(true) &
+                      t.apiUsageOwnerNanoId.notEquals(null) &
+                      t.apiUsageOwnerNanoId.equals(nanoId))),
+      include: Scrappable.include(
+        targetRequest: ScrappableRequest.include(),
+      ),
+    );
 
     final ScrappableRequest? targetRequest = scrappable?.targetRequest;
 
@@ -158,7 +168,8 @@ mixin ApiHelperMixin {
   Future<T> wrapAnalytics<T>(
     Session session,
     ApiKey? apiKey,
-    Future<T> Function(void Function(Scrappable? scrappable) onSetScrapable)
+    Future<T> Function(void Function(Scrappable? scrappable) onSetScrapable,
+            NanoId? nanoId)
         call,
   ) async {
     Scrappable? scrappable;
@@ -167,7 +178,7 @@ mixin ApiHelperMixin {
     try {
       return await call((s) {
         scrappable = s;
-      });
+      }, concurrencyId);
     } on _ApiError catch (error, stackTrace) {
       await _setScrappable(session, scrappable, error.status);
       session.log(

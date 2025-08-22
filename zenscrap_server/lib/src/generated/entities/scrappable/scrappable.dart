@@ -21,6 +21,7 @@ abstract class Scrappable
   Scrappable._({
     _i1.UuidValue? id,
     this.accountId,
+    this.apiUsageOwnerNanoId,
     required this.createdAt,
     required this.name,
     required this.description,
@@ -38,6 +39,7 @@ abstract class Scrappable
   factory Scrappable({
     _i1.UuidValue? id,
     int? accountId,
+    String? apiUsageOwnerNanoId,
     required DateTime createdAt,
     required String name,
     required String description,
@@ -56,6 +58,7 @@ abstract class Scrappable
     return Scrappable(
       id: _i1.UuidValueJsonExtension.fromJson(jsonSerialization['id']),
       accountId: jsonSerialization['accountId'] as int?,
+      apiUsageOwnerNanoId: jsonSerialization['apiUsageOwnerNanoId'] as String?,
       createdAt:
           _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
       name: jsonSerialization['name'] as String,
@@ -94,6 +97,8 @@ abstract class Scrappable
 
   int? accountId;
 
+  String? apiUsageOwnerNanoId;
+
   DateTime createdAt;
 
   String name;
@@ -127,6 +132,7 @@ abstract class Scrappable
   Scrappable copyWith({
     _i1.UuidValue? id,
     int? accountId,
+    String? apiUsageOwnerNanoId,
     DateTime? createdAt,
     String? name,
     String? description,
@@ -145,6 +151,8 @@ abstract class Scrappable
     return {
       'id': id.toJson(),
       if (accountId != null) 'accountId': accountId,
+      if (apiUsageOwnerNanoId != null)
+        'apiUsageOwnerNanoId': apiUsageOwnerNanoId,
       'createdAt': createdAt.toJson(),
       'name': name,
       'description': description,
@@ -168,7 +176,6 @@ abstract class Scrappable
   Map<String, dynamic> toJsonForProtocol() {
     return {
       'id': id.toJson(),
-      if (accountId != null) 'accountId': accountId,
       'createdAt': createdAt.toJson(),
       'name': name,
       'description': description,
@@ -233,6 +240,7 @@ class _ScrappableImpl extends Scrappable {
   _ScrappableImpl({
     _i1.UuidValue? id,
     int? accountId,
+    String? apiUsageOwnerNanoId,
     required DateTime createdAt,
     required String name,
     required String description,
@@ -248,6 +256,7 @@ class _ScrappableImpl extends Scrappable {
   }) : super._(
           id: id,
           accountId: accountId,
+          apiUsageOwnerNanoId: apiUsageOwnerNanoId,
           createdAt: createdAt,
           name: name,
           description: description,
@@ -269,6 +278,7 @@ class _ScrappableImpl extends Scrappable {
   Scrappable copyWith({
     _i1.UuidValue? id,
     Object? accountId = _Undefined,
+    Object? apiUsageOwnerNanoId = _Undefined,
     DateTime? createdAt,
     String? name,
     String? description,
@@ -285,6 +295,9 @@ class _ScrappableImpl extends Scrappable {
     return Scrappable(
       id: id ?? this.id,
       accountId: accountId is int? ? accountId : this.accountId,
+      apiUsageOwnerNanoId: apiUsageOwnerNanoId is String?
+          ? apiUsageOwnerNanoId
+          : this.apiUsageOwnerNanoId,
       createdAt: createdAt ?? this.createdAt,
       name: name ?? this.name,
       description: description ?? this.description,
@@ -314,6 +327,10 @@ class ScrappableTable extends _i1.Table<_i1.UuidValue> {
   ScrappableTable({super.tableRelation}) : super(tableName: 'scrappable') {
     accountId = _i1.ColumnInt(
       'accountId',
+      this,
+    );
+    apiUsageOwnerNanoId = _i1.ColumnString(
+      'apiUsageOwnerNanoId',
       this,
     );
     createdAt = _i1.ColumnDateTime(
@@ -355,6 +372,8 @@ class ScrappableTable extends _i1.Table<_i1.UuidValue> {
   }
 
   late final _i1.ColumnInt accountId;
+
+  late final _i1.ColumnString apiUsageOwnerNanoId;
 
   late final _i1.ColumnDateTime createdAt;
 
@@ -443,6 +462,7 @@ class ScrappableTable extends _i1.Table<_i1.UuidValue> {
   List<_i1.Column> get columns => [
         id,
         accountId,
+        apiUsageOwnerNanoId,
         createdAt,
         name,
         description,

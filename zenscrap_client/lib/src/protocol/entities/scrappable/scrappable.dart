@@ -17,7 +17,6 @@ import '../../entities/scrappable/reference_test_data.dart' as _i4;
 abstract class Scrappable implements _i1.SerializableModel {
   Scrappable._({
     _i1.UuidValue? id,
-    this.accountId,
     required this.createdAt,
     required this.name,
     required this.description,
@@ -34,7 +33,6 @@ abstract class Scrappable implements _i1.SerializableModel {
 
   factory Scrappable({
     _i1.UuidValue? id,
-    int? accountId,
     required DateTime createdAt,
     required String name,
     required String description,
@@ -52,7 +50,6 @@ abstract class Scrappable implements _i1.SerializableModel {
   factory Scrappable.fromJson(Map<String, dynamic> jsonSerialization) {
     return Scrappable(
       id: _i1.UuidValueJsonExtension.fromJson(jsonSerialization['id']),
-      accountId: jsonSerialization['accountId'] as int?,
       createdAt:
           _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
       name: jsonSerialization['name'] as String,
@@ -87,8 +84,6 @@ abstract class Scrappable implements _i1.SerializableModel {
   /// the id will be null.
   _i1.UuidValue id;
 
-  int? accountId;
-
   DateTime createdAt;
 
   String name;
@@ -118,7 +113,6 @@ abstract class Scrappable implements _i1.SerializableModel {
   @_i1.useResult
   Scrappable copyWith({
     _i1.UuidValue? id,
-    int? accountId,
     DateTime? createdAt,
     String? name,
     String? description,
@@ -136,7 +130,6 @@ abstract class Scrappable implements _i1.SerializableModel {
   Map<String, dynamic> toJson() {
     return {
       'id': id.toJson(),
-      if (accountId != null) 'accountId': accountId,
       'createdAt': createdAt.toJson(),
       'name': name,
       'description': description,
@@ -167,7 +160,6 @@ class _Undefined {}
 class _ScrappableImpl extends Scrappable {
   _ScrappableImpl({
     _i1.UuidValue? id,
-    int? accountId,
     required DateTime createdAt,
     required String name,
     required String description,
@@ -182,7 +174,6 @@ class _ScrappableImpl extends Scrappable {
     _i4.ReferenceTestData? referenceTestData,
   }) : super._(
           id: id,
-          accountId: accountId,
           createdAt: createdAt,
           name: name,
           description: description,
@@ -203,7 +194,6 @@ class _ScrappableImpl extends Scrappable {
   @override
   Scrappable copyWith({
     _i1.UuidValue? id,
-    Object? accountId = _Undefined,
     DateTime? createdAt,
     String? name,
     String? description,
@@ -219,7 +209,6 @@ class _ScrappableImpl extends Scrappable {
   }) {
     return Scrappable(
       id: id ?? this.id,
-      accountId: accountId is int? ? accountId : this.accountId,
       createdAt: createdAt ?? this.createdAt,
       name: name ?? this.name,
       description: description ?? this.description,

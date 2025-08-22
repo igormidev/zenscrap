@@ -27,11 +27,13 @@ class ScrappableApiEndpoint extends Endpoint with ApiHelperMixin {
     String? apiKey,
     required Map<String, dynamic> payload,
   }) async {
-    return wrapAnalytics(session, apiKey, (setScrappableCallback) async {
+    return wrapAnalytics(session, apiKey,
+        (setScrappableCallback, nanoId) async {
       await discountApiTokens(session, apiKey: apiKey);
 
       final (Scrappable scrappable, ScrappableRequest targetRequest) =
-          await getScrappableById(session, scrappableId);
+          await getScrappableById(session, scrappableId, nanoId);
+
       setScrappableCallback(scrappable);
       final String targetUrl = composeUrl(payload, targetRequest);
       final extractRules = await getExtractRules(session, scrappable, apiKey);
