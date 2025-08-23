@@ -8,6 +8,7 @@ import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_contro
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_gemini_api_impl.dart';
 import 'package:zenscrap_server/src/endpoints/public/scrappable_chat_session.dart';
 import 'package:zenscrap_server/src/web/routes/root.dart';
+import 'package:zenscrap_server/src/webhooks/stripe_webhook.dart';
 import 'src/generated/protocol.dart';
 import 'src/generated/endpoints.dart';
 
@@ -27,6 +28,7 @@ void run(List<String> args) async {
   // Setup a default page at the web root.
   pod.webServer.addRoute(RouteRoot(), '/');
   pod.webServer.addRoute(RouteRoot(), '/index.html');
+  pod.webServer.addRoute(StripeWebhookRoute(), '/stripe/webhook');
   // Serve all files in the /static directory.
   pod.webServer.addRoute(
     RouteStaticDirectory(serverDirectory: 'static', basePath: '/'),

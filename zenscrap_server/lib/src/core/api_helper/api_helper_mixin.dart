@@ -6,7 +6,7 @@ typedef ApiKey = String;
 typedef NanoId = String;
 mixin ApiHelperMixin {
   static final Map<NanoId, int> currentConcurrencyRequests = {};
-  static final Map<NanoId, PlanTier> concurrencyMaxAmountTier = {};
+  static final Map<NanoId, PlanTier> currentAccountPlanTierCache = {};
   static final Map<NanoId, int> remainingSubscriptionCredits = {};
   static final Map<NanoId, int> remainingPurchasedCredits = {};
 
@@ -16,7 +16,7 @@ mixin ApiHelperMixin {
     if (splitted.length != 2) throw _invalidApiKeyFormat;
     final nanoId = splitted[0];
 
-    final PlanTier? cachePlanTier = concurrencyMaxAmountTier[nanoId];
+    final PlanTier? cachePlanTier = currentAccountPlanTierCache[nanoId];
     if (cachePlanTier != null) {
       if (cachePlanTier == PlanTier.none) throw _noActivePlan;
       return nanoId;
@@ -32,14 +32,14 @@ mixin ApiHelperMixin {
 
     if (planTier == null) throw _invalidApiKey;
     if (cachePlanTier == PlanTier.none) throw _noActivePlan;
-    concurrencyMaxAmountTier[nanoId] = planTier;
+    currentAccountPlanTierCache[nanoId] = planTier;
 
     return nanoId;
   }
 
   void increaseConcurrency(NanoId? nanoId) {
     if (nanoId == null) return;
-    final maxConcurrentRequests = concurrencyMaxAmountTier[nanoId]
+    final maxConcurrentRequests = currentAccountPlanTierCache[nanoId]
         ?.numberOfConcurrentRequestsAllowedByPlan;
     if (maxConcurrentRequests == null) throw _noActivePlan;
 
