@@ -1,0 +1,71 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
+import 'package:zenscrap_flutter/src/states/marketplace/marketplace_state.dart';
+
+final marketplaceProvider =
+    StateNotifierProvider<MarketplaceNotifier, MarketplaceState>((ref) {
+  final client = ref.watch(clientProvider);
+  return MarketplaceNotifier(client);
+});
+
+class MarketplaceNotifier extends StateNotifier<MarketplaceState> {
+  final Client _client;
+  
+  MarketplaceNotifier(this._client) : super(const MarketplaceState.initial());
+
+  String _currentSearchQuery = '';
+  int _currentPage = 1;
+
+  Future<void> loadMarketplace({
+    int page = 1,
+    String searchQuery = '',
+  }) async {
+    try {
+      state = const MarketplaceState.loading();
+      _currentPage = page;
+      _currentSearchQuery = searchQuery;
+
+      final response = await _client.marketplace.getItems(
+        page: page,
+        pageSize: 20,
+        searchQuery: searchQuery.isNotEmpty ? searchQuery : null,
+      );
+
+      state = MarketplaceState.loaded(
+        response: response,
+        searchQuery: searchQuery,
+      );
+    } on ZenScrapException catch (e) {
+      state = MarketplaceState.withError(e);
+    } catch (e) {
+      state = MarketplaceState.withError(
+        ZenScrapException(
+          title: 'Error loading marketplace',
+          description: 'An unexpected error occurred: $e',
+        ),
+      );
+    }
+  }
+
+  Future<void> changePage(int page) async {
+    await loadMarketplace(
+      page: page,
+      searchQuery: _currentSearchQuery,
+    );
+  }
+
+  Future<void> search(String query) async {
+    await loadMarketplace(
+      page: 1,
+      searchQuery: query,
+    );
+  }
+
+  Future<void> refresh() async {
+    await loadMarketplace(
+      page: _currentPage,
+      searchQuery: _currentSearchQuery,
+    );
+  }
+}

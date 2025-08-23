@@ -1,0 +1,8 @@
+class: PaginationMetadata
+fields:
+  currentPage: int
+  pageSize: int
+  totalCount: int
+  totalPages: int
+  hasNextPage: bool
+  hasPreviousPage: bool

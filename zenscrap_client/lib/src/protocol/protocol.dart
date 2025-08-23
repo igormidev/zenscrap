@@ -20,21 +20,23 @@ import 'entities/account/api_usage/api_creadit_history/credit_package_purchase.d
 import 'entities/account/api_usage/api_creadit_history/monthly_subscription_credit_deposit.dart'
     as _i7;
 import 'entities/account/plan_tier.dart' as _i8;
-import 'entities/monthly_credits_data.dart' as _i9;
+import 'entities/marketplace/paginated_scrappable_response.dart' as _i9;
+import 'entities/marketplace/pagination_metadata.dart' as _i10;
+import 'entities/monthly_credits_data.dart' as _i11;
 import 'entities/redraft_scrappable_session/create_session_response.dart'
-    as _i10;
-import 'entities/redraft_scrappable_session/prompt_role_enum.dart' as _i11;
-import 'entities/redraft_scrappable_session/chat_response.dart' as _i12;
-import 'entities/scrappable/reference_test_data.dart' as _i13;
-import 'entities/scrappable/request_status.dart' as _i14;
-import 'entities/scrappable/scrappable.dart' as _i15;
-import 'entities/scrappable/scrappable_analytics.dart' as _i16;
-import 'entities/scrappable/scrappable_request.dart' as _i17;
-import 'entities/scrappable/scrappable_test_result.dart' as _i18;
-import 'entities/zenscrap_exception.dart' as _i19;
+    as _i12;
+import 'entities/redraft_scrappable_session/prompt_role_enum.dart' as _i13;
+import 'entities/redraft_scrappable_session/chat_response.dart' as _i14;
+import 'entities/scrappable/reference_test_data.dart' as _i15;
+import 'entities/scrappable/request_status.dart' as _i16;
+import 'entities/scrappable/scrappable.dart' as _i17;
+import 'entities/scrappable/scrappable_analytics.dart' as _i18;
+import 'entities/scrappable/scrappable_request.dart' as _i19;
+import 'entities/scrappable/scrappable_test_result.dart' as _i20;
+import 'entities/zenscrap_exception.dart' as _i21;
 import 'package:zenscrap_client/src/protocol/entities/scrappable/scrappable.dart'
-    as _i20;
-import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i21;
+    as _i22;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i23;
 export 'entities/account/account.dart';
 export 'entities/account/account_api_key.dart';
 export 'entities/account/api_usage/account_api_usage.dart';
@@ -42,6 +44,8 @@ export 'entities/account/api_usage/api_creadit_history/api_creadit_history_item.
 export 'entities/account/api_usage/api_creadit_history/credit_package_purchase.dart';
 export 'entities/account/api_usage/api_creadit_history/monthly_subscription_credit_deposit.dart';
 export 'entities/account/plan_tier.dart';
+export 'entities/marketplace/paginated_scrappable_response.dart';
+export 'entities/marketplace/pagination_metadata.dart';
 export 'entities/monthly_credits_data.dart';
 export 'entities/redraft_scrappable_session/chat_response.dart';
 export 'entities/redraft_scrappable_session/create_session_response.dart';
@@ -89,47 +93,53 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i8.PlanTier) {
       return _i8.PlanTier.fromJson(data) as T;
     }
-    if (t == _i9.MonthlyCreditsData) {
-      return _i9.MonthlyCreditsData.fromJson(data) as T;
+    if (t == _i9.PaginatedScrappableResponse) {
+      return _i9.PaginatedScrappableResponse.fromJson(data) as T;
     }
-    if (t == _i10.CreateSessionResponse) {
-      return _i10.CreateSessionResponse.fromJson(data) as T;
+    if (t == _i10.PaginationMetadata) {
+      return _i10.PaginationMetadata.fromJson(data) as T;
     }
-    if (t == _i11.PromptRole) {
-      return _i11.PromptRole.fromJson(data) as T;
+    if (t == _i11.MonthlyCreditsData) {
+      return _i11.MonthlyCreditsData.fromJson(data) as T;
     }
-    if (t == _i12.ErrorTextResponse) {
-      return _i12.ErrorTextResponse.fromJson(data) as T;
+    if (t == _i12.CreateSessionResponse) {
+      return _i12.CreateSessionResponse.fromJson(data) as T;
     }
-    if (t == _i12.MessageTextAndNewExtractRulesResponse) {
-      return _i12.MessageTextAndNewExtractRulesResponse.fromJson(data) as T;
+    if (t == _i13.PromptRole) {
+      return _i13.PromptRole.fromJson(data) as T;
     }
-    if (t == _i12.MessageTextResponse) {
-      return _i12.MessageTextResponse.fromJson(data) as T;
+    if (t == _i14.ErrorTextResponse) {
+      return _i14.ErrorTextResponse.fromJson(data) as T;
     }
-    if (t == _i12.NewExtractRuleResponse) {
-      return _i12.NewExtractRuleResponse.fromJson(data) as T;
+    if (t == _i14.MessageTextAndNewExtractRulesResponse) {
+      return _i14.MessageTextAndNewExtractRulesResponse.fromJson(data) as T;
     }
-    if (t == _i13.ReferenceTestData) {
-      return _i13.ReferenceTestData.fromJson(data) as T;
+    if (t == _i14.MessageTextResponse) {
+      return _i14.MessageTextResponse.fromJson(data) as T;
     }
-    if (t == _i14.RequestStatus) {
-      return _i14.RequestStatus.fromJson(data) as T;
+    if (t == _i14.NewExtractRuleResponse) {
+      return _i14.NewExtractRuleResponse.fromJson(data) as T;
     }
-    if (t == _i15.Scrappable) {
-      return _i15.Scrappable.fromJson(data) as T;
+    if (t == _i15.ReferenceTestData) {
+      return _i15.ReferenceTestData.fromJson(data) as T;
     }
-    if (t == _i16.ScrappableAnalytics) {
-      return _i16.ScrappableAnalytics.fromJson(data) as T;
+    if (t == _i16.RequestStatus) {
+      return _i16.RequestStatus.fromJson(data) as T;
     }
-    if (t == _i17.ScrappableRequest) {
-      return _i17.ScrappableRequest.fromJson(data) as T;
+    if (t == _i17.Scrappable) {
+      return _i17.Scrappable.fromJson(data) as T;
     }
-    if (t == _i18.ScrappableTestResult) {
-      return _i18.ScrappableTestResult.fromJson(data) as T;
+    if (t == _i18.ScrappableAnalytics) {
+      return _i18.ScrappableAnalytics.fromJson(data) as T;
     }
-    if (t == _i19.ZenScrapException) {
-      return _i19.ZenScrapException.fromJson(data) as T;
+    if (t == _i19.ScrappableRequest) {
+      return _i19.ScrappableRequest.fromJson(data) as T;
+    }
+    if (t == _i20.ScrappableTestResult) {
+      return _i20.ScrappableTestResult.fromJson(data) as T;
+    }
+    if (t == _i21.ZenScrapException) {
+      return _i21.ZenScrapException.fromJson(data) as T;
     }
     if (t == _i1.getType<_i2.AccountInfo?>()) {
       return (data != null ? _i2.AccountInfo.fromJson(data) : null) as T;
@@ -155,58 +165,68 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i1.getType<_i8.PlanTier?>()) {
       return (data != null ? _i8.PlanTier.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i9.MonthlyCreditsData?>()) {
-      return (data != null ? _i9.MonthlyCreditsData.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i10.CreateSessionResponse?>()) {
-      return (data != null ? _i10.CreateSessionResponse.fromJson(data) : null)
-          as T;
-    }
-    if (t == _i1.getType<_i11.PromptRole?>()) {
-      return (data != null ? _i11.PromptRole.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i12.ErrorTextResponse?>()) {
-      return (data != null ? _i12.ErrorTextResponse.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i12.MessageTextAndNewExtractRulesResponse?>()) {
+    if (t == _i1.getType<_i9.PaginatedScrappableResponse?>()) {
       return (data != null
-          ? _i12.MessageTextAndNewExtractRulesResponse.fromJson(data)
+          ? _i9.PaginatedScrappableResponse.fromJson(data)
           : null) as T;
     }
-    if (t == _i1.getType<_i12.MessageTextResponse?>()) {
-      return (data != null ? _i12.MessageTextResponse.fromJson(data) : null)
+    if (t == _i1.getType<_i10.PaginationMetadata?>()) {
+      return (data != null ? _i10.PaginationMetadata.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i12.NewExtractRuleResponse?>()) {
-      return (data != null ? _i12.NewExtractRuleResponse.fromJson(data) : null)
+    if (t == _i1.getType<_i11.MonthlyCreditsData?>()) {
+      return (data != null ? _i11.MonthlyCreditsData.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i13.ReferenceTestData?>()) {
-      return (data != null ? _i13.ReferenceTestData.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i14.RequestStatus?>()) {
-      return (data != null ? _i14.RequestStatus.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i15.Scrappable?>()) {
-      return (data != null ? _i15.Scrappable.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i16.ScrappableAnalytics?>()) {
-      return (data != null ? _i16.ScrappableAnalytics.fromJson(data) : null)
+    if (t == _i1.getType<_i12.CreateSessionResponse?>()) {
+      return (data != null ? _i12.CreateSessionResponse.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i17.ScrappableRequest?>()) {
-      return (data != null ? _i17.ScrappableRequest.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i13.PromptRole?>()) {
+      return (data != null ? _i13.PromptRole.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i18.ScrappableTestResult?>()) {
-      return (data != null ? _i18.ScrappableTestResult.fromJson(data) : null)
-          as T;
+    if (t == _i1.getType<_i14.ErrorTextResponse?>()) {
+      return (data != null ? _i14.ErrorTextResponse.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i19.ZenScrapException?>()) {
-      return (data != null ? _i19.ZenScrapException.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<List<_i15.Scrappable>?>()) {
+    if (t == _i1.getType<_i14.MessageTextAndNewExtractRulesResponse?>()) {
       return (data != null
-          ? (data as List).map((e) => deserialize<_i15.Scrappable>(e)).toList()
+          ? _i14.MessageTextAndNewExtractRulesResponse.fromJson(data)
+          : null) as T;
+    }
+    if (t == _i1.getType<_i14.MessageTextResponse?>()) {
+      return (data != null ? _i14.MessageTextResponse.fromJson(data) : null)
+          as T;
+    }
+    if (t == _i1.getType<_i14.NewExtractRuleResponse?>()) {
+      return (data != null ? _i14.NewExtractRuleResponse.fromJson(data) : null)
+          as T;
+    }
+    if (t == _i1.getType<_i15.ReferenceTestData?>()) {
+      return (data != null ? _i15.ReferenceTestData.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i16.RequestStatus?>()) {
+      return (data != null ? _i16.RequestStatus.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i17.Scrappable?>()) {
+      return (data != null ? _i17.Scrappable.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i18.ScrappableAnalytics?>()) {
+      return (data != null ? _i18.ScrappableAnalytics.fromJson(data) : null)
+          as T;
+    }
+    if (t == _i1.getType<_i19.ScrappableRequest?>()) {
+      return (data != null ? _i19.ScrappableRequest.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i20.ScrappableTestResult?>()) {
+      return (data != null ? _i20.ScrappableTestResult.fromJson(data) : null)
+          as T;
+    }
+    if (t == _i1.getType<_i21.ZenScrapException?>()) {
+      return (data != null ? _i21.ZenScrapException.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<List<_i17.Scrappable>?>()) {
+      return (data != null
+          ? (data as List).map((e) => deserialize<_i17.Scrappable>(e)).toList()
           : null) as T;
     }
     if (t == _i1.getType<List<_i5.CreditHistoryItem>?>()) {
@@ -223,10 +243,14 @@ class Protocol extends _i1.SerializationManager {
               .toList()
           : null) as T;
     }
-    if (t == _i1.getType<List<_i16.ScrappableAnalytics>?>()) {
+    if (t == List<_i17.Scrappable>) {
+      return (data as List).map((e) => deserialize<_i17.Scrappable>(e)).toList()
+          as T;
+    }
+    if (t == _i1.getType<List<_i18.ScrappableAnalytics>?>()) {
       return (data != null
           ? (data as List)
-              .map((e) => deserialize<_i16.ScrappableAnalytics>(e))
+              .map((e) => deserialize<_i18.ScrappableAnalytics>(e))
               .toList()
           : null) as T;
     }
@@ -241,12 +265,12 @@ class Protocol extends _i1.SerializationManager {
       return (data as Map).map((k, v) =>
           MapEntry(deserialize<String>(k), deserialize<dynamic>(v))) as T;
     }
-    if (t == List<_i20.Scrappable>) {
-      return (data as List).map((e) => deserialize<_i20.Scrappable>(e)).toList()
+    if (t == List<_i22.Scrappable>) {
+      return (data as List).map((e) => deserialize<_i22.Scrappable>(e)).toList()
           as T;
     }
     try {
-      return _i21.Protocol().deserialize<T>(data, t);
+      return _i23.Protocol().deserialize<T>(data, t);
     } on _i1.DeserializationTypeNotFoundException catch (_) {}
     return super.deserialize<T>(data, t);
   }
@@ -276,49 +300,55 @@ class Protocol extends _i1.SerializationManager {
     if (data is _i8.PlanTier) {
       return 'PlanTier';
     }
-    if (data is _i9.MonthlyCreditsData) {
+    if (data is _i9.PaginatedScrappableResponse) {
+      return 'PaginatedScrappableResponse';
+    }
+    if (data is _i10.PaginationMetadata) {
+      return 'PaginationMetadata';
+    }
+    if (data is _i11.MonthlyCreditsData) {
       return 'MonthlyCreditsData';
     }
-    if (data is _i10.CreateSessionResponse) {
+    if (data is _i12.CreateSessionResponse) {
       return 'CreateSessionResponse';
     }
-    if (data is _i11.PromptRole) {
+    if (data is _i13.PromptRole) {
       return 'PromptRole';
     }
-    if (data is _i12.ErrorTextResponse) {
+    if (data is _i14.ErrorTextResponse) {
       return 'ErrorTextResponse';
     }
-    if (data is _i12.MessageTextAndNewExtractRulesResponse) {
+    if (data is _i14.MessageTextAndNewExtractRulesResponse) {
       return 'MessageTextAndNewExtractRulesResponse';
     }
-    if (data is _i12.MessageTextResponse) {
+    if (data is _i14.MessageTextResponse) {
       return 'MessageTextResponse';
     }
-    if (data is _i12.NewExtractRuleResponse) {
+    if (data is _i14.NewExtractRuleResponse) {
       return 'NewExtractRuleResponse';
     }
-    if (data is _i13.ReferenceTestData) {
+    if (data is _i15.ReferenceTestData) {
       return 'ReferenceTestData';
     }
-    if (data is _i14.RequestStatus) {
+    if (data is _i16.RequestStatus) {
       return 'RequestStatus';
     }
-    if (data is _i15.Scrappable) {
+    if (data is _i17.Scrappable) {
       return 'Scrappable';
     }
-    if (data is _i16.ScrappableAnalytics) {
+    if (data is _i18.ScrappableAnalytics) {
       return 'ScrappableAnalytics';
     }
-    if (data is _i17.ScrappableRequest) {
+    if (data is _i19.ScrappableRequest) {
       return 'ScrappableRequest';
     }
-    if (data is _i18.ScrappableTestResult) {
+    if (data is _i20.ScrappableTestResult) {
       return 'ScrappableTestResult';
     }
-    if (data is _i19.ZenScrapException) {
+    if (data is _i21.ZenScrapException) {
       return 'ZenScrapException';
     }
-    className = _i21.Protocol().getClassNameForObject(data);
+    className = _i23.Protocol().getClassNameForObject(data);
     if (className != null) {
       return 'serverpod_auth.$className';
     }
@@ -352,52 +382,58 @@ class Protocol extends _i1.SerializationManager {
     if (dataClassName == 'PlanTier') {
       return deserialize<_i8.PlanTier>(data['data']);
     }
+    if (dataClassName == 'PaginatedScrappableResponse') {
+      return deserialize<_i9.PaginatedScrappableResponse>(data['data']);
+    }
+    if (dataClassName == 'PaginationMetadata') {
+      return deserialize<_i10.PaginationMetadata>(data['data']);
+    }
     if (dataClassName == 'MonthlyCreditsData') {
-      return deserialize<_i9.MonthlyCreditsData>(data['data']);
+      return deserialize<_i11.MonthlyCreditsData>(data['data']);
     }
     if (dataClassName == 'CreateSessionResponse') {
-      return deserialize<_i10.CreateSessionResponse>(data['data']);
+      return deserialize<_i12.CreateSessionResponse>(data['data']);
     }
     if (dataClassName == 'PromptRole') {
-      return deserialize<_i11.PromptRole>(data['data']);
+      return deserialize<_i13.PromptRole>(data['data']);
     }
     if (dataClassName == 'ErrorTextResponse') {
-      return deserialize<_i12.ErrorTextResponse>(data['data']);
+      return deserialize<_i14.ErrorTextResponse>(data['data']);
     }
     if (dataClassName == 'MessageTextAndNewExtractRulesResponse') {
-      return deserialize<_i12.MessageTextAndNewExtractRulesResponse>(
+      return deserialize<_i14.MessageTextAndNewExtractRulesResponse>(
           data['data']);
     }
     if (dataClassName == 'MessageTextResponse') {
-      return deserialize<_i12.MessageTextResponse>(data['data']);
+      return deserialize<_i14.MessageTextResponse>(data['data']);
     }
     if (dataClassName == 'NewExtractRuleResponse') {
-      return deserialize<_i12.NewExtractRuleResponse>(data['data']);
+      return deserialize<_i14.NewExtractRuleResponse>(data['data']);
     }
     if (dataClassName == 'ReferenceTestData') {
-      return deserialize<_i13.ReferenceTestData>(data['data']);
+      return deserialize<_i15.ReferenceTestData>(data['data']);
     }
     if (dataClassName == 'RequestStatus') {
-      return deserialize<_i14.RequestStatus>(data['data']);
+      return deserialize<_i16.RequestStatus>(data['data']);
     }
     if (dataClassName == 'Scrappable') {
-      return deserialize<_i15.Scrappable>(data['data']);
+      return deserialize<_i17.Scrappable>(data['data']);
     }
     if (dataClassName == 'ScrappableAnalytics') {
-      return deserialize<_i16.ScrappableAnalytics>(data['data']);
+      return deserialize<_i18.ScrappableAnalytics>(data['data']);
     }
     if (dataClassName == 'ScrappableRequest') {
-      return deserialize<_i17.ScrappableRequest>(data['data']);
+      return deserialize<_i19.ScrappableRequest>(data['data']);
     }
     if (dataClassName == 'ScrappableTestResult') {
-      return deserialize<_i18.ScrappableTestResult>(data['data']);
+      return deserialize<_i20.ScrappableTestResult>(data['data']);
     }
     if (dataClassName == 'ZenScrapException') {
-      return deserialize<_i19.ZenScrapException>(data['data']);
+      return deserialize<_i21.ZenScrapException>(data['data']);
     }
     if (dataClassName.startsWith('serverpod_auth.')) {
       data['className'] = dataClassName.substring(15);
-      return _i21.Protocol().deserializeByClassName(data);
+      return _i23.Protocol().deserializeByClassName(data);
     }
     return super.deserializeByClassName(data);
   }

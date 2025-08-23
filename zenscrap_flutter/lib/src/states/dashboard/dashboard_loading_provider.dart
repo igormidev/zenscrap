@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_state.dart';
 import 'package:zenscrap_flutter/src/states/dashboard/dashboard_index_provider.dart';
+import 'package:zenscrap_flutter/src/states/marketplace/marketplace_provider.dart';
+import 'package:zenscrap_flutter/src/states/marketplace/marketplace_state.dart';
 import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables.dart';
 import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables_state.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
@@ -24,7 +26,10 @@ final dashboardLoadingProvider = Provider<HaveAnyActiveLoading>((ref) {
         ref.watch(userScrappables.select((value) =>
             value.maybeMap(loading: (loading) => true, orElse: () => false))),
       ],
-    DashboardNavigationType.marketPlace => [],
+    DashboardNavigationType.marketPlace => [
+        ref.watch(marketplaceProvider.select((value) =>
+            value.maybeMap(loading: (loading) => true, orElse: () => false))),
+      ],
     DashboardNavigationType.usage => [],
     DashboardNavigationType.account => [],
     DashboardNavigationType.logOut => [],
