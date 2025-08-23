@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:serverpod/serverpod.dart';
+import 'package:zenscrap_server/src/core/api_helper/api_helper_mixin.dart';
 import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_api.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_config.dart';
@@ -135,6 +136,15 @@ class StripeWebhookRoute extends Route {
 
       await AccountInfo.db.updateRow(session, accountInfo);
 
+      // Get API usage to reset cache
+      final apiUsage = await AccountApiUsage.db.findById(
+        session,
+        accountInfo.accountApiUsageId,
+      );
+      if (apiUsage != null) {
+        ApiHelperMixin.resetNanoId(apiUsage.nanoId);
+      }
+
       // Add initial credits and schedule monthly credit addition
       await _addSubscriptionCredits(session, accountInfo, accountInfo.planTier);
 
@@ -209,6 +219,15 @@ class StripeWebhookRoute extends Route {
 
       await AccountInfo.db.updateRow(session, accountInfo);
 
+      // Get API usage to reset cache
+      final apiUsage = await AccountApiUsage.db.findById(
+        session,
+        accountInfo.accountApiUsageId,
+      );
+      if (apiUsage != null) {
+        ApiHelperMixin.resetNanoId(apiUsage.nanoId);
+      }
+
       // Add API credits for the new subscription
       if (status == 'active' || status == 'trialing') {
         await _addSubscriptionCredits(session, accountInfo, newPlanTier);
@@ -277,6 +296,15 @@ class StripeWebhookRoute extends Route {
 
       await AccountInfo.db.updateRow(session, accountInfo);
 
+      // Get API usage to reset cache when plan changes
+      final apiUsage = await AccountApiUsage.db.findById(
+        session,
+        accountInfo.accountApiUsageId,
+      );
+      if (apiUsage != null) {
+        ApiHelperMixin.resetNanoId(apiUsage.nanoId);
+      }
+
       session.log('Subscription updated for account ${accountInfo.id}');
     } catch (e) {
       session.log('Error handling subscription updated: $e');
@@ -311,6 +339,15 @@ class StripeWebhookRoute extends Route {
       accountInfo.planTier = PlanTier.none;
 
       await AccountInfo.db.updateRow(session, accountInfo);
+
+      // Get API usage to reset cache when subscription is canceled
+      final apiUsage = await AccountApiUsage.db.findById(
+        session,
+        accountInfo.accountApiUsageId,
+      );
+      if (apiUsage != null) {
+        ApiHelperMixin.resetNanoId(apiUsage.nanoId);
+      }
 
       session.log('Subscription deleted for account ${accountInfo.id}');
     } catch (e) {
@@ -376,6 +413,15 @@ class StripeWebhookRoute extends Route {
       accountInfo.subscriptionStatus = 'past_due';
       await AccountInfo.db.updateRow(session, accountInfo);
 
+      // Get API usage to reset cache when payment fails
+      final apiUsage = await AccountApiUsage.db.findById(
+        session,
+        accountInfo.accountApiUsageId,
+      );
+      if (apiUsage != null) {
+        ApiHelperMixin.resetNanoId(apiUsage.nanoId);
+      }
+
       session.log('Invoice payment failed for account ${accountInfo.id}');
     } catch (e) {
       session.log('Error handling invoice payment failed: $e');
@@ -423,6 +469,9 @@ class StripeWebhookRoute extends Route {
     if (apiUsage != null) {
       apiUsage.subscriptionCredits += creditsToAdd;
       await AccountApiUsage.db.updateRow(session, apiUsage);
+
+      // Reset cache after adding credits
+      ApiHelperMixin.resetNanoId(apiUsage.nanoId);
 
       session.log(
           'Added $creditsToAdd subscription credits to account ${accountInfo.id}');

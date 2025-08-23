@@ -7,6 +7,7 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
+import 'package:zenscrap_flutter/src/ui/account/views/account_view.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/splash_view.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
@@ -94,7 +95,7 @@ final StateProvider routerProvider = StateProvider((ref) {
           ),
           GoRoute(
             path: DashboardNavigationType.account.routeOnClick!,
-            builder: (context, state) => Container(),
+            builder: (context, state) => AccountView(),
           ),
         ],
         builder: (context, state, child) {

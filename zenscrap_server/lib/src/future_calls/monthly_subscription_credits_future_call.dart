@@ -51,8 +51,7 @@ class MonthlySubscriptionCreditsFutureCall extends FutureCall {
         await AccountApiUsage.db.updateRow(session, apiUsage);
 
         // Update the cached values in ApiHelperMixin
-        ApiHelperMixin.remainingSubscriptionCredits[apiUsage.nanoId] =
-            apiUsage.subscriptionCredits;
+        ApiHelperMixin.resetNanoId(apiUsage.nanoId);
 
         session.log(
             'Added $creditsToAdd monthly subscription credits to account ${accountInfo.id} (nanoId: ${apiUsage.nanoId})');

@@ -5,10 +5,17 @@ import 'package:zenscrap_server/src/generated/protocol.dart';
 typedef ApiKey = String;
 typedef NanoId = String;
 mixin ApiHelperMixin {
-  static final Map<NanoId, int> currentConcurrencyRequests = {};
-  static final Map<NanoId, PlanTier> currentAccountPlanTierCache = {};
-  static final Map<NanoId, int> remainingSubscriptionCredits = {};
-  static final Map<NanoId, int> remainingPurchasedCredits = {};
+  static final Map<NanoId, int> _currentConcurrencyRequests = {};
+  static final Map<NanoId, PlanTier> _currentAccountPlanTierCache = {};
+  static final Map<NanoId, int> _remainingSubscriptionCredits = {};
+  static final Map<NanoId, int> _remainingPurchasedCredits = {};
+
+  static void resetNanoId(NanoId nanoId) {
+    _currentConcurrencyRequests.remove(nanoId);
+    _currentAccountPlanTierCache.remove(nanoId);
+    _remainingSubscriptionCredits.remove(nanoId);
+    _remainingPurchasedCredits.remove(nanoId);
+  }
 
   Future<NanoId?> getNanoId(Session session, ApiKey? apikey) async {
     if (apikey == null) return null;
@@ -16,7 +23,7 @@ mixin ApiHelperMixin {
     if (splitted.length != 2) throw _invalidApiKeyFormat;
     final nanoId = splitted[0];
 
-    final PlanTier? cachePlanTier = currentAccountPlanTierCache[nanoId];
+    final PlanTier? cachePlanTier = _currentAccountPlanTierCache[nanoId];
     if (cachePlanTier != null) {
       if (cachePlanTier == PlanTier.none) throw _noActivePlan;
       return nanoId;
@@ -32,31 +39,31 @@ mixin ApiHelperMixin {
 
     if (planTier == null) throw _invalidApiKey;
     if (cachePlanTier == PlanTier.none) throw _noActivePlan;
-    currentAccountPlanTierCache[nanoId] = planTier;
+    _currentAccountPlanTierCache[nanoId] = planTier;
 
     return nanoId;
   }
 
   void increaseConcurrency(NanoId? nanoId) {
     if (nanoId == null) return;
-    final maxConcurrentRequests = currentAccountPlanTierCache[nanoId]
+    final maxConcurrentRequests = _currentAccountPlanTierCache[nanoId]
         ?.numberOfConcurrentRequestsAllowedByPlan;
     if (maxConcurrentRequests == null) throw _noActivePlan;
 
     final canIncrease =
-        (currentConcurrencyRequests[nanoId] ?? 0) + 1 <= maxConcurrentRequests;
+        (_currentConcurrencyRequests[nanoId] ?? 0) + 1 <= maxConcurrentRequests;
     if (!canIncrease) throw _maxConcurrency;
 
-    currentConcurrencyRequests[nanoId] =
-        (currentConcurrencyRequests[nanoId] ?? 0) + 1;
+    _currentConcurrencyRequests[nanoId] =
+        (_currentConcurrencyRequests[nanoId] ?? 0) + 1;
   }
 
   void decreaseConcurrency(NanoId? nanoId) {
     if (nanoId == null) return;
-    currentConcurrencyRequests[nanoId] =
-        (currentConcurrencyRequests[nanoId] ?? 1) - 1;
-    if (currentConcurrencyRequests[nanoId] == 0) {
-      currentConcurrencyRequests.remove(nanoId);
+    _currentConcurrencyRequests[nanoId] =
+        (_currentConcurrencyRequests[nanoId] ?? 1) - 1;
+    if (_currentConcurrencyRequests[nanoId] == 0) {
+      _currentConcurrencyRequests.remove(nanoId);
     }
   }
 
@@ -104,8 +111,8 @@ mixin ApiHelperMixin {
     required NanoId? nanoId,
   }) async {
     if (nanoId == null) return;
-    final subscriptionCredits = remainingSubscriptionCredits[nanoId];
-    final purchasedCredits = remainingPurchasedCredits[nanoId];
+    final subscriptionCredits = _remainingSubscriptionCredits[nanoId];
+    final purchasedCredits = _remainingPurchasedCredits[nanoId];
 
     if (subscriptionCredits == null || purchasedCredits == null) {
       // Let's get the most updated value from data base
@@ -116,22 +123,22 @@ mixin ApiHelperMixin {
       );
       if (accountApiUsage == null) throw _noApiFound;
 
-      remainingPurchasedCredits[nanoId] = accountApiUsage.purchasedCredits;
-      remainingSubscriptionCredits[nanoId] =
+      _remainingPurchasedCredits[nanoId] = accountApiUsage.purchasedCredits;
+      _remainingSubscriptionCredits[nanoId] =
           accountApiUsage.subscriptionCredits;
       return discountApiTokens(session, nanoId: nanoId);
     }
 
     // First, try to deduct from subscription credits
     if (subscriptionCredits > 0) {
-      remainingSubscriptionCredits[nanoId] =
-          (remainingSubscriptionCredits[nanoId] ?? subscriptionCredits) - 1;
+      _remainingSubscriptionCredits[nanoId] =
+          (_remainingSubscriptionCredits[nanoId] ?? subscriptionCredits) - 1;
       return;
     }
 
     if (purchasedCredits > 0) {
-      remainingPurchasedCredits[nanoId] =
-          (remainingPurchasedCredits[nanoId] ?? purchasedCredits) - 1;
+      _remainingPurchasedCredits[nanoId] =
+          (_remainingPurchasedCredits[nanoId] ?? purchasedCredits) - 1;
       return;
     }
 

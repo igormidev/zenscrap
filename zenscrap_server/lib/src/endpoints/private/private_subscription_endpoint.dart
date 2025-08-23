@@ -1,5 +1,6 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart';
+import 'package:zenscrap_server/src/core/api_helper/api_helper_mixin.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_api.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_config.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
@@ -123,6 +124,15 @@ class PrivateSubscriptionEndpoint extends Endpoint {
       // Update account info
       accountInfo.subscriptionStatus = 'canceled';
       await AccountInfo.db.updateRow(session, accountInfo);
+
+      // Get API usage to reset cache when subscription is canceled
+      final apiUsage = await AccountApiUsage.db.findById(
+        session,
+        accountInfo.accountApiUsageId,
+      );
+      if (apiUsage != null) {
+        ApiHelperMixin.resetNanoId(apiUsage.nanoId);
+      }
 
       return true;
     } catch (e) {
