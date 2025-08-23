@@ -3,6 +3,8 @@ import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/auth/handlers/on_send_reset_email.dart';
 import 'package:zenscrap_server/src/auth/handlers/on_send_validation_email.dart';
 import 'package:zenscrap_server/src/core/scraping_bee.dart';
+import 'package:zenscrap_server/src/core/stripe/stripe_config.dart';
+import 'package:zenscrap_server/src/future_calls/monthly_subscription_credits_future_call.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as auth;
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_claude_sdk_impl.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_gemini_api_impl.dart';
@@ -53,9 +55,25 @@ void run(List<String> args) async {
     geminiApiKey: pod.getPassword('geminiApiKey') ?? '',
   );
 
-  // Register your future call
+  // Initialize Stripe configuration
+  StripeConfig.initialize({
+    'stripe_secret_key': pod.getPassword('stripeSecretKey') ?? '',
+    'stripe_webhook_secret': pod.getPassword('stripeWebhookSecret') ?? '',
+    'stripe_basic_price_id_monthly': pod.getPassword('stripeBasicPriceIdMonthly') ?? '',
+    'stripe_basic_price_id_yearly': pod.getPassword('stripeBasicPriceIdYearly') ?? '',
+    'stripe_pro_price_id_monthly': pod.getPassword('stripeProPriceIdMonthly') ?? '',
+    'stripe_pro_price_id_yearly': pod.getPassword('stripeProPriceIdYearly') ?? '',
+    'stripe_ultra_price_id_monthly': pod.getPassword('stripeUltraPriceIdMonthly') ?? '',
+    'stripe_ultra_price_id_yearly': pod.getPassword('stripeUltraPriceIdYearly') ?? '',
+    'stripe_success_url': pod.getPassword('stripeSuccessUrl') ?? 'https://yourdomain.com/success',
+    'stripe_cancel_url': pod.getPassword('stripeCancelUrl') ?? 'https://yourdomain.com/cancel',
+  });
+
+  // Register your future calls
   pod.registerFutureCall(
       TestScrappableDisposeFutureCall(), 'dispose_temporary_scrappable');
+  pod.registerFutureCall(
+      MonthlySubscriptionCreditsFutureCall(), 'monthly_subscription_credits');
 
   // Start the server.
   await pod.start();

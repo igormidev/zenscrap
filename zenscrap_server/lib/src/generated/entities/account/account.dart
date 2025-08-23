@@ -27,6 +27,10 @@ abstract class AccountInfo
     required this.accountApiUsageId,
     this.accountApiUsage,
     required this.planTier,
+    this.stripeCustomerId,
+    this.stripeSubscriptionId,
+    this.subscriptionStatus,
+    this.subscriptionEndDate,
   });
 
   factory AccountInfo({
@@ -37,6 +41,10 @@ abstract class AccountInfo
     required int accountApiUsageId,
     _i4.AccountApiUsage? accountApiUsage,
     required _i5.PlanTier planTier,
+    String? stripeCustomerId,
+    String? stripeSubscriptionId,
+    String? subscriptionStatus,
+    DateTime? subscriptionEndDate,
   }) = _AccountInfoImpl;
 
   factory AccountInfo.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -56,6 +64,14 @@ abstract class AccountInfo
           : _i4.AccountApiUsage.fromJson(
               (jsonSerialization['accountApiUsage'] as Map<String, dynamic>)),
       planTier: _i5.PlanTier.fromJson((jsonSerialization['planTier'] as int)),
+      stripeCustomerId: jsonSerialization['stripeCustomerId'] as String?,
+      stripeSubscriptionId:
+          jsonSerialization['stripeSubscriptionId'] as String?,
+      subscriptionStatus: jsonSerialization['subscriptionStatus'] as String?,
+      subscriptionEndDate: jsonSerialization['subscriptionEndDate'] == null
+          ? null
+          : _i1.DateTimeJsonExtension.fromJson(
+              jsonSerialization['subscriptionEndDate']),
     );
   }
 
@@ -78,6 +94,14 @@ abstract class AccountInfo
 
   _i5.PlanTier planTier;
 
+  String? stripeCustomerId;
+
+  String? stripeSubscriptionId;
+
+  String? subscriptionStatus;
+
+  DateTime? subscriptionEndDate;
+
   @override
   _i1.Table<int?> get table => t;
 
@@ -92,6 +116,10 @@ abstract class AccountInfo
     int? accountApiUsageId,
     _i4.AccountApiUsage? accountApiUsage,
     _i5.PlanTier? planTier,
+    String? stripeCustomerId,
+    String? stripeSubscriptionId,
+    String? subscriptionStatus,
+    DateTime? subscriptionEndDate,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -104,6 +132,12 @@ abstract class AccountInfo
       'accountApiUsageId': accountApiUsageId,
       if (accountApiUsage != null) 'accountApiUsage': accountApiUsage?.toJson(),
       'planTier': planTier.toJson(),
+      if (stripeCustomerId != null) 'stripeCustomerId': stripeCustomerId,
+      if (stripeSubscriptionId != null)
+        'stripeSubscriptionId': stripeSubscriptionId,
+      if (subscriptionStatus != null) 'subscriptionStatus': subscriptionStatus,
+      if (subscriptionEndDate != null)
+        'subscriptionEndDate': subscriptionEndDate?.toJson(),
     };
   }
 
@@ -120,6 +154,12 @@ abstract class AccountInfo
       if (accountApiUsage != null)
         'accountApiUsage': accountApiUsage?.toJsonForProtocol(),
       'planTier': planTier.toJson(),
+      if (stripeCustomerId != null) 'stripeCustomerId': stripeCustomerId,
+      if (stripeSubscriptionId != null)
+        'stripeSubscriptionId': stripeSubscriptionId,
+      if (subscriptionStatus != null) 'subscriptionStatus': subscriptionStatus,
+      if (subscriptionEndDate != null)
+        'subscriptionEndDate': subscriptionEndDate?.toJson(),
     };
   }
 
@@ -172,6 +212,10 @@ class _AccountInfoImpl extends AccountInfo {
     required int accountApiUsageId,
     _i4.AccountApiUsage? accountApiUsage,
     required _i5.PlanTier planTier,
+    String? stripeCustomerId,
+    String? stripeSubscriptionId,
+    String? subscriptionStatus,
+    DateTime? subscriptionEndDate,
   }) : super._(
           id: id,
           scrappables: scrappables,
@@ -180,6 +224,10 @@ class _AccountInfoImpl extends AccountInfo {
           accountApiUsageId: accountApiUsageId,
           accountApiUsage: accountApiUsage,
           planTier: planTier,
+          stripeCustomerId: stripeCustomerId,
+          stripeSubscriptionId: stripeSubscriptionId,
+          subscriptionStatus: subscriptionStatus,
+          subscriptionEndDate: subscriptionEndDate,
         );
 
   /// Returns a shallow copy of this [AccountInfo]
@@ -194,6 +242,10 @@ class _AccountInfoImpl extends AccountInfo {
     int? accountApiUsageId,
     Object? accountApiUsage = _Undefined,
     _i5.PlanTier? planTier,
+    Object? stripeCustomerId = _Undefined,
+    Object? stripeSubscriptionId = _Undefined,
+    Object? subscriptionStatus = _Undefined,
+    Object? subscriptionEndDate = _Undefined,
   }) {
     return AccountInfo(
       id: id is int? ? id : this.id,
@@ -208,6 +260,18 @@ class _AccountInfoImpl extends AccountInfo {
           ? accountApiUsage
           : this.accountApiUsage?.copyWith(),
       planTier: planTier ?? this.planTier,
+      stripeCustomerId: stripeCustomerId is String?
+          ? stripeCustomerId
+          : this.stripeCustomerId,
+      stripeSubscriptionId: stripeSubscriptionId is String?
+          ? stripeSubscriptionId
+          : this.stripeSubscriptionId,
+      subscriptionStatus: subscriptionStatus is String?
+          ? subscriptionStatus
+          : this.subscriptionStatus,
+      subscriptionEndDate: subscriptionEndDate is DateTime?
+          ? subscriptionEndDate
+          : this.subscriptionEndDate,
     );
   }
 }
@@ -227,6 +291,22 @@ class AccountInfoTable extends _i1.Table<int?> {
       this,
       _i1.EnumSerialization.byIndex,
     );
+    stripeCustomerId = _i1.ColumnString(
+      'stripeCustomerId',
+      this,
+    );
+    stripeSubscriptionId = _i1.ColumnString(
+      'stripeSubscriptionId',
+      this,
+    );
+    subscriptionStatus = _i1.ColumnString(
+      'subscriptionStatus',
+      this,
+    );
+    subscriptionEndDate = _i1.ColumnDateTime(
+      'subscriptionEndDate',
+      this,
+    );
   }
 
   _i2.ScrappableTable? ___scrappables;
@@ -242,6 +322,14 @@ class AccountInfoTable extends _i1.Table<int?> {
   _i4.AccountApiUsageTable? _accountApiUsage;
 
   late final _i1.ColumnEnum<_i5.PlanTier> planTier;
+
+  late final _i1.ColumnString stripeCustomerId;
+
+  late final _i1.ColumnString stripeSubscriptionId;
+
+  late final _i1.ColumnString subscriptionStatus;
+
+  late final _i1.ColumnDateTime subscriptionEndDate;
 
   _i2.ScrappableTable get __scrappables {
     if (___scrappables != null) return ___scrappables!;
@@ -306,6 +394,10 @@ class AccountInfoTable extends _i1.Table<int?> {
         userInfoId,
         accountApiUsageId,
         planTier,
+        stripeCustomerId,
+        stripeSubscriptionId,
+        subscriptionStatus,
+        subscriptionEndDate,
       ];
 
   @override

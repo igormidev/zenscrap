@@ -1,0 +1,3 @@
+class: MonthlyCreditsData
+fields:
+  accountInfoId: int

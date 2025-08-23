@@ -58,6 +58,40 @@ class EndpointPrivateApiUsage extends _i1.EndpointRef {
 }
 
 /// {@category Endpoint}
+class EndpointPrivateSubscription extends _i1.EndpointRef {
+  EndpointPrivateSubscription(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'privateSubscription';
+
+  _i2.Future<String> createCheckoutSession({
+    required String planTier,
+    required bool isYearly,
+  }) =>
+      caller.callServerEndpoint<String>(
+        'privateSubscription',
+        'createCheckoutSession',
+        {
+          'planTier': planTier,
+          'isYearly': isYearly,
+        },
+      );
+
+  _i2.Future<Map<String, dynamic>> getSubscriptionStatus() =>
+      caller.callServerEndpoint<Map<String, dynamic>>(
+        'privateSubscription',
+        'getSubscriptionStatus',
+        {},
+      );
+
+  _i2.Future<bool> cancelSubscription() => caller.callServerEndpoint<bool>(
+        'privateSubscription',
+        'cancelSubscription',
+        {},
+      );
+}
+
+/// {@category Endpoint}
 class EndpointPrivateUserScrappables extends _i1.EndpointRef {
   EndpointPrivateUserScrappables(_i1.EndpointCaller caller) : super(caller);
 
@@ -236,6 +270,7 @@ class Client extends _i1.ServerpodClientShared {
         ) {
     privateAccount = EndpointPrivateAccount(this);
     privateApiUsage = EndpointPrivateApiUsage(this);
+    privateSubscription = EndpointPrivateSubscription(this);
     privateUserScrappables = EndpointPrivateUserScrappables(this);
     createScrappable = EndpointCreateScrappable(this);
     marketplace = EndpointMarketplace(this);
@@ -248,6 +283,8 @@ class Client extends _i1.ServerpodClientShared {
   late final EndpointPrivateAccount privateAccount;
 
   late final EndpointPrivateApiUsage privateApiUsage;
+
+  late final EndpointPrivateSubscription privateSubscription;
 
   late final EndpointPrivateUserScrappables privateUserScrappables;
 
@@ -267,6 +304,7 @@ class Client extends _i1.ServerpodClientShared {
   Map<String, _i1.EndpointRef> get endpointRefLookup => {
         'privateAccount': privateAccount,
         'privateApiUsage': privateApiUsage,
+        'privateSubscription': privateSubscription,
         'privateUserScrappables': privateUserScrappables,
         'createScrappable': createScrappable,
         'marketplace': marketplace,

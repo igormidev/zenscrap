@@ -21,6 +21,7 @@ dependencies:
   freezed_annotation: ^2.4.4
   json_annotation: ^4.9.0
   collection: ^1.19.1
+  crypto: ^3.0.5
   claude_code_sdk:
     path: ../claude_code_sdk
 

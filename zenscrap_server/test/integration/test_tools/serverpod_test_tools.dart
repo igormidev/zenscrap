@@ -116,6 +116,8 @@ class TestEndpoints {
 
   late final _PrivateApiUsageEndpoint privateApiUsage;
 
+  late final _PrivateSubscriptionEndpoint privateSubscription;
+
   late final _PrivateUserScrappablesEndpoint privateUserScrappables;
 
   late final _CreateScrappableEndpoint createScrappable;
@@ -141,6 +143,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     privateApiUsage = _PrivateApiUsageEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    privateSubscription = _PrivateSubscriptionEndpoint(
       endpoints,
       serializationManager,
     );
@@ -242,6 +248,104 @@ class _PrivateApiUsageEndpoint {
           _localUniqueSession,
           _localCallContext.arguments,
         ) as _i3.Future<_i6.AccountApiUsage>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _PrivateSubscriptionEndpoint {
+  _PrivateSubscriptionEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<String> createCheckoutSession(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required String planTier,
+    required bool isYearly,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'privateSubscription',
+        method: 'createCheckoutSession',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'privateSubscription',
+          methodName: 'createCheckoutSession',
+          parameters: _i1.testObjectToJson({
+            'planTier': planTier,
+            'isYearly': isYearly,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<String>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<Map<String, dynamic>> getSubscriptionStatus(
+      _i1.TestSessionBuilder sessionBuilder) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'privateSubscription',
+        method: 'getSubscriptionStatus',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'privateSubscription',
+          methodName: 'getSubscriptionStatus',
+          parameters: _i1.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<Map<String, dynamic>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<bool> cancelSubscription(
+      _i1.TestSessionBuilder sessionBuilder) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'privateSubscription',
+        method: 'cancelSubscription',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'privateSubscription',
+          methodName: 'cancelSubscription',
+          parameters: _i1.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<bool>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

@@ -106,7 +106,6 @@ mixin ApiHelperMixin {
     if (nanoId == null) return;
     final subscriptionCredits = remainingSubscriptionCredits[nanoId];
     final purchasedCredits = remainingPurchasedCredits[nanoId];
-    // int? cacheRemaining = remainingCredits[nanoId];
 
     if (subscriptionCredits == null || purchasedCredits == null) {
       // Let's get the most updated value from data base
@@ -125,12 +124,14 @@ mixin ApiHelperMixin {
 
     // First, try to deduct from subscription credits
     if (subscriptionCredits > 0) {
-      remainingSubscriptionCredits[nanoId] = subscriptionCredits - 1;
+      remainingSubscriptionCredits[nanoId] =
+          (remainingSubscriptionCredits[nanoId] ?? subscriptionCredits) - 1;
       return;
     }
 
     if (purchasedCredits > 0) {
-      remainingPurchasedCredits[nanoId] = purchasedCredits - 1;
+      remainingPurchasedCredits[nanoId] =
+          (remainingPurchasedCredits[nanoId] ?? purchasedCredits) - 1;
       return;
     }
 

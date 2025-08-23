@@ -1,3 +1,5 @@
+@zenscrap_server/lib/src/endpoints/private/private_subscription_endpoint.dart @zenscrap_server/lib/src/webhooks/stripe_webhook.dart @zenscrap_flutter/lib/src/ui/dashboard/pages/pricing_page.dart @zenscrap_server/lib/src/entities/account/plan_tier.spy.yaml @zenscrap_server/lib/src/core/extension/plan_tier_extension.dart 
+
 I what to create a subscription system for my app.
 I have a stripe account and I need your help to configure it and make the implementation in the serverpod side.
 
@@ -8,4 +10,6 @@ Ps: I don't know what is the best way of identify the user, I suggested email bu
 
 Bty, if you need to generate serverpod files, use the command "serverpod generate --experimental-features=all". It need to have that flag because I am using some experimental-features...
 
-Ultra think in a good way to do that...
+Guidelines: You should not use any type of package. Also, you SHOULD CHECK THE DOCUMENTATION of stripe with webresearch, mainly the part that talks about webhooks (https://docs.stripe.com/webhooks?utm_source=chatgpt.com). Do not forget to do that research before starting to build anything.
+
+Ultra think in a good way to do that and take you time to get this correctly done...

@@ -2,6 +2,10 @@ privateAccount:
   - getAccountInfo:
 privateApiUsage:
   - getUsageInfo:
+privateSubscription:
+  - createCheckoutSession:
+  - getSubscriptionStatus:
+  - cancelSubscription:
 privateUserScrappables:
   - call:
 createScrappable:

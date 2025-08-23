@@ -6,6 +6,10 @@ fields:
   accountApiUsageId: int
   accountApiUsage: AccountApiUsage?, relation(name=user_account_api_usage, field=accountApiUsageId)
   planTier: PlanTier
+  stripeCustomerId: String?
+  stripeSubscriptionId: String?
+  subscriptionStatus: String?
+  subscriptionEndDate: DateTime?
 indexes:
   user_info_id_unique_idx:  
     fields: userInfoId  

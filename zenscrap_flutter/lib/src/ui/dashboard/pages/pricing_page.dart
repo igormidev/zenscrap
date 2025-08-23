@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pricing_page/pricing_page.dart';
-import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 
@@ -37,8 +37,7 @@ class ZenScrapPricingPage extends ConsumerWidget {
               ],
               onTap: (bool isYearly) async {
                 await ref.globalLoadingSetter(() async {
-                  await testSubscribePro(ref, context);
-                  context.go('/endpoints');
+                  await _handleSubscription(ref, context, 'basic', isYearly);
                 });
               },
             ),
@@ -54,7 +53,11 @@ class ZenScrapPricingPage extends ConsumerWidget {
                 '<b><u><tC>10<tC><u><b> active endpoints',
                 'Access to the best AI model (20 messages)',
               ],
-              onTap: (bool isYearly) {},
+              onTap: (bool isYearly) async {
+                await ref.globalLoadingSetter(() async {
+                  await _handleSubscription(ref, context, 'pro', isYearly);
+                });
+              },
             ),
             PricesModel(
               title: 'ULTRA',
@@ -69,7 +72,11 @@ class ZenScrapPricingPage extends ConsumerWidget {
                 'Priority Support',
                 'Hide endpoints from marketplace',
               ],
-              onTap: (bool isYearly) {},
+              onTap: (bool isYearly) async {
+                await ref.globalLoadingSetter(() async {
+                  await _handleSubscription(ref, context, 'ultra', isYearly);
+                });
+              },
             ),
           ],
         ),
@@ -77,21 +84,62 @@ class ZenScrapPricingPage extends ConsumerWidget {
     );
   }
 
-  Future<void> testSubscribePro(WidgetRef ref, BuildContext context) async {
-    final userInfo = ref.read(sessionManagerProvider).signedInUser;
-    final email = userInfo?.email;
-    if (email == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('User not found'),
-        ),
-      );
-      return;
-    }
-    await ref.read(clientProvider).publicTier.updatePlayerTier(
-          email: email,
-          tierManipulationKey: '0195744f-a23c-757e-9bf4-184f7ef3bb24',
-          planTier: PlanTier.pro,
+  Future<void> _handleSubscription(
+    WidgetRef ref,
+    BuildContext context,
+    String planTier,
+    bool isYearly,
+  ) async {
+    try {
+      // Check if user is logged in
+      final isSignedIn = ref.read(sessionManagerProvider).isSignedIn;
+      if (!isSignedIn) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please sign in to subscribe'),
+          ),
         );
+        await Future.delayed(const Duration(milliseconds: 500));
+        // ignore: use_build_context_synchronously
+        context.go('/auth');
+        return;
+      }
+
+      // Create checkout session
+      final checkoutUrl = await ref
+          .read(clientProvider)
+          .privateSubscription
+          .createCheckoutSession(
+            planTier: planTier,
+            isYearly: isYearly,
+          );
+
+      // Launch Stripe checkout
+      if (checkoutUrl.isNotEmpty) {
+        final uri = Uri.parse(checkoutUrl);
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(
+            uri,
+            mode: LaunchMode.externalApplication,
+          );
+        } else {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Could not open checkout page'),
+              ),
+            );
+          }
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+          ),
+        );
+      }
+    }
   }
 }
