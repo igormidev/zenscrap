@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/states/chat_session/is_chat_loading_provider.dart';
 
 class CTAContinueFlow extends ConsumerStatefulWidget {
   final Scrappable scrappable;
@@ -49,6 +50,7 @@ class _CTAContinueFlowState extends ConsumerState<CTAContinueFlow> {
 
   @override
   Widget build(BuildContext context) {
+    final isChatLoading = ref.watch(isChatLoadingProvider);
     return Row(
       children: [
         // Text('Deploy to use at scale', style: context.t.titleLarge),
@@ -92,12 +94,14 @@ class _CTAContinueFlowState extends ConsumerState<CTAContinueFlow> {
           message:
               'Continue to edit/use this scrappable endpoint by deploying it!',
           child: FilledButton.icon(
-            onPressed: () async {
-              await context.push(
-                '/auth',
-                extra: widget.scrappable,
-              );
-            },
+            onPressed: isChatLoading
+                ? null
+                : () async {
+                    await context.push(
+                      '/auth',
+                      extra: widget.scrappable,
+                    );
+                  },
             label: Text('DEPLOY ENDPOINT'),
             iconAlignment: IconAlignment.end,
             icon: Icon(Icons.rocket),

@@ -9,6 +9,7 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/convert_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/chat_scroll_controller_provider.dart';
+import 'package:zenscrap_flutter/src/states/chat_session/is_chat_loading_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_messages_provider.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
 
@@ -92,14 +93,7 @@ class _ScrappableChatMessageStreamSectionState
             ),
           );
         }
-        final ChatResponse lastItem = messages.last;
-        final bool hasOnlyUserMessage = messages.length == 1;
-        final bool willHideLoading = !hasOnlyUserMessage &&
-            (lastItem.role == PromptRole.user ||
-                lastItem is ErrorTextResponse ||
-                lastItem is NewExtractRuleResponse ||
-                (lastItem is MessageTextResponse &&
-                    lastItem.role == PromptRole.model));
+        final bool willHideLoading = messages.willHideLoading;
 
         return ListView.builder(
           controller: scrollController,

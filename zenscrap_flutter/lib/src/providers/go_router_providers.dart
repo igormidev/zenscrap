@@ -78,9 +78,7 @@ final StateProvider routerProvider = StateProvider((ref) {
         path: '/scrappable-form',
         builder: (context, state) {
           final scrappable = state.extra as Scrappable?;
-          return InitialChatView(
-            scrappable: scrappable,
-          );
+          return InitialChatView(scrappable: scrappable);
         },
       ),
       ShellRoute(

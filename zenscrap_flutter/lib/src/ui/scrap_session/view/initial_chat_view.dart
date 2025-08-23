@@ -29,14 +29,16 @@ class _InitialChatViewState extends ConsumerState<InitialChatView> {
   void initState() {
     super.initState();
     // WidgetsBinding.instance.addPostFrameCallback((_) async {
-    Future.delayed(const Duration(seconds: 3), () async {
-      if (widget.scrappable != null) {
+    if (widget.scrappable != null) {
+      Future.delayed(const Duration(seconds: 3), () async {
         await ref
             .read(scrapChatProvider.notifier)
             .createSessionWithScrappable(widget.scrappable!);
         _initializationCompleter.complete();
-      }
-    });
+      });
+    } else {
+      _initializationCompleter.complete();
+    }
   }
 
   @override

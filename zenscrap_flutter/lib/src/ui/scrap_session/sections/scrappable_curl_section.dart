@@ -5,6 +5,7 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/convert_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/code_bloc.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
+import 'package:zenscrap_flutter/src/states/chat_session/is_chat_loading_provider.dart';
 
 class ScrappableCurlSection extends ConsumerStatefulWidget {
   final UuidValue scrappableId;
@@ -30,6 +31,16 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection> {
 
   @override
   Widget build(BuildContext context) {
+    final isChatLoading = ref.watch(isChatLoadingProvider);
+    if (isChatLoading) {
+      return Tooltip(
+        message: 'Chat is loading...',
+        child: Opacity(
+          opacity: 0.6,
+          child: CodeBlock(code: code),
+        ),
+      );
+    }
     return CodeBlock(code: code);
   }
 
@@ -38,23 +49,24 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection> {
     Map<String, String>? headers,
   }) {
     if (testData == null) return null;
-    
+
     // Get the full server URL properly
     final client = ref.read(clientProvider);
     final baseUrl = client.host;
-    final String url = '${baseUrl}scrappableApi/test';
-    
+    // Use the new route-based endpoint
+    final String url = '${baseUrl}api/scrappable/test';
+
     // Parse the example payload from the test data
     final examplePayload = tryDecode(testData.referenceQueryParametersJson);
-    
-    // Build the request payload matching the server endpoint format
+
+    // Build the request payload matching the new route format
     final Map<String, dynamic> payload = {
       'scrappableId': widget.scrappableId.toString(),
       'payload': examplePayload ?? {},
     };
-    
-    // Use compact JSON format for better readability in curl
-    final encoder = const JsonEncoder();
+
+    // Use pretty-printed JSON for better readability
+    final encoder = const JsonEncoder.withIndent('  ');
 
     final buffer = StringBuffer();
     buffer.write('curl -X POST "$url"');
@@ -70,9 +82,9 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection> {
       buffer.write(' \\\n  -H "$key: $value"');
     });
 
-    // Payload - format JSON without excessive escaping for better readability
+    // Payload - format JSON for better readability
     final jsonPayload = encoder.convert(payload);
-    // Single escape for quotes to work in both terminal and Postman/Insomnia
+    // Minimal escaping for compatibility with Postman/Insomnia
     final escapedPayload = jsonPayload.replaceAll('"', '\\"');
     buffer.write(' \\\n  -d "$escapedPayload"');
 
