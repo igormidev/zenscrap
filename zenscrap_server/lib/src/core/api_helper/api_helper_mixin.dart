@@ -39,8 +39,8 @@ mixin ApiHelperMixin {
 
   void increaseConcurrency(NanoId? nanoId) {
     if (nanoId == null) return;
-    final maxConcurrentRequests =
-        concurrencyMaxAmountTier[nanoId]?.maxConcurrentRequests;
+    final maxConcurrentRequests = concurrencyMaxAmountTier[nanoId]
+        ?.numberOfConcurrentRequestsAllowedByPlan;
     if (maxConcurrentRequests == null) throw _noActivePlan;
 
     final canIncrease =
