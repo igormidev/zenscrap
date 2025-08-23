@@ -4,6 +4,8 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_state.dart';
 import 'package:zenscrap_flutter/src/states/dashboard/dashboard_index_provider.dart';
+import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables.dart';
+import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables_state.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
 
 // If null, means no error
@@ -20,7 +22,10 @@ final dashboardErrorProvider = Provider<ZenScrapException?>((ref) {
 
   final List<ZenScrapException?> pageDependenciesErrors =
       switch (selectedPage) {
-    DashboardNavigationType.endpoints => [],
+    DashboardNavigationType.userEndpoints => [
+        ref.watch(userScrappables
+            .select((value) => value.whenOrNull(withError: (error) => error))),
+      ],
     DashboardNavigationType.marketPlace => [],
     DashboardNavigationType.usage => [],
     DashboardNavigationType.account => [],

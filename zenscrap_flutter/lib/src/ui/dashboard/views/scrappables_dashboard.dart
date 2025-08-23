@@ -144,7 +144,7 @@ class DashboardTemplateState extends ConsumerState<DashboardView> {
 }
 
 enum DashboardNavigationType {
-  endpoints(
+  userEndpoints(
     label: 'Endpoints',
     activeIcon: Icons.api,
     inactiveIcon: Icons.api_outlined,

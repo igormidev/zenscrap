@@ -87,7 +87,7 @@ final StateProvider routerProvider = StateProvider((ref) {
         navigatorKey: _shellNavigatorKey,
         routes: [
           GoRoute(
-            path: DashboardNavigationType.endpoints.routeOnClick!,
+            path: DashboardNavigationType.userEndpoints.routeOnClick!,
             builder: (context, state) => UserScrappablesListage(),
           ),
           GoRoute(
