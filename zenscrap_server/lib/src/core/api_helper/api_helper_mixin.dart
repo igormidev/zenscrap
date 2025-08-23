@@ -1,5 +1,5 @@
 import 'package:serverpod/serverpod.dart';
-import 'package:zenscrap_server/src/core/extension/plan_tier.dart';
+import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 typedef ApiKey = String;
