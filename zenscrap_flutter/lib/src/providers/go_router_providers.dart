@@ -8,6 +8,7 @@ import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 import 'package:zenscrap_flutter/src/ui/account/views/account_view.dart';
+import 'package:zenscrap_flutter/src/ui/api_usage/views/api_usage_view.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/splash_view.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
@@ -90,8 +91,12 @@ final StateProvider routerProvider = StateProvider((ref) {
             builder: (context, state) => UserScrappablesListage(),
           ),
           GoRoute(
-            path: DashboardNavigationType.usage.routeOnClick!,
+            path: DashboardNavigationType.marketPlace.routeOnClick!,
             builder: (context, state) => Container(),
+          ),
+          GoRoute(
+            path: DashboardNavigationType.usage.routeOnClick!,
+            builder: (context, state) => ApiUsageView(),
           ),
           GoRoute(
             path: DashboardNavigationType.account.routeOnClick!,
