@@ -161,7 +161,13 @@ class Protocol extends _i1.SerializationManagerServer {
           dartType: 'String',
         ),
         _i2.ColumnDefinition(
-          name: 'remainingCredits',
+          name: 'subscriptionCredits',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _i2.ColumnDefinition(
+          name: 'purchasedCredits',
           columnType: _i2.ColumnType.bigint,
           isNullable: false,
           dartType: 'int',

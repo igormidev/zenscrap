@@ -22,7 +22,8 @@ abstract class AccountApiUsage
   AccountApiUsage._({
     this.id,
     required this.nanoId,
-    required this.remainingCredits,
+    required this.subscriptionCredits,
+    required this.purchasedCredits,
     this.accountInfo,
     this.history,
     this.apiKeys,
@@ -31,7 +32,8 @@ abstract class AccountApiUsage
   factory AccountApiUsage({
     int? id,
     required String nanoId,
-    required int remainingCredits,
+    required int subscriptionCredits,
+    required int purchasedCredits,
     _i2.AccountInfo? accountInfo,
     List<_i3.CreditHistoryItem>? history,
     List<_i4.AccountApiKey>? apiKeys,
@@ -41,7 +43,8 @@ abstract class AccountApiUsage
     return AccountApiUsage(
       id: jsonSerialization['id'] as int?,
       nanoId: jsonSerialization['nanoId'] as String,
-      remainingCredits: jsonSerialization['remainingCredits'] as int,
+      subscriptionCredits: jsonSerialization['subscriptionCredits'] as int,
+      purchasedCredits: jsonSerialization['purchasedCredits'] as int,
       accountInfo: jsonSerialization['accountInfo'] == null
           ? null
           : _i2.AccountInfo.fromJson(
@@ -65,7 +68,9 @@ abstract class AccountApiUsage
 
   String nanoId;
 
-  int remainingCredits;
+  int subscriptionCredits;
+
+  int purchasedCredits;
 
   _i2.AccountInfo? accountInfo;
 
@@ -82,7 +87,8 @@ abstract class AccountApiUsage
   AccountApiUsage copyWith({
     int? id,
     String? nanoId,
-    int? remainingCredits,
+    int? subscriptionCredits,
+    int? purchasedCredits,
     _i2.AccountInfo? accountInfo,
     List<_i3.CreditHistoryItem>? history,
     List<_i4.AccountApiKey>? apiKeys,
@@ -92,7 +98,8 @@ abstract class AccountApiUsage
     return {
       if (id != null) 'id': id,
       'nanoId': nanoId,
-      'remainingCredits': remainingCredits,
+      'subscriptionCredits': subscriptionCredits,
+      'purchasedCredits': purchasedCredits,
       if (accountInfo != null) 'accountInfo': accountInfo?.toJson(),
       if (history != null)
         'history': history?.toJson(valueToJson: (v) => v.toJson()),
@@ -106,7 +113,8 @@ abstract class AccountApiUsage
     return {
       if (id != null) 'id': id,
       'nanoId': nanoId,
-      'remainingCredits': remainingCredits,
+      'subscriptionCredits': subscriptionCredits,
+      'purchasedCredits': purchasedCredits,
       if (accountInfo != null) 'accountInfo': accountInfo?.toJsonForProtocol(),
       if (history != null)
         'history': history?.toJson(valueToJson: (v) => v.toJsonForProtocol()),
@@ -159,14 +167,16 @@ class _AccountApiUsageImpl extends AccountApiUsage {
   _AccountApiUsageImpl({
     int? id,
     required String nanoId,
-    required int remainingCredits,
+    required int subscriptionCredits,
+    required int purchasedCredits,
     _i2.AccountInfo? accountInfo,
     List<_i3.CreditHistoryItem>? history,
     List<_i4.AccountApiKey>? apiKeys,
   }) : super._(
           id: id,
           nanoId: nanoId,
-          remainingCredits: remainingCredits,
+          subscriptionCredits: subscriptionCredits,
+          purchasedCredits: purchasedCredits,
           accountInfo: accountInfo,
           history: history,
           apiKeys: apiKeys,
@@ -179,7 +189,8 @@ class _AccountApiUsageImpl extends AccountApiUsage {
   AccountApiUsage copyWith({
     Object? id = _Undefined,
     String? nanoId,
-    int? remainingCredits,
+    int? subscriptionCredits,
+    int? purchasedCredits,
     Object? accountInfo = _Undefined,
     Object? history = _Undefined,
     Object? apiKeys = _Undefined,
@@ -187,7 +198,8 @@ class _AccountApiUsageImpl extends AccountApiUsage {
     return AccountApiUsage(
       id: id is int? ? id : this.id,
       nanoId: nanoId ?? this.nanoId,
-      remainingCredits: remainingCredits ?? this.remainingCredits,
+      subscriptionCredits: subscriptionCredits ?? this.subscriptionCredits,
+      purchasedCredits: purchasedCredits ?? this.purchasedCredits,
       accountInfo: accountInfo is _i2.AccountInfo?
           ? accountInfo
           : this.accountInfo?.copyWith(),
@@ -208,15 +220,21 @@ class AccountApiUsageTable extends _i1.Table<int?> {
       'nanoId',
       this,
     );
-    remainingCredits = _i1.ColumnInt(
-      'remainingCredits',
+    subscriptionCredits = _i1.ColumnInt(
+      'subscriptionCredits',
+      this,
+    );
+    purchasedCredits = _i1.ColumnInt(
+      'purchasedCredits',
       this,
     );
   }
 
   late final _i1.ColumnString nanoId;
 
-  late final _i1.ColumnInt remainingCredits;
+  late final _i1.ColumnInt subscriptionCredits;
+
+  late final _i1.ColumnInt purchasedCredits;
 
   _i2.AccountInfoTable? _accountInfo;
 
@@ -307,7 +325,8 @@ class AccountApiUsageTable extends _i1.Table<int?> {
   List<_i1.Column> get columns => [
         id,
         nanoId,
-        remainingCredits,
+        subscriptionCredits,
+        purchasedCredits,
       ];
 
   @override

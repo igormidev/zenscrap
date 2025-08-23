@@ -7,7 +7,8 @@ typedef NanoId = String;
 mixin ApiHelperMixin {
   static final Map<NanoId, int> currentConcurrencyRequests = {};
   static final Map<NanoId, PlanTier> concurrencyMaxAmountTier = {};
-  static final Map<NanoId, int> remainingCredits = {};
+  static final Map<NanoId, int> remainingSubscriptionCredits = {};
+  static final Map<NanoId, int> remainingPurchasedCredits = {};
 
   Future<NanoId?> getNanoId(Session session, ApiKey? apikey) async {
     if (apikey == null) return null;
@@ -97,14 +98,17 @@ mixin ApiHelperMixin {
     return targetUrl;
   }
 
+  /// Priority is; first deduce on subscription, then on purchased credits
   Future<void> discountApiTokens(
     Session session, {
     required NanoId? nanoId,
   }) async {
     if (nanoId == null) return;
-    int? cacheRemaining = remainingCredits[nanoId];
+    final subscriptionCredits = remainingSubscriptionCredits[nanoId];
+    final purchasedCredits = remainingPurchasedCredits[nanoId];
+    // int? cacheRemaining = remainingCredits[nanoId];
 
-    if (cacheRemaining == null) {
+    if (subscriptionCredits == null || purchasedCredits == null) {
       // Let's get the most updated value from data base
       final accountApiUsage = await AccountApiUsage.db.findFirstRow(
         session,
@@ -113,13 +117,24 @@ mixin ApiHelperMixin {
       );
       if (accountApiUsage == null) throw _noApiFound;
 
-      cacheRemaining = accountApiUsage.remainingCredits;
-      remainingCredits[nanoId] = cacheRemaining;
+      remainingPurchasedCredits[nanoId] = accountApiUsage.purchasedCredits;
+      remainingSubscriptionCredits[nanoId] =
+          accountApiUsage.subscriptionCredits;
+      return discountApiTokens(session, nanoId: nanoId);
     }
 
-    final hasEnoughCredits = cacheRemaining > 0;
-    if (!hasEnoughCredits) throw _insufficientCredits;
-    remainingCredits[nanoId] = cacheRemaining - 1;
+    // First, try to deduct from subscription credits
+    if (subscriptionCredits > 0) {
+      remainingSubscriptionCredits[nanoId] = subscriptionCredits - 1;
+      return;
+    }
+
+    if (purchasedCredits > 0) {
+      remainingPurchasedCredits[nanoId] = purchasedCredits - 1;
+      return;
+    }
+
+    throw _insufficientCredits;
   }
 
   Future<(Scrappable, ScrappableRequest)> getScrappableById(

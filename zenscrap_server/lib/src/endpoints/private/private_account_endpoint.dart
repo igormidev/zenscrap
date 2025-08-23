@@ -43,7 +43,8 @@ class PrivateAccountEndpoint extends Endpoint {
           final accountApiUsage = await AccountApiUsage.db.insertRow(
             session,
             AccountApiUsage(
-              remainingCredits: 0,
+              purchasedCredits: 0,
+              subscriptionCredits: 0,
               nanoId: nanoId,
             ),
             transaction: transaction,
