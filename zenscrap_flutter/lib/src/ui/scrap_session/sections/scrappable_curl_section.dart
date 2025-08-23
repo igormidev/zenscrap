@@ -38,37 +38,41 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection> {
     Map<String, String>? headers,
   }) {
     if (testData == null) return null;
-    final String url =
-        '${ref.read(clientProvider).host}handleApiScrapRequest/test/';
-    final Map<String, dynamic> queryParams = {};
+    
+    // Get the full server URL properly
+    final client = ref.read(clientProvider);
+    final baseUrl = client.host;
+    final String url = '${baseUrl}scrappableApi/test';
+    
+    // Parse the example payload from the test data
     final examplePayload = tryDecode(testData.referenceQueryParametersJson);
+    
+    // Build the request payload matching the server endpoint format
     final Map<String, dynamic> payload = {
       'scrappableId': widget.scrappableId.toString(),
-      if (examplePayload != null) 'payload': examplePayload,
+      'payload': examplePayload ?? {},
     };
-    final encoder = const JsonEncoder.withIndent('  ');
-
-    // Build full URL with query parameters
-    final uri = Uri.parse(url)
-        .replace(queryParameters: queryParams.isEmpty ? null : queryParams);
+    
+    // Use compact JSON format for better readability in curl
+    final encoder = const JsonEncoder();
 
     final buffer = StringBuffer();
-    buffer.write('curl -X POST "$uri"');
+    buffer.write('curl -X POST "$url"');
+
+    // Add default headers
+    final allHeaders = {
+      'Content-Type': 'application/json',
+      ...?headers,
+    };
 
     // Headers
-    headers?.forEach((key, value) {
+    allHeaders.forEach((key, value) {
       buffer.write(' \\\n  -H "$key: $value"');
     });
 
-    // Add Content-Type if not provided and payload exists
-    if (!(headers?.keys.any((h) => h.toLowerCase() == 'content-type') ??
-        false)) {
-      buffer.write(' \\\n  -H "Content-Type: application/json"');
-    }
-
-    // Payload
+    // Payload - format JSON without excessive escaping for better readability
     final jsonPayload = encoder.convert(payload);
-    // Escape quotes for shell safety
+    // Single escape for quotes to work in both terminal and Postman/Insomnia
     final escapedPayload = jsonPayload.replaceAll('"', '\\"');
     buffer.write(' \\\n  -d "$escapedPayload"');
 
