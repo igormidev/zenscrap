@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/src/core/extensions/convert_extensions.dart';
 import 'package:zenscrap_flutter/src/core/extensions/string_extension.dart';
+import 'package:zenscrap_flutter/src/core/mixins/curl_builder_mixin.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
+import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
+import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
+import 'package:zenscrap_flutter/src/states/account/account_state.dart';
 
-class MarketplaceScrappableCard extends StatelessWidget {
+class MarketplaceScrappableCard extends ConsumerWidget with CurlBuilderMixin {
   final Scrappable scrappable;
   final VoidCallback? onTap;
 
@@ -14,7 +22,7 @@ class MarketplaceScrappableCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final hasUrl = scrappable.targetRequest?.url != null;
     final url = scrappable.targetRequest?.url ?? '';
 
@@ -102,9 +110,7 @@ class MarketplaceScrappableCard extends StatelessWidget {
             Row(
               children: [
                 InkWell(
-                  onTap: () {
-                    // Todo(Implement copy curl logic)
-                  },
+                  onTap: () => _copyCurl(context, ref),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
@@ -178,6 +184,48 @@ class MarketplaceScrappableCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _copyCurl(BuildContext context, WidgetRef ref) async {
+    // Get the first API key from the account state
+    final accountState = ref.read(accountProvider);
+    
+    accountState.whenOrNull(
+      withData: (accountInfo) async {
+        final apiKeys = accountInfo.accountApiUsage?.apiKeys;
+        
+        if (apiKeys == null || apiKeys.isEmpty) {
+          showSnackbar(context, 'No API keys found. Please create one first.');
+          return;
+        }
+        
+        // Use the first API key
+        final firstApiKey = apiKeys.first;
+        final client = ref.read(clientProvider);
+        final baseUrl = client.host.replaceAll('localhost:8080', 'localhost:8082');
+        
+        // Parse example payload if available
+        Map<String, dynamic>? examplePayload;
+        if (scrappable.referenceTestData != null) {
+          examplePayload = tryDecode(
+            scrappable.referenceTestData!.referenceQueryParametersJson
+          );
+        }
+        
+        final curlCommand = buildSimpleCurl(
+          baseUrl: baseUrl,
+          scrappableId: scrappable.id,
+          apiKey: firstApiKey.apiKey,
+          examplePayload: examplePayload,
+        );
+        
+        await Clipboard.setData(ClipboardData(text: curlCommand));
+        
+        if (context.mounted) {
+          showSnackbar(context, 'Curl command copied to clipboard');
+        }
+      },
     );
   }
 
