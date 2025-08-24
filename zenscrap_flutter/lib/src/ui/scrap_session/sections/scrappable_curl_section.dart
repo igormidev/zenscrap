@@ -41,6 +41,7 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection> {
         ),
       );
     }
+
     return CodeBlock(code: code);
   }
 

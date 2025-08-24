@@ -56,36 +56,46 @@ class ChatControllerGeminiApiImpl extends IChatController {
     required ReferenceTestData referenceTestData,
     required StreamController<ChatResponse> chatSeason,
   }) async {
-    const int MAX_ATTEMPTS = 3;
-    int attempt = 0;
-    RetryContent? retryContent;
-    while (attempt < MAX_ATTEMPTS) {
-      attempt++;
-      final GenerateContentResponse response = await chatSession.sendMessage(
-        retryContent ??
-            composeUserPromptIfNeeded(
-                referenceTestData: referenceTestData, userPrompt: userPromt),
-      );
-      retryContent = await _getChatResponses(
-        session: session,
-        generatedContent: response,
-        testData: referenceTestData,
-        chatSeasonController: chatSeason,
-        attemptNumber: attempt,
-      );
-      if (retryContent == null) {
-        // No retry needed.
-        return;
+    try {
+      const int MAX_ATTEMPTS = 3;
+      int attempt = 0;
+      RetryContent? retryContent;
+      while (attempt < MAX_ATTEMPTS) {
+        attempt++;
+        final GenerateContentResponse response = await chatSession.sendMessage(
+          retryContent ??
+              composeUserPromptIfNeeded(
+                  referenceTestData: referenceTestData, userPrompt: userPromt),
+        );
+        retryContent = await _getChatResponses(
+          session: session,
+          generatedContent: response,
+          testData: referenceTestData,
+          chatSeasonController: chatSeason,
+          attemptNumber: attempt,
+        );
+        if (retryContent == null) {
+          // No retry needed.
+          return;
+        }
       }
-    }
 
-    chatSeason.add(
-      ErrorTextResponse(
+      chatSeason.add(
+        ErrorTextResponse(
+          role: PromptRole.system,
+          errorMessage:
+              'Exceeded maximum attempts to generate extract rules. The AI is not collaborating at all...\nThe AI is generating extract rules that do not work or not even generating extract rules at all...',
+        ),
+      );
+    } catch (error, stackTrace) {
+      session.log('Error occurred while generating extract rules',
+          exception: error, stackTrace: stackTrace, level: LogLevel.error);
+      chatSeason.add(ErrorTextResponse(
         role: PromptRole.system,
         errorMessage:
-            'Exceeded maximum attempts to generate extract rules. The AI is not collaborating at all...\nThe AI is generating extract rules that do not work or not even generating extract rules at all...',
-      ),
-    );
+            '[ FATAL ]\nAn internal error occurred while generating extract rules:\n$error',
+      ));
+    }
   }
 
   Future<RetryContent?> _getChatResponses({
@@ -306,14 +316,25 @@ My task prompt is:'''),
     ]);
   }
 
-  final Uint8List jsonBytes = utf8.encode(
-    referenceTestData.scrappableTestResult!.testExtractRule,
-  );
+  // Get the JSON string and try to format it nicely
+  final String rawJson =
+      referenceTestData.scrappableTestResult!.testExtractRule;
+  String existingRulesJson;
+
+  try {
+    // Try to parse and pretty-print the JSON
+    final Map<String, dynamic> jsonMap = json.decode(rawJson);
+    const JsonEncoder encoder = JsonEncoder.withIndent('  ');
+    existingRulesJson = encoder.convert(jsonMap);
+  } catch (_) {
+    // If parsing fails, use the raw JSON string
+    existingRulesJson = rawJson;
+  }
 
   return Content.multi([
     TextPart(
-        'I wan\'t to iterate on the last extract rules I built. I will attach it bellow:'),
-    DataPart('application/json', jsonBytes),
+        'I wan\'t to iterate on the last extract rules I built. Here are the current rules:'),
+    TextPart('```json\n$existingRulesJson\n```'),
     TextPart('''It worked well, but I want to modify it.
 
 **RESPONSE FORMAT - Use ONE of these three patterns:**
