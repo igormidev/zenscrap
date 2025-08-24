@@ -20,7 +20,7 @@ class ZenScrapPricingPage extends ConsumerWidget {
         body: PricingBackground(
           child: PricingPage(
             width: 832,
-            childAspectRatio: 0.5,
+            childAspectRatio: 0.45,
             perMonthText: 'Per month',
             perYearText: 'Per year',
             subtitle:
@@ -76,7 +76,8 @@ class ZenScrapPricingPage extends ConsumerWidget {
                   '<b><u><tC>100<tC><u><b> active endpoints',
                   'Access to the best AI model (100 messages)',
                   'Priority Support',
-                  'Hide endpoints from marketplace',
+                  'Hide your endpoints from marketplace',
+                  'Copy endpoints from marketplace',
                 ],
                 onTap: (bool isYearly) async {
                   await ref.globalLoadingSetter(() async {

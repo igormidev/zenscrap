@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/src/core/extensions/string_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 
 class MarketplaceScrappableCard extends StatelessWidget {
@@ -21,7 +22,8 @@ class MarketplaceScrappableCard extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16)
+            .copyWith(bottom: 0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
@@ -83,7 +85,7 @@ class MarketplaceScrappableCard extends StatelessWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        url,
+                        url.shortUrl,
                         style: context.t.bodySmall?.copyWith(
                           color: context.c.primary,
                           fontFamily: 'monospace',
@@ -99,32 +101,38 @@ class MarketplaceScrappableCard extends StatelessWidget {
             const SizedBox(height: 12),
             Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: context.c.tertiary.withAlpha(26),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.public_rounded,
-                        size: 12,
-                        color: context.c.tertiary,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        'Public',
-                        style: context.t.labelSmall?.copyWith(
+                InkWell(
+                  onTap: () {
+                    // Todo(Implement copy curl logic)
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: context.c.primaryContainer.withAlpha(156),
+                      // color: context.c.tertiary.withAlpha(26),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.copy,
+                          size: 12,
                           color: context.c.tertiary,
-                          fontWeight: FontWeight.w600,
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 6),
+                        Text(
+                          'Copy curl request',
+                          style: context.t.labelSmall?.copyWith(
+                            color: context.c.tertiary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -161,7 +169,7 @@ class MarketplaceScrappableCard extends StatelessWidget {
                 const Spacer(),
                 Text(
                   'Created ${_formatDate(scrappable.createdAt)}',
-                  style: context.t.labelSmall?.copyWith(
+                  style: context.t.labelMedium?.copyWith(
                     color: context.c.onSurfaceVariant.withAlpha(179),
                   ),
                 ),

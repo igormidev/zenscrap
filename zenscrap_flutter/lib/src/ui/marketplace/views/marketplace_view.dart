@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/src/core/extensions/string_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/states/marketplace/marketplace_provider.dart';
 import 'package:zenscrap_flutter/src/states/marketplace/marketplace_state.dart';
@@ -59,7 +60,7 @@ class _MarketplaceViewState extends ConsumerState<MarketplaceView> {
                       gridDelegate:
                           const SliverGridDelegateWithMaxCrossAxisExtent(
                         maxCrossAxisExtent: 480,
-                        childAspectRatio: 1.4,
+                        childAspectRatio: 1.72,
                         crossAxisSpacing: 20,
                         mainAxisSpacing: 20,
                       ),
@@ -179,8 +180,8 @@ class _MarketplaceViewState extends ConsumerState<MarketplaceView> {
                 ),
                 const SizedBox(height: 8),
                 SelectableText(
-                  scrappable.targetRequest!.url,
-                  style: context.t.bodyMedium?.copyWith(
+                  scrappable.targetRequest!.url.shortUrl,
+                  style: context.t.bodyLarge?.copyWith(
                     fontFamily: 'monospace',
                     color: context.c.primary,
                   ),
