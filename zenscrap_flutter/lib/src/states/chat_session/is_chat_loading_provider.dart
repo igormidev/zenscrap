@@ -4,23 +4,32 @@ import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_messages_pro
 
 final isChatLoadingProvider = Provider<bool>((ref) {
   return ref.watch(chatMessagesProvider.select((value) => value.maybeMap(
-        data: (data) => !data.value.willHideLoading,
+        data: (data) => data.value.willShowLoading,
         orElse: () => false,
       )));
 });
 
 extension MessagesExt on List<ChatResponse> {
   bool get willHideLoading {
-    if (isEmpty) return false;
-    final ChatResponse lastItem = last;
-    final bool hasOnlyUserMessage = length == 1;
-    final bool willHideLoading = !hasOnlyUserMessage &&
-        (lastItem.role == PromptRole.user ||
-            lastItem is ErrorTextResponse ||
-            lastItem is NewExtractRuleResponse ||
-            (lastItem is MessageTextResponse &&
-                lastItem.role == PromptRole.model));
+    return !willShowLoading;
+  }
 
-    return willHideLoading;
+  bool get willShowLoading {
+    if (isEmpty) return false;
+
+    final ChatResponse lastItem = last;
+
+    if (lastItem.role == PromptRole.user) {
+      return true;
+    } else if (lastItem.role == PromptRole.model) {
+      if (lastItem is MessageTextResponse) return false;
+      if (lastItem is ErrorTextResponse) return false;
+      return true;
+    } else {
+      // lastItem.role == PromptRole.system
+      if (lastItem is MessageTextResponse) return false;
+      if (lastItem is ErrorTextResponse) return false;
+      return true;
+    }
   }
 }

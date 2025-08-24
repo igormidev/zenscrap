@@ -109,8 +109,7 @@ class ChatControllerGeminiApiImpl extends IChatController {
         attemptNumber > 1 ? '# Attempt $attemptNumber\n' : '';
 
     String? responseText = generatedContent.text;
-    print(
-        'Raw AI response:\n$responseText\n--------------------------------------------------');
+    print('Raw AI response: $responseText');
     if (responseText == null || responseText.isEmpty) {
       chatSeasonController.add(ErrorTextResponse(
         role: PromptRole.system,
@@ -237,10 +236,13 @@ class ChatControllerGeminiApiImpl extends IChatController {
             ),
           );
         } else {
-          testResult = ScrappableTestResult(
-            scrappableId: scrappableId,
-            extractJsonResult: jsonEncode(result),
-            testExtractRule: extractedRules,
+          testResult = await ScrappableTestResult.db.insertRow(
+            session,
+            ScrappableTestResult(
+              scrappableId: scrappableId,
+              extractJsonResult: jsonEncode(result),
+              testExtractRule: extractedRules,
+            ),
           );
         }
         chatSeasonController.add(NewExtractRuleResponse(
