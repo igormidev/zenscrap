@@ -204,13 +204,15 @@ class ChatControllerGeminiApiImpl extends IChatController {
     }
 
     final extractedRules = newState.newExtractRules;
-    chatSeasonController.add(MessageTextResponse(
-      role: PromptRole.system,
-      messageText:
-          'Great, I will now test the extract rules you created to se if it works in the reference link we are using for testing.\n'
-          'Please wait a moment...',
-    ));
-    await Future.delayed(const Duration(milliseconds: 400));
+
+    Future.delayed(const Duration(milliseconds: 700), () {
+      chatSeasonController.add(MessageTextResponse(
+        role: PromptRole.system,
+        messageText:
+            'Great, I will now test the extract rules you created to se if it works in the reference link we are using for testing.\n'
+            'Please wait a moment...',
+      ));
+    });
 
     // Needs to validate if the rules are working...
     final ExtractDataByRule extractResult = await scrapingBee.extractByRules(

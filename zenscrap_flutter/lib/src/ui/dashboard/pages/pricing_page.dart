@@ -11,74 +11,81 @@ class ZenScrapPricingPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 224, 240, 255),
-      body: PricingBackground(
-        child: PricingPage(
-          width: 832,
-          childAspectRatio: 0.7,
-          subtitle:
-              "We have you covered, whether you're an unique person running\na side-project, a startup or even an enterprise company.",
-          decorationMapper: (decoration) {
-            return decoration.copyWith(
-              color: Theme.of(context).colorScheme.onSecondary,
-            );
-          },
-          pricesList: [
-            PricesModel(
-              title: 'BASIC',
-              subTitle: 'FOR SIDE-PROJECTS',
-              monthlyPrice: 100,
-              yearlyPrice: 1050,
-              advantagesListage: [
-                '<b><u><tC>50.000<tC><u><b> api calls',
-                '<b><u><tC>10<tC><u><b> concurrent requests',
-                '<b><u><tC>3<tC><u><b> active endpoints',
-              ],
-              onTap: (bool isYearly) async {
-                await ref.globalLoadingSetter(() async {
-                  await _handleSubscription(ref, context, 'basic', isYearly);
-                });
-              },
-            ),
-            PricesModel(
-              title: 'PRO',
-              subTitle: 'FOR STARTUP',
-              emphasisText: 'MOST POPULAR',
-              monthlyPrice: 199,
-              yearlyPrice: 1999,
-              advantagesListage: [
-                '<b><u><tC>200.000<tC><u><b> api calls',
-                '<b><u><tC>30<tC><u><b> concurrent requests',
-                '<b><u><tC>10<tC><u><b> active endpoints',
-                'Access to the best AI model (20 messages)',
-              ],
-              onTap: (bool isYearly) async {
-                await ref.globalLoadingSetter(() async {
-                  await _handleSubscription(ref, context, 'pro', isYearly);
-                });
-              },
-            ),
-            PricesModel(
-              title: 'ULTRA',
-              subTitle: 'ENTERPRISE USAGE',
-              monthlyPrice: 500,
-              yearlyPrice: 5500,
-              advantagesListage: [
-                '<b><u><tC>1.000.000<tC><u><b> api calls',
-                '<b><u><tC>100<tC><u><b> concurrent requests',
-                '<b><u><tC>100<tC><u><b> active endpoints',
-                'Access to the best AI model (100 messages)',
-                'Priority Support',
-                'Hide endpoints from marketplace',
-              ],
-              onTap: (bool isYearly) async {
-                await ref.globalLoadingSetter(() async {
-                  await _handleSubscription(ref, context, 'ultra', isYearly);
-                });
-              },
-            ),
-          ],
+    return Theme(
+      data: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.cyanAccent),
+      ),
+      child: Scaffold(
+        backgroundColor: const Color.fromARGB(255, 224, 240, 255),
+        body: PricingBackground(
+          child: PricingPage(
+            width: 832,
+            childAspectRatio: 0.5,
+            perMonthText: 'Per month',
+            perYearText: 'Per year',
+            subtitle:
+                "We have you covered, whether you're an unique person running\na side-project, a startup or even an enterprise company.",
+            decorationMapper: (decoration) {
+              return decoration.copyWith(
+                color: Theme.of(context).colorScheme.onSecondary,
+              );
+            },
+            pricesList: [
+              PricesModel(
+                title: 'BASIC',
+                subTitle: 'FOR SIDE-PROJECTS',
+                monthlyPrice: 100,
+                yearlyPrice: 1050,
+                advantagesListage: [
+                  '<b><u><tC>50.000<tC><u><b> api calls',
+                  '<b><u><tC>10<tC><u><b> concurrent requests',
+                  '<b><u><tC>3<tC><u><b> active endpoints',
+                ],
+                onTap: (bool isYearly) async {
+                  await ref.globalLoadingSetter(() async {
+                    await _handleSubscription(ref, context, 'basic', isYearly);
+                  });
+                },
+              ),
+              PricesModel(
+                title: 'PRO',
+                subTitle: 'FOR STARTUP',
+                emphasisText: 'MOST POPULAR',
+                monthlyPrice: 199,
+                yearlyPrice: 1999,
+                advantagesListage: [
+                  '<b><u><tC>200.000<tC><u><b> api calls',
+                  '<b><u><tC>30<tC><u><b> concurrent requests',
+                  '<b><u><tC>10<tC><u><b> active endpoints',
+                  'Access to the best AI model (20 messages)',
+                ],
+                onTap: (bool isYearly) async {
+                  await ref.globalLoadingSetter(() async {
+                    await _handleSubscription(ref, context, 'pro', isYearly);
+                  });
+                },
+              ),
+              PricesModel(
+                title: 'ULTRA',
+                subTitle: 'ENTERPRISE USAGE',
+                monthlyPrice: 500,
+                yearlyPrice: 5500,
+                advantagesListage: [
+                  '<b><u><tC>1.000.000<tC><u><b> api calls',
+                  '<b><u><tC>100<tC><u><b> concurrent requests',
+                  '<b><u><tC>100<tC><u><b> active endpoints',
+                  'Access to the best AI model (100 messages)',
+                  'Priority Support',
+                  'Hide endpoints from marketplace',
+                ],
+                onTap: (bool isYearly) async {
+                  await ref.globalLoadingSetter(() async {
+                    await _handleSubscription(ref, context, 'ultra', isYearly);
+                  });
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

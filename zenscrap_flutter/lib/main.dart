@@ -17,9 +17,9 @@ import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 import 'package:zenscrap_flutter/src/providers/go_router_providers.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/providers/shared_preferences_provider.dart';
-import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
+import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
 
 late final Client client;
 
@@ -158,11 +158,11 @@ class _MyAppState extends ConsumerState<MyApp> {
   Widget build(BuildContext context) {
     ref.listen(sessionProvider, (previous, next) {
       Future.delayed(const Duration(milliseconds: 300), () {
-        ref.read(accountProvider.notifier).logOut();
-
         next.mapOrNull(
           logged: (value) {
-            ref.read(routerProvider).go('/dashboard');
+            ref
+                .read(routerProvider)
+                .go(DashboardNavigationType.userEndpoints.routeOnClick!);
           },
           notSignedIn: (_) {
             ref.read(routerProvider).go('/scrappable-form');

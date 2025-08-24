@@ -26,8 +26,7 @@ extension MessagesExt on List<ChatResponse> {
       if (lastItem is ErrorTextResponse) return false;
       return true;
     } else {
-      // lastItem.role == PromptRole.system
-      if (lastItem is MessageTextResponse) return false;
+      if (lastItem is NewExtractRuleResponse) return false;
       if (lastItem is ErrorTextResponse) return false;
       return true;
     }

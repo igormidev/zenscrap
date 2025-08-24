@@ -53,7 +53,7 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection> {
 
     // Get the full server URL properly
     final client = ref.read(clientProvider);
-    final baseUrl = client.host;
+    final baseUrl = client.host.replaceAll('localhost:8080', 'localhost:8082');
     // Use the new route-based endpoint
     final String url = '${baseUrl}api/scrappable/test';
 
