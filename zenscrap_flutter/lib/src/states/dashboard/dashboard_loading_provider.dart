@@ -33,6 +33,7 @@ final dashboardLoadingProvider = Provider<HaveAnyActiveLoading>((ref) {
     DashboardNavigationType.usage => [],
     DashboardNavigationType.account => [],
     DashboardNavigationType.logOut => [],
+    DashboardNavigationType.pricingPage => [],
   };
 
   return pageDependenciesLoading.any((element) => element);

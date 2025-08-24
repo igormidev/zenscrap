@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pricing_page/pricing_page.dart';
 
@@ -26,6 +27,14 @@ class EmptyScrappableListageIndicatorPage extends StatelessWidget {
           Text(
             'You did not create any scrappables yet.',
             textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 32),
+          FilledButton.icon(
+            onPressed: () {
+              context.push('/scrappable-form');
+            },
+            icon: const Icon(Icons.add),
+            label: const Text('Create your first scrappable'),
           ),
           const SizedBox(height: 32),
         ],

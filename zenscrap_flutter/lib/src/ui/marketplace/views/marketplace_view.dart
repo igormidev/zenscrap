@@ -32,11 +32,11 @@ class _MarketplaceViewState extends ConsumerState<MarketplaceView> {
   @override
   Widget build(BuildContext context) {
     final marketplaceState = ref.watch(marketplaceProvider);
-    
+
     return Column(
       children: [
         _buildHeader(context),
-        Divider(height: 1),
+        // Divider(height: 1),
         Expanded(
           child: marketplaceState.when(
             initial: () => const Center(
@@ -50,19 +50,26 @@ class _MarketplaceViewState extends ConsumerState<MarketplaceView> {
                   searchQuery: searchQuery,
                 );
               }
-              
+
               return Column(
                 children: [
                   Expanded(
                     child: GridView.builder(
                       itemCount: response.data.length,
-                      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                        maxCrossAxisExtent: 400,
+                      gridDelegate:
+                          const SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent: 480,
                         childAspectRatio: 1.4,
+                        crossAxisSpacing: 20,
+                        mainAxisSpacing: 20,
                       ),
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 20,
-                        horizontal: 20,
+                      padding: const EdgeInsets.only(
+                        // vertical: 20,
+                        // horizontal: 20,
+                        top: 8,
+                        bottom: 20,
+                        left: 20,
+                        right: 20,
                       ),
                       itemBuilder: (context, index) {
                         final scrappable = response.data[index];
@@ -93,6 +100,7 @@ class _MarketplaceViewState extends ConsumerState<MarketplaceView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
                 'Marketplace',
@@ -100,9 +108,10 @@ class _MarketplaceViewState extends ConsumerState<MarketplaceView> {
               ),
               const SizedBox(width: 16),
               Container(
+                margin: EdgeInsets.only(top: 4),
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 4,
+                  horizontal: 12,
+                  vertical: 8,
                 ),
                 decoration: BoxDecoration(
                   color: context.c.tertiary.withAlpha(26),
@@ -110,7 +119,7 @@ class _MarketplaceViewState extends ConsumerState<MarketplaceView> {
                 ),
                 child: Text(
                   'Public Scrappables',
-                  style: context.t.labelSmall?.copyWith(
+                  style: context.t.labelLarge?.copyWith(
                     color: context.c.tertiary,
                     fontWeight: FontWeight.w600,
                   ),
@@ -118,6 +127,7 @@ class _MarketplaceViewState extends ConsumerState<MarketplaceView> {
               ),
               const Spacer(),
               IconButton(
+                tooltip: 'Refresh page',
                 onPressed: () {
                   ref.read(marketplaceProvider.notifier).refresh();
                 },

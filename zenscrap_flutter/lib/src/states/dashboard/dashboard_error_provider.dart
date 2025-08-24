@@ -35,6 +35,7 @@ final dashboardErrorProvider = Provider<ZenScrapException?>((ref) {
     DashboardNavigationType.usage => [],
     DashboardNavigationType.account => [],
     DashboardNavigationType.logOut => [],
+    DashboardNavigationType.pricingPage => [],
   };
 
   return pageDependenciesErrors.firstWhereOrNull((element) => element != null);

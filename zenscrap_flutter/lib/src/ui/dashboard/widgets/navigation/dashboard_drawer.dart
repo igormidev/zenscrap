@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/states/dashboard/dashboard_index_provider.dart';
+import 'package:zenscrap_flutter/src/states/dashboard/possible_navigations_provider.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
@@ -22,6 +23,7 @@ class DashboardDrawer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final navigationOptions = ref.watch(prossibleNavigationsProvider);
     final currentTabIndex = ref.watch(currentTabIndexProvider);
     final accountImageUrl = ref
         .watch(sessionProvider)
@@ -35,8 +37,7 @@ class DashboardDrawer extends ConsumerWidget {
             backgroundColor: context.c.surface,
             selectedIndex: currentTabIndex,
             onDestinationSelected: (int index) async {
-              final DashboardNavigationType tab =
-                  DashboardNavigationType.values[index];
+              final DashboardNavigationType tab = navigationOptions[index];
 
               await changeTab(tab, context, ref);
               if (context.mounted) Scaffold.of(context).closeDrawer();
@@ -46,7 +47,7 @@ class DashboardDrawer extends ConsumerWidget {
               AccountImage(image: accountImageUrl, size: 120),
               const SizedBox(height: 20),
               const Divider(height: 16),
-              ...DashboardNavigationType.values.map((item) {
+              ...navigationOptions.map((item) {
                 final isActive = true;
                 return NavigationDrawerDestination(
                   enabled: isActive,

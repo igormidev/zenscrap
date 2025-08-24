@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_flutter/src/states/dashboard/dashboard_index_provider.dart';
+import 'package:zenscrap_flutter/src/states/dashboard/possible_navigations_provider.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
@@ -21,6 +22,7 @@ class DashboardRail extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final navigationOptions = ref.watch(prossibleNavigationsProvider);
     final currentTabIndex = ref.watch(currentTabIndexProvider);
     final accountImageUrl = ref.watch(sessionProvider).mapOrNull(
           logged: (value) => value.user.imageUrl,
@@ -38,12 +40,11 @@ class DashboardRail extends ConsumerWidget {
           child: NavigationRail(
             selectedIndex: currentTabIndex,
             onDestinationSelected: (int index) async {
-              final DashboardNavigationType tab =
-                  DashboardNavigationType.values[index];
+              final DashboardNavigationType tab = navigationOptions[index];
               changeTab(tab, context, ref);
             },
             destinations: [
-              ...DashboardNavigationType.values.map(
+              ...navigationOptions.map(
                 (item) {
                   final isActive = true;
                   return NavigationRailDestination(

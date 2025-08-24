@@ -5,7 +5,7 @@ import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.d
 class MarketplaceScrappableCard extends StatelessWidget {
   final Scrappable scrappable;
   final VoidCallback? onTap;
-  
+
   const MarketplaceScrappableCard({
     super.key,
     required this.scrappable,
@@ -34,47 +34,27 @@ class MarketplaceScrappableCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: context.c.secondary.withAlpha(26),
-                    borderRadius: BorderRadius.circular(8),
+                Text(
+                  scrappable.name,
+                  style: context.t.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: context.c.onSurface,
                   ),
-                  child: Icon(
-                    Icons.shopping_bag_rounded,
-                    color: context.c.secondary,
-                    size: 24,
-                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        scrappable.name,
-                        style: context.t.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: context.c.onSurface,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        scrappable.description,
-                        style: context.t.bodyMedium?.copyWith(
-                          color: context.c.onSurfaceVariant,
-                          height: 1.4,
-                        ),
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+                const SizedBox(height: 8),
+                Text(
+                  scrappable.description,
+                  style: context.t.bodyMedium?.copyWith(
+                    color: context.c.onSurfaceVariant,
+                    height: 1.4,
                   ),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -108,7 +88,7 @@ class MarketplaceScrappableCard extends StatelessWidget {
                           color: context.c.primary,
                           fontFamily: 'monospace',
                         ),
-                        maxLines: 1,
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),

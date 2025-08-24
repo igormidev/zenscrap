@@ -1,0 +1,14 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 8090,
+            "driver": "PostgreSQL",
+            "name": "zenscrap",
+            "database": "zenscrap",
+            "username": "postgres",
+            "password": "Jg86waNc-5JHZ0V7BQfhX8dEcV686fWQ"
+        }
+    ]
+}

@@ -12,7 +12,6 @@ import 'package:zenscrap_flutter/src/states/dashboard/dashboard_loading_provider
 import 'package:zenscrap_flutter/src/states/dashboard/onboarding_flow_provider.dart';
 import 'package:zenscrap_flutter/src/states/dashboard/onboarding_flow_state.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/fullscreen_loading_page.dart';
-import 'package:zenscrap_flutter/src/ui/dashboard/pages/pricing_page.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/widgets/compact_dashboard_appbar.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/widgets/navigation/dashboard_drawer.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/widgets/navigation/dashboard_rail.dart';
@@ -80,10 +79,9 @@ class DashboardTemplateState extends ConsumerState<DashboardView> {
             Opacity(
               opacity: error != null || isLoading ? 0 : 1,
               child: Center(
-                child: onboardingFlowState.when<Widget>(
+                child: onboardingFlowState.maybeWhen<Widget>(
                   none: () => const SizedBox.shrink(),
-                  pendingPaymentFromUser: () => ZenScrapPricingPage(),
-                  everythingOk: () => widget.child,
+                  orElse: () => widget.child,
                 ),
               ),
             ),
@@ -145,7 +143,7 @@ class DashboardTemplateState extends ConsumerState<DashboardView> {
 
 enum DashboardNavigationType {
   userEndpoints(
-    label: 'Endpoints',
+    label: 'Your endpoints',
     activeIcon: Icons.api,
     inactiveIcon: Icons.api_outlined,
     routeOnClick: '/endpoints',
@@ -173,6 +171,12 @@ enum DashboardNavigationType {
     activeIcon: Icons.logout,
     inactiveIcon: Icons.logout,
     routeOnClick: null,
+  ),
+  pricingPage(
+    label: 'Subscription',
+    activeIcon: Icons.workspace_premium,
+    inactiveIcon: Icons.workspace_premium_outlined,
+    routeOnClick: '/subscription',
   );
 
   final String label;

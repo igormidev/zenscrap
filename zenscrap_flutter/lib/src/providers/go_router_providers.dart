@@ -11,7 +11,9 @@ import 'package:zenscrap_flutter/src/ui/account/views/account_view.dart';
 import 'package:zenscrap_flutter/src/ui/api_usage/views/api_usage_view.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/splash_view.dart';
+import 'package:zenscrap_flutter/src/ui/dashboard/pages/pricing_page.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
+import 'package:zenscrap_flutter/src/ui/marketplace/views/marketplace_view.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/view/initial_chat_view.dart';
 import 'package:zenscrap_flutter/src/ui/scrappables/view/user_scrappables_listage.dart';
 
@@ -90,7 +92,7 @@ final StateProvider routerProvider = StateProvider((ref) {
           ),
           GoRoute(
             path: DashboardNavigationType.marketPlace.routeOnClick!,
-            builder: (context, state) => Container(),
+            builder: (context, state) => MarketplaceView(),
           ),
           GoRoute(
             path: DashboardNavigationType.usage.routeOnClick!,
@@ -99,6 +101,10 @@ final StateProvider routerProvider = StateProvider((ref) {
           GoRoute(
             path: DashboardNavigationType.account.routeOnClick!,
             builder: (context, state) => AccountView(),
+          ),
+          GoRoute(
+            path: DashboardNavigationType.pricingPage.routeOnClick!,
+            builder: (context, state) => ZenScrapPricingPage(),
           ),
         ],
         builder: (context, state, child) {

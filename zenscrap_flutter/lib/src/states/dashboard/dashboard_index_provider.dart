@@ -4,17 +4,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
+import 'package:zenscrap_flutter/src/states/dashboard/possible_navigations_provider.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
 
 final currentTabIndexProvider =
-    StateNotifierProvider<CurrentTabIndexStateNotifier, int>((ref) {
-  return CurrentTabIndexStateNotifier(ref);
-});
+    StateNotifierProvider<CurrentTabIndexStateNotifier, int>(
+        CurrentTabIndexStateNotifier.new);
 
 final currentDashboardTabProvider = Provider<DashboardNavigationType>((ref) {
+  final navigationOptions = ref.watch(prossibleNavigationsProvider);
   final currentTabIndex = ref.watch(currentTabIndexProvider);
 
-  return DashboardNavigationType.values[currentTabIndex];
+  return navigationOptions[currentTabIndex];
 });
 
 class CurrentTabIndexStateNotifier extends StateNotifier<int> {
@@ -38,7 +39,9 @@ Future<void> changeTab(
     return;
   }
 
-  ref.read(currentTabIndexProvider.notifier).setPage(tab.index);
+  ref
+      .read(currentTabIndexProvider.notifier)
+      .setPage(ref.read(prossibleNavigationsProvider).indexOf(tab));
 
   final route = tab.routeOnClick;
   if (route != null) {

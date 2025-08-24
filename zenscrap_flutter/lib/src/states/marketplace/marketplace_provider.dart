@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:talker_flutter/talker_flutter.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/marketplace/marketplace_state.dart';
 
@@ -11,7 +13,7 @@ final marketplaceProvider =
 
 class MarketplaceNotifier extends StateNotifier<MarketplaceState> {
   final Client _client;
-  
+
   MarketplaceNotifier(this._client) : super(const MarketplaceState.initial());
 
   String _currentSearchQuery = '';
@@ -38,11 +40,17 @@ class MarketplaceNotifier extends StateNotifier<MarketplaceState> {
       );
     } on ZenScrapException catch (e) {
       state = MarketplaceState.withError(e);
-    } catch (e) {
+    } catch (error, stackTrace) {
+      talker.log(
+        'Error loading marketplace',
+        exception: error,
+        stackTrace: stackTrace,
+        logLevel: LogLevel.error,
+      );
       state = MarketplaceState.withError(
         ZenScrapException(
           title: 'Error loading marketplace',
-          description: 'An unexpected error occurred: $e',
+          description: 'An unexpected error occurred:\n$error',
         ),
       );
     }
