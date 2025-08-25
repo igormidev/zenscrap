@@ -33,7 +33,8 @@ mixin ApiHelperMixin {
       session,
       where: (p0) =>
           p0.accountApiUsage.nanoId.equals(nanoId) &
-          p0.accountApiUsage.apiKeys.any((key) => key.apiKey.equals(apikey)),
+          p0.accountApiUsage.apiKeys.any((key) => 
+              key.apiKey.equals(apikey) & key.isActive.equals(true)),
     ))
         ?.planTier;
 

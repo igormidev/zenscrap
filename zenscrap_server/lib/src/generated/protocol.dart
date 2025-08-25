@@ -36,8 +36,12 @@ import 'entities/scrappable/scrappable_analytics.dart' as _i20;
 import 'entities/scrappable/scrappable_request.dart' as _i21;
 import 'entities/scrappable/scrappable_test_result.dart' as _i22;
 import 'entities/zenscrap_exception.dart' as _i23;
-import 'package:zenscrap_server/src/generated/entities/scrappable/scrappable.dart'
+import 'package:zenscrap_server/src/generated/entities/account/api_usage/api_creadit_history/api_creadit_history_item.dart'
     as _i24;
+import 'package:zenscrap_server/src/generated/entities/account/account_api_key.dart'
+    as _i25;
+import 'package:zenscrap_server/src/generated/entities/scrappable/scrappable.dart'
+    as _i26;
 export 'entities/account/account.dart';
 export 'entities/account/account_api_key.dart';
 export 'entities/account/api_usage/account_api_usage.dart';
@@ -97,6 +101,13 @@ class Protocol extends _i1.SerializationManagerServer {
           columnType: _i2.ColumnType.timestampWithoutTimeZone,
           isNullable: false,
           dartType: 'DateTime',
+        ),
+        _i2.ColumnDefinition(
+          name: 'isActive',
+          columnType: _i2.ColumnType.boolean,
+          isNullable: false,
+          dartType: 'bool',
+          columnDefault: 'true',
         ),
         _i2.ColumnDefinition(
           name: 'accountApiUsageId',
@@ -707,7 +718,33 @@ class Protocol extends _i1.SerializationManagerServer {
           type: 'btree',
           isUnique: true,
           isPrimary: true,
-        )
+        ),
+        _i2.IndexDefinition(
+          indexName: 'scrappable_analytics_attached_nanoid_idx',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'attachedNanoId',
+            )
+          ],
+          type: 'btree',
+          isUnique: false,
+          isPrimary: false,
+        ),
+        _i2.IndexDefinition(
+          indexName: 'scrappable_analytics_attached_apikey_idx',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'attachedApiKey',
+            )
+          ],
+          type: 'btree',
+          isUnique: false,
+          isPrimary: false,
+        ),
       ],
       managed: true,
     ),
@@ -1110,12 +1147,26 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == List<String>) {
       return (data as List).map((e) => deserialize<String>(e)).toList() as T;
     }
+    if (t == List<_i24.CreditHistoryItem>) {
+      return (data as List)
+          .map((e) => deserialize<_i24.CreditHistoryItem>(e))
+          .toList() as T;
+    }
+    if (t == List<_i25.AccountApiKey>) {
+      return (data as List)
+          .map((e) => deserialize<_i25.AccountApiKey>(e))
+          .toList() as T;
+    }
+    if (t == Map<int, int>) {
+      return Map.fromEntries((data as List).map((e) =>
+          MapEntry(deserialize<int>(e['k']), deserialize<int>(e['v'])))) as T;
+    }
     if (t == Map<String, dynamic>) {
       return (data as Map).map((k, v) =>
           MapEntry(deserialize<String>(k), deserialize<dynamic>(v))) as T;
     }
-    if (t == List<_i24.Scrappable>) {
-      return (data as List).map((e) => deserialize<_i24.Scrappable>(e)).toList()
+    if (t == List<_i26.Scrappable>) {
+      return (data as List).map((e) => deserialize<_i26.Scrappable>(e)).toList()
           as T;
     }
     try {

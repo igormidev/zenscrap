@@ -6,3 +6,9 @@ fields:
   attachedNanoId: String
   attachedApiKey: String
   scrappable: Scrappable?, relation(name=scrappable_analytics)
+
+indexes:
+  scrappable_analytics_attached_nanoid_idx:
+    fields: attachedNanoId
+  scrappable_analytics_attached_apikey_idx:
+    fields: attachedApiKey

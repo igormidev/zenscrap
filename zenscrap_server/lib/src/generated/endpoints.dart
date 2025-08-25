@@ -121,16 +121,99 @@ class Endpoints extends _i1.EndpointDispatch {
       name: 'privateApiUsage',
       endpoint: endpoints['privateApiUsage']!,
       methodConnectors: {
-        'getUsageInfo': _i1.MethodConnector(
-          name: 'getUsageInfo',
+        'getCreditHistory': _i1.MethodConnector(
+          name: 'getCreditHistory',
+          params: {
+            'offset': _i1.ParameterDescription(
+              name: 'offset',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'limit': _i1.ParameterDescription(
+              name: 'limit',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['privateApiUsage'] as _i3.PrivateApiUsageEndpoint)
+                  .getCreditHistory(
+            session,
+            offset: params['offset'],
+            limit: params['limit'],
+          ),
+        ),
+        'createApiKey': _i1.MethodConnector(
+          name: 'createApiKey',
+          params: {
+            'name': _i1.ParameterDescription(
+              name: 'name',
+              type: _i1.getType<String>(),
+              nullable: false,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['privateApiUsage'] as _i3.PrivateApiUsageEndpoint)
+                  .createApiKey(
+            session,
+            name: params['name'],
+          ),
+        ),
+        'deactivateApiKey': _i1.MethodConnector(
+          name: 'deactivateApiKey',
+          params: {
+            'apiKeyId': _i1.ParameterDescription(
+              name: 'apiKeyId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['privateApiUsage'] as _i3.PrivateApiUsageEndpoint)
+                  .deactivateApiKey(
+            session,
+            apiKeyId: params['apiKeyId'],
+          ),
+        ),
+        'getActiveApiKeys': _i1.MethodConnector(
+          name: 'getActiveApiKeys',
           params: {},
           call: (
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
               (endpoints['privateApiUsage'] as _i3.PrivateApiUsageEndpoint)
-                  .getUsageInfo(session),
-        )
+                  .getActiveApiKeys(session),
+        ),
+        'getApiKeyUsageStats': _i1.MethodConnector(
+          name: 'getApiKeyUsageStats',
+          params: {},
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['privateApiUsage'] as _i3.PrivateApiUsageEndpoint)
+                  .getApiKeyUsageStats(session),
+        ),
+        'getApiUsageInfo': _i1.MethodConnector(
+          name: 'getApiUsageInfo',
+          params: {},
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['privateApiUsage'] as _i3.PrivateApiUsageEndpoint)
+                  .getApiUsageInfo(session),
+        ),
       },
     );
     connectors['privateCloneScrappable'] = _i1.EndpointConnector(

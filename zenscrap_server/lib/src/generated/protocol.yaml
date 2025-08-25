@@ -1,7 +1,12 @@
 privateAccount:
   - getAccountInfo:
 privateApiUsage:
-  - getUsageInfo:
+  - getCreditHistory:
+  - createApiKey:
+  - deactivateApiKey:
+  - getActiveApiKeys:
+  - getApiKeyUsageStats:
+  - getApiUsageInfo:
 privateCloneScrappable:
   - cloneFromMarketplace:
 privateSubscription:

@@ -4,6 +4,7 @@ fields:
   apiKey: String
   name: String
   createdAt: DateTime
+  isActive: bool, default=true
   accountApiUsage: AccountApiUsage?, relation(name=api_usage_api_keys)
 
 indexes:

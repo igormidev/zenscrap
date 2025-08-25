@@ -18,15 +18,17 @@ abstract class AccountApiKey implements _i1.SerializableModel {
     required this.apiKey,
     required this.name,
     required this.createdAt,
+    bool? isActive,
     required this.accountApiUsageId,
     this.accountApiUsage,
-  });
+  }) : isActive = isActive ?? true;
 
   factory AccountApiKey({
     int? id,
     required String apiKey,
     required String name,
     required DateTime createdAt,
+    bool? isActive,
     required int accountApiUsageId,
     _i2.AccountApiUsage? accountApiUsage,
   }) = _AccountApiKeyImpl;
@@ -38,6 +40,7 @@ abstract class AccountApiKey implements _i1.SerializableModel {
       name: jsonSerialization['name'] as String,
       createdAt:
           _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
+      isActive: jsonSerialization['isActive'] as bool,
       accountApiUsageId: jsonSerialization['accountApiUsageId'] as int,
       accountApiUsage: jsonSerialization['accountApiUsage'] == null
           ? null
@@ -57,6 +60,8 @@ abstract class AccountApiKey implements _i1.SerializableModel {
 
   DateTime createdAt;
 
+  bool isActive;
+
   int accountApiUsageId;
 
   _i2.AccountApiUsage? accountApiUsage;
@@ -69,6 +74,7 @@ abstract class AccountApiKey implements _i1.SerializableModel {
     String? apiKey,
     String? name,
     DateTime? createdAt,
+    bool? isActive,
     int? accountApiUsageId,
     _i2.AccountApiUsage? accountApiUsage,
   });
@@ -79,6 +85,7 @@ abstract class AccountApiKey implements _i1.SerializableModel {
       'apiKey': apiKey,
       'name': name,
       'createdAt': createdAt.toJson(),
+      'isActive': isActive,
       'accountApiUsageId': accountApiUsageId,
       if (accountApiUsage != null) 'accountApiUsage': accountApiUsage?.toJson(),
     };
@@ -98,6 +105,7 @@ class _AccountApiKeyImpl extends AccountApiKey {
     required String apiKey,
     required String name,
     required DateTime createdAt,
+    bool? isActive,
     required int accountApiUsageId,
     _i2.AccountApiUsage? accountApiUsage,
   }) : super._(
@@ -105,6 +113,7 @@ class _AccountApiKeyImpl extends AccountApiKey {
           apiKey: apiKey,
           name: name,
           createdAt: createdAt,
+          isActive: isActive,
           accountApiUsageId: accountApiUsageId,
           accountApiUsage: accountApiUsage,
         );
@@ -118,6 +127,7 @@ class _AccountApiKeyImpl extends AccountApiKey {
     String? apiKey,
     String? name,
     DateTime? createdAt,
+    bool? isActive,
     int? accountApiUsageId,
     Object? accountApiUsage = _Undefined,
   }) {
@@ -126,6 +136,7 @@ class _AccountApiKeyImpl extends AccountApiKey {
       apiKey: apiKey ?? this.apiKey,
       name: name ?? this.name,
       createdAt: createdAt ?? this.createdAt,
+      isActive: isActive ?? this.isActive,
       accountApiUsageId: accountApiUsageId ?? this.accountApiUsageId,
       accountApiUsage: accountApiUsage is _i2.AccountApiUsage?
           ? accountApiUsage

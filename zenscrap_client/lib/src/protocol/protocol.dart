@@ -34,9 +34,13 @@ import 'entities/scrappable/scrappable_analytics.dart' as _i18;
 import 'entities/scrappable/scrappable_request.dart' as _i19;
 import 'entities/scrappable/scrappable_test_result.dart' as _i20;
 import 'entities/zenscrap_exception.dart' as _i21;
-import 'package:zenscrap_client/src/protocol/entities/scrappable/scrappable.dart'
+import 'package:zenscrap_client/src/protocol/entities/account/api_usage/api_creadit_history/api_creadit_history_item.dart'
     as _i22;
-import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i23;
+import 'package:zenscrap_client/src/protocol/entities/account/account_api_key.dart'
+    as _i23;
+import 'package:zenscrap_client/src/protocol/entities/scrappable/scrappable.dart'
+    as _i24;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i25;
 export 'entities/account/account.dart';
 export 'entities/account/account_api_key.dart';
 export 'entities/account/api_usage/account_api_usage.dart';
@@ -261,16 +265,30 @@ class Protocol extends _i1.SerializationManager {
     if (t == List<String>) {
       return (data as List).map((e) => deserialize<String>(e)).toList() as T;
     }
+    if (t == List<_i22.CreditHistoryItem>) {
+      return (data as List)
+          .map((e) => deserialize<_i22.CreditHistoryItem>(e))
+          .toList() as T;
+    }
+    if (t == List<_i23.AccountApiKey>) {
+      return (data as List)
+          .map((e) => deserialize<_i23.AccountApiKey>(e))
+          .toList() as T;
+    }
+    if (t == Map<int, int>) {
+      return Map.fromEntries((data as List).map((e) =>
+          MapEntry(deserialize<int>(e['k']), deserialize<int>(e['v'])))) as T;
+    }
     if (t == Map<String, dynamic>) {
       return (data as Map).map((k, v) =>
           MapEntry(deserialize<String>(k), deserialize<dynamic>(v))) as T;
     }
-    if (t == List<_i22.Scrappable>) {
-      return (data as List).map((e) => deserialize<_i22.Scrappable>(e)).toList()
+    if (t == List<_i24.Scrappable>) {
+      return (data as List).map((e) => deserialize<_i24.Scrappable>(e)).toList()
           as T;
     }
     try {
-      return _i23.Protocol().deserialize<T>(data, t);
+      return _i25.Protocol().deserialize<T>(data, t);
     } on _i1.DeserializationTypeNotFoundException catch (_) {}
     return super.deserialize<T>(data, t);
   }
@@ -348,7 +366,7 @@ class Protocol extends _i1.SerializationManager {
     if (data is _i21.ZenScrapException) {
       return 'ZenScrapException';
     }
-    className = _i23.Protocol().getClassNameForObject(data);
+    className = _i25.Protocol().getClassNameForObject(data);
     if (className != null) {
       return 'serverpod_auth.$className';
     }
@@ -433,7 +451,7 @@ class Protocol extends _i1.SerializationManager {
     }
     if (dataClassName.startsWith('serverpod_auth.')) {
       data['className'] = dataClassName.substring(15);
-      return _i23.Protocol().deserializeByClassName(data);
+      return _i25.Protocol().deserializeByClassName(data);
     }
     return super.deserializeByClassName(data);
   }

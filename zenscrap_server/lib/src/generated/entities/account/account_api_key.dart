@@ -21,15 +21,17 @@ abstract class AccountApiKey
     required this.apiKey,
     required this.name,
     required this.createdAt,
+    bool? isActive,
     required this.accountApiUsageId,
     this.accountApiUsage,
-  });
+  }) : isActive = isActive ?? true;
 
   factory AccountApiKey({
     int? id,
     required String apiKey,
     required String name,
     required DateTime createdAt,
+    bool? isActive,
     required int accountApiUsageId,
     _i2.AccountApiUsage? accountApiUsage,
   }) = _AccountApiKeyImpl;
@@ -41,6 +43,7 @@ abstract class AccountApiKey
       name: jsonSerialization['name'] as String,
       createdAt:
           _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
+      isActive: jsonSerialization['isActive'] as bool,
       accountApiUsageId: jsonSerialization['accountApiUsageId'] as int,
       accountApiUsage: jsonSerialization['accountApiUsage'] == null
           ? null
@@ -62,6 +65,8 @@ abstract class AccountApiKey
 
   DateTime createdAt;
 
+  bool isActive;
+
   int accountApiUsageId;
 
   _i2.AccountApiUsage? accountApiUsage;
@@ -77,6 +82,7 @@ abstract class AccountApiKey
     String? apiKey,
     String? name,
     DateTime? createdAt,
+    bool? isActive,
     int? accountApiUsageId,
     _i2.AccountApiUsage? accountApiUsage,
   });
@@ -87,6 +93,7 @@ abstract class AccountApiKey
       'apiKey': apiKey,
       'name': name,
       'createdAt': createdAt.toJson(),
+      'isActive': isActive,
       'accountApiUsageId': accountApiUsageId,
       if (accountApiUsage != null) 'accountApiUsage': accountApiUsage?.toJson(),
     };
@@ -99,6 +106,7 @@ abstract class AccountApiKey
       'apiKey': apiKey,
       'name': name,
       'createdAt': createdAt.toJson(),
+      'isActive': isActive,
       'accountApiUsageId': accountApiUsageId,
       if (accountApiUsage != null)
         'accountApiUsage': accountApiUsage?.toJsonForProtocol(),
@@ -144,6 +152,7 @@ class _AccountApiKeyImpl extends AccountApiKey {
     required String apiKey,
     required String name,
     required DateTime createdAt,
+    bool? isActive,
     required int accountApiUsageId,
     _i2.AccountApiUsage? accountApiUsage,
   }) : super._(
@@ -151,6 +160,7 @@ class _AccountApiKeyImpl extends AccountApiKey {
           apiKey: apiKey,
           name: name,
           createdAt: createdAt,
+          isActive: isActive,
           accountApiUsageId: accountApiUsageId,
           accountApiUsage: accountApiUsage,
         );
@@ -164,6 +174,7 @@ class _AccountApiKeyImpl extends AccountApiKey {
     String? apiKey,
     String? name,
     DateTime? createdAt,
+    bool? isActive,
     int? accountApiUsageId,
     Object? accountApiUsage = _Undefined,
   }) {
@@ -172,6 +183,7 @@ class _AccountApiKeyImpl extends AccountApiKey {
       apiKey: apiKey ?? this.apiKey,
       name: name ?? this.name,
       createdAt: createdAt ?? this.createdAt,
+      isActive: isActive ?? this.isActive,
       accountApiUsageId: accountApiUsageId ?? this.accountApiUsageId,
       accountApiUsage: accountApiUsage is _i2.AccountApiUsage?
           ? accountApiUsage
@@ -195,6 +207,11 @@ class AccountApiKeyTable extends _i1.Table<int?> {
       'createdAt',
       this,
     );
+    isActive = _i1.ColumnBool(
+      'isActive',
+      this,
+      hasDefault: true,
+    );
     accountApiUsageId = _i1.ColumnInt(
       'accountApiUsageId',
       this,
@@ -206,6 +223,8 @@ class AccountApiKeyTable extends _i1.Table<int?> {
   late final _i1.ColumnString name;
 
   late final _i1.ColumnDateTime createdAt;
+
+  late final _i1.ColumnBool isActive;
 
   late final _i1.ColumnInt accountApiUsageId;
 
@@ -230,6 +249,7 @@ class AccountApiKeyTable extends _i1.Table<int?> {
         apiKey,
         name,
         createdAt,
+        isActive,
         accountApiUsageId,
       ];
 
