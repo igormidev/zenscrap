@@ -3,4 +3,6 @@ table: scrappable_analytics
 fields:
   requestStatus: RequestStatus
   requestedAt: DateTime
+  attachedNanoId: String
+  attachedApiKey: String
   scrappable: Scrappable?, relation(name=scrappable_analytics)

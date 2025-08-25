@@ -18,6 +18,8 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
     this.id,
     required this.requestStatus,
     required this.requestedAt,
+    required this.attachedNanoId,
+    required this.attachedApiKey,
     required this.scrappableId,
     this.scrappable,
   });
@@ -26,6 +28,8 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
     int? id,
     required _i2.RequestStatus requestStatus,
     required DateTime requestedAt,
+    required String attachedNanoId,
+    required String attachedApiKey,
     required _i1.UuidValue scrappableId,
     _i3.Scrappable? scrappable,
   }) = _ScrappableAnalyticsImpl;
@@ -37,6 +41,8 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
           (jsonSerialization['requestStatus'] as int)),
       requestedAt:
           _i1.DateTimeJsonExtension.fromJson(jsonSerialization['requestedAt']),
+      attachedNanoId: jsonSerialization['attachedNanoId'] as String,
+      attachedApiKey: jsonSerialization['attachedApiKey'] as String,
       scrappableId: _i1.UuidValueJsonExtension.fromJson(
           jsonSerialization['scrappableId']),
       scrappable: jsonSerialization['scrappable'] == null
@@ -55,6 +61,10 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
 
   DateTime requestedAt;
 
+  String attachedNanoId;
+
+  String attachedApiKey;
+
   _i1.UuidValue scrappableId;
 
   _i3.Scrappable? scrappable;
@@ -66,6 +76,8 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
     int? id,
     _i2.RequestStatus? requestStatus,
     DateTime? requestedAt,
+    String? attachedNanoId,
+    String? attachedApiKey,
     _i1.UuidValue? scrappableId,
     _i3.Scrappable? scrappable,
   });
@@ -75,6 +87,8 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
       if (id != null) 'id': id,
       'requestStatus': requestStatus.toJson(),
       'requestedAt': requestedAt.toJson(),
+      'attachedNanoId': attachedNanoId,
+      'attachedApiKey': attachedApiKey,
       'scrappableId': scrappableId.toJson(),
       if (scrappable != null) 'scrappable': scrappable?.toJson(),
     };
@@ -93,12 +107,16 @@ class _ScrappableAnalyticsImpl extends ScrappableAnalytics {
     int? id,
     required _i2.RequestStatus requestStatus,
     required DateTime requestedAt,
+    required String attachedNanoId,
+    required String attachedApiKey,
     required _i1.UuidValue scrappableId,
     _i3.Scrappable? scrappable,
   }) : super._(
           id: id,
           requestStatus: requestStatus,
           requestedAt: requestedAt,
+          attachedNanoId: attachedNanoId,
+          attachedApiKey: attachedApiKey,
           scrappableId: scrappableId,
           scrappable: scrappable,
         );
@@ -111,6 +129,8 @@ class _ScrappableAnalyticsImpl extends ScrappableAnalytics {
     Object? id = _Undefined,
     _i2.RequestStatus? requestStatus,
     DateTime? requestedAt,
+    String? attachedNanoId,
+    String? attachedApiKey,
     _i1.UuidValue? scrappableId,
     Object? scrappable = _Undefined,
   }) {
@@ -118,6 +138,8 @@ class _ScrappableAnalyticsImpl extends ScrappableAnalytics {
       id: id is int? ? id : this.id,
       requestStatus: requestStatus ?? this.requestStatus,
       requestedAt: requestedAt ?? this.requestedAt,
+      attachedNanoId: attachedNanoId ?? this.attachedNanoId,
+      attachedApiKey: attachedApiKey ?? this.attachedApiKey,
       scrappableId: scrappableId ?? this.scrappableId,
       scrappable: scrappable is _i3.Scrappable?
           ? scrappable

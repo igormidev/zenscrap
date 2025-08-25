@@ -205,7 +205,8 @@ mixin ApiHelperMixin {
         scrappable = s;
       }, concurrencyId);
     } on _ApiError catch (error, stackTrace) {
-      await _setScrappable(session, scrappable, error.status);
+      await _setScrappable(
+          session, scrappable, error.status, apiKey, concurrencyId);
       session.log(
         '[${error.status.name.toUpperCase()}] ${_noApiFound.exception.title}',
         exception: error.exception,
@@ -214,7 +215,8 @@ mixin ApiHelperMixin {
       );
       throw error.exception;
     } catch (error, stackTrace) {
-      await _setScrappable(session, scrappable, RequestStatus.serverError);
+      await _setScrappable(session, scrappable, RequestStatus.serverError,
+          apiKey, concurrencyId);
       session.log(
         'An unknown error occurred in api',
         exception: error,
@@ -235,8 +237,10 @@ mixin ApiHelperMixin {
     Session session,
     Scrappable? scrappable,
     RequestStatus status,
+    ApiKey? apiKey,
+    NanoId? nanoId,
   ) async {
-    if (scrappable != null) {
+    if (scrappable != null && apiKey != null && nanoId != null) {
       await session.db.transaction((transaction) async {
         final analytics = await ScrappableAnalytics.db.insertRow(
             session,
@@ -245,6 +249,8 @@ mixin ApiHelperMixin {
               scrappableId: scrappable.id,
               scrappable: scrappable,
               requestedAt: DateTime.now(),
+              attachedApiKey: apiKey,
+              attachedNanoId: nanoId,
             ),
             transaction: transaction);
         await Scrappable.db.attachRow.scrappableAnalytics(
