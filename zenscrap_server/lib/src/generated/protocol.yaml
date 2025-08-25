@@ -2,10 +2,13 @@ privateAccount:
   - getAccountInfo:
 privateApiUsage:
   - getUsageInfo:
+privateCloneScrappable:
+  - cloneFromMarketplace:
 privateSubscription:
   - createCheckoutSession:
   - getSubscriptionStatus:
   - cancelSubscription:
+  - createCustomerPortalSession:
 privateUserScrappables:
   - call:
 createScrappable:

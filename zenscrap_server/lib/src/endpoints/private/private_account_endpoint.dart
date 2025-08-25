@@ -37,7 +37,7 @@ class PrivateAccountEndpoint extends Endpoint {
 
     if (accountInfo == null) {
       final String nanoId = nanoid();
-      final acountApiKey = nanoId + _uuid.v7();
+      final acountApiKey = '$nanoId::${_uuid.v7()}';
       try {
         return await session.db.transaction((transaction) async {
           final accountApiUsage = await AccountApiUsage.db.insertRow(

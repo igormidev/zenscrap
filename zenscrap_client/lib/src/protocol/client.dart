@@ -17,16 +17,17 @@ import 'package:zenscrap_client/src/protocol/entities/scrappable/scrappable.dart
     as _i4;
 import 'package:zenscrap_client/src/protocol/entities/account/api_usage/account_api_usage.dart'
     as _i5;
+import 'package:uuid/uuid_value.dart' as _i6;
 import 'package:zenscrap_client/src/protocol/entities/marketplace/paginated_scrappable_response.dart'
-    as _i6;
-import 'package:zenscrap_client/src/protocol/entities/account/plan_tier.dart'
     as _i7;
-import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/create_session_response.dart'
+import 'package:zenscrap_client/src/protocol/entities/account/plan_tier.dart'
     as _i8;
-import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/chat_response.dart'
+import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/create_session_response.dart'
     as _i9;
-import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i10;
-import 'protocol.dart' as _i11;
+import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/chat_response.dart'
+    as _i10;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i11;
+import 'protocol.dart' as _i12;
 
 /// {@category Endpoint}
 class EndpointPrivateAccount extends _i1.EndpointRef {
@@ -60,6 +61,22 @@ class EndpointPrivateApiUsage extends _i1.EndpointRef {
 }
 
 /// {@category Endpoint}
+class EndpointPrivateCloneScrappable extends _i1.EndpointRef {
+  EndpointPrivateCloneScrappable(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'privateCloneScrappable';
+
+  _i2.Future<_i4.Scrappable> cloneFromMarketplace(
+          {required _i6.UuidValue scrappableId}) =>
+      caller.callServerEndpoint<_i4.Scrappable>(
+        'privateCloneScrappable',
+        'cloneFromMarketplace',
+        {'scrappableId': scrappableId},
+      );
+}
+
+/// {@category Endpoint}
 class EndpointPrivateSubscription extends _i1.EndpointRef {
   EndpointPrivateSubscription(_i1.EndpointCaller caller) : super(caller);
 
@@ -89,6 +106,13 @@ class EndpointPrivateSubscription extends _i1.EndpointRef {
   _i2.Future<bool> cancelSubscription() => caller.callServerEndpoint<bool>(
         'privateSubscription',
         'cancelSubscription',
+        {},
+      );
+
+  _i2.Future<String> createCustomerPortalSession() =>
+      caller.callServerEndpoint<String>(
+        'privateSubscription',
+        'createCustomerPortalSession',
         {},
       );
 }
@@ -130,12 +154,12 @@ class EndpointMarketplace extends _i1.EndpointRef {
   @override
   String get name => 'marketplace';
 
-  _i2.Future<_i6.PaginatedScrappableResponse> getItems({
+  _i2.Future<_i7.PaginatedScrappableResponse> getItems({
     required int page,
     required int pageSize,
     String? searchQuery,
   }) =>
-      caller.callServerEndpoint<_i6.PaginatedScrappableResponse>(
+      caller.callServerEndpoint<_i7.PaginatedScrappableResponse>(
         'marketplace',
         'getItems',
         {
@@ -156,7 +180,7 @@ class EndpointPublicTier extends _i1.EndpointRef {
   _i2.Future<void> updatePlayerTier({
     required String email,
     required String tierManipulationKey,
-    required _i7.PlanTier planTier,
+    required _i8.PlanTier planTier,
   }) =>
       caller.callServerEndpoint<void>(
         'publicTier',
@@ -212,18 +236,18 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
   @override
   String get name => 'scrappableChatSession';
 
-  _i2.Future<_i8.CreateSessionResponse> createSession(
+  _i2.Future<_i9.CreateSessionResponse> createSession(
           {required _i4.Scrappable scrappable}) =>
-      caller.callServerEndpoint<_i8.CreateSessionResponse>(
+      caller.callServerEndpoint<_i9.CreateSessionResponse>(
         'scrappableChatSession',
         'createSession',
         {'scrappable': scrappable},
       );
 
-  _i2.Stream<_i9.ChatResponse> listenToScrappableRedraftSession(
+  _i2.Stream<_i10.ChatResponse> listenToScrappableRedraftSession(
           {required String sessionUuid}) =>
-      caller.callStreamingServerEndpoint<_i2.Stream<_i9.ChatResponse>,
-          _i9.ChatResponse>(
+      caller.callStreamingServerEndpoint<_i2.Stream<_i10.ChatResponse>,
+          _i10.ChatResponse>(
         'scrappableChatSession',
         'listenToScrappableRedraftSession',
         {'sessionUuid': sessionUuid},
@@ -246,10 +270,10 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
 
 class Modules {
   Modules(Client client) {
-    auth = _i10.Caller(client);
+    auth = _i11.Caller(client);
   }
 
-  late final _i10.Caller auth;
+  late final _i11.Caller auth;
 }
 
 class Client extends _i1.ServerpodClientShared {
@@ -268,7 +292,7 @@ class Client extends _i1.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
           host,
-          _i11.Protocol(),
+          _i12.Protocol(),
           securityContext: securityContext,
           authenticationKeyManager: authenticationKeyManager,
           streamingConnectionTimeout: streamingConnectionTimeout,
@@ -280,6 +304,7 @@ class Client extends _i1.ServerpodClientShared {
         ) {
     privateAccount = EndpointPrivateAccount(this);
     privateApiUsage = EndpointPrivateApiUsage(this);
+    privateCloneScrappable = EndpointPrivateCloneScrappable(this);
     privateSubscription = EndpointPrivateSubscription(this);
     privateUserScrappables = EndpointPrivateUserScrappables(this);
     createScrappable = EndpointCreateScrappable(this);
@@ -293,6 +318,8 @@ class Client extends _i1.ServerpodClientShared {
   late final EndpointPrivateAccount privateAccount;
 
   late final EndpointPrivateApiUsage privateApiUsage;
+
+  late final EndpointPrivateCloneScrappable privateCloneScrappable;
 
   late final EndpointPrivateSubscription privateSubscription;
 
@@ -314,6 +341,7 @@ class Client extends _i1.ServerpodClientShared {
   Map<String, _i1.EndpointRef> get endpointRefLookup => {
         'privateAccount': privateAccount,
         'privateApiUsage': privateApiUsage,
+        'privateCloneScrappable': privateCloneScrappable,
         'privateSubscription': privateSubscription,
         'privateUserScrappables': privateUserScrappables,
         'createScrappable': createScrappable,

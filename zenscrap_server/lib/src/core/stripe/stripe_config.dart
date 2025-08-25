@@ -9,6 +9,7 @@ class StripeConfig {
   static late String ultraPriceIdYearly;
   static late String successUrl;
   static late String cancelUrl;
+  static late String portalReturnUrl;
 
   static void initialize(Map<String, dynamic> config) {
     secretKey = config['stripe_secret_key'] ?? '';
@@ -25,6 +26,7 @@ class StripeConfig {
     // URLs for redirect after payment
     successUrl = config['stripe_success_url'] ?? '';
     cancelUrl = config['stripe_cancel_url'] ?? '';
+    portalReturnUrl = config['stripe_portal_return_url'] ?? '';
   }
 
   static String getPriceId(String tier, bool isYearly) {

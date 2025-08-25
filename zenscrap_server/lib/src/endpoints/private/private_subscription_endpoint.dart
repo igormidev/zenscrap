@@ -140,4 +140,42 @@ class PrivateSubscriptionEndpoint extends Endpoint {
       throw Exception('Failed to cancel subscription: $e');
     }
   }
+
+  Future<String> createCustomerPortalSession(Session session) async {
+    // Get authenticated user
+    final authenticationInfo = await session.authenticated;
+    if (authenticationInfo == null) {
+      throw Exception('User not authenticated');
+    }
+    final authenticatedUserId = authenticationInfo.userId;
+
+    // Get account info
+    final accountInfo = await AccountInfo.db.findFirstRow(
+      session,
+      where: (t) => t.userInfoId.equals(authenticatedUserId),
+    );
+
+    if (accountInfo == null) {
+      throw Exception('Account info not found');
+    }
+
+    if (accountInfo.stripeCustomerId == null) {
+      throw Exception('No Stripe customer found. Please subscribe to a plan first.');
+    }
+
+    try {
+      // Create customer portal session in Stripe
+      final portalSession = await StripeApi.createCustomerPortalSession(
+        secretKey: StripeConfig.secretKey,
+        customerId: accountInfo.stripeCustomerId!,
+        returnUrl: StripeConfig.portalReturnUrl,
+      );
+
+      // Return the portal URL
+      return portalSession['url'] as String;
+    } catch (e) {
+      session.log('Failed to create customer portal session: $e');
+      throw Exception('Failed to create customer portal session: $e');
+    }
+  }
 }

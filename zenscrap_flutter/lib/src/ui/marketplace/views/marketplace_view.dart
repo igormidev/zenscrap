@@ -8,12 +8,15 @@ import 'package:zenscrap_flutter/src/core/extensions/convert_extensions.dart';
 import 'package:zenscrap_flutter/src/core/extensions/string_extension.dart';
 import 'package:zenscrap_flutter/src/core/mixins/curl_builder_mixin.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/code_bloc.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_state.dart';
 import 'package:zenscrap_flutter/src/states/marketplace/marketplace_provider.dart';
 import 'package:zenscrap_flutter/src/states/marketplace/marketplace_state.dart';
+import 'package:zenscrap_flutter/src/ui/marketplace/dialogs/clone_success_dialog.dart';
+import 'package:zenscrap_flutter/src/ui/marketplace/dialogs/upgrade_plan_dialog.dart';
 import 'package:zenscrap_flutter/src/ui/marketplace/pages/empty_marketplace_page.dart';
 import 'package:zenscrap_flutter/src/ui/marketplace/widgets/api_key_selector_dialog.dart';
 import 'package:zenscrap_flutter/src/ui/marketplace/widgets/marketplace_pagination_controls.dart';
@@ -420,10 +423,7 @@ class _ScrappableDetailsDialogState
           child: const Text('Close'),
         ),
         FilledButton.icon(
-          onPressed: () {
-            Navigator.of(context).pop();
-            context.push('/scrappable-form?clone=${widget.scrappable.id}');
-          },
+          onPressed: () => _handleClone(context),
           icon: const Icon(Icons.copy_rounded),
           label: const Text('Clone to My Endpoints'),
         ),
@@ -433,5 +433,82 @@ class _ScrappableDetailsDialogState
 
   String _formatFullDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year} at ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+  }
+
+  Future<void> _handleClone(BuildContext context) async {
+    // Check if user has unlimited plan
+    final accountState = ref.read(accountProvider);
+    final hasUnlimitedPlan = accountState.maybeWhen(
+      withData: (accountInfo) => accountInfo.planTier == PlanTier.unlimited,
+      orElse: () => false,
+    );
+
+    if (!hasUnlimitedPlan) {
+      // Close current dialog and show upgrade dialog
+      Navigator.of(context).pop();
+      showDialog(
+        context: context,
+        builder: (context) => const UpgradePlanDialog(),
+      );
+      return;
+    }
+
+    // Show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: Card(
+          child: Padding(
+            padding: EdgeInsets.all(20),
+            child: CircularProgressIndicator(),
+          ),
+        ),
+      ),
+    );
+
+    try {
+      final client = ref.read(clientProvider);
+      final clonedScrappable = await client.privateCloneScrappable.cloneFromMarketplace(
+        scrappableId: widget.scrappable.id,
+      );
+
+      if (context.mounted) {
+        // Close loading dialog
+        Navigator.of(context).pop();
+        // Close details dialog
+        Navigator.of(context).pop();
+        
+        // Show success dialog
+        showDialog(
+          context: context,
+          builder: (context) => CloneSuccessDialog(
+            clonedScrappable: clonedScrappable,
+          ),
+        );
+      }
+    } on ZenScrapException catch (e) {
+      if (context.mounted) {
+        // Close loading dialog
+        Navigator.of(context).pop();
+        
+        if (e.title.contains('Upgrade Required')) {
+          // Close details dialog and show upgrade dialog
+          Navigator.of(context).pop();
+          showDialog(
+            context: context,
+            builder: (context) => const UpgradePlanDialog(),
+          );
+        } else {
+          showSnackbar(context, 'Failed to clone: ${e.description}');
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        // Close loading dialog
+        Navigator.of(context).pop();
+        showSnackbar(context, 'Failed to clone scrappable: $e');
+      }
+    }
   }
 }

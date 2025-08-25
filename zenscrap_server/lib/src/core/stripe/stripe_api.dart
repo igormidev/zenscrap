@@ -100,6 +100,44 @@ class StripeApi {
     }
   }
 
+  static Future<Map<String, dynamic>> createCustomerPortalSession({
+    required String secretKey,
+    required String customerId,
+    required String returnUrl,
+  }) async {
+    final client = HttpClient();
+    try {
+      final request = await client.postUrl(Uri.parse('$baseUrl/billing_portal/sessions'));
+      
+      // Set headers
+      request.headers.set('Authorization', 'Bearer $secretKey');
+      request.headers.set('Content-Type', 'application/x-www-form-urlencoded');
+      
+      // Build form data
+      final formData = {
+        'customer': customerId,
+        'return_url': returnUrl,
+      };
+      
+      final body = formData.entries
+          .map((e) => '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+          .join('&');
+      
+      request.write(body);
+      
+      final response = await request.close();
+      final responseBody = await response.transform(utf8.decoder).join();
+      
+      if (response.statusCode == 200) {
+        return jsonDecode(responseBody);
+      } else {
+        throw Exception('Failed to create customer portal session: $responseBody');
+      }
+    } finally {
+      client.close();
+    }
+  }
+
   static bool verifyWebhookSignature({
     required String payload,
     required String signature,
