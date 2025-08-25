@@ -7,6 +7,7 @@ part 'analytics_state.freezed.dart';
 abstract class AnalyticsState with _$AnalyticsState {
   factory AnalyticsState.initial() = _Initial;
   factory AnalyticsState.loading() = _Loading;
+  factory AnalyticsState.emptyData() = _EmptyData;
   factory AnalyticsState.withData(List<ScrappableRequestsAnalyticsItem> items) =
       _Loaded;
   factory AnalyticsState.withError({required ZenScrapException error}) = _Error;

@@ -52,6 +52,7 @@ extension AnalyticsStatePatterns on AnalyticsState {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Initial value)? initial,
     TResult Function(_Loading value)? loading,
+    TResult Function(_EmptyData value)? emptyData,
     TResult Function(_Loaded value)? withData,
     TResult Function(_Error value)? withError,
     required TResult orElse(),
@@ -62,6 +63,8 @@ extension AnalyticsStatePatterns on AnalyticsState {
         return initial(_that);
       case _Loading() when loading != null:
         return loading(_that);
+      case _EmptyData() when emptyData != null:
+        return emptyData(_that);
       case _Loaded() when withData != null:
         return withData(_that);
       case _Error() when withError != null:
@@ -88,6 +91,7 @@ extension AnalyticsStatePatterns on AnalyticsState {
   TResult map<TResult extends Object?>({
     required TResult Function(_Initial value) initial,
     required TResult Function(_Loading value) loading,
+    required TResult Function(_EmptyData value) emptyData,
     required TResult Function(_Loaded value) withData,
     required TResult Function(_Error value) withError,
   }) {
@@ -97,6 +101,8 @@ extension AnalyticsStatePatterns on AnalyticsState {
         return initial(_that);
       case _Loading():
         return loading(_that);
+      case _EmptyData():
+        return emptyData(_that);
       case _Loaded():
         return withData(_that);
       case _Error():
@@ -122,6 +128,7 @@ extension AnalyticsStatePatterns on AnalyticsState {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Initial value)? initial,
     TResult? Function(_Loading value)? loading,
+    TResult? Function(_EmptyData value)? emptyData,
     TResult? Function(_Loaded value)? withData,
     TResult? Function(_Error value)? withError,
   }) {
@@ -131,6 +138,8 @@ extension AnalyticsStatePatterns on AnalyticsState {
         return initial(_that);
       case _Loading() when loading != null:
         return loading(_that);
+      case _EmptyData() when emptyData != null:
+        return emptyData(_that);
       case _Loaded() when withData != null:
         return withData(_that);
       case _Error() when withError != null:
@@ -156,6 +165,7 @@ extension AnalyticsStatePatterns on AnalyticsState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
+    TResult Function()? emptyData,
     TResult Function(List<ScrappableRequestsAnalyticsItem> items)? withData,
     TResult Function(ZenScrapException error)? withError,
     required TResult orElse(),
@@ -166,6 +176,8 @@ extension AnalyticsStatePatterns on AnalyticsState {
         return initial();
       case _Loading() when loading != null:
         return loading();
+      case _EmptyData() when emptyData != null:
+        return emptyData();
       case _Loaded() when withData != null:
         return withData(_that.items);
       case _Error() when withError != null:
@@ -192,6 +204,7 @@ extension AnalyticsStatePatterns on AnalyticsState {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
+    required TResult Function() emptyData,
     required TResult Function(List<ScrappableRequestsAnalyticsItem> items)
         withData,
     required TResult Function(ZenScrapException error) withError,
@@ -202,6 +215,8 @@ extension AnalyticsStatePatterns on AnalyticsState {
         return initial();
       case _Loading():
         return loading();
+      case _EmptyData():
+        return emptyData();
       case _Loaded():
         return withData(_that.items);
       case _Error():
@@ -227,6 +242,7 @@ extension AnalyticsStatePatterns on AnalyticsState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
+    TResult? Function()? emptyData,
     TResult? Function(List<ScrappableRequestsAnalyticsItem> items)? withData,
     TResult? Function(ZenScrapException error)? withError,
   }) {
@@ -236,6 +252,8 @@ extension AnalyticsStatePatterns on AnalyticsState {
         return initial();
       case _Loading() when loading != null:
         return loading();
+      case _EmptyData() when emptyData != null:
+        return emptyData();
       case _Loaded() when withData != null:
         return withData(_that.items);
       case _Error() when withError != null:
@@ -283,6 +301,26 @@ class _Loading implements AnalyticsState {
   @override
   String toString() {
     return 'AnalyticsState.loading()';
+  }
+}
+
+/// @nodoc
+
+class _EmptyData implements AnalyticsState {
+  _EmptyData();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _EmptyData);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'AnalyticsState.emptyData()';
   }
 }
 

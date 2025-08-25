@@ -36,6 +36,10 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
           ),
       limit: 4,
     );
+    if (scrappables.isEmpty) {
+      // No scrappables found with analytics in the last 12 hours
+      return;
+    }
 
     final hoursScope = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
