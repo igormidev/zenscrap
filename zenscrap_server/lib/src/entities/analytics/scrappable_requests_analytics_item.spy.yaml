@@ -1,0 +1,9 @@
+class: ScrappableRequestsAnalyticsItem
+fields:
+  scrappable: Scrappable
+  successTotalCount: int
+  clientErrorTotalCount: int
+  serverErrorTotalCount: int
+  insufficientCreditsTotalCount: int
+  maxConcurrencyExceededTotalCount: int
+  data: List<ScrappableRequestPerHour>

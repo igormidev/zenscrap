@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_state.dart';
+import 'package:zenscrap_flutter/src/states/analytics/analytics_provider.dart';
+import 'package:zenscrap_flutter/src/states/analytics/analytics_state.dart';
 import 'package:zenscrap_flutter/src/states/dashboard/dashboard_index_provider.dart';
 import 'package:zenscrap_flutter/src/states/marketplace/marketplace_provider.dart';
 import 'package:zenscrap_flutter/src/states/marketplace/marketplace_state.dart';
@@ -24,6 +26,10 @@ final dashboardErrorProvider = Provider<ZenScrapException?>((ref) {
 
   final List<ZenScrapException?> pageDependenciesErrors =
       switch (selectedPage) {
+    DashboardNavigationType.analytics => [
+        ref.watch(analyticsProvider
+            .select((value) => value.whenOrNull(withError: (error) => error))),
+      ],
     DashboardNavigationType.userEndpoints => [
         ref.watch(userScrappables
             .select((value) => value.whenOrNull(withError: (error) => error))),

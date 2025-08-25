@@ -160,6 +160,12 @@ enum DashboardNavigationType {
     inactiveIcon: Icons.language,
     routeOnClick: '/api-usage',
   ),
+  analytics(
+    label: 'Api analytics',
+    activeIcon: Icons.analytics,
+    inactiveIcon: Icons.analytics_outlined,
+    routeOnClick: '/api-analytics',
+  ),
   account(
     label: 'Account',
     activeIcon: Icons.person,

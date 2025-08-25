@@ -9,6 +9,8 @@ privateApiUsage:
   - getApiUsageInfo:
 privateCloneScrappable:
   - cloneFromMarketplace:
+privateScrappableAnalytics:
+  - getScrappableAnalyticsOfTheLast12Hours:
 privateSubscription:
   - createCheckoutSession:
   - getSubscriptionStatus:

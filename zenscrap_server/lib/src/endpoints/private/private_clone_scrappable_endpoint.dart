@@ -1,5 +1,6 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:uuid/uuid.dart';
+import 'package:zenscrap_server/src/core/default_classes.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class PrivateCloneScrappableEndpoint extends Endpoint {
@@ -10,14 +11,11 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
     Session session, {
     required UuidValue scrappableId,
   }) async {
-    // Get authenticated user
     final authenticationInfo = await session.authenticated;
     if (authenticationInfo == null) {
-      throw ZenScrapException(
-        title: 'Authentication Required',
-        description: 'You must be logged in to clone scrappables.',
-      );
+      throw defaultAuthenticationException;
     }
+
     final authenticatedUserId = authenticationInfo.userId;
 
     // Get account info with plan tier
@@ -75,17 +73,19 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
       queryParams: sourceScrappable.targetRequest!.queryParams,
       pathParams: sourceScrappable.targetRequest!.pathParams,
     );
-    
+
     await ScrappableRequest.db.insertRow(session, clonedRequest);
 
     // Clone the ReferenceTestData
     final clonedTestData = ReferenceTestData(
       referenceLinkUsed: sourceScrappable.referenceTestData!.referenceLinkUsed,
-      referenceQueryParametersJson: sourceScrappable.referenceTestData!.referenceQueryParametersJson,
+      referenceQueryParametersJson:
+          sourceScrappable.referenceTestData!.referenceQueryParametersJson,
       referenceHtmlPage: sourceScrappable.referenceTestData!.referenceHtmlPage,
-      referenceSiteScreenshot: sourceScrappable.referenceTestData!.referenceSiteScreenshot,
+      referenceSiteScreenshot:
+          sourceScrappable.referenceTestData!.referenceSiteScreenshot,
     );
-    
+
     await ReferenceTestData.db.insertRow(session, clonedTestData);
 
     // Create the cloned scrappable

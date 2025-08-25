@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/convert_extensions.dart';
 import 'package:zenscrap_flutter/src/core/extensions/string_extension.dart';
@@ -469,7 +468,8 @@ class _ScrappableDetailsDialogState
 
     try {
       final client = ref.read(clientProvider);
-      final clonedScrappable = await client.privateCloneScrappable.cloneFromMarketplace(
+      final clonedScrappable =
+          await client.privateCloneScrappable.cloneFromMarketplace(
         scrappableId: widget.scrappable.id,
       );
 
@@ -478,7 +478,7 @@ class _ScrappableDetailsDialogState
         Navigator.of(context).pop();
         // Close details dialog
         Navigator.of(context).pop();
-        
+
         // Show success dialog
         showDialog(
           context: context,
@@ -491,7 +491,7 @@ class _ScrappableDetailsDialogState
       if (context.mounted) {
         // Close loading dialog
         Navigator.of(context).pop();
-        
+
         if (e.title.contains('Upgrade Required')) {
           // Close details dialog and show upgrade dialog
           Navigator.of(context).pop();

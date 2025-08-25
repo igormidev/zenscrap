@@ -8,6 +8,7 @@ import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 import 'package:zenscrap_flutter/src/ui/account/views/account_view.dart';
+import 'package:zenscrap_flutter/src/ui/api_analytics/view/api_analytics_view.dart';
 import 'package:zenscrap_flutter/src/ui/api_usage/views/api_usage_view.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/splash_view.dart';
@@ -97,6 +98,10 @@ final StateProvider routerProvider = StateProvider((ref) {
           GoRoute(
             path: DashboardNavigationType.usage.routeOnClick!,
             builder: (context, state) => ApiUsageView(),
+          ),
+          GoRoute(
+            path: DashboardNavigationType.analytics.routeOnClick!,
+            builder: (context, state) => ApiAnalyticsView(),
           ),
           GoRoute(
             path: DashboardNavigationType.account.routeOnClick!,
