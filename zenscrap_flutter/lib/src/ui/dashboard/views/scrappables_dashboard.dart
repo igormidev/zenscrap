@@ -76,16 +76,25 @@ class DashboardTemplateState extends ConsumerState<DashboardView> {
 
         Widget content = Stack(
           children: [
-            Opacity(
-              opacity: error != null || isLoading ? 0 : 1,
-              child: Center(
-                child: onboardingFlowState.maybeWhen<Widget>(
-                  none: () => const SizedBox.shrink(),
-                  orElse: () => widget.child,
+            if (error == null)
+              AnimatedOpacity(
+                duration: const Duration(milliseconds: 500),
+                opacity: isLoading ? 0 : 1,
+                child: Center(
+                  child: onboardingFlowState.maybeWhen<Widget>(
+                    none: () => const SizedBox.shrink(),
+                    orElse: () => widget.child,
+                  ),
                 ),
               ),
-            ),
-            if (isLoading && error == null) const FullpageLoadingPage(),
+            if (error == null)
+              AnimatedOpacity(
+                duration: const Duration(milliseconds: 500),
+                opacity: isLoading ? 1 : 0,
+                child: isLoading
+                    ? const FullpageLoadingPage()
+                    : const SizedBox.shrink(),
+              ),
             if (error != null) ZenErrorTab(error),
           ],
         );
