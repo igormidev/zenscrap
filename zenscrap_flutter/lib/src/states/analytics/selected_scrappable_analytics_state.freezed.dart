@@ -55,7 +55,11 @@ extension SelectedScrappableAnalyticsStatePatterns
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_SelectedScrappableAnalyticsStateNone value)? none,
     TResult Function(_SelectedScrappableAnalyticsStateLoading value)? loading,
+    TResult Function(_SelectedScrappableAnalyticsStateLoadingMore value)?
+        loadingMore,
     TResult Function(_SelectedScrappableAnalyticsStateWithData value)? withData,
+    TResult Function(_SelectedScrappableAnalyticsStateWithError value)?
+        withError,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -64,8 +68,13 @@ extension SelectedScrappableAnalyticsStatePatterns
         return none(_that);
       case _SelectedScrappableAnalyticsStateLoading() when loading != null:
         return loading(_that);
+      case _SelectedScrappableAnalyticsStateLoadingMore()
+          when loadingMore != null:
+        return loadingMore(_that);
       case _SelectedScrappableAnalyticsStateWithData() when withData != null:
         return withData(_that);
+      case _SelectedScrappableAnalyticsStateWithError() when withError != null:
+        return withError(_that);
       case _:
         return orElse();
     }
@@ -89,8 +98,13 @@ extension SelectedScrappableAnalyticsStatePatterns
     required TResult Function(_SelectedScrappableAnalyticsStateNone value) none,
     required TResult Function(_SelectedScrappableAnalyticsStateLoading value)
         loading,
+    required TResult Function(
+            _SelectedScrappableAnalyticsStateLoadingMore value)
+        loadingMore,
     required TResult Function(_SelectedScrappableAnalyticsStateWithData value)
         withData,
+    required TResult Function(_SelectedScrappableAnalyticsStateWithError value)
+        withError,
   }) {
     final _that = this;
     switch (_that) {
@@ -98,8 +112,12 @@ extension SelectedScrappableAnalyticsStatePatterns
         return none(_that);
       case _SelectedScrappableAnalyticsStateLoading():
         return loading(_that);
+      case _SelectedScrappableAnalyticsStateLoadingMore():
+        return loadingMore(_that);
       case _SelectedScrappableAnalyticsStateWithData():
         return withData(_that);
+      case _SelectedScrappableAnalyticsStateWithError():
+        return withError(_that);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -121,8 +139,12 @@ extension SelectedScrappableAnalyticsStatePatterns
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_SelectedScrappableAnalyticsStateNone value)? none,
     TResult? Function(_SelectedScrappableAnalyticsStateLoading value)? loading,
+    TResult? Function(_SelectedScrappableAnalyticsStateLoadingMore value)?
+        loadingMore,
     TResult? Function(_SelectedScrappableAnalyticsStateWithData value)?
         withData,
+    TResult? Function(_SelectedScrappableAnalyticsStateWithError value)?
+        withError,
   }) {
     final _that = this;
     switch (_that) {
@@ -130,8 +152,13 @@ extension SelectedScrappableAnalyticsStatePatterns
         return none(_that);
       case _SelectedScrappableAnalyticsStateLoading() when loading != null:
         return loading(_that);
+      case _SelectedScrappableAnalyticsStateLoadingMore()
+          when loadingMore != null:
+        return loadingMore(_that);
       case _SelectedScrappableAnalyticsStateWithData() when withData != null:
         return withData(_that);
+      case _SelectedScrappableAnalyticsStateWithError() when withError != null:
+        return withError(_that);
       case _:
         return null;
     }
@@ -153,7 +180,9 @@ extension SelectedScrappableAnalyticsStatePatterns
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? none,
     TResult Function()? loading,
-    TResult Function(List<ScrappableAnalytics> result)? withData,
+    TResult Function(PaginatedScrappableAnalytics currentData)? loadingMore,
+    TResult Function(PaginatedScrappableAnalytics data)? withData,
+    TResult Function(String error)? withError,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -162,8 +191,13 @@ extension SelectedScrappableAnalyticsStatePatterns
         return none();
       case _SelectedScrappableAnalyticsStateLoading() when loading != null:
         return loading();
+      case _SelectedScrappableAnalyticsStateLoadingMore()
+          when loadingMore != null:
+        return loadingMore(_that.currentData);
       case _SelectedScrappableAnalyticsStateWithData() when withData != null:
-        return withData(_that.result);
+        return withData(_that.data);
+      case _SelectedScrappableAnalyticsStateWithError() when withError != null:
+        return withError(_that.error);
       case _:
         return orElse();
     }
@@ -186,7 +220,10 @@ extension SelectedScrappableAnalyticsStatePatterns
   TResult when<TResult extends Object?>({
     required TResult Function() none,
     required TResult Function() loading,
-    required TResult Function(List<ScrappableAnalytics> result) withData,
+    required TResult Function(PaginatedScrappableAnalytics currentData)
+        loadingMore,
+    required TResult Function(PaginatedScrappableAnalytics data) withData,
+    required TResult Function(String error) withError,
   }) {
     final _that = this;
     switch (_that) {
@@ -194,8 +231,12 @@ extension SelectedScrappableAnalyticsStatePatterns
         return none();
       case _SelectedScrappableAnalyticsStateLoading():
         return loading();
+      case _SelectedScrappableAnalyticsStateLoadingMore():
+        return loadingMore(_that.currentData);
       case _SelectedScrappableAnalyticsStateWithData():
-        return withData(_that.result);
+        return withData(_that.data);
+      case _SelectedScrappableAnalyticsStateWithError():
+        return withError(_that.error);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -217,7 +258,9 @@ extension SelectedScrappableAnalyticsStatePatterns
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? none,
     TResult? Function()? loading,
-    TResult? Function(List<ScrappableAnalytics> result)? withData,
+    TResult? Function(PaginatedScrappableAnalytics currentData)? loadingMore,
+    TResult? Function(PaginatedScrappableAnalytics data)? withData,
+    TResult? Function(String error)? withError,
   }) {
     final _that = this;
     switch (_that) {
@@ -225,8 +268,13 @@ extension SelectedScrappableAnalyticsStatePatterns
         return none();
       case _SelectedScrappableAnalyticsStateLoading() when loading != null:
         return loading();
+      case _SelectedScrappableAnalyticsStateLoadingMore()
+          when loadingMore != null:
+        return loadingMore(_that.currentData);
       case _SelectedScrappableAnalyticsStateWithData() when withData != null:
-        return withData(_that.result);
+        return withData(_that.data);
+      case _SelectedScrappableAnalyticsStateWithError() when withError != null:
+        return withError(_that.error);
       case _:
         return null;
     }
@@ -279,18 +327,82 @@ class _SelectedScrappableAnalyticsStateLoading
 
 /// @nodoc
 
+class _SelectedScrappableAnalyticsStateLoadingMore
+    implements SelectedScrappableAnalyticsState {
+  _SelectedScrappableAnalyticsStateLoadingMore({required this.currentData});
+
+  final PaginatedScrappableAnalytics currentData;
+
+  /// Create a copy of SelectedScrappableAnalyticsState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$SelectedScrappableAnalyticsStateLoadingMoreCopyWith<
+          _SelectedScrappableAnalyticsStateLoadingMore>
+      get copyWith =>
+          __$SelectedScrappableAnalyticsStateLoadingMoreCopyWithImpl<
+              _SelectedScrappableAnalyticsStateLoadingMore>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _SelectedScrappableAnalyticsStateLoadingMore &&
+            (identical(other.currentData, currentData) ||
+                other.currentData == currentData));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, currentData);
+
+  @override
+  String toString() {
+    return 'SelectedScrappableAnalyticsState.loadingMore(currentData: $currentData)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$SelectedScrappableAnalyticsStateLoadingMoreCopyWith<$Res>
+    implements $SelectedScrappableAnalyticsStateCopyWith<$Res> {
+  factory _$SelectedScrappableAnalyticsStateLoadingMoreCopyWith(
+          _SelectedScrappableAnalyticsStateLoadingMore value,
+          $Res Function(_SelectedScrappableAnalyticsStateLoadingMore) _then) =
+      __$SelectedScrappableAnalyticsStateLoadingMoreCopyWithImpl;
+  @useResult
+  $Res call({PaginatedScrappableAnalytics currentData});
+}
+
+/// @nodoc
+class __$SelectedScrappableAnalyticsStateLoadingMoreCopyWithImpl<$Res>
+    implements _$SelectedScrappableAnalyticsStateLoadingMoreCopyWith<$Res> {
+  __$SelectedScrappableAnalyticsStateLoadingMoreCopyWithImpl(
+      this._self, this._then);
+
+  final _SelectedScrappableAnalyticsStateLoadingMore _self;
+  final $Res Function(_SelectedScrappableAnalyticsStateLoadingMore) _then;
+
+  /// Create a copy of SelectedScrappableAnalyticsState
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? currentData = null,
+  }) {
+    return _then(_SelectedScrappableAnalyticsStateLoadingMore(
+      currentData: null == currentData
+          ? _self.currentData
+          : currentData // ignore: cast_nullable_to_non_nullable
+              as PaginatedScrappableAnalytics,
+    ));
+  }
+}
+
+/// @nodoc
+
 class _SelectedScrappableAnalyticsStateWithData
     implements SelectedScrappableAnalyticsState {
-  _SelectedScrappableAnalyticsStateWithData(
-      {required final List<ScrappableAnalytics> result})
-      : _result = result;
+  _SelectedScrappableAnalyticsStateWithData({required this.data});
 
-  final List<ScrappableAnalytics> _result;
-  List<ScrappableAnalytics> get result {
-    if (_result is EqualUnmodifiableListView) return _result;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_result);
-  }
+  final PaginatedScrappableAnalytics data;
 
   /// Create a copy of SelectedScrappableAnalyticsState
   /// with the given fields replaced by the non-null parameter values.
@@ -306,16 +418,15 @@ class _SelectedScrappableAnalyticsStateWithData
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _SelectedScrappableAnalyticsStateWithData &&
-            const DeepCollectionEquality().equals(other._result, _result));
+            (identical(other.data, data) || other.data == data));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(_result));
+  int get hashCode => Object.hash(runtimeType, data);
 
   @override
   String toString() {
-    return 'SelectedScrappableAnalyticsState.withData(result: $result)';
+    return 'SelectedScrappableAnalyticsState.withData(data: $data)';
   }
 }
 
@@ -327,7 +438,7 @@ abstract mixin class _$SelectedScrappableAnalyticsStateWithDataCopyWith<$Res>
           $Res Function(_SelectedScrappableAnalyticsStateWithData) _then) =
       __$SelectedScrappableAnalyticsStateWithDataCopyWithImpl;
   @useResult
-  $Res call({List<ScrappableAnalytics> result});
+  $Res call({PaginatedScrappableAnalytics data});
 }
 
 /// @nodoc
@@ -343,13 +454,82 @@ class __$SelectedScrappableAnalyticsStateWithDataCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? result = null,
+    Object? data = null,
   }) {
     return _then(_SelectedScrappableAnalyticsStateWithData(
-      result: null == result
-          ? _self._result
-          : result // ignore: cast_nullable_to_non_nullable
-              as List<ScrappableAnalytics>,
+      data: null == data
+          ? _self.data
+          : data // ignore: cast_nullable_to_non_nullable
+              as PaginatedScrappableAnalytics,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _SelectedScrappableAnalyticsStateWithError
+    implements SelectedScrappableAnalyticsState {
+  _SelectedScrappableAnalyticsStateWithError({required this.error});
+
+  final String error;
+
+  /// Create a copy of SelectedScrappableAnalyticsState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$SelectedScrappableAnalyticsStateWithErrorCopyWith<
+          _SelectedScrappableAnalyticsStateWithError>
+      get copyWith => __$SelectedScrappableAnalyticsStateWithErrorCopyWithImpl<
+          _SelectedScrappableAnalyticsStateWithError>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _SelectedScrappableAnalyticsStateWithError &&
+            (identical(other.error, error) || other.error == error));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, error);
+
+  @override
+  String toString() {
+    return 'SelectedScrappableAnalyticsState.withError(error: $error)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$SelectedScrappableAnalyticsStateWithErrorCopyWith<$Res>
+    implements $SelectedScrappableAnalyticsStateCopyWith<$Res> {
+  factory _$SelectedScrappableAnalyticsStateWithErrorCopyWith(
+          _SelectedScrappableAnalyticsStateWithError value,
+          $Res Function(_SelectedScrappableAnalyticsStateWithError) _then) =
+      __$SelectedScrappableAnalyticsStateWithErrorCopyWithImpl;
+  @useResult
+  $Res call({String error});
+}
+
+/// @nodoc
+class __$SelectedScrappableAnalyticsStateWithErrorCopyWithImpl<$Res>
+    implements _$SelectedScrappableAnalyticsStateWithErrorCopyWith<$Res> {
+  __$SelectedScrappableAnalyticsStateWithErrorCopyWithImpl(
+      this._self, this._then);
+
+  final _SelectedScrappableAnalyticsStateWithError _self;
+  final $Res Function(_SelectedScrappableAnalyticsStateWithError) _then;
+
+  /// Create a copy of SelectedScrappableAnalyticsState
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? error = null,
+  }) {
+    return _then(_SelectedScrappableAnalyticsStateWithError(
+      error: null == error
+          ? _self.error
+          : error // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }

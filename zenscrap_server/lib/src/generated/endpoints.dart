@@ -253,20 +253,58 @@ class Endpoints extends _i1.EndpointDispatch {
       name: 'privateScrappableAnalytics',
       endpoint: endpoints['privateScrappableAnalytics']!,
       methodConnectors: {
-        'getScrappableAnalyticsOfTheLast12Hours': _i1.MethodStreamConnector(
+        'getScrappableAnalyticsOfTheLast12Hours': _i1.MethodConnector(
           name: 'getScrappableAnalyticsOfTheLast12Hours',
-          params: {},
-          streamParams: {},
-          returnType: _i1.MethodStreamReturnType.streamType,
+          params: {
+            'page': _i1.ParameterDescription(
+              name: 'page',
+              type: _i1.getType<int>(),
+              nullable: false,
+            )
+          },
           call: (
             _i1.Session session,
             Map<String, dynamic> params,
-            Map<String, Stream> streamParams,
-          ) =>
+          ) async =>
               (endpoints['privateScrappableAnalytics']
                       as _i5.PrivateScrappableAnalyticsEndpoint)
-                  .getScrappableAnalyticsOfTheLast12Hours(session),
-        )
+                  .getScrappableAnalyticsOfTheLast12Hours(
+            session,
+            page: params['page'],
+          ),
+        ),
+        'getScrappableAnalytics': _i1.MethodConnector(
+          name: 'getScrappableAnalytics',
+          params: {
+            'scrappableId': _i1.ParameterDescription(
+              name: 'scrappableId',
+              type: _i1.getType<_i14.UuidValue>(),
+              nullable: false,
+            ),
+            'page': _i1.ParameterDescription(
+              name: 'page',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'daysBack': _i1.ParameterDescription(
+              name: 'daysBack',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['privateScrappableAnalytics']
+                      as _i5.PrivateScrappableAnalyticsEndpoint)
+                  .getScrappableAnalytics(
+            session,
+            scrappableId: params['scrappableId'],
+            page: params['page'],
+            daysBack: params['daysBack'],
+          ),
+        ),
       },
     );
     connectors['privateSubscription'] = _i1.EndpointConnector(

@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
-import 'package:zenscrap_flutter/src/core/extensions/serverpod_to_result.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/analytics/analytics_state.dart';
 
@@ -11,21 +10,69 @@ final analyticsProvider =
 class AnalyticsNotifier extends StateNotifier<AnalyticsState> {
   final Ref ref;
   AnalyticsNotifier(this.ref) : super(AnalyticsState.initial());
+  
+  int _currentPage = 1;
 
   Future<void> getAnalyticsData() async {
+    _currentPage = 1;
     state = AnalyticsState.loading();
-    final allData = <ScrappableRequestsAnalyticsItem>[];
-    ref
-        .read(clientProvider)
-        .privateScrappableAnalytics
-        .getScrappableAnalyticsOfTheLast12Hours()
-        .toResult((item) {
-      allData.add(item);
-      state = AnalyticsState.withData(allData);
-    }, (error) => state = AnalyticsState.withError(error: error));
+    
+    try {
+      final result = await ref
+          .read(clientProvider)
+          .privateScrappableAnalytics
+          .getScrappableAnalyticsOfTheLast12Hours(
+            page: _currentPage,
+          );
+      
+      if (result.items.isEmpty) {
+        state = AnalyticsState.emptyData();
+      } else {
+        state = AnalyticsState.withData(result);
+      }
+    } catch (error) {
+      state = AnalyticsState.withError(
+        error: error is ZenScrapException 
+            ? error 
+            : ZenScrapException(
+                title: 'Error',
+                description: error.toString(),
+              ),
+      );
+    }
+  }
 
-    if (allData.isEmpty) {
-      state = AnalyticsState.emptyData();
+  Future<void> loadMoreAnalytics() async {
+    final currentData = state.whenOrNull(
+      withData: (data) => data,
+    );
+    if (currentData == null) return;
+    if (!currentData.hasNextPage) return;
+    
+    state = AnalyticsState.loadingMore(currentData: currentData);
+    
+    try {
+      _currentPage++;
+      final result = await ref
+          .read(clientProvider)
+          .privateScrappableAnalytics
+          .getScrappableAnalyticsOfTheLast12Hours(
+            page: _currentPage,
+          );
+      
+      // Merge the new data with existing data
+      final mergedData = PaginatedScrappableRequestsAnalytics(
+        items: [...currentData.items, ...result.items],
+        hasNextPage: result.hasNextPage,
+        totalCount: result.totalCount,
+        currentPage: result.currentPage,
+        pageSize: result.pageSize,
+      );
+      
+      state = AnalyticsState.withData(mergedData);
+    } catch (error) {
+      // Revert to previous data on error
+      state = AnalyticsState.withData(currentData);
     }
   }
 }

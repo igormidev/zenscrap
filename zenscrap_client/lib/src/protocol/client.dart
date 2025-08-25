@@ -22,18 +22,20 @@ import 'package:zenscrap_client/src/protocol/entities/account/account_api_key.da
 import 'package:zenscrap_client/src/protocol/entities/account/api_usage/account_api_usage.dart'
     as _i7;
 import 'package:uuid/uuid_value.dart' as _i8;
-import 'package:zenscrap_client/src/protocol/entities/analytics/scrappable_requests_analytics_item.dart'
+import 'package:zenscrap_client/src/protocol/entities/analytics/paginated_scrappable_requests_analytics.dart'
     as _i9;
-import 'package:zenscrap_client/src/protocol/entities/marketplace/paginated_scrappable_response.dart'
+import 'package:zenscrap_client/src/protocol/entities/analytics/paginated_scrappable_analytics.dart'
     as _i10;
-import 'package:zenscrap_client/src/protocol/entities/account/plan_tier.dart'
+import 'package:zenscrap_client/src/protocol/entities/marketplace/paginated_scrappable_response.dart'
     as _i11;
-import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/create_session_response.dart'
+import 'package:zenscrap_client/src/protocol/entities/account/plan_tier.dart'
     as _i12;
-import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/chat_response.dart'
+import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/create_session_response.dart'
     as _i13;
-import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i14;
-import 'protocol.dart' as _i15;
+import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/chat_response.dart'
+    as _i14;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i15;
+import 'protocol.dart' as _i16;
 
 /// {@category Endpoint}
 class EndpointPrivateAccount extends _i1.EndpointRef {
@@ -130,16 +132,28 @@ class EndpointPrivateScrappableAnalytics extends _i1.EndpointRef {
   @override
   String get name => 'privateScrappableAnalytics';
 
-  _i2.Stream<_i9.ScrappableRequestsAnalyticsItem>
-      getScrappableAnalyticsOfTheLast12Hours() =>
-          caller.callStreamingServerEndpoint<
-              _i2.Stream<_i9.ScrappableRequestsAnalyticsItem>,
-              _i9.ScrappableRequestsAnalyticsItem>(
+  _i2.Future<_i9.PaginatedScrappableRequestsAnalytics>
+      getScrappableAnalyticsOfTheLast12Hours({required int page}) =>
+          caller.callServerEndpoint<_i9.PaginatedScrappableRequestsAnalytics>(
             'privateScrappableAnalytics',
             'getScrappableAnalyticsOfTheLast12Hours',
-            {},
-            {},
+            {'page': page},
           );
+
+  _i2.Future<_i10.PaginatedScrappableAnalytics> getScrappableAnalytics({
+    required _i8.UuidValue scrappableId,
+    required int page,
+    required int daysBack,
+  }) =>
+      caller.callServerEndpoint<_i10.PaginatedScrappableAnalytics>(
+        'privateScrappableAnalytics',
+        'getScrappableAnalytics',
+        {
+          'scrappableId': scrappableId,
+          'page': page,
+          'daysBack': daysBack,
+        },
+      );
 }
 
 /// {@category Endpoint}
@@ -220,12 +234,12 @@ class EndpointMarketplace extends _i1.EndpointRef {
   @override
   String get name => 'marketplace';
 
-  _i2.Future<_i10.PaginatedScrappableResponse> getItems({
+  _i2.Future<_i11.PaginatedScrappableResponse> getItems({
     required int page,
     required int pageSize,
     String? searchQuery,
   }) =>
-      caller.callServerEndpoint<_i10.PaginatedScrappableResponse>(
+      caller.callServerEndpoint<_i11.PaginatedScrappableResponse>(
         'marketplace',
         'getItems',
         {
@@ -246,7 +260,7 @@ class EndpointPublicTier extends _i1.EndpointRef {
   _i2.Future<void> updatePlayerTier({
     required String email,
     required String tierManipulationKey,
-    required _i11.PlanTier planTier,
+    required _i12.PlanTier planTier,
   }) =>
       caller.callServerEndpoint<void>(
         'publicTier',
@@ -302,18 +316,18 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
   @override
   String get name => 'scrappableChatSession';
 
-  _i2.Future<_i12.CreateSessionResponse> createSession(
+  _i2.Future<_i13.CreateSessionResponse> createSession(
           {required _i4.Scrappable scrappable}) =>
-      caller.callServerEndpoint<_i12.CreateSessionResponse>(
+      caller.callServerEndpoint<_i13.CreateSessionResponse>(
         'scrappableChatSession',
         'createSession',
         {'scrappable': scrappable},
       );
 
-  _i2.Stream<_i13.ChatResponse> listenToScrappableRedraftSession(
+  _i2.Stream<_i14.ChatResponse> listenToScrappableRedraftSession(
           {required String sessionUuid}) =>
-      caller.callStreamingServerEndpoint<_i2.Stream<_i13.ChatResponse>,
-          _i13.ChatResponse>(
+      caller.callStreamingServerEndpoint<_i2.Stream<_i14.ChatResponse>,
+          _i14.ChatResponse>(
         'scrappableChatSession',
         'listenToScrappableRedraftSession',
         {'sessionUuid': sessionUuid},
@@ -336,10 +350,10 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
 
 class Modules {
   Modules(Client client) {
-    auth = _i14.Caller(client);
+    auth = _i15.Caller(client);
   }
 
-  late final _i14.Caller auth;
+  late final _i15.Caller auth;
 }
 
 class Client extends _i1.ServerpodClientShared {
@@ -358,7 +372,7 @@ class Client extends _i1.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
           host,
-          _i15.Protocol(),
+          _i16.Protocol(),
           securityContext: securityContext,
           authenticationKeyManager: authenticationKeyManager,
           streamingConnectionTimeout: streamingConnectionTimeout,

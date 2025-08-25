@@ -11,6 +11,7 @@ privateCloneScrappable:
   - cloneFromMarketplace:
 privateScrappableAnalytics:
   - getScrappableAnalyticsOfTheLast12Hours:
+  - getScrappableAnalytics:
 privateSubscription:
   - createCheckoutSession:
   - getSubscriptionStatus:

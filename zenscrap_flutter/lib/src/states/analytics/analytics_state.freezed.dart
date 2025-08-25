@@ -52,6 +52,7 @@ extension AnalyticsStatePatterns on AnalyticsState {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Initial value)? initial,
     TResult Function(_Loading value)? loading,
+    TResult Function(_LoadingMore value)? loadingMore,
     TResult Function(_EmptyData value)? emptyData,
     TResult Function(_Loaded value)? withData,
     TResult Function(_Error value)? withError,
@@ -63,6 +64,8 @@ extension AnalyticsStatePatterns on AnalyticsState {
         return initial(_that);
       case _Loading() when loading != null:
         return loading(_that);
+      case _LoadingMore() when loadingMore != null:
+        return loadingMore(_that);
       case _EmptyData() when emptyData != null:
         return emptyData(_that);
       case _Loaded() when withData != null:
@@ -91,6 +94,7 @@ extension AnalyticsStatePatterns on AnalyticsState {
   TResult map<TResult extends Object?>({
     required TResult Function(_Initial value) initial,
     required TResult Function(_Loading value) loading,
+    required TResult Function(_LoadingMore value) loadingMore,
     required TResult Function(_EmptyData value) emptyData,
     required TResult Function(_Loaded value) withData,
     required TResult Function(_Error value) withError,
@@ -101,6 +105,8 @@ extension AnalyticsStatePatterns on AnalyticsState {
         return initial(_that);
       case _Loading():
         return loading(_that);
+      case _LoadingMore():
+        return loadingMore(_that);
       case _EmptyData():
         return emptyData(_that);
       case _Loaded():
@@ -128,6 +134,7 @@ extension AnalyticsStatePatterns on AnalyticsState {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Initial value)? initial,
     TResult? Function(_Loading value)? loading,
+    TResult? Function(_LoadingMore value)? loadingMore,
     TResult? Function(_EmptyData value)? emptyData,
     TResult? Function(_Loaded value)? withData,
     TResult? Function(_Error value)? withError,
@@ -138,6 +145,8 @@ extension AnalyticsStatePatterns on AnalyticsState {
         return initial(_that);
       case _Loading() when loading != null:
         return loading(_that);
+      case _LoadingMore() when loadingMore != null:
+        return loadingMore(_that);
       case _EmptyData() when emptyData != null:
         return emptyData(_that);
       case _Loaded() when withData != null:
@@ -165,8 +174,10 @@ extension AnalyticsStatePatterns on AnalyticsState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
+    TResult Function(PaginatedScrappableRequestsAnalytics currentData)?
+        loadingMore,
     TResult Function()? emptyData,
-    TResult Function(List<ScrappableRequestsAnalyticsItem> items)? withData,
+    TResult Function(PaginatedScrappableRequestsAnalytics data)? withData,
     TResult Function(ZenScrapException error)? withError,
     required TResult orElse(),
   }) {
@@ -176,10 +187,12 @@ extension AnalyticsStatePatterns on AnalyticsState {
         return initial();
       case _Loading() when loading != null:
         return loading();
+      case _LoadingMore() when loadingMore != null:
+        return loadingMore(_that.currentData);
       case _EmptyData() when emptyData != null:
         return emptyData();
       case _Loaded() when withData != null:
-        return withData(_that.items);
+        return withData(_that.data);
       case _Error() when withError != null:
         return withError(_that.error);
       case _:
@@ -204,8 +217,10 @@ extension AnalyticsStatePatterns on AnalyticsState {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
+    required TResult Function(PaginatedScrappableRequestsAnalytics currentData)
+        loadingMore,
     required TResult Function() emptyData,
-    required TResult Function(List<ScrappableRequestsAnalyticsItem> items)
+    required TResult Function(PaginatedScrappableRequestsAnalytics data)
         withData,
     required TResult Function(ZenScrapException error) withError,
   }) {
@@ -215,10 +230,12 @@ extension AnalyticsStatePatterns on AnalyticsState {
         return initial();
       case _Loading():
         return loading();
+      case _LoadingMore():
+        return loadingMore(_that.currentData);
       case _EmptyData():
         return emptyData();
       case _Loaded():
-        return withData(_that.items);
+        return withData(_that.data);
       case _Error():
         return withError(_that.error);
       case _:
@@ -242,8 +259,10 @@ extension AnalyticsStatePatterns on AnalyticsState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
+    TResult? Function(PaginatedScrappableRequestsAnalytics currentData)?
+        loadingMore,
     TResult? Function()? emptyData,
-    TResult? Function(List<ScrappableRequestsAnalyticsItem> items)? withData,
+    TResult? Function(PaginatedScrappableRequestsAnalytics data)? withData,
     TResult? Function(ZenScrapException error)? withError,
   }) {
     final _that = this;
@@ -252,10 +271,12 @@ extension AnalyticsStatePatterns on AnalyticsState {
         return initial();
       case _Loading() when loading != null:
         return loading();
+      case _LoadingMore() when loadingMore != null:
+        return loadingMore(_that.currentData);
       case _EmptyData() when emptyData != null:
         return emptyData();
       case _Loaded() when withData != null:
-        return withData(_that.items);
+        return withData(_that.data);
       case _Error() when withError != null:
         return withError(_that.error);
       case _:
@@ -306,6 +327,70 @@ class _Loading implements AnalyticsState {
 
 /// @nodoc
 
+class _LoadingMore implements AnalyticsState {
+  _LoadingMore({required this.currentData});
+
+  final PaginatedScrappableRequestsAnalytics currentData;
+
+  /// Create a copy of AnalyticsState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$LoadingMoreCopyWith<_LoadingMore> get copyWith =>
+      __$LoadingMoreCopyWithImpl<_LoadingMore>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _LoadingMore &&
+            (identical(other.currentData, currentData) ||
+                other.currentData == currentData));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, currentData);
+
+  @override
+  String toString() {
+    return 'AnalyticsState.loadingMore(currentData: $currentData)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$LoadingMoreCopyWith<$Res>
+    implements $AnalyticsStateCopyWith<$Res> {
+  factory _$LoadingMoreCopyWith(
+          _LoadingMore value, $Res Function(_LoadingMore) _then) =
+      __$LoadingMoreCopyWithImpl;
+  @useResult
+  $Res call({PaginatedScrappableRequestsAnalytics currentData});
+}
+
+/// @nodoc
+class __$LoadingMoreCopyWithImpl<$Res> implements _$LoadingMoreCopyWith<$Res> {
+  __$LoadingMoreCopyWithImpl(this._self, this._then);
+
+  final _LoadingMore _self;
+  final $Res Function(_LoadingMore) _then;
+
+  /// Create a copy of AnalyticsState
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? currentData = null,
+  }) {
+    return _then(_LoadingMore(
+      currentData: null == currentData
+          ? _self.currentData
+          : currentData // ignore: cast_nullable_to_non_nullable
+              as PaginatedScrappableRequestsAnalytics,
+    ));
+  }
+}
+
+/// @nodoc
+
 class _EmptyData implements AnalyticsState {
   _EmptyData();
 
@@ -327,14 +412,9 @@ class _EmptyData implements AnalyticsState {
 /// @nodoc
 
 class _Loaded implements AnalyticsState {
-  _Loaded(final List<ScrappableRequestsAnalyticsItem> items) : _items = items;
+  _Loaded(this.data);
 
-  final List<ScrappableRequestsAnalyticsItem> _items;
-  List<ScrappableRequestsAnalyticsItem> get items {
-    if (_items is EqualUnmodifiableListView) return _items;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_items);
-  }
+  final PaginatedScrappableRequestsAnalytics data;
 
   /// Create a copy of AnalyticsState
   /// with the given fields replaced by the non-null parameter values.
@@ -348,16 +428,15 @@ class _Loaded implements AnalyticsState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _Loaded &&
-            const DeepCollectionEquality().equals(other._items, _items));
+            (identical(other.data, data) || other.data == data));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(_items));
+  int get hashCode => Object.hash(runtimeType, data);
 
   @override
   String toString() {
-    return 'AnalyticsState.withData(items: $items)';
+    return 'AnalyticsState.withData(data: $data)';
   }
 }
 
@@ -367,7 +446,7 @@ abstract mixin class _$LoadedCopyWith<$Res>
   factory _$LoadedCopyWith(_Loaded value, $Res Function(_Loaded) _then) =
       __$LoadedCopyWithImpl;
   @useResult
-  $Res call({List<ScrappableRequestsAnalyticsItem> items});
+  $Res call({PaginatedScrappableRequestsAnalytics data});
 }
 
 /// @nodoc
@@ -381,13 +460,13 @@ class __$LoadedCopyWithImpl<$Res> implements _$LoadedCopyWith<$Res> {
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? items = null,
+    Object? data = null,
   }) {
     return _then(_Loaded(
-      null == items
-          ? _self._items
-          : items // ignore: cast_nullable_to_non_nullable
-              as List<ScrappableRequestsAnalyticsItem>,
+      null == data
+          ? _self.data
+          : data // ignore: cast_nullable_to_non_nullable
+              as PaginatedScrappableRequestsAnalytics,
     ));
   }
 }

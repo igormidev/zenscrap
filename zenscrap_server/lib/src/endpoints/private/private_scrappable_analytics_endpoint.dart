@@ -8,8 +8,12 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
   @override
   bool get requireLogin => true;
 
-  Stream<ScrappableRequestsAnalyticsItem>
-      getScrappableAnalyticsOfTheLast12Hours(Session session) async* {
+  Future<PaginatedScrappableRequestsAnalytics>
+      getScrappableAnalyticsOfTheLast12Hours(
+    Session session, {
+    int page = 1,
+  }) async {
+    const int pageSize = 4; // Fixed page size
     final authenticationInfo = await session.authenticated;
     if (authenticationInfo == null) throw defaultAuthenticationException;
     final userId = authenticationInfo.userId;
@@ -24,23 +28,33 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
       );
     }
     final now = DateTime.now();
-
     final targetDate = now.subtract(Duration(hours: 12));
+    
+    // Get total count for pagination
+    final totalCount = await Scrappable.db.count(
+      session,
+      where: (t) =>
+          t.accountId.equals(accountInfo.id) &
+          t.scrappableAnalytics.any(
+            (p0) => p0.requestedAt >= targetDate,
+          ),
+    );
+    
+    final offset = (page - 1) * pageSize;
     final List<Scrappable> scrappables = await Scrappable.db.find(
       session,
       where: (t) =>
           t.accountId.equals(accountInfo.id) &
           t.scrappableAnalytics.any(
-            // Scrappables that had been used in the last 30 days
             (p0) => p0.requestedAt >= targetDate,
           ),
-      limit: 4,
+      limit: pageSize,
+      offset: offset,
+      orderBy: (t) => t.id,
+      orderDescending: false,
     );
-    if (scrappables.isEmpty) {
-      // No scrappables found with analytics in the last 12 hours
-      return;
-    }
-
+    
+    final List<ScrappableRequestsAnalyticsItem> items = [];
     final hoursScope = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
     for (final Scrappable scrappable in scrappables) {
@@ -51,7 +65,6 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
       int insufficientCreditsTotalCount = 0;
       int maxConcurrencyExceededTotalCount = 0;
 
-      // Not lets make the last 12 hours loop
       DateTime end = now;
       for (final int hour in hoursScope) {
         final DateTime start = now.subtract(Duration(hours: hour));
@@ -93,7 +106,7 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
         end = start;
       }
 
-      yield ScrappableRequestsAnalyticsItem(
+      items.add(ScrappableRequestsAnalyticsItem(
         scrappable: scrappable,
         successTotalCount: successTotalCount,
         clientErrorTotalCount: clientErrorTotalCount,
@@ -101,8 +114,84 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
         insufficientCreditsTotalCount: insufficientCreditsTotalCount,
         maxConcurrencyExceededTotalCount: maxConcurrencyExceededTotalCount,
         data: data.reversed.toList(),
+      ));
+    }
+
+    return PaginatedScrappableRequestsAnalytics(
+      items: items,
+      hasNextPage: (offset + pageSize) < totalCount,
+      totalCount: totalCount,
+      currentPage: page,
+      pageSize: pageSize,
+    );
+  }
+
+  Future<PaginatedScrappableAnalytics> getScrappableAnalytics(
+    Session session, {
+    required UuidValue scrappableId,
+    int page = 1,
+    int daysBack = 7,
+  }) async {
+    const int pageSize = 30; // Fixed page size
+    final authenticationInfo = await session.authenticated;
+    if (authenticationInfo == null) throw defaultAuthenticationException;
+    final userId = authenticationInfo.userId;
+    final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
+      session,
+      where: (t) => t.userInfoId.equals(userId),
+    );
+    if (accountInfo == null) {
+      throw ZenScrapException(
+        title: 'Account Not Found',
+        description: 'No account information found for the authenticated user.',
       );
     }
+
+    // Verify scrappable ownership
+    final scrappable = await Scrappable.db.findById(session, scrappableId);
+    if (scrappable == null || scrappable.accountId != accountInfo.id) {
+      throw ZenScrapException(
+        title: 'Scrappable Not Found',
+        description: 'The requested scrappable was not found or you do not have access to it.',
+      );
+    }
+
+    final now = DateTime.now();
+    final targetDate = now.subtract(Duration(days: daysBack));
+    
+    // Get total count for pagination
+    final totalCount = await ScrappableAnalytics.db.count(
+      session,
+      where: (t) =>
+          t.scrappableId.equals(scrappableId) &
+          (t.requestedAt >= targetDate),
+    );
+
+    final offset = (page - 1) * pageSize;
+    
+    // Fetch paginated analytics with includes for better performance
+    final analytics = await ScrappableAnalytics.db.find(
+      session,
+      where: (t) =>
+          t.scrappableId.equals(scrappableId) &
+          (t.requestedAt >= targetDate),
+      limit: pageSize,
+      offset: offset,
+      orderBy: (t) => t.requestedAt,
+      orderDescending: true,
+      include: ScrappableAnalytics.include(
+        scrappable: Scrappable.include(),
+      ),
+    );
+
+    return PaginatedScrappableAnalytics(
+      scrappable: scrappable,
+      items: analytics,
+      hasNextPage: (offset + pageSize) < totalCount,
+      totalCount: totalCount,
+      currentPage: page,
+      pageSize: pageSize,
+    );
   }
 }
 

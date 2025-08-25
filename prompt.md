@@ -1,5 +1,13 @@
-I wan't to build the RequestsAnalyticsView. Ultra think in this task.
-This is a page that the user will be able to have a general perspective of all the requests made by the customer api keys.
+I wan't you to build the ApiAnalyticsView in  @zenscrap_flutter/lib/src/ui/api_analytics/view/api_analytics_view.dart. Ultra think in this task.
+
+This is a page that the user will be able to have a general perspective of all the requests made by his api keys. 
+
+The page will be splitted in two sections. One is the listage ScrappableRequestsAnalyticsItem and the other is the specific list of ScrappableAnalytics of one scrappable.
+
+In the listage of ScrappableRequestsAnalyticsItem, use the @zenscrap_server/lib/src/endpoints/private/private_scrappable_analytics_endpoint.dart that is called in the @zenscrap_flutter/lib/src/states/analytics/analytics_provider.dart provider. It only brings 4 because this is a intensive operation to be done, so you should add in the end of the listage there should be a button to get more 4 (you will need to modify the endpoint getScrappableAnalyticsOfTheLast12Hours to get more 4 items). In the ui part, you should display a card with the scrappable name/description and the other data of @zenscrap_server/lib/src/entities/analytics/scrappable_requests_analytics_item.spy.yaml. The data of ScrappableRequestsAnalyticsItem.data will be displayed in columns where each column will represent the number of calls in 1 hour interval. The amount of each count will be a color. I will attach a reference ui so you can have a better ideia of what I expect from there card, use it as reference and ultra think to make a good ui:
+
+The second tab will display the NoSelectedScrappableIndicatorPage in a first moment. But if the user taps on the card of ScrappableRequestsAnalyticsItem the Scrappable of that
+
 
 IMPORANT:
 If you need to generate serverpod files, use the command "serverpod generate --experimental-features=all". It need to have that flag because I am using some experimental-features... And on the flutter part you need to run the freezed build command in case you build any freezed class. At the end of the task, double-check if there are any static analysis error...

@@ -10,7 +10,13 @@ abstract class SelectedScrappableAnalyticsState
       _SelectedScrappableAnalyticsStateNone;
   factory SelectedScrappableAnalyticsState.loading() =
       _SelectedScrappableAnalyticsStateLoading;
+  factory SelectedScrappableAnalyticsState.loadingMore({
+    required PaginatedScrappableAnalytics currentData,
+  }) = _SelectedScrappableAnalyticsStateLoadingMore;
   factory SelectedScrappableAnalyticsState.withData({
-    required List<ScrappableAnalytics> result,
+    required PaginatedScrappableAnalytics data,
   }) = _SelectedScrappableAnalyticsStateWithData;
+  factory SelectedScrappableAnalyticsState.withError({
+    required String error,
+  }) = _SelectedScrappableAnalyticsStateWithError;
 }

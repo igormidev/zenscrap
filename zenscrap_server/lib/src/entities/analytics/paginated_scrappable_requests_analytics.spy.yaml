@@ -1,0 +1,7 @@
+class: PaginatedScrappableRequestsAnalytics
+fields:
+  items: List<ScrappableRequestsAnalyticsItem>
+  hasNextPage: bool
+  totalCount: int
+  currentPage: int
+  pageSize: int
