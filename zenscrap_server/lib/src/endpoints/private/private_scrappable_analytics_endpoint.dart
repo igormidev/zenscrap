@@ -29,7 +29,7 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
     }
     final now = DateTime.now();
     final targetDate = now.subtract(Duration(hours: 12));
-    
+
     // Get total count for pagination
     final totalCount = await Scrappable.db.count(
       session,
@@ -39,7 +39,7 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
             (p0) => p0.requestedAt >= targetDate,
           ),
     );
-    
+
     final offset = (page - 1) * pageSize;
     final List<Scrappable> scrappables = await Scrappable.db.find(
       session,
@@ -53,7 +53,7 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
       orderBy: (t) => t.id,
       orderDescending: false,
     );
-    
+
     final List<ScrappableRequestsAnalyticsItem> items = [];
     final hoursScope = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
@@ -130,8 +130,8 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
     Session session, {
     required UuidValue scrappableId,
     int page = 1,
-    int daysBack = 7,
   }) async {
+    const int daysBack = 7;
     const int pageSize = 30; // Fixed page size
     final authenticationInfo = await session.authenticated;
     if (authenticationInfo == null) throw defaultAuthenticationException;
@@ -152,29 +152,28 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
     if (scrappable == null || scrappable.accountId != accountInfo.id) {
       throw ZenScrapException(
         title: 'Scrappable Not Found',
-        description: 'The requested scrappable was not found or you do not have access to it.',
+        description:
+            'The requested scrappable was not found or you do not have access to it.',
       );
     }
 
     final now = DateTime.now();
     final targetDate = now.subtract(Duration(days: daysBack));
-    
+
     // Get total count for pagination
     final totalCount = await ScrappableAnalytics.db.count(
       session,
       where: (t) =>
-          t.scrappableId.equals(scrappableId) &
-          (t.requestedAt >= targetDate),
+          t.scrappableId.equals(scrappableId) & (t.requestedAt >= targetDate),
     );
 
     final offset = (page - 1) * pageSize;
-    
+
     // Fetch paginated analytics with includes for better performance
     final analytics = await ScrappableAnalytics.db.find(
       session,
       where: (t) =>
-          t.scrappableId.equals(scrappableId) &
-          (t.requestedAt >= targetDate),
+          t.scrappableId.equals(scrappableId) & (t.requestedAt >= targetDate),
       limit: pageSize,
       offset: offset,
       orderBy: (t) => t.requestedAt,
