@@ -24,6 +24,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_native_splash: ^2.4.6
   zenscrap_client:
     path: ../zenscrap_client
   dio: ^5.9.0
@@ -90,6 +91,22 @@ flutter_launcher_icons:
   web:
     generate: true
     image_path: "assets/logo.PNG"
+
+# Flutter Native Splash configuration
+flutter_native_splash:
+  color: "#607D8B"  # Blue-grey background color
+  image: "assets/transparent_logo.PNG"
+  android: true
+  ios: true
+  web: true
+  
+  # Web-specific settings for better control
+  web_image_mode: center  # Center the logo on web
+  
+  # Android 12+ specific settings
+  android_12:
+    color: "#607D8B"
+    image: "assets/transparent_logo.PNG"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -22,7 +22,7 @@ Future<bool> onSendResetEmail(
   );
   return sendEmail(
     destinyEmail: email,
-    subject: 'GO BABEL | Reset your password',
+    subject: 'Zen Scrap | Reset your password',
     htmlMessage: htmlText,
   );
 }

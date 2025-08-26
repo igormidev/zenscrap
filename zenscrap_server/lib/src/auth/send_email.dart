@@ -10,7 +10,7 @@ Future<bool> sendEmail({
   // you have two-factor authentication enabled and created an App password.
   // Search for "gmail app password 2fa"
   // The alternative is to use oauth.
-  String username = 'admin@gobabel.io';
+  String username = 'admin@zenscrap.com';
   String password = '5HLF7UXvE^fjD*S*4m#K';
 
   // final smtpServer = gmail(username, password);
@@ -29,7 +29,7 @@ Future<bool> sendEmail({
 
   // Create our message.
   final message = Message()
-    ..from = Address(username, 'GO Babel')
+    ..from = Address(username, 'Zen Scrap')
     ..recipients.add(destinyEmail)
     ..subject = subject
     ..html = htmlMessage;

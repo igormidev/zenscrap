@@ -16,7 +16,7 @@ Future<bool> onSendValidationEmail(
   );
   return sendEmail(
     destinyEmail: email,
-    subject: 'GO BABEL | Confirm your email address',
+    subject: 'Zen Scrap | Confirm your email address',
     htmlMessage: htmlText,
   );
 }
