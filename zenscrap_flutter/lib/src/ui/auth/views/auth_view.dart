@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 import 'package:serverpod_auth_email_flutter/serverpod_auth_email_flutter.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/contact_support_button.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/ui/auth/pages/confirm_email_page.dart';
@@ -151,6 +152,15 @@ class _AuthViewState extends ConsumerState<AuthView>
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                if (context.canPop())
+                                  CircleAvatar(
+                                    backgroundColor:
+                                        context.c.surfaceContainerHighest,
+                                    child: IconButton(
+                                      onPressed: context.pop,
+                                      icon: Icon(Icons.arrow_back),
+                                    ),
+                                  ),
                                 Text(
                                   'Welcome',
                                   style: Theme.of(
@@ -184,7 +194,8 @@ class _AuthViewState extends ConsumerState<AuthView>
                                   ScrappableCardIndicator(
                                     isNew: true,
                                     scrappable: widget.scrappable!,
-                                    onTap: () => context.pop(),
+                                    onEdit: onEdit,
+                                    onTap: context.pop,
                                   ),
                                 ],
                                 const SizedBox(height: 16),
@@ -208,6 +219,17 @@ class _AuthViewState extends ConsumerState<AuthView>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisSize: MainAxisSize.min,
                               children: [
+                                if (context.canPop()) ...[
+                                  CircleAvatar(
+                                    backgroundColor:
+                                        context.c.surfaceContainerHighest,
+                                    child: IconButton(
+                                      onPressed: context.pop,
+                                      icon: Icon(Icons.arrow_back),
+                                    ),
+                                  ),
+                                  SizedBox(height: 8),
+                                ],
                                 Text(
                                   'Welcome',
                                   style: Theme.of(
@@ -241,8 +263,9 @@ class _AuthViewState extends ConsumerState<AuthView>
                                   const SizedBox(height: 16),
                                   ScrappableCardIndicator(
                                     isNew: true,
-                                    onTap: () => context.pop(),
                                     scrappable: widget.scrappable!,
+                                    onEdit: onEdit,
+                                    onTap: context.pop,
                                   ),
                                 ],
                                 const SizedBox(height: 16),
@@ -285,6 +308,8 @@ class _AuthViewState extends ConsumerState<AuthView>
       ),
     );
   }
+
+  void onEdit() {}
 }
 
 class AuthContainer extends StatelessWidget {

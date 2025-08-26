@@ -53,6 +53,10 @@ final StateProvider routerProvider = StateProvider((ref) {
       }
 
       if (haveUser == false) {
+        if (path == '/auth') {
+          return null;
+        }
+
         // Allow unauthenticated access to auth, splash, and review session routes
         // The review route is public so anyone can help review hardcoded strings
         if (path.contains('/scrappable-form') == false &&

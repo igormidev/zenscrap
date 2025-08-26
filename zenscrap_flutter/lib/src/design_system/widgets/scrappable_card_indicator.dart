@@ -6,11 +6,13 @@ class ScrappableCardIndicator extends StatelessWidget {
   final bool isNew;
   final Scrappable scrappable;
   final VoidCallback? onTap;
+  final VoidCallback? onEdit;
   const ScrappableCardIndicator({
     super.key,
     required this.scrappable,
     this.isNew = false,
     required this.onTap,
+    this.onEdit,
   });
 
   @override
@@ -56,14 +58,28 @@ class ScrappableCardIndicator extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        scrappable.name,
-                        style: context.t.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: context.c.onSurface,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              scrappable.name,
+                              style: context.t.titleLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: context.c.onSurface,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (onEdit != null) ...[
+                            Icon(
+                              Icons.edit,
+                              size: 26,
+                              color: context.c.primary,
+                            ),
+                            SizedBox(width: 4),
+                          ],
+                        ],
                       ),
                       const SizedBox(height: 8),
                       Text(
