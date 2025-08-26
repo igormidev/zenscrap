@@ -10,7 +10,10 @@ Future<bool> sendEmail({
   // you have two-factor authentication enabled and created an App password.
   // Search for "gmail app password 2fa"
   // The alternative is to use oauth.
-  String username = 'admin@zenscrap.com';
+  
+  // TODO: Create admin@zenscrap.com email account with Hostinger and update credentials
+  // Temporarily using gobabel.io until Zen Scrap email is set up
+  String username = 'admin@gobabel.io';
   String password = '5HLF7UXvE^fjD*S*4m#K';
 
   // final smtpServer = gmail(username, password);
@@ -39,7 +42,7 @@ Future<bool> sendEmail({
     print('Message sent: $sendReport');
     return true;
   } on MailerException catch (e) {
-    print('Message not sent.');
+    print('Message not sent.\n$e');
     for (var p in e.problems) {
       print('Problem: ${p.code}: ${p.msg}');
     }

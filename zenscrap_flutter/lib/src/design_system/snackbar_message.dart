@@ -30,6 +30,7 @@ void _showSnackBar(
   ScaffoldMessenger.of(context)
     ..hideCurrentSnackBar()
     ..showSnackBar(SnackBar(
+      duration: Duration(milliseconds: 800),
       content: Text(
         message,
         style: TextStyle(
