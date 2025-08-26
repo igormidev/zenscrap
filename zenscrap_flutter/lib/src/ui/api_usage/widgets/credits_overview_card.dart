@@ -24,7 +24,7 @@ class CreditsOverviewCard extends StatelessWidget {
         gradient: LinearGradient(
           colors: [
             context.c.primary,
-            context.c.primary.withAlpha(200),
+            context.c.primary.withAlpha(180),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,

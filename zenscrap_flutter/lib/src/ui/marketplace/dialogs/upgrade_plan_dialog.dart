@@ -23,11 +23,12 @@ class _UpgradePlanDialogState extends ConsumerState<UpgradePlanDialog> {
 
     try {
       final client = ref.read(clientProvider);
-      final portalUrl = await client.privateSubscription.createCustomerPortalSession();
-      
+      final portalUrl =
+          await client.privateSubscription.createCustomerPortalSession();
+
       if (await canLaunchUrl(Uri.parse(portalUrl))) {
         await launchUrl(Uri.parse(portalUrl));
-        
+
         if (mounted) {
           Navigator.of(context).pop();
           showDialog(
@@ -76,6 +77,7 @@ class _UpgradePlanDialogState extends ConsumerState<UpgradePlanDialog> {
           children: [
             // Header with premium icon
             Container(
+              width: double.maxFinite,
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.only(
@@ -117,7 +119,7 @@ class _UpgradePlanDialogState extends ConsumerState<UpgradePlanDialog> {
                 ],
               ),
             ),
-            
+
             // Content
             Padding(
               padding: const EdgeInsets.all(24),
@@ -140,34 +142,38 @@ class _UpgradePlanDialogState extends ConsumerState<UpgradePlanDialog> {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 24),
-                  
+
                   // Benefits list
                   _BenefitItem(
                     icon: Icons.copy_all_rounded,
                     title: 'One-Click Clone',
-                    description: 'Instantly copy any marketplace scrappable to your collection',
+                    description:
+                        'Instantly copy any marketplace scrappable to your collection',
                   ),
                   const SizedBox(height: 12),
                   _BenefitItem(
                     icon: Icons.edit_note_rounded,
                     title: 'Full Customization',
-                    description: 'Modify extraction rules, URLs, and parameters to your needs',
+                    description:
+                        'Modify extraction rules, URLs, and parameters to your needs',
                   ),
                   const SizedBox(height: 12),
                   _BenefitItem(
                     icon: Icons.rocket_launch_rounded,
                     title: 'Save Development Time',
-                    description: 'Build on existing scrappables instead of starting from scratch',
+                    description:
+                        'Build on existing scrappables instead of starting from scratch',
                   ),
                   const SizedBox(height: 12),
                   _BenefitItem(
                     icon: Icons.all_inclusive_rounded,
                     title: 'Plus Everything in Ultra',
-                    description: '1M API calls, 100 concurrent requests, priority support & more',
+                    description:
+                        '1M API calls, 100 concurrent requests, priority support & more',
                   ),
-                  
+
                   const SizedBox(height: 32),
-                  
+
                   // Pricing highlight
                   Container(
                     padding: const EdgeInsets.all(16),
@@ -219,7 +225,7 @@ class _UpgradePlanDialogState extends ConsumerState<UpgradePlanDialog> {
                 ],
               ),
             ),
-            
+
             // Actions
             Container(
               padding: const EdgeInsets.all(20),
@@ -254,6 +260,8 @@ class _UpgradePlanDialogState extends ConsumerState<UpgradePlanDialog> {
                           vertical: 16,
                         ),
                         backgroundColor: context.c.primary,
+                        foregroundColor: context.c.onPrimary,
+                        iconAlignment: IconAlignment.start,
                       ),
                       icon: _isLoadingPortal
                           ? SizedBox(
@@ -264,11 +272,17 @@ class _UpgradePlanDialogState extends ConsumerState<UpgradePlanDialog> {
                                 color: context.c.onPrimary,
                               ),
                             )
-                          : const Icon(Icons.upgrade_rounded),
+                          : const Icon(
+                              Icons.upgrade_outlined,
+                              size: 28,
+                            ),
                       label: Text(
-                        _isLoadingPortal ? 'Opening Portal...' : 'Upgrade to Ultra',
+                        _isLoadingPortal
+                            ? 'Opening Portal...'
+                            : 'Upgrade to Ultra',
                         style: context.t.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
+                          color: context.c.onPrimary,
                         ),
                       ),
                     ),

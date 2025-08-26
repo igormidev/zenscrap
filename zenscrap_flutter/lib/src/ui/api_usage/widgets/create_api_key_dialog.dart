@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 
 class CreateApiKeyDialog extends StatefulWidget {
-  final Function(String) onCreateApiKey;
+  final Future<void> Function(String) onCreateApiKey;
 
   const CreateApiKeyDialog({
     super.key,
@@ -49,7 +49,7 @@ class _CreateApiKeyDialogState extends State<CreateApiKeyDialog> {
         borderRadius: BorderRadius.circular(16),
       ),
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 400),
+        constraints: const BoxConstraints(maxWidth: 600),
         padding: const EdgeInsets.all(24),
         child: Form(
           key: _formKey,
@@ -85,7 +85,8 @@ class _CreateApiKeyDialogState extends State<CreateApiKeyDialog> {
                       Icons.close,
                       color: context.c.onSurface.withAlpha(150),
                     ),
-                    onPressed: _isCreating ? null : () => Navigator.of(context).pop(),
+                    onPressed:
+                        _isCreating ? null : () => Navigator.of(context).pop(),
                   ),
                 ],
               ),
@@ -159,7 +160,8 @@ class _CreateApiKeyDialogState extends State<CreateApiKeyDialog> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TextButton(
-                    onPressed: _isCreating ? null : () => Navigator.of(context).pop(),
+                    onPressed:
+                        _isCreating ? null : () => Navigator.of(context).pop(),
                     child: Text('Cancel'),
                   ),
                   const SizedBox(width: 12),

@@ -7,11 +7,14 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/elements/zen_tab.dart';
 import 'package:zenscrap_flutter/src/providers/shared_preferences_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
+import 'package:zenscrap_flutter/src/states/account/account_state.dart';
 import 'package:zenscrap_flutter/src/states/dashboard/dashboard_error_provider.dart';
+import 'package:zenscrap_flutter/src/states/dashboard/dashboard_index_provider.dart';
 import 'package:zenscrap_flutter/src/states/dashboard/dashboard_loading_provider.dart';
 import 'package:zenscrap_flutter/src/states/dashboard/onboarding_flow_provider.dart';
 import 'package:zenscrap_flutter/src/states/dashboard/onboarding_flow_state.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/fullscreen_loading_page.dart';
+import 'package:zenscrap_flutter/src/states/dashboard/possible_navigations_provider.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/widgets/compact_dashboard_appbar.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/widgets/navigation/dashboard_drawer.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/widgets/navigation/dashboard_rail.dart';
@@ -59,6 +62,19 @@ class DashboardTemplateState extends ConsumerState<DashboardView> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(
+      accountProvider.select((value) => value.maybeWhen(
+          orElse: () => null, withData: (accountInfo) => accountInfo.planTier)),
+      (previous, next) {
+        if (next != null) {
+          if (next == PlanTier.none) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              changeTab(DashboardNavigationType.pricingPage, context, ref);
+            });
+          }
+        }
+      },
+    );
     // [ --------- ERROR HANDLING --------- ]
     // [ --------- ERROR HANDLING --------- ]
 

@@ -40,6 +40,7 @@ class _UserScrappablesListageState
 
     return Column(
       children: [
+        SizedBox(height: 16),
         Row(
           children: [
             SizedBox(width: 20),
@@ -56,25 +57,31 @@ class _UserScrappablesListageState
             SizedBox(width: 20),
           ],
         ),
-        Divider(height: 1),
+        SizedBox(height: 22),
         Expanded(
-          child: GridView.builder(
-            itemCount: scrappables.length,
-            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 400,
-              childAspectRatio: 1.5,
-            ),
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-            itemBuilder: (context, index) {
-              final scrappable = scrappables[index];
-              return ScrappableCardIndicator(
-                scrappable: scrappable,
-                onTap: () {
-                  context.push('/scrappable-form');
-                },
-              );
-            },
-          ),
+          child: LayoutBuilder(builder: (context, constaints) {
+            final optimalCrossAxisCount = (constaints.maxWidth / 480).floor();
+            return GridView.builder(
+              itemCount: scrappables.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: optimalCrossAxisCount,
+                mainAxisExtent: 240,
+                crossAxisSpacing: 20,
+                mainAxisSpacing: 20,
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+              itemBuilder: (context, index) {
+                final scrappable = scrappables[index];
+                return ScrappableCardIndicator(
+                  scrappable: scrappable,
+                  onEdit: () {},
+                  onTap: () {
+                    context.push('/scrappable-form');
+                  },
+                );
+              },
+            );
+          }),
         ),
       ],
     );

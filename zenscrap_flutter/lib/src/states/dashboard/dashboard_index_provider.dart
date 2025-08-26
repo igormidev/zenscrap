@@ -12,7 +12,7 @@ final currentTabIndexProvider =
         CurrentTabIndexStateNotifier.new);
 
 final currentDashboardTabProvider = Provider<DashboardNavigationType>((ref) {
-  final navigationOptions = ref.watch(prossibleNavigationsProvider);
+  final navigationOptions = ref.watch(possibleNavigationsProvider);
   final currentTabIndex = ref.watch(currentTabIndexProvider);
 
   return navigationOptions[currentTabIndex];
@@ -41,7 +41,7 @@ Future<void> changeTab(
 
   ref
       .read(currentTabIndexProvider.notifier)
-      .setPage(ref.read(prossibleNavigationsProvider).indexOf(tab));
+      .setPage(ref.read(possibleNavigationsProvider).indexOf(tab));
 
   final route = tab.routeOnClick;
   if (route != null) {

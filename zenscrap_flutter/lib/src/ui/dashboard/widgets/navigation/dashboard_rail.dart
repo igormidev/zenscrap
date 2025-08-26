@@ -22,7 +22,7 @@ class DashboardRail extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final navigationOptions = ref.watch(prossibleNavigationsProvider);
+    final navigationOptions = ref.watch(possibleNavigationsProvider);
     final currentTabIndex = ref.watch(currentTabIndexProvider);
     final accountImageUrl = ref.watch(sessionProvider).mapOrNull(
           logged: (value) => value.user.imageUrl,

@@ -3,7 +3,7 @@ import 'package:zenscrap_flutter/src/states/dashboard/onboarding_flow_provider.d
 import 'package:zenscrap_flutter/src/states/dashboard/onboarding_flow_state.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
 
-final prossibleNavigationsProvider =
+final possibleNavigationsProvider =
     Provider<List<DashboardNavigationType>>((ref) {
   final List<DashboardNavigationType> defaultOptions = [
     DashboardNavigationType.userEndpoints,
