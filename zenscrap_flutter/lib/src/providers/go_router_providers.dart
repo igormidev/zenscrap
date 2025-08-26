@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:talker_flutter/talker_flutter.dart';
-import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
@@ -84,8 +83,8 @@ final StateProvider routerProvider = StateProvider((ref) {
       GoRoute(
         path: '/scrappable-form',
         builder: (context, state) {
-          final scrappable = state.extra as Scrappable?;
-          return InitialChatView(scrappable: scrappable);
+          final scrappableId = state.uri.queryParameters['id'];
+          return InitialChatView(scrappableId: scrappableId);
         },
       ),
       ShellRoute(

@@ -22,8 +22,9 @@ dependencies:
   json_annotation: ^4.9.0
   collection: ^1.19.1
   crypto: ^3.0.5
-  claude_code_sdk:
-    path: ../claude_code_sdk
+  claude_code_sdk: ^1.0.0
+  # claude_code_sdk:
+  #   path: ../claude_code_sdk
 
 dev_dependencies:
   lints: '>=3.0.0 <7.0.0'

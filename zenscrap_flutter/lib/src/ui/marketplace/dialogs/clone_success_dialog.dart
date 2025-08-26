@@ -120,7 +120,7 @@ class CloneSuccessDialog extends StatelessWidget {
                   child: FilledButton.icon(
                     onPressed: () {
                       Navigator.of(context).pop();
-                      context.push('/scrappable-form', extra: clonedScrappable);
+                      context.push('/scrappable-form?id=${clonedScrappable.id.toString()}');
                     },
                     style: FilledButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),

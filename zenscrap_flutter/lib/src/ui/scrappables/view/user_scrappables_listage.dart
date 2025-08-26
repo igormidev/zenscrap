@@ -50,7 +50,9 @@ class _UserScrappablesListageState
             ),
             Spacer(),
             FilledButton.tonalIcon(
-              onPressed: () {},
+              onPressed: () {
+                context.push('/scrappable-form');
+              },
               label: Text('Create new endpoint'),
               icon: Icon(Icons.add),
             ),
@@ -74,9 +76,11 @@ class _UserScrappablesListageState
                 final scrappable = scrappables[index];
                 return ScrappableCardIndicator(
                   scrappable: scrappable,
-                  onEdit: () {},
+                  onEdit: () {
+                    context.push('/scrappable-form?id=${scrappable.id.toString()}');
+                  },
                   onTap: () {
-                    context.push('/scrappable-form');
+                    context.push('/scrappable-form?id=${scrappable.id.toString()}');
                   },
                 );
               },

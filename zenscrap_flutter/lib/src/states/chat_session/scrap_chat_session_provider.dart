@@ -97,6 +97,24 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
     );
   }
 
+  Future<void> createSessionWithScrappableId(String scrappableId) async {
+    // First fetch the scrappable by ID
+    final scrappableResult = await ref
+        .read(clientProvider)
+        .privateUserScrappables
+        .getScrappableById(scrappableId)
+        .toResult;
+
+    await scrappableResult.fold(
+      (Scrappable scrappable) async {
+        await createSessionWithScrappable(scrappable);
+      },
+      (failure) {
+        state = ScrapChatSessionState.withError(error: failure);
+      },
+    );
+  }
+
   Future<void> createSessionWithScrappable(Scrappable scrappable) async {
     final sessionResult = await ref
         .read(clientProvider)

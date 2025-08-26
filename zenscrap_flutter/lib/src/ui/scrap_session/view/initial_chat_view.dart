@@ -11,10 +11,10 @@ import 'package:zenscrap_flutter/src/ui/scrap_session/pages/initial_chat_page.da
 import 'package:zenscrap_flutter/src/ui/scrap_session/view/scrappable_edit_session.dart';
 
 class InitialChatView extends ConsumerStatefulWidget {
-  final Scrappable? scrappable;
+  final String? scrappableId;
   const InitialChatView({
     super.key,
-    required this.scrappable,
+    required this.scrappableId,
   });
 
   @override
@@ -29,11 +29,11 @@ class _InitialChatViewState extends ConsumerState<InitialChatView> {
   void initState() {
     super.initState();
     // WidgetsBinding.instance.addPostFrameCallback((_) async {
-    if (widget.scrappable != null) {
+    if (widget.scrappableId != null) {
       Future.delayed(const Duration(seconds: 3), () async {
         await ref
             .read(scrapChatProvider.notifier)
-            .createSessionWithScrappable(widget.scrappable!);
+            .createSessionWithScrappableId(widget.scrappableId!);
         _initializationCompleter.complete();
       });
     } else {

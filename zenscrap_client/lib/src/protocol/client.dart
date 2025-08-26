@@ -208,6 +208,13 @@ class EndpointPrivateUserScrappables extends _i1.EndpointRef {
         'call',
         {},
       );
+
+  _i2.Future<_i4.Scrappable> getScrappableById(String scrappableId) =>
+      caller.callServerEndpoint<_i4.Scrappable>(
+        'privateUserScrappables',
+        'getScrappableById',
+        {'scrappableId': scrappableId},
+      );
 }
 
 /// {@category Endpoint}

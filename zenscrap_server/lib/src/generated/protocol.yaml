@@ -19,6 +19,7 @@ privateSubscription:
   - createCustomerPortalSession:
 privateUserScrappables:
   - call:
+  - getScrappableById:
 createScrappable:
   - call:
 editScrappable:

@@ -32,4 +32,59 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
 
     return accountInfo.scrappables ?? <Scrappable>[];
   }
+
+  Future<Scrappable> getScrappableById(Session session, String scrappableId) async {
+    final userId = (await session.authenticated)?.userId;
+    if (userId == null) {
+      throw ZenScrapException(
+        title: 'User Not Authenticated',
+        description: 'You must be logged in to access your scrappables.',
+      );
+    }
+
+    // Parse the UUID string
+    final uuid = UuidValue.fromString(scrappableId);
+    
+    // First check if the user owns this scrappable
+    final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
+      session,
+      where: (p0) => p0.userInfoId.equals(userId),
+    );
+    
+    if (accountInfo == null) {
+      throw ZenScrapException(
+        title: 'Account Not Found',
+        description: 'No account found for the authenticated user.',
+      );
+    }
+
+    // Find the scrappable with all necessary includes
+    final scrappable = await Scrappable.db.findById(
+      session,
+      uuid,
+      include: Scrappable.include(
+        targetRequest: ScrappableRequest.include(),
+        referenceTestData: ReferenceTestData.include(
+          scrappableTestResult: ScrappableTestResult.include(),
+        ),
+      ),
+    );
+
+    if (scrappable == null) {
+      throw ZenScrapException(
+        title: 'Scrappable Not Found',
+        description: 'The requested scrappable does not exist.',
+      );
+    }
+
+    // Verify the user owns this scrappable
+    if (scrappable.accountId != accountInfo.id) {
+      throw ZenScrapException(
+        title: 'Access Denied',
+        description: 'You do not have permission to access this scrappable.',
+      );
+    }
+
+    return scrappable;
+  }
 }
