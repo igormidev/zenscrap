@@ -10,7 +10,7 @@ import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_contro
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_gemini_api_impl.dart';
 import 'package:zenscrap_server/src/endpoints/public/scrappable_chat_session.dart';
 import 'package:zenscrap_server/src/routes/scrappable_api_route.dart';
-import 'package:zenscrap_server/src/web/routes/root.dart';
+import 'package:zenscrap_server/src/web/routes/route_single_page_app.dart';
 import 'package:zenscrap_server/src/webhooks/stripe_webhook.dart';
 import 'src/generated/protocol.dart';
 import 'src/generated/endpoints.dart';
@@ -28,15 +28,21 @@ void run(List<String> args) async {
     authenticationHandler: auth.authenticationHandler,
   );
 
-  // Setup a default page at the web root.
-  pod.webServer.addRoute(RouteRoot(), '/');
-  pod.webServer.addRoute(RouteRoot(), '/index.html');
+  // Setup a single page app to serve Flutter web
+  pod.webServer.addRoute(
+    RouteSinglePageApp(
+      serverDirectory: 'app',
+      appRootPath: 'index.html',
+    ),
+    '/*',
+  );
+
   pod.webServer.addRoute(StripeWebhookRoute(), '/stripe/webhook');
-  
+
   // Register the scrappable API routes
   pod.webServer.addRoute(ScrappableApiRoute(), '/api/scrappable/test');
   pod.webServer.addRoute(ScrappableApiRoute(), '/api/scrappable/prod');
-  
+
   // Serve all files in the /static directory.
   pod.webServer.addRoute(
     RouteStaticDirectory(serverDirectory: 'static', basePath: '/'),
@@ -65,14 +71,22 @@ void run(List<String> args) async {
   StripeConfig.initialize({
     'stripe_secret_key': pod.getPassword('stripeSecretKey') ?? '',
     'stripe_webhook_secret': pod.getPassword('stripeWebhookSecret') ?? '',
-    'stripe_basic_price_id_monthly': pod.getPassword('stripeBasicPriceIdMonthly') ?? '',
-    'stripe_basic_price_id_yearly': pod.getPassword('stripeBasicPriceIdYearly') ?? '',
-    'stripe_pro_price_id_monthly': pod.getPassword('stripeProPriceIdMonthly') ?? '',
-    'stripe_pro_price_id_yearly': pod.getPassword('stripeProPriceIdYearly') ?? '',
-    'stripe_ultra_price_id_monthly': pod.getPassword('stripeUltraPriceIdMonthly') ?? '',
-    'stripe_ultra_price_id_yearly': pod.getPassword('stripeUltraPriceIdYearly') ?? '',
-    'stripe_success_url': pod.getPassword('stripeSuccessUrl') ?? 'https://yourdomain.com/success',
-    'stripe_cancel_url': pod.getPassword('stripeCancelUrl') ?? 'https://yourdomain.com/cancel',
+    'stripe_basic_price_id_monthly':
+        pod.getPassword('stripeBasicPriceIdMonthly') ?? '',
+    'stripe_basic_price_id_yearly':
+        pod.getPassword('stripeBasicPriceIdYearly') ?? '',
+    'stripe_pro_price_id_monthly':
+        pod.getPassword('stripeProPriceIdMonthly') ?? '',
+    'stripe_pro_price_id_yearly':
+        pod.getPassword('stripeProPriceIdYearly') ?? '',
+    'stripe_ultra_price_id_monthly':
+        pod.getPassword('stripeUltraPriceIdMonthly') ?? '',
+    'stripe_ultra_price_id_yearly':
+        pod.getPassword('stripeUltraPriceIdYearly') ?? '',
+    'stripe_success_url':
+        pod.getPassword('stripeSuccessUrl') ?? 'https://yourdomain.com/success',
+    'stripe_cancel_url':
+        pod.getPassword('stripeCancelUrl') ?? 'https://yourdomain.com/cancel',
   });
 
   // Register your future calls

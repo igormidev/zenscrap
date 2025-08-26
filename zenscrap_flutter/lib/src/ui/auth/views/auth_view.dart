@@ -130,24 +130,15 @@ class _AuthViewState extends ConsumerState<AuthView>
               child: isCompactSize
                   ? Column(
                       children: [
-                        // Image section for compact size
-                        // Expanded(
-                        //   flex: 2,
-                        //   child: Center(
-                        //     child: Padding(
-                        //       padding: const EdgeInsets.all(20),
-                        //       child:
-                        //     ),
-                        //   ),
-                        // ),
                         SizedBox(height: 20),
                         Transform.scale(
                           scale: 1.6,
-                          child: Image.asset(
-                            'assets/design_system/gobabel_display_image_raw.PNG',
+                          child: Lottie.network(
+                            'https://lottie.host/6778c6b9-32ee-401c-bc8f-97eea151b1df/U3LT3t31Wa.lottie',
+                            decoder: customDecoder,
                             width: double.maxFinite,
+                            height: 200,
                             fit: BoxFit.fitHeight,
-                            height: 280,
                           ),
                         ),
                         // Form section for compact size

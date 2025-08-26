@@ -1,5 +1,4 @@
 import 'package:serverpod/serverpod.dart';
-import 'package:uuid/uuid.dart';
 import 'package:zenscrap_server/src/core/default_classes.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 

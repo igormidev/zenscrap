@@ -12,4 +12,3 @@ cd ..
 # Copy the build files into the web/app directory.
 rm -rf zenscrap_server/web/app
 cp -r zenscrap_flutter/build/web zenscrap_server/web/app
-# Note: We keep index.html in web/app for proper SPA routing

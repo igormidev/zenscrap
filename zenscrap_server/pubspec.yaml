@@ -23,6 +23,7 @@ dependencies:
   collection: ^1.19.1
   crypto: ^3.0.5
   claude_code_sdk: ^1.0.0
+  path: ^1.9.1
   # claude_code_sdk:
   #   path: ../claude_code_sdk
 
