@@ -97,10 +97,7 @@ class _CTAContinueFlowState extends ConsumerState<CTAContinueFlow> {
             onPressed: isChatLoading
                 ? null
                 : () async {
-                    await context.push(
-                      '/auth',
-                      extra: widget.scrappable,
-                    );
+                    await context.push('/auth');
                   },
             label: Text('DEPLOY ENDPOINT'),
             iconAlignment: IconAlignment.end,

@@ -81,6 +81,22 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
             );
   }
 
+  void updateScrappableDetails({
+    required String name,
+    required String description,
+  }) {
+    state.mapOrNull(
+      standard: (value) {
+        state = value.copyWith(
+          data: value.data.copyWith(
+            name: name,
+            description: description,
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> createSessionWithScrappable(Scrappable scrappable) async {
     final sessionResult = await ref
         .read(clientProvider)

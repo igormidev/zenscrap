@@ -123,9 +123,7 @@ final StateProvider routerProvider = StateProvider((ref) {
       GoRoute(
         path: '/auth',
         builder: (context, state) {
-          return AuthView(
-            scrappable: state.extra as Scrappable?,
-          );
+          return const AuthView();
         },
       ),
     ],

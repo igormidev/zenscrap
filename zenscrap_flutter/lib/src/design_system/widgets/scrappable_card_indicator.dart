@@ -168,7 +168,7 @@ class ScrappableCardIndicator extends StatelessWidget {
                       const SizedBox(width: 6),
                       Text(
                         isNew
-                            ? 'This endpoint will be active after you Sign In'
+                            ? 'This endpoint will be active and attached to your account after you sign In'
                             : (scrappable.isActive ? 'Active' : 'Inactive'),
                         style: context.t.labelSmall?.copyWith(
                           color: scrappable.isActive && !isNew

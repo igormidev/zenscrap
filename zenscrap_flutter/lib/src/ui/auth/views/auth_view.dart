@@ -17,10 +17,11 @@ import 'package:zenscrap_flutter/src/ui/auth/pages/password_reset_validate_code_
 import 'package:zenscrap_flutter/src/ui/auth/pages/sign_in_page.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/scrappable_card_indicator.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/edit_scrappable_dialog.dart';
+import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
+import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_state.dart';
 
 class AuthView extends ConsumerStatefulWidget {
-  final Scrappable? scrappable;
-  const AuthView({super.key, this.scrappable});
+  const AuthView({super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _AuthViewState();
@@ -96,6 +97,12 @@ class _AuthViewState extends ConsumerState<AuthView>
 
   @override
   Widget build(BuildContext context) {
+    final scrapChatState = ref.watch(scrapChatProvider);
+    final scrappable = scrapChatState.maybeMap(
+      standard: (state) => state.data,
+      orElse: () => null,
+    );
+
     final double screenWidth = MediaQuery.sizeOf(context).width;
     final bool isCompactSize = screenWidth < 1060.0;
     return Scaffold(
@@ -190,12 +197,12 @@ class _AuthViewState extends ConsumerState<AuthView>
                                   ),
                                 ),
                                 const SizedBox(height: 16),
-                                if (widget.scrappable != null) ...[
+                                if (scrappable != null) ...[
                                   const SizedBox(height: 16),
                                   ScrappableCardIndicator(
                                     isNew: true,
-                                    scrappable: widget.scrappable!,
-                                    onEdit: onEdit,
+                                    scrappable: scrappable,
+                                    onEdit: () => onEdit(scrappable),
                                     onTap: context.pop,
                                   ),
                                 ],
@@ -260,12 +267,12 @@ class _AuthViewState extends ConsumerState<AuthView>
                                         _onSuccessChangePassword,
                                   ),
                                 ),
-                                if (widget.scrappable != null) ...[
+                                if (scrappable != null) ...[
                                   const SizedBox(height: 16),
                                   ScrappableCardIndicator(
                                     isNew: true,
-                                    scrappable: widget.scrappable!,
-                                    onEdit: onEdit,
+                                    scrappable: scrappable,
+                                    onEdit: () => onEdit(scrappable),
                                     onTap: context.pop,
                                   ),
                                 ],
@@ -310,27 +317,27 @@ class _AuthViewState extends ConsumerState<AuthView>
     );
   }
 
-  Future<void> onEdit() async {
-    if (widget.scrappable == null) return;
-
+  Future<void> onEdit(Scrappable scrappable) async {
     await showDialog<bool>(
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) => EditScrappableDialog(
-        scrappable: widget.scrappable!,
+        scrappable: scrappable,
         onSave: (name, description) async {
           try {
             final client = ref.read(clientProvider);
             final success = await client.editScrappable.call(
-              scrappableId: widget.scrappable!.id.toString(),
+              scrappableId: scrappable.id.toString(),
               name: name,
               description: description,
             );
 
             if (success && mounted) {
-              // Update the local scrappable with new values
-              widget.scrappable!.name = name;
-              widget.scrappable!.description = description;
+              // Update the scrappable in the state provider
+              ref.read(scrapChatProvider.notifier).updateScrappableDetails(
+                    name: name,
+                    description: description,
+                  );
 
               // Show success message
               if (!context.mounted) return success;
