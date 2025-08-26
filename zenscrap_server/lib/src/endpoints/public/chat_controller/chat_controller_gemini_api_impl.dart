@@ -16,7 +16,9 @@ class ChatControllerGeminiApiImpl extends IChatController {
   static late final GenerativeModel _geminiModel;
   static void initialize({required String geminiApiKey}) {
     _geminiModel = GenerativeModel(
-      model: 'gemini-2.5-pro',
+      // model: 'gemini-2.5-pro',
+
+      model: 'gemini-2.5-flash',
       apiKey: geminiApiKey,
       generationConfig: GenerationConfig(
         responseSchema: generateExtractRulesSchema,

@@ -74,6 +74,22 @@ dev_dependencies:
     sdk: flutter
   freezed: ^3.2.0
   json_serializable: ^6.10.0
+  flutter_launcher_icons: ^0.14.4
+
+# Flutter Launcher Icons configuration
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/logo.PNG"
+  macos:
+    generate: true
+    image_path: "assets/logo.PNG"
+  windows:
+    generate: true
+    image_path: "assets/logo.PNG"
+  web:
+    generate: true
+    image_path: "assets/logo.PNG"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -87,9 +103,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  assets:
+    - assets/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

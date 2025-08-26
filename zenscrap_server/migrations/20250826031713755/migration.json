@@ -1,0 +1,155 @@
+{
+  "actions": [
+    {
+      "type": "alterTable",
+      "alterTable": {
+        "name": "account_api_key",
+        "schema": "public",
+        "addColumns": [
+          {
+            "name": "isActive",
+            "columnType": 1,
+            "isNullable": false,
+            "columnDefault": "true",
+            "dartType": "bool"
+          }
+        ],
+        "deleteColumns": [],
+        "modifyColumns": [],
+        "addIndexes": [],
+        "deleteIndexes": [],
+        "addForeignKeys": [],
+        "deleteForeignKeys": [],
+        "warnings": [
+          {
+            "type": "tableDropped",
+            "message": "One or more columns are added to table \"scrappable_analytics\" which cannot be added in a table migration. The complete table will be deleted and recreated.",
+            "table": "scrappable_analytics",
+            "columns": [
+              "attachedNanoId"
+            ],
+            "destrucive": true
+          }
+        ]
+      }
+    },
+    {
+      "type": "deleteTable",
+      "deleteTable": "scrappable_analytics"
+    },
+    {
+      "type": "createTable",
+      "createTable": {
+        "name": "scrappable_analytics",
+        "dartName": "ScrappableAnalytics",
+        "module": "zenscrap",
+        "schema": "public",
+        "columns": [
+          {
+            "name": "id",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "nextval('scrappable_analytics_id_seq'::regclass)",
+            "dartType": "int?"
+          },
+          {
+            "name": "requestStatus",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "protocol:RequestStatus"
+          },
+          {
+            "name": "requestedAt",
+            "columnType": 4,
+            "isNullable": false,
+            "dartType": "DateTime"
+          },
+          {
+            "name": "attachedNanoId",
+            "columnType": 0,
+            "isNullable": false,
+            "dartType": "String"
+          },
+          {
+            "name": "attachedApiKey",
+            "columnType": 0,
+            "isNullable": false,
+            "dartType": "String"
+          },
+          {
+            "name": "scrappableId",
+            "columnType": 7,
+            "isNullable": false,
+            "dartType": "UuidValue"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "constraintName": "scrappable_analytics_fk_0",
+            "columns": [
+              "scrappableId"
+            ],
+            "referenceTable": "scrappable",
+            "referenceTableSchema": "public",
+            "referenceColumns": [
+              "id"
+            ],
+            "onUpdate": 3,
+            "onDelete": 3
+          }
+        ],
+        "indexes": [
+          {
+            "indexName": "scrappable_analytics_pkey",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "id"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": true
+          },
+          {
+            "indexName": "scrappable_analytics_attached_nanoid_idx",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "attachedNanoId"
+              }
+            ],
+            "type": "btree",
+            "isUnique": false,
+            "isPrimary": false
+          },
+          {
+            "indexName": "scrappable_analytics_attached_apikey_idx",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "attachedApiKey"
+              }
+            ],
+            "type": "btree",
+            "isUnique": false,
+            "isPrimary": false
+          }
+        ],
+        "managed": true
+      }
+    }
+  ],
+  "warnings": [
+    {
+      "type": "tableDropped",
+      "message": "One or more columns are added to table \"scrappable_analytics\" which cannot be added in a table migration. The complete table will be deleted and recreated.",
+      "table": "scrappable_analytics",
+      "columns": [
+        "attachedNanoId"
+      ],
+      "destrucive": true
+    }
+  ],
+  "migrationApiVersion": 1
+}
