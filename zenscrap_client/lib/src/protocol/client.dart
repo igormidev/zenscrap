@@ -226,6 +226,29 @@ class EndpointCreateScrappable extends _i1.EndpointRef {
 }
 
 /// {@category Endpoint}
+class EndpointEditScrappable extends _i1.EndpointRef {
+  EndpointEditScrappable(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'editScrappable';
+
+  _i2.Future<bool> call({
+    required String scrappableId,
+    required String name,
+    required String description,
+  }) =>
+      caller.callServerEndpoint<bool>(
+        'editScrappable',
+        'call',
+        {
+          'scrappableId': scrappableId,
+          'name': name,
+          'description': description,
+        },
+      );
+}
+
+/// {@category Endpoint}
 class EndpointMarketplace extends _i1.EndpointRef {
   EndpointMarketplace(_i1.EndpointCaller caller) : super(caller);
 
@@ -387,6 +410,7 @@ class Client extends _i1.ServerpodClientShared {
     privateSubscription = EndpointPrivateSubscription(this);
     privateUserScrappables = EndpointPrivateUserScrappables(this);
     createScrappable = EndpointCreateScrappable(this);
+    editScrappable = EndpointEditScrappable(this);
     marketplace = EndpointMarketplace(this);
     publicTier = EndpointPublicTier(this);
     scrappableApi = EndpointScrappableApi(this);
@@ -408,6 +432,8 @@ class Client extends _i1.ServerpodClientShared {
 
   late final EndpointCreateScrappable createScrappable;
 
+  late final EndpointEditScrappable editScrappable;
+
   late final EndpointMarketplace marketplace;
 
   late final EndpointPublicTier publicTier;
@@ -427,6 +453,7 @@ class Client extends _i1.ServerpodClientShared {
         'privateSubscription': privateSubscription,
         'privateUserScrappables': privateUserScrappables,
         'createScrappable': createScrappable,
+        'editScrappable': editScrappable,
         'marketplace': marketplace,
         'publicTier': publicTier,
         'scrappableApi': scrappableApi,

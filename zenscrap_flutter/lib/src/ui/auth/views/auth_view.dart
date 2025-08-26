@@ -16,6 +16,7 @@ import 'package:zenscrap_flutter/src/ui/auth/pages/password_reset_page.dart';
 import 'package:zenscrap_flutter/src/ui/auth/pages/password_reset_validate_code_page.dart';
 import 'package:zenscrap_flutter/src/ui/auth/pages/sign_in_page.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/scrappable_card_indicator.dart';
+import 'package:zenscrap_flutter/src/design_system/widgets/edit_scrappable_dialog.dart';
 
 class AuthView extends ConsumerStatefulWidget {
   final Scrappable? scrappable;
@@ -309,7 +310,55 @@ class _AuthViewState extends ConsumerState<AuthView>
     );
   }
 
-  void onEdit() {}
+  Future<void> onEdit() async {
+    if (widget.scrappable == null) return;
+
+    await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => EditScrappableDialog(
+        scrappable: widget.scrappable!,
+        onSave: (name, description) async {
+          try {
+            final client = ref.read(clientProvider);
+            final success = await client.editScrappable.call(
+              scrappableId: widget.scrappable!.id.toString(),
+              name: name,
+              description: description,
+            );
+
+            if (success && mounted) {
+              // Update the local scrappable with new values
+              widget.scrappable!.name = name;
+              widget.scrappable!.description = description;
+
+              // Show success message
+              if (!context.mounted) return success;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('Scrappable updated successfully'),
+                  backgroundColor: context.c.primary,
+                ),
+              );
+            }
+
+            return success;
+          } catch (e) {
+            if (mounted) {
+              if (!context.mounted) return false;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Error: ${e.toString()}'),
+                  backgroundColor: context.c.error,
+                ),
+              );
+            }
+            return false;
+          }
+        },
+      ),
+    );
+  }
 }
 
 class AuthContainer extends StatelessWidget {

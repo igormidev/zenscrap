@@ -72,10 +72,14 @@ class ScrappableCardIndicator extends StatelessWidget {
                             ),
                           ),
                           if (onEdit != null) ...[
-                            Icon(
-                              Icons.edit,
-                              size: 26,
-                              color: context.c.primary,
+                            InkWell(
+                              onTap: onEdit,
+                              hoverColor: context.c.primaryContainer,
+                              child: Icon(
+                                Icons.edit,
+                                size: 26,
+                                color: context.c.primary,
+                              ),
                             ),
                             SizedBox(width: 4),
                           ],

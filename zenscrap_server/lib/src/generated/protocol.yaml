@@ -21,6 +21,8 @@ privateUserScrappables:
   - call:
 createScrappable:
   - call:
+editScrappable:
+  - call:
 marketplace:
   - getItems:
 publicTier:
