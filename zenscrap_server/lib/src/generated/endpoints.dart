@@ -286,11 +286,6 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<int>(),
               nullable: false,
             ),
-            'daysBack': _i1.ParameterDescription(
-              name: 'daysBack',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
           },
           call: (
             _i1.Session session,
@@ -302,7 +297,6 @@ class Endpoints extends _i1.EndpointDispatch {
             session,
             scrappableId: params['scrappableId'],
             page: params['page'],
-            daysBack: params['daysBack'],
           ),
         ),
       },

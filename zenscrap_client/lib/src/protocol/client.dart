@@ -143,7 +143,6 @@ class EndpointPrivateScrappableAnalytics extends _i1.EndpointRef {
   _i2.Future<_i10.PaginatedScrappableAnalytics> getScrappableAnalytics({
     required _i8.UuidValue scrappableId,
     required int page,
-    required int daysBack,
   }) =>
       caller.callServerEndpoint<_i10.PaginatedScrappableAnalytics>(
         'privateScrappableAnalytics',
@@ -151,7 +150,6 @@ class EndpointPrivateScrappableAnalytics extends _i1.EndpointRef {
         {
           'scrappableId': scrappableId,
           'page': page,
-          'daysBack': daysBack,
         },
       );
 }

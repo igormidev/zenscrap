@@ -14,7 +14,6 @@ class SelectedScrappableAnalyticsNotifier
       : super(SelectedScrappableAnalyticsState.none());
 
   int _currentPage = 1;
-  static const int _daysBack = 7;
 
   void resetState() {
     _currentPage = 1;
@@ -24,7 +23,7 @@ class SelectedScrappableAnalyticsNotifier
   Future<void> selectScrappable(Scrappable scrappable) async {
     _currentPage = 1;
     state = SelectedScrappableAnalyticsState.loading();
-    
+
     try {
       final result = await ref
           .read(clientProvider)
@@ -32,9 +31,8 @@ class SelectedScrappableAnalyticsNotifier
           .getScrappableAnalytics(
             scrappableId: scrappable.id,
             page: _currentPage,
-            daysBack: _daysBack,
           );
-      
+
       state = SelectedScrappableAnalyticsState.withData(data: result);
     } catch (error) {
       state = SelectedScrappableAnalyticsState.withError(
@@ -49,11 +47,11 @@ class SelectedScrappableAnalyticsNotifier
     );
     if (currentData == null) return;
     if (!currentData.hasNextPage) return;
-    
+
     state = SelectedScrappableAnalyticsState.loadingMore(
       currentData: currentData,
     );
-    
+
     try {
       _currentPage++;
       final result = await ref
@@ -62,9 +60,8 @@ class SelectedScrappableAnalyticsNotifier
           .getScrappableAnalytics(
             scrappableId: currentData.scrappable.id,
             page: _currentPage,
-            daysBack: _daysBack,
           );
-      
+
       // Merge the new data with existing data
       final mergedData = PaginatedScrappableAnalytics(
         scrappable: result.scrappable,
@@ -74,7 +71,7 @@ class SelectedScrappableAnalyticsNotifier
         currentPage: result.currentPage,
         pageSize: result.pageSize,
       );
-      
+
       state = SelectedScrappableAnalyticsState.withData(data: mergedData);
     } catch (error) {
       // Revert to previous data on error

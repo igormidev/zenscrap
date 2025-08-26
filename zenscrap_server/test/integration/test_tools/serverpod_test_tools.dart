@@ -508,7 +508,6 @@ class _PrivateScrappableAnalyticsEndpoint {
     _i1.TestSessionBuilder sessionBuilder, {
     required _i9.UuidValue scrappableId,
     required int page,
-    required int daysBack,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -524,7 +523,6 @@ class _PrivateScrappableAnalyticsEndpoint {
           parameters: _i1.testObjectToJson({
             'scrappableId': scrappableId,
             'page': page,
-            'daysBack': daysBack,
           }),
           serializationManager: _serializationManager,
         );
