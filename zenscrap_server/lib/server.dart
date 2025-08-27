@@ -6,7 +6,6 @@ import 'package:zenscrap_server/src/core/scraping_bee.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_config.dart';
 import 'package:zenscrap_server/src/future_calls/monthly_subscription_credits_future_call.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as auth;
-import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_claude_sdk_impl.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_gemini_api_impl.dart';
 import 'package:zenscrap_server/src/endpoints/public/scrappable_chat_session.dart';
 import 'package:zenscrap_server/src/routes/scrappable_api_route.dart';
@@ -59,10 +58,10 @@ void run(List<String> args) async {
   final String? openAiApiKey = pod.getPassword('openAiApiKey');
   openAiClient = OpenAIClient(apiKey: openAiApiKey);
 
-  await ChatControllerClaudeSdkImpl.initialize(
-    claudeApiKey: pod.getPassword('claudeCodeApiKey') ?? '',
-    scrapingBeeApiKey: scrapingBeeApiKey ?? '',
-  );
+  // await ChatControllerClaudeSdkImpl.initialize(
+  //   claudeApiKey: pod.getPassword('claudeCodeApiKey') ?? '',
+  //   scrapingBeeApiKey: scrapingBeeApiKey ?? '',
+  // );
   ChatControllerGeminiApiImpl.initialize(
     geminiApiKey: pod.getPassword('geminiApiKey') ?? '',
   );
