@@ -19,6 +19,10 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
   StreamSubscription<ChatResponse>? _chatResponseSubscription;
   ScrapChatSessionNotifier(this.ref) : super(ScrapChatSessionState.blank());
 
+  void reset() {
+    state = ScrapChatSessionState.blank();
+  }
+
   Future<void> createScrappable({
     required String targetUrl,
     required String userPrompt,

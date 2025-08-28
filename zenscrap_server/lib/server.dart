@@ -27,24 +27,23 @@ void run(List<String> args) async {
     authenticationHandler: auth.authenticationHandler,
   );
 
-  // Setup a single page app to serve Flutter web
+  // Register API routes FIRST (before catch-all routes)
+  pod.webServer.addRoute(StripeWebhookRoute(), '/stripe/webhook');
+  pod.webServer.addRoute(ScrappableApiRoute(), '/api/scrappable/test');
+  pod.webServer.addRoute(ScrappableApiRoute(), '/api/scrappable/prod');
+
+  // Serve all files in the /static directory
+  pod.webServer.addRoute(
+    RouteStaticDirectory(serverDirectory: 'static', basePath: '/'),
+    '/static/*',
+  );
+
+  // Setup single page app LAST (catch-all for remaining routes)
   pod.webServer.addRoute(
     RouteSinglePageApp(
       serverDirectory: 'app',
       appRootPath: 'index.html',
     ),
-    '/*',
-  );
-
-  pod.webServer.addRoute(StripeWebhookRoute(), '/stripe/webhook');
-
-  // Register the scrappable API routes
-  pod.webServer.addRoute(ScrappableApiRoute(), '/api/scrappable/test');
-  pod.webServer.addRoute(ScrappableApiRoute(), '/api/scrappable/prod');
-
-  // Serve all files in the /static directory.
-  pod.webServer.addRoute(
-    RouteStaticDirectory(serverDirectory: 'static', basePath: '/'),
     '/*',
   );
 

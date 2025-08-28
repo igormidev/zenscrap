@@ -194,6 +194,7 @@ class _ChatViewPageState extends ConsumerState<ChatViewPage>
             alignment: Alignment.topRight,
             child: TextButton.icon(
               onPressed: () {
+                ref.read(scrapChatProvider.notifier).reset();
                 context.push('/auth');
               },
               icon: const Icon(Icons.login),
