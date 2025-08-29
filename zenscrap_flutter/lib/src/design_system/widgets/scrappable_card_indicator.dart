@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/src/core/extensions/scraper_category_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 
 class ScrappableCardIndicator extends StatelessWidget {
@@ -11,7 +12,7 @@ class ScrappableCardIndicator extends StatelessWidget {
     super.key,
     required this.scrappable,
     this.isNew = false,
-    required this.onTap,
+    this.onTap,
     this.onEdit,
   });
 
@@ -48,7 +49,7 @@ class ScrappableCardIndicator extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
-                    Icons.web_asset_rounded,
+                    scrappable.category.icon,
                     color: context.c.primary,
                     size: 24,
                   ),
@@ -141,6 +142,41 @@ class ScrappableCardIndicator extends StatelessWidget {
             const SizedBox(height: 12),
             Row(
               children: [
+                // Category badge
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: context.c.primaryContainer.withAlpha(51),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                      color: context.c.primary.withAlpha(51),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        scrappable.category.icon,
+                        size: 14,
+                        color: context.c.primary,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        scrappable.category.displayName,
+                        style: context.t.labelSmall?.copyWith(
+                          color: context.c.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // Status badge
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 8,

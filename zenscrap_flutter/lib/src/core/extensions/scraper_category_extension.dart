@@ -1,27 +1,5 @@
-import 'package:zenscrap_server/src/generated/protocol.dart';
-
-extension PlanTierExt on PlanTier {
-  /// The user has a subscription to a plan tier.
-  /// Each month, the user receives a certain number of api credits based on their plan tier.
-  int get apiCreditsToBeAddedPerMonth {
-    return switch (this) {
-      PlanTier.none => 0,
-      PlanTier.base => 50000,
-      PlanTier.pro => 200000,
-      PlanTier.unlimited => 1000000,
-    };
-  }
-
-  /// The number of api-calls/concurrent requests allowed by the user's current plan.
-  int get numberOfConcurrentRequestsAllowedByPlan {
-    return switch (this) {
-      PlanTier.none => 0,
-      PlanTier.base => 10,
-      PlanTier.pro => 30,
-      PlanTier.unlimited => 100,
-    };
-  }
-}
+import 'package:flutter/material.dart';
+import 'package:zenscrap_client/zenscrap_client.dart';
 
 extension ScraperCategoryExt on ScraperCategory {
   String get displayName {
@@ -171,6 +149,81 @@ extension ScraperCategoryExt on ScraperCategory {
         return 'Video platforms (e.g. streaming, video sharing)';
       case ScraperCategory.other:
         return 'Other or uncategorized';
+    }
+  }
+
+  IconData get icon {
+    switch (this) {
+      case ScraperCategory.general:
+        return Icons.category_outlined;
+      case ScraperCategory.fitness:
+        return Icons.fitness_center_rounded;
+      case ScraperCategory.sports:
+        return Icons.sports_soccer_rounded;
+      case ScraperCategory.esports:
+        return Icons.sports_esports_rounded;
+      case ScraperCategory.health:
+        return Icons.health_and_safety_rounded;
+      case ScraperCategory.movies:
+        return Icons.movie_rounded;
+      case ScraperCategory.jobs:
+        return Icons.work_rounded;
+      case ScraperCategory.finance:
+        return Icons.account_balance_rounded;
+      case ScraperCategory.location:
+        return Icons.location_on_rounded;
+      case ScraperCategory.science:
+        return Icons.science_rounded;
+      case ScraperCategory.gaming:
+        return Icons.games_rounded;
+      case ScraperCategory.travel:
+        return Icons.flight_rounded;
+      case ScraperCategory.social_media:
+        return Icons.share_rounded;
+      case ScraperCategory.ecommerce:
+        return Icons.shopping_cart_rounded;
+      case ScraperCategory.news:
+        return Icons.newspaper_rounded;
+      case ScraperCategory.weather:
+        return Icons.cloud_rounded;
+      case ScraperCategory.education:
+        return Icons.school_rounded;
+      case ScraperCategory.music:
+        return Icons.music_note_rounded;
+      case ScraperCategory.books:
+        return Icons.menu_book_rounded;
+      case ScraperCategory.comics:
+        return Icons.auto_stories_rounded;
+      case ScraperCategory.anime:
+        return Icons.animation_rounded;
+      case ScraperCategory.real_estate:
+        return Icons.home_rounded;
+      case ScraperCategory.food:
+        return Icons.restaurant_rounded;
+      case ScraperCategory.fashion:
+        return Icons.checkroom_rounded;
+      case ScraperCategory.security:
+        return Icons.security_rounded;
+      case ScraperCategory.ai:
+        return Icons.psychology_rounded;
+      case ScraperCategory.seo:
+        return Icons.search_rounded;
+      case ScraperCategory.lead_generation:
+        return Icons.contacts_rounded;
+      case ScraperCategory.developer_tools:
+        return Icons.code_rounded;
+      case ScraperCategory.automotive:
+        return Icons.directions_car_rounded;
+      case ScraperCategory.government:
+        return Icons.account_balance_rounded;
+      case ScraperCategory.cryptocurrency:
+        return Icons.currency_bitcoin_rounded;
+      case ScraperCategory.images:
+        return Icons.image_rounded;
+      case ScraperCategory.videos:
+        return Icons.videocam_rounded;
+      case ScraperCategory.other:
+        return Icons.more_horiz_rounded;
     }
   }
 }

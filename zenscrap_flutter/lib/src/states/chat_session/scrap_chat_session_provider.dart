@@ -20,6 +20,7 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
   ScrapChatSessionNotifier(this.ref) : super(ScrapChatSessionState.blank());
 
   void reset() {
+    ref.read(chatMessagesProvider.notifier).state = const AsyncValue.data([]);
     state = ScrapChatSessionState.blank();
   }
 

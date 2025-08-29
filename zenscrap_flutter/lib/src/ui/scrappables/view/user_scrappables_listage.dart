@@ -99,10 +99,9 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
                       ),
                     );
                   },
-                  onTap: () {
-                    context.push(
-                        '/scrappable-form?id=${scrappable.id.toString()}');
-                  },
+                  // onTap: () {
+                  //   context.push('/scrappable-form?id=${scrappable.id.toString()}');
+                  // },
                 );
               },
             );

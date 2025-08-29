@@ -57,7 +57,7 @@ class ZenScrapPricingPage extends ConsumerWidget {
                   '<b><u><tC>200.000<tC><u><b> api calls',
                   '<b><u><tC>30<tC><u><b> concurrent requests',
                   '<b><u><tC>10<tC><u><b> active endpoints',
-                  'Access to the best AI model (20 messages)',
+                  'Access a best AI model (20 messages)',
                 ],
                 onTap: (bool isYearly) async {
                   await ref.globalLoadingSetter(() async {
@@ -74,7 +74,7 @@ class ZenScrapPricingPage extends ConsumerWidget {
                   '<b><u><tC>1.000.000<tC><u><b> api calls',
                   '<b><u><tC>100<tC><u><b> concurrent requests',
                   '<b><u><tC>100<tC><u><b> active endpoints',
-                  'Access to the best AI model (100 messages)',
+                  'Access a best AI model (100 messages)',
                   'Priority Support',
                   'Hide your endpoints from marketplace',
                   'Copy endpoints from marketplace',

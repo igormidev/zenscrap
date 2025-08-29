@@ -33,6 +33,7 @@ class _ScrappableEditVisualizationState
       ),
       child: ScrappableEditForm(
         scrappable: widget.scrappable,
+        shouldPopOnEnd: false,
         onSave: (name, description, category) async {
           return onEditScrappable(
             widget.scrappable,

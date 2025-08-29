@@ -3,7 +3,10 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/src/core/extensions/scraper_category_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
+import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 
 class EditScrappableDialog extends ConsumerStatefulWidget {
   final Scrappable scrappable;
@@ -98,11 +101,54 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog> {
               ),
             ).animate().fadeIn(duration: 200.ms).slideY(begin: -0.1, end: 0),
 
-            SizedBox(
-              height: 400,
-              child: ScrappableEditForm(
-                  scrappable: widget.scrappable, onSave: widget.onSave),
-            )
+            ScrappableEditForm(
+              scrappable: widget.scrappable,
+              onSave: widget.onSave,
+              shouldPopOnEnd: true,
+            ),
+
+            Transform.translate(
+              offset: const Offset(0, -10),
+              child: Row(
+                children: [
+                  Expanded(child: Divider(endIndent: 16, indent: 20)),
+                  Text('OR'),
+                  Expanded(child: Divider(indent: 16, endIndent: 20)),
+                ],
+              ),
+            ),
+            SizedBox(height: 6),
+
+            Row(
+              children: [
+                SizedBox(width: 20),
+                CircleAvatar(
+                  backgroundColor: context.c.errorContainer,
+                  child: IconButton(
+                    tooltip: 'Delete scrappable',
+                    color: context.c.error,
+                    onPressed: () {
+                      // Add switch to hide/show
+                    },
+                    icon: Icon(
+                      Icons.delete,
+                    ),
+                  ),
+                ),
+                Spacer(),
+                FilledButton(
+                  onPressed: () {
+                    ref.read(scrapChatProvider.notifier).reset();
+                    context.go(
+                        '/scrappable-form?id=${widget.scrappable.id.toString()}');
+                  },
+                  child: Text('Edit scrapper extract logic'),
+                ),
+                SizedBox(width: 20),
+              ],
+            ),
+
+            SizedBox(height: 20)
           ],
         ),
       ).animate().scale(
@@ -119,8 +165,13 @@ class ScrappableEditForm extends StatefulWidget {
   final Scrappable scrappable;
   final Future<bool> Function(
       String name, String description, ScraperCategory? category) onSave;
-  const ScrappableEditForm(
-      {super.key, required this.scrappable, required this.onSave});
+  final bool shouldPopOnEnd;
+  const ScrappableEditForm({
+    super.key,
+    required this.scrappable,
+    required this.onSave,
+    required this.shouldPopOnEnd,
+  });
 
   @override
   State<ScrappableEditForm> createState() => _ScrappableEditFormState();
@@ -178,6 +229,7 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
     });
 
     try {
+      await Future.delayed(const Duration(seconds: 1));
       final success = await widget.onSave(
         _nameController.text.trim(),
         _descriptionController.text.trim(),
@@ -185,23 +237,22 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
       );
 
       if (success && mounted) {
-        context.pop(true);
+        if (widget.shouldPopOnEnd) {
+          context.pop(true);
+        } else {
+          setState(() {
+            _hasChanges = false;
+          });
+        }
       } else if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Failed to update scrappable'),
-            backgroundColor: context.c.error,
-          ),
+        showErrorSnackbar(
+          context,
+          'Failed to update scrappable',
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: ${e.toString()}'),
-            backgroundColor: context.c.error,
-          ),
-        );
+        showErrorSnackbar(context, 'Error: ${e.toString()}');
       }
     } finally {
       if (mounted) {
@@ -215,6 +266,7 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
   @override
   Widget build(BuildContext context) {
     return ListView(
+      shrinkWrap: widget.shouldPopOnEnd ? true : false,
       children: [
         // Content
         Padding(
@@ -319,7 +371,7 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              _getCategoryDisplayName(_selectedCategory!),
+                              _selectedCategory!.displayName,
                               style: context.t.bodyLarge?.copyWith(
                                 color: context.c.onSurface,
                               ),
@@ -402,231 +454,50 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
                 ],
               ).animate().fadeIn(delay: 200.ms).slideX(begin: -0.1, end: 0),
 
-              SizedBox(height: 20),
+              SizedBox(height: 16),
               // Action Buttons
-              Row(
-                children: [
-                  Expanded(
-                    child: TextButton(
-                      onPressed:
-                          _isLoading ? null : () => Navigator.of(context).pop(),
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(
-                            color: context.c.outline.withAlpha(100),
+              FilledButton.icon(
+                onPressed: _hasChanges && !_isLoading ? _handleSave : null,
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  backgroundColor: context.c.primary,
+                  disabledBackgroundColor: context.c.surfaceContainerHighest,
+                ),
+                icon: _isLoading
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            context.c.onSurfaceVariant,
                           ),
                         ),
+                      )
+                    : Icon(
+                        Icons.save_rounded,
+                        color: _hasChanges
+                            ? context.c.onPrimary
+                            : context.c.onSurfaceVariant,
                       ),
-                      child: Text(
-                        'Cancel',
-                        style: context.t.labelLarge?.copyWith(
-                          color: context.c.onSurface,
-                        ),
-                      ),
-                    ),
+                label: Text(
+                  _isLoading ? 'Saving...' : 'Save Changes',
+                  style: context.t.labelLarge?.copyWith(
+                    color: _hasChanges
+                        ? context.c.onPrimary
+                        : context.c.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    flex: 2,
-                    child: FilledButton.icon(
-                      onPressed:
-                          _hasChanges && !_isLoading ? _handleSave : null,
-                      style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        backgroundColor: context.c.primary,
-                        disabledBackgroundColor:
-                            context.c.surfaceContainerHighest,
-                      ),
-                      icon: _isLoading
-                          ? SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  context.c.onSurfaceVariant,
-                                ),
-                              ),
-                            )
-                          : Icon(
-                              Icons.save_rounded,
-                              color: _hasChanges
-                                  ? context.c.onPrimary
-                                  : context.c.onSurfaceVariant,
-                            ),
-                      label: Text(
-                        _isLoading ? 'Saving...' : 'Save Changes',
-                        style: context.t.labelLarge?.copyWith(
-                          color: _hasChanges
-                              ? context.c.onPrimary
-                              : context.c.onSurfaceVariant,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.1, end: 0),
             ],
           ),
         )
       ],
     );
-  }
-
-  String _getCategoryDisplayName(ScraperCategory category) {
-    switch (category) {
-      case ScraperCategory.general:
-        return 'General';
-      case ScraperCategory.fitness:
-        return 'Fitness';
-      case ScraperCategory.sports:
-        return 'Sports';
-      case ScraperCategory.esports:
-        return 'E-sports';
-      case ScraperCategory.health:
-        return 'Health';
-      case ScraperCategory.movies:
-        return 'Movies';
-      case ScraperCategory.jobs:
-        return 'Jobs';
-      case ScraperCategory.finance:
-        return 'Finance';
-      case ScraperCategory.location:
-        return 'Location';
-      case ScraperCategory.science:
-        return 'Science';
-      case ScraperCategory.gaming:
-        return 'Gaming';
-      case ScraperCategory.travel:
-        return 'Travel';
-      case ScraperCategory.social_media:
-        return 'Social Media';
-      case ScraperCategory.ecommerce:
-        return 'E-commerce';
-      case ScraperCategory.news:
-        return 'News';
-      case ScraperCategory.weather:
-        return 'Weather';
-      case ScraperCategory.education:
-        return 'Education';
-      case ScraperCategory.music:
-        return 'Music';
-      case ScraperCategory.books:
-        return 'Books';
-      case ScraperCategory.comics:
-        return 'Comics';
-      case ScraperCategory.anime:
-        return 'Anime';
-      case ScraperCategory.real_estate:
-        return 'Real Estate';
-      case ScraperCategory.food:
-        return 'Food';
-      case ScraperCategory.fashion:
-        return 'Fashion';
-      case ScraperCategory.security:
-        return 'Security';
-      case ScraperCategory.ai:
-        return 'AI';
-      case ScraperCategory.seo:
-        return 'SEO';
-      case ScraperCategory.lead_generation:
-        return 'Lead Generation';
-      case ScraperCategory.developer_tools:
-        return 'Developer Tools';
-      case ScraperCategory.automotive:
-        return 'Automotive';
-      case ScraperCategory.government:
-        return 'Government';
-      case ScraperCategory.cryptocurrency:
-        return 'Cryptocurrency';
-      case ScraperCategory.images:
-        return 'Images';
-      case ScraperCategory.videos:
-        return 'Videos';
-      case ScraperCategory.other:
-        return 'Other';
-    }
-  }
-
-  String _getCategoryDescription(ScraperCategory category) {
-    switch (category) {
-      case ScraperCategory.general:
-        return 'General-purpose or uncategorized scrapers';
-      case ScraperCategory.fitness:
-        return 'Health and fitness related';
-      case ScraperCategory.sports:
-        return 'Traditional sports data';
-      case ScraperCategory.esports:
-        return 'E-sports (competitive gaming)';
-      case ScraperCategory.health:
-        return 'Healthcare and medicine';
-      case ScraperCategory.movies:
-        return 'Movies and TV information';
-      case ScraperCategory.jobs:
-        return 'Job listings and employment';
-      case ScraperCategory.finance:
-        return 'Finance, banking, stock market';
-      case ScraperCategory.location:
-        return 'Location-based data, maps, geocoding';
-      case ScraperCategory.science:
-        return 'Science, research, academic data';
-      case ScraperCategory.gaming:
-        return 'Video games (general gaming info)';
-      case ScraperCategory.travel:
-        return 'Travel, tourism, hospitality';
-      case ScraperCategory.social_media:
-        return 'Social networks and social media platforms';
-      case ScraperCategory.ecommerce:
-        return 'E-commerce and online shopping';
-      case ScraperCategory.news:
-        return 'News and journalism sites';
-      case ScraperCategory.weather:
-        return 'Weather and climate data';
-      case ScraperCategory.education:
-        return 'Educational content and e-learning';
-      case ScraperCategory.music:
-        return 'Music, audio streaming, artist info';
-      case ScraperCategory.books:
-        return 'Books, literature, libraries';
-      case ScraperCategory.comics:
-        return 'Comics, manga';
-      case ScraperCategory.anime:
-        return 'Anime and animation';
-      case ScraperCategory.real_estate:
-        return 'Real estate, housing, property listings';
-      case ScraperCategory.food:
-        return 'Food, recipes, restaurants';
-      case ScraperCategory.fashion:
-        return 'Fashion, style, beauty';
-      case ScraperCategory.security:
-        return 'Cybersecurity, threat intelligence';
-      case ScraperCategory.ai:
-        return 'Artificial intelligence, ML tools';
-      case ScraperCategory.seo:
-        return 'SEO tools, search engine data';
-      case ScraperCategory.lead_generation:
-        return 'Lead generation, marketing data';
-      case ScraperCategory.developer_tools:
-        return 'Developer tools, general web scraping utilities';
-      case ScraperCategory.automotive:
-        return 'Automotive, vehicles, car listings';
-      case ScraperCategory.government:
-        return 'Government data, public records';
-      case ScraperCategory.cryptocurrency:
-        return 'Cryptocurrency and blockchain data';
-      case ScraperCategory.images:
-        return 'Image platforms or photography';
-      case ScraperCategory.videos:
-        return 'Video platforms (e.g. streaming, video sharing)';
-      case ScraperCategory.other:
-        return 'Other or uncategorized';
-    }
   }
 
   void _showCategorySelectionDialog() {
@@ -721,7 +592,7 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
-                              Icons.tag_rounded,
+                              category.icon,
                               size: 20,
                               color: isSelected
                                   ? context.c.onPrimary
@@ -729,7 +600,7 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
                             ),
                           ),
                           title: Text(
-                            _getCategoryDisplayName(category),
+                            category.displayName,
                             style: context.t.bodyLarge?.copyWith(
                               color: context.c.onSurface,
                               fontWeight: isSelected
@@ -738,7 +609,7 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
                             ),
                           ),
                           subtitle: Text(
-                            _getCategoryDescription(category),
+                            category.description,
                             style: context.t.bodySmall?.copyWith(
                               color: context.c.onSurfaceVariant.withAlpha(180),
                             ),
