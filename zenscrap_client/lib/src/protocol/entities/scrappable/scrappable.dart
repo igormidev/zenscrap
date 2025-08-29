@@ -13,6 +13,7 @@ import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import '../../entities/scrappable/scrappable_request.dart' as _i2;
 import '../../entities/scrappable/scrappable_analytics.dart' as _i3;
 import '../../entities/scrappable/reference_test_data.dart' as _i4;
+import '../../entities/scrappable/scraper_category.dart' as _i5;
 
 abstract class Scrappable implements _i1.SerializableModel {
   Scrappable._({
@@ -29,6 +30,7 @@ abstract class Scrappable implements _i1.SerializableModel {
     required this.referenceTestDataId,
     this.scrappableAnalytics,
     this.referenceTestData,
+    required this.category,
   }) : id = id ?? _i1.Uuid().v4obj();
 
   factory Scrappable({
@@ -45,6 +47,7 @@ abstract class Scrappable implements _i1.SerializableModel {
     required int referenceTestDataId,
     List<_i3.ScrappableAnalytics>? scrappableAnalytics,
     _i4.ReferenceTestData? referenceTestData,
+    required _i5.ScraperCategory category,
   }) = _ScrappableImpl;
 
   factory Scrappable.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -76,6 +79,8 @@ abstract class Scrappable implements _i1.SerializableModel {
           ? null
           : _i4.ReferenceTestData.fromJson(
               (jsonSerialization['referenceTestData'] as Map<String, dynamic>)),
+      category:
+          _i5.ScraperCategory.fromJson((jsonSerialization['category'] as int)),
     );
   }
 
@@ -108,6 +113,8 @@ abstract class Scrappable implements _i1.SerializableModel {
 
   _i4.ReferenceTestData? referenceTestData;
 
+  _i5.ScraperCategory category;
+
   /// Returns a shallow copy of this [Scrappable]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
@@ -125,6 +132,7 @@ abstract class Scrappable implements _i1.SerializableModel {
     int? referenceTestDataId,
     List<_i3.ScrappableAnalytics>? scrappableAnalytics,
     _i4.ReferenceTestData? referenceTestData,
+    _i5.ScraperCategory? category,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -146,6 +154,7 @@ abstract class Scrappable implements _i1.SerializableModel {
             scrappableAnalytics?.toJson(valueToJson: (v) => v.toJson()),
       if (referenceTestData != null)
         'referenceTestData': referenceTestData?.toJson(),
+      'category': category.toJson(),
     };
   }
 
@@ -172,6 +181,7 @@ class _ScrappableImpl extends Scrappable {
     required int referenceTestDataId,
     List<_i3.ScrappableAnalytics>? scrappableAnalytics,
     _i4.ReferenceTestData? referenceTestData,
+    required _i5.ScraperCategory category,
   }) : super._(
           id: id,
           createdAt: createdAt,
@@ -186,6 +196,7 @@ class _ScrappableImpl extends Scrappable {
           referenceTestDataId: referenceTestDataId,
           scrappableAnalytics: scrappableAnalytics,
           referenceTestData: referenceTestData,
+          category: category,
         );
 
   /// Returns a shallow copy of this [Scrappable]
@@ -206,6 +217,7 @@ class _ScrappableImpl extends Scrappable {
     int? referenceTestDataId,
     Object? scrappableAnalytics = _Undefined,
     Object? referenceTestData = _Undefined,
+    _i5.ScraperCategory? category,
   }) {
     return Scrappable(
       id: id ?? this.id,
@@ -230,6 +242,7 @@ class _ScrappableImpl extends Scrappable {
       referenceTestData: referenceTestData is _i4.ReferenceTestData?
           ? referenceTestData
           : this.referenceTestData?.copyWith(),
+      category: category ?? this.category,
     );
   }
 }

@@ -36,17 +36,18 @@ import 'entities/redraft_scrappable_session/prompt_role_enum.dart' as _i19;
 import 'entities/redraft_scrappable_session/chat_response.dart' as _i20;
 import 'entities/scrappable/reference_test_data.dart' as _i21;
 import 'entities/scrappable/request_status.dart' as _i22;
-import 'entities/scrappable/scrappable.dart' as _i23;
-import 'entities/scrappable/scrappable_analytics.dart' as _i24;
-import 'entities/scrappable/scrappable_request.dart' as _i25;
-import 'entities/scrappable/scrappable_test_result.dart' as _i26;
-import 'entities/zenscrap_exception.dart' as _i27;
+import 'entities/scrappable/scraper_category.dart' as _i23;
+import 'entities/scrappable/scrappable.dart' as _i24;
+import 'entities/scrappable/scrappable_analytics.dart' as _i25;
+import 'entities/scrappable/scrappable_request.dart' as _i26;
+import 'entities/scrappable/scrappable_test_result.dart' as _i27;
+import 'entities/zenscrap_exception.dart' as _i28;
 import 'package:zenscrap_server/src/generated/entities/account/api_usage/api_creadit_history/api_creadit_history_item.dart'
-    as _i28;
-import 'package:zenscrap_server/src/generated/entities/account/account_api_key.dart'
     as _i29;
-import 'package:zenscrap_server/src/generated/entities/scrappable/scrappable.dart'
+import 'package:zenscrap_server/src/generated/entities/account/account_api_key.dart'
     as _i30;
+import 'package:zenscrap_server/src/generated/entities/scrappable/scrappable.dart'
+    as _i31;
 export 'entities/account/account.dart';
 export 'entities/account/account_api_key.dart';
 export 'entities/account/api_usage/account_api_usage.dart';
@@ -66,6 +67,7 @@ export 'entities/redraft_scrappable_session/create_session_response.dart';
 export 'entities/redraft_scrappable_session/prompt_role_enum.dart';
 export 'entities/scrappable/reference_test_data.dart';
 export 'entities/scrappable/request_status.dart';
+export 'entities/scrappable/scraper_category.dart';
 export 'entities/scrappable/scrappable.dart';
 export 'entities/scrappable/scrappable_analytics.dart';
 export 'entities/scrappable/scrappable_request.dart';
@@ -582,6 +584,12 @@ class Protocol extends _i1.SerializationManagerServer {
           isNullable: false,
           dartType: 'int',
         ),
+        _i2.ColumnDefinition(
+          name: 'category',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'protocol:ScraperCategory',
+        ),
       ],
       foreignKeys: [
         _i2.ForeignKeyDefinition(
@@ -1033,20 +1041,23 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i22.RequestStatus) {
       return _i22.RequestStatus.fromJson(data) as T;
     }
-    if (t == _i23.Scrappable) {
-      return _i23.Scrappable.fromJson(data) as T;
+    if (t == _i23.ScraperCategory) {
+      return _i23.ScraperCategory.fromJson(data) as T;
     }
-    if (t == _i24.ScrappableAnalytics) {
-      return _i24.ScrappableAnalytics.fromJson(data) as T;
+    if (t == _i24.Scrappable) {
+      return _i24.Scrappable.fromJson(data) as T;
     }
-    if (t == _i25.ScrappableRequest) {
-      return _i25.ScrappableRequest.fromJson(data) as T;
+    if (t == _i25.ScrappableAnalytics) {
+      return _i25.ScrappableAnalytics.fromJson(data) as T;
     }
-    if (t == _i26.ScrappableTestResult) {
-      return _i26.ScrappableTestResult.fromJson(data) as T;
+    if (t == _i26.ScrappableRequest) {
+      return _i26.ScrappableRequest.fromJson(data) as T;
     }
-    if (t == _i27.ZenScrapException) {
-      return _i27.ZenScrapException.fromJson(data) as T;
+    if (t == _i27.ScrappableTestResult) {
+      return _i27.ScrappableTestResult.fromJson(data) as T;
+    }
+    if (t == _i28.ZenScrapException) {
+      return _i28.ZenScrapException.fromJson(data) as T;
     }
     if (t == _i1.getType<_i4.AccountInfo?>()) {
       return (data != null ? _i4.AccountInfo.fromJson(data) : null) as T;
@@ -1134,26 +1145,29 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i1.getType<_i22.RequestStatus?>()) {
       return (data != null ? _i22.RequestStatus.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i23.Scrappable?>()) {
-      return (data != null ? _i23.Scrappable.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i23.ScraperCategory?>()) {
+      return (data != null ? _i23.ScraperCategory.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i24.ScrappableAnalytics?>()) {
-      return (data != null ? _i24.ScrappableAnalytics.fromJson(data) : null)
+    if (t == _i1.getType<_i24.Scrappable?>()) {
+      return (data != null ? _i24.Scrappable.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i25.ScrappableAnalytics?>()) {
+      return (data != null ? _i25.ScrappableAnalytics.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i25.ScrappableRequest?>()) {
-      return (data != null ? _i25.ScrappableRequest.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i26.ScrappableRequest?>()) {
+      return (data != null ? _i26.ScrappableRequest.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i26.ScrappableTestResult?>()) {
-      return (data != null ? _i26.ScrappableTestResult.fromJson(data) : null)
+    if (t == _i1.getType<_i27.ScrappableTestResult?>()) {
+      return (data != null ? _i27.ScrappableTestResult.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i27.ZenScrapException?>()) {
-      return (data != null ? _i27.ZenScrapException.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i28.ZenScrapException?>()) {
+      return (data != null ? _i28.ZenScrapException.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<List<_i23.Scrappable>?>()) {
+    if (t == _i1.getType<List<_i24.Scrappable>?>()) {
       return (data != null
-          ? (data as List).map((e) => deserialize<_i23.Scrappable>(e)).toList()
+          ? (data as List).map((e) => deserialize<_i24.Scrappable>(e)).toList()
           : null) as T;
     }
     if (t == _i1.getType<List<_i7.CreditHistoryItem>?>()) {
@@ -1170,9 +1184,9 @@ class Protocol extends _i1.SerializationManagerServer {
               .toList()
           : null) as T;
     }
-    if (t == List<_i24.ScrappableAnalytics>) {
+    if (t == List<_i25.ScrappableAnalytics>) {
       return (data as List)
-          .map((e) => deserialize<_i24.ScrappableAnalytics>(e))
+          .map((e) => deserialize<_i25.ScrappableAnalytics>(e))
           .toList() as T;
     }
     if (t == List<_i14.ScrappableRequestsAnalyticsItem>) {
@@ -1185,14 +1199,14 @@ class Protocol extends _i1.SerializationManagerServer {
           .map((e) => deserialize<_i13.ScrappableRequestPerHour>(e))
           .toList() as T;
     }
-    if (t == List<_i23.Scrappable>) {
-      return (data as List).map((e) => deserialize<_i23.Scrappable>(e)).toList()
+    if (t == List<_i24.Scrappable>) {
+      return (data as List).map((e) => deserialize<_i24.Scrappable>(e)).toList()
           as T;
     }
-    if (t == _i1.getType<List<_i24.ScrappableAnalytics>?>()) {
+    if (t == _i1.getType<List<_i25.ScrappableAnalytics>?>()) {
       return (data != null
           ? (data as List)
-              .map((e) => deserialize<_i24.ScrappableAnalytics>(e))
+              .map((e) => deserialize<_i25.ScrappableAnalytics>(e))
               .toList()
           : null) as T;
     }
@@ -1203,14 +1217,14 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == List<String>) {
       return (data as List).map((e) => deserialize<String>(e)).toList() as T;
     }
-    if (t == List<_i28.CreditHistoryItem>) {
+    if (t == List<_i29.CreditHistoryItem>) {
       return (data as List)
-          .map((e) => deserialize<_i28.CreditHistoryItem>(e))
+          .map((e) => deserialize<_i29.CreditHistoryItem>(e))
           .toList() as T;
     }
-    if (t == List<_i29.AccountApiKey>) {
+    if (t == List<_i30.AccountApiKey>) {
       return (data as List)
-          .map((e) => deserialize<_i29.AccountApiKey>(e))
+          .map((e) => deserialize<_i30.AccountApiKey>(e))
           .toList() as T;
     }
     if (t == Map<int, int>) {
@@ -1221,8 +1235,8 @@ class Protocol extends _i1.SerializationManagerServer {
       return (data as Map).map((k, v) =>
           MapEntry(deserialize<String>(k), deserialize<dynamic>(v))) as T;
     }
-    if (t == List<_i30.Scrappable>) {
-      return (data as List).map((e) => deserialize<_i30.Scrappable>(e)).toList()
+    if (t == List<_i31.Scrappable>) {
+      return (data as List).map((e) => deserialize<_i31.Scrappable>(e)).toList()
           as T;
     }
     try {
@@ -1304,19 +1318,22 @@ class Protocol extends _i1.SerializationManagerServer {
     if (data is _i22.RequestStatus) {
       return 'RequestStatus';
     }
-    if (data is _i23.Scrappable) {
+    if (data is _i23.ScraperCategory) {
+      return 'ScraperCategory';
+    }
+    if (data is _i24.Scrappable) {
       return 'Scrappable';
     }
-    if (data is _i24.ScrappableAnalytics) {
+    if (data is _i25.ScrappableAnalytics) {
       return 'ScrappableAnalytics';
     }
-    if (data is _i25.ScrappableRequest) {
+    if (data is _i26.ScrappableRequest) {
       return 'ScrappableRequest';
     }
-    if (data is _i26.ScrappableTestResult) {
+    if (data is _i27.ScrappableTestResult) {
       return 'ScrappableTestResult';
     }
-    if (data is _i27.ZenScrapException) {
+    if (data is _i28.ZenScrapException) {
       return 'ZenScrapException';
     }
     className = _i2.Protocol().getClassNameForObject(data);
@@ -1404,20 +1421,23 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName == 'RequestStatus') {
       return deserialize<_i22.RequestStatus>(data['data']);
     }
+    if (dataClassName == 'ScraperCategory') {
+      return deserialize<_i23.ScraperCategory>(data['data']);
+    }
     if (dataClassName == 'Scrappable') {
-      return deserialize<_i23.Scrappable>(data['data']);
+      return deserialize<_i24.Scrappable>(data['data']);
     }
     if (dataClassName == 'ScrappableAnalytics') {
-      return deserialize<_i24.ScrappableAnalytics>(data['data']);
+      return deserialize<_i25.ScrappableAnalytics>(data['data']);
     }
     if (dataClassName == 'ScrappableRequest') {
-      return deserialize<_i25.ScrappableRequest>(data['data']);
+      return deserialize<_i26.ScrappableRequest>(data['data']);
     }
     if (dataClassName == 'ScrappableTestResult') {
-      return deserialize<_i26.ScrappableTestResult>(data['data']);
+      return deserialize<_i27.ScrappableTestResult>(data['data']);
     }
     if (dataClassName == 'ZenScrapException') {
-      return deserialize<_i27.ZenScrapException>(data['data']);
+      return deserialize<_i28.ZenScrapException>(data['data']);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);
@@ -1459,14 +1479,14 @@ class Protocol extends _i1.SerializationManagerServer {
         return _i9.MonthlySubscriptionCreditDeposit.t;
       case _i21.ReferenceTestData:
         return _i21.ReferenceTestData.t;
-      case _i23.Scrappable:
-        return _i23.Scrappable.t;
-      case _i24.ScrappableAnalytics:
-        return _i24.ScrappableAnalytics.t;
-      case _i25.ScrappableRequest:
-        return _i25.ScrappableRequest.t;
-      case _i26.ScrappableTestResult:
-        return _i26.ScrappableTestResult.t;
+      case _i24.Scrappable:
+        return _i24.Scrappable.t;
+      case _i25.ScrappableAnalytics:
+        return _i25.ScrappableAnalytics.t;
+      case _i26.ScrappableRequest:
+        return _i26.ScrappableRequest.t;
+      case _i27.ScrappableTestResult:
+        return _i27.ScrappableTestResult.t;
     }
     return null;
   }

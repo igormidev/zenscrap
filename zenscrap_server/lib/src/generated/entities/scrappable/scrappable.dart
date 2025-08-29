@@ -15,6 +15,7 @@ import 'package:serverpod/serverpod.dart' as _i1;
 import '../../entities/scrappable/scrappable_request.dart' as _i2;
 import '../../entities/scrappable/scrappable_analytics.dart' as _i3;
 import '../../entities/scrappable/reference_test_data.dart' as _i4;
+import '../../entities/scrappable/scraper_category.dart' as _i5;
 
 abstract class Scrappable
     implements _i1.TableRow<_i1.UuidValue>, _i1.ProtocolSerialization {
@@ -34,6 +35,7 @@ abstract class Scrappable
     required this.referenceTestDataId,
     this.scrappableAnalytics,
     this.referenceTestData,
+    required this.category,
   }) : id = id ?? _i1.Uuid().v4obj();
 
   factory Scrappable({
@@ -52,6 +54,7 @@ abstract class Scrappable
     required int referenceTestDataId,
     List<_i3.ScrappableAnalytics>? scrappableAnalytics,
     _i4.ReferenceTestData? referenceTestData,
+    required _i5.ScraperCategory category,
   }) = _ScrappableImpl;
 
   factory Scrappable.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -85,6 +88,8 @@ abstract class Scrappable
           ? null
           : _i4.ReferenceTestData.fromJson(
               (jsonSerialization['referenceTestData'] as Map<String, dynamic>)),
+      category:
+          _i5.ScraperCategory.fromJson((jsonSerialization['category'] as int)),
     );
   }
 
@@ -123,6 +128,8 @@ abstract class Scrappable
 
   _i4.ReferenceTestData? referenceTestData;
 
+  _i5.ScraperCategory category;
+
   @override
   _i1.Table<_i1.UuidValue> get table => t;
 
@@ -145,6 +152,7 @@ abstract class Scrappable
     int? referenceTestDataId,
     List<_i3.ScrappableAnalytics>? scrappableAnalytics,
     _i4.ReferenceTestData? referenceTestData,
+    _i5.ScraperCategory? category,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -169,6 +177,7 @@ abstract class Scrappable
             scrappableAnalytics?.toJson(valueToJson: (v) => v.toJson()),
       if (referenceTestData != null)
         'referenceTestData': referenceTestData?.toJson(),
+      'category': category.toJson(),
     };
   }
 
@@ -193,6 +202,7 @@ abstract class Scrappable
             valueToJson: (v) => v.toJsonForProtocol()),
       if (referenceTestData != null)
         'referenceTestData': referenceTestData?.toJsonForProtocol(),
+      'category': category.toJson(),
     };
   }
 
@@ -253,6 +263,7 @@ class _ScrappableImpl extends Scrappable {
     required int referenceTestDataId,
     List<_i3.ScrappableAnalytics>? scrappableAnalytics,
     _i4.ReferenceTestData? referenceTestData,
+    required _i5.ScraperCategory category,
   }) : super._(
           id: id,
           accountId: accountId,
@@ -269,6 +280,7 @@ class _ScrappableImpl extends Scrappable {
           referenceTestDataId: referenceTestDataId,
           scrappableAnalytics: scrappableAnalytics,
           referenceTestData: referenceTestData,
+          category: category,
         );
 
   /// Returns a shallow copy of this [Scrappable]
@@ -291,6 +303,7 @@ class _ScrappableImpl extends Scrappable {
     int? referenceTestDataId,
     Object? scrappableAnalytics = _Undefined,
     Object? referenceTestData = _Undefined,
+    _i5.ScraperCategory? category,
   }) {
     return Scrappable(
       id: id ?? this.id,
@@ -319,6 +332,7 @@ class _ScrappableImpl extends Scrappable {
       referenceTestData: referenceTestData is _i4.ReferenceTestData?
           ? referenceTestData
           : this.referenceTestData?.copyWith(),
+      category: category ?? this.category,
     );
   }
 }
@@ -369,6 +383,11 @@ class ScrappableTable extends _i1.Table<_i1.UuidValue> {
       'referenceTestDataId',
       this,
     );
+    category = _i1.ColumnEnum(
+      'category',
+      this,
+      _i1.EnumSerialization.byIndex,
+    );
   }
 
   late final _i1.ColumnInt accountId;
@@ -400,6 +419,8 @@ class ScrappableTable extends _i1.Table<_i1.UuidValue> {
   _i1.ManyRelation<_i3.ScrappableAnalyticsTable>? _scrappableAnalytics;
 
   _i4.ReferenceTestDataTable? _referenceTestData;
+
+  late final _i1.ColumnEnum<_i5.ScraperCategory> category;
 
   _i2.ScrappableRequestTable get targetRequest {
     if (_targetRequest != null) return _targetRequest!;
@@ -472,6 +493,7 @@ class ScrappableTable extends _i1.Table<_i1.UuidValue> {
         isActive,
         targetRequestId,
         referenceTestDataId,
+        category,
       ];
 
   @override

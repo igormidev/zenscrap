@@ -5,13 +5,17 @@ import 'package:zenscrap_flutter/src/core/mixins/curl_builder_mixin.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/code_bloc.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/is_chat_loading_provider.dart';
+import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/deploy_button.dart';
+import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/remaining_time_indicator.dart';
 
 class ScrappableCurlSection extends ConsumerStatefulWidget {
   final UuidValue scrappableId;
+  final DateTime targetTime;
   final ReferenceTestData? testData;
   const ScrappableCurlSection({
     super.key,
     required this.scrappableId,
+    required this.targetTime,
     required this.testData,
   });
 
@@ -28,7 +32,7 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection>
     super.initState();
     final client = ref.read(clientProvider);
     final baseUrl = client.host.replaceAll('localhost:8080', 'localhost:8082');
-    
+
     code = buildCurl(
       baseUrl: baseUrl,
       scrappableId: widget.scrappableId,
@@ -45,11 +49,19 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection>
         message: 'Chat is loading...',
         child: Opacity(
           opacity: 0.6,
-          child: CodeBlock(code: code),
+          child: CodeBlock(
+            code: code,
+            leadingWidgets: [RemainingTimeIndicator(widget.targetTime)],
+            trailingWidgets: [DeployButton()],
+          ),
         ),
       );
     }
 
-    return CodeBlock(code: code);
+    return CodeBlock(
+      code: code,
+      leadingWidgets: [RemainingTimeIndicator(widget.targetTime)],
+      trailingWidgets: [DeployButton()],
+    );
   }
 }

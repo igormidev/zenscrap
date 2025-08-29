@@ -103,6 +103,7 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
       targetRequest: clonedRequest,
       referenceTestDataId: clonedTestData.id!,
       referenceTestData: clonedTestData,
+      category: sourceScrappable.category,
     );
 
     await Scrappable.db.insertRow(session, clonedScrappable);

@@ -16,6 +16,7 @@ fields:
   referenceTestDataId: int
   scrappableAnalytics: List<ScrappableAnalytics>?, relation(name=scrappable_analytics)
   referenceTestData: ReferenceTestData?, relation(name=test_scrappable, field=referenceTestDataId)
+  category: ScraperCategory
 indexes:
   scrappable_target_request_unique_idx:
     fields: targetRequestId

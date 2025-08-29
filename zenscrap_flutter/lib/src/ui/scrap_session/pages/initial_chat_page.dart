@@ -90,7 +90,7 @@ class _ChatViewPageState extends ConsumerState<ChatViewPage>
               key: _formKey,
               child: Column(
                 children: [
-                  SizedBox(height: 20),
+                  SizedBox(height: 40),
                   SizedBox(
                     height: 400,
                     child: Transform.scale(

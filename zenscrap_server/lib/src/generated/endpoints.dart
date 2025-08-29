@@ -25,9 +25,11 @@ import '../endpoints/public/scrappable_chat_session.dart' as _i13;
 import 'package:zenscrap_server/src/generated/entities/scrappable/scrappable.dart'
     as _i14;
 import 'package:uuid/uuid_value.dart' as _i15;
-import 'package:zenscrap_server/src/generated/entities/account/plan_tier.dart'
+import 'package:zenscrap_server/src/generated/entities/scrappable/scraper_category.dart'
     as _i16;
-import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i17;
+import 'package:zenscrap_server/src/generated/entities/account/plan_tier.dart'
+    as _i17;
+import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i18;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -457,6 +459,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<String>(),
               nullable: false,
             ),
+            'category': _i1.ParameterDescription(
+              name: 'category',
+              type: _i1.getType<_i16.ScraperCategory?>(),
+              nullable: true,
+            ),
           },
           call: (
             _i1.Session session,
@@ -467,6 +474,7 @@ class Endpoints extends _i1.EndpointDispatch {
             scrappableId: params['scrappableId'],
             name: params['name'],
             description: params['description'],
+            category: params['category'],
           ),
         )
       },
@@ -526,7 +534,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'planTier': _i1.ParameterDescription(
               name: 'planTier',
-              type: _i1.getType<_i16.PlanTier>(),
+              type: _i1.getType<_i17.PlanTier>(),
               nullable: false,
             ),
           },
@@ -676,6 +684,6 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
       },
     );
-    modules['serverpod_auth'] = _i17.Endpoints()..initializeEndpoints(server);
+    modules['serverpod_auth'] = _i18.Endpoints()..initializeEndpoints(server);
   }
 }

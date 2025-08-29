@@ -1,0 +1,37 @@
+enum: ScraperCategory
+values:
+  - general          # General-purpose or uncategorized scrapers
+  - fitness          # Health and fitness related
+  - sports           # Traditional sports data
+  - esports          # E-sports (competitive gaming)
+  - health           # Healthcare and medicine
+  - movies           # Movies and TV information
+  - jobs             # Job listings and employment
+  - finance          # Finance, banking, stock market
+  - location         # Location-based data, maps, geocoding
+  - science          # Science, research, academic data
+  - gaming           # Video games (general gaming info)
+  - travel           # Travel, tourism, hospitality
+  - social_media     # Social networks and social media platforms
+  - ecommerce        # E-commerce and online shopping
+  - news             # News and journalism sites
+  - weather          # Weather and climate data
+  - education        # Educational content and e-learning
+  - music            # Music, audio streaming, artist info
+  - books            # Books, literature, libraries
+  - comics           # Comics, manga
+  - anime            # Anime and animation
+  - real_estate      # Real estate, housing, property listings
+  - food             # Food, recipes, restaurants
+  - fashion          # Fashion, style, beauty
+  - security         # Cybersecurity, threat intelligence
+  - ai               # Artificial intelligence, ML tools
+  - seo              # SEO tools, search engine data
+  - lead_generation  # Lead generation, marketing data
+  - developer_tools  # Developer tools, general web scraping utilities
+  - automotive       # Automotive, vehicles, car listings
+  - government       # Government data, public records
+  - cryptocurrency   # Cryptocurrency and blockchain data
+  - images           # Image platforms or photography
+  - videos           # Video platforms (e.g. streaming, video sharing)
+  - other            # Other or uncategorized

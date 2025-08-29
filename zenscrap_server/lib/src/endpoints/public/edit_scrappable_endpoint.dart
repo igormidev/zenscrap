@@ -7,6 +7,7 @@ class EditScrappableEndpoint extends Endpoint {
     required String scrappableId,
     required String name,
     required String description,
+    ScraperCategory? category,
   }) async {
     // Get the authenticated user ID (might be null if not logged in)
     final userId = (await session.authenticated)?.userId;
@@ -95,6 +96,11 @@ class EditScrappableEndpoint extends Endpoint {
     // Update the scrappable
     scrappable.name = trimmedName;
     scrappable.description = trimmedDescription;
+    
+    // Update category if provided
+    if (category != null) {
+      scrappable.category = category;
+    }
 
     try {
       await Scrappable.db.updateRow(session, scrappable);

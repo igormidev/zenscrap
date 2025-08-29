@@ -7,7 +7,7 @@ set -e
 # Build the web app.
 cd zenscrap_flutter
 flutter pub get
-flutter build web --release
+flutter build web --wasm --release
 cd ..
 # Copy the build files into the web/app directory.
 rm -rf zenscrap_server/web/app

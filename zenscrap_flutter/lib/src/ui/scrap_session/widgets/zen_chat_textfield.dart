@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_validator/form_validator.dart';
@@ -7,7 +9,11 @@ import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_prov
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/zen_textfield.dart';
 
 class ZenChatTextfield extends ConsumerStatefulWidget {
-  const ZenChatTextfield({super.key});
+  final DateTime targetTime;
+  const ZenChatTextfield({
+    super.key,
+    required this.targetTime,
+  });
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -15,19 +21,31 @@ class ZenChatTextfield extends ConsumerStatefulWidget {
 }
 
 class _ZenChatTextfieldState extends ConsumerState<ZenChatTextfield> {
+  bool isEndpointTimeExpired = false;
   final TextEditingController _promptEC = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
+  Timer? _timer;
 
   @override
   void initState() {
     super.initState();
+    // Use targetTime
+    final Duration whenWillEnd = widget.targetTime.difference(DateTime.now());
+    _timer = Timer.periodic(whenWillEnd, (timer) {
+      if (mounted) {
+        setState(() {
+          isEndpointTimeExpired = true;
+        });
+      }
+    });
     _focusNode.addListener(_onFocusChange);
   }
 
   @override
   void dispose() {
+    _timer?.cancel();
     _focusNode.removeListener(_onFocusChange);
     _focusNode.dispose();
     _promptEC.dispose();
@@ -69,6 +87,7 @@ class _ZenChatTextfieldState extends ConsumerState<ZenChatTextfield> {
 
   @override
   Widget build(BuildContext context) {
+    // final isEndpointTimeExpired = widget.targetTime.isBefore(DateTime.now());
     return Form(
       key: _formKey,
       child: Row(
@@ -82,7 +101,7 @@ class _ZenChatTextfieldState extends ConsumerState<ZenChatTextfield> {
               hintText: '',
               minLines: 1,
               maxLines: 5,
-              enabled: !_isLoading,
+              enabled: !isEndpointTimeExpired && !_isLoading,
               onSubmitted: (_) => _sendMessage(),
               validator: ValidationBuilder()
                   .minLength(3, 'Message must be at least 3 characters')

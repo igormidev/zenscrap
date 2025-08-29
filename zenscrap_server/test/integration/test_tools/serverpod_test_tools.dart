@@ -29,14 +29,16 @@ import 'package:zenscrap_server/src/generated/entities/analytics/paginated_scrap
     as _i10;
 import 'package:zenscrap_server/src/generated/entities/analytics/paginated_scrappable_analytics.dart'
     as _i11;
-import 'package:zenscrap_server/src/generated/entities/marketplace/paginated_scrappable_response.dart'
+import 'package:zenscrap_server/src/generated/entities/scrappable/scraper_category.dart'
     as _i12;
-import 'package:zenscrap_server/src/generated/entities/account/plan_tier.dart'
+import 'package:zenscrap_server/src/generated/entities/marketplace/paginated_scrappable_response.dart'
     as _i13;
-import 'package:zenscrap_server/src/generated/entities/redraft_scrappable_session/create_session_response.dart'
+import 'package:zenscrap_server/src/generated/entities/account/plan_tier.dart'
     as _i14;
-import 'package:zenscrap_server/src/generated/entities/redraft_scrappable_session/chat_response.dart'
+import 'package:zenscrap_server/src/generated/entities/redraft_scrappable_session/create_session_response.dart'
     as _i15;
+import 'package:zenscrap_server/src/generated/entities/redraft_scrappable_session/chat_response.dart'
+    as _i16;
 import 'package:zenscrap_server/src/generated/protocol.dart';
 import 'package:zenscrap_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -791,6 +793,7 @@ class _EditScrappableEndpoint {
     required String scrappableId,
     required String name,
     required String description,
+    _i12.ScraperCategory? category,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -807,6 +810,7 @@ class _EditScrappableEndpoint {
             'scrappableId': scrappableId,
             'name': name,
             'description': description,
+            'category': category,
           }),
           serializationManager: _serializationManager,
         );
@@ -832,7 +836,7 @@ class _MarketplaceEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i12.PaginatedScrappableResponse> getItems(
+  _i3.Future<_i13.PaginatedScrappableResponse> getItems(
     _i1.TestSessionBuilder sessionBuilder, {
     required int page,
     required int pageSize,
@@ -859,7 +863,7 @@ class _MarketplaceEndpoint {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<_i12.PaginatedScrappableResponse>);
+        ) as _i3.Future<_i13.PaginatedScrappableResponse>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -882,7 +886,7 @@ class _PublicTierEndpoint {
     _i1.TestSessionBuilder sessionBuilder, {
     required String email,
     required String tierManipulationKey,
-    required _i13.PlanTier planTier,
+    required _i14.PlanTier planTier,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1003,7 +1007,7 @@ class _ScrappableChatSession {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i14.CreateSessionResponse> createSession(
+  _i3.Future<_i15.CreateSessionResponse> createSession(
     _i1.TestSessionBuilder sessionBuilder, {
     required _i5.Scrappable scrappable,
   }) async {
@@ -1024,7 +1028,7 @@ class _ScrappableChatSession {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<_i14.CreateSessionResponse>);
+        ) as _i3.Future<_i15.CreateSessionResponse>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1032,11 +1036,11 @@ class _ScrappableChatSession {
     });
   }
 
-  _i3.Stream<_i15.ChatResponse> listenToScrappableRedraftSession(
+  _i3.Stream<_i16.ChatResponse> listenToScrappableRedraftSession(
     _i1.TestSessionBuilder sessionBuilder, {
     required String sessionUuid,
   }) {
-    var _localTestStreamManager = _i1.TestStreamManager<_i15.ChatResponse>();
+    var _localTestStreamManager = _i1.TestStreamManager<_i16.ChatResponse>();
     _i1.callStreamFunctionAndHandleExceptions(
       () async {
         var _localUniqueSession =

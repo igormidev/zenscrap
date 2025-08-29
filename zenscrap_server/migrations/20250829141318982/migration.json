@@ -1,0 +1,190 @@
+{
+  "actions": [
+    {
+      "type": "deleteTable",
+      "deleteTable": "scrappable"
+    },
+    {
+      "type": "createTable",
+      "createTable": {
+        "name": "scrappable",
+        "dartName": "Scrappable",
+        "module": "zenscrap",
+        "schema": "public",
+        "columns": [
+          {
+            "name": "id",
+            "columnType": 7,
+            "isNullable": false,
+            "columnDefault": "gen_random_uuid()",
+            "dartType": "UuidValue"
+          },
+          {
+            "name": "accountId",
+            "columnType": 6,
+            "isNullable": true,
+            "dartType": "int?"
+          },
+          {
+            "name": "apiUsageOwnerNanoId",
+            "columnType": 0,
+            "isNullable": true,
+            "dartType": "String?"
+          },
+          {
+            "name": "createdAt",
+            "columnType": 4,
+            "isNullable": false,
+            "dartType": "DateTime"
+          },
+          {
+            "name": "name",
+            "columnType": 0,
+            "isNullable": false,
+            "dartType": "String"
+          },
+          {
+            "name": "description",
+            "columnType": 0,
+            "isNullable": false,
+            "dartType": "String"
+          },
+          {
+            "name": "isPrivate",
+            "columnType": 1,
+            "isNullable": false,
+            "dartType": "bool"
+          },
+          {
+            "name": "testEndpointAvailableUntil",
+            "columnType": 4,
+            "isNullable": true,
+            "dartType": "DateTime?"
+          },
+          {
+            "name": "scrappingRules",
+            "columnType": 0,
+            "isNullable": true,
+            "dartType": "String?"
+          },
+          {
+            "name": "isActive",
+            "columnType": 1,
+            "isNullable": false,
+            "dartType": "bool"
+          },
+          {
+            "name": "targetRequestId",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "int"
+          },
+          {
+            "name": "referenceTestDataId",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "int"
+          },
+          {
+            "name": "category",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "protocol:ScraperCategory"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "constraintName": "scrappable_fk_0",
+            "columns": [
+              "accountId"
+            ],
+            "referenceTable": "account_info",
+            "referenceTableSchema": "public",
+            "referenceColumns": [
+              "id"
+            ],
+            "onUpdate": 3,
+            "onDelete": 3
+          },
+          {
+            "constraintName": "scrappable_fk_1",
+            "columns": [
+              "targetRequestId"
+            ],
+            "referenceTable": "scrappable_target_request",
+            "referenceTableSchema": "public",
+            "referenceColumns": [
+              "id"
+            ],
+            "onUpdate": 3,
+            "onDelete": 3
+          },
+          {
+            "constraintName": "scrappable_fk_2",
+            "columns": [
+              "referenceTestDataId"
+            ],
+            "referenceTable": "scrappable_test_data",
+            "referenceTableSchema": "public",
+            "referenceColumns": [
+              "id"
+            ],
+            "onUpdate": 3,
+            "onDelete": 3
+          }
+        ],
+        "indexes": [
+          {
+            "indexName": "scrappable_pkey",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "id"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": true
+          },
+          {
+            "indexName": "scrappable_target_request_unique_idx",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "targetRequestId"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": false
+          },
+          {
+            "indexName": "scrappable_reference_test_data_unique_idx",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "referenceTestDataId"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": false
+          }
+        ],
+        "managed": true
+      }
+    }
+  ],
+  "warnings": [
+    {
+      "type": "tableDropped",
+      "message": "One or more columns are added to table \"scrappable\" which cannot be added in a table migration. The complete table will be deleted and recreated.",
+      "table": "scrappable",
+      "columns": [
+        "category"
+      ],
+      "destrucive": true
+    }
+  ],
+  "migrationApiVersion": 1
+}

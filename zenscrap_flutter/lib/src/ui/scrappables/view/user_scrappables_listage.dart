@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/src/core/mixins/edit_scrappable.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/scrappable_card_indicator.dart';
 import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables.dart';
 import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables_state.dart';
 import 'package:zenscrap_flutter/src/ui/scrappables/pages/empty_scrappable_listage_indicator_page.dart';
+import 'package:zenscrap_flutter/src/design_system/widgets/edit_scrappable_dialog.dart';
 
 class UserScrappablesListage extends ConsumerStatefulWidget {
   const UserScrappablesListage({super.key});
@@ -17,8 +19,8 @@ class UserScrappablesListage extends ConsumerStatefulWidget {
       _UserScrappablesListageState();
 }
 
-class _UserScrappablesListageState
-    extends ConsumerState<UserScrappablesListage> {
+class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
+    with EditScrappable {
   @override
   void initState() {
     super.initState();
@@ -76,11 +78,30 @@ class _UserScrappablesListageState
                 final scrappable = scrappables[index];
                 return ScrappableCardIndicator(
                   scrappable: scrappable,
-                  onEdit: () {
-                    context.push('/scrappable-form?id=${scrappable.id.toString()}');
+                  onEdit: () async {
+                    await showDialog<bool>(
+                      context: context,
+                      builder: (dialogContext) => EditScrappableDialog(
+                        scrappable: scrappable,
+                        onSave: (name, description, category) async {
+                          return onEditScrappable(
+                            scrappable,
+                            name,
+                            description,
+                            category,
+                            () {
+                              unawaited(ref
+                                  .read(userScrappables.notifier)
+                                  .getScrappables());
+                            },
+                          );
+                        },
+                      ),
+                    );
                   },
                   onTap: () {
-                    context.push('/scrappable-form?id=${scrappable.id.toString()}');
+                    context.push(
+                        '/scrappable-form?id=${scrappable.id.toString()}');
                   },
                 );
               },

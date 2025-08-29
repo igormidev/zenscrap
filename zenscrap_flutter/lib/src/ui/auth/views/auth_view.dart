@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 import 'package:serverpod_auth_email_flutter/serverpod_auth_email_flutter.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/src/core/mixins/edit_scrappable.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/contact_support_button.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
@@ -28,7 +29,7 @@ class AuthView extends ConsumerStatefulWidget {
 }
 
 class _AuthViewState extends ConsumerState<AuthView>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, EditScrappable {
   late final TabController _tabController = TabController(
     length: 3,
     vsync: this,
@@ -314,45 +315,20 @@ class _AuthViewState extends ConsumerState<AuthView>
       barrierDismissible: false,
       builder: (dialogContext) => EditScrappableDialog(
         scrappable: scrappable,
-        onSave: (name, description) async {
-          try {
-            final client = ref.read(clientProvider);
-            final success = await client.editScrappable.call(
-              scrappableId: scrappable.id.toString(),
-              name: name,
-              description: description,
-            );
-
-            if (success && mounted) {
+        onSave: (name, description, category) async {
+          return onEditScrappable(
+            scrappable,
+            name,
+            description,
+            category,
+            () {
               // Update the scrappable in the state provider
               ref.read(scrapChatProvider.notifier).updateScrappableDetails(
                     name: name,
                     description: description,
                   );
-
-              // Show success message
-              if (!context.mounted) return success;
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('Scrappable updated successfully'),
-                  backgroundColor: context.c.primary,
-                ),
-              );
-            }
-
-            return success;
-          } catch (e) {
-            if (mounted) {
-              if (!context.mounted) return false;
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Error: ${e.toString()}'),
-                  backgroundColor: context.c.error,
-                ),
-              );
-            }
-            return false;
-          }
+            },
+          );
         },
       ),
     );

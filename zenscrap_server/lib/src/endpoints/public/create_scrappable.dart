@@ -51,6 +51,7 @@ class CreateScrappableEndpoint extends Endpoint {
     late final Map<String, String> queryParams;
     late final List<String> pathParams;
     late final Map<String, String> referenceLinkPathParameters;
+    late final ScraperCategory category;
 
     final scrapingResult =
         await scrapingBee.fetchHtmlAndScreenshot(referenceLink);
@@ -93,6 +94,15 @@ class CreateScrappableEndpoint extends Endpoint {
           convertedData['referenceLinkPathParameters'] as Map? ?? {});
       rawRefLinkParams.remove('__example__');
       referenceLinkPathParameters = Map<String, String>.from(rawRefLinkParams);
+
+      // Parse the category from the AI response
+      final String categoryStr = convertedData['category'] as String? ?? 'general';
+      try {
+        category = ScraperCategory.values.byName(categoryStr);
+      } catch (e) {
+        // If the category doesn't match any enum value, default to general
+        category = ScraperCategory.general;
+      }
     } catch (error, stackTrace) {
       session.log('Error decoding JSON from Gemini AI response:\n$error',
           level: LogLevel.error, stackTrace: stackTrace);
@@ -147,6 +157,7 @@ class CreateScrappableEndpoint extends Endpoint {
           referenceTestDataId: referenceTestData.id!,
           referenceTestData: referenceTestData,
           targetRequest: targetRequest,
+          category: category,
         ),
         transaction: transaction,
       );
@@ -278,6 +289,49 @@ final createScrappableSchema = Schema(
               'This is just an example property to satisfy the schema requirement. The actual properties will be dynamic based on the URL path parameters.',
         ),
       },
+    ),
+    'category': Schema(
+      SchemaType.string,
+      nullable: false,
+      description:
+          'The category that best describes the purpose of this scrappable. Must be one of the predefined category values.',
+      enumValues: [
+        'general',
+        'fitness',
+        'sports',
+        'esports',
+        'health',
+        'movies',
+        'jobs',
+        'finance',
+        'location',
+        'science',
+        'gaming',
+        'travel',
+        'social_media',
+        'ecommerce',
+        'news',
+        'weather',
+        'education',
+        'music',
+        'books',
+        'comics',
+        'anime',
+        'real_estate',
+        'food',
+        'fashion',
+        'security',
+        'ai',
+        'seo',
+        'lead_generation',
+        'developer_tools',
+        'automotive',
+        'government',
+        'cryptocurrency',
+        'images',
+        'videos',
+        'other',
+      ],
     ),
   },
 );
