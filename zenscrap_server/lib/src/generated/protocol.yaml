@@ -22,6 +22,8 @@ privateUserScrappables:
   - getScrappableById:
 createScrappable:
   - call:
+deleteScrappable:
+  - call:
 editScrappable:
   - call:
 marketplace:

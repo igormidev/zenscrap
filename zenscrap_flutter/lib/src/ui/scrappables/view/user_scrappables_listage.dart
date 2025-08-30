@@ -10,6 +10,8 @@ import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables.dart';
 import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables_state.dart';
 import 'package:zenscrap_flutter/src/ui/scrappables/pages/empty_scrappable_listage_indicator_page.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/edit_scrappable_dialog.dart';
+import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
+import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
 
 class UserScrappablesListage extends ConsumerStatefulWidget {
   const UserScrappablesListage({super.key});
@@ -95,6 +97,35 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
                                   .getScrappables());
                             },
                           );
+                        },
+                        onDelete: () async {
+                          try {
+                            final client = ref.read(clientProvider);
+                            final success = await client.deleteScrappable.call(
+                              scrappableId: scrappable.id.toString(),
+                            );
+                            
+                            if (success) {
+                              // Refresh the scrappables list
+                              unawaited(ref.read(userScrappables.notifier).getScrappables());
+                              if (context.mounted) {
+                                showSnackbar(
+                                  context,
+                                  'Scrappable deleted successfully',
+                                );
+                              }
+                            }
+                            
+                            return success;
+                          } catch (e) {
+                            if (context.mounted) {
+                              showErrorSnackbar(
+                                context,
+                                'Failed to delete scrappable: ${e.toString()}',
+                              );
+                            }
+                            return false;
+                          }
                         },
                       ),
                     );

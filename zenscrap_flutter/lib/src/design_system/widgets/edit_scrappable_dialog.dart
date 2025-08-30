@@ -6,17 +6,20 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/scraper_category_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
+import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 
 class EditScrappableDialog extends ConsumerStatefulWidget {
   final Scrappable scrappable;
   final Future<bool> Function(
       String name, String description, ScraperCategory? category) onSave;
+  final Future<bool> Function()? onDelete;
 
   const EditScrappableDialog({
     super.key,
     required this.scrappable,
     required this.onSave,
+    this.onDelete,
   });
 
   @override
@@ -25,6 +28,63 @@ class EditScrappableDialog extends ConsumerStatefulWidget {
 }
 
 class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog> {
+  final ValueNotifier<bool> _isDeleting = ValueNotifier<bool>(false);
+
+  @override
+  void dispose() {
+    _isDeleting.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleDelete() async {
+    if (widget.onDelete == null) return;
+
+    await ref.globalLoadingSetter(() async {
+      // Show confirmation dialog
+      final shouldDelete = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: Text('Delete Scrappable'),
+          content: Text(
+              'Are you sure you want to delete "${widget.scrappable.name}"? This action cannot be undone.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              style: FilledButton.styleFrom(
+                backgroundColor: context.c.error,
+              ),
+              child: Text('Delete'),
+            ),
+          ],
+        ),
+      );
+
+      if (shouldDelete != true) return;
+
+      _isDeleting.value = true;
+      try {
+        final success = await widget.onDelete!();
+        if (success && mounted) {
+          context.pop();
+        } else if (mounted) {
+          showErrorSnackbar(context, 'Failed to delete scrappable');
+        }
+      } catch (e) {
+        if (mounted) {
+          showErrorSnackbar(context, 'Error: ${e.toString()}');
+        }
+      } finally {
+        if (mounted) {
+          _isDeleting.value = false;
+        }
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -122,19 +182,34 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog> {
             Row(
               children: [
                 SizedBox(width: 20),
-                CircleAvatar(
-                  backgroundColor: context.c.errorContainer,
-                  child: IconButton(
-                    tooltip: 'Delete scrappable',
-                    color: context.c.error,
-                    onPressed: () {
-                      // Add switch to hide/show
+                if (widget.onDelete != null)
+                  ValueListenableBuilder<bool>(
+                    valueListenable: _isDeleting,
+                    builder: (context, isDeleting, child) {
+                      return CircleAvatar(
+                        backgroundColor: isDeleting
+                            ? context.c.surfaceContainerHighest
+                            : context.c.errorContainer,
+                        child: isDeleting
+                            ? SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    context.c.onSurfaceVariant,
+                                  ),
+                                ),
+                              )
+                            : IconButton(
+                                tooltip: 'Delete scrappable',
+                                color: context.c.error,
+                                onPressed: _handleDelete,
+                                icon: Icon(Icons.delete),
+                              ),
+                      );
                     },
-                    icon: Icon(
-                      Icons.delete,
-                    ),
                   ),
-                ),
                 Spacer(),
                 FilledButton(
                   onPressed: () {
@@ -166,11 +241,13 @@ class ScrappableEditForm extends StatefulWidget {
   final Future<bool> Function(
       String name, String description, ScraperCategory? category) onSave;
   final bool shouldPopOnEnd;
+  final List<Widget> children;
   const ScrappableEditForm({
     super.key,
     required this.scrappable,
     required this.onSave,
     required this.shouldPopOnEnd,
+    this.children = const [],
   });
 
   @override
@@ -493,6 +570,13 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
                   ),
                 ),
               ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.1, end: 0),
+
+              ...widget.children.map(
+                (child) => child
+                    .animate()
+                    .fadeIn(delay: 200.ms)
+                    .slideX(begin: -0.1, end: 0),
+              ),
             ],
           ),
         )

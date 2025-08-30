@@ -13,10 +13,12 @@ class MarketplaceEndpoint extends Endpoint {
     
     // Build where clause  
     // Add search filter if query is provided
+    // Also filter out deleted scrappables
     final whereClause = searchQuery != null && searchQuery.isNotEmpty 
         ? (ScrappableTable t) => t.isPrivate.equals(false) & 
+            t.isDeleted.equals(false) &
             (t.name.ilike('%$searchQuery%') | t.description.ilike('%$searchQuery%'))
-        : (ScrappableTable t) => t.isPrivate.equals(false);
+        : (ScrappableTable t) => t.isPrivate.equals(false) & t.isDeleted.equals(false);
     
     // Get total count for pagination
     final totalCount = await Scrappable.db.count(

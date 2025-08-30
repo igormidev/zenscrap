@@ -170,6 +170,11 @@ mixin ApiHelperMixin {
       throw _noScrappableFound(scrappableId);
     }
 
+    // Check if scrappable is deleted
+    if (scrappable.isDeleted) {
+      throw _noScrappableFound(scrappableId);
+    }
+
     return (scrappable, targetRequest);
   }
 
