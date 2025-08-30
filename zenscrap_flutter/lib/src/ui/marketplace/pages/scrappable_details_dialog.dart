@@ -289,6 +289,25 @@ class _ScrappableDetailsDialogState
             ),
           ],
         ),
+        SizedBox(width: 32),
+        AlertDialog(
+          title: Text('Example Response'),
+          content: Builder(builder: (context) {
+            final String? result = widget.scrappable.referenceTestData
+                ?.scrappableTestResult?.extractJsonResult;
+
+            return SingleChildScrollView(
+              child: SelectableText(
+                result != null && result.isNotEmpty
+                    ? result
+                    : 'No example response available.',
+                style: context.t.bodyMedium?.copyWith(
+                  fontFamily: 'monospace',
+                ),
+              ),
+            );
+          }),
+        ),
       ],
     );
   }

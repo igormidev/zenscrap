@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
-import 'package:zenscrap_flutter/src/core/extensions/scraper_category_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/category_badge.dart';
 

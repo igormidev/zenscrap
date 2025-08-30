@@ -33,9 +33,13 @@ This prevents introducing bugs and maintains code quality standards.
 
 ### Widget Creation Guidelines
 
+#### ⚠️ CRITICAL: NEVER Create Functions That Return Widgets
+**ALWAYS use widget classes, 100% of the time. NO EXCEPTIONS.**
+
 #### ✅ DO: Use Widget Classes
 - Always create separate widget classes instead of functions that return widgets
 - This ensures proper widget lifecycle management and optimization
+- Every UI component must be a proper widget class (StatelessWidget, StatefulWidget, or ConsumerWidget)
 
 ```dart
 // GOOD - Widget class
