@@ -20,6 +20,7 @@ class ScrappableCardIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     final hasUrl = scrappable.targetRequest?.url != null;
     final url = scrappable.targetRequest?.url ?? '';
+    final willHideFromMarketplace = scrappable.willHideFromMarketplace;
 
     return InkWell(
       onTap: onTap,
@@ -196,16 +197,16 @@ class ScrappableCardIndicator extends StatelessWidget {
                         height: 6,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: !isNew
-                              ? Colors.green
-                              : Colors.orange,
+                          color: !isNew ? Colors.green : Colors.orange,
                         ),
                       ),
                       const SizedBox(width: 6),
                       Text(
                         isNew
                             ? 'This endpoint will be active and attached to your account after you sign In'
-                            : 'Active',
+                            : willHideFromMarketplace
+                                ? 'Not available in marketplace'
+                                : 'Available in marketplace',
                         style: context.t.labelSmall?.copyWith(
                           color: !isNew
                               ? Colors.green.shade700

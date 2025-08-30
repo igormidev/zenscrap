@@ -32,7 +32,7 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
 
     // Filter out deleted scrappables
     final scrappables = accountInfo.scrappables ?? <Scrappable>[];
-    return scrappables.where((s) => !s.isDeleted).toList();
+    return scrappables.where((s) => s.isDeleted != true).toList();
   }
 
   Future<Scrappable> getScrappableById(Session session, String scrappableId) async {
@@ -80,7 +80,7 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
     }
 
     // Check if scrappable is deleted
-    if (scrappable.isDeleted) {
+    if (scrappable.isDeleted == true) {
       throw ZenScrapException(
         title: 'Scrappable Not Found',
         description: 'The requested scrappable does not exist.',

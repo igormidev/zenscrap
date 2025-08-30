@@ -34,7 +34,7 @@ class DeleteScrappableEndpoint extends Endpoint {
     }
 
     // Check if already deleted
-    if (scrappable.isDeleted) {
+    if (scrappable.isDeleted == true) {
       throw ZenScrapException(
         title: 'Already Deleted',
         description: 'This scrappable has already been deleted.',

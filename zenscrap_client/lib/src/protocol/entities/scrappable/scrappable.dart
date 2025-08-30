@@ -31,7 +31,6 @@ abstract class Scrappable implements _i1.SerializableModel {
     this.scrappableAnalytics,
     this.referenceTestData,
     required this.category,
-    bool? isDeleted,
   })  : id = id ?? _i1.Uuid().v4obj(),
         isDeleted = isDeleted ?? false;
 
@@ -50,7 +49,6 @@ abstract class Scrappable implements _i1.SerializableModel {
     List<_i3.ScrappableAnalytics>? scrappableAnalytics,
     _i4.ReferenceTestData? referenceTestData,
     required _i5.ScraperCategory category,
-    bool? isDeleted,
   }) = _ScrappableImpl;
 
   factory Scrappable.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -85,7 +83,6 @@ abstract class Scrappable implements _i1.SerializableModel {
               (jsonSerialization['referenceTestData'] as Map<String, dynamic>)),
       category:
           _i5.ScraperCategory.fromJson((jsonSerialization['category'] as int)),
-      isDeleted: jsonSerialization['isDeleted'] as bool,
     );
   }
 
@@ -120,8 +117,6 @@ abstract class Scrappable implements _i1.SerializableModel {
 
   _i5.ScraperCategory category;
 
-  bool isDeleted;
-
   /// Returns a shallow copy of this [Scrappable]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
@@ -140,7 +135,6 @@ abstract class Scrappable implements _i1.SerializableModel {
     List<_i3.ScrappableAnalytics>? scrappableAnalytics,
     _i4.ReferenceTestData? referenceTestData,
     _i5.ScraperCategory? category,
-    bool? isDeleted,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -163,7 +157,6 @@ abstract class Scrappable implements _i1.SerializableModel {
       if (referenceTestData != null)
         'referenceTestData': referenceTestData?.toJson(),
       'category': category.toJson(),
-      'isDeleted': isDeleted,
     };
   }
 
@@ -191,7 +184,6 @@ class _ScrappableImpl extends Scrappable {
     List<_i3.ScrappableAnalytics>? scrappableAnalytics,
     _i4.ReferenceTestData? referenceTestData,
     required _i5.ScraperCategory category,
-    bool? isDeleted,
   }) : super._(
           id: id,
           createdAt: createdAt,
@@ -207,7 +199,6 @@ class _ScrappableImpl extends Scrappable {
           scrappableAnalytics: scrappableAnalytics,
           referenceTestData: referenceTestData,
           category: category,
-          isDeleted: isDeleted,
         );
 
   /// Returns a shallow copy of this [Scrappable]
@@ -229,7 +220,6 @@ class _ScrappableImpl extends Scrappable {
     Object? scrappableAnalytics = _Undefined,
     Object? referenceTestData = _Undefined,
     _i5.ScraperCategory? category,
-    bool? isDeleted,
   }) {
     return Scrappable(
       id: id ?? this.id,
@@ -256,7 +246,6 @@ class _ScrappableImpl extends Scrappable {
           ? referenceTestData
           : this.referenceTestData?.copyWith(),
       category: category ?? this.category,
-      isDeleted: isDeleted ?? this.isDeleted,
     );
   }
 }
