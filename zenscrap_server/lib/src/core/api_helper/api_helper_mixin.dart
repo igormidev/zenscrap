@@ -9,12 +9,14 @@ mixin ApiHelperMixin {
   static final Map<NanoId, PlanTier> _currentAccountPlanTierCache = {};
   static final Map<NanoId, int> _remainingSubscriptionCredits = {};
   static final Map<NanoId, int> _remainingPurchasedCredits = {};
+  static final Map<NanoId, List<ApiKey>> _apiKeysAttachedToNanoId = {};
 
   static void resetNanoId(NanoId nanoId) {
     _currentConcurrencyRequests.remove(nanoId);
     _currentAccountPlanTierCache.remove(nanoId);
     _remainingSubscriptionCredits.remove(nanoId);
     _remainingPurchasedCredits.remove(nanoId);
+    _apiKeysAttachedToNanoId.remove(nanoId);
   }
 
   Future<NanoId?> getNanoId(Session session, ApiKey? apikey) async {
@@ -41,6 +43,7 @@ mixin ApiHelperMixin {
     if (planTier == null) throw _invalidApiKey;
     if (cachePlanTier == PlanTier.none) throw _noActivePlan;
     _currentAccountPlanTierCache[nanoId] = planTier;
+    _apiKeysAttachedToNanoId[nanoId] ??= [apikey];
 
     return nanoId;
   }
@@ -207,6 +210,30 @@ mixin ApiHelperMixin {
     return extractRules;
   }
 
+  bool checkIdApiKeyExists(NanoId? nanoId, ApiKey? apiKey) {
+    return _apiKeysAttachedToNanoId[nanoId]?.contains(apiKey) ?? false;
+  }
+
+  Future<void> garanteeApiKeyExists(
+      Session session, NanoId? nanoId, ApiKey? apiKey) async {
+    final isTest = nanoId == null || apiKey == null;
+    if (isTest) return;
+
+    final accountApiUsage = await AccountApiUsage.db.findFirstRow(
+      session,
+      where: (p0) =>
+          p0.nanoId.equals(nanoId) &
+          p0.apiKeys.any(
+              (key) => key.apiKey.equals(apiKey) & key.isActive.equals(true)),
+    );
+
+    if (accountApiUsage == null) {
+      throw _apiKeyNotFound(apiKey);
+    } else {
+      _apiKeysAttachedToNanoId[nanoId] ??= [apiKey];
+    }
+  }
+
   Future<T> wrapAnalytics<T>(
     Session session,
     ApiKey? apiKey,
@@ -215,15 +242,18 @@ mixin ApiHelperMixin {
         call,
   ) async {
     Scrappable? scrappable;
-    final NanoId? concurrencyId = await getNanoId(session, apiKey);
-    increaseConcurrency(apiKey);
+    final NanoId? nanoId = await getNanoId(session, apiKey);
+    increaseConcurrency(nanoId);
+    final doesApiKeyExists = checkIdApiKeyExists(nanoId, apiKey);
+    // Will throw if not exists and cache result if exist so new calls to db are not needed each time
+    if (!doesApiKeyExists) await garanteeApiKeyExists(session, nanoId, apiKey);
+
     try {
       return await call((s) {
         scrappable = s;
-      }, concurrencyId);
+      }, nanoId);
     } on _ApiError catch (error, stackTrace) {
-      await _setScrappable(
-          session, scrappable, error.status, apiKey, concurrencyId);
+      await _setScrappable(session, scrappable, error.status, apiKey, nanoId);
       session.log(
         '[${error.status.name.toUpperCase()}] ${_noApiFound.exception.title}',
         exception: error.exception,
@@ -232,8 +262,8 @@ mixin ApiHelperMixin {
       );
       throw error.exception;
     } catch (error, stackTrace) {
-      await _setScrappable(session, scrappable, RequestStatus.serverError,
-          apiKey, concurrencyId);
+      await _setScrappable(
+          session, scrappable, RequestStatus.serverError, apiKey, nanoId);
       session.log(
         'An unknown error occurred in api',
         exception: error,
@@ -246,7 +276,7 @@ mixin ApiHelperMixin {
         description: 'An unexpected error occurred: ${error.toString()}',
       );
     } finally {
-      decreaseConcurrency(concurrencyId);
+      decreaseConcurrency(nanoId);
     }
   }
 
@@ -281,6 +311,16 @@ mixin ApiHelperMixin {
   }
 }
 
+_ApiError _apiKeyNotFound(ApiKey apiKey) => _ApiError(
+      RequestStatus.clientError,
+      ZenScrapException(
+        title: 'Valid API Key Not Found',
+        description:
+            'There is no active API key matching the provided value: $apiKey.\n'
+            'It could be that the key was deleted or deactivated - check in your api key tab on ZenScrap site.',
+      ),
+    );
+
 final _testPeriodExpired = _ApiError(
   RequestStatus.clientError,
   ZenScrapException(
@@ -292,7 +332,6 @@ You can:
 - Call the production endpoint with a valid API key if you have an account''',
   ),
 );
-
 final _noApiFound = _ApiError(
   RequestStatus.clientError,
   ZenScrapException(
