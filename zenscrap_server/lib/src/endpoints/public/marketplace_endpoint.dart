@@ -1,12 +1,17 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
+typedef ScrappableId = String;
+final Map<ScrappableId, DateTime> _usageCountDateCache = {};
+final Map<ScrappableId, int> _usageCountCache = {};
+
 class MarketplaceEndpoint extends Endpoint {
   Future<PaginatedScrappableResponse> getItems(
     Session session, {
     int page = 1,
     String? searchQuery,
   }) async {
+    final now = DateTime.now();
     const int pageSize = 20;
 
     // Ensure page is at least 1
@@ -41,7 +46,7 @@ class MarketplaceEndpoint extends Endpoint {
     // Calculate offset
     final offset = (page - 1) * pageSize;
 
-    final sevenDaysAgo = DateTime.now().subtract(const Duration(days: 7));
+    final sevenDaysAgo = now.subtract(const Duration(days: 7));
 
     // Fetch paginated data
     final scrappables = await Scrappable.db.find(
@@ -63,8 +68,41 @@ class MarketplaceEndpoint extends Endpoint {
       ),
     );
 
+    final List<MarketPlacePaginatedItem> items = [];
+
+    for (final Scrappable scrappable in scrappables) {
+      int? count;
+
+      final DateTime? dataCache =
+          _usageCountDateCache[scrappable.id.toString()];
+
+      final bool isCacheOutdated = dataCache == null ||
+          dataCache.isBefore(now.subtract(const Duration(hours: 2)));
+      if (isCacheOutdated == false) {
+        final int? usageCount = _usageCountCache[scrappable.id.toString()];
+        count = usageCount;
+      }
+
+      if (count == null) {
+        count = await ScrappableAnalytics.db.count(
+          session,
+          where: (ScrappableAnalyticsTable t) =>
+              t.scrappableId.equals(scrappable.id) &
+              (t.requestedAt >= sevenDaysAgo) &
+              (t.requestStatus.equals(RequestStatus.success)),
+        );
+        _usageCountCache[scrappable.id.toString()] = count;
+        _usageCountDateCache[scrappable.id.toString()] = now;
+      }
+
+      items.add(MarketPlacePaginatedItem(
+        scrappable: scrappable,
+        usageCount: count,
+      ));
+    }
+
     return PaginatedScrappableResponse(
-      data: scrappables,
+      data: items,
       pagination: PaginationMetadata(
         currentPage: page,
         pageSize: pageSize,

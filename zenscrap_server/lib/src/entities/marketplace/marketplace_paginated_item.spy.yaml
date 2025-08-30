@@ -1,0 +1,4 @@
+class: MarketPlacePaginatedItem
+fields:
+  scrappable: Scrappable
+  usageCount: int

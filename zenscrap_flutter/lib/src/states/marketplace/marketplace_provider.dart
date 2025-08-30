@@ -30,7 +30,6 @@ class MarketplaceNotifier extends StateNotifier<MarketplaceState> {
 
       final response = await _client.marketplace.getItems(
         page: page,
-        pageSize: 20,
         searchQuery: searchQuery.isNotEmpty ? searchQuery : null,
       );
 

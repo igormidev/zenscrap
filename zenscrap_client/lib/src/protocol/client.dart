@@ -285,7 +285,6 @@ class EndpointMarketplace extends _i1.EndpointRef {
 
   _i2.Future<_i12.PaginatedScrappableResponse> getItems({
     required int page,
-    required int pageSize,
     String? searchQuery,
   }) =>
       caller.callServerEndpoint<_i12.PaginatedScrappableResponse>(
@@ -293,7 +292,6 @@ class EndpointMarketplace extends _i1.EndpointRef {
         'getItems',
         {
           'page': page,
-          'pageSize': pageSize,
           'searchQuery': searchQuery,
         },
       );

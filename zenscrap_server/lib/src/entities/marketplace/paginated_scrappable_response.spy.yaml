@@ -1,4 +1,4 @@
 class: PaginatedScrappableResponse
 fields:
-  data: List<Scrappable>
+  data: List<MarketPlacePaginatedItem>
   pagination: PaginationMetadata

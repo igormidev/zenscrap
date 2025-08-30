@@ -72,11 +72,16 @@ class _MarketplaceViewState extends ConsumerState<MarketplaceView>
                         right: 20,
                       ),
                       itemBuilder: (context, index) {
-                        final scrappable = response.data[index];
+                        final MarketPlacePaginatedItem marketPlaceItem =
+                            response.data[index];
+                        // final scrappable = response.data[index];
+
                         return MarketplaceScrappableCard(
-                          scrappable: scrappable,
+                          scrappable: marketPlaceItem.scrappable,
+                          usedCount: marketPlaceItem.usageCount,
                           onTap: () {
-                            _showScrappableDetails(context, scrappable);
+                            _showScrappableDetails(
+                                context, marketPlaceItem.scrappable);
                           },
                         );
                       },

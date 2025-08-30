@@ -887,7 +887,6 @@ class _MarketplaceEndpoint {
   _i3.Future<_i13.PaginatedScrappableResponse> getItems(
     _i1.TestSessionBuilder sessionBuilder, {
     required int page,
-    required int pageSize,
     String? searchQuery,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
@@ -903,7 +902,6 @@ class _MarketplaceEndpoint {
           methodName: 'getItems',
           parameters: _i1.testObjectToJson({
             'page': page,
-            'pageSize': pageSize,
             'searchQuery': searchQuery,
           }),
           serializationManager: _serializationManager,

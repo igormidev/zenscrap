@@ -1,0 +1,82 @@
+/* AUTOMATICALLY GENERATED CODE DO NOT MODIFY */
+/*   To generate run: "serverpod generate"    */
+
+// ignore_for_file: implementation_imports
+// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: public_member_api_docs
+// ignore_for_file: type_literal_in_constant_pattern
+// ignore_for_file: use_super_parameters
+
+// ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:serverpod_client/serverpod_client.dart' as _i1;
+import '../../entities/scrappable/scrappable.dart' as _i2;
+
+abstract class MarketPlacePaginatedItem implements _i1.SerializableModel {
+  MarketPlacePaginatedItem._({
+    required this.scrappable,
+    required this.usageCount,
+  });
+
+  factory MarketPlacePaginatedItem({
+    required _i2.Scrappable scrappable,
+    required int usageCount,
+  }) = _MarketPlacePaginatedItemImpl;
+
+  factory MarketPlacePaginatedItem.fromJson(
+      Map<String, dynamic> jsonSerialization) {
+    return MarketPlacePaginatedItem(
+      scrappable: _i2.Scrappable.fromJson(
+          (jsonSerialization['scrappable'] as Map<String, dynamic>)),
+      usageCount: jsonSerialization['usageCount'] as int,
+    );
+  }
+
+  _i2.Scrappable scrappable;
+
+  int usageCount;
+
+  /// Returns a shallow copy of this [MarketPlacePaginatedItem]
+  /// with some or all fields replaced by the given arguments.
+  @_i1.useResult
+  MarketPlacePaginatedItem copyWith({
+    _i2.Scrappable? scrappable,
+    int? usageCount,
+  });
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      'scrappable': scrappable.toJson(),
+      'usageCount': usageCount,
+    };
+  }
+
+  @override
+  String toString() {
+    return _i1.SerializationManager.encode(this);
+  }
+}
+
+class _MarketPlacePaginatedItemImpl extends MarketPlacePaginatedItem {
+  _MarketPlacePaginatedItemImpl({
+    required _i2.Scrappable scrappable,
+    required int usageCount,
+  }) : super._(
+          scrappable: scrappable,
+          usageCount: usageCount,
+        );
+
+  /// Returns a shallow copy of this [MarketPlacePaginatedItem]
+  /// with some or all fields replaced by the given arguments.
+  @_i1.useResult
+  @override
+  MarketPlacePaginatedItem copyWith({
+    _i2.Scrappable? scrappable,
+    int? usageCount,
+  }) {
+    return MarketPlacePaginatedItem(
+      scrappable: scrappable ?? this.scrappable.copyWith(),
+      usageCount: usageCount ?? this.usageCount,
+    );
+  }
+}

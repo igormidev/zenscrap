@@ -529,11 +529,6 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<int>(),
               nullable: false,
             ),
-            'pageSize': _i1.ParameterDescription(
-              name: 'pageSize',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
             'searchQuery': _i1.ParameterDescription(
               name: 'searchQuery',
               type: _i1.getType<String?>(),
@@ -547,7 +542,6 @@ class Endpoints extends _i1.EndpointDispatch {
               (endpoints['marketplace'] as _i11.MarketplaceEndpoint).getItems(
             session,
             page: params['page'],
-            pageSize: params['pageSize'],
             searchQuery: params['searchQuery'],
           ),
         )

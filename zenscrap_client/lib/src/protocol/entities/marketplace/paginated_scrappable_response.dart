@@ -10,7 +10,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
-import '../../entities/scrappable/scrappable.dart' as _i2;
+import '../../entities/marketplace/marketplace_paginated_item.dart' as _i2;
 import '../../entities/marketplace/pagination_metadata.dart' as _i3;
 
 abstract class PaginatedScrappableResponse implements _i1.SerializableModel {
@@ -20,7 +20,7 @@ abstract class PaginatedScrappableResponse implements _i1.SerializableModel {
   });
 
   factory PaginatedScrappableResponse({
-    required List<_i2.Scrappable> data,
+    required List<_i2.MarketPlacePaginatedItem> data,
     required _i3.PaginationMetadata pagination,
   }) = _PaginatedScrappableResponseImpl;
 
@@ -28,14 +28,15 @@ abstract class PaginatedScrappableResponse implements _i1.SerializableModel {
       Map<String, dynamic> jsonSerialization) {
     return PaginatedScrappableResponse(
       data: (jsonSerialization['data'] as List)
-          .map((e) => _i2.Scrappable.fromJson((e as Map<String, dynamic>)))
+          .map((e) => _i2.MarketPlacePaginatedItem.fromJson(
+              (e as Map<String, dynamic>)))
           .toList(),
       pagination: _i3.PaginationMetadata.fromJson(
           (jsonSerialization['pagination'] as Map<String, dynamic>)),
     );
   }
 
-  List<_i2.Scrappable> data;
+  List<_i2.MarketPlacePaginatedItem> data;
 
   _i3.PaginationMetadata pagination;
 
@@ -43,7 +44,7 @@ abstract class PaginatedScrappableResponse implements _i1.SerializableModel {
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   PaginatedScrappableResponse copyWith({
-    List<_i2.Scrappable>? data,
+    List<_i2.MarketPlacePaginatedItem>? data,
     _i3.PaginationMetadata? pagination,
   });
   @override
@@ -62,7 +63,7 @@ abstract class PaginatedScrappableResponse implements _i1.SerializableModel {
 
 class _PaginatedScrappableResponseImpl extends PaginatedScrappableResponse {
   _PaginatedScrappableResponseImpl({
-    required List<_i2.Scrappable> data,
+    required List<_i2.MarketPlacePaginatedItem> data,
     required _i3.PaginationMetadata pagination,
   }) : super._(
           data: data,
@@ -74,7 +75,7 @@ class _PaginatedScrappableResponseImpl extends PaginatedScrappableResponse {
   @_i1.useResult
   @override
   PaginatedScrappableResponse copyWith({
-    List<_i2.Scrappable>? data,
+    List<_i2.MarketPlacePaginatedItem>? data,
     _i3.PaginationMetadata? pagination,
   }) {
     return PaginatedScrappableResponse(
