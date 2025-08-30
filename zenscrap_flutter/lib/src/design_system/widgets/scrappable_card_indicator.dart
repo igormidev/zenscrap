@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/scraper_category_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/widgets/category_badge.dart';
 
 class ScrappableCardIndicator extends StatelessWidget {
   final bool isNew;
@@ -41,66 +42,41 @@ class ScrappableCardIndicator extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: context.c.primary.withAlpha(26),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    scrappable.category.icon,
-                    color: context.c.primary,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 16),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              scrappable.name,
-                              style: context.t.titleLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: context.c.onSurface,
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          if (onEdit != null) ...[
-                            InkWell(
-                              onTap: onEdit,
-                              hoverColor: context.c.primaryContainer,
-                              child: Icon(
-                                Icons.edit,
-                                size: 26,
-                                color: context.c.primary,
-                              ),
-                            ),
-                            SizedBox(width: 4),
-                          ],
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        scrappable.description,
-                        style: context.t.bodyMedium?.copyWith(
-                          color: context.c.onSurfaceVariant,
-                          height: 1.4,
-                        ),
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+                  child: Text(
+                    scrappable.name,
+                    style: context.t.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: context.c.onSurface,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
+                if (onEdit != null) ...[
+                  InkWell(
+                    onTap: onEdit,
+                    hoverColor: context.c.primaryContainer,
+                    child: Icon(
+                      Icons.edit,
+                      size: 26,
+                      color: context.c.primary,
+                    ),
+                  ),
+                  SizedBox(width: 4),
+                ],
               ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              scrappable.description,
+              style: context.t.bodyMedium?.copyWith(
+                color: context.c.onSurfaceVariant,
+                height: 1.4,
+              ),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
             ),
             if (hasUrl) ...[
               const SizedBox(height: 16),
@@ -144,38 +120,7 @@ class ScrappableCardIndicator extends StatelessWidget {
             Row(
               children: [
                 // Category badge
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: context.c.primaryContainer.withAlpha(51),
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(
-                      color: context.c.primary.withAlpha(51),
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        scrappable.category.icon,
-                        size: 14,
-                        color: context.c.primary,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        scrappable.category.displayName,
-                        style: context.t.labelSmall?.copyWith(
-                          color: context.c.primary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                CategoryBadge(scrappable: scrappable),
                 const SizedBox(width: 8),
                 // Status badge
                 Container(

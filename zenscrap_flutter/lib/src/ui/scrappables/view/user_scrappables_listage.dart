@@ -73,7 +73,7 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
               itemCount: scrappables.length,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: optimalCrossAxisCount,
-                mainAxisExtent: 240,
+                mainAxisExtent: 200,
                 crossAxisSpacing: 20,
                 mainAxisSpacing: 20,
               ),
@@ -87,7 +87,8 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
                       context: context,
                       builder: (dialogContext) => EditScrappableDialog(
                         scrappable: scrappable,
-                        onSave: (name, description, category, willHideFromMarketplace) async {
+                        onSave: (name, description, category,
+                            willHideFromMarketplace) async {
                           return onEditScrappable(
                             scrappable,
                             name,
@@ -103,14 +104,18 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
                         },
                         onDelete: () async {
                           final client = ref.read(clientProvider);
-                          final result = await client.deleteScrappable.call(
-                            scrappableId: scrappable.id.toString(),
-                          ).toResult;
-                          
+                          final result = await client.deleteScrappable
+                              .call(
+                                scrappableId: scrappable.id.toString(),
+                              )
+                              .toResult;
+
                           return result.fold(
                             (success) {
                               // Refresh the scrappables list
-                              unawaited(ref.read(userScrappables.notifier).getScrappables());
+                              unawaited(ref
+                                  .read(userScrappables.notifier)
+                                  .getScrappables());
                               if (context.mounted) {
                                 showSnackbar(
                                   context,
@@ -130,9 +135,6 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
                       ),
                     );
                   },
-                  // onTap: () {
-                  //   context.push('/scrappable-form?id=${scrappable.id.toString()}');
-                  // },
                 );
               },
             );

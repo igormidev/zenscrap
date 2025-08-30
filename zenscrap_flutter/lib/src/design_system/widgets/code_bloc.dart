@@ -31,7 +31,7 @@ class CodeBlock extends StatelessWidget {
         }
       },
     );
-    final bool hasLeading = leadingWidgets?.isNotEmpty ?? true;
+    final bool hasLeading = leadingWidgets?.isNotEmpty ?? false;
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
