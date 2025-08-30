@@ -150,6 +150,7 @@ class CreateScrappableEndpoint extends Endpoint {
           name: name,
           description: description,
           createdAt: DateTime.now(),
+          isDeleted: false,
           willHideFromMarketplace: false,
           accountId: accountApiUsage?.accountInfo?.id,
           apiUsageOwnerNanoId: accountApiUsage?.nanoId,

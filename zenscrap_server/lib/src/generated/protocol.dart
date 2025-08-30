@@ -587,9 +587,8 @@ class Protocol extends _i1.SerializationManagerServer {
         _i2.ColumnDefinition(
           name: 'isDeleted',
           columnType: _i2.ColumnType.boolean,
-          isNullable: true,
-          dartType: 'bool?',
-          columnDefault: 'false',
+          isNullable: false,
+          dartType: 'bool',
         ),
       ],
       foreignKeys: [
