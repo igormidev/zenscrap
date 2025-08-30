@@ -98,7 +98,7 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
       isPrivate: true, // Cloned scrappables start as private
       testEndpointAvailableUntil: null,
       scrappingRules: sourceScrappable.scrappingRules,
-      isActive: true,
+      willHideFromMarketplace: false,
       targetRequestId: clonedRequest.id!,
       targetRequest: clonedRequest,
       referenceTestDataId: clonedTestData.id!,

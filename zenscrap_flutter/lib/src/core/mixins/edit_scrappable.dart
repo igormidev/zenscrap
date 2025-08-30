@@ -14,6 +14,7 @@ mixin EditScrappable<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     String name,
     String description,
     ScraperCategory? category,
+    bool? willHideFromMarketplace,
     void Function() onSuccess,
   ) async {
     final client = ref.read(clientProvider);
@@ -23,6 +24,7 @@ mixin EditScrappable<T extends ConsumerStatefulWidget> on ConsumerState<T> {
           name: name,
           description: description,
           category: category,
+          willHideFromMarketplace: willHideFromMarketplace,
         )
         .toResult;
 

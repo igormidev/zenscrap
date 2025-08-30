@@ -315,12 +315,13 @@ class _AuthViewState extends ConsumerState<AuthView>
       barrierDismissible: false,
       builder: (dialogContext) => EditScrappableDialog(
         scrappable: scrappable,
-        onSave: (name, description, category) async {
+        onSave: (name, description, category, willHideFromMarketplace) async {
           return onEditScrappable(
             scrappable,
             name,
             description,
             category,
+            willHideFromMarketplace,
             () {
               // Update the scrappable in the state provider
               ref.read(scrapChatProvider.notifier).updateScrappableDetails(

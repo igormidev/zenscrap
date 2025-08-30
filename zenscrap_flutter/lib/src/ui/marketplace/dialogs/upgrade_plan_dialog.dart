@@ -6,18 +6,17 @@ import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
 
-class UpgradePlanDialog extends ConsumerStatefulWidget {
+class _UpgradePlanDialog extends ConsumerStatefulWidget {
   final String mainCTAText;
-  const UpgradePlanDialog({
-    super.key,
+  const _UpgradePlanDialog({
     required this.mainCTAText,
   });
 
   @override
-  ConsumerState<UpgradePlanDialog> createState() => _UpgradePlanDialogState();
+  ConsumerState<_UpgradePlanDialog> createState() => _UpgradePlanDialogState();
 }
 
-class _UpgradePlanDialogState extends ConsumerState<UpgradePlanDialog> {
+class _UpgradePlanDialogState extends ConsumerState<_UpgradePlanDialog> {
   bool _isLoadingPortal = false;
 
   Future<void> _openCustomerPortal() async {
@@ -404,6 +403,154 @@ class _RefreshAfterUpgradeDialog extends ConsumerWidget {
           label: const Text('Refresh Account'),
         ),
       ],
+    );
+  }
+}
+
+// Public wrapper functions for showing upgrade dialogs with explanations
+
+/// Shows upgrade dialog for cloning marketplace scrappables
+Future<void> showCloneUpgradeDialog(BuildContext context) async {
+  final result = await showDialog<bool>(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      icon: Icon(
+        Icons.copy_all_rounded,
+        size: 48,
+        color: context.c.primary,
+      ),
+      title: const Text('Clone Marketplace Scrappables'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'This feature allows you to instantly copy any marketplace scrappable to your collection and customize it to your needs.',
+            style: context.t.bodyMedium,
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: context.c.primaryContainer.withAlpha(51),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: context.c.primary.withAlpha(77),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.info_outline_rounded,
+                  color: context.c.primary,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Requires Unlimited Plan (\$500/month)',
+                    style: context.t.bodySmall?.copyWith(
+                      color: context.c.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(dialogContext).pop(false),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(dialogContext).pop(true),
+          child: const Text('View Upgrade Options'),
+        ),
+      ],
+    ),
+  );
+
+  if (result == true && context.mounted) {
+    await showDialog(
+      context: context,
+      builder: (context) => const _UpgradePlanDialog(
+        mainCTAText: 'Get instant access to clone and customize any marketplace scrappable. Build on proven solutions instead of starting from scratch.',
+      ),
+    );
+  }
+}
+
+/// Shows upgrade dialog for hiding scrappables from marketplace
+Future<void> showHideFromMarketplaceUpgradeDialog(BuildContext context) async {
+  final result = await showDialog<bool>(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      icon: Icon(
+        Icons.visibility_off_rounded,
+        size: 48,
+        color: context.c.primary,
+      ),
+      title: const Text('Hide from Marketplace'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'Control the visibility of your scrappables in the marketplace. Keep your proprietary solutions private while still accessible via API.',
+            style: context.t.bodyMedium,
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: context.c.primaryContainer.withAlpha(51),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: context.c.primary.withAlpha(77),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.workspace_premium_rounded,
+                  color: context.c.primary,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Unlimited Plan Exclusive Feature',
+                    style: context.t.bodySmall?.copyWith(
+                      color: context.c.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(dialogContext).pop(false),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(dialogContext).pop(true),
+          child: const Text('Upgrade to Unlimited'),
+        ),
+      ],
+    ),
+  );
+
+  if (result == true && context.mounted) {
+    await showDialog(
+      context: context,
+      builder: (context) => const _UpgradePlanDialog(
+        mainCTAText: 'Unlock the ability to hide your scrappables from the marketplace while keeping them fully accessible through your API.',
+      ),
     );
   }
 }

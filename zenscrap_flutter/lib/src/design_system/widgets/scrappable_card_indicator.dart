@@ -183,7 +183,7 @@ class ScrappableCardIndicator extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: scrappable.isActive && !isNew
+                    color: !isNew
                         ? Colors.green.withAlpha(26)
                         : Colors.orange.withAlpha(26),
                     borderRadius: BorderRadius.circular(6),
@@ -196,7 +196,7 @@ class ScrappableCardIndicator extends StatelessWidget {
                         height: 6,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: scrappable.isActive && !isNew
+                          color: !isNew
                               ? Colors.green
                               : Colors.orange,
                         ),
@@ -205,9 +205,9 @@ class ScrappableCardIndicator extends StatelessWidget {
                       Text(
                         isNew
                             ? 'This endpoint will be active and attached to your account after you sign In'
-                            : (scrappable.isActive ? 'Active' : 'Inactive'),
+                            : 'Active',
                         style: context.t.labelSmall?.copyWith(
-                          color: scrappable.isActive && !isNew
+                          color: !isNew
                               ? Colors.green.shade700
                               : Colors.orange.shade700,
                           fontWeight: FontWeight.w600,

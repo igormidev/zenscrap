@@ -261,6 +261,7 @@ class EndpointEditScrappable extends _i1.EndpointRef {
     required String name,
     required String description,
     _i11.ScraperCategory? category,
+    bool? willHideFromMarketplace,
   }) =>
       caller.callServerEndpoint<bool>(
         'editScrappable',
@@ -270,6 +271,7 @@ class EndpointEditScrappable extends _i1.EndpointRef {
           'name': name,
           'description': description,
           'category': category,
+          'willHideFromMarketplace': willHideFromMarketplace,
         },
       );
 }

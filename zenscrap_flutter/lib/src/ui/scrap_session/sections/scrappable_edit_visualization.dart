@@ -34,12 +34,13 @@ class _ScrappableEditVisualizationState
       child: ScrappableEditForm(
         scrappable: widget.scrappable,
         shouldPopOnEnd: false,
-        onSave: (name, description, category) async {
+        onSave: (name, description, category, willHideFromMarketplace) async {
           return onEditScrappable(
             widget.scrappable,
             name,
             description,
             category,
+            willHideFromMarketplace,
             () {
               // Update the scrappable in the state provider
               ref.read(scrapChatProvider.notifier).updateScrappableDetails(

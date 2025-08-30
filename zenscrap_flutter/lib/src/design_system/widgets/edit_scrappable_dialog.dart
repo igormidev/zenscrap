@@ -7,11 +7,14 @@ import 'package:zenscrap_flutter/src/core/extensions/scraper_category_extension.
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
+import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
+import 'package:zenscrap_flutter/src/states/account/account_state.dart';
+import 'package:zenscrap_flutter/src/ui/marketplace/dialogs/upgrade_plan_dialog.dart';
 
 class EditScrappableDialog extends ConsumerStatefulWidget {
   final Scrappable scrappable;
   final Future<bool> Function(
-      String name, String description, ScraperCategory? category) onSave;
+      String name, String description, ScraperCategory? category, bool? willHideFromMarketplace) onSave;
   final Future<bool> Function()? onDelete;
 
   const EditScrappableDialog({
@@ -159,9 +162,24 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog> {
             ).animate().fadeIn(duration: 200.ms).slideY(begin: -0.1, end: 0),
 
             ScrappableEditForm(
+              key: ValueKey('edit_form_${widget.scrappable.id}'),
               scrappable: widget.scrappable,
               onSave: widget.onSave,
               shouldPopOnEnd: true,
+              children: [
+                Builder(
+                  builder: (context) {
+                    // Get the form state to access the setWillHideFromMarketplace method
+                    final formState = context.findAncestorStateOfType<_ScrappableEditFormState>();
+                    if (formState == null) return const SizedBox.shrink();
+                    
+                    return HideFromMarketplaceToggle(
+                      initialValue: widget.scrappable.willHideFromMarketplace,
+                      onChanged: formState.setWillHideFromMarketplace,
+                    );
+                  },
+                ),
+              ],
             ),
 
             Transform.translate(
@@ -236,7 +254,7 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog> {
 class ScrappableEditForm extends StatefulWidget {
   final Scrappable scrappable;
   final Future<bool> Function(
-      String name, String description, ScraperCategory? category) onSave;
+      String name, String description, ScraperCategory? category, bool? willHideFromMarketplace) onSave;
   final bool shouldPopOnEnd;
   final List<Widget> children;
   const ScrappableEditForm({
@@ -257,7 +275,9 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
   late String _initialName;
   late String _initialDescription;
   late ScraperCategory _initialCategory;
+  late bool _initialWillHideFromMarketplace;
   ScraperCategory? _selectedCategory;
+  bool? _willHideFromMarketplace;
   bool _isLoading = false;
   bool _hasChanges = false;
 
@@ -267,7 +287,9 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
     _initialName = widget.scrappable.name;
     _initialDescription = widget.scrappable.description;
     _initialCategory = widget.scrappable.category;
+    _initialWillHideFromMarketplace = widget.scrappable.willHideFromMarketplace;
     _selectedCategory = _initialCategory;
+    _willHideFromMarketplace = _initialWillHideFromMarketplace;
     _nameController = TextEditingController(text: _initialName);
     _descriptionController = TextEditingController(text: _initialDescription);
     _nameController.addListener(_checkForChanges);
@@ -286,13 +308,21 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
   void _checkForChanges() {
     final hasChanges = _nameController.text != _initialName ||
         _descriptionController.text != _initialDescription ||
-        _selectedCategory != _initialCategory;
+        _selectedCategory != _initialCategory ||
+        _willHideFromMarketplace != _initialWillHideFromMarketplace;
 
     if (hasChanges != _hasChanges) {
       setState(() {
         _hasChanges = hasChanges;
       });
     }
+  }
+  
+  void setWillHideFromMarketplace(bool value) {
+    setState(() {
+      _willHideFromMarketplace = value;
+    });
+    _checkForChanges();
   }
 
   Future<void> _handleSave() async {
@@ -308,6 +338,7 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
         _nameController.text.trim(),
         _descriptionController.text.trim(),
         _selectedCategory != _initialCategory ? _selectedCategory : null,
+        _willHideFromMarketplace != _initialWillHideFromMarketplace ? _willHideFromMarketplace : null,
       );
 
       if (success && mounted) {
@@ -712,6 +743,104 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
           ),
         );
       },
+    );
+  }
+}
+
+class HideFromMarketplaceToggle extends ConsumerStatefulWidget {
+  final bool initialValue;
+  final void Function(bool) onChanged;
+  
+  const HideFromMarketplaceToggle({
+    super.key,
+    required this.initialValue,
+    required this.onChanged,
+  });
+
+  @override
+  ConsumerState<HideFromMarketplaceToggle> createState() => _HideFromMarketplaceToggleState();
+}
+
+class _HideFromMarketplaceToggleState extends ConsumerState<HideFromMarketplaceToggle> {
+  late bool _value;
+  
+  @override
+  void initState() {
+    super.initState();
+    _value = widget.initialValue;
+  }
+  
+  Future<void> _handleToggle(bool newValue) async {
+    // Check if user has Unlimited plan
+    final accountState = ref.read(accountProvider);
+    AccountInfo? account;
+    
+    if (accountState is AccountStateWithData) {
+      account = accountState.accountInfo;
+    }
+    
+    if (newValue && (account == null || account.planTier != PlanTier.unlimited)) {
+      // Show upgrade dialog
+      await showHideFromMarketplaceUpgradeDialog(context);
+      return;
+    }
+    
+    setState(() {
+      _value = newValue;
+    });
+    widget.onChanged(newValue);
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: context.c.surfaceContainerHighest.withAlpha(51),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: context.c.outline.withAlpha(50),
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.visibility_off_outlined,
+                color: context.c.onSurfaceVariant,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Hide from Marketplace',
+                      style: context.t.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Keep this scrappable private while accessible via API',
+                      style: context.t.bodySmall?.copyWith(
+                        color: context.c.onSurfaceVariant.withAlpha(180),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Switch(
+                value: _value,
+                onChanged: _handleToggle,
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

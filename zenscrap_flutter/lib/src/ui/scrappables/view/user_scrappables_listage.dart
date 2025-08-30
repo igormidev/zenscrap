@@ -87,12 +87,13 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
                       context: context,
                       builder: (dialogContext) => EditScrappableDialog(
                         scrappable: scrappable,
-                        onSave: (name, description, category) async {
+                        onSave: (name, description, category, willHideFromMarketplace) async {
                           return onEditScrappable(
                             scrappable,
                             name,
                             description,
                             category,
+                            willHideFromMarketplace,
                             () {
                               unawaited(ref
                                   .read(userScrappables.notifier)

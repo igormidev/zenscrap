@@ -24,7 +24,7 @@ abstract class Scrappable implements _i1.SerializableModel {
     required this.isPrivate,
     this.testEndpointAvailableUntil,
     this.scrappingRules,
-    required this.isActive,
+    required this.willHideFromMarketplace,
     required this.targetRequestId,
     this.targetRequest,
     required this.referenceTestDataId,
@@ -43,7 +43,7 @@ abstract class Scrappable implements _i1.SerializableModel {
     required bool isPrivate,
     DateTime? testEndpointAvailableUntil,
     String? scrappingRules,
-    required bool isActive,
+    required bool willHideFromMarketplace,
     required int targetRequestId,
     _i2.ScrappableRequest? targetRequest,
     required int referenceTestDataId,
@@ -67,7 +67,8 @@ abstract class Scrappable implements _i1.SerializableModel {
               : _i1.DateTimeJsonExtension.fromJson(
                   jsonSerialization['testEndpointAvailableUntil']),
       scrappingRules: jsonSerialization['scrappingRules'] as String?,
-      isActive: jsonSerialization['isActive'] as bool,
+      willHideFromMarketplace:
+          jsonSerialization['willHideFromMarketplace'] as bool,
       targetRequestId: jsonSerialization['targetRequestId'] as int,
       targetRequest: jsonSerialization['targetRequest'] == null
           ? null
@@ -105,7 +106,7 @@ abstract class Scrappable implements _i1.SerializableModel {
 
   String? scrappingRules;
 
-  bool isActive;
+  bool willHideFromMarketplace;
 
   int targetRequestId;
 
@@ -132,7 +133,7 @@ abstract class Scrappable implements _i1.SerializableModel {
     bool? isPrivate,
     DateTime? testEndpointAvailableUntil,
     String? scrappingRules,
-    bool? isActive,
+    bool? willHideFromMarketplace,
     int? targetRequestId,
     _i2.ScrappableRequest? targetRequest,
     int? referenceTestDataId,
@@ -152,7 +153,7 @@ abstract class Scrappable implements _i1.SerializableModel {
       if (testEndpointAvailableUntil != null)
         'testEndpointAvailableUntil': testEndpointAvailableUntil?.toJson(),
       if (scrappingRules != null) 'scrappingRules': scrappingRules,
-      'isActive': isActive,
+      'willHideFromMarketplace': willHideFromMarketplace,
       'targetRequestId': targetRequestId,
       if (targetRequest != null) 'targetRequest': targetRequest?.toJson(),
       'referenceTestDataId': referenceTestDataId,
@@ -183,7 +184,7 @@ class _ScrappableImpl extends Scrappable {
     required bool isPrivate,
     DateTime? testEndpointAvailableUntil,
     String? scrappingRules,
-    required bool isActive,
+    required bool willHideFromMarketplace,
     required int targetRequestId,
     _i2.ScrappableRequest? targetRequest,
     required int referenceTestDataId,
@@ -199,7 +200,7 @@ class _ScrappableImpl extends Scrappable {
           isPrivate: isPrivate,
           testEndpointAvailableUntil: testEndpointAvailableUntil,
           scrappingRules: scrappingRules,
-          isActive: isActive,
+          willHideFromMarketplace: willHideFromMarketplace,
           targetRequestId: targetRequestId,
           targetRequest: targetRequest,
           referenceTestDataId: referenceTestDataId,
@@ -221,7 +222,7 @@ class _ScrappableImpl extends Scrappable {
     bool? isPrivate,
     Object? testEndpointAvailableUntil = _Undefined,
     Object? scrappingRules = _Undefined,
-    bool? isActive,
+    bool? willHideFromMarketplace,
     int? targetRequestId,
     Object? targetRequest = _Undefined,
     int? referenceTestDataId,
@@ -241,7 +242,8 @@ class _ScrappableImpl extends Scrappable {
           : this.testEndpointAvailableUntil,
       scrappingRules:
           scrappingRules is String? ? scrappingRules : this.scrappingRules,
-      isActive: isActive ?? this.isActive,
+      willHideFromMarketplace:
+          willHideFromMarketplace ?? this.willHideFromMarketplace,
       targetRequestId: targetRequestId ?? this.targetRequestId,
       targetRequest: targetRequest is _i2.ScrappableRequest?
           ? targetRequest

@@ -567,7 +567,7 @@ class Protocol extends _i1.SerializationManagerServer {
           dartType: 'String?',
         ),
         _i2.ColumnDefinition(
-          name: 'isActive',
+          name: 'willHideFromMarketplace',
           columnType: _i2.ColumnType.boolean,
           isNullable: false,
           dartType: 'bool',

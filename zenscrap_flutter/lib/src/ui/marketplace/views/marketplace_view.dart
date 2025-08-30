@@ -445,12 +445,7 @@ class _ScrappableDetailsDialogState
     if (!hasUnlimitedPlan) {
       // Close current dialog and show upgrade dialog
       Navigator.of(context).pop();
-      showDialog(
-        context: context,
-        builder: (context) => const UpgradePlanDialog(
-            mainCTAText:
-                'With Ultra plan, you can instantly clone any public scrappable from the marketplace and customize it to perfectly fit your needs.'),
-      );
+      await showCloneUpgradeDialog(context);
       return;
     }
 
@@ -497,12 +492,7 @@ class _ScrappableDetailsDialogState
         if (e.title.contains('Upgrade Required')) {
           // Close details dialog and show upgrade dialog
           Navigator.of(context).pop();
-          showDialog(
-            context: context,
-            builder: (context) => const UpgradePlanDialog(
-                mainCTAText:
-                    'With Ultra plan, you can instantly clone any public scrappable from the marketplace and customize it to perfectly fit your needs.'),
-          );
+          await showCloneUpgradeDialog(context);
         } else {
           showSnackbar(context, 'Failed to clone: ${e.description}');
         }

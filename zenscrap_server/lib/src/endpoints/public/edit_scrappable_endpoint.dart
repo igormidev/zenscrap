@@ -8,6 +8,7 @@ class EditScrappableEndpoint extends Endpoint {
     required String name,
     required String description,
     ScraperCategory? category,
+    bool? willHideFromMarketplace,
   }) async {
     // Get the authenticated user ID (might be null if not logged in)
     final userId = (await session.authenticated)?.userId;
@@ -100,6 +101,32 @@ class EditScrappableEndpoint extends Endpoint {
     // Update category if provided
     if (category != null) {
       scrappable.category = category;
+    }
+    
+    // Update willHideFromMarketplace if provided
+    if (willHideFromMarketplace != null) {
+      // Check if user has Ultra plan permission
+      if (userId == null) {
+        throw ZenScrapException(
+          title: 'Authentication Required',
+          description: 'You must be logged in to hide scrappables from marketplace.',
+        );
+      }
+      
+      // Get the account info for plan check
+      final userAccount = await AccountInfo.db.findFirstRow(
+        session,
+        where: (p) => p.userInfoId.equals(userId),
+      );
+      
+      if (userAccount == null || userAccount.planTier != PlanTier.unlimited) {
+        throw ZenScrapException(
+          title: 'Unlimited Plan Required',
+          description: 'Hiding scrappables from marketplace is only available for Unlimited plan users.',
+        );
+      }
+      
+      scrappable.willHideFromMarketplace = willHideFromMarketplace;
     }
 
     try {

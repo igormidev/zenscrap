@@ -10,7 +10,7 @@ fields:
   isPrivate: bool
   testEndpointAvailableUntil: DateTime?
   scrappingRules: String?
-  isActive: bool
+  willHideFromMarketplace: bool
   targetRequestId: int
   targetRequest: ScrappableRequest?, relation(name=request_scrappable, field=targetRequestId)
   referenceTestDataId: int

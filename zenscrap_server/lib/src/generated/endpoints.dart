@@ -496,6 +496,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<_i17.ScraperCategory?>(),
               nullable: true,
             ),
+            'willHideFromMarketplace': _i1.ParameterDescription(
+              name: 'willHideFromMarketplace',
+              type: _i1.getType<bool?>(),
+              nullable: true,
+            ),
           },
           call: (
             _i1.Session session,
@@ -507,6 +512,7 @@ class Endpoints extends _i1.EndpointDispatch {
             name: params['name'],
             description: params['description'],
             category: params['category'],
+            willHideFromMarketplace: params['willHideFromMarketplace'],
           ),
         )
       },

@@ -840,6 +840,7 @@ class _EditScrappableEndpoint {
     required String name,
     required String description,
     _i12.ScraperCategory? category,
+    bool? willHideFromMarketplace,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -857,6 +858,7 @@ class _EditScrappableEndpoint {
             'name': name,
             'description': description,
             'category': category,
+            'willHideFromMarketplace': willHideFromMarketplace,
           }),
           serializationManager: _serializationManager,
         );
