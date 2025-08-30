@@ -1,0 +1,5 @@
+class: ByteTestData
+table: byte_test_data
+fields:
+    referenceHtmlPage: ByteData
+    referenceSiteScreenshot: ByteData

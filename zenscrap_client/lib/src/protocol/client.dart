@@ -366,11 +366,11 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
   String get name => 'scrappableChatSession';
 
   _i2.Future<_i14.CreateSessionResponse> createSession(
-          {required _i4.Scrappable scrappable}) =>
+          {required String scrappableId}) =>
       caller.callServerEndpoint<_i14.CreateSessionResponse>(
         'scrappableChatSession',
         'createSession',
-        {'scrappable': scrappable},
+        {'scrappableId': scrappableId},
       );
 
   _i2.Stream<_i15.ChatResponse> listenToScrappableRedraftSession(

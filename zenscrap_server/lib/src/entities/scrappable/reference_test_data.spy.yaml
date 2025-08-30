@@ -1,9 +1,11 @@
 class: ReferenceTestData
 table: scrappable_test_data
 fields:
-    referenceLinkUsed: String
-    referenceQueryParametersJson: String
-    referenceHtmlPage: ByteData
-    referenceSiteScreenshot: ByteData
-    scrappableTestResult: ScrappableTestResult?, relation(name=test_result_reference)
-    scrappable: Scrappable?, relation(name=test_scrappable)
+  referenceLinkUsed: String
+  referenceQueryParametersJson: String
+  byteData: ByteTestData?, relation
+  scrappableTestResult: ScrappableTestResult?, relation(name=test_result_reference)
+  scrappable: Scrappable?, relation(name=test_scrappable)
+indexes:
+  reference_test_data_byte_data_id_idx:
+    fields: byteDataId

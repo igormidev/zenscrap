@@ -657,9 +657,9 @@ class Endpoints extends _i1.EndpointDispatch {
         'createSession': _i1.MethodConnector(
           name: 'createSession',
           params: {
-            'scrappable': _i1.ParameterDescription(
-              name: 'scrappable',
-              type: _i1.getType<_i15.Scrappable>(),
+            'scrappableId': _i1.ParameterDescription(
+              name: 'scrappableId',
+              type: _i1.getType<String>(),
               nullable: false,
             )
           },
@@ -670,7 +670,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (endpoints['scrappableChatSession'] as _i14.ScrappableChatSession)
                   .createSession(
             session,
-            scrappable: params['scrappable'],
+            scrappableId: params['scrappableId'],
           ),
         ),
         'sendPromptMessage': _i1.MethodConnector(

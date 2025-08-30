@@ -124,7 +124,7 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
     final sessionResult = await ref
         .read(clientProvider)
         .scrappableChatSession
-        .createSession(scrappable: scrappable)
+        .createSession(scrappableId: scrappable.id.toString())
         .toResult;
 
     await sessionResult.fold((createdSessionResponse) async {

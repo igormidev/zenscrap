@@ -132,17 +132,29 @@ class CreateScrappableEndpoint extends Endpoint {
         ),
         transaction: transaction,
       );
+
+      final ByteTestData testData = await ByteTestData.db.insertRow(
+          session,
+          ByteTestData(
+            referenceHtmlPage: htmlByteData,
+            referenceSiteScreenshot: screenshotByteData,
+          ),
+          transaction: transaction);
       final ReferenceTestData referenceTestData =
           await ReferenceTestData.db.insertRow(
-        session,
-        ReferenceTestData(
-          referenceLinkUsed: referenceLink,
-          referenceHtmlPage: htmlByteData,
-          referenceSiteScreenshot: screenshotByteData,
-          referenceQueryParametersJson: jsonEncode(referenceLinkPathParameters),
-        ),
-        transaction: transaction,
-      );
+              session,
+              ReferenceTestData(
+                referenceLinkUsed: referenceLink,
+                byteDataId: testData.id!,
+                byteData: testData,
+                referenceQueryParametersJson:
+                    jsonEncode(referenceLinkPathParameters),
+              ),
+              transaction: transaction);
+
+      await ReferenceTestData.db.attachRow.byteData(
+          session, referenceTestData, testData,
+          transaction: transaction);
 
       final Scrappable scrappable = await Scrappable.db.insertRow(
         session,

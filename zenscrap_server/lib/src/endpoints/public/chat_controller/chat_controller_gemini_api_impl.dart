@@ -362,8 +362,9 @@ Content getSystemPrompt({
       referenceTestData.scrappableTestResult == null;
 
   final Uint8List imagePng =
-      referenceTestData.referenceSiteScreenshot.asUint8List;
-  final Uint8List htmlBytes = referenceTestData.referenceHtmlPage.asUint8List;
+      referenceTestData.byteData!.referenceSiteScreenshot.asUint8List;
+  final Uint8List htmlBytes =
+      referenceTestData.byteData!.referenceHtmlPage.asUint8List;
 
   return Content('user', [
     TextPart(

@@ -10,7 +10,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
-import 'dart:typed_data' as _i2;
+import '../../entities/scrappable/byte_test_data.dart' as _i2;
 import '../../entities/scrappable/scrappable_test_result.dart' as _i3;
 import '../../entities/scrappable/scrappable.dart' as _i4;
 
@@ -19,8 +19,8 @@ abstract class ReferenceTestData implements _i1.SerializableModel {
     this.id,
     required this.referenceLinkUsed,
     required this.referenceQueryParametersJson,
-    required this.referenceHtmlPage,
-    required this.referenceSiteScreenshot,
+    required this.byteDataId,
+    this.byteData,
     this.scrappableTestResult,
     this.scrappable,
   });
@@ -29,8 +29,8 @@ abstract class ReferenceTestData implements _i1.SerializableModel {
     int? id,
     required String referenceLinkUsed,
     required String referenceQueryParametersJson,
-    required _i2.ByteData referenceHtmlPage,
-    required _i2.ByteData referenceSiteScreenshot,
+    required int byteDataId,
+    _i2.ByteTestData? byteData,
     _i3.ScrappableTestResult? scrappableTestResult,
     _i4.Scrappable? scrappable,
   }) = _ReferenceTestDataImpl;
@@ -41,10 +41,11 @@ abstract class ReferenceTestData implements _i1.SerializableModel {
       referenceLinkUsed: jsonSerialization['referenceLinkUsed'] as String,
       referenceQueryParametersJson:
           jsonSerialization['referenceQueryParametersJson'] as String,
-      referenceHtmlPage: _i1.ByteDataJsonExtension.fromJson(
-          jsonSerialization['referenceHtmlPage']),
-      referenceSiteScreenshot: _i1.ByteDataJsonExtension.fromJson(
-          jsonSerialization['referenceSiteScreenshot']),
+      byteDataId: jsonSerialization['byteDataId'] as int,
+      byteData: jsonSerialization['byteData'] == null
+          ? null
+          : _i2.ByteTestData.fromJson(
+              (jsonSerialization['byteData'] as Map<String, dynamic>)),
       scrappableTestResult: jsonSerialization['scrappableTestResult'] == null
           ? null
           : _i3.ScrappableTestResult.fromJson(
@@ -66,9 +67,9 @@ abstract class ReferenceTestData implements _i1.SerializableModel {
 
   String referenceQueryParametersJson;
 
-  _i2.ByteData referenceHtmlPage;
+  int byteDataId;
 
-  _i2.ByteData referenceSiteScreenshot;
+  _i2.ByteTestData? byteData;
 
   _i3.ScrappableTestResult? scrappableTestResult;
 
@@ -81,8 +82,8 @@ abstract class ReferenceTestData implements _i1.SerializableModel {
     int? id,
     String? referenceLinkUsed,
     String? referenceQueryParametersJson,
-    _i2.ByteData? referenceHtmlPage,
-    _i2.ByteData? referenceSiteScreenshot,
+    int? byteDataId,
+    _i2.ByteTestData? byteData,
     _i3.ScrappableTestResult? scrappableTestResult,
     _i4.Scrappable? scrappable,
   });
@@ -92,8 +93,8 @@ abstract class ReferenceTestData implements _i1.SerializableModel {
       if (id != null) 'id': id,
       'referenceLinkUsed': referenceLinkUsed,
       'referenceQueryParametersJson': referenceQueryParametersJson,
-      'referenceHtmlPage': referenceHtmlPage.toJson(),
-      'referenceSiteScreenshot': referenceSiteScreenshot.toJson(),
+      'byteDataId': byteDataId,
+      if (byteData != null) 'byteData': byteData?.toJson(),
       if (scrappableTestResult != null)
         'scrappableTestResult': scrappableTestResult?.toJson(),
       if (scrappable != null) 'scrappable': scrappable?.toJson(),
@@ -113,16 +114,16 @@ class _ReferenceTestDataImpl extends ReferenceTestData {
     int? id,
     required String referenceLinkUsed,
     required String referenceQueryParametersJson,
-    required _i2.ByteData referenceHtmlPage,
-    required _i2.ByteData referenceSiteScreenshot,
+    required int byteDataId,
+    _i2.ByteTestData? byteData,
     _i3.ScrappableTestResult? scrappableTestResult,
     _i4.Scrappable? scrappable,
   }) : super._(
           id: id,
           referenceLinkUsed: referenceLinkUsed,
           referenceQueryParametersJson: referenceQueryParametersJson,
-          referenceHtmlPage: referenceHtmlPage,
-          referenceSiteScreenshot: referenceSiteScreenshot,
+          byteDataId: byteDataId,
+          byteData: byteData,
           scrappableTestResult: scrappableTestResult,
           scrappable: scrappable,
         );
@@ -135,8 +136,8 @@ class _ReferenceTestDataImpl extends ReferenceTestData {
     Object? id = _Undefined,
     String? referenceLinkUsed,
     String? referenceQueryParametersJson,
-    _i2.ByteData? referenceHtmlPage,
-    _i2.ByteData? referenceSiteScreenshot,
+    int? byteDataId,
+    Object? byteData = _Undefined,
     Object? scrappableTestResult = _Undefined,
     Object? scrappable = _Undefined,
   }) {
@@ -145,9 +146,9 @@ class _ReferenceTestDataImpl extends ReferenceTestData {
       referenceLinkUsed: referenceLinkUsed ?? this.referenceLinkUsed,
       referenceQueryParametersJson:
           referenceQueryParametersJson ?? this.referenceQueryParametersJson,
-      referenceHtmlPage: referenceHtmlPage ?? this.referenceHtmlPage.clone(),
-      referenceSiteScreenshot:
-          referenceSiteScreenshot ?? this.referenceSiteScreenshot.clone(),
+      byteDataId: byteDataId ?? this.byteDataId,
+      byteData:
+          byteData is _i2.ByteTestData? ? byteData : this.byteData?.copyWith(),
       scrappableTestResult: scrappableTestResult is _i3.ScrappableTestResult?
           ? scrappableTestResult
           : this.scrappableTestResult?.copyWith(),

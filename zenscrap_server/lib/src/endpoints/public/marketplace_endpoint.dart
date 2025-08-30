@@ -50,6 +50,9 @@ class MarketplaceEndpoint extends Endpoint {
       offset: offset,
       include: Scrappable.include(
         targetRequest: ScrappableRequest.include(),
+        referenceTestData: ReferenceTestData.include(
+          byteData: ByteTestData.include(),
+        ),
       ),
     );
 

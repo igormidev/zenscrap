@@ -16,16 +16,29 @@ class ScrappableChatSession extends Endpoint {
 
   Future<CreateSessionResponse> createSession(
     Session session, {
-    required Scrappable scrappable,
+    required String scrappableId,
   }) async {
-    final ReferenceTestData? referenceTestData =
-        (scrappable.referenceTestData ??
-            await ReferenceTestData.db.findFirstRow(
-              session,
-              where: (p0) =>
-                  p0.scrappable.id.equals(scrappable.id) |
-                  p0.id.equals(scrappable.referenceTestDataId),
-            ));
+    final Scrappable? scrappable = await Scrappable.db.findById(
+      session,
+      UuidValue.fromString(scrappableId),
+      include: Scrappable.include(
+        targetRequest: ScrappableRequest.include(),
+        referenceTestData: ReferenceTestData.include(
+          byteData: ByteTestData.include(),
+        ),
+      ),
+    );
+    final ReferenceTestData? referenceTestData = scrappable?.referenceTestData;
+    if (scrappable == null) {
+      session.log(
+        'No scrappable found with id $scrappableId.',
+        level: LogLevel.error,
+      );
+      throw ZenScrapException(
+        title: 'Scrappable Not Found',
+        description: 'No scrappable found with id $scrappableId.',
+      );
+    }
     if (referenceTestData == null) {
       session.log(
         'No reference test data found for scrappable with id ${scrappable.id}.',

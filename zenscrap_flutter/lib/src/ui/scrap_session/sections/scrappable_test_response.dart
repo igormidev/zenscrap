@@ -55,8 +55,8 @@ class _ScrappableTestResponseState extends State<ScrappableTestResponse>
             children: [
               ScrappableTestJsonResponseViewer(
                 testResponse: mappedResponse,
-                htmlData: testData.referenceHtmlPage,
-                screenshotData: testData.referenceSiteScreenshot,
+                htmlData: testData.byteData?.referenceHtmlPage,
+                screenshotData: testData.byteData?.referenceSiteScreenshot,
               ),
               ScrappableEditVisualization(
                 scrappable: widget.scrappable,

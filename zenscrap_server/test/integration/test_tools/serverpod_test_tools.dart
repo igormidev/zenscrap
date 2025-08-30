@@ -1057,7 +1057,7 @@ class _ScrappableChatSession {
 
   _i3.Future<_i15.CreateSessionResponse> createSession(
     _i1.TestSessionBuilder sessionBuilder, {
-    required _i5.Scrappable scrappable,
+    required String scrappableId,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1070,7 +1070,7 @@ class _ScrappableChatSession {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'scrappableChatSession',
           methodName: 'createSession',
-          parameters: _i1.testObjectToJson({'scrappable': scrappable}),
+          parameters: _i1.testObjectToJson({'scrappableId': scrappableId}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue = await (_localCallContext.method.call(

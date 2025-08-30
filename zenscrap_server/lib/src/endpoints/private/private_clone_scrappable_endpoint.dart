@@ -47,7 +47,9 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
       scrappableId,
       include: Scrappable.include(
         targetRequest: ScrappableRequest.include(),
-        referenceTestData: ReferenceTestData.include(),
+        referenceTestData: ReferenceTestData.include(
+          byteData: ByteTestData.include(),
+        ),
       ),
     );
 
@@ -66,55 +68,91 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
       );
     }
 
-    // Clone the ScrappableRequest
-    final clonedRequest = ScrappableRequest(
-      url: sourceScrappable.targetRequest!.url,
-      queryParams: sourceScrappable.targetRequest!.queryParams,
-      pathParams: sourceScrappable.targetRequest!.pathParams,
-    );
+    // Prepare id for the new scrappable to fetch after commit
+    final newScrappableId = UuidValue.fromString(Uuid().v4());
 
-    await ScrappableRequest.db.insertRow(session, clonedRequest);
+    // Transaction: clone request, test data, reference data, and scrappable atomically
+    await session.db.transaction<void>((transaction) async {
+      // Clone the ScrappableRequest
+      final clonedRequest = ScrappableRequest(
+        url: sourceScrappable.targetRequest!.url,
+        queryParams: sourceScrappable.targetRequest!.queryParams,
+        pathParams: sourceScrappable.targetRequest!.pathParams,
+      );
+      await ScrappableRequest.db.insertRow(
+        session,
+        clonedRequest,
+        transaction: transaction,
+      );
 
-    // Clone the ReferenceTestData
-    final clonedTestData = ReferenceTestData(
-      referenceLinkUsed: sourceScrappable.referenceTestData!.referenceLinkUsed,
-      referenceQueryParametersJson:
-          sourceScrappable.referenceTestData!.referenceQueryParametersJson,
-      referenceHtmlPage: sourceScrappable.referenceTestData!.referenceHtmlPage,
-      referenceSiteScreenshot:
-          sourceScrappable.referenceTestData!.referenceSiteScreenshot,
-    );
+      // Clone ByteTestData
+      final ByteTestData testData = await ByteTestData.db.insertRow(
+        session,
+        ByteTestData(
+          referenceHtmlPage:
+              sourceScrappable.referenceTestData!.byteData!.referenceHtmlPage,
+          referenceSiteScreenshot: sourceScrappable
+              .referenceTestData!.byteData!.referenceSiteScreenshot,
+        ),
+        transaction: transaction,
+      );
 
-    await ReferenceTestData.db.insertRow(session, clonedTestData);
+      // Clone the ReferenceTestData
+      final clonedTestData = ReferenceTestData(
+        referenceLinkUsed:
+            sourceScrappable.referenceTestData!.referenceLinkUsed,
+        referenceQueryParametersJson:
+            sourceScrappable.referenceTestData!.referenceQueryParametersJson,
+        byteDataId: testData.id!,
+        byteData: testData,
+      );
+      await ReferenceTestData.db.insertRow(
+        session,
+        clonedTestData,
+        transaction: transaction,
+      );
 
-    // Create the cloned scrappable
-    final clonedScrappable = Scrappable(
-      id: UuidValue.fromString(Uuid().v4()),
-      accountId: accountInfo.id,
-      apiUsageOwnerNanoId: accountInfo.accountApiUsage?.nanoId,
-      createdAt: DateTime.now(),
-      name: '${sourceScrappable.name} (Copy)',
-      description: sourceScrappable.description,
-      testEndpointAvailableUntil: null,
-      scrappingRules: sourceScrappable.scrappingRules,
-      willHideFromMarketplace: false,
-      isDeleted: false,
-      targetRequestId: clonedRequest.id!,
-      targetRequest: clonedRequest,
-      referenceTestDataId: clonedTestData.id!,
-      referenceTestData: clonedTestData,
-      category: sourceScrappable.category,
-    );
+      await ReferenceTestData.db.attachRow.byteData(
+        session,
+        clonedTestData,
+        testData,
+        transaction: transaction,
+      );
 
-    await Scrappable.db.insertRow(session, clonedScrappable);
+      // Create the cloned scrappable
+      final clonedScrappable = Scrappable(
+        id: newScrappableId,
+        accountId: accountInfo.id,
+        apiUsageOwnerNanoId: accountInfo.accountApiUsage?.nanoId,
+        createdAt: DateTime.now(),
+        name: '${sourceScrappable.name} (Copy)',
+        description: sourceScrappable.description,
+        testEndpointAvailableUntil: null,
+        scrappingRules: sourceScrappable.scrappingRules,
+        willHideFromMarketplace: false,
+        isDeleted: false,
+        targetRequestId: clonedRequest.id!,
+        targetRequest: clonedRequest,
+        referenceTestDataId: clonedTestData.id!,
+        referenceTestData: clonedTestData,
+        category: sourceScrappable.category,
+      );
+      await Scrappable.db.insertRow(
+        session,
+        clonedScrappable,
+        transaction: transaction,
+      );
+    });
 
-    // Return the cloned scrappable with all relations
+    // Return the cloned scrappable with all relations (after commit)
     final result = await Scrappable.db.findById(
       session,
-      clonedScrappable.id,
+      newScrappableId,
       include: Scrappable.include(
         targetRequest: ScrappableRequest.include(),
-        referenceTestData: ReferenceTestData.include(),
+        referenceTestData: ReferenceTestData.include(
+          byteData: ByteTestData.include(),
+        ),
       ),
     );
 

@@ -35,7 +35,8 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
     return scrappables.where((s) => s.isDeleted != true).toList();
   }
 
-  Future<Scrappable> getScrappableById(Session session, String scrappableId) async {
+  Future<Scrappable> getScrappableById(
+      Session session, String scrappableId) async {
     final userId = (await session.authenticated)?.userId;
     if (userId == null) {
       throw ZenScrapException(
@@ -46,13 +47,13 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
 
     // Parse the UUID string
     final uuid = UuidValue.fromString(scrappableId);
-    
+
     // First check if the user owns this scrappable
     final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
       session,
       where: (p0) => p0.userInfoId.equals(userId),
     );
-    
+
     if (accountInfo == null) {
       throw ZenScrapException(
         title: 'Account Not Found',
@@ -67,6 +68,7 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
       include: Scrappable.include(
         targetRequest: ScrappableRequest.include(),
         referenceTestData: ReferenceTestData.include(
+          byteData: ByteTestData.include(),
           scrappableTestResult: ScrappableTestResult.include(),
         ),
       ),
