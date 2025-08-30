@@ -209,7 +209,9 @@ class ScrappableCardIndicator extends StatelessWidget {
                                 : 'Available in marketplace',
                         style: context.t.labelSmall?.copyWith(
                           color: !isNew
-                              ? Colors.green.shade700
+                              ? willHideFromMarketplace
+                                  ? Colors.green.shade700
+                                  : Colors.amber
                               : Colors.orange.shade700,
                           fontWeight: FontWeight.w600,
                         ),

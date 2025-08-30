@@ -1,0 +1,51 @@
+{
+  "actions": [
+    {
+      "type": "alterTable",
+      "alterTable": {
+        "name": "scrappable",
+        "schema": "public",
+        "addColumns": [],
+        "deleteColumns": [
+          "isPrivate"
+        ],
+        "modifyColumns": [
+          {
+            "columnName": "isDeleted",
+            "addNullable": true,
+            "removeNullable": false,
+            "changeDefault": false,
+            "newDefault": "false"
+          }
+        ],
+        "addIndexes": [],
+        "deleteIndexes": [],
+        "addForeignKeys": [],
+        "deleteForeignKeys": [],
+        "warnings": [
+          {
+            "type": "columnDropped",
+            "message": "Column \"isPrivate\" of table \"scrappable\" will be dropped.",
+            "table": "scrappable",
+            "columns": [
+              "isPrivate"
+            ],
+            "destrucive": true
+          }
+        ]
+      }
+    }
+  ],
+  "warnings": [
+    {
+      "type": "columnDropped",
+      "message": "Column \"isPrivate\" of table \"scrappable\" will be dropped.",
+      "table": "scrappable",
+      "columns": [
+        "isPrivate"
+      ],
+      "destrucive": true
+    }
+  ],
+  "migrationApiVersion": 1
+}

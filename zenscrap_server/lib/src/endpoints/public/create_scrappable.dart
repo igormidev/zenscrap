@@ -96,7 +96,8 @@ class CreateScrappableEndpoint extends Endpoint {
       referenceLinkPathParameters = Map<String, String>.from(rawRefLinkParams);
 
       // Parse the category from the AI response
-      final String categoryStr = convertedData['category'] as String? ?? 'general';
+      final String categoryStr =
+          convertedData['category'] as String? ?? 'general';
       try {
         category = ScraperCategory.values.byName(categoryStr);
       } catch (e) {
@@ -150,7 +151,6 @@ class CreateScrappableEndpoint extends Endpoint {
           description: description,
           createdAt: DateTime.now(),
           willHideFromMarketplace: false,
-          isPrivate: false,
           accountId: accountApiUsage?.accountInfo?.id,
           apiUsageOwnerNanoId: accountApiUsage?.nanoId,
           targetRequestId: targetRequest.id!,

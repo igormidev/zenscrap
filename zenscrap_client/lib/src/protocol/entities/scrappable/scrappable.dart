@@ -21,7 +21,6 @@ abstract class Scrappable implements _i1.SerializableModel {
     required this.createdAt,
     required this.name,
     required this.description,
-    required this.isPrivate,
     this.testEndpointAvailableUntil,
     this.scrappingRules,
     required this.willHideFromMarketplace,
@@ -39,7 +38,6 @@ abstract class Scrappable implements _i1.SerializableModel {
     required DateTime createdAt,
     required String name,
     required String description,
-    required bool isPrivate,
     DateTime? testEndpointAvailableUntil,
     String? scrappingRules,
     required bool willHideFromMarketplace,
@@ -58,7 +56,6 @@ abstract class Scrappable implements _i1.SerializableModel {
           _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
       name: jsonSerialization['name'] as String,
       description: jsonSerialization['description'] as String,
-      isPrivate: jsonSerialization['isPrivate'] as bool,
       testEndpointAvailableUntil:
           jsonSerialization['testEndpointAvailableUntil'] == null
               ? null
@@ -97,8 +94,6 @@ abstract class Scrappable implements _i1.SerializableModel {
 
   String description;
 
-  bool isPrivate;
-
   DateTime? testEndpointAvailableUntil;
 
   String? scrappingRules;
@@ -125,7 +120,6 @@ abstract class Scrappable implements _i1.SerializableModel {
     DateTime? createdAt,
     String? name,
     String? description,
-    bool? isPrivate,
     DateTime? testEndpointAvailableUntil,
     String? scrappingRules,
     bool? willHideFromMarketplace,
@@ -143,7 +137,6 @@ abstract class Scrappable implements _i1.SerializableModel {
       'createdAt': createdAt.toJson(),
       'name': name,
       'description': description,
-      'isPrivate': isPrivate,
       if (testEndpointAvailableUntil != null)
         'testEndpointAvailableUntil': testEndpointAvailableUntil?.toJson(),
       if (scrappingRules != null) 'scrappingRules': scrappingRules,
@@ -174,7 +167,6 @@ class _ScrappableImpl extends Scrappable {
     required DateTime createdAt,
     required String name,
     required String description,
-    required bool isPrivate,
     DateTime? testEndpointAvailableUntil,
     String? scrappingRules,
     required bool willHideFromMarketplace,
@@ -189,7 +181,6 @@ class _ScrappableImpl extends Scrappable {
           createdAt: createdAt,
           name: name,
           description: description,
-          isPrivate: isPrivate,
           testEndpointAvailableUntil: testEndpointAvailableUntil,
           scrappingRules: scrappingRules,
           willHideFromMarketplace: willHideFromMarketplace,
@@ -210,7 +201,6 @@ class _ScrappableImpl extends Scrappable {
     DateTime? createdAt,
     String? name,
     String? description,
-    bool? isPrivate,
     Object? testEndpointAvailableUntil = _Undefined,
     Object? scrappingRules = _Undefined,
     bool? willHideFromMarketplace,
@@ -226,7 +216,6 @@ class _ScrappableImpl extends Scrappable {
       createdAt: createdAt ?? this.createdAt,
       name: name ?? this.name,
       description: description ?? this.description,
-      isPrivate: isPrivate ?? this.isPrivate,
       testEndpointAvailableUntil: testEndpointAvailableUntil is DateTime?
           ? testEndpointAvailableUntil
           : this.testEndpointAvailableUntil,

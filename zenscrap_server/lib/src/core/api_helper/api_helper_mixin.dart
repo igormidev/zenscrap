@@ -33,8 +33,8 @@ mixin ApiHelperMixin {
       session,
       where: (p0) =>
           p0.accountApiUsage.nanoId.equals(nanoId) &
-          p0.accountApiUsage.apiKeys.any((key) => 
-              key.apiKey.equals(apikey) & key.isActive.equals(true)),
+          p0.accountApiUsage.apiKeys.any(
+              (key) => key.apiKey.equals(apikey) & key.isActive.equals(true)),
     ))
         ?.planTier;
 
@@ -153,10 +153,10 @@ mixin ApiHelperMixin {
       where: (t) =>
           t.id.equals(UuidValue.fromString(scrappableId)) &
           ( // If not private, allow all
-              t.isPrivate.equals(false) |
+              t.willHideFromMarketplace.equals(false) |
 
                   // If private, allow only if the nanoId matches
-                  (t.isPrivate.equals(true) &
+                  (t.willHideFromMarketplace.equals(true) &
                       t.apiUsageOwnerNanoId.notEquals(null) &
                       t.apiUsageOwnerNanoId.equals(nanoId))),
       include: Scrappable.include(

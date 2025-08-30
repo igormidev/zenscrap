@@ -59,7 +59,7 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
     }
 
     // Verify it's a public scrappable
-    if (sourceScrappable.isPrivate) {
+    if (sourceScrappable.willHideFromMarketplace) {
       throw ZenScrapException(
         title: 'Access Denied',
         description: 'This scrappable is private and cannot be cloned.',
@@ -95,7 +95,6 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
       createdAt: DateTime.now(),
       name: '${sourceScrappable.name} (Copy)',
       description: sourceScrappable.description,
-      isPrivate: true, // Cloned scrappables start as private
       testEndpointAvailableUntil: null,
       scrappingRules: sourceScrappable.scrappingRules,
       willHideFromMarketplace: false,

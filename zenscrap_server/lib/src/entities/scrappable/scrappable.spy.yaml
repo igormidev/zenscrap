@@ -7,7 +7,6 @@ fields:
   createdAt: DateTime
   name: String
   description: String
-  isPrivate: bool
   testEndpointAvailableUntil: DateTime?
   scrappingRules: String?
   willHideFromMarketplace: bool
