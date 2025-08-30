@@ -1,0 +1,48 @@
+{
+  "actions": [
+    {
+      "type": "alterTable",
+      "alterTable": {
+        "name": "scrappable",
+        "schema": "public",
+        "addColumns": [],
+        "deleteColumns": [],
+        "modifyColumns": [
+          {
+            "columnName": "isDeleted",
+            "addNullable": false,
+            "removeNullable": true,
+            "changeDefault": true
+          }
+        ],
+        "addIndexes": [],
+        "deleteIndexes": [],
+        "addForeignKeys": [],
+        "deleteForeignKeys": [],
+        "warnings": [
+          {
+            "type": "notNullAdded",
+            "message": "Column isDeleted of table scrappable is modified to be not null. If there are existing rows with null values, this migration will fail.",
+            "table": "scrappable",
+            "columns": [
+              "isDeleted"
+            ],
+            "destrucive": false
+          }
+        ]
+      }
+    }
+  ],
+  "warnings": [
+    {
+      "type": "notNullAdded",
+      "message": "Column isDeleted of table scrappable is modified to be not null. If there are existing rows with null values, this migration will fail.",
+      "table": "scrappable",
+      "columns": [
+        "isDeleted"
+      ],
+      "destrucive": false
+    }
+  ],
+  "migrationApiVersion": 1
+}

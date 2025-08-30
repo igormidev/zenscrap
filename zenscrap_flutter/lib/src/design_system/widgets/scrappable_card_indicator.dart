@@ -185,7 +185,9 @@ class ScrappableCardIndicator extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: !isNew
-                        ? Colors.green.withAlpha(26)
+                        ? willHideFromMarketplace
+                            ? Colors.amber.withAlpha(26)
+                            : Colors.green.withAlpha(26)
                         : Colors.orange.withAlpha(26),
                     borderRadius: BorderRadius.circular(6),
                   ),
@@ -197,7 +199,11 @@ class ScrappableCardIndicator extends StatelessWidget {
                         height: 6,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: !isNew ? Colors.green : Colors.orange,
+                          color: !isNew
+                              ? willHideFromMarketplace
+                                  ? Colors.amber
+                                  : Colors.green
+                              : Colors.orange,
                         ),
                       ),
                       const SizedBox(width: 6),
@@ -210,8 +216,8 @@ class ScrappableCardIndicator extends StatelessWidget {
                         style: context.t.labelSmall?.copyWith(
                           color: !isNew
                               ? willHideFromMarketplace
-                                  ? Colors.green.shade700
-                                  : Colors.amber
+                                  ? Colors.amber.shade700
+                                  : Colors.green.shade700
                               : Colors.orange.shade700,
                           fontWeight: FontWeight.w600,
                         ),

@@ -13,8 +13,8 @@ import 'package:zenscrap_flutter/src/ui/marketplace/dialogs/upgrade_plan_dialog.
 
 class EditScrappableDialog extends ConsumerStatefulWidget {
   final Scrappable scrappable;
-  final Future<bool> Function(
-      String name, String description, ScraperCategory? category, bool? willHideFromMarketplace) onSave;
+  final Future<bool> Function(String name, String description,
+      ScraperCategory? category, bool? willHideFromMarketplace) onSave;
   final Future<bool> Function()? onDelete;
 
   const EditScrappableDialog({
@@ -30,10 +30,12 @@ class EditScrappableDialog extends ConsumerStatefulWidget {
 }
 
 class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog> {
+  final ValueNotifier<bool> _hasChangesVN = ValueNotifier<bool>(false);
   final ValueNotifier<bool> _isDeleting = ValueNotifier<bool>(false);
 
   @override
   void dispose() {
+    _hasChangesVN.dispose();
     _isDeleting.dispose();
     super.dispose();
   }
@@ -166,13 +168,16 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog> {
               scrappable: widget.scrappable,
               onSave: widget.onSave,
               shouldPopOnEnd: true,
+              onHasChangesUpdated: (hasChanges) =>
+                  _hasChangesVN.value = hasChanges,
               children: [
                 Builder(
                   builder: (context) {
                     // Get the form state to access the setWillHideFromMarketplace method
-                    final formState = context.findAncestorStateOfType<_ScrappableEditFormState>();
+                    final formState = context
+                        .findAncestorStateOfType<_ScrappableEditFormState>();
                     if (formState == null) return const SizedBox.shrink();
-                    
+
                     return HideFromMarketplaceToggle(
                       initialValue: widget.scrappable.willHideFromMarketplace,
                       onChanged: formState.setWillHideFromMarketplace,
@@ -226,13 +231,21 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog> {
                     },
                   ),
                 Spacer(),
-                FilledButton(
-                  onPressed: () {
-                    ref.read(scrapChatProvider.notifier).reset();
-                    context.go(
-                        '/scrappable-form?id=${widget.scrappable.id.toString()}');
+                ValueListenableBuilder(
+                  valueListenable: _hasChangesVN,
+                  builder: (context, hasChanges, child) {
+                    return FilledButton(
+                      onPressed: hasChanges
+                          ? null
+                          : () {
+                              ref.read(scrapChatProvider.notifier).reset();
+                              context.go(
+                                '/scrappable-form?id=${widget.scrappable.id.toString()}',
+                              );
+                            },
+                      child: Text('Edit scrapper extract logic'),
+                    );
                   },
-                  child: Text('Edit scrapper extract logic'),
                 ),
                 SizedBox(width: 20),
               ],
@@ -253,15 +266,17 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog> {
 
 class ScrappableEditForm extends StatefulWidget {
   final Scrappable scrappable;
-  final Future<bool> Function(
-      String name, String description, ScraperCategory? category, bool? willHideFromMarketplace) onSave;
+  final Future<bool> Function(String name, String description,
+      ScraperCategory? category, bool? willHideFromMarketplace) onSave;
   final bool shouldPopOnEnd;
   final List<Widget> children;
+  final void Function(bool hasChanges)? onHasChangesUpdated;
   const ScrappableEditForm({
     super.key,
     required this.scrappable,
     required this.onSave,
     required this.shouldPopOnEnd,
+    this.onHasChangesUpdated,
     this.children = const [],
   });
 
@@ -315,9 +330,10 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
       setState(() {
         _hasChanges = hasChanges;
       });
+      widget.onHasChangesUpdated?.call(hasChanges);
     }
   }
-  
+
   void setWillHideFromMarketplace(bool value) {
     setState(() {
       _willHideFromMarketplace = value;
@@ -338,7 +354,9 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
         _nameController.text.trim(),
         _descriptionController.text.trim(),
         _selectedCategory != _initialCategory ? _selectedCategory : null,
-        _willHideFromMarketplace != _initialWillHideFromMarketplace ? _willHideFromMarketplace : null,
+        _willHideFromMarketplace != _initialWillHideFromMarketplace
+            ? _willHideFromMarketplace
+            : null,
       );
 
       if (success && mounted) {
@@ -559,6 +577,12 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
                 ],
               ).animate().fadeIn(delay: 200.ms).slideX(begin: -0.1, end: 0),
 
+              ...widget.children.map(
+                (child) => child
+                    .animate()
+                    .fadeIn(delay: 200.ms)
+                    .slideX(begin: -0.1, end: 0),
+              ),
               SizedBox(height: 16),
               // Action Buttons
               FilledButton.icon(
@@ -598,13 +622,6 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
                   ),
                 ),
               ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.1, end: 0),
-
-              ...widget.children.map(
-                (child) => child
-                    .animate()
-                    .fadeIn(delay: 200.ms)
-                    .slideX(begin: -0.1, end: 0),
-              ),
             ],
           ),
         )
@@ -750,7 +767,7 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
 class HideFromMarketplaceToggle extends ConsumerStatefulWidget {
   final bool initialValue;
   final void Function(bool) onChanged;
-  
+
   const HideFromMarketplaceToggle({
     super.key,
     required this.initialValue,
@@ -758,39 +775,41 @@ class HideFromMarketplaceToggle extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<HideFromMarketplaceToggle> createState() => _HideFromMarketplaceToggleState();
+  ConsumerState<HideFromMarketplaceToggle> createState() =>
+      _HideFromMarketplaceToggleState();
 }
 
-class _HideFromMarketplaceToggleState extends ConsumerState<HideFromMarketplaceToggle> {
+class _HideFromMarketplaceToggleState
+    extends ConsumerState<HideFromMarketplaceToggle> {
   late bool _value;
-  
+
   @override
   void initState() {
     super.initState();
     _value = widget.initialValue;
   }
-  
+
   Future<void> _handleToggle(bool newValue) async {
     // Check if user has Unlimited plan
     final accountState = ref.read(accountProvider);
     AccountInfo? account;
-    
+
     if (accountState is AccountStateWithData) {
       account = accountState.accountInfo;
     }
-    
+
     if (newValue && (account == null || account.planTier != PlanTier.ultra)) {
       // Show upgrade dialog
       await showHideFromMarketplaceUpgradeDialog(context);
       return;
     }
-    
+
     setState(() {
       _value = newValue;
     });
     widget.onChanged(newValue);
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Column(
