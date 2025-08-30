@@ -447,7 +447,9 @@ class _ScrappableDetailsDialogState
       Navigator.of(context).pop();
       showDialog(
         context: context,
-        builder: (context) => const UpgradePlanDialog(),
+        builder: (context) => const UpgradePlanDialog(
+            mainCTAText:
+                'With Ultra plan, you can instantly clone any public scrappable from the marketplace and customize it to perfectly fit your needs.'),
       );
       return;
     }
@@ -497,7 +499,9 @@ class _ScrappableDetailsDialogState
           Navigator.of(context).pop();
           showDialog(
             context: context,
-            builder: (context) => const UpgradePlanDialog(),
+            builder: (context) => const UpgradePlanDialog(
+                mainCTAText:
+                    'With Ultra plan, you can instantly clone any public scrappable from the marketplace and customize it to perfectly fit your needs.'),
           );
         } else {
           showSnackbar(context, 'Failed to clone: ${e.description}');

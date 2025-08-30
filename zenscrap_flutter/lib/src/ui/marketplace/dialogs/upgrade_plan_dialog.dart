@@ -7,7 +7,11 @@ import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
 
 class UpgradePlanDialog extends ConsumerStatefulWidget {
-  const UpgradePlanDialog({super.key});
+  final String mainCTAText;
+  const UpgradePlanDialog({
+    super.key,
+    required this.mainCTAText,
+  });
 
   @override
   ConsumerState<UpgradePlanDialog> createState() => _UpgradePlanDialogState();
@@ -134,7 +138,7 @@ class _UpgradePlanDialogState extends ConsumerState<UpgradePlanDialog> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'With Ultra plan, you can instantly clone any public scrappable from the marketplace and customize it to perfectly fit your needs.',
+                    widget.mainCTAText,
                     style: context.t.bodyMedium?.copyWith(
                       color: context.c.onSurfaceVariant,
                       height: 1.5,

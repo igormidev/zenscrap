@@ -12,6 +12,8 @@ import 'package:zenscrap_flutter/src/ui/scrappables/pages/empty_scrappable_lista
 import 'package:zenscrap_flutter/src/design_system/widgets/edit_scrappable_dialog.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
+import 'package:zenscrap_flutter/src/core/extensions/serverpod_to_result.dart';
+import 'package:zenscrap_flutter/src/design_system/default_error_snackbar.dart';
 
 class UserScrappablesListage extends ConsumerStatefulWidget {
   const UserScrappablesListage({super.key});
@@ -99,13 +101,13 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
                           );
                         },
                         onDelete: () async {
-                          try {
-                            final client = ref.read(clientProvider);
-                            final success = await client.deleteScrappable.call(
-                              scrappableId: scrappable.id.toString(),
-                            );
-                            
-                            if (success) {
+                          final client = ref.read(clientProvider);
+                          final result = await client.deleteScrappable.call(
+                            scrappableId: scrappable.id.toString(),
+                          ).toResult;
+                          
+                          return result.fold(
+                            (success) {
                               // Refresh the scrappables list
                               unawaited(ref.read(userScrappables.notifier).getScrappables());
                               if (context.mounted) {
@@ -114,18 +116,15 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
                                   'Scrappable deleted successfully',
                                 );
                               }
-                            }
-                            
-                            return success;
-                          } catch (e) {
-                            if (context.mounted) {
-                              showErrorSnackbar(
-                                context,
-                                'Failed to delete scrappable: ${e.toString()}',
-                              );
-                            }
-                            return false;
-                          }
+                              return success;
+                            },
+                            (error) {
+                              if (context.mounted) {
+                                handleBabelException(context, error);
+                              }
+                              return false;
+                            },
+                          );
                         },
                       ),
                     );

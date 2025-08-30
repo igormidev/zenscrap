@@ -1,5 +1,28 @@
 # Claude Development Guidelines
 
+## ⚠️ IMPORTANT: Serverpod Code Generation
+
+**ALWAYS use the experimental features flag when generating Serverpod files:**
+
+```bash
+serverpod generate --experimental-features=all
+```
+
+This project uses experimental Serverpod features. Omitting the `--experimental-features=all` flag will cause generation errors.
+
+## ⚠️ IMPORTANT: Static Analysis Verification
+
+**ALWAYS check for static analysis errors after making code changes:**
+
+Before completing any task, ensure:
+1. No red squiggly lines (errors) in the IDE
+2. No yellow squiggly lines (warnings) unless absolutely necessary
+3. Run `dart analyze` or check IDE diagnostics to verify
+4. Fix any unused imports, undefined variables, or type mismatches
+5. Ensure all required parameters are provided
+
+This prevents introducing bugs and maintains code quality standards.
+
 ## Flutter Best Practices
 
 ### Theme and Color Access
@@ -58,3 +81,40 @@ Widget _buildButton(String label, VoidCallback onPressed) {
 - Use private widget classes (prefixed with `_`) for widgets only used within a single file
 - Keep widgets focused on a single responsibility
 - Pass callbacks and data through constructor parameters rather than accessing them globally
+
+## API Error Handling Guidelines
+
+### Always Use toResult Extension
+When making API calls, always use the `toResult` extension from `zenscrap_flutter/lib/src/core/extensions/serverpod_to_result.dart`:
+
+```dart
+// GOOD - Using toResult
+final result = await client.someEndpoint.call().toResult;
+result.fold(
+  (success) => // handle success,
+  (error) => // handle error
+);
+```
+
+```dart
+// BAD - Direct try-catch
+try {
+  await client.someEndpoint.call();
+} catch (e) {
+  // handle error
+}
+```
+
+### Dialog Error Handling
+When making API calls directly within dialogs, use `handleBabelException` from `zenscrap_flutter/lib/src/design_system/default_error_snackbar.dart`:
+
+```dart
+// In dialogs, use handleBabelException for errors
+final result = await client.someEndpoint.call().toResult;
+result.fold(
+  (success) => // handle success,
+  (error) => handleBabelException(context, error),
+);
+```
+
+This ensures consistent error handling and user feedback across the application.

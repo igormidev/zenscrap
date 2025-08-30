@@ -6,7 +6,6 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/scraper_category_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
-import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 
 class EditScrappableDialog extends ConsumerStatefulWidget {
@@ -39,50 +38,48 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog> {
   Future<void> _handleDelete() async {
     if (widget.onDelete == null) return;
 
-    await ref.globalLoadingSetter(() async {
-      // Show confirmation dialog
-      final shouldDelete = await showDialog<bool>(
-        context: context,
-        builder: (dialogContext) => AlertDialog(
-          title: Text('Delete Scrappable'),
-          content: Text(
-              'Are you sure you want to delete "${widget.scrappable.name}"? This action cannot be undone.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: Text('Cancel'),
+    // Show confirmation dialog
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text('Delete Scrappable'),
+        content: Text(
+            'Are you sure you want to delete "${widget.scrappable.name}"? This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            style: FilledButton.styleFrom(
+              backgroundColor: context.c.error,
             ),
-            FilledButton(
-              onPressed: () => Navigator.of(dialogContext).pop(true),
-              style: FilledButton.styleFrom(
-                backgroundColor: context.c.error,
-              ),
-              child: Text('Delete'),
-            ),
-          ],
-        ),
-      );
+            child: Text('Delete'),
+          ),
+        ],
+      ),
+    );
 
-      if (shouldDelete != true) return;
+    if (shouldDelete != true) return;
 
-      _isDeleting.value = true;
-      try {
-        final success = await widget.onDelete!();
-        if (success && mounted) {
-          context.pop();
-        } else if (mounted) {
-          showErrorSnackbar(context, 'Failed to delete scrappable');
-        }
-      } catch (e) {
-        if (mounted) {
-          showErrorSnackbar(context, 'Error: ${e.toString()}');
-        }
-      } finally {
-        if (mounted) {
-          _isDeleting.value = false;
-        }
+    _isDeleting.value = true;
+    try {
+      final success = await widget.onDelete!();
+      if (success && mounted) {
+        context.pop();
+      } else if (mounted) {
+        showErrorSnackbar(context, 'Failed to delete scrappable');
       }
-    });
+    } catch (e) {
+      if (mounted) {
+        showErrorSnackbar(context, 'Error: ${e.toString()}');
+      }
+    } finally {
+      if (mounted) {
+        _isDeleting.value = false;
+      }
+    }
   }
 
   @override
