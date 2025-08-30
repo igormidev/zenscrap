@@ -33,8 +33,8 @@ class ScrappableApiEndpoint extends Endpoint with ApiHelperMixin {
 
       final (Scrappable scrappable, ScrappableRequest targetRequest) =
           await getScrappableById(session, scrappableId, nanoId);
-
       setScrappableCallback(scrappable);
+      throwErrorIfIsATestRequestAndTestTimeExpired(apiKey, scrappable);
       final String targetUrl = composeUrl(payload, targetRequest);
       final extractRules = await getExtractRules(session, scrappable, apiKey);
 

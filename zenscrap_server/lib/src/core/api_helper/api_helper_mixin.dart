@@ -68,6 +68,17 @@ mixin ApiHelperMixin {
     }
   }
 
+  void throwErrorIfIsATestRequestAndTestTimeExpired(
+      ApiKey? apiKey, Scrappable scrappable) {
+    final isTest = apiKey == null;
+    if (isTest) {
+      final testExpiry = scrappable.testEndpointAvailableUntil;
+      if (testExpiry == null || testExpiry.isBefore(DateTime.now())) {
+        throw _testPeriodExpired;
+      }
+    }
+  }
+
   String composeUrl(
     Map<String, dynamic> payload,
     ScrappableRequest targetRequest,
@@ -269,6 +280,18 @@ mixin ApiHelperMixin {
     }
   }
 }
+
+final _testPeriodExpired = _ApiError(
+  RequestStatus.clientError,
+  ZenScrapException(
+    title: 'Test Period Expired',
+    description: '''The test period for this scrappable has expired.
+
+You can:
+- Start a new testing session, that will start a new test period
+- Call the production endpoint with a valid API key if you have an account''',
+  ),
+);
 
 final _noApiFound = _ApiError(
   RequestStatus.clientError,

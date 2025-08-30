@@ -52,10 +52,6 @@ class ScrappableChatSession extends Endpoint {
     }
     final RedraftSrappableSessionId sessionUuid = uuid.v4();
     _scrapRedraftSessions[sessionUuid] = ReplaySubject<ChatResponse>();
-    // chatSessions[sessionUuid] = ChatControllerClaudeSdkImpl.create(
-    //   scrappableId: scrappable.id,
-    //   referenceTestData: referenceTestData,
-    // );
     chatSessions[sessionUuid] = ChatControllerGeminiApiImpl.create(
       scrappableId: scrappable.id,
       referenceTestData: referenceTestData,
