@@ -5,9 +5,10 @@ class MarketplaceEndpoint extends Endpoint {
   Future<PaginatedScrappableResponse> getItems(
     Session session, {
     int page = 1,
-    int pageSize = 20,
     String? searchQuery,
   }) async {
+    const int pageSize = 20;
+
     // Ensure page is at least 1
     page = page < 1 ? 1 : page;
 
@@ -40,11 +41,17 @@ class MarketplaceEndpoint extends Endpoint {
     // Calculate offset
     final offset = (page - 1) * pageSize;
 
+    final sevenDaysAgo = DateTime.now().subtract(const Duration(days: 7));
+
     // Fetch paginated data
     final scrappables = await Scrappable.db.find(
       session,
       where: whereClause,
-      orderBy: (t) => t.createdAt,
+      orderBy: (t) => t.scrappableAnalytics.count(
+        (a) =>
+            (a.requestedAt >= sevenDaysAgo) &
+            (a.requestStatus.equals(RequestStatus.success)),
+      ),
       orderDescending: true,
       limit: pageSize,
       offset: offset,
