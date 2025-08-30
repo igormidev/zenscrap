@@ -65,7 +65,6 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
             SizedBox(width: 20),
           ],
         ),
-        SizedBox(height: 22),
         Expanded(
           child: LayoutBuilder(builder: (context, constaints) {
             final optimalCrossAxisCount = (constaints.maxWidth / 480).floor();
@@ -73,7 +72,7 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
               itemCount: scrappables.length,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: optimalCrossAxisCount,
-                mainAxisExtent: 200,
+                mainAxisExtent: 220,
                 crossAxisSpacing: 20,
                 mainAxisSpacing: 20,
               ),

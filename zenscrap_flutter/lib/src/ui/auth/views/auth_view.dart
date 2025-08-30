@@ -327,6 +327,7 @@ class _AuthViewState extends ConsumerState<AuthView>
               ref.read(scrapChatProvider.notifier).updateScrappableDetails(
                     name: name,
                     description: description,
+                    category: category,
                   );
             },
           );

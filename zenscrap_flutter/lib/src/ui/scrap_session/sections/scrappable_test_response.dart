@@ -59,6 +59,7 @@ class _ScrappableTestResponseState extends State<ScrappableTestResponse>
                 screenshotData: testData.byteData?.referenceSiteScreenshot,
               ),
               ScrappableEditVisualization(
+                key: UniqueKey(),
                 scrappable: widget.scrappable,
               ),
             ],

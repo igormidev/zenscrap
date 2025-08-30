@@ -14,7 +14,7 @@ import 'package:zenscrap_flutter/src/ui/marketplace/dialogs/upgrade_plan_dialog.
 class EditScrappableDialog extends ConsumerStatefulWidget {
   final Scrappable scrappable;
   final Future<bool> Function(String name, String description,
-      ScraperCategory? category, bool? willHideFromMarketplace) onSave;
+      ScraperCategory category, bool? willHideFromMarketplace) onSave;
   final Future<bool> Function()? onDelete;
 
   const EditScrappableDialog({
@@ -267,7 +267,7 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog> {
 class ScrappableEditForm extends StatefulWidget {
   final Scrappable scrappable;
   final Future<bool> Function(String name, String description,
-      ScraperCategory? category, bool? willHideFromMarketplace) onSave;
+      ScraperCategory category, bool? willHideFromMarketplace) onSave;
   final bool shouldPopOnEnd;
   final List<Widget> children;
   final void Function(bool hasChanges)? onHasChangesUpdated;
@@ -353,7 +353,7 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
       final success = await widget.onSave(
         _nameController.text.trim(),
         _descriptionController.text.trim(),
-        _selectedCategory != _initialCategory ? _selectedCategory : null,
+        _selectedCategory ?? _initialCategory,
         _willHideFromMarketplace != _initialWillHideFromMarketplace
             ? _willHideFromMarketplace
             : null,

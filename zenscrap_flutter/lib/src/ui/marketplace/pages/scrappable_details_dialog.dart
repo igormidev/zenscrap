@@ -117,150 +117,188 @@ class _ScrappableDetailsDialogState
     );
 
     return Row(
+      spacing: 32,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         AlertDialog(
-          title: Row(
-            children: [
-              Text(widget.scrappable.name),
-              SizedBox(width: 16),
-              CategoryBadge(
-                scrappable: widget.scrappable,
-              ),
-              Spacer(),
-              InkWell(
-                onTap: () {},
-                child: Icon(
-                  Icons.close,
-                  color: context.c.onSurfaceVariant,
-                ),
-              )
-            ],
-          ),
-          content: SingleChildScrollView(
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.6,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.scrappable.description,
-                    style: context.t.bodyMedium,
+          title: Text('Example Response'),
+          insetPadding: EdgeInsets.symmetric(vertical: 20),
+          titlePadding: EdgeInsets.only(left: 24, right: 24, top: 24),
+          contentPadding: EdgeInsets.only(left: 24, right: 24),
+          content: SizedBox(
+            height: MediaQuery.sizeOf(context).height * 0.6 + 58,
+            width: MediaQuery.sizeOf(context).width * 0.3,
+            child: Builder(builder: (context) {
+              final String? result = widget.scrappable.referenceTestData
+                  ?.scrappableTestResult?.extractJsonResult;
+
+              return SingleChildScrollView(
+                padding: EdgeInsets.symmetric(vertical: 20),
+                child: SelectableText(
+                  result != null && result.isNotEmpty
+                      ? result
+                      : 'No example response available.',
+                  style: context.t.bodyMedium?.copyWith(
+                    fontFamily: 'monospace',
                   ),
-                  if (widget.scrappable.targetRequest?.url != null) ...[
-                    const SizedBox(height: 16),
-                    Text(
-                      'Target URL:',
-                      style: context.t.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+                ),
+              );
+            }),
+          ),
+        ),
+        AlertDialog(
+          insetPadding: EdgeInsets.symmetric(vertical: 20),
+          actionsPadding: EdgeInsets.only(bottom: 16, left: 22, right: 22),
+          titlePadding: EdgeInsets.only(left: 24, right: 24, top: 24),
+          contentPadding: EdgeInsets.only(left: 24, right: 24),
+          title: SizedBox(
+            width: MediaQuery.sizeOf(context).width * 0.3,
+            child: Row(
+              children: [
+                Expanded(child: Text(widget.scrappable.name)),
+                SizedBox(width: 8),
+                InkWell(
+                  onTap: () {},
+                  child: Icon(
+                    Icons.close,
+                    color: context.c.onSurfaceVariant,
+                  ),
+                )
+              ],
+            ),
+          ),
+          content: SizedBox(
+            height: MediaQuery.sizeOf(context).height * 0.6,
+            width: MediaQuery.sizeOf(context).width * 0.3,
+            child: ListView(
+              padding: EdgeInsets.only(bottom: 20, top: 6),
+              children: [
+                Text(
+                  widget.scrappable.description,
+                  style: context.t.bodyMedium,
+                ),
+                SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: CategoryBadge(
+                    scrappable: widget.scrappable,
+                  ),
+                ),
+                if (widget.scrappable.targetRequest?.url != null) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    'Target URL:',
+                    style: context.t.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  BabelText(
+                    '<onTap><u><pC>${widget.scrappable.targetRequest!.url.shortUrl}<pC><u><onTap>',
+                    style: context.t.bodyMedium?.copyWith(),
+                    onTapMapping: {
+                      '<onTap>': (context) {
+                        launchUrlString(
+                            widget.scrappable.targetRequest!.url.shortUrl);
+                      }
+                    },
+                  ),
+                ],
+                if (selectedApiKey != null) ...[
+                  SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: context.c.surfaceContainerHighest.withAlpha(77),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: context.c.outline.withAlpha(51),
                       ),
                     ),
-                    BabelText(
-                      '<onTap><u><pC>${widget.scrappable.targetRequest!.url.shortUrl}<pC><u><onTap>',
-                      style: context.t.bodyLarge?.copyWith(),
-                      onTapMapping: {
-                        '<onTap>': (context) {
-                          launchUrlString(
-                              widget.scrappable.targetRequest!.url.shortUrl);
-                        }
-                      },
-                    ),
-                  ],
-                  if (selectedApiKey != null) ...[
-                    SizedBox(height: 16),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: context.c.surfaceContainerHighest.withAlpha(77),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: context.c.outline.withAlpha(51),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.vpn_key,
+                          size: 16,
+                          color: context.c.onSurfaceVariant,
                         ),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.vpn_key,
-                            size: 16,
+                        const SizedBox(width: 8),
+                        Text(
+                          selectedApiKey!.name,
+                          style: context.t.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '(${selectedApiKey!.apiKey.substring(0, 8)}...)',
+                          style: context.t.bodySmall?.copyWith(
+                            fontFamily: 'monospace',
                             color: context.c.onSurfaceVariant,
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            selectedApiKey!.name,
-                            style: context.t.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            '(${selectedApiKey!.apiKey.substring(0, 8)}...)',
-                            style: context.t.bodySmall?.copyWith(
-                              fontFamily: 'monospace',
-                              color: context.c.onSurfaceVariant,
-                            ),
-                          ),
-                          if (apiKeys.length > 1) ...[
-                            Spacer(),
-                            TextButton.icon(
-                              onPressed: _selectApiKey,
-                              icon: const Icon(Icons.swap_horiz, size: 18),
-                              label: const Text('Change'),
-                            ),
-                          ]
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Text(
-                      'Curl Command',
-                      style: context.t.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      height: 200,
-                      child: CodeBlock(
-                        code: curlCommand,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ] else if (apiKeys.isEmpty) ...[
-                    const SizedBox(height: 24),
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: context.c.errorContainer.withAlpha(26),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: context.c.error.withAlpha(51),
                         ),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.warning_amber_rounded,
-                            color: context.c.error,
+                        if (apiKeys.length > 1) ...[
+                          Spacer(),
+                          TextButton.icon(
+                            onPressed: _selectApiKey,
+                            icon: const Icon(Icons.swap_horiz, size: 18),
+                            label: const Text('Change'),
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              'No API keys found. Please create an API key first to use this scrappable.',
-                              style: context.t.bodyMedium?.copyWith(
-                                color: context.c.error,
-                              ),
-                            ),
-                          ),
-                        ],
+                        ]
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    'Curl Command',
+                    style: context.t.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  CodeBlock(
+                    code: curlCommand
+                        .replaceAll(r'\"', '"')
+                        // replace the api key
+                        .replaceAll(selectedApiKey!.apiKey,
+                            '${selectedApiKey!.apiKey.substring(0, 8)}...'),
+                    copyCode: curlCommand,
+                    fontSize: 12,
+                  ),
+                ] else if (apiKeys.isEmpty) ...[
+                  const SizedBox(height: 24),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: context.c.errorContainer.withAlpha(26),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: context.c.error.withAlpha(51),
                       ),
                     ),
-                  ],
-                  const SizedBox(height: 16),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.warning_amber_rounded,
+                          color: context.c.error,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'No API keys found. Please create an API key first to use this scrappable.',
+                            style: context.t.bodyMedium?.copyWith(
+                              color: context.c.error,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
-              ),
+                const SizedBox(height: 16),
+              ],
             ),
           ),
           actionsAlignment: MainAxisAlignment.spaceBetween,
@@ -288,25 +326,6 @@ class _ScrappableDetailsDialogState
               ],
             ),
           ],
-        ),
-        SizedBox(width: 32),
-        AlertDialog(
-          title: Text('Example Response'),
-          content: Builder(builder: (context) {
-            final String? result = widget.scrappable.referenceTestData
-                ?.scrappableTestResult?.extractJsonResult;
-
-            return SingleChildScrollView(
-              child: SelectableText(
-                result != null && result.isNotEmpty
-                    ? result
-                    : 'No example response available.',
-                style: context.t.bodyMedium?.copyWith(
-                  fontFamily: 'monospace',
-                ),
-              ),
-            );
-          }),
         ),
       ],
     );

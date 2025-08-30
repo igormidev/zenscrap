@@ -12,7 +12,7 @@ class MarketplaceEndpoint extends Endpoint {
     String? searchQuery,
   }) async {
     final now = DateTime.now();
-    const int pageSize = 20;
+    const int pageSize = 12;
 
     // Ensure page is at least 1
     page = page < 1 ? 1 : page;
@@ -64,6 +64,7 @@ class MarketplaceEndpoint extends Endpoint {
         targetRequest: ScrappableRequest.include(),
         referenceTestData: ReferenceTestData.include(
           byteData: ByteTestData.include(),
+          scrappableTestResult: ScrappableTestResult.include(),
         ),
       ),
     );

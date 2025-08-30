@@ -33,6 +33,7 @@ class CodeBlock extends StatelessWidget {
     );
     final bool hasLeading = leadingWidgets?.isNotEmpty ?? false;
     return Container(
+      height: 240,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         color: context.c.onPrimary,
@@ -47,13 +48,14 @@ class CodeBlock extends StatelessWidget {
               children: [
                 if (hasLeading) ...[
                   Expanded(
-                      child: Row(
-                    spacing: 8,
-                    children: [
-                      copyButton,
-                      ...?leadingWidgets,
-                    ],
-                  )),
+                    child: Row(
+                      spacing: 8,
+                      children: [
+                        copyButton,
+                        ...?leadingWidgets,
+                      ],
+                    ),
+                  ),
                 ] else
                   Expanded(
                     child: Row(
@@ -78,16 +80,19 @@ class CodeBlock extends StatelessWidget {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 16),
-            child: SelectableText(
-              code,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyLarge?.copyWith(fontSize: fontSize),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 16),
+              child: SingleChildScrollView(
+                child: SelectableText(
+                  code,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyLarge?.copyWith(fontSize: fontSize),
+                ),
+              ),
             ),
           ),
-          const SizedBox(height: 20),
         ],
       ),
     );

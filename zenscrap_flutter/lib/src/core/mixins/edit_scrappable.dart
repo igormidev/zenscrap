@@ -13,7 +13,7 @@ mixin EditScrappable<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     Scrappable scrappable,
     String name,
     String description,
-    ScraperCategory? category,
+    ScraperCategory category,
     bool? willHideFromMarketplace,
     void Function() onSuccess,
   ) async {

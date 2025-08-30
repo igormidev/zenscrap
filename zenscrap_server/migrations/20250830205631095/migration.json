@@ -1,0 +1,162 @@
+{
+  "actions": [
+    {
+      "type": "createTable",
+      "createTable": {
+        "name": "byte_test_data",
+        "dartName": "ByteTestData",
+        "module": "zenscrap",
+        "schema": "public",
+        "columns": [
+          {
+            "name": "id",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "nextval('byte_test_data_id_seq'::regclass)",
+            "dartType": "int?"
+          },
+          {
+            "name": "referenceHtmlPage",
+            "columnType": 5,
+            "isNullable": false,
+            "dartType": "dart:typed_data:ByteData"
+          },
+          {
+            "name": "referenceSiteScreenshot",
+            "columnType": 5,
+            "isNullable": false,
+            "dartType": "dart:typed_data:ByteData"
+          }
+        ],
+        "foreignKeys": [],
+        "indexes": [
+          {
+            "indexName": "byte_test_data_pkey",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "id"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": true
+          }
+        ],
+        "managed": true
+      }
+    },
+    {
+      "type": "deleteTable",
+      "deleteTable": "scrappable_test_data"
+    },
+    {
+      "type": "createTable",
+      "createTable": {
+        "name": "scrappable_test_data",
+        "dartName": "ReferenceTestData",
+        "module": "zenscrap",
+        "schema": "public",
+        "columns": [
+          {
+            "name": "id",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "nextval('scrappable_test_data_id_seq'::regclass)",
+            "dartType": "int?"
+          },
+          {
+            "name": "referenceLinkUsed",
+            "columnType": 0,
+            "isNullable": false,
+            "dartType": "String"
+          },
+          {
+            "name": "referenceQueryParametersJson",
+            "columnType": 0,
+            "isNullable": false,
+            "dartType": "String"
+          },
+          {
+            "name": "byteDataId",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "int"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "constraintName": "scrappable_test_data_fk_0",
+            "columns": [
+              "byteDataId"
+            ],
+            "referenceTable": "byte_test_data",
+            "referenceTableSchema": "public",
+            "referenceColumns": [
+              "id"
+            ],
+            "onUpdate": 3,
+            "onDelete": 3
+          }
+        ],
+        "indexes": [
+          {
+            "indexName": "scrappable_test_data_pkey",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "id"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": true
+          },
+          {
+            "indexName": "reference_test_data_byte_data_id_idx",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "byteDataId"
+              }
+            ],
+            "type": "btree",
+            "isUnique": false,
+            "isPrimary": false
+          }
+        ],
+        "managed": true
+      }
+    }
+  ],
+  "warnings": [
+    {
+      "type": "columnDropped",
+      "message": "Column \"referenceHtmlPage\" of table \"scrappable_test_data\" will be dropped.",
+      "table": "scrappable_test_data",
+      "columns": [
+        "referenceHtmlPage"
+      ],
+      "destrucive": true
+    },
+    {
+      "type": "columnDropped",
+      "message": "Column \"referenceSiteScreenshot\" of table \"scrappable_test_data\" will be dropped.",
+      "table": "scrappable_test_data",
+      "columns": [
+        "referenceSiteScreenshot"
+      ],
+      "destrucive": true
+    },
+    {
+      "type": "tableDropped",
+      "message": "One or more columns are added to table \"scrappable_test_data\" which cannot be added in a table migration. The complete table will be deleted and recreated.",
+      "table": "scrappable_test_data",
+      "columns": [
+        "byteDataId"
+      ],
+      "destrucive": true
+    }
+  ],
+  "migrationApiVersion": 1
+}

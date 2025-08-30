@@ -89,6 +89,7 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
   void updateScrappableDetails({
     required String name,
     required String description,
+    required ScraperCategory category,
   }) {
     state.mapOrNull(
       standard: (value) {
@@ -96,6 +97,7 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
           data: value.data.copyWith(
             name: name,
             description: description,
+            category: category,
           ),
         );
       },

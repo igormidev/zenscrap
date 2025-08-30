@@ -49,7 +49,7 @@ class ScrappableCardIndicator extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       color: context.c.onSurface,
                     ),
-                    maxLines: 2,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),

@@ -46,6 +46,7 @@ class _ScrappableEditVisualizationState
               ref.read(scrapChatProvider.notifier).updateScrappableDetails(
                     name: name,
                     description: description,
+                    category: category,
                   );
             },
           );
