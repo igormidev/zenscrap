@@ -438,7 +438,7 @@ class _ScrappableDetailsDialogState
     // Check if user has unlimited plan
     final accountState = ref.read(accountProvider);
     final hasUnlimitedPlan = accountState.maybeWhen(
-      withData: (accountInfo) => accountInfo.planTier == PlanTier.unlimited,
+      withData: (accountInfo) => accountInfo.planTier == PlanTier.ultra,
       orElse: () => false,
     );
 

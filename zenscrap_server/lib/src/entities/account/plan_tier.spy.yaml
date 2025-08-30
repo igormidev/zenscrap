@@ -2,6 +2,6 @@ enum: PlanTier
 serialized: byIndex
 values:
   - none
-  - base
+  - basic
   - pro
-  - unlimited
+  - ultra

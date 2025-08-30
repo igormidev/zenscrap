@@ -119,10 +119,10 @@ class EditScrappableEndpoint extends Endpoint {
         where: (p) => p.userInfoId.equals(userId),
       );
       
-      if (userAccount == null || userAccount.planTier != PlanTier.unlimited) {
+      if (userAccount == null || userAccount.planTier != PlanTier.ultra) {
         throw ZenScrapException(
-          title: 'Unlimited Plan Required',
-          description: 'Hiding scrappables from marketplace is only available for Unlimited plan users.',
+          title: 'Ultra Plan Required',
+          description: 'Hiding scrappables from marketplace is only available for Ultra plan users.',
         );
       }
       

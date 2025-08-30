@@ -436,13 +436,13 @@ class StripeWebhookRoute extends Route {
     // Map price IDs to plan tiers
     if (priceId == StripeConfig.basicPriceIdMonthly ||
         priceId == StripeConfig.basicPriceIdYearly) {
-      return PlanTier.base;
+      return PlanTier.basic;
     } else if (priceId == StripeConfig.proPriceIdMonthly ||
         priceId == StripeConfig.proPriceIdYearly) {
       return PlanTier.pro;
     } else if (priceId == StripeConfig.ultraPriceIdMonthly ||
         priceId == StripeConfig.ultraPriceIdYearly) {
-      return PlanTier.unlimited;
+      return PlanTier.ultra;
     }
 
     return PlanTier.none;

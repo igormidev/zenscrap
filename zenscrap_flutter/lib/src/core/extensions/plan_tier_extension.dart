@@ -4,9 +4,9 @@ extension PlanTierExtension on PlanTier {
   String get displayName {
     return switch (this) {
       PlanTier.none => 'None',
-      PlanTier.base => 'Base',
+      PlanTier.basic => 'Basic',
       PlanTier.pro => 'Pro',
-      PlanTier.unlimited => 'Unlimited',
+      PlanTier.ultra => 'Ultra',
     };
   }
 }

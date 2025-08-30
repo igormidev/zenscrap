@@ -34,7 +34,7 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
     }
 
     // Check if user has unlimited plan
-    if (accountInfo.planTier != PlanTier.unlimited) {
+    if (accountInfo.planTier != PlanTier.ultra) {
       throw ZenScrapException(
         title: 'Upgrade Required',
         description: 'Cloning marketplace scrappables requires an Ultra plan.',

@@ -6,9 +6,9 @@ extension PlanTierExt on PlanTier {
   int get apiCreditsToBeAddedPerMonth {
     return switch (this) {
       PlanTier.none => 0,
-      PlanTier.base => 50000,
+      PlanTier.basic => 50000,
       PlanTier.pro => 200000,
-      PlanTier.unlimited => 1000000,
+      PlanTier.ultra => 1000000,
     };
   }
 
@@ -16,9 +16,9 @@ extension PlanTierExt on PlanTier {
   int get numberOfConcurrentRequestsAllowedByPlan {
     return switch (this) {
       PlanTier.none => 0,
-      PlanTier.base => 10,
+      PlanTier.basic => 10,
       PlanTier.pro => 30,
-      PlanTier.unlimited => 100,
+      PlanTier.ultra => 100,
     };
   }
 }

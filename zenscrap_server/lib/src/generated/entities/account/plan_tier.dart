@@ -13,20 +13,20 @@ import 'package:serverpod/serverpod.dart' as _i1;
 
 enum PlanTier implements _i1.SerializableModel {
   none,
-  base,
+  basic,
   pro,
-  unlimited;
+  ultra;
 
   static PlanTier fromJson(int index) {
     switch (index) {
       case 0:
         return PlanTier.none;
       case 1:
-        return PlanTier.base;
+        return PlanTier.basic;
       case 2:
         return PlanTier.pro;
       case 3:
-        return PlanTier.unlimited;
+        return PlanTier.ultra;
       default:
         throw ArgumentError('Value "$index" cannot be converted to "PlanTier"');
     }

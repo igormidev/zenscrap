@@ -779,7 +779,7 @@ class _HideFromMarketplaceToggleState extends ConsumerState<HideFromMarketplaceT
       account = accountState.accountInfo;
     }
     
-    if (newValue && (account == null || account.planTier != PlanTier.unlimited)) {
+    if (newValue && (account == null || account.planTier != PlanTier.ultra)) {
       // Show upgrade dialog
       await showHideFromMarketplaceUpgradeDialog(context);
       return;

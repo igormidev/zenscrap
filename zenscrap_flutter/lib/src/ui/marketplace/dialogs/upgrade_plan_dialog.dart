@@ -447,7 +447,7 @@ Future<void> showCloneUpgradeDialog(BuildContext context) async {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Requires Unlimited Plan (\$500/month)',
+                    'Requires Ultra Plan (\$500/month)',
                     style: context.t.bodySmall?.copyWith(
                       color: context.c.primary,
                       fontWeight: FontWeight.w600,
@@ -520,7 +520,7 @@ Future<void> showHideFromMarketplaceUpgradeDialog(BuildContext context) async {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Unlimited Plan Exclusive Feature',
+                    'Ultra Plan Exclusive Feature',
                     style: context.t.bodySmall?.copyWith(
                       color: context.c.primary,
                       fontWeight: FontWeight.w600,
@@ -539,7 +539,7 @@ Future<void> showHideFromMarketplaceUpgradeDialog(BuildContext context) async {
         ),
         FilledButton(
           onPressed: () => Navigator.of(dialogContext).pop(true),
-          child: const Text('Upgrade to Unlimited'),
+          child: const Text('Upgrade to Ultra'),
         ),
       ],
     ),
