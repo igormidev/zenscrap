@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:babel_text/babel_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/convert_extensions.dart';
@@ -109,6 +111,11 @@ class _ScrappableDetailsDialogState
   @override
   Widget build(BuildContext context) {
     final accountState = ref.watch(accountProvider);
+
+    final accountId = ref.watch(accountProvider).mapOrNull(
+          withData: (value) => value.accountInfo.id,
+        );
+    final isMyScrappable = accountId == widget.scrappable.accountId;
     final apiKeys = accountState.maybeWhen(
       withData: (accountInfo) => accountInfo.accountApiUsage?.apiKeys ?? [],
       orElse: () => <AccountApiKey>[],
@@ -130,11 +137,13 @@ class _ScrappableDetailsDialogState
               final String? result = widget.scrappable.referenceTestData
                   ?.scrappableTestResult?.extractJsonResult;
 
+              final decodedJson = tryDecode(result);
+
               return SingleChildScrollView(
                 padding: EdgeInsets.symmetric(vertical: 20),
                 child: SelectableText(
-                  result != null && result.isNotEmpty
-                      ? result
+                  result != null && result.isNotEmpty && decodedJson != null
+                      ? JsonEncoder.withIndent('  ').convert(decodedJson)
                       : 'No example response available.',
                   style: context.t.bodyMedium?.copyWith(
                     fontFamily: 'monospace',
@@ -156,7 +165,7 @@ class _ScrappableDetailsDialogState
                 Expanded(child: Text(widget.scrappable.name)),
                 SizedBox(width: 8),
                 InkWell(
-                  onTap: () {},
+                  onTap: context.pop,
                   child: Icon(
                     Icons.close,
                     color: context.c.onSurfaceVariant,
@@ -257,6 +266,7 @@ class _ScrappableDetailsDialogState
                   ),
                   const SizedBox(height: 8),
                   CodeBlock(
+                    copyTooltipMessage: 'Copy the test cURL command',
                     code: curlCommand
                         .replaceAll(r'\"', '"')
                         // replace the api key
@@ -301,10 +311,13 @@ class _ScrappableDetailsDialogState
           ),
           actionsAlignment: MainAxisAlignment.spaceBetween,
           actions: [
-            Text(
-              'Created: ${_formatFullDate(widget.scrappable.createdAt)}',
-              style: context.t.bodySmall?.copyWith(
-                color: context.c.onSurfaceVariant,
+            Padding(
+              padding: const EdgeInsets.only(bottom: 27.0),
+              child: Text(
+                'Created: ${_formatFullDate(widget.scrappable.createdAt)}',
+                style: context.t.bodySmall?.copyWith(
+                  color: context.c.onSurfaceVariant,
+                ),
               ),
             ),
             Row(
@@ -315,12 +328,15 @@ class _ScrappableDetailsDialogState
                 //   onPressed: () => Navigator.of(context).pop(),
                 //   child: const Text('Close'),
                 // ),
-                SizedBox(width: 8),
-                FilledButton.icon(
-                  onPressed: () => _handleClone(context),
-                  icon: const Icon(Icons.copy_rounded),
-                  label: const Text('Clone to My Endpoints'),
-                )
+                // I cant clone my own scrappable
+                if (isMyScrappable == false) ...[
+                  SizedBox(width: 8),
+                  FilledButton.icon(
+                    onPressed: () => _handleClone(context),
+                    icon: const Icon(Icons.copy_rounded),
+                    label: const Text('Clone to My Endpoints'),
+                  ),
+                ],
               ],
             ),
           ],
@@ -330,7 +346,7 @@ class _ScrappableDetailsDialogState
   }
 
   String _formatFullDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year} at ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+    return '${date.day}/${date.month}/${date.year}';
   }
 
   Future<void> _handleClone(BuildContext context) async {

@@ -9,6 +9,7 @@ import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.d
 import 'package:zenscrap_flutter/src/design_system/widgets/scrappable_card_indicator.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_state.dart';
+import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables.dart';
 import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables_state.dart';
 import 'package:zenscrap_flutter/src/ui/scrappables/pages/empty_scrappable_listage_indicator_page.dart';
@@ -56,8 +57,13 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
             ),
             Spacer(),
             FilledButton.tonalIcon(
-              onPressed: () {
-                context.push('/scrappable-form');
+              onPressed: () async {
+                ref.read(scrapChatProvider.notifier).reset();
+                final result = await context.push('/scrappable-form');
+                if (result == true) {
+                  unawaited(
+                      ref.read(userScrappables.notifier).getScrappables());
+                }
               },
               label: Text('Create new endpoint'),
               icon: Icon(Icons.add),

@@ -5,6 +5,7 @@ import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
 
 class CodeBlock extends StatelessWidget {
   final String code;
+  final String? copyTooltipMessage;
   final String? copyCode;
   final double? fontSize;
   final List<Widget>? leadingWidgets;
@@ -13,6 +14,7 @@ class CodeBlock extends StatelessWidget {
     super.key,
     required this.code,
     this.copyCode,
+    this.copyTooltipMessage,
     this.fontSize,
     this.leadingWidgets,
     this.trailingWidgets,
@@ -22,6 +24,7 @@ class CodeBlock extends StatelessWidget {
   Widget build(BuildContext context) {
     final IconButton copyButton = IconButton(
       icon: const Icon(Icons.copy),
+      tooltip: copyTooltipMessage,
       onPressed: () async {
         await Clipboard.setData(
           ClipboardData(text: copyCode ?? code),

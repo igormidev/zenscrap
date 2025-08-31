@@ -59,7 +59,9 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection>
     }
 
     return CodeBlock(
-      code: code,
+      copyTooltipMessage: 'Copy the test cURL command',
+      code: code.replaceAll(r'\"', '"'),
+      copyCode: code,
       leadingWidgets: [RemainingTimeIndicator(widget.targetTime)],
       trailingWidgets: [DeployButton()],
     );

@@ -246,8 +246,13 @@ class ChatControllerGeminiApiImpl extends IChatController {
               scrappableId: scrappableId,
               extractJsonResult: jsonEncode(result),
               testExtractRule: extractedRules,
+              referenceTestDataId: testData.id!,
+              referenceTestData: testData,
             ),
           );
+
+          await ScrappableTestResult.db.attachRow
+              .referenceTestData(session, testResult, testData);
         }
         chatSeasonController.add(NewExtractRuleResponse(
           role: PromptRole.system,

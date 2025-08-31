@@ -64,8 +64,8 @@ final StateProvider routerProvider = StateProvider((ref) {
         }
       } else {
         // If user is authenticated and trying to access auth page, redirect to labels
-        if (path == '/scrappable-form' || path.contains('/scrappable-form')) {
-          return '/scrappable-form';
+        if (path == '/auth' || path.contains('/auth')) {
+          return DashboardNavigationType.userEndpoints.routeOnClick;
         }
       }
 

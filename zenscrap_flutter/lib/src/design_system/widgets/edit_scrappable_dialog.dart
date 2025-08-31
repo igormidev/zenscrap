@@ -290,9 +290,10 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
                             ? null
                             : () {
                                 ref.read(scrapChatProvider.notifier).reset();
-                                context.go(
-                                  '/scrappable-form?id=${widget.scrappable.id.toString()}',
-                                );
+                                final router = GoRouter.of(context);
+                                Navigator.pop(context);
+                                router.push(
+                                    '/scrappable-form?id=${widget.scrappable.id.toString()}');
                               },
                         child: Text('Edit scrapper extract logic'),
                       );
@@ -539,7 +540,7 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
                       child: Row(
                         children: [
                           Icon(
-                            Icons.category_outlined,
+                            _selectedCategory?.icon ?? _initialCategory.icon,
                             color: context.c.onSurfaceVariant,
                           ),
                           const SizedBox(width: 12),
