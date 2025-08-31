@@ -11,8 +11,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import '../../entities/scrappable/scrappable_request.dart' as _i2;
-import '../../entities/scrappable/scrappable_analytics.dart' as _i3;
-import '../../entities/scrappable/reference_test_data.dart' as _i4;
+import '../../entities/scrappable/reference_test_data.dart' as _i3;
+import '../../entities/scrappable/scrappable_analytics.dart' as _i4;
 import '../../entities/scrappable/scraper_category.dart' as _i5;
 
 abstract class Scrappable implements _i1.SerializableModel {
@@ -30,8 +30,8 @@ abstract class Scrappable implements _i1.SerializableModel {
     required this.targetRequestId,
     this.targetRequest,
     required this.referenceTestDataId,
-    this.scrappableAnalytics,
     this.referenceTestData,
+    this.scrappableAnalytics,
     required this.category,
     required this.isDeleted,
   }) : id = id ?? _i1.Uuid().v4obj();
@@ -50,8 +50,8 @@ abstract class Scrappable implements _i1.SerializableModel {
     required int targetRequestId,
     _i2.ScrappableRequest? targetRequest,
     required int referenceTestDataId,
-    List<_i3.ScrappableAnalytics>? scrappableAnalytics,
-    _i4.ReferenceTestData? referenceTestData,
+    _i3.ReferenceTestData? referenceTestData,
+    List<_i4.ScrappableAnalytics>? scrappableAnalytics,
     required _i5.ScraperCategory category,
     required bool isDeleted,
   }) = _ScrappableImpl;
@@ -82,14 +82,14 @@ abstract class Scrappable implements _i1.SerializableModel {
           : _i2.ScrappableRequest.fromJson(
               (jsonSerialization['targetRequest'] as Map<String, dynamic>)),
       referenceTestDataId: jsonSerialization['referenceTestDataId'] as int,
-      scrappableAnalytics: (jsonSerialization['scrappableAnalytics'] as List?)
-          ?.map((e) =>
-              _i3.ScrappableAnalytics.fromJson((e as Map<String, dynamic>)))
-          .toList(),
       referenceTestData: jsonSerialization['referenceTestData'] == null
           ? null
-          : _i4.ReferenceTestData.fromJson(
+          : _i3.ReferenceTestData.fromJson(
               (jsonSerialization['referenceTestData'] as Map<String, dynamic>)),
+      scrappableAnalytics: (jsonSerialization['scrappableAnalytics'] as List?)
+          ?.map((e) =>
+              _i4.ScrappableAnalytics.fromJson((e as Map<String, dynamic>)))
+          .toList(),
       category:
           _i5.ScraperCategory.fromJson((jsonSerialization['category'] as int)),
       isDeleted: jsonSerialization['isDeleted'] as bool,
@@ -125,9 +125,9 @@ abstract class Scrappable implements _i1.SerializableModel {
 
   int referenceTestDataId;
 
-  List<_i3.ScrappableAnalytics>? scrappableAnalytics;
+  _i3.ReferenceTestData? referenceTestData;
 
-  _i4.ReferenceTestData? referenceTestData;
+  List<_i4.ScrappableAnalytics>? scrappableAnalytics;
 
   _i5.ScraperCategory category;
 
@@ -150,8 +150,8 @@ abstract class Scrappable implements _i1.SerializableModel {
     int? targetRequestId,
     _i2.ScrappableRequest? targetRequest,
     int? referenceTestDataId,
-    List<_i3.ScrappableAnalytics>? scrappableAnalytics,
-    _i4.ReferenceTestData? referenceTestData,
+    _i3.ReferenceTestData? referenceTestData,
+    List<_i4.ScrappableAnalytics>? scrappableAnalytics,
     _i5.ScraperCategory? category,
     bool? isDeleted,
   });
@@ -172,11 +172,11 @@ abstract class Scrappable implements _i1.SerializableModel {
       'targetRequestId': targetRequestId,
       if (targetRequest != null) 'targetRequest': targetRequest?.toJson(),
       'referenceTestDataId': referenceTestDataId,
+      if (referenceTestData != null)
+        'referenceTestData': referenceTestData?.toJson(),
       if (scrappableAnalytics != null)
         'scrappableAnalytics':
             scrappableAnalytics?.toJson(valueToJson: (v) => v.toJson()),
-      if (referenceTestData != null)
-        'referenceTestData': referenceTestData?.toJson(),
       'category': category.toJson(),
       'isDeleted': isDeleted,
     };
@@ -205,8 +205,8 @@ class _ScrappableImpl extends Scrappable {
     required int targetRequestId,
     _i2.ScrappableRequest? targetRequest,
     required int referenceTestDataId,
-    List<_i3.ScrappableAnalytics>? scrappableAnalytics,
-    _i4.ReferenceTestData? referenceTestData,
+    _i3.ReferenceTestData? referenceTestData,
+    List<_i4.ScrappableAnalytics>? scrappableAnalytics,
     required _i5.ScraperCategory category,
     required bool isDeleted,
   }) : super._(
@@ -223,8 +223,8 @@ class _ScrappableImpl extends Scrappable {
           targetRequestId: targetRequestId,
           targetRequest: targetRequest,
           referenceTestDataId: referenceTestDataId,
-          scrappableAnalytics: scrappableAnalytics,
           referenceTestData: referenceTestData,
+          scrappableAnalytics: scrappableAnalytics,
           category: category,
           isDeleted: isDeleted,
         );
@@ -247,8 +247,8 @@ class _ScrappableImpl extends Scrappable {
     int? targetRequestId,
     Object? targetRequest = _Undefined,
     int? referenceTestDataId,
-    Object? scrappableAnalytics = _Undefined,
     Object? referenceTestData = _Undefined,
+    Object? scrappableAnalytics = _Undefined,
     _i5.ScraperCategory? category,
     bool? isDeleted,
   }) {
@@ -274,12 +274,12 @@ class _ScrappableImpl extends Scrappable {
           ? targetRequest
           : this.targetRequest?.copyWith(),
       referenceTestDataId: referenceTestDataId ?? this.referenceTestDataId,
-      scrappableAnalytics: scrappableAnalytics is List<_i3.ScrappableAnalytics>?
-          ? scrappableAnalytics
-          : this.scrappableAnalytics?.map((e0) => e0.copyWith()).toList(),
-      referenceTestData: referenceTestData is _i4.ReferenceTestData?
+      referenceTestData: referenceTestData is _i3.ReferenceTestData?
           ? referenceTestData
           : this.referenceTestData?.copyWith(),
+      scrappableAnalytics: scrappableAnalytics is List<_i4.ScrappableAnalytics>?
+          ? scrappableAnalytics
+          : this.scrappableAnalytics?.map((e0) => e0.copyWith()).toList(),
       category: category ?? this.category,
       isDeleted: isDeleted ?? this.isDeleted,
     );

@@ -1,6 +1,6 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart';
-import 'package:zenscrap_server/src/core/api_helper/api_helper_mixin.dart';
+import 'package:zenscrap_server/src/core/mixins/api_helper_mixin.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class PublicTierEndpoint extends Endpoint {

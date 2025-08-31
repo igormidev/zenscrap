@@ -2,9 +2,10 @@ import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/core/default_classes.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
-class DeployEndpointRelated extends Endpoint {
-  Future<void> deployReferenceTestData(
-    Session session, {
+mixin DeployEndpointMixin {
+  Future<void> deployReferenceTestData({
+    required Session session,
+    required Transaction transaction,
     required ReferenceTestData testData,
   }) async {
     if (testData.scrappableTestResult == null) {
@@ -63,20 +64,22 @@ class DeployEndpointRelated extends Endpoint {
       );
     }
 
-    await session.db.transaction((transaction) async {
-      await Scrappable.db.updateRow(
-          session, scrappable!.copyWith(extractRulesUpdatedAt: DateTime.now()),
-          transaction: transaction);
+    await Scrappable.db.updateRow(
+        session,
+        scrappable.copyWith(
+          extractRulesUpdatedAt: DateTime.now(),
+          scrappingRules: testData.scrappableTestResult?.testExtractRule,
+        ),
+        transaction: transaction);
 
-      await ScrappableTestResult.db.updateRow(
-          session, testData.scrappableTestResult!,
-          transaction: transaction);
+    await ScrappableTestResult.db.updateRow(
+        session, testData.scrappableTestResult!,
+        transaction: transaction);
 
-      await ByteTestData.db
-          .updateRow(session, testData.byteData!, transaction: transaction);
+    await ByteTestData.db
+        .updateRow(session, testData.byteData!, transaction: transaction);
 
-      await ReferenceTestData.db
-          .updateRow(session, testData, transaction: transaction);
-    });
+    await ReferenceTestData.db
+        .updateRow(session, testData, transaction: transaction);
   }
 }

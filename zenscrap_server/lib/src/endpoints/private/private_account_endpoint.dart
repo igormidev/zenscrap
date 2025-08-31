@@ -2,9 +2,10 @@ import 'package:nanoid2/nanoid2.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart';
 import 'package:zenscrap_server/src/core/default_classes.dart';
+import 'package:zenscrap_server/src/core/mixins/deploy_endpoint_mixin.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
-class PrivateAccountEndpoint extends Endpoint {
+class PrivateAccountEndpoint extends Endpoint with DeployEndpointMixin {
   final Uuid _uuid = Uuid();
   @override
   bool get requireLogin => true;
@@ -77,15 +78,8 @@ class PrivateAccountEndpoint extends Endpoint {
           accountInfo = await AccountInfo.db
               .insertRow(session, accountInfo, transaction: transaction);
           if (initialScrappableIfNewUser != null) {
-            await Scrappable.db.updateRow(
-                session,
-                initialScrappableIfNewUser.copyWith(
-                  accountId: accountInfo.id,
-                ),
-                transaction: transaction);
-            await AccountInfo.db.attachRow.scrappables(
-                session, accountInfo, initialScrappableIfNewUser,
-                transaction: transaction);
+            await _attachScrappable(
+                session, transaction, accountInfo, initialScrappableIfNewUser);
           }
 
           await AccountInfo.db.attachRow.accountApiUsage(
@@ -114,10 +108,38 @@ class PrivateAccountEndpoint extends Endpoint {
           description: 'Unable to create new account. Please try again later.',
         );
       }
+    } else {
+      if (initialScrappableIfNewUser != null) {
+        await session.db.transaction((transaction) async {
+          await _attachScrappable(
+              session, transaction, accountInfo!, initialScrappableIfNewUser);
+        });
+      }
     }
 
-    accountInfo.userInfoId;
     return accountInfo;
+  }
+
+  Future<void> _attachScrappable(Session session, Transaction transaction,
+      AccountInfo accountInfo, Scrappable scrappable) async {
+    final Scrappable? existingScrappable = await Scrappable.db.findById(
+      session,
+      scrappable.id,
+    );
+    if (existingScrappable == null || existingScrappable.accountId != null) {
+      // Already have a account attached, just ignore...
+      return;
+    }
+    await Scrappable.db.updateRow(
+        session, scrappable.copyWith(accountId: accountInfo.id),
+        transaction: transaction);
+    await AccountInfo.db.attachRow.scrappables(session, accountInfo, scrappable,
+        transaction: transaction);
+    await deployReferenceTestData(
+      session: session,
+      transaction: transaction,
+      testData: scrappable.referenceTestData!,
+    );
   }
 
   final include = AccountInfo.include(

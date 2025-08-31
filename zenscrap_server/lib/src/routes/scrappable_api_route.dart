@@ -1,38 +1,35 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:serverpod/serverpod.dart';
-import 'package:zenscrap_server/src/core/api_helper/api_helper_mixin.dart';
+import 'package:zenscrap_server/src/core/mixins/api_helper_mixin.dart';
 import 'package:zenscrap_server/src/core/scraping_bee.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class ScrappableApiRoute extends Route with ApiHelperMixin {
   final scrapingBee = ScrapingBee();
-  
+
   @override
   Future<bool> handleCall(Session session, HttpRequest request) async {
     try {
       // Only handle POST requests
       if (request.method != 'POST') {
         request.response.statusCode = HttpStatus.methodNotAllowed;
-        request.response.write(jsonEncode({
-          'error': 'Method not allowed. Use POST.'
-        }));
+        request.response
+            .write(jsonEncode({'error': 'Method not allowed. Use POST.'}));
         await request.response.close();
         return true;
       }
 
       // Read the request body
       final body = await utf8.decoder.bind(request).join();
-      
+
       // Parse JSON body
       Map<String, dynamic> requestData;
       try {
         requestData = jsonDecode(body) as Map<String, dynamic>;
       } catch (e) {
         request.response.statusCode = HttpStatus.badRequest;
-        request.response.write(jsonEncode({
-          'error': 'Invalid JSON body'
-        }));
+        request.response.write(jsonEncode({'error': 'Invalid JSON body'}));
         await request.response.close();
         return true;
       }
@@ -43,9 +40,8 @@ class ScrappableApiRoute extends Route with ApiHelperMixin {
 
       if (scrappableId == null) {
         request.response.statusCode = HttpStatus.badRequest;
-        request.response.write(jsonEncode({
-          'error': 'Missing required parameter: scrappableId'
-        }));
+        request.response.write(
+            jsonEncode({'error': 'Missing required parameter: scrappableId'}));
         await request.response.close();
         return true;
       }
@@ -56,9 +52,8 @@ class ScrappableApiRoute extends Route with ApiHelperMixin {
 
       if (!isTest && apiKey == null) {
         request.response.statusCode = HttpStatus.unauthorized;
-        request.response.write(jsonEncode({
-          'error': 'API key required for production calls'
-        }));
+        request.response.write(
+            jsonEncode({'error': 'API key required for production calls'}));
         await request.response.close();
         return true;
       }
@@ -77,7 +72,6 @@ class ScrappableApiRoute extends Route with ApiHelperMixin {
       request.response.write(jsonEncode(result));
       await request.response.close();
       return true;
-
     } catch (e) {
       session.log('Error in ScrappableApiRoute: $e');
       request.response.statusCode = HttpStatus.internalServerError;

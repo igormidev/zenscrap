@@ -1,6 +1,6 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart';
-import 'package:zenscrap_server/src/core/api_helper/api_helper_mixin.dart';
+import 'package:zenscrap_server/src/core/mixins/api_helper_mixin.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_api.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_config.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
@@ -39,7 +39,7 @@ class PrivateSubscriptionEndpoint extends Endpoint {
     }
 
     // Check if user already has an active subscription
-    if (accountInfo.stripeSubscriptionId != null && 
+    if (accountInfo.stripeSubscriptionId != null &&
         accountInfo.subscriptionStatus == 'active') {
       throw Exception('User already has an active subscription');
     }
@@ -53,7 +53,8 @@ class PrivateSubscriptionEndpoint extends Endpoint {
         secretKey: StripeConfig.secretKey,
         priceId: priceId,
         customerEmail: accountInfo.userInfo!.email!,
-        successUrl: '${StripeConfig.successUrl}?session_id={CHECKOUT_SESSION_ID}',
+        successUrl:
+            '${StripeConfig.successUrl}?session_id={CHECKOUT_SESSION_ID}',
         cancelUrl: StripeConfig.cancelUrl,
         accountInfoId: accountInfo.id!,
       );
@@ -160,7 +161,8 @@ class PrivateSubscriptionEndpoint extends Endpoint {
     }
 
     if (accountInfo.stripeCustomerId == null) {
-      throw Exception('No Stripe customer found. Please subscribe to a plan first.');
+      throw Exception(
+          'No Stripe customer found. Please subscribe to a plan first.');
     }
 
     try {

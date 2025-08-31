@@ -1,3 +1,5 @@
+deployEndpointRelated:
+  - deployReferenceTestData:
 privateAccount:
   - getAccountInfo:
 privateApiUsage:
