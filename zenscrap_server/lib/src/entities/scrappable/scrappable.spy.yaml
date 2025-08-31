@@ -5,6 +5,8 @@ fields:
   accountId: int?, relation(name=account_info_scrappable, parent=account_info)
   apiUsageOwnerNanoId: String?, scope=serverOnly
   createdAt: DateTime
+  generalInfosUpdatedAt: DateTime
+  extractRulesUpdatedAt: DateTime
   name: String
   description: String
   testEndpointAvailableUntil: DateTime?

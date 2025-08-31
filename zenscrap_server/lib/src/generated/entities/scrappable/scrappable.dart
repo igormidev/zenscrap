@@ -24,6 +24,8 @@ abstract class Scrappable
     this.accountId,
     this.apiUsageOwnerNanoId,
     required this.createdAt,
+    required this.generalInfosUpdatedAt,
+    required this.extractRulesUpdatedAt,
     required this.name,
     required this.description,
     this.testEndpointAvailableUntil,
@@ -43,6 +45,8 @@ abstract class Scrappable
     int? accountId,
     String? apiUsageOwnerNanoId,
     required DateTime createdAt,
+    required DateTime generalInfosUpdatedAt,
+    required DateTime extractRulesUpdatedAt,
     required String name,
     required String description,
     DateTime? testEndpointAvailableUntil,
@@ -64,6 +68,10 @@ abstract class Scrappable
       apiUsageOwnerNanoId: jsonSerialization['apiUsageOwnerNanoId'] as String?,
       createdAt:
           _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
+      generalInfosUpdatedAt: _i1.DateTimeJsonExtension.fromJson(
+          jsonSerialization['generalInfosUpdatedAt']),
+      extractRulesUpdatedAt: _i1.DateTimeJsonExtension.fromJson(
+          jsonSerialization['extractRulesUpdatedAt']),
       name: jsonSerialization['name'] as String,
       description: jsonSerialization['description'] as String,
       testEndpointAvailableUntil:
@@ -107,6 +115,10 @@ abstract class Scrappable
 
   DateTime createdAt;
 
+  DateTime generalInfosUpdatedAt;
+
+  DateTime extractRulesUpdatedAt;
+
   String name;
 
   String description;
@@ -142,6 +154,8 @@ abstract class Scrappable
     int? accountId,
     String? apiUsageOwnerNanoId,
     DateTime? createdAt,
+    DateTime? generalInfosUpdatedAt,
+    DateTime? extractRulesUpdatedAt,
     String? name,
     String? description,
     DateTime? testEndpointAvailableUntil,
@@ -163,6 +177,8 @@ abstract class Scrappable
       if (apiUsageOwnerNanoId != null)
         'apiUsageOwnerNanoId': apiUsageOwnerNanoId,
       'createdAt': createdAt.toJson(),
+      'generalInfosUpdatedAt': generalInfosUpdatedAt.toJson(),
+      'extractRulesUpdatedAt': extractRulesUpdatedAt.toJson(),
       'name': name,
       'description': description,
       if (testEndpointAvailableUntil != null)
@@ -188,6 +204,8 @@ abstract class Scrappable
       'id': id.toJson(),
       if (accountId != null) 'accountId': accountId,
       'createdAt': createdAt.toJson(),
+      'generalInfosUpdatedAt': generalInfosUpdatedAt.toJson(),
+      'extractRulesUpdatedAt': extractRulesUpdatedAt.toJson(),
       'name': name,
       'description': description,
       if (testEndpointAvailableUntil != null)
@@ -254,6 +272,8 @@ class _ScrappableImpl extends Scrappable {
     int? accountId,
     String? apiUsageOwnerNanoId,
     required DateTime createdAt,
+    required DateTime generalInfosUpdatedAt,
+    required DateTime extractRulesUpdatedAt,
     required String name,
     required String description,
     DateTime? testEndpointAvailableUntil,
@@ -271,6 +291,8 @@ class _ScrappableImpl extends Scrappable {
           accountId: accountId,
           apiUsageOwnerNanoId: apiUsageOwnerNanoId,
           createdAt: createdAt,
+          generalInfosUpdatedAt: generalInfosUpdatedAt,
+          extractRulesUpdatedAt: extractRulesUpdatedAt,
           name: name,
           description: description,
           testEndpointAvailableUntil: testEndpointAvailableUntil,
@@ -294,6 +316,8 @@ class _ScrappableImpl extends Scrappable {
     Object? accountId = _Undefined,
     Object? apiUsageOwnerNanoId = _Undefined,
     DateTime? createdAt,
+    DateTime? generalInfosUpdatedAt,
+    DateTime? extractRulesUpdatedAt,
     String? name,
     String? description,
     Object? testEndpointAvailableUntil = _Undefined,
@@ -314,6 +338,10 @@ class _ScrappableImpl extends Scrappable {
           ? apiUsageOwnerNanoId
           : this.apiUsageOwnerNanoId,
       createdAt: createdAt ?? this.createdAt,
+      generalInfosUpdatedAt:
+          generalInfosUpdatedAt ?? this.generalInfosUpdatedAt,
+      extractRulesUpdatedAt:
+          extractRulesUpdatedAt ?? this.extractRulesUpdatedAt,
       name: name ?? this.name,
       description: description ?? this.description,
       testEndpointAvailableUntil: testEndpointAvailableUntil is DateTime?
@@ -352,6 +380,14 @@ class ScrappableTable extends _i1.Table<_i1.UuidValue> {
     );
     createdAt = _i1.ColumnDateTime(
       'createdAt',
+      this,
+    );
+    generalInfosUpdatedAt = _i1.ColumnDateTime(
+      'generalInfosUpdatedAt',
+      this,
+    );
+    extractRulesUpdatedAt = _i1.ColumnDateTime(
+      'extractRulesUpdatedAt',
       this,
     );
     name = _i1.ColumnString(
@@ -398,6 +434,10 @@ class ScrappableTable extends _i1.Table<_i1.UuidValue> {
   late final _i1.ColumnString apiUsageOwnerNanoId;
 
   late final _i1.ColumnDateTime createdAt;
+
+  late final _i1.ColumnDateTime generalInfosUpdatedAt;
+
+  late final _i1.ColumnDateTime extractRulesUpdatedAt;
 
   late final _i1.ColumnString name;
 
@@ -488,6 +528,8 @@ class ScrappableTable extends _i1.Table<_i1.UuidValue> {
         accountId,
         apiUsageOwnerNanoId,
         createdAt,
+        generalInfosUpdatedAt,
+        extractRulesUpdatedAt,
         name,
         description,
         testEndpointAvailableUntil,

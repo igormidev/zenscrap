@@ -20,6 +20,8 @@ abstract class Scrappable implements _i1.SerializableModel {
     _i1.UuidValue? id,
     this.accountId,
     required this.createdAt,
+    required this.generalInfosUpdatedAt,
+    required this.extractRulesUpdatedAt,
     required this.name,
     required this.description,
     this.testEndpointAvailableUntil,
@@ -38,6 +40,8 @@ abstract class Scrappable implements _i1.SerializableModel {
     _i1.UuidValue? id,
     int? accountId,
     required DateTime createdAt,
+    required DateTime generalInfosUpdatedAt,
+    required DateTime extractRulesUpdatedAt,
     required String name,
     required String description,
     DateTime? testEndpointAvailableUntil,
@@ -58,6 +62,10 @@ abstract class Scrappable implements _i1.SerializableModel {
       accountId: jsonSerialization['accountId'] as int?,
       createdAt:
           _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
+      generalInfosUpdatedAt: _i1.DateTimeJsonExtension.fromJson(
+          jsonSerialization['generalInfosUpdatedAt']),
+      extractRulesUpdatedAt: _i1.DateTimeJsonExtension.fromJson(
+          jsonSerialization['extractRulesUpdatedAt']),
       name: jsonSerialization['name'] as String,
       description: jsonSerialization['description'] as String,
       testEndpointAvailableUntil:
@@ -97,6 +105,10 @@ abstract class Scrappable implements _i1.SerializableModel {
 
   DateTime createdAt;
 
+  DateTime generalInfosUpdatedAt;
+
+  DateTime extractRulesUpdatedAt;
+
   String name;
 
   String description;
@@ -128,6 +140,8 @@ abstract class Scrappable implements _i1.SerializableModel {
     _i1.UuidValue? id,
     int? accountId,
     DateTime? createdAt,
+    DateTime? generalInfosUpdatedAt,
+    DateTime? extractRulesUpdatedAt,
     String? name,
     String? description,
     DateTime? testEndpointAvailableUntil,
@@ -147,6 +161,8 @@ abstract class Scrappable implements _i1.SerializableModel {
       'id': id.toJson(),
       if (accountId != null) 'accountId': accountId,
       'createdAt': createdAt.toJson(),
+      'generalInfosUpdatedAt': generalInfosUpdatedAt.toJson(),
+      'extractRulesUpdatedAt': extractRulesUpdatedAt.toJson(),
       'name': name,
       'description': description,
       if (testEndpointAvailableUntil != null)
@@ -179,6 +195,8 @@ class _ScrappableImpl extends Scrappable {
     _i1.UuidValue? id,
     int? accountId,
     required DateTime createdAt,
+    required DateTime generalInfosUpdatedAt,
+    required DateTime extractRulesUpdatedAt,
     required String name,
     required String description,
     DateTime? testEndpointAvailableUntil,
@@ -195,6 +213,8 @@ class _ScrappableImpl extends Scrappable {
           id: id,
           accountId: accountId,
           createdAt: createdAt,
+          generalInfosUpdatedAt: generalInfosUpdatedAt,
+          extractRulesUpdatedAt: extractRulesUpdatedAt,
           name: name,
           description: description,
           testEndpointAvailableUntil: testEndpointAvailableUntil,
@@ -217,6 +237,8 @@ class _ScrappableImpl extends Scrappable {
     _i1.UuidValue? id,
     Object? accountId = _Undefined,
     DateTime? createdAt,
+    DateTime? generalInfosUpdatedAt,
+    DateTime? extractRulesUpdatedAt,
     String? name,
     String? description,
     Object? testEndpointAvailableUntil = _Undefined,
@@ -234,6 +256,10 @@ class _ScrappableImpl extends Scrappable {
       id: id ?? this.id,
       accountId: accountId is int? ? accountId : this.accountId,
       createdAt: createdAt ?? this.createdAt,
+      generalInfosUpdatedAt:
+          generalInfosUpdatedAt ?? this.generalInfosUpdatedAt,
+      extractRulesUpdatedAt:
+          extractRulesUpdatedAt ?? this.extractRulesUpdatedAt,
       name: name ?? this.name,
       description: description ?? this.description,
       testEndpointAvailableUntil: testEndpointAvailableUntil is DateTime?

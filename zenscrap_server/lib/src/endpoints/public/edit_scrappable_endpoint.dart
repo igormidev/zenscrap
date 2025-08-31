@@ -97,35 +97,38 @@ class EditScrappableEndpoint extends Endpoint {
     // Update the scrappable
     scrappable.name = trimmedName;
     scrappable.description = trimmedDescription;
-    
+
     // Update category if provided
     if (category != null) {
       scrappable.category = category;
     }
-    
+    scrappable.generalInfosUpdatedAt = DateTime.now();
+
     // Update willHideFromMarketplace if provided
     if (willHideFromMarketplace != null) {
       // Check if user has Ultra plan permission
       if (userId == null) {
         throw ZenScrapException(
           title: 'Authentication Required',
-          description: 'You must be logged in to hide scrappables from marketplace.',
+          description:
+              'You must be logged in to hide scrappables from marketplace.',
         );
       }
-      
+
       // Get the account info for plan check
       final userAccount = await AccountInfo.db.findFirstRow(
         session,
         where: (p) => p.userInfoId.equals(userId),
       );
-      
+
       if (userAccount == null || userAccount.planTier != PlanTier.ultra) {
         throw ZenScrapException(
           title: 'Ultra Plan Required',
-          description: 'Hiding scrappables from marketplace is only available for Ultra plan users.',
+          description:
+              'Hiding scrappables from marketplace is only available for Ultra plan users.',
         );
       }
-      
+
       scrappable.willHideFromMarketplace = willHideFromMarketplace;
     }
 

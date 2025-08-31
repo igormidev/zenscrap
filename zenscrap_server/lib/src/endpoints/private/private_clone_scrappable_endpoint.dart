@@ -119,12 +119,16 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
         transaction: transaction,
       );
 
+      final now = DateTime.now();
+
       // Create the cloned scrappable
       final clonedScrappable = Scrappable(
         id: newScrappableId,
         accountId: accountInfo.id,
         apiUsageOwnerNanoId: accountInfo.accountApiUsage?.nanoId,
-        createdAt: DateTime.now(),
+        createdAt: now,
+        generalInfosUpdatedAt: now,
+        extractRulesUpdatedAt: now,
         name: '${sourceScrappable.name} (Copy)',
         description: sourceScrappable.description,
         testEndpointAvailableUntil: null,

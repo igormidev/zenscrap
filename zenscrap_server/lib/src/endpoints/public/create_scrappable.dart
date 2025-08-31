@@ -155,13 +155,15 @@ class CreateScrappableEndpoint extends Endpoint {
       await ReferenceTestData.db.attachRow.byteData(
           session, referenceTestData, testData,
           transaction: transaction);
-
+      final now = DateTime.now();
       final Scrappable scrappable = await Scrappable.db.insertRow(
         session,
         Scrappable(
           name: name,
           description: description,
-          createdAt: DateTime.now(),
+          createdAt: now,
+          generalInfosUpdatedAt: now,
+          extractRulesUpdatedAt: now,
           isDeleted: false,
           willHideFromMarketplace: false,
           accountId: accountApiUsage?.accountInfo?.id,
@@ -199,6 +201,7 @@ You must return a JSON object with EXACTLY these fields at the root level:
 - queryParams: An object with query parameters and their values from the URL
 - pathParams: An array of parameter names that were replaced in the URL
 - referenceLinkPathParameters: An object mapping parameter names to their actual values from the reference URL
+- category: The most appropriate category for this URL (see category selection rules below)
 
 EXAMPLE:
 If the input URL is: www.mySocialMedia.com/posts/123/comments/3854?sort=asc&filter=all
@@ -216,16 +219,75 @@ You should return EXACTLY this structure:
   "referenceLinkPathParameters": {
     "postId": "123",
     "commentId": "3854"
-  }
+  },
+  "category": "social_media"
 }
 
 IMPORTANT RULES:
 1. Return ONLY a single flat JSON object - no nesting under "scrappable" or "scrappableTargetRequest"
-2. ALL six fields must be at the root level of the JSON
+2. ALL seven fields must be at the root level of the JSON (including category)
 3. Intelligently identify dynamic URL segments (numbers, IDs, slugs) and replace them with descriptive {paramName} placeholders
 4. The pathParams array must contain the exact same parameter names used in the url placeholders
 5. The referenceLinkPathParameters must map these parameter names to their actual values from the reference URL
 6. Return raw JSON only - no markdown, no code blocks, no extra text
+
+CATEGORY SELECTION RULES - EXTREMELY IMPORTANT:
+You MUST carefully analyze the URL content and domain to select the MOST SPECIFIC category. 
+DO NOT default to "general" unless you are 100% certain the URL doesn't fit ANY other category.
+
+Think step by step:
+1. First, analyze the domain name and URL path for obvious category indicators
+2. Look for keywords in the URL that match specific categories
+3. Consider the primary purpose of what's being scraped
+4. Only select "general" as an absolute LAST RESORT after ruling out ALL other categories
+
+CATEGORY DESCRIPTIONS (select the MOST APPROPRIATE one):
+- fitness: Health and fitness related (gyms, workouts, exercise tracking, fitness apps)
+- sports: Traditional sports data (scores, teams, players, leagues, sports news)
+- esports: E-sports/competitive gaming (tournaments, teams, game stats, esports leagues)
+- health: Healthcare and medicine (medical info, hospitals, symptoms, treatments)
+- movies: Movies and TV information (IMDB, streaming platforms, reviews, showtimes)
+- jobs: Job listings and employment (Indeed, LinkedIn jobs, career sites)
+- finance: Finance, banking, stock market (trading, investments, banking, crypto prices)
+- location: Location-based data, maps, geocoding (Google Maps, GPS, addresses)
+- science: Science, research, academic data (journals, research papers, scientific data)
+- gaming: Video games general info (game stores, reviews, gaming news, Steam)
+- travel: Travel, tourism, hospitality (hotels, flights, Airbnb, travel guides)
+- social_media: Social networks and platforms (Twitter, Facebook, Instagram, TikTok)
+- ecommerce: E-commerce and online shopping (Amazon, eBay, product listings, prices)
+- news: News and journalism sites (CNN, BBC, newspapers, news aggregators)
+- weather: Weather and climate data (weather.com, forecasts, climate info)
+- education: Educational content and e-learning (courses, tutorials, universities)
+- music: Music, audio streaming, artist info (Spotify, SoundCloud, music charts)
+- books: Books, literature, libraries (Goodreads, book stores, ISBN lookups)
+- comics: Comics, manga (comic sites, manga readers, webtoons)
+- anime: Anime and animation (MyAnimeList, Crunchyroll, anime databases)
+- real_estate: Real estate, housing, property (Zillow, property listings, rentals)
+- food: Food, recipes, restaurants (Yelp, recipe sites, food delivery, menus)
+- fashion: Fashion, style, beauty (clothing stores, fashion blogs, beauty products)
+- security: Cybersecurity, threat intelligence (CVE databases, security advisories)
+- ai: Artificial intelligence, ML tools (AI platforms, model repos, AI services)
+- seo: SEO tools, search engine data (keyword tools, rankings, search analytics)
+- lead_generation: Lead generation, marketing data (business contacts, B2B data)
+- developer_tools: Developer tools, APIs, code repos (GitHub, npm, developer docs)
+- automotive: Automotive, vehicles, car listings (car dealers, auto parts, vehicles)
+- government: Government data, public records (gov sites, public data, regulations)
+- cryptocurrency: Cryptocurrency and blockchain (crypto exchanges, DeFi, wallets)
+- images: Image platforms or photography (Instagram, Flickr, stock photos)
+- videos: Video platforms (YouTube, Vimeo, TikTok, streaming services)
+- other: Use ONLY if absolutely nothing else fits
+- general: LAST RESORT - use ONLY after carefully considering ALL categories above
+
+CATEGORY SELECTION EXAMPLES:
+- github.com/user/repo → "developer_tools"
+- twitter.com/user/status → "social_media"  
+- amazon.com/product/123 → "ecommerce"
+- imdb.com/movie/tt123 → "movies"
+- weather.com/forecast → "weather"
+- linkedin.com/jobs/view → "jobs"
+- espn.com/nba/scores → "sports"
+- twitch.tv/esports → "esports"
+- zillow.com/homedetails → "real_estate"
 
 Return JSON that exactly matches this schema. Do not add or remove fields.
 
