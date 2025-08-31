@@ -1,5 +1,6 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';
+import 'package:zenscrap_server/src/endpoints/public/scrappable_chat_session.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 typedef ApiKey = String;
@@ -195,13 +196,21 @@ mixin ApiHelperMixin {
   Future<String> getExtractRules(Session session, Scrappable scrappable,
       String? accountApiKeyString) async {
     final isTest = accountApiKeyString == null;
-    final String? extractRules = isTest
-        ? (await ScrappableTestResult.db.findFirstRow(
-            session,
-            where: (p0) => p0.scrappableId.equals(scrappable.id),
-          ))
-            ?.testExtractRule
-        : scrappable.scrappingRules;
+    if (isTest) {
+      final testSessionExtractRule =
+          getTestExtractRules(scrappable.id.toString());
+      if (testSessionExtractRule == null) {
+        throw _noActiveTestSessionFinded;
+      }
+
+      return testSessionExtractRule;
+    }
+
+    final String? extractRules = (await ScrappableTestResult.db.findFirstRow(
+      session,
+      where: (p0) => p0.scrappableId.equals(scrappable.id),
+    ))
+        ?.testExtractRule;
 
     if (extractRules == null || extractRules.isEmpty) {
       throw _missingExtractRules;
@@ -320,7 +329,14 @@ _ApiError _apiKeyNotFound(ApiKey apiKey) => _ApiError(
             'It could be that the key was deleted or deactivated - check in your api key tab on ZenScrap site.',
       ),
     );
-
+final _noActiveTestSessionFinded = _ApiError(
+  RequestStatus.clientError,
+  ZenScrapException(
+    title: 'No Active Test Session Found',
+    description:
+        'There is no active test session found for the provided scrappable.',
+  ),
+);
 final _testPeriodExpired = _ApiError(
   RequestStatus.clientError,
   ZenScrapException(

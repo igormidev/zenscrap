@@ -111,7 +111,7 @@ class ChatControllerGeminiApiImpl extends IChatController {
         attemptNumber > 1 ? '# Attempt $attemptNumber\n' : '';
 
     String? responseText = generatedContent.text;
-    print('Raw AI response: $responseText');
+
     if (responseText == null || responseText.isEmpty) {
       chatSeasonController.add(ErrorTextResponse(
         role: PromptRole.system,
@@ -231,15 +231,7 @@ class ChatControllerGeminiApiImpl extends IChatController {
         ));
         await Future.delayed(const Duration(milliseconds: 400));
         ScrappableTestResult? testResult = testData.scrappableTestResult;
-        if (testResult != null) {
-          testResult = await ScrappableTestResult.db.updateRow(
-            session,
-            testResult.copyWith(
-              extractJsonResult: jsonEncode(result),
-              testExtractRule: extractedRules,
-            ),
-          );
-        } else {
+        if (testResult == null) {
           testResult = await ScrappableTestResult.db.insertRow(
             session,
             ScrappableTestResult(
@@ -253,6 +245,11 @@ class ChatControllerGeminiApiImpl extends IChatController {
 
           await ScrappableTestResult.db.attachRow
               .referenceTestData(session, testResult, testData);
+        } else {
+          testResult = testResult.copyWith(
+            extractJsonResult: jsonEncode(result),
+            testExtractRule: extractedRules,
+          );
         }
         chatSeasonController.add(NewExtractRuleResponse(
           role: PromptRole.system,
