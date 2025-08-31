@@ -25,9 +25,6 @@ mixin DeployEndpointMixin {
 
     final int? userId = (await session.authenticated)?.userId;
     final Scrappable? scrappable;
-    ScrappableInclude include = Scrappable.include(
-        referenceTestData: ReferenceTestData.include(
-            scrappableTestResult: ScrappableTestResult.include()));
     if (userId == null) {
       // If not autenticated, should only be able to modify scrappables that are not attached to any account
       scrappable = await Scrappable.db.findFirstRow(session,
@@ -36,8 +33,7 @@ mixin DeployEndpointMixin {
               t.referenceTestData.scrappableTestResult.id
                   .equals(testData.scrappableTestResult?.id) &
               t.referenceTestData.byteData.id.equals(testData.byteData?.id) &
-              t.accountId.equals(null),
-          include: include);
+              t.accountId.equals(null));
     } else {
       final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
         session,
@@ -52,8 +48,7 @@ mixin DeployEndpointMixin {
               t.referenceTestData.scrappableTestResult.id
                   .equals(testData.scrappableTestResult?.id) &
               t.referenceTestData.byteData.id.equals(testData.byteData?.id) &
-              t.accountId.equals(accountInfo.id),
-          include: include);
+              t.accountId.equals(accountInfo.id));
     }
 
     if (scrappable == null) {

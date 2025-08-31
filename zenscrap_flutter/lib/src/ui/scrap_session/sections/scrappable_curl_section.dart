@@ -52,7 +52,7 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection>
           child: CodeBlock(
             code: code,
             leadingWidgets: [RemainingTimeIndicator(widget.targetTime)],
-            trailingWidgets: [DeployButton()],
+            trailingWidgets: [DeployButton(testData: widget.testData!)],
           ),
         ),
       );
@@ -63,7 +63,7 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection>
       code: code.replaceAll(r'\"', '"'),
       copyCode: code,
       leadingWidgets: [RemainingTimeIndicator(widget.targetTime)],
-      trailingWidgets: [DeployButton()],
+      trailingWidgets: [DeployButton(testData: widget.testData!)],
     );
   }
 }

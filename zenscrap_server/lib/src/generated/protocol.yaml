@@ -1,5 +1,3 @@
-deployEndpointRelated:
-  - deployReferenceTestData:
 privateAccount:
   - getAccountInfo:
 privateApiUsage:
@@ -25,6 +23,8 @@ privateUserScrappables:
 createScrappable:
   - call:
 deleteScrappable:
+  - call:
+deployScrappable:
   - call:
 editScrappable:
   - call:

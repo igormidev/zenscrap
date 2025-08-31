@@ -11,22 +11,22 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import 'dart:async' as _i2;
-import 'package:zenscrap_client/src/protocol/entities/scrappable/reference_test_data.dart'
-    as _i3;
 import 'package:zenscrap_client/src/protocol/entities/account/account.dart'
-    as _i4;
+    as _i3;
 import 'package:zenscrap_client/src/protocol/entities/scrappable/scrappable.dart'
-    as _i5;
+    as _i4;
 import 'package:zenscrap_client/src/protocol/entities/account/api_usage/api_creadit_history/api_creadit_history_item.dart'
-    as _i6;
+    as _i5;
 import 'package:zenscrap_client/src/protocol/entities/account/account_api_key.dart'
-    as _i7;
+    as _i6;
 import 'package:zenscrap_client/src/protocol/entities/account/api_usage/account_api_usage.dart'
-    as _i8;
-import 'package:uuid/uuid_value.dart' as _i9;
+    as _i7;
+import 'package:uuid/uuid_value.dart' as _i8;
 import 'package:zenscrap_client/src/protocol/entities/analytics/paginated_scrappable_requests_analytics.dart'
-    as _i10;
+    as _i9;
 import 'package:zenscrap_client/src/protocol/entities/analytics/paginated_scrappable_analytics.dart'
+    as _i10;
+import 'package:zenscrap_client/src/protocol/entities/scrappable/reference_test_data.dart'
     as _i11;
 import 'package:zenscrap_client/src/protocol/entities/scrappable/scraper_category.dart'
     as _i12;
@@ -42,31 +42,15 @@ import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i17;
 import 'protocol.dart' as _i18;
 
 /// {@category Endpoint}
-class EndpointDeployEndpointRelated extends _i1.EndpointRef {
-  EndpointDeployEndpointRelated(_i1.EndpointCaller caller) : super(caller);
-
-  @override
-  String get name => 'deployEndpointRelated';
-
-  _i2.Future<void> deployReferenceTestData(
-          {required _i3.ReferenceTestData testData}) =>
-      caller.callServerEndpoint<void>(
-        'deployEndpointRelated',
-        'deployReferenceTestData',
-        {'testData': testData},
-      );
-}
-
-/// {@category Endpoint}
 class EndpointPrivateAccount extends _i1.EndpointRef {
   EndpointPrivateAccount(_i1.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'privateAccount';
 
-  _i2.Future<_i4.AccountInfo> getAccountInfo(
-          {required _i5.Scrappable? initialScrappableIfNewUser}) =>
-      caller.callServerEndpoint<_i4.AccountInfo>(
+  _i2.Future<_i3.AccountInfo> getAccountInfo(
+          {required _i4.Scrappable? initialScrappableIfNewUser}) =>
+      caller.callServerEndpoint<_i3.AccountInfo>(
         'privateAccount',
         'getAccountInfo',
         {'initialScrappableIfNewUser': initialScrappableIfNewUser},
@@ -80,11 +64,11 @@ class EndpointPrivateApiUsage extends _i1.EndpointRef {
   @override
   String get name => 'privateApiUsage';
 
-  _i2.Future<List<_i6.CreditHistoryItem>> getCreditHistory({
+  _i2.Future<List<_i5.CreditHistoryItem>> getCreditHistory({
     required int offset,
     required int limit,
   }) =>
-      caller.callServerEndpoint<List<_i6.CreditHistoryItem>>(
+      caller.callServerEndpoint<List<_i5.CreditHistoryItem>>(
         'privateApiUsage',
         'getCreditHistory',
         {
@@ -93,8 +77,8 @@ class EndpointPrivateApiUsage extends _i1.EndpointRef {
         },
       );
 
-  _i2.Future<_i7.AccountApiKey> createApiKey({required String name}) =>
-      caller.callServerEndpoint<_i7.AccountApiKey>(
+  _i2.Future<_i6.AccountApiKey> createApiKey({required String name}) =>
+      caller.callServerEndpoint<_i6.AccountApiKey>(
         'privateApiUsage',
         'createApiKey',
         {'name': name},
@@ -107,8 +91,8 @@ class EndpointPrivateApiUsage extends _i1.EndpointRef {
         {'apiKeyId': apiKeyId},
       );
 
-  _i2.Future<List<_i7.AccountApiKey>> getActiveApiKeys() =>
-      caller.callServerEndpoint<List<_i7.AccountApiKey>>(
+  _i2.Future<List<_i6.AccountApiKey>> getActiveApiKeys() =>
+      caller.callServerEndpoint<List<_i6.AccountApiKey>>(
         'privateApiUsage',
         'getActiveApiKeys',
         {},
@@ -121,8 +105,8 @@ class EndpointPrivateApiUsage extends _i1.EndpointRef {
         {},
       );
 
-  _i2.Future<_i8.AccountApiUsage> getApiUsageInfo() =>
-      caller.callServerEndpoint<_i8.AccountApiUsage>(
+  _i2.Future<_i7.AccountApiUsage> getApiUsageInfo() =>
+      caller.callServerEndpoint<_i7.AccountApiUsage>(
         'privateApiUsage',
         'getApiUsageInfo',
         {},
@@ -136,9 +120,9 @@ class EndpointPrivateCloneScrappable extends _i1.EndpointRef {
   @override
   String get name => 'privateCloneScrappable';
 
-  _i2.Future<_i5.Scrappable> cloneFromMarketplace(
-          {required _i9.UuidValue scrappableId}) =>
-      caller.callServerEndpoint<_i5.Scrappable>(
+  _i2.Future<_i4.Scrappable> cloneFromMarketplace(
+          {required _i8.UuidValue scrappableId}) =>
+      caller.callServerEndpoint<_i4.Scrappable>(
         'privateCloneScrappable',
         'cloneFromMarketplace',
         {'scrappableId': scrappableId},
@@ -152,19 +136,19 @@ class EndpointPrivateScrappableAnalytics extends _i1.EndpointRef {
   @override
   String get name => 'privateScrappableAnalytics';
 
-  _i2.Future<_i10.PaginatedScrappableRequestsAnalytics>
+  _i2.Future<_i9.PaginatedScrappableRequestsAnalytics>
       getScrappableAnalyticsOfTheLast12Hours({required int page}) =>
-          caller.callServerEndpoint<_i10.PaginatedScrappableRequestsAnalytics>(
+          caller.callServerEndpoint<_i9.PaginatedScrappableRequestsAnalytics>(
             'privateScrappableAnalytics',
             'getScrappableAnalyticsOfTheLast12Hours',
             {'page': page},
           );
 
-  _i2.Future<_i11.PaginatedScrappableAnalytics> getScrappableAnalytics({
-    required _i9.UuidValue scrappableId,
+  _i2.Future<_i10.PaginatedScrappableAnalytics> getScrappableAnalytics({
+    required _i8.UuidValue scrappableId,
     required int page,
   }) =>
-      caller.callServerEndpoint<_i11.PaginatedScrappableAnalytics>(
+      caller.callServerEndpoint<_i10.PaginatedScrappableAnalytics>(
         'privateScrappableAnalytics',
         'getScrappableAnalytics',
         {
@@ -222,15 +206,15 @@ class EndpointPrivateUserScrappables extends _i1.EndpointRef {
   @override
   String get name => 'privateUserScrappables';
 
-  _i2.Future<List<_i5.Scrappable>> call() =>
-      caller.callServerEndpoint<List<_i5.Scrappable>>(
+  _i2.Future<List<_i4.Scrappable>> call() =>
+      caller.callServerEndpoint<List<_i4.Scrappable>>(
         'privateUserScrappables',
         'call',
         {},
       );
 
-  _i2.Future<_i5.Scrappable> getScrappableById(String scrappableId) =>
-      caller.callServerEndpoint<_i5.Scrappable>(
+  _i2.Future<_i4.Scrappable> getScrappableById(String scrappableId) =>
+      caller.callServerEndpoint<_i4.Scrappable>(
         'privateUserScrappables',
         'getScrappableById',
         {'scrappableId': scrappableId},
@@ -244,8 +228,8 @@ class EndpointCreateScrappable extends _i1.EndpointRef {
   @override
   String get name => 'createScrappable';
 
-  _i2.Future<_i5.Scrappable> call({required String referenceLink}) =>
-      caller.callServerEndpoint<_i5.Scrappable>(
+  _i2.Future<_i4.Scrappable> call({required String referenceLink}) =>
+      caller.callServerEndpoint<_i4.Scrappable>(
         'createScrappable',
         'call',
         {'referenceLink': referenceLink},
@@ -264,6 +248,21 @@ class EndpointDeleteScrappable extends _i1.EndpointRef {
         'deleteScrappable',
         'call',
         {'scrappableId': scrappableId},
+      );
+}
+
+/// {@category Endpoint}
+class EndpointDeployScrappable extends _i1.EndpointRef {
+  EndpointDeployScrappable(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'deployScrappable';
+
+  _i2.Future<void> call({required _i11.ReferenceTestData testData}) =>
+      caller.callServerEndpoint<void>(
+        'deployScrappable',
+        'call',
+        {'testData': testData},
       );
 }
 
@@ -447,7 +446,6 @@ class Client extends _i1.ServerpodClientShared {
           disconnectStreamsOnLostInternetConnection:
               disconnectStreamsOnLostInternetConnection,
         ) {
-    deployEndpointRelated = EndpointDeployEndpointRelated(this);
     privateAccount = EndpointPrivateAccount(this);
     privateApiUsage = EndpointPrivateApiUsage(this);
     privateCloneScrappable = EndpointPrivateCloneScrappable(this);
@@ -456,6 +454,7 @@ class Client extends _i1.ServerpodClientShared {
     privateUserScrappables = EndpointPrivateUserScrappables(this);
     createScrappable = EndpointCreateScrappable(this);
     deleteScrappable = EndpointDeleteScrappable(this);
+    deployScrappable = EndpointDeployScrappable(this);
     editScrappable = EndpointEditScrappable(this);
     marketplace = EndpointMarketplace(this);
     publicTier = EndpointPublicTier(this);
@@ -463,8 +462,6 @@ class Client extends _i1.ServerpodClientShared {
     scrappableChatSession = EndpointScrappableChatSession(this);
     modules = Modules(this);
   }
-
-  late final EndpointDeployEndpointRelated deployEndpointRelated;
 
   late final EndpointPrivateAccount privateAccount;
 
@@ -482,6 +479,8 @@ class Client extends _i1.ServerpodClientShared {
 
   late final EndpointDeleteScrappable deleteScrappable;
 
+  late final EndpointDeployScrappable deployScrappable;
+
   late final EndpointEditScrappable editScrappable;
 
   late final EndpointMarketplace marketplace;
@@ -496,7 +495,6 @@ class Client extends _i1.ServerpodClientShared {
 
   @override
   Map<String, _i1.EndpointRef> get endpointRefLookup => {
-        'deployEndpointRelated': deployEndpointRelated,
         'privateAccount': privateAccount,
         'privateApiUsage': privateApiUsage,
         'privateCloneScrappable': privateCloneScrappable,
@@ -505,6 +503,7 @@ class Client extends _i1.ServerpodClientShared {
         'privateUserScrappables': privateUserScrappables,
         'createScrappable': createScrappable,
         'deleteScrappable': deleteScrappable,
+        'deployScrappable': deployScrappable,
         'editScrappable': editScrappable,
         'marketplace': marketplace,
         'publicTier': publicTier,

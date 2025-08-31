@@ -47,9 +47,7 @@ class _DeployButtonState extends ConsumerState<DeployButton> {
                         await ref.globalLoadingSetter(() async {
                           final deployResult = await ref
                               .read(clientProvider)
-                              .deployEndpointRelated
-                              .deployReferenceTestData(
-                                  testData: widget.testData)
+                              .deployScrappable(testData: widget.testData)
                               .toResult;
 
                           deployResult.fold(
