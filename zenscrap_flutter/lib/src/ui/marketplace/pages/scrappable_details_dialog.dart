@@ -21,12 +21,10 @@ import 'package:zenscrap_flutter/src/ui/marketplace/widgets/api_key_selector_dia
 
 class ScrappableDetailsDialog extends ConsumerStatefulWidget {
   final Scrappable scrappable;
-  final CurlBuilderMixin curlBuilderMixin;
 
   const ScrappableDetailsDialog({
     super.key,
     required this.scrappable,
-    required this.curlBuilderMixin,
   });
 
   @override
@@ -35,7 +33,7 @@ class ScrappableDetailsDialog extends ConsumerStatefulWidget {
 }
 
 class _ScrappableDetailsDialogState
-    extends ConsumerState<ScrappableDetailsDialog> {
+    extends ConsumerState<ScrappableDetailsDialog> with CurlBuilderMixin {
   AccountApiKey? selectedApiKey;
   String curlCommand = '';
 
@@ -74,7 +72,7 @@ class _ScrappableDetailsDialogState
     }
 
     setState(() {
-      curlCommand = widget.curlBuilderMixin.buildSimpleCurl(
+      curlCommand = buildSimpleCurl(
         baseUrl: baseUrl,
         scrappableId: widget.scrappable.id,
         apiKey: selectedApiKey!.apiKey,

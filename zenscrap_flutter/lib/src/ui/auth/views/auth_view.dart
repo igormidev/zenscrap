@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 import 'package:serverpod_auth_email_flutter/serverpod_auth_email_flutter.dart';
-import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/mixins/edit_scrappable.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/contact_support_button.dart';
@@ -17,7 +16,6 @@ import 'package:zenscrap_flutter/src/ui/auth/pages/password_reset_page.dart';
 import 'package:zenscrap_flutter/src/ui/auth/pages/password_reset_validate_code_page.dart';
 import 'package:zenscrap_flutter/src/ui/auth/pages/sign_in_page.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/scrappable_card_indicator.dart';
-import 'package:zenscrap_flutter/src/design_system/widgets/edit_scrappable_dialog.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_state.dart';
 
@@ -192,10 +190,8 @@ class _AuthViewState extends ConsumerState<AuthView>
                                 if (scrappable != null) ...[
                                   const SizedBox(height: 16),
                                   ScrappableCardIndicator(
-                                    isNew: true,
+                                    accountId: null,
                                     scrappable: scrappable,
-                                    onEdit: () => onEdit(scrappable),
-                                    onTap: context.pop,
                                   ),
                                 ],
                                 const SizedBox(height: 16),
@@ -262,10 +258,8 @@ class _AuthViewState extends ConsumerState<AuthView>
                                 if (scrappable != null) ...[
                                   const SizedBox(height: 16),
                                   ScrappableCardIndicator(
-                                    isNew: true,
+                                    accountId: null,
                                     scrappable: scrappable,
-                                    onEdit: () => onEdit(scrappable),
-                                    onTap: context.pop,
                                   ),
                                 ],
                                 const SizedBox(height: 16),
@@ -305,33 +299,6 @@ class _AuthViewState extends ConsumerState<AuthView>
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Future<void> onEdit(Scrappable scrappable) async {
-    await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) => EditScrappableDialog(
-        scrappable: scrappable,
-        onSave: (name, description, category, willHideFromMarketplace) async {
-          return onEditScrappable(
-            scrappable,
-            name,
-            description,
-            category,
-            willHideFromMarketplace,
-            () {
-              // Update the scrappable in the state provider
-              ref.read(scrapChatProvider.notifier).updateScrappableDetails(
-                    name: name,
-                    description: description,
-                    category: category,
-                  );
-            },
-          );
-        },
       ),
     );
   }

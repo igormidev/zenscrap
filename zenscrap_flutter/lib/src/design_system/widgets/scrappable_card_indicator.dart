@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/category_badge.dart';
+import 'package:zenscrap_flutter/src/design_system/widgets/edit_scrappable_dialog.dart';
+import 'package:zenscrap_flutter/src/ui/marketplace/pages/scrappable_details_dialog.dart';
 
 class ScrappableCardIndicator extends StatelessWidget {
-  final bool isNew;
+  final int? accountId;
   final Scrappable scrappable;
-  final VoidCallback? onTap;
-  final VoidCallback? onEdit;
+  final int? usageCount;
   const ScrappableCardIndicator({
     super.key,
     required this.scrappable,
-    this.isNew = false,
-    this.onTap,
-    this.onEdit,
+    required this.accountId,
+    this.usageCount,
   });
 
   @override
@@ -21,9 +21,18 @@ class ScrappableCardIndicator extends StatelessWidget {
     final hasUrl = scrappable.targetRequest?.url != null;
     final url = scrappable.targetRequest?.url ?? '';
     final willHideFromMarketplace = scrappable.willHideFromMarketplace;
+    final bool isNew = scrappable.accountId == null;
+    final bool isMyScrappable = scrappable.accountId == accountId;
 
     return InkWell(
-      onTap: onTap,
+      onTap: () async {
+        await showDialog(
+          context: context,
+          builder: (context) => ScrappableDetailsDialog(
+            scrappable: scrappable,
+          ),
+        );
+      },
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -53,9 +62,17 @@ class ScrappableCardIndicator extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                if (onEdit != null) ...[
+                if (isMyScrappable) ...[
                   InkWell(
-                    onTap: onEdit,
+                    onTap: () async {
+                      await showDialog<bool>(
+                        context: context,
+                        builder: (dialogContext) => EditScrappableDialog(
+                          scrappable: scrappable,
+                          willHaveOrOptions: isNew == false,
+                        ),
+                      );
+                    },
                     hoverColor: context.c.primaryContainer,
                     child: Icon(
                       Icons.edit,
@@ -121,61 +138,76 @@ class ScrappableCardIndicator extends StatelessWidget {
                 // Category badge
                 CategoryBadge(scrappable: scrappable),
                 const SizedBox(width: 8),
-                // Status badge
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
+                if (usageCount != null) ...[
+                  Tooltip(
+                    message:
+                        'This scrapper was used\n$usageCount times in the\nlast 7 days',
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.bar_chart),
+                        SizedBox(width: 8),
+                        Text('$usageCount calls in last 7 days')
+                      ],
+                    ),
                   ),
-                  decoration: BoxDecoration(
-                    color: !isNew
-                        ? willHideFromMarketplace
-                            ? Colors.amber.withAlpha(26)
-                            : Colors.green.withAlpha(26)
-                        : Colors.orange.withAlpha(26),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 6,
-                        height: 6,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: !isNew
-                              ? willHideFromMarketplace
-                                  ? Colors.amber
-                                  : Colors.green
-                              : Colors.orange,
+                ] else ...[
+                  // Status badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: !isNew
+                          ? willHideFromMarketplace
+                              ? Colors.amber.withAlpha(26)
+                              : Colors.green.withAlpha(26)
+                          : Colors.orange.withAlpha(26),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: !isNew
+                                ? willHideFromMarketplace
+                                    ? Colors.amber
+                                    : Colors.green
+                                : Colors.orange,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        isNew
-                            ? 'This endpoint will be active and attached to your account after you sign In'
-                            : willHideFromMarketplace
-                                ? 'Not available in marketplace'
-                                : 'Available in marketplace',
-                        style: context.t.labelSmall?.copyWith(
-                          color: !isNew
-                              ? willHideFromMarketplace
-                                  ? Colors.amber.shade700
-                                  : Colors.green.shade700
-                              : Colors.orange.shade700,
-                          fontWeight: FontWeight.w600,
+                        const SizedBox(width: 6),
+                        Text(
+                          isNew
+                              ? 'This endpoint will be active and attached to your account after you sign In'
+                              : willHideFromMarketplace
+                                  ? 'Not available in marketplace'
+                                  : 'Available in marketplace',
+                          style: context.t.labelSmall?.copyWith(
+                            color: !isNew
+                                ? willHideFromMarketplace
+                                    ? Colors.amber.shade700
+                                    : Colors.green.shade700
+                                : Colors.orange.shade700,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                const Spacer(),
-                Text(
-                  'Created ${_formatDate(scrappable.createdAt)}',
-                  style: context.t.labelSmall?.copyWith(
-                    color: context.c.onSurfaceVariant.withAlpha(179),
+                  const Spacer(),
+                  Text(
+                    'Created ${_formatDate(scrappable.createdAt)}',
+                    style: context.t.labelSmall?.copyWith(
+                      color: context.c.onSurfaceVariant.withAlpha(179),
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
           ],

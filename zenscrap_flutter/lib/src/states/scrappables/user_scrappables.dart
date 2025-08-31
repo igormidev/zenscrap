@@ -12,6 +12,10 @@ class UserScrappablesNotifier extends StateNotifier<UserScrappablesState> {
   UserScrappablesNotifier(this.ref) : super(UserScrappablesState.initial());
 
   Future<void> getScrappables() async {
+    final sessionManager = ref.read(sessionManagerProvider);
+    final signedInUser = sessionManager.signedInUser;
+    if (signedInUser == null) return;
+
     state = UserScrappablesState.loading();
     final result =
         await ref.read(clientProvider).privateUserScrappables().toResult;

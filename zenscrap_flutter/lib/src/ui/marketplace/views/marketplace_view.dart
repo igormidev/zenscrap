@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/mixins/curl_builder_mixin.dart';
+import 'package:zenscrap_flutter/src/design_system/widgets/scrappable_card_indicator.dart';
+import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
+import 'package:zenscrap_flutter/src/states/account/account_state.dart';
 import 'package:zenscrap_flutter/src/states/marketplace/marketplace_provider.dart';
 import 'package:zenscrap_flutter/src/states/marketplace/marketplace_state.dart';
 import 'package:zenscrap_flutter/src/ui/marketplace/pages/empty_marketplace_page.dart';
-import 'package:zenscrap_flutter/src/ui/marketplace/pages/scrappable_details_dialog.dart';
 import 'package:zenscrap_flutter/src/ui/marketplace/widgets/marketplace_pagination_controls.dart';
-import 'package:zenscrap_flutter/src/ui/marketplace/widgets/marketplace_scrappable_card.dart';
 import 'package:zenscrap_flutter/src/ui/marketplace/widgets/marketplace_header.dart';
 
 class MarketplaceView extends ConsumerStatefulWidget {
@@ -31,6 +32,9 @@ class _MarketplaceViewState extends ConsumerState<MarketplaceView>
 
   @override
   Widget build(BuildContext context) {
+    final accountId = ref.watch(accountProvider).mapOrNull(
+          withData: (value) => value.accountInfo.id,
+        );
     final marketplaceState = ref.watch(marketplaceProvider);
 
     return Column(
@@ -74,15 +78,11 @@ class _MarketplaceViewState extends ConsumerState<MarketplaceView>
                       itemBuilder: (context, index) {
                         final MarketPlacePaginatedItem marketPlaceItem =
                             response.data[index];
-                        // final scrappable = response.data[index];
 
-                        return MarketplaceScrappableCard(
+                        return ScrappableCardIndicator(
+                          accountId: accountId,
                           scrappable: marketPlaceItem.scrappable,
-                          usedCount: marketPlaceItem.usageCount,
-                          onTap: () {
-                            _showScrappableDetails(
-                                context, marketPlaceItem.scrappable);
-                          },
+                          usageCount: marketPlaceItem.usageCount,
                         );
                       },
                     ),
@@ -95,16 +95,6 @@ class _MarketplaceViewState extends ConsumerState<MarketplaceView>
           ),
         ),
       ],
-    );
-  }
-
-  void _showScrappableDetails(BuildContext context, Scrappable scrappable) {
-    showDialog(
-      context: context,
-      builder: (context) => ScrappableDetailsDialog(
-        scrappable: scrappable,
-        curlBuilderMixin: this,
-      ),
     );
   }
 }

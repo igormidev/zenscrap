@@ -1,27 +1,31 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/scraper_category_extension.dart';
+import 'package:zenscrap_flutter/src/core/extensions/serverpod_to_result.dart';
+import 'package:zenscrap_flutter/src/core/mixins/edit_scrappable.dart';
+import 'package:zenscrap_flutter/src/design_system/default_error_snackbar.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
+import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_state.dart';
+import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables.dart';
 import 'package:zenscrap_flutter/src/ui/marketplace/dialogs/upgrade_plan_dialog.dart';
 
 class EditScrappableDialog extends ConsumerStatefulWidget {
+  final bool willHaveOrOptions;
   final Scrappable scrappable;
-  final Future<bool> Function(String name, String description,
-      ScraperCategory category, bool? willHideFromMarketplace) onSave;
-  final Future<bool> Function()? onDelete;
 
   const EditScrappableDialog({
     super.key,
     required this.scrappable,
-    required this.onSave,
-    this.onDelete,
+    required this.willHaveOrOptions,
   });
 
   @override
@@ -29,7 +33,8 @@ class EditScrappableDialog extends ConsumerStatefulWidget {
       _EditScrappableDialogState();
 }
 
-class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog> {
+class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
+    with EditScrappable {
   final ValueNotifier<bool> _hasChangesVN = ValueNotifier<bool>(false);
   final ValueNotifier<bool> _isDeleting = ValueNotifier<bool>(false);
 
@@ -41,8 +46,6 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog> {
   }
 
   Future<void> _handleDelete() async {
-    if (widget.onDelete == null) return;
-
     // Show confirmation dialog
     final shouldDelete = await showDialog<bool>(
       context: context,
@@ -70,7 +73,7 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog> {
 
     _isDeleting.value = true;
     try {
-      final success = await widget.onDelete!();
+      final success = await _onDelete();
       if (success && mounted) {
         context.pop();
       } else if (mounted) {
@@ -85,6 +88,35 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog> {
         _isDeleting.value = false;
       }
     }
+  }
+
+  Future<bool> _onDelete() async {
+    final client = ref.read(clientProvider);
+    final result = await client.deleteScrappable
+        .call(
+          scrappableId: widget.scrappable.id.toString(),
+        )
+        .toResult;
+
+    return result.fold(
+      (success) {
+        // Refresh the scrappables list
+        unawaited(ref.read(userScrappables.notifier).getScrappables());
+        if (context.mounted) {
+          showSnackbar(
+            context,
+            'Scrappable deleted successfully',
+          );
+        }
+        return success;
+      },
+      (error) {
+        if (context.mounted) {
+          handleBabelException(context, error);
+        }
+        return false;
+      },
+    );
   }
 
   @override
@@ -166,7 +198,28 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog> {
             ScrappableEditForm(
               key: ValueKey('edit_form_${widget.scrappable.id}'),
               scrappable: widget.scrappable,
-              onSave: widget.onSave,
+              onSave:
+                  (name, description, category, willHideFromMarketplace) async {
+                return onEditScrappable(
+                  widget.scrappable,
+                  name,
+                  description,
+                  category,
+                  willHideFromMarketplace,
+                  () {
+                    unawaited(
+                        ref.read(userScrappables.notifier).getScrappables());
+                    // Update the scrappable in the state provider
+                    ref
+                        .read(scrapChatProvider.notifier)
+                        .updateScrappableDetails(
+                          name: name,
+                          description: description,
+                          category: category,
+                        );
+                  },
+                );
+              },
               shouldPopOnEnd: true,
               onHasChangesUpdated: (hasChanges) =>
                   _hasChangesVN.value = hasChanges,
@@ -186,23 +239,21 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog> {
                 ),
               ],
             ),
-
-            Transform.translate(
-              offset: const Offset(0, -10),
-              child: Row(
-                children: [
-                  Expanded(child: Divider(endIndent: 16, indent: 20)),
-                  Text('OR'),
-                  Expanded(child: Divider(indent: 16, endIndent: 20)),
-                ],
+            if (widget.willHaveOrOptions) ...[
+              Transform.translate(
+                offset: const Offset(0, -10),
+                child: Row(
+                  children: [
+                    Expanded(child: Divider(endIndent: 16, indent: 20)),
+                    Text('OR'),
+                    Expanded(child: Divider(indent: 16, endIndent: 20)),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(height: 6),
-
-            Row(
-              children: [
-                SizedBox(width: 20),
-                if (widget.onDelete != null)
+              SizedBox(height: 6),
+              Row(
+                children: [
+                  SizedBox(width: 20),
                   ValueListenableBuilder<bool>(
                     valueListenable: _isDeleting,
                     builder: (context, isDeleting, child) {
@@ -230,27 +281,27 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog> {
                       );
                     },
                   ),
-                Spacer(),
-                ValueListenableBuilder(
-                  valueListenable: _hasChangesVN,
-                  builder: (context, hasChanges, child) {
-                    return FilledButton(
-                      onPressed: hasChanges
-                          ? null
-                          : () {
-                              ref.read(scrapChatProvider.notifier).reset();
-                              context.go(
-                                '/scrappable-form?id=${widget.scrappable.id.toString()}',
-                              );
-                            },
-                      child: Text('Edit scrapper extract logic'),
-                    );
-                  },
-                ),
-                SizedBox(width: 20),
-              ],
-            ),
-
+                  Spacer(),
+                  ValueListenableBuilder(
+                    valueListenable: _hasChangesVN,
+                    builder: (context, hasChanges, child) {
+                      return FilledButton(
+                        onPressed: hasChanges
+                            ? null
+                            : () {
+                                ref.read(scrapChatProvider.notifier).reset();
+                                context.go(
+                                  '/scrappable-form?id=${widget.scrappable.id.toString()}',
+                                );
+                              },
+                        child: Text('Edit scrapper extract logic'),
+                      );
+                    },
+                  ),
+                  SizedBox(width: 20),
+                ],
+              ),
+            ],
             SizedBox(height: 20)
           ],
         ),

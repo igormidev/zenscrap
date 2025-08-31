@@ -2,7 +2,7 @@ class: Scrappable
 table: scrappable
 fields:
   id: UuidValue, defaultModel=random
-  accountId: int?, relation(name=account_info_scrappable, parent=account_info), scope=serverOnly
+  accountId: int?, relation(name=account_info_scrappable, parent=account_info)
   apiUsageOwnerNanoId: String?, scope=serverOnly
   createdAt: DateTime
   name: String

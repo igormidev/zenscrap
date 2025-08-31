@@ -186,6 +186,7 @@ abstract class Scrappable
   Map<String, dynamic> toJsonForProtocol() {
     return {
       'id': id.toJson(),
+      if (accountId != null) 'accountId': accountId,
       'createdAt': createdAt.toJson(),
       'name': name,
       'description': description,

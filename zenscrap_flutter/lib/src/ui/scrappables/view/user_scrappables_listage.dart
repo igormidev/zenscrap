@@ -6,14 +6,11 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/mixins/edit_scrappable.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/scrappable_card_indicator.dart';
+import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
+import 'package:zenscrap_flutter/src/states/account/account_state.dart';
 import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables.dart';
 import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables_state.dart';
 import 'package:zenscrap_flutter/src/ui/scrappables/pages/empty_scrappable_listage_indicator_page.dart';
-import 'package:zenscrap_flutter/src/design_system/widgets/edit_scrappable_dialog.dart';
-import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
-import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
-import 'package:zenscrap_flutter/src/core/extensions/serverpod_to_result.dart';
-import 'package:zenscrap_flutter/src/design_system/default_error_snackbar.dart';
 
 class UserScrappablesListage extends ConsumerStatefulWidget {
   const UserScrappablesListage({super.key});
@@ -35,6 +32,9 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
 
   @override
   Widget build(BuildContext context) {
+    final accountId = ref.watch(accountProvider).mapOrNull(
+          withData: (value) => value.accountInfo.id,
+        );
     final List<Scrappable> scrappables = ref.watch(userScrappables).maybeWhen(
           withData: (scrappables) => scrappables,
           orElse: () => <Scrappable>[],
@@ -80,60 +80,8 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
               itemBuilder: (context, index) {
                 final scrappable = scrappables[index];
                 return ScrappableCardIndicator(
+                  accountId: accountId,
                   scrappable: scrappable,
-                  onEdit: () async {
-                    await showDialog<bool>(
-                      context: context,
-                      builder: (dialogContext) => EditScrappableDialog(
-                        scrappable: scrappable,
-                        onSave: (name, description, category,
-                            willHideFromMarketplace) async {
-                          return onEditScrappable(
-                            scrappable,
-                            name,
-                            description,
-                            category,
-                            willHideFromMarketplace,
-                            () {
-                              unawaited(ref
-                                  .read(userScrappables.notifier)
-                                  .getScrappables());
-                            },
-                          );
-                        },
-                        onDelete: () async {
-                          final client = ref.read(clientProvider);
-                          final result = await client.deleteScrappable
-                              .call(
-                                scrappableId: scrappable.id.toString(),
-                              )
-                              .toResult;
-
-                          return result.fold(
-                            (success) {
-                              // Refresh the scrappables list
-                              unawaited(ref
-                                  .read(userScrappables.notifier)
-                                  .getScrappables());
-                              if (context.mounted) {
-                                showSnackbar(
-                                  context,
-                                  'Scrappable deleted successfully',
-                                );
-                              }
-                              return success;
-                            },
-                            (error) {
-                              if (context.mounted) {
-                                handleBabelException(context, error);
-                              }
-                              return false;
-                            },
-                          );
-                        },
-                      ),
-                    );
-                  },
                 );
               },
             );

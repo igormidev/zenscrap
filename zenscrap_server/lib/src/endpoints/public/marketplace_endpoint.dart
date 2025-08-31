@@ -25,12 +25,14 @@ class MarketplaceEndpoint extends Endpoint {
             t.willHideFromMarketplace.equals(false) &
             t.isDeleted.equals(false) &
             t.willHideFromMarketplace.equals(false) &
+            t.accountId.notEquals(null) &
             (t.name.ilike('%$searchQuery%') |
                 t.description.ilike('%$searchQuery%'))
         : (ScrappableTable t) =>
             t.willHideFromMarketplace.equals(false) &
             t.isDeleted.equals(false) &
-            t.willHideFromMarketplace.equals(false);
+            t.willHideFromMarketplace.equals(false) &
+            t.accountId.notEquals(null);
 
     // Get total count for pagination
     final totalCount = await Scrappable.db.count(

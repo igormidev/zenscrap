@@ -9,6 +9,7 @@ import 'package:zenscrap_flutter/src/core/extensions/serverpod_to_result.dart';
 import 'package:zenscrap_flutter/src/design_system/default_error_snackbar.dart';
 
 mixin EditScrappable<T extends ConsumerStatefulWidget> on ConsumerState<T> {
+// mixin EditScrappable<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   Future<bool> onEditScrappable(
     Scrappable scrappable,
     String name,
