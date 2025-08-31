@@ -47,10 +47,9 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
 
     return Column(
       children: [
-        SizedBox(height: 16),
+        SizedBox(height: 20),
         Row(
           children: [
-            SizedBox(width: 20),
             Text(
               'Your endpoints',
               style: context.t.displaySmall,
@@ -66,6 +65,7 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
             SizedBox(width: 20),
           ],
         ),
+        SizedBox(height: 16),
         Expanded(
           child: ScrappableGridListage(
             itemCount: scrappables.length,

@@ -41,7 +41,7 @@ class _MarketplaceViewState extends ConsumerState<MarketplaceView>
     return Column(
       children: [
         const MarketplaceHeader(),
-        // Divider(height: 1),
+        SizedBox(height: 16),
         Expanded(
           child: marketplaceState.when(
             initial: () => const Center(
@@ -65,18 +65,10 @@ class _MarketplaceViewState extends ConsumerState<MarketplaceView>
                         final MarketPlacePaginatedItem marketPlaceItem =
                             response.data[index];
 
-                        return Center(
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 400),
-                            child: SizedBox(
-                              width: double.infinity,
-                              child: ScrappableCardIndicator(
-                                accountId: accountId,
-                                scrappable: marketPlaceItem.scrappable,
-                                usageCount: marketPlaceItem.usageCount,
-                              ),
-                            ),
-                          ),
+                        return ScrappableCardIndicator(
+                          accountId: accountId,
+                          scrappable: marketPlaceItem.scrappable,
+                          usageCount: marketPlaceItem.usageCount,
                         );
                       },
                     ),

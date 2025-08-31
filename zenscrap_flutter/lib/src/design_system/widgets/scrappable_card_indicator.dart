@@ -200,14 +200,14 @@ class ScrappableCardIndicator extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const Spacer(),
-                  Text(
-                    'Created ${_formatDate(scrappable.createdAt)}',
-                    style: context.t.labelSmall?.copyWith(
-                      color: context.c.onSurfaceVariant.withAlpha(179),
-                    ),
-                  ),
                 ],
+                const Spacer(),
+                Text(
+                  'Created ${_formatDate(scrappable.createdAt)}',
+                  style: context.t.labelSmall?.copyWith(
+                    color: context.c.onSurfaceVariant.withAlpha(179),
+                  ),
+                ),
               ],
             ),
           ],

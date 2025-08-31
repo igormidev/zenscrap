@@ -20,6 +20,9 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
           scrappables: Scrappable.includeList(
             include: Scrappable.include(
               targetRequest: ScrappableRequest.include(),
+              referenceTestData: ReferenceTestData.include(
+                scrappableTestResult: ScrappableTestResult.include(),
+              ),
             ),
           ),
         ));

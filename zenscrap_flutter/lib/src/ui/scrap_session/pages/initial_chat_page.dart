@@ -189,7 +189,7 @@ class _ChatViewPageState extends ConsumerState<ChatViewPage>
         if (ref.watch(sessionProvider.select((value) => value.maybeMap(
               orElse: () => false,
               notSignedIn: (_) => true,
-            ))))
+            )))) ...[
           Align(
             alignment: Alignment.topRight,
             child: TextButton.icon(
@@ -200,7 +200,22 @@ class _ChatViewPageState extends ConsumerState<ChatViewPage>
               icon: const Icon(Icons.login),
               label: const Text('Already have an account? Log in'),
             ),
-          )
+          ),
+        ] else ...[
+          Align(
+            alignment: Alignment.topLeft,
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: IconButton.filledTonal(
+                tooltip: 'Go back to zen scrap dashboard',
+                onPressed: () {
+                  context.pop();
+                },
+                icon: const Icon(Icons.navigate_before_rounded),
+              ),
+            ),
+          ),
+        ]
       ],
     );
   }

@@ -65,7 +65,6 @@ class MarketplaceEndpoint extends Endpoint {
       include: Scrappable.include(
         targetRequest: ScrappableRequest.include(),
         referenceTestData: ReferenceTestData.include(
-          byteData: ByteTestData.include(),
           scrappableTestResult: ScrappableTestResult.include(),
         ),
       ),

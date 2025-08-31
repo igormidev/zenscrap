@@ -13,7 +13,7 @@ class ScrappableGridListage extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final count = (constraints.maxWidth / 400).floor();
+        final count = (constraints.maxWidth / 500).floor();
         final crossAxisCount = count < 1 ? 1 : count;
 
         return GridView.builder(
@@ -21,14 +21,10 @@ class ScrappableGridListage extends StatelessWidget {
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: crossAxisCount,
             mainAxisExtent: 220,
-            // childAspectRatio: 1.82,
+            crossAxisSpacing: 20,
+            mainAxisSpacing: 20,
           ),
-          padding: const EdgeInsets.only(
-            top: 8,
-            bottom: 20,
-            left: 20,
-            right: 20,
-          ),
+          padding: const EdgeInsets.only(bottom: 20),
           itemBuilder: itemBuilder,
         );
       },
