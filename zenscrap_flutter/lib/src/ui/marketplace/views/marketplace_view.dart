@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/mixins/curl_builder_mixin.dart';
+import 'package:zenscrap_flutter/src/design_system/elements/scrappable_grid_listage.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/scrappable_card_indicator.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_state.dart';
@@ -58,31 +59,24 @@ class _MarketplaceViewState extends ConsumerState<MarketplaceView>
               return Column(
                 children: [
                   Expanded(
-                    child: GridView.builder(
+                    child: ScrappableGridListage(
                       itemCount: response.data.length,
-                      gridDelegate:
-                          const SliverGridDelegateWithMaxCrossAxisExtent(
-                        maxCrossAxisExtent: 480,
-                        childAspectRatio: 1.72,
-                        crossAxisSpacing: 20,
-                        mainAxisSpacing: 20,
-                      ),
-                      padding: const EdgeInsets.only(
-                        // vertical: 20,
-                        // horizontal: 20,
-                        top: 8,
-                        bottom: 20,
-                        left: 20,
-                        right: 20,
-                      ),
                       itemBuilder: (context, index) {
                         final MarketPlacePaginatedItem marketPlaceItem =
                             response.data[index];
 
-                        return ScrappableCardIndicator(
-                          accountId: accountId,
-                          scrappable: marketPlaceItem.scrappable,
-                          usageCount: marketPlaceItem.usageCount,
+                        return Center(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 400),
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: ScrappableCardIndicator(
+                                accountId: accountId,
+                                scrappable: marketPlaceItem.scrappable,
+                                usageCount: marketPlaceItem.usageCount,
+                              ),
+                            ),
+                          ),
                         );
                       },
                     ),

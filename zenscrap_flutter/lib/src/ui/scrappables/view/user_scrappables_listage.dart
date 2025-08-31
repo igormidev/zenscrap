@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/mixins/edit_scrappable.dart';
+import 'package:zenscrap_flutter/src/design_system/elements/scrappable_grid_listage.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/scrappable_card_indicator.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
@@ -66,26 +67,16 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
           ],
         ),
         Expanded(
-          child: LayoutBuilder(builder: (context, constaints) {
-            final optimalCrossAxisCount = (constaints.maxWidth / 480).floor();
-            return GridView.builder(
-              itemCount: scrappables.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: optimalCrossAxisCount,
-                mainAxisExtent: 220,
-                crossAxisSpacing: 20,
-                mainAxisSpacing: 20,
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-              itemBuilder: (context, index) {
-                final scrappable = scrappables[index];
-                return ScrappableCardIndicator(
-                  accountId: accountId,
-                  scrappable: scrappable,
-                );
-              },
-            );
-          }),
+          child: ScrappableGridListage(
+            itemCount: scrappables.length,
+            itemBuilder: (context, index) {
+              final scrappable = scrappables[index];
+              return ScrappableCardIndicator(
+                accountId: accountId,
+                scrappable: scrappable,
+              );
+            },
+          ),
         ),
       ],
     );
