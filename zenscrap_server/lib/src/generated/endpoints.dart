@@ -709,12 +709,7 @@ class Endpoints extends _i1.EndpointDispatch {
               name: 'scrappableId',
               type: _i1.getType<String>(),
               nullable: false,
-            ),
-            'aiModel': _i1.ParameterDescription(
-              name: 'aiModel',
-              type: _i1.getType<_i21.AiModel>(),
-              nullable: false,
-            ),
+            )
           },
           call: (
             _i1.Session session,
@@ -724,7 +719,6 @@ class Endpoints extends _i1.EndpointDispatch {
                   .createSession(
             session,
             scrappableId: params['scrappableId'],
-            aiModel: params['aiModel'],
           ),
         ),
         'changeChatModel': _i1.MethodConnector(

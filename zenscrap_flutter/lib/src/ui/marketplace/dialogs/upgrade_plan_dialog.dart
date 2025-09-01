@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
@@ -8,8 +9,10 @@ import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
 
 class _UpgradePlanDialog extends ConsumerStatefulWidget {
   final String mainCTAText;
+  final PlanTier targetPlan;
   const _UpgradePlanDialog({
     required this.mainCTAText,
+    required this.targetPlan,
   });
 
   @override
@@ -112,7 +115,11 @@ class _UpgradePlanDialogState extends ConsumerState<_UpgradePlanDialog> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    '🚀 Unlock Ultra Features',
+                    widget.targetPlan == PlanTier.ultra 
+                        ? '🚀 Unlock Ultra Features'
+                        : widget.targetPlan == PlanTier.pro
+                            ? '⭐ Unlock Pro Features'
+                            : '✨ Get Started with Basic',
                     style: context.t.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: context.c.primary,
@@ -129,7 +136,11 @@ class _UpgradePlanDialogState extends ConsumerState<_UpgradePlanDialog> {
               child: Column(
                 children: [
                   Text(
-                    'Clone & Customize Marketplace Scrappables',
+                    widget.targetPlan == PlanTier.ultra
+                        ? 'Clone & Customize Marketplace Scrappables'
+                        : widget.targetPlan == PlanTier.pro
+                            ? 'Access Advanced AI Models & More'
+                            : 'Start Your Web Scraping Journey',
                     style: context.t.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -147,33 +158,7 @@ class _UpgradePlanDialogState extends ConsumerState<_UpgradePlanDialog> {
                   const SizedBox(height: 24),
 
                   // Benefits list
-                  _BenefitItem(
-                    icon: Icons.copy_all_rounded,
-                    title: 'One-Click Clone',
-                    description:
-                        'Instantly copy any marketplace scrappable to your collection',
-                  ),
-                  const SizedBox(height: 12),
-                  _BenefitItem(
-                    icon: Icons.edit_note_rounded,
-                    title: 'Full Customization',
-                    description:
-                        'Modify extraction rules, URLs, and parameters to your needs',
-                  ),
-                  const SizedBox(height: 12),
-                  _BenefitItem(
-                    icon: Icons.rocket_launch_rounded,
-                    title: 'Save Development Time',
-                    description:
-                        'Build on existing scrappables instead of starting from scratch',
-                  ),
-                  const SizedBox(height: 12),
-                  _BenefitItem(
-                    icon: Icons.all_inclusive_rounded,
-                    title: 'Plus Everything in Ultra',
-                    description:
-                        '1M API calls, 100 concurrent requests, priority support & more',
-                  ),
+                  ..._getBenefitsForPlan(widget.targetPlan),
 
                   const SizedBox(height: 32),
 
@@ -198,7 +183,7 @@ class _UpgradePlanDialogState extends ConsumerState<_UpgradePlanDialog> {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          'Starting at just \$500/month',
+                          _getPricingText(widget.targetPlan),
                           style: context.t.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: context.c.tertiary,
@@ -215,7 +200,7 @@ class _UpgradePlanDialogState extends ConsumerState<_UpgradePlanDialog> {
                             color: context.c.error,
                           ),
                           child: Text(
-                            'Save \$500/year',
+                            _getSavingsText(widget.targetPlan),
                             style: context.t.labelSmall?.copyWith(
                               color: context.c.onError,
                               fontWeight: FontWeight.bold,
@@ -282,7 +267,7 @@ class _UpgradePlanDialogState extends ConsumerState<_UpgradePlanDialog> {
                       label: Text(
                         _isLoadingPortal
                             ? 'Opening Portal...'
-                            : 'Upgrade to Ultra',
+                            : 'Upgrade to ${_getPlanName(widget.targetPlan)}',
                         style: context.t.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: context.c.onPrimary,
@@ -297,6 +282,130 @@ class _UpgradePlanDialogState extends ConsumerState<_UpgradePlanDialog> {
         ),
       ),
     );
+  }
+  
+  List<Widget> _getBenefitsForPlan(PlanTier plan) {
+    switch (plan) {
+      case PlanTier.ultra:
+        return [
+          _BenefitItem(
+            icon: Icons.copy_all_rounded,
+            title: 'One-Click Clone',
+            description: 'Instantly copy any marketplace scrappable to your collection',
+          ),
+          const SizedBox(height: 12),
+          _BenefitItem(
+            icon: Icons.edit_note_rounded,
+            title: 'Full Customization',
+            description: 'Modify extraction rules, URLs, and parameters to your needs',
+          ),
+          const SizedBox(height: 12),
+          _BenefitItem(
+            icon: Icons.rocket_launch_rounded,
+            title: 'Save Development Time',
+            description: 'Build on existing scrappables instead of starting from scratch',
+          ),
+          const SizedBox(height: 12),
+          _BenefitItem(
+            icon: Icons.all_inclusive_rounded,
+            title: 'Plus Everything in Ultra',
+            description: '1M API calls, 100 concurrent requests, priority support & more',
+          ),
+        ];
+      case PlanTier.pro:
+        return [
+          _BenefitItem(
+            icon: Icons.psychology_rounded,
+            title: 'Advanced AI Models',
+            description: 'Access to Gemini 2.5 Pro for better extraction accuracy',
+          ),
+          const SizedBox(height: 12),
+          _BenefitItem(
+            icon: Icons.api_rounded,
+            title: '200,000 API Calls',
+            description: 'Plenty of requests for growing projects',
+          ),
+          const SizedBox(height: 12),
+          _BenefitItem(
+            icon: Icons.speed_rounded,
+            title: '30 Concurrent Requests',
+            description: '3x more concurrent requests than Basic',
+          ),
+          const SizedBox(height: 12),
+          _BenefitItem(
+            icon: Icons.hub_rounded,
+            title: '10 Active Endpoints',
+            description: 'Create more scraping endpoints for your projects',
+          ),
+        ];
+      case PlanTier.basic:
+        return [
+          _BenefitItem(
+            icon: Icons.timer_off_rounded,
+            title: 'No Time Limits',
+            description: 'Endpoints never expire unlike the free tier',
+          ),
+          const SizedBox(height: 12),
+          _BenefitItem(
+            icon: Icons.api_rounded,
+            title: '50,000 API Calls',
+            description: 'Perfect for side projects and small applications',
+          ),
+          const SizedBox(height: 12),
+          _BenefitItem(
+            icon: Icons.speed_rounded,
+            title: '10 Concurrent Requests',
+            description: 'Handle multiple requests simultaneously',
+          ),
+          const SizedBox(height: 12),
+          _BenefitItem(
+            icon: Icons.hub_rounded,
+            title: '3 Active Endpoints',
+            description: 'Create and manage up to 3 scraping endpoints',
+          ),
+        ];
+      default:
+        return [];
+    }
+  }
+  
+  String _getPricingText(PlanTier plan) {
+    switch (plan) {
+      case PlanTier.ultra:
+        return 'Starting at just \$500/month';
+      case PlanTier.pro:
+        return 'Starting at just \$199/month';
+      case PlanTier.basic:
+        return 'Starting at just \$100/month';
+      default:
+        return '';
+    }
+  }
+  
+  String _getSavingsText(PlanTier plan) {
+    switch (plan) {
+      case PlanTier.ultra:
+        return 'Save \$500/year';
+      case PlanTier.pro:
+        return 'Save \$189/year';
+      case PlanTier.basic:
+        return 'Save \$150/year';
+      default:
+        return '';
+    }
+  }
+  
+  String _getPlanName(PlanTier plan) {
+    switch (plan) {
+      case PlanTier.ultra:
+        return 'Ultra';
+      case PlanTier.pro:
+        return 'Pro';
+      case PlanTier.basic:
+        return 'Basic';
+      default:
+        return '';
+    }
   }
 }
 
@@ -482,9 +591,34 @@ Future<void> showCloneUpgradeDialog(BuildContext context) async {
       builder: (context) => const _UpgradePlanDialog(
         mainCTAText:
             'Get instant access to clone and customize any marketplace scrappable. Build on proven solutions instead of starting from scratch.',
+        targetPlan: PlanTier.ultra,
       ),
     );
   }
+}
+
+/// Shows upgrade dialog for Pro plan (AI models)
+Future<void> showProPlanUpgradeDialog(BuildContext context, {required String mainCTAText}) async {
+  await showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) => _UpgradePlanDialog(
+      mainCTAText: mainCTAText,
+      targetPlan: PlanTier.pro,
+    ),
+  );
+}
+
+/// Shows upgrade dialog for Basic plan (no time limits)
+Future<void> showBasicPlanUpgradeDialog(BuildContext context, {required String mainCTAText}) async {
+  await showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) => _UpgradePlanDialog(
+      mainCTAText: mainCTAText,
+      targetPlan: PlanTier.basic,
+    ),
+  );
 }
 
 /// Shows upgrade dialog for hiding scrappables from marketplace
@@ -556,6 +690,7 @@ Future<void> showHideFromMarketplaceUpgradeDialog(BuildContext context) async {
       builder: (context) => const _UpgradePlanDialog(
         mainCTAText:
             'Unlock the ability to hide your scrappables from the marketplace while keeping them fully accessible through your API.',
+        targetPlan: PlanTier.ultra,
       ),
     );
   }

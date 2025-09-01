@@ -34,8 +34,8 @@ class ScrappableChatSession extends Endpoint {
   Future<CreateSessionResponse> createSession(
     Session session, {
     required String scrappableId,
-    required AiModel aiModel,
   }) async {
+    AiModel aiModel = AiModel.gemini_2_5_flash;
     final Scrappable? scrappable = await Scrappable.db.findById(
       session,
       UuidValue.fromString(scrappableId),
@@ -142,6 +142,38 @@ class ScrappableChatSession extends Endpoint {
     final referenceTestData = _cacheTestData[sessionUuid];
     if (scrappableId == null || referenceTestData == null) {
       throw sessionNotFount;
+    }
+
+    // Validate plan for Gemini 2.5 Pro
+    if (aiModel == AiModel.gemini_2_5_pro) {
+      final authenticationInfo = await session.authenticated;
+      if (authenticationInfo == null) {
+        throw ZenScrapException(
+          title: 'Authentication Required',
+          description: 'You must be logged in to use Gemini 2.5 Pro.',
+        );
+      }
+
+      final userId = authenticationInfo.userId;
+      final account = await AccountInfo.db.findFirstRow(
+        session,
+        where: (t) => t.userInfoId.equals(userId),
+      );
+
+      if (account == null) {
+        throw ZenScrapException(
+          title: 'Account Not Found',
+          description: 'Could not find account information.',
+        );
+      }
+
+      // Check if user has at least Pro plan
+      if (account.planTier == PlanTier.none || account.planTier == PlanTier.basic) {
+        throw ZenScrapException(
+          title: 'Upgrade Required',
+          description: 'You need at least a Pro plan to use Gemini 2.5 Pro. Upgrade your plan to access advanced AI models.',
+        );
+      }
     }
 
     _chatSessions.remove(sessionUuid);

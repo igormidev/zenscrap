@@ -36,9 +36,9 @@ import 'package:zenscrap_client/src/protocol/entities/account/plan_tier.dart'
     as _i14;
 import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/create_session_response.dart'
     as _i15;
-import 'package:zenscrap_client/src/protocol/entities/scrappable/ai_model.dart'
-    as _i16;
 import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/chat_response.dart'
+    as _i16;
+import 'package:zenscrap_client/src/protocol/entities/scrappable/ai_model.dart'
     as _i17;
 import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i18;
 import 'protocol.dart' as _i19;
@@ -389,23 +389,18 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
         {'sessionId': sessionId},
       );
 
-  _i2.Future<_i15.CreateSessionResponse> createSession({
-    required String scrappableId,
-    required _i16.AiModel aiModel,
-  }) =>
+  _i2.Future<_i15.CreateSessionResponse> createSession(
+          {required String scrappableId}) =>
       caller.callServerEndpoint<_i15.CreateSessionResponse>(
         'scrappableChatSession',
         'createSession',
-        {
-          'scrappableId': scrappableId,
-          'aiModel': aiModel,
-        },
+        {'scrappableId': scrappableId},
       );
 
-  _i2.Stream<_i17.ChatResponse> listenToScrappableRedraftSession(
+  _i2.Stream<_i16.ChatResponse> listenToScrappableRedraftSession(
           {required String sessionUuid}) =>
-      caller.callStreamingServerEndpoint<_i2.Stream<_i17.ChatResponse>,
-          _i17.ChatResponse>(
+      caller.callStreamingServerEndpoint<_i2.Stream<_i16.ChatResponse>,
+          _i16.ChatResponse>(
         'scrappableChatSession',
         'listenToScrappableRedraftSession',
         {'sessionUuid': sessionUuid},
@@ -414,7 +409,7 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
 
   _i2.Future<void> changeChatModel({
     required String sessionUuid,
-    required _i16.AiModel aiModel,
+    required _i17.AiModel aiModel,
   }) =>
       caller.callServerEndpoint<void>(
         'scrappableChatSession',
