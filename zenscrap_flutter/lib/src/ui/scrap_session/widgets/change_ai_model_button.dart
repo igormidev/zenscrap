@@ -56,7 +56,7 @@ class _ChangeAiModelButtonState extends ConsumerState<ChangeAiModelButton> {
                   },
                 ),
                 anchor: const Aligned(
-                  follower: Alignment.topLeft,
+                  follower: Alignment.bottomRight,
                   target: Alignment.topRight,
                   offset: Offset(8, 0),
                 ),
