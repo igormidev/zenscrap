@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_portal/flutter_portal.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
@@ -29,64 +28,81 @@ class ChangeAiModelButton extends ConsumerStatefulWidget {
 
 class _ChangeAiModelButtonState extends ConsumerState<ChangeAiModelButton> {
   final ValueNotifier<bool> _isChangingVN = ValueNotifier(false);
-  final ValueNotifier<bool> _showDropdownVN = ValueNotifier(false);
+  final OverlayPortalController _overlayController = OverlayPortalController();
   AiModel aiModel = AiModel.gemini_2_5_flash;
+
+  @override
+  void dispose() {
+    _isChangingVN.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
       valueListenable: _isChangingVN,
       builder: (context, isChanging, child) {
-        return ValueListenableBuilder(
-          valueListenable: _showDropdownVN,
-          builder: (context, showDropdown, child) {
-            return TapRegion(
-              onTapOutside: showDropdown
-                  ? (_) {
-                      _showDropdownVN.value = false;
-                    }
-                  : null,
-              child: PortalTarget(
-                visible: showDropdown,
-                portalFollower: _AiModelDropdownMenu(
-                  currentModel: aiModel,
-                  onModelSelected: (model) {
-                    _showDropdownVN.value = false;
-                    _validateAndChangeModel(model);
-                  },
-                ),
-                anchor: const Aligned(
-                  follower: Alignment.bottomRight,
-                  target: Alignment.topRight,
-                  offset: Offset(8, 0),
-                ),
-                child: TextButton.icon(
-                  onPressed: isChanging
-                      ? null
-                      : () {
-                          _showDropdownVN.value = !_showDropdownVN.value;
+        return OverlayPortal(
+          controller: _overlayController,
+          overlayChildBuilder: (BuildContext context) {
+            return Positioned(
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+              child: TapRegion(
+                onTapOutside: (_) {
+                  _overlayController.hide();
+                },
+                child: Stack(
+                  children: [
+                    CompositedTransformFollower(
+                      link: _layerLink,
+                      targetAnchor: Alignment.topRight,
+                      followerAnchor: Alignment.bottomRight,
+                      offset: const Offset(8, 0),
+                      child: _AiModelDropdownMenu(
+                        currentModel: aiModel,
+                        onModelSelected: (model) {
+                          _overlayController.hide();
+                          _validateAndChangeModel(model);
                         },
-                  label: Text(aiModel.displayName),
-                  style: TextButton.styleFrom(
-                    foregroundColor: Theme.of(context).colorScheme.secondary,
-                    padding: EdgeInsets.zero,
-                    iconAlignment: IconAlignment.end,
-                  ),
-                  icon: isChanging
-                      ? CupertinoActivityIndicator()
-                      : Icon(
-                          showDropdown
-                              ? Icons.keyboard_arrow_up
-                              : Icons.keyboard_arrow_down,
-                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             );
           },
+          child: CompositedTransformTarget(
+            link: _layerLink,
+            child: TextButton.icon(
+              onPressed: isChanging
+                  ? null
+                  : () {
+                      _overlayController.toggle();
+                    },
+              label: Text(aiModel.displayName),
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.secondary,
+                padding: EdgeInsets.zero,
+                iconAlignment: IconAlignment.end,
+              ),
+              icon: isChanging
+                  ? CupertinoActivityIndicator()
+                  : Icon(
+                      _overlayController.isShowing
+                          ? Icons.keyboard_arrow_up
+                          : Icons.keyboard_arrow_down,
+                    ),
+            ),
+          ),
         );
       },
     );
   }
+
+  final LayerLink _layerLink = LayerLink();
 
   Future<void> _validateAndChangeModel(AiModel aiModel) async {
     // Check if user is logged in

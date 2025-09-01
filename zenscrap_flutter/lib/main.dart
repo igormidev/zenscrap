@@ -2,7 +2,6 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_portal/flutter_portal.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:serverpod_auth_shared_flutter/serverpod_auth_shared_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -47,6 +46,7 @@ void main() async {
   final serverUrlFromEnv = String.fromEnvironment('SERVER_URL',
       defaultValue:
           kDebugMode ? 'http://$localhost:8080/' : 'https://api.zenscrap.com/');
+
   final serverUrl =
       serverUrlFromEnv.isEmpty ? 'http://$localhost:8080/' : serverUrlFromEnv;
 
@@ -178,48 +178,46 @@ class _MyAppState extends ConsumerState<MyApp> {
     });
     final router = ref.watch(routerProvider);
 
-    return Portal(
-      child: MaterialApp.router(
-        title: 'Zen Scrap',
-        routeInformationProvider: router.routeInformationProvider,
-        routeInformationParser: router.routeInformationParser,
-        routerDelegate: router.routerDelegate,
-        locale: const Locale('en'),
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-          cupertinoOverrideTheme: const CupertinoThemeData(
-            textTheme: CupertinoTextThemeData(),
-          ),
-          useMaterial3: true,
-          filledButtonTheme: FilledButtonThemeData(
-            style: FilledButton.styleFrom(
-              minimumSize: const Size(20, 50),
-              maximumSize: const Size(double.infinity, 50),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              textStyle: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-              ),
+    return MaterialApp.router(
+      title: 'Zen Scrap',
+      routeInformationProvider: router.routeInformationProvider,
+      routeInformationParser: router.routeInformationParser,
+      routerDelegate: router.routerDelegate,
+      locale: const Locale('en'),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        cupertinoOverrideTheme: const CupertinoThemeData(
+          textTheme: CupertinoTextThemeData(),
+        ),
+        useMaterial3: true,
+        filledButtonTheme: FilledButtonThemeData(
+          style: FilledButton.styleFrom(
+            minimumSize: const Size(20, 50),
+            maximumSize: const Size(double.infinity, 50),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            textStyle: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ),
-        builder: (context, child) {
-          return Consumer(
-            child: child,
-            builder: (context, ref, child) {
-              final isGlobalLoading = ref.watch(isGlobalLoadingProvider);
-              return IgnorePointer(ignoring: isGlobalLoading, child: child);
-            },
-          );
-        },
       ),
+      builder: (context, child) {
+        return Consumer(
+          child: child,
+          builder: (context, ref, child) {
+            final isGlobalLoading = ref.watch(isGlobalLoadingProvider);
+            return IgnorePointer(ignoring: isGlobalLoading, child: child);
+          },
+        );
+      },
     );
   }
 }

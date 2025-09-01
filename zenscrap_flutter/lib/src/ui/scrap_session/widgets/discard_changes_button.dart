@@ -6,6 +6,8 @@ import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.d
 import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_messages_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
+import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
+import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 
 class DiscardChangesButton extends ConsumerStatefulWidget {
   const DiscardChangesButton({super.key});
@@ -25,6 +27,14 @@ class _DiscardChangesButtonState extends ConsumerState<DiscardChangesButton> {
 
   @override
   Widget build(BuildContext context) {
+    final isLoggedIn =
+        ref.watch(sessionProvider.select((value) => value.maybeMap(
+              orElse: () => true,
+              notSignedIn: (_) => false,
+            )));
+    if (!isLoggedIn) {
+      return SizedBox.shrink();
+    }
     final bool hasAtLeastOneMessage = ref.watch(chatMessagesProvider.select(
       (value) => value.maybeMap(
         data: (data) => data.value.isNotEmpty,
@@ -72,7 +82,7 @@ class _DiscardChangesButtonState extends ConsumerState<DiscardChangesButton> {
                 icon: isDiscarding
                     ? CupertinoActivityIndicator()
                     : Icon(
-                        hasAtLeastOneMessage ? Icons.close : Icons.arrow_back),
+                        hasAtLeastOneMessage ? Icons.delete : Icons.arrow_back),
               );
             }),
       ),

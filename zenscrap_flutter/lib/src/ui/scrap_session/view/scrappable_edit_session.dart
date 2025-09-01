@@ -20,12 +20,13 @@ class ScrappableEditSessionView extends StatelessWidget {
     final ScrappableRequest? request = scrappable.targetRequest;
     final ReferenceTestData? testData = scrappable.referenceTestData;
     if (request == null) return SizedBox.fromSize();
+
     return Row(
       children: [
         Expanded(
           child: Stack(
             children: [
-              Expanded(
+              SizedBox.expand(
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 20, left: 20),
                   child: Column(

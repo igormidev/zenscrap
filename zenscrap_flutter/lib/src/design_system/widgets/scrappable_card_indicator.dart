@@ -202,13 +202,15 @@ class ScrappableCardIndicator extends StatelessWidget {
                     ),
                   ),
                 ],
-                const Spacer(),
-                Text(
-                  'Last modified ${scrappable.extractRulesUpdatedAt.formatToDisplay}',
-                  style: context.t.labelSmall?.copyWith(
-                    color: context.c.onSurfaceVariant.withAlpha(179),
+                if (!isNew) ...[
+                  const Spacer(),
+                  Text(
+                    'Last modified ${scrappable.extractRulesUpdatedAt.formatToDisplay}',
+                    style: context.t.labelSmall?.copyWith(
+                      color: context.c.onSurfaceVariant.withAlpha(179),
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
           ],
