@@ -13,16 +13,20 @@ import 'package:zenscrap_server/src/endpoints/public/chat_controller/i_chat_cont
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class ChatControllerGeminiApiImpl extends IChatController {
-  static late final GenerativeModel _geminiModel;
+  static late final GenerativeModel _geminiModel_2_5_flash;
+  static late final GenerativeModel _geminiModel_2_5_pro;
   static void initialize({required String geminiApiKey}) {
-    _geminiModel = GenerativeModel(
-      // model: 'gemini-2.5-pro',
-
+    final genConfig =
+        GenerationConfig(responseSchema: generateExtractRulesSchema);
+    _geminiModel_2_5_flash = GenerativeModel(
       model: 'gemini-2.5-flash',
       apiKey: geminiApiKey,
-      generationConfig: GenerationConfig(
-        responseSchema: generateExtractRulesSchema,
-      ),
+      generationConfig: genConfig,
+    );
+    _geminiModel_2_5_pro = GenerativeModel(
+      model: 'gemini-2.5-pro',
+      apiKey: geminiApiKey,
+      generationConfig: genConfig,
     );
   }
 
@@ -36,8 +40,13 @@ class ChatControllerGeminiApiImpl extends IChatController {
   factory ChatControllerGeminiApiImpl.create({
     required UuidValue scrappableId,
     required ReferenceTestData referenceTestData,
+    required AiModel aiModel,
   }) {
-    final chat = _geminiModel.startChat(
+    final chat = (switch (aiModel) {
+      AiModel.gemini_2_5_flash => _geminiModel_2_5_flash,
+      AiModel.gemini_2_5_pro => _geminiModel_2_5_pro,
+    })
+        .startChat(
       history: [getSystemPrompt(referenceTestData: referenceTestData)],
       generationConfig: GenerationConfig(
         responseSchema: generateExtractRulesSchema,

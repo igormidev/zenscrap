@@ -35,7 +35,7 @@ class _DiscardChangesButtonState extends ConsumerState<DiscardChangesButton> {
       alignment: Alignment.topLeft,
       child: Container(
         height: 32,
-        margin: const EdgeInsets.only(top: 20, left: 20),
+        margin: const EdgeInsets.only(top: 10, left: 20),
         child: ValueListenableBuilder(
             valueListenable: _isDiscardingVN,
             builder: (context, isDiscarding, child) {

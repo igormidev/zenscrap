@@ -1,0 +1,4 @@
+enum: AiModel
+values:
+  - gemini_2_5_flash
+  - gemini_2_5_pro

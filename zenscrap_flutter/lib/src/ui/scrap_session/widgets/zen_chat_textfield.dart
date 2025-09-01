@@ -90,52 +90,77 @@ class _ZenChatTextfieldState extends ConsumerState<ZenChatTextfield> {
     // final isEndpointTimeExpired = widget.targetTime.isBefore(DateTime.now());
     return Form(
       key: _formKey,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Expanded(
-            child: ZenTextfield(
-              controller: _promptEC,
-              focusNode: _focusNode,
-              labelText: 'Ask for any modification...',
-              hintText: '',
-              minLines: 1,
-              maxLines: 5,
-              enabled: !isEndpointTimeExpired && !_isLoading,
-              onSubmitted: (_) => _sendMessage(),
-              validator: ValidationBuilder()
-                  .minLength(3, 'Message must be at least 3 characters')
-                  .maxLength(1000, 'Message must be less than 1000 characters')
-                  .build(),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              onPressed: () {},
+              label: Text('Gemini 2.5-flash'),
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.secondary,
+                padding: EdgeInsets.zero,
+                // textStyle: const TextStyle(fontSize: 12),
+                // padding: const EdgeInsets.symmetric(
+                //   horizontal: 8,
+                //   vertical: 4,
+                // ),
+                // minimumSize: Size.zero,
+                // tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              icon: Icon(Icons.keyboard_arrow_down),
             ),
           ),
-          const SizedBox(width: 8),
-          Material(
-            borderRadius: BorderRadius.circular(12),
-            color: Theme.of(context).colorScheme.primary,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(12),
-              onTap: _isLoading ? null : _sendMessage,
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                child: _isLoading
-                    ? SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Theme.of(context).colorScheme.onPrimary,
-                          ),
-                        ),
-                      )
-                    : Icon(
-                        Icons.send_rounded,
-                        color: Theme.of(context).colorScheme.onPrimary,
-                        size: 24,
-                      ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: ZenTextfield(
+                  controller: _promptEC,
+                  focusNode: _focusNode,
+                  labelText: 'Ask for any modification...',
+                  hintText: '',
+                  minLines: 1,
+                  maxLines: 5,
+                  enabled: !isEndpointTimeExpired && !_isLoading,
+                  onSubmitted: (_) => _sendMessage(),
+                  validator: ValidationBuilder()
+                      .minLength(3, 'Message must be at least 3 characters')
+                      .maxLength(
+                          1000, 'Message must be less than 1000 characters')
+                      .build(),
+                ),
               ),
-            ),
+              const SizedBox(width: 8),
+              Material(
+                borderRadius: BorderRadius.circular(12),
+                color: Theme.of(context).colorScheme.primary,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: _isLoading ? null : _sendMessage,
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    child: _isLoading
+                        ? SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Theme.of(context).colorScheme.onPrimary,
+                              ),
+                            ),
+                          )
+                        : Icon(
+                            Icons.send_rounded,
+                            color: Theme.of(context).colorScheme.onPrimary,
+                            size: 24,
+                          ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

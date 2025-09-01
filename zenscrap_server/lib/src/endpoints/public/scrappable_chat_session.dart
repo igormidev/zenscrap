@@ -33,6 +33,7 @@ class ScrappableChatSession extends Endpoint {
   Future<CreateSessionResponse> createSession(
     Session session, {
     required String scrappableId,
+    required AiModel aiModel,
   }) async {
     final Scrappable? scrappable = await Scrappable.db.findById(
       session,
@@ -83,11 +84,14 @@ class ScrappableChatSession extends Endpoint {
     _chatSessions[sessionUuid] = ChatControllerGeminiApiImpl.create(
       scrappableId: scrappable.id,
       referenceTestData: referenceTestData,
+      aiModel: aiModel,
     );
     _cacheTestData[sessionUuid] = referenceTestData;
     final duration = const Duration(hours: 1);
-    final response =
-        CreateSessionResponse(expiresIn: duration, sessionId: sessionUuid);
+    final response = CreateSessionResponse(
+      expiresIn: duration,
+      sessionId: sessionUuid,
+    );
     await session.serverpod.futureCallWithDelay(
       'dispose_temporary_scrappable',
       response,
