@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_portal/flutter_portal.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_validator/form_validator.dart';
 import 'package:zenscrap_flutter/src/core/utils/talker.dart';
@@ -89,9 +90,10 @@ class _ZenChatTextfieldState extends ConsumerState<ZenChatTextfield> {
   @override
   Widget build(BuildContext context) {
     // final isEndpointTimeExpired = widget.targetTime.isBefore(DateTime.now());
-    return Form(
-      key: _formKey,
-      child: Column(
+    return Portal(
+      child: Form(
+        key: _formKey,
+        child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Align(
@@ -149,6 +151,7 @@ class _ZenChatTextfieldState extends ConsumerState<ZenChatTextfield> {
             ],
           ),
         ],
+      ),
       ),
     );
   }
