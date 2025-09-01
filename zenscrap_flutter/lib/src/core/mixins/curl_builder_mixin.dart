@@ -5,7 +5,7 @@ import 'package:zenscrap_flutter/src/core/extensions/convert_extensions.dart';
 mixin CurlBuilderMixin {
   String buildCurl({
     required String baseUrl,
-    required UuidValue scrappableId,
+    required int scrappableId,
     required ReferenceTestData? testData,
     required bool isProd,
     String? apiKey,
@@ -22,7 +22,7 @@ mixin CurlBuilderMixin {
 
     // Build the request payload
     final Map<String, dynamic> payload = {
-      'scrappableId': scrappableId.toString(),
+      'scrappableId': scrappableId,
       'payload': examplePayload ?? {},
     };
     
@@ -59,7 +59,7 @@ mixin CurlBuilderMixin {
 
   String buildSimpleCurl({
     required String baseUrl,
-    required UuidValue scrappableId,
+    required int scrappableId,
     required String apiKey,
     Map<String, dynamic>? examplePayload,
     Map<String, String>? additionalHeaders,
@@ -69,7 +69,7 @@ mixin CurlBuilderMixin {
 
     // Build the request payload
     final Map<String, dynamic> payload = {
-      'scrappableId': scrappableId.toString(),
+      'scrappableId': scrappableId,
       'apiKey': apiKey,
       'payload': examplePayload ?? {},
     };

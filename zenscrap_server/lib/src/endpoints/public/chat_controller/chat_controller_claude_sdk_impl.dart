@@ -33,10 +33,10 @@
 //   });
 
 //   final ClaudeChat chatSession;
-//   final UuidValue scrappableId;
+//   final int scrappableId;
 
 //   factory ChatControllerClaudeSdkImpl.create({
-//     required UuidValue scrappableId,
+//     required int scrappableId,
 //     required ReferenceTestData referenceTestData,
 //   }) {
 //     final chat = _claudeModel.createNewChat(

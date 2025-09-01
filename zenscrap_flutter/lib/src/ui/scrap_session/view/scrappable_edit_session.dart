@@ -52,7 +52,7 @@ class ScrappableEditSessionView extends StatelessWidget {
               children: [
                 ScrappableCurlSection(
                   targetTime: testExpirationDate,
-                  scrappableId: scrappable.id,
+                  scrappableId: scrappable.id!,
                   testData: testData,
                 ),
                 SizedBox(height: 8),

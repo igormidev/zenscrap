@@ -26,7 +26,7 @@ abstract class ScrappableTestResult implements _i1.SerializableModel {
     int? id,
     required String testExtractRule,
     required String extractJsonResult,
-    required _i1.UuidValue scrappableId,
+    required int scrappableId,
     int? referenceTestDataId,
     _i2.ReferenceTestData? referenceTestData,
   }) = _ScrappableTestResultImpl;
@@ -37,8 +37,7 @@ abstract class ScrappableTestResult implements _i1.SerializableModel {
       id: jsonSerialization['id'] as int?,
       testExtractRule: jsonSerialization['testExtractRule'] as String,
       extractJsonResult: jsonSerialization['extractJsonResult'] as String,
-      scrappableId: _i1.UuidValueJsonExtension.fromJson(
-          jsonSerialization['scrappableId']),
+      scrappableId: jsonSerialization['scrappableId'] as int,
       referenceTestDataId: jsonSerialization['referenceTestDataId'] as int?,
       referenceTestData: jsonSerialization['referenceTestData'] == null
           ? null
@@ -56,7 +55,7 @@ abstract class ScrappableTestResult implements _i1.SerializableModel {
 
   String extractJsonResult;
 
-  _i1.UuidValue scrappableId;
+  int scrappableId;
 
   int? referenceTestDataId;
 
@@ -69,7 +68,7 @@ abstract class ScrappableTestResult implements _i1.SerializableModel {
     int? id,
     String? testExtractRule,
     String? extractJsonResult,
-    _i1.UuidValue? scrappableId,
+    int? scrappableId,
     int? referenceTestDataId,
     _i2.ReferenceTestData? referenceTestData,
   });
@@ -79,7 +78,7 @@ abstract class ScrappableTestResult implements _i1.SerializableModel {
       if (id != null) 'id': id,
       'testExtractRule': testExtractRule,
       'extractJsonResult': extractJsonResult,
-      'scrappableId': scrappableId.toJson(),
+      'scrappableId': scrappableId,
       if (referenceTestDataId != null)
         'referenceTestDataId': referenceTestDataId,
       if (referenceTestData != null)
@@ -100,7 +99,7 @@ class _ScrappableTestResultImpl extends ScrappableTestResult {
     int? id,
     required String testExtractRule,
     required String extractJsonResult,
-    required _i1.UuidValue scrappableId,
+    required int scrappableId,
     int? referenceTestDataId,
     _i2.ReferenceTestData? referenceTestData,
   }) : super._(
@@ -120,7 +119,7 @@ class _ScrappableTestResultImpl extends ScrappableTestResult {
     Object? id = _Undefined,
     String? testExtractRule,
     String? extractJsonResult,
-    _i1.UuidValue? scrappableId,
+    int? scrappableId,
     Object? referenceTestDataId = _Undefined,
     Object? referenceTestData = _Undefined,
   }) {

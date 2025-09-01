@@ -94,7 +94,7 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
     final client = ref.read(clientProvider);
     final result = await client.deleteScrappable
         .call(
-          scrappableId: widget.scrappable.id.toString(),
+          scrappableId: widget.scrappable.id!,
         )
         .toResult;
 

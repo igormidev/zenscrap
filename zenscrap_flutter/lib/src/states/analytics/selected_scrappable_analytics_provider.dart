@@ -29,7 +29,7 @@ class SelectedScrappableAnalyticsNotifier
           .read(clientProvider)
           .privateScrappableAnalytics
           .getScrappableAnalytics(
-            scrappableId: scrappable.id,
+            scrappableId: scrappable.id!,
             page: _currentPage,
           );
 
@@ -58,7 +58,7 @@ class SelectedScrappableAnalyticsNotifier
           .read(clientProvider)
           .privateScrappableAnalytics
           .getScrappableAnalytics(
-            scrappableId: currentData.scrappable.id,
+            scrappableId: currentData.scrappable.id!,
             page: _currentPage,
           );
 

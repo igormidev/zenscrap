@@ -33,7 +33,7 @@ abstract class ScrappableAnalytics
     required DateTime requestedAt,
     required String attachedNanoId,
     required String attachedApiKey,
-    required _i1.UuidValue scrappableId,
+    required int scrappableId,
     _i3.Scrappable? scrappable,
   }) = _ScrappableAnalyticsImpl;
 
@@ -46,8 +46,7 @@ abstract class ScrappableAnalytics
           _i1.DateTimeJsonExtension.fromJson(jsonSerialization['requestedAt']),
       attachedNanoId: jsonSerialization['attachedNanoId'] as String,
       attachedApiKey: jsonSerialization['attachedApiKey'] as String,
-      scrappableId: _i1.UuidValueJsonExtension.fromJson(
-          jsonSerialization['scrappableId']),
+      scrappableId: jsonSerialization['scrappableId'] as int,
       scrappable: jsonSerialization['scrappable'] == null
           ? null
           : _i3.Scrappable.fromJson(
@@ -70,7 +69,7 @@ abstract class ScrappableAnalytics
 
   String attachedApiKey;
 
-  _i1.UuidValue scrappableId;
+  int scrappableId;
 
   _i3.Scrappable? scrappable;
 
@@ -86,7 +85,7 @@ abstract class ScrappableAnalytics
     DateTime? requestedAt,
     String? attachedNanoId,
     String? attachedApiKey,
-    _i1.UuidValue? scrappableId,
+    int? scrappableId,
     _i3.Scrappable? scrappable,
   });
   @override
@@ -97,7 +96,7 @@ abstract class ScrappableAnalytics
       'requestedAt': requestedAt.toJson(),
       'attachedNanoId': attachedNanoId,
       'attachedApiKey': attachedApiKey,
-      'scrappableId': scrappableId.toJson(),
+      'scrappableId': scrappableId,
       if (scrappable != null) 'scrappable': scrappable?.toJson(),
     };
   }
@@ -110,7 +109,7 @@ abstract class ScrappableAnalytics
       'requestedAt': requestedAt.toJson(),
       'attachedNanoId': attachedNanoId,
       'attachedApiKey': attachedApiKey,
-      'scrappableId': scrappableId.toJson(),
+      'scrappableId': scrappableId,
       if (scrappable != null) 'scrappable': scrappable?.toJsonForProtocol(),
     };
   }
@@ -155,7 +154,7 @@ class _ScrappableAnalyticsImpl extends ScrappableAnalytics {
     required DateTime requestedAt,
     required String attachedNanoId,
     required String attachedApiKey,
-    required _i1.UuidValue scrappableId,
+    required int scrappableId,
     _i3.Scrappable? scrappable,
   }) : super._(
           id: id,
@@ -177,7 +176,7 @@ class _ScrappableAnalyticsImpl extends ScrappableAnalytics {
     DateTime? requestedAt,
     String? attachedNanoId,
     String? attachedApiKey,
-    _i1.UuidValue? scrappableId,
+    int? scrappableId,
     Object? scrappable = _Undefined,
   }) {
     return ScrappableAnalytics(
@@ -214,7 +213,7 @@ class ScrappableAnalyticsTable extends _i1.Table<int?> {
       'attachedApiKey',
       this,
     );
-    scrappableId = _i1.ColumnUuid(
+    scrappableId = _i1.ColumnInt(
       'scrappableId',
       this,
     );
@@ -228,7 +227,7 @@ class ScrappableAnalyticsTable extends _i1.Table<int?> {
 
   late final _i1.ColumnString attachedApiKey;
 
-  late final _i1.ColumnUuid scrappableId;
+  late final _i1.ColumnInt scrappableId;
 
   _i3.ScrappableTable? _scrappable;
 

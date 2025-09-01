@@ -4,7 +4,6 @@ import 'package:rxdart/subjects.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_gemini_api_impl.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/i_chat_controller.dart';
-import 'package:zenscrap_server/src/endpoints/public/marketplace_endpoint.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 typedef RedraftSrappableSessionId = String;
@@ -12,10 +11,10 @@ final Map<RedraftSrappableSessionId, ReplaySubject<ChatResponse>>
     _scrapRedraftSessions = {};
 final Map<RedraftSrappableSessionId, IChatController> _chatSessions = {};
 final Map<RedraftSrappableSessionId, ReferenceTestData> _cacheTestData = {};
-final Map<ScrappableId, RedraftSrappableSessionId>
+final Map<int, RedraftSrappableSessionId>
     _scrappableOpenedSessionsIds = {};
 
-String? getTestExtractRules(ScrappableId scrappableId) {
+String? getTestExtractRules(int scrappableId) {
   final ReferenceTestData? testData =
       _cacheTestData[_scrappableOpenedSessionsIds[scrappableId]];
   return testData?.scrappableTestResult?.testExtractRule;
@@ -33,12 +32,12 @@ class ScrappableChatSession extends Endpoint {
 
   Future<CreateSessionResponse> createSession(
     Session session, {
-    required String scrappableId,
+    required int scrappableId,
   }) async {
     AiModel aiModel = AiModel.gemini_2_5_flash;
     final Scrappable? scrappable = await Scrappable.db.findById(
       session,
-      UuidValue.fromString(scrappableId),
+      scrappableId,
       include: Scrappable.include(
         targetRequest: ScrappableRequest.include(),
         referenceTestData: ReferenceTestData.include(
@@ -70,7 +69,7 @@ class ScrappableChatSession extends Endpoint {
       );
     }
     final bool isAlreadyAnyOpenedSession =
-        _scrappableOpenedSessionsIds.containsKey(scrappable.id.toString());
+        _scrappableOpenedSessionsIds.containsKey(scrappable.id!);
     if (isAlreadyAnyOpenedSession) {
       throw ZenScrapException(
         title: 'Session Already Opened',
@@ -80,10 +79,10 @@ class ScrappableChatSession extends Endpoint {
     }
 
     final RedraftSrappableSessionId sessionUuid = uuid.v4();
-    _scrappableOpenedSessionsIds[scrappable.id.toString()] = sessionUuid;
+    _scrappableOpenedSessionsIds[scrappable.id!] = sessionUuid;
     _scrapRedraftSessions[sessionUuid] = ReplaySubject<ChatResponse>();
     _chatSessions[sessionUuid] = ChatControllerGeminiApiImpl.create(
-      scrappableId: scrappable.id,
+      scrappableId: scrappable.id!,
       referenceTestData: referenceTestData,
       aiModel: aiModel,
     );
@@ -178,7 +177,7 @@ class ScrappableChatSession extends Endpoint {
 
     _chatSessions.remove(sessionUuid);
     _chatSessions[sessionUuid] = ChatControllerGeminiApiImpl.create(
-      scrappableId: UuidValue.fromString(scrappableId),
+      scrappableId: scrappableId,
       referenceTestData: referenceTestData,
       aiModel: aiModel,
     );
@@ -250,7 +249,7 @@ class ScrappableChatSession extends Endpoint {
   }
 }
 
-Future<void> disposeFromScrappableId(ScrappableId scrappableId) async {
+Future<void> disposeFromScrappableId(int scrappableId) async {
   final sessionId = _scrappableOpenedSessionsIds[scrappableId];
   if (sessionId != null) await _disposeSession(sessionId: sessionId);
 }

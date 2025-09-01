@@ -30,7 +30,7 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
     required DateTime requestedAt,
     required String attachedNanoId,
     required String attachedApiKey,
-    required _i1.UuidValue scrappableId,
+    required int scrappableId,
     _i3.Scrappable? scrappable,
   }) = _ScrappableAnalyticsImpl;
 
@@ -43,8 +43,7 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
           _i1.DateTimeJsonExtension.fromJson(jsonSerialization['requestedAt']),
       attachedNanoId: jsonSerialization['attachedNanoId'] as String,
       attachedApiKey: jsonSerialization['attachedApiKey'] as String,
-      scrappableId: _i1.UuidValueJsonExtension.fromJson(
-          jsonSerialization['scrappableId']),
+      scrappableId: jsonSerialization['scrappableId'] as int,
       scrappable: jsonSerialization['scrappable'] == null
           ? null
           : _i3.Scrappable.fromJson(
@@ -65,7 +64,7 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
 
   String attachedApiKey;
 
-  _i1.UuidValue scrappableId;
+  int scrappableId;
 
   _i3.Scrappable? scrappable;
 
@@ -78,7 +77,7 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
     DateTime? requestedAt,
     String? attachedNanoId,
     String? attachedApiKey,
-    _i1.UuidValue? scrappableId,
+    int? scrappableId,
     _i3.Scrappable? scrappable,
   });
   @override
@@ -89,7 +88,7 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
       'requestedAt': requestedAt.toJson(),
       'attachedNanoId': attachedNanoId,
       'attachedApiKey': attachedApiKey,
-      'scrappableId': scrappableId.toJson(),
+      'scrappableId': scrappableId,
       if (scrappable != null) 'scrappable': scrappable?.toJson(),
     };
   }
@@ -109,7 +108,7 @@ class _ScrappableAnalyticsImpl extends ScrappableAnalytics {
     required DateTime requestedAt,
     required String attachedNanoId,
     required String attachedApiKey,
-    required _i1.UuidValue scrappableId,
+    required int scrappableId,
     _i3.Scrappable? scrappable,
   }) : super._(
           id: id,
@@ -131,7 +130,7 @@ class _ScrappableAnalyticsImpl extends ScrappableAnalytics {
     DateTime? requestedAt,
     String? attachedNanoId,
     String? attachedApiKey,
-    _i1.UuidValue? scrappableId,
+    int? scrappableId,
     Object? scrappable = _Undefined,
   }) {
     return ScrappableAnalytics(

@@ -1,9 +1,9 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
-typedef ScrappableId = String;
-final Map<ScrappableId, DateTime> _usageCountDateCache = {};
-final Map<ScrappableId, int> _usageCountCache = {};
+typedef ScrappableId = int;
+final Map<int, DateTime> _usageCountDateCache = {};
+final Map<int, int> _usageCountCache = {};
 
 class MarketplaceEndpoint extends Endpoint {
   Future<PaginatedScrappableResponse> getItems(
@@ -76,12 +76,12 @@ class MarketplaceEndpoint extends Endpoint {
       int? count;
 
       final DateTime? dataCache =
-          _usageCountDateCache[scrappable.id.toString()];
+          _usageCountDateCache[scrappable.id!];
 
       final bool isCacheOutdated = dataCache == null ||
           dataCache.isBefore(now.subtract(const Duration(hours: 2)));
       if (isCacheOutdated == false) {
-        final int? usageCount = _usageCountCache[scrappable.id.toString()];
+        final int? usageCount = _usageCountCache[scrappable.id!];
         count = usageCount;
       }
 
@@ -93,8 +93,8 @@ class MarketplaceEndpoint extends Endpoint {
               (t.requestedAt >= sevenDaysAgo) &
               (t.requestStatus.equals(RequestStatus.success)),
         );
-        _usageCountCache[scrappable.id.toString()] = count;
-        _usageCountDateCache[scrappable.id.toString()] = now;
+        _usageCountCache[scrappable.id!] = count;
+        _usageCountDateCache[scrappable.id!] = now;
       }
 
       items.add(MarketPlacePaginatedItem(

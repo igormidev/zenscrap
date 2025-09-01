@@ -1,7 +1,7 @@
 class: Scrappable
 table: scrappable
 fields:
-  id: UuidValue, defaultModel=random
+  id: int?, defaultPersist=serial
   accountId: int?, relation(name=account_info_scrappable, parent=account_info)
   apiUsageOwnerNanoId: String?, scope=serverOnly
   createdAt: DateTime

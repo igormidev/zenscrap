@@ -11,7 +11,7 @@ import 'package:zenscrap_flutter/src/ui/scrap_session/pages/initial_chat_page.da
 import 'package:zenscrap_flutter/src/ui/scrap_session/view/scrappable_edit_session.dart';
 
 class InitialChatView extends ConsumerStatefulWidget {
-  final String? scrappableId;
+  final int? scrappableId;
   const InitialChatView({
     super.key,
     required this.scrappableId,

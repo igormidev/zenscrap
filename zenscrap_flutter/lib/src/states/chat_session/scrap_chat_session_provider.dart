@@ -115,7 +115,7 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
     );
   }
 
-  Future<void> createSessionWithScrappableId(String scrappableId) async {
+  Future<void> createSessionWithScrappableId(int scrappableId) async {
     // First fetch the scrappable by ID
     final scrappableResult = await ref
         .read(clientProvider)
@@ -137,7 +137,7 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
     final sessionResult = await ref
         .read(clientProvider)
         .scrappableChatSession
-        .createSession(scrappableId: scrappable.id.toString())
+        .createSession(scrappableId: scrappable.id!)
         .toResult;
 
     await sessionResult.fold((createdSessionResponse) async {

@@ -3,7 +3,7 @@ table: scrappable_test_result
 fields:
     testExtractRule: String
     extractJsonResult: String
-    scrappableId: UuidValue
+    scrappableId: int
     referenceTestDataId: int?
     referenceTestData: ReferenceTestData?, relation(name=test_result_reference, field=referenceTestDataId, onDelete=cascade)
 indexes:

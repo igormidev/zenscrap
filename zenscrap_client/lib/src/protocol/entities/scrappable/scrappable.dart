@@ -17,7 +17,7 @@ import '../../entities/scrappable/scraper_category.dart' as _i5;
 
 abstract class Scrappable implements _i1.SerializableModel {
   Scrappable._({
-    _i1.UuidValue? id,
+    this.id,
     this.accountId,
     required this.createdAt,
     required this.generalInfosUpdatedAt,
@@ -34,10 +34,10 @@ abstract class Scrappable implements _i1.SerializableModel {
     this.scrappableAnalytics,
     required this.category,
     required this.isDeleted,
-  }) : id = id ?? _i1.Uuid().v4obj();
+  });
 
   factory Scrappable({
-    _i1.UuidValue? id,
+    int? id,
     int? accountId,
     required DateTime createdAt,
     required DateTime generalInfosUpdatedAt,
@@ -58,7 +58,7 @@ abstract class Scrappable implements _i1.SerializableModel {
 
   factory Scrappable.fromJson(Map<String, dynamic> jsonSerialization) {
     return Scrappable(
-      id: _i1.UuidValueJsonExtension.fromJson(jsonSerialization['id']),
+      id: jsonSerialization['id'] as int?,
       accountId: jsonSerialization['accountId'] as int?,
       createdAt:
           _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
@@ -99,7 +99,7 @@ abstract class Scrappable implements _i1.SerializableModel {
   /// The database id, set if the object has been inserted into the
   /// database or if it has been fetched from the database. Otherwise,
   /// the id will be null.
-  _i1.UuidValue id;
+  int? id;
 
   int? accountId;
 
@@ -137,7 +137,7 @@ abstract class Scrappable implements _i1.SerializableModel {
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   Scrappable copyWith({
-    _i1.UuidValue? id,
+    int? id,
     int? accountId,
     DateTime? createdAt,
     DateTime? generalInfosUpdatedAt,
@@ -158,7 +158,7 @@ abstract class Scrappable implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
-      'id': id.toJson(),
+      if (id != null) 'id': id,
       if (accountId != null) 'accountId': accountId,
       'createdAt': createdAt.toJson(),
       'generalInfosUpdatedAt': generalInfosUpdatedAt.toJson(),
@@ -192,7 +192,7 @@ class _Undefined {}
 
 class _ScrappableImpl extends Scrappable {
   _ScrappableImpl({
-    _i1.UuidValue? id,
+    int? id,
     int? accountId,
     required DateTime createdAt,
     required DateTime generalInfosUpdatedAt,
@@ -234,7 +234,7 @@ class _ScrappableImpl extends Scrappable {
   @_i1.useResult
   @override
   Scrappable copyWith({
-    _i1.UuidValue? id,
+    Object? id = _Undefined,
     Object? accountId = _Undefined,
     DateTime? createdAt,
     DateTime? generalInfosUpdatedAt,
@@ -253,7 +253,7 @@ class _ScrappableImpl extends Scrappable {
     bool? isDeleted,
   }) {
     return Scrappable(
-      id: id ?? this.id,
+      id: id is int? ? id : this.id,
       accountId: accountId is int? ? accountId : this.accountId,
       createdAt: createdAt ?? this.createdAt,
       generalInfosUpdatedAt:

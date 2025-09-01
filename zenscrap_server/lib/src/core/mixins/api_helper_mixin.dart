@@ -162,11 +162,11 @@ mixin ApiHelperMixin {
   }
 
   Future<(Scrappable, ScrappableRequest)> getScrappableById(
-      Session session, String scrappableId, NanoId? nanoId) async {
+      Session session, int scrappableId, NanoId? nanoId) async {
     final Scrappable? scrappable = await Scrappable.db.findFirstRow(
       session,
       where: (t) =>
-          t.id.equals(UuidValue.fromString(scrappableId)) &
+          t.id.equals(scrappableId) &
           ( // If not private, allow all
               t.willHideFromMarketplace.equals(false) |
 
@@ -182,12 +182,12 @@ mixin ApiHelperMixin {
     final ScrappableRequest? targetRequest = scrappable?.targetRequest;
 
     if (scrappable == null || targetRequest == null) {
-      throw _noScrappableFound(scrappableId);
+      throw _noScrappableFound(scrappableId.toString());
     }
 
     // Check if scrappable is deleted
     if (scrappable.isDeleted == true) {
-      throw _noScrappableFound(scrappableId);
+      throw _noScrappableFound(scrappableId.toString());
     }
 
     return (scrappable, targetRequest);
@@ -198,7 +198,7 @@ mixin ApiHelperMixin {
     final isTest = accountApiKeyString == null;
     if (isTest) {
       final testSessionExtractRule =
-          getTestExtractRules(scrappable.id.toString());
+          getTestExtractRules(scrappable.id!);
       if (testSessionExtractRule == null) {
         throw _noActiveTestSessionFinded;
       }
@@ -302,7 +302,7 @@ mixin ApiHelperMixin {
             session,
             ScrappableAnalytics(
               requestStatus: status,
-              scrappableId: scrappable.id,
+              scrappableId: scrappable.id!,
               scrappable: scrappable,
               requestedAt: DateTime.now(),
               attachedApiKey: apiKey,

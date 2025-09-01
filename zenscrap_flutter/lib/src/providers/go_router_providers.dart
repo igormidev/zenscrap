@@ -83,7 +83,8 @@ final StateProvider routerProvider = StateProvider((ref) {
       GoRoute(
         path: '/scrappable-form',
         builder: (context, state) {
-          final scrappableId = state.uri.queryParameters['id'];
+          final scrappableIdStr = state.uri.queryParameters['id'];
+          final int? scrappableId = scrappableIdStr != null ? int.tryParse(scrappableIdStr) : null;
           return InitialChatView(scrappableId: scrappableId);
         },
       ),

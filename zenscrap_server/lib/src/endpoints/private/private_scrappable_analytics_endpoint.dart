@@ -128,7 +128,7 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
 
   Future<PaginatedScrappableAnalytics> getScrappableAnalytics(
     Session session, {
-    required UuidValue scrappableId,
+    required int scrappableId,
     int page = 1,
   }) async {
     const int daysBack = 7;

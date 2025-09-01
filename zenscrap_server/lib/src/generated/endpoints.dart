@@ -26,16 +26,15 @@ import '../endpoints/public/scrappable_api.dart' as _i14;
 import '../endpoints/public/scrappable_chat_session.dart' as _i15;
 import 'package:zenscrap_server/src/generated/entities/scrappable/scrappable.dart'
     as _i16;
-import 'package:uuid/uuid_value.dart' as _i17;
 import 'package:zenscrap_server/src/generated/entities/scrappable/reference_test_data.dart'
-    as _i18;
+    as _i17;
 import 'package:zenscrap_server/src/generated/entities/scrappable/scraper_category.dart'
-    as _i19;
+    as _i18;
 import 'package:zenscrap_server/src/generated/entities/account/plan_tier.dart'
-    as _i20;
+    as _i19;
 import 'package:zenscrap_server/src/generated/entities/scrappable/ai_model.dart'
-    as _i21;
-import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i22;
+    as _i20;
+import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i21;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -259,7 +258,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'scrappableId': _i1.ParameterDescription(
               name: 'scrappableId',
-              type: _i1.getType<_i17.UuidValue>(),
+              type: _i1.getType<int>(),
               nullable: false,
             )
           },
@@ -305,7 +304,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'scrappableId': _i1.ParameterDescription(
               name: 'scrappableId',
-              type: _i1.getType<_i17.UuidValue>(),
+              type: _i1.getType<int>(),
               nullable: false,
             ),
             'page': _i1.ParameterDescription(
@@ -413,7 +412,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'scrappableId': _i1.ParameterDescription(
               name: 'scrappableId',
-              type: _i1.getType<String>(),
+              type: _i1.getType<int>(),
               nullable: false,
             )
           },
@@ -464,7 +463,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'scrappableId': _i1.ParameterDescription(
               name: 'scrappableId',
-              type: _i1.getType<String>(),
+              type: _i1.getType<int>(),
               nullable: false,
             )
           },
@@ -489,7 +488,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'testData': _i1.ParameterDescription(
               name: 'testData',
-              type: _i1.getType<_i18.ReferenceTestData>(),
+              type: _i1.getType<_i17.ReferenceTestData>(),
               nullable: false,
             )
           },
@@ -513,7 +512,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'scrappableId': _i1.ParameterDescription(
               name: 'scrappableId',
-              type: _i1.getType<String>(),
+              type: _i1.getType<int>(),
               nullable: false,
             ),
             'name': _i1.ParameterDescription(
@@ -528,7 +527,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'category': _i1.ParameterDescription(
               name: 'category',
-              type: _i1.getType<_i19.ScraperCategory?>(),
+              type: _i1.getType<_i18.ScraperCategory?>(),
               nullable: true,
             ),
             'willHideFromMarketplace': _i1.ParameterDescription(
@@ -601,7 +600,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'planTier': _i1.ParameterDescription(
               name: 'planTier',
-              type: _i1.getType<_i20.PlanTier>(),
+              type: _i1.getType<_i19.PlanTier>(),
               nullable: false,
             ),
           },
@@ -628,7 +627,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'scrappableId': _i1.ParameterDescription(
               name: 'scrappableId',
-              type: _i1.getType<String>(),
+              type: _i1.getType<int>(),
               nullable: false,
             ),
             'apiKey': _i1.ParameterDescription(
@@ -658,7 +657,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'scrappableId': _i1.ParameterDescription(
               name: 'scrappableId',
-              type: _i1.getType<String>(),
+              type: _i1.getType<int>(),
               nullable: false,
             ),
             'payload': _i1.ParameterDescription(
@@ -707,7 +706,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'scrappableId': _i1.ParameterDescription(
               name: 'scrappableId',
-              type: _i1.getType<String>(),
+              type: _i1.getType<int>(),
               nullable: false,
             )
           },
@@ -731,7 +730,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'aiModel': _i1.ParameterDescription(
               name: 'aiModel',
-              type: _i1.getType<_i21.AiModel>(),
+              type: _i1.getType<_i20.AiModel>(),
               nullable: false,
             ),
           },
@@ -795,6 +794,6 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
       },
     );
-    modules['serverpod_auth'] = _i22.Endpoints()..initializeEndpoints(server);
+    modules['serverpod_auth'] = _i21.Endpoints()..initializeEndpoints(server);
   }
 }

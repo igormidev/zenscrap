@@ -81,6 +81,6 @@ mixin DeployEndpointMixin {
     await ReferenceTestData.db
         .updateRow(session, testData, transaction: transaction);
 
-    await disposeFromScrappableId(scrappable.id.toString());
+    await disposeFromScrappableId(scrappable.id!);
   }
 }

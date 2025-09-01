@@ -9,7 +9,7 @@ import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/deploy_button.dart
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/remaining_time_indicator.dart';
 
 class ScrappableCurlSection extends ConsumerStatefulWidget {
-  final UuidValue scrappableId;
+  final int scrappableId;
   final DateTime targetTime;
   final ReferenceTestData? testData;
   const ScrappableCurlSection({

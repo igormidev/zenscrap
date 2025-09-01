@@ -36,9 +36,9 @@ class ChatControllerGeminiApiImpl extends IChatController {
   });
 
   final ChatSession chatSession;
-  final UuidValue scrappableId;
+  final int scrappableId;
   factory ChatControllerGeminiApiImpl.create({
-    required UuidValue scrappableId,
+    required int scrappableId,
     required ReferenceTestData referenceTestData,
     required AiModel aiModel,
   }) {

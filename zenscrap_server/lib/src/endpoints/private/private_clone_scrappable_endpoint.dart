@@ -8,7 +8,7 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
 
   Future<Scrappable> cloneFromMarketplace(
     Session session, {
-    required UuidValue scrappableId,
+    required int scrappableId,
   }) async {
     final authenticationInfo = await session.authenticated;
     if (authenticationInfo == null) {
@@ -68,10 +68,8 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
       );
     }
 
-    // Prepare id for the new scrappable to fetch after commit
-    final newScrappableId = UuidValue.fromString(Uuid().v4());
-
     // Transaction: clone request, test data, reference data, and scrappable atomically
+    Scrappable? clonedScrappable;
     await session.db.transaction<void>((transaction) async {
       // Clone the ScrappableRequest
       final clonedRequest = ScrappableRequest(
@@ -122,8 +120,7 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
       final now = DateTime.now();
 
       // Create the cloned scrappable
-      final clonedScrappable = Scrappable(
-        id: newScrappableId,
+      clonedScrappable = Scrappable(
         accountId: accountInfo.id,
         apiUsageOwnerNanoId: accountInfo.accountApiUsage?.nanoId,
         createdAt: now,
@@ -141,9 +138,9 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
         referenceTestData: clonedTestData,
         category: sourceScrappable.category,
       );
-      await Scrappable.db.insertRow(
+      clonedScrappable = await Scrappable.db.insertRow(
         session,
-        clonedScrappable,
+        clonedScrappable!,
         transaction: transaction,
       );
     });
@@ -151,7 +148,7 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
     // Return the cloned scrappable with all relations (after commit)
     final result = await Scrappable.db.findById(
       session,
-      newScrappableId,
+      clonedScrappable!.id!,
       include: Scrappable.include(
         targetRequest: ScrappableRequest.include(),
         referenceTestData: ReferenceTestData.include(

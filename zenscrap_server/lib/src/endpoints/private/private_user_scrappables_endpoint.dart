@@ -39,7 +39,7 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
   }
 
   Future<Scrappable> getScrappableById(
-      Session session, String scrappableId) async {
+      Session session, int scrappableId) async {
     final userId = (await session.authenticated)?.userId;
     if (userId == null) {
       throw ZenScrapException(
@@ -47,9 +47,6 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
         description: 'You must be logged in to access your scrappables.',
       );
     }
-
-    // Parse the UUID string
-    final uuid = UuidValue.fromString(scrappableId);
 
     // First check if the user owns this scrappable
     final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
@@ -67,7 +64,7 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
     // Find the scrappable with all necessary includes
     final scrappable = await Scrappable.db.findById(
       session,
-      uuid,
+      scrappableId,
       include: Scrappable.include(
         targetRequest: ScrappableRequest.include(),
         referenceTestData: ReferenceTestData.include(

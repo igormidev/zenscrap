@@ -21,7 +21,7 @@ mixin EditScrappable<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     final client = ref.read(clientProvider);
     final result = await client
         .editScrappable(
-          scrappableId: scrappable.id.toString(),
+          scrappableId: scrappable.id!,
           name: name,
           description: description,
           category: category,

@@ -4,7 +4,7 @@ import 'package:zenscrap_server/src/generated/protocol.dart';
 class EditScrappableEndpoint extends Endpoint {
   Future<bool> call(
     Session session, {
-    required String scrappableId,
+    required int scrappableId,
     required String name,
     required String description,
     ScraperCategory? category,
@@ -13,21 +13,10 @@ class EditScrappableEndpoint extends Endpoint {
     // Get the authenticated user ID (might be null if not logged in)
     final userId = (await session.authenticated)?.userId;
 
-    // Parse the UUID
-    final UuidValue scrappableUuid;
-    try {
-      scrappableUuid = UuidValue.fromString(scrappableId);
-    } catch (e) {
-      throw ZenScrapException(
-        title: 'Invalid Scrappable ID',
-        description: 'The provided scrappable ID is not valid.',
-      );
-    }
-
     // Find the scrappable
     final scrappable = await Scrappable.db.findById(
       session,
-      scrappableUuid,
+      scrappableId,
     );
 
     if (scrappable == null) {

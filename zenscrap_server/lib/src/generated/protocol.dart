@@ -563,10 +563,10 @@ class Protocol extends _i1.SerializationManagerServer {
       columns: [
         _i2.ColumnDefinition(
           name: 'id',
-          columnType: _i2.ColumnType.uuid,
+          columnType: _i2.ColumnType.bigint,
           isNullable: false,
-          dartType: 'UuidValue',
-          columnDefault: 'gen_random_uuid()',
+          dartType: 'int?',
+          columnDefault: 'nextval(\'scrappable_id_seq\'::regclass)',
         ),
         _i2.ColumnDefinition(
           name: 'accountId',
@@ -767,9 +767,9 @@ class Protocol extends _i1.SerializationManagerServer {
         ),
         _i2.ColumnDefinition(
           name: 'scrappableId',
-          columnType: _i2.ColumnType.uuid,
+          columnType: _i2.ColumnType.bigint,
           isNullable: false,
-          dartType: 'UuidValue',
+          dartType: 'int',
         ),
       ],
       foreignKeys: [
@@ -979,9 +979,9 @@ class Protocol extends _i1.SerializationManagerServer {
         ),
         _i2.ColumnDefinition(
           name: 'scrappableId',
-          columnType: _i2.ColumnType.uuid,
+          columnType: _i2.ColumnType.bigint,
           isNullable: false,
-          dartType: 'UuidValue',
+          dartType: 'int',
         ),
         _i2.ColumnDefinition(
           name: 'referenceTestDataId',

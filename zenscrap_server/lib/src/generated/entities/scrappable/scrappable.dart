@@ -18,9 +18,9 @@ import '../../entities/scrappable/scrappable_analytics.dart' as _i4;
 import '../../entities/scrappable/scraper_category.dart' as _i5;
 
 abstract class Scrappable
-    implements _i1.TableRow<_i1.UuidValue>, _i1.ProtocolSerialization {
+    implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   Scrappable._({
-    _i1.UuidValue? id,
+    this.id,
     this.accountId,
     this.apiUsageOwnerNanoId,
     required this.createdAt,
@@ -38,10 +38,10 @@ abstract class Scrappable
     this.scrappableAnalytics,
     required this.category,
     required this.isDeleted,
-  }) : id = id ?? _i1.Uuid().v4obj();
+  });
 
   factory Scrappable({
-    _i1.UuidValue? id,
+    int? id,
     int? accountId,
     String? apiUsageOwnerNanoId,
     required DateTime createdAt,
@@ -63,7 +63,7 @@ abstract class Scrappable
 
   factory Scrappable.fromJson(Map<String, dynamic> jsonSerialization) {
     return Scrappable(
-      id: _i1.UuidValueJsonExtension.fromJson(jsonSerialization['id']),
+      id: jsonSerialization['id'] as int?,
       accountId: jsonSerialization['accountId'] as int?,
       apiUsageOwnerNanoId: jsonSerialization['apiUsageOwnerNanoId'] as String?,
       createdAt:
@@ -107,7 +107,7 @@ abstract class Scrappable
   static const db = ScrappableRepository._();
 
   @override
-  _i1.UuidValue id;
+  int? id;
 
   int? accountId;
 
@@ -144,13 +144,13 @@ abstract class Scrappable
   bool isDeleted;
 
   @override
-  _i1.Table<_i1.UuidValue> get table => t;
+  _i1.Table<int?> get table => t;
 
   /// Returns a shallow copy of this [Scrappable]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   Scrappable copyWith({
-    _i1.UuidValue? id,
+    int? id,
     int? accountId,
     String? apiUsageOwnerNanoId,
     DateTime? createdAt,
@@ -172,7 +172,7 @@ abstract class Scrappable
   @override
   Map<String, dynamic> toJson() {
     return {
-      'id': id.toJson(),
+      if (id != null) 'id': id,
       if (accountId != null) 'accountId': accountId,
       if (apiUsageOwnerNanoId != null)
         'apiUsageOwnerNanoId': apiUsageOwnerNanoId,
@@ -201,7 +201,7 @@ abstract class Scrappable
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
-      'id': id.toJson(),
+      if (id != null) 'id': id,
       if (accountId != null) 'accountId': accountId,
       'createdAt': createdAt.toJson(),
       'generalInfosUpdatedAt': generalInfosUpdatedAt.toJson(),
@@ -268,7 +268,7 @@ class _Undefined {}
 
 class _ScrappableImpl extends Scrappable {
   _ScrappableImpl({
-    _i1.UuidValue? id,
+    int? id,
     int? accountId,
     String? apiUsageOwnerNanoId,
     required DateTime createdAt,
@@ -312,7 +312,7 @@ class _ScrappableImpl extends Scrappable {
   @_i1.useResult
   @override
   Scrappable copyWith({
-    _i1.UuidValue? id,
+    Object? id = _Undefined,
     Object? accountId = _Undefined,
     Object? apiUsageOwnerNanoId = _Undefined,
     DateTime? createdAt,
@@ -332,7 +332,7 @@ class _ScrappableImpl extends Scrappable {
     bool? isDeleted,
   }) {
     return Scrappable(
-      id: id ?? this.id,
+      id: id is int? ? id : this.id,
       accountId: accountId is int? ? accountId : this.accountId,
       apiUsageOwnerNanoId: apiUsageOwnerNanoId is String?
           ? apiUsageOwnerNanoId
@@ -368,7 +368,7 @@ class _ScrappableImpl extends Scrappable {
   }
 }
 
-class ScrappableTable extends _i1.Table<_i1.UuidValue> {
+class ScrappableTable extends _i1.Table<int?> {
   ScrappableTable({super.tableRelation}) : super(tableName: 'scrappable') {
     accountId = _i1.ColumnInt(
       'accountId',
@@ -581,7 +581,7 @@ class ScrappableInclude extends _i1.IncludeObject {
       };
 
   @override
-  _i1.Table<_i1.UuidValue> get table => Scrappable.t;
+  _i1.Table<int?> get table => Scrappable.t;
 }
 
 class ScrappableIncludeList extends _i1.IncludeList {
@@ -601,7 +601,7 @@ class ScrappableIncludeList extends _i1.IncludeList {
   Map<String, _i1.Include?> get includes => include?.includes ?? {};
 
   @override
-  _i1.Table<_i1.UuidValue> get table => Scrappable.t;
+  _i1.Table<int?> get table => Scrappable.t;
 }
 
 class ScrappableRepository {
@@ -701,7 +701,7 @@ class ScrappableRepository {
   /// Finds a single [Scrappable] by its [id] or null if no such row exists.
   Future<Scrappable?> findById(
     _i1.Session session,
-    _i1.UuidValue id, {
+    int id, {
     _i1.Transaction? transaction,
     ScrappableInclude? include,
   }) async {

@@ -132,7 +132,7 @@ class PrivateAccountEndpoint extends Endpoint with DeployEndpointMixin {
       AccountInfo accountInfo, Scrappable scrappable) async {
     final Scrappable? existingScrappable = await Scrappable.db.findById(
       session,
-      scrappable.id,
+      scrappable.id!,
     );
     if (existingScrappable == null ||
         existingScrappable.accountId != null ||

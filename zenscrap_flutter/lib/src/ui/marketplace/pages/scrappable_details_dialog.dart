@@ -77,7 +77,7 @@ class _ScrappableDetailsDialogState
     setState(() {
       curlCommand = buildSimpleCurl(
         baseUrl: baseUrl,
-        scrappableId: widget.scrappable.id,
+        scrappableId: widget.scrappable.id!,
         apiKey: selectedApiKey!.apiKey,
         examplePayload: examplePayload,
       );
@@ -374,7 +374,7 @@ class _ScrappableDetailsDialogState
       final client = ref.read(clientProvider);
       final clonedScrappable =
           await client.privateCloneScrappable.cloneFromMarketplace(
-        scrappableId: widget.scrappable.id,
+        scrappableId: widget.scrappable.id!,
       );
 
       if (context.mounted) {

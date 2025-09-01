@@ -7,7 +7,7 @@ import 'package:zenscrap_server/src/generated/protocol.dart';
 class ScrappableApiEndpoint extends Endpoint with ApiHelperMixin {
   Future<Map<String, dynamic>> prod(
     Session session, {
-    required String scrappableId,
+    required int scrappableId,
     required String apiKey,
     required Map<String, dynamic> payload,
   }) async =>
@@ -16,14 +16,14 @@ class ScrappableApiEndpoint extends Endpoint with ApiHelperMixin {
 
   Future<Map<String, dynamic>> test(
     Session session, {
-    required String scrappableId,
+    required int scrappableId,
     required Map<String, dynamic> payload,
   }) async =>
       _callFunc(session, payload: payload, scrappableId: scrappableId);
 
   Future<Map<String, dynamic>> _callFunc(
     Session session, {
-    required String scrappableId,
+    required int scrappableId,
     String? apiKey,
     required Map<String, dynamic> payload,
   }) async {

@@ -35,13 +35,35 @@ class ScrappableApiRoute extends Route with ApiHelperMixin {
       }
 
       // Extract parameters
-      final scrappableId = requestData['scrappableId'] as String?;
+      final scrappableIdRaw = requestData['scrappableId'];
       final payload = requestData['payload'] as Map<String, dynamic>? ?? {};
 
-      if (scrappableId == null) {
+      if (scrappableIdRaw == null) {
         request.response.statusCode = HttpStatus.badRequest;
         request.response.write(
             jsonEncode({'error': 'Missing required parameter: scrappableId'}));
+        await request.response.close();
+        return true;
+      }
+
+      final int scrappableId;
+      if (scrappableIdRaw is int) {
+        scrappableId = scrappableIdRaw;
+      } else if (scrappableIdRaw is String) {
+        // Support string for backwards compatibility
+        try {
+          scrappableId = int.parse(scrappableIdRaw);
+        } catch (e) {
+          request.response.statusCode = HttpStatus.badRequest;
+          request.response.write(
+              jsonEncode({'error': 'Invalid scrappableId: must be an integer or numeric string'}));
+          await request.response.close();
+          return true;
+        }
+      } else {
+        request.response.statusCode = HttpStatus.badRequest;
+        request.response.write(
+            jsonEncode({'error': 'Invalid scrappableId: must be an integer or numeric string'}));
         await request.response.close();
         return true;
       }
@@ -86,7 +108,7 @@ class ScrappableApiRoute extends Route with ApiHelperMixin {
 
   Future<Map<String, dynamic>> _processScrappableRequest(
     Session session, {
-    required String scrappableId,
+    required int scrappableId,
     String? apiKey,
     required Map<String, dynamic> payload,
   }) async {
