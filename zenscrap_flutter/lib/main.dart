@@ -23,8 +23,6 @@ import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.da
 
 late final Client client;
 
-late String serverUrl;
-
 /*
  /$$$$$$$$  /$$$$$$  /$$$$$$$      /$$$$$$$  /$$$$$$$  /$$$$$$  /$$$$$$   /$$$$$$ 
 |____ /$$/ /$$__  $$| $$__  $$    /$$_____/ /$$_____/ /$$__  $$|____  $$ /$$__  $$
@@ -43,12 +41,18 @@ void main() async {
   // Configure URL strategy for web (removes the # from URLs)
   configureUrlStrategy();
 
-  final serverUrlFromEnv = String.fromEnvironment('SERVER_URL',
-      defaultValue:
-          kDebugMode ? 'http://$localhost:8080/' : 'https://api.zenscrap.com/');
+  // IMPORTANT: Must use const with String.fromEnvironment for Flutter web release mode
+  const serverUrlFromEnv = String.fromEnvironment('SERVER_URL', defaultValue: '');
 
-  final serverUrl =
-      serverUrlFromEnv.isEmpty ? 'http://$localhost:8080/' : serverUrlFromEnv;
+  // Determine the server URL based on environment and debug mode
+  final String serverUrl;
+  if (serverUrlFromEnv.isNotEmpty) {
+    serverUrl = serverUrlFromEnv;
+  } else if (kDebugMode) {
+    serverUrl = 'http://$localhost:8080/';
+  } else {
+    serverUrl = 'https://api.zenscrap.com/';
+  }
 
   client = Client(
     serverUrl,
