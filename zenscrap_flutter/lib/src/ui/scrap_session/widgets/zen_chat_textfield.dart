@@ -6,6 +6,7 @@ import 'package:form_validator/form_validator.dart';
 import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/chat_scroll_controller_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
+import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/change_ai_model_button.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/zen_textfield.dart';
 
 class ZenChatTextfield extends ConsumerStatefulWidget {
@@ -95,22 +96,7 @@ class _ZenChatTextfieldState extends ConsumerState<ZenChatTextfield> {
         children: [
           Align(
             alignment: Alignment.centerRight,
-            child: TextButton.icon(
-              onPressed: () {},
-              label: Text('Gemini 2.5-flash'),
-              style: TextButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.secondary,
-                padding: EdgeInsets.zero,
-                // textStyle: const TextStyle(fontSize: 12),
-                // padding: const EdgeInsets.symmetric(
-                //   horizontal: 8,
-                //   vertical: 4,
-                // ),
-                // minimumSize: Size.zero,
-                // tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              icon: Icon(Icons.keyboard_arrow_down),
-            ),
+            child: ChangeAiModelButton(),
           ),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,

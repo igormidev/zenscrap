@@ -33,7 +33,9 @@ import 'package:zenscrap_server/src/generated/entities/scrappable/scraper_catego
     as _i19;
 import 'package:zenscrap_server/src/generated/entities/account/plan_tier.dart'
     as _i20;
-import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i21;
+import 'package:zenscrap_server/src/generated/entities/scrappable/ai_model.dart'
+    as _i21;
+import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i22;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -707,7 +709,12 @@ class Endpoints extends _i1.EndpointDispatch {
               name: 'scrappableId',
               type: _i1.getType<String>(),
               nullable: false,
-            )
+            ),
+            'aiModel': _i1.ParameterDescription(
+              name: 'aiModel',
+              type: _i1.getType<_i21.AiModel>(),
+              nullable: false,
+            ),
           },
           call: (
             _i1.Session session,
@@ -717,6 +724,32 @@ class Endpoints extends _i1.EndpointDispatch {
                   .createSession(
             session,
             scrappableId: params['scrappableId'],
+            aiModel: params['aiModel'],
+          ),
+        ),
+        'changeChatModel': _i1.MethodConnector(
+          name: 'changeChatModel',
+          params: {
+            'sessionUuid': _i1.ParameterDescription(
+              name: 'sessionUuid',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'aiModel': _i1.ParameterDescription(
+              name: 'aiModel',
+              type: _i1.getType<_i21.AiModel>(),
+              nullable: false,
+            ),
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['scrappableChatSession'] as _i15.ScrappableChatSession)
+                  .changeChatModel(
+            session,
+            sessionUuid: params['sessionUuid'],
+            aiModel: params['aiModel'],
           ),
         ),
         'sendPromptMessage': _i1.MethodConnector(
@@ -768,6 +801,6 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
       },
     );
-    modules['serverpod_auth'] = _i21.Endpoints()..initializeEndpoints(server);
+    modules['serverpod_auth'] = _i22.Endpoints()..initializeEndpoints(server);
   }
 }

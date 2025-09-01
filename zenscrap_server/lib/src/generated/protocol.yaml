@@ -39,4 +39,5 @@ scrappableChatSession:
   - disposeSession:
   - createSession:
   - listenToScrappableRedraftSession:
+  - changeChatModel:
   - sendPromptMessage:

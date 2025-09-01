@@ -43,7 +43,9 @@ void main() async {
   // Configure URL strategy for web (removes the # from URLs)
   configureUrlStrategy();
 
-  const serverUrlFromEnv = String.fromEnvironment('SERVER_URL');
+  final serverUrlFromEnv = String.fromEnvironment('SERVER_URL',
+      defaultValue:
+          kDebugMode ? 'http://$localhost:8080/' : 'https://api.zenscrap.com/');
   final serverUrl =
       serverUrlFromEnv.isEmpty ? 'http://$localhost:8080/' : serverUrlFromEnv;
 

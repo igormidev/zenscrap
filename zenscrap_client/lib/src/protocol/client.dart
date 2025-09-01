@@ -36,10 +36,12 @@ import 'package:zenscrap_client/src/protocol/entities/account/plan_tier.dart'
     as _i14;
 import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/create_session_response.dart'
     as _i15;
-import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/chat_response.dart'
+import 'package:zenscrap_client/src/protocol/entities/scrappable/ai_model.dart'
     as _i16;
-import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i17;
-import 'protocol.dart' as _i18;
+import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/chat_response.dart'
+    as _i17;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i18;
+import 'protocol.dart' as _i19;
 
 /// {@category Endpoint}
 class EndpointPrivateAccount extends _i1.EndpointRef {
@@ -387,22 +389,40 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
         {'sessionId': sessionId},
       );
 
-  _i2.Future<_i15.CreateSessionResponse> createSession(
-          {required String scrappableId}) =>
+  _i2.Future<_i15.CreateSessionResponse> createSession({
+    required String scrappableId,
+    required _i16.AiModel aiModel,
+  }) =>
       caller.callServerEndpoint<_i15.CreateSessionResponse>(
         'scrappableChatSession',
         'createSession',
-        {'scrappableId': scrappableId},
+        {
+          'scrappableId': scrappableId,
+          'aiModel': aiModel,
+        },
       );
 
-  _i2.Stream<_i16.ChatResponse> listenToScrappableRedraftSession(
+  _i2.Stream<_i17.ChatResponse> listenToScrappableRedraftSession(
           {required String sessionUuid}) =>
-      caller.callStreamingServerEndpoint<_i2.Stream<_i16.ChatResponse>,
-          _i16.ChatResponse>(
+      caller.callStreamingServerEndpoint<_i2.Stream<_i17.ChatResponse>,
+          _i17.ChatResponse>(
         'scrappableChatSession',
         'listenToScrappableRedraftSession',
         {'sessionUuid': sessionUuid},
         {},
+      );
+
+  _i2.Future<void> changeChatModel({
+    required String sessionUuid,
+    required _i16.AiModel aiModel,
+  }) =>
+      caller.callServerEndpoint<void>(
+        'scrappableChatSession',
+        'changeChatModel',
+        {
+          'sessionUuid': sessionUuid,
+          'aiModel': aiModel,
+        },
       );
 
   _i2.Future<void> sendPromptMessage({
@@ -421,10 +441,10 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
 
 class Modules {
   Modules(Client client) {
-    auth = _i17.Caller(client);
+    auth = _i18.Caller(client);
   }
 
-  late final _i17.Caller auth;
+  late final _i18.Caller auth;
 }
 
 class Client extends _i1.ServerpodClientShared {
@@ -443,7 +463,7 @@ class Client extends _i1.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
           host,
-          _i18.Protocol(),
+          _i19.Protocol(),
           securityContext: securityContext,
           authenticationKeyManager: authenticationKeyManager,
           streamingConnectionTimeout: streamingConnectionTimeout,

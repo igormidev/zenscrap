@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:collection/collection.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_gemini_api_impl.dart';
@@ -121,6 +122,34 @@ class ScrappableChatSession extends Endpoint {
       );
     }
     return subject.stream;
+  }
+
+  Future<void> changeChatModel(
+    Session session, {
+    required RedraftSrappableSessionId sessionUuid,
+    required AiModel aiModel,
+  }) async {
+    final sessionNotFount = ZenScrapException(
+      title: 'Session Not Found',
+      description: 'No active session found for uuid $sessionUuid.',
+    );
+    if (_chatSessions.containsKey(sessionUuid) == false) {
+      throw sessionNotFount;
+    }
+    final scrappableId = _scrappableOpenedSessionsIds.entries
+        .firstWhereOrNull((element) => element.value == sessionUuid)
+        ?.key;
+    final referenceTestData = _cacheTestData[sessionUuid];
+    if (scrappableId == null || referenceTestData == null) {
+      throw sessionNotFount;
+    }
+
+    _chatSessions.remove(sessionUuid);
+    _chatSessions[sessionUuid] = ChatControllerGeminiApiImpl.create(
+      scrappableId: UuidValue.fromString(scrappableId),
+      referenceTestData: referenceTestData,
+      aiModel: aiModel,
+    );
   }
 
   Future<void> sendPromptMessage(
