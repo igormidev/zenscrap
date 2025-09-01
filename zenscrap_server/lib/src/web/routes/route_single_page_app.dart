@@ -98,6 +98,16 @@ class RouteSinglePageApp extends RouteStaticDirectory {
           case '.map':
             contentType = ContentType('application', 'json');
             break;
+          case '.wasm':
+            contentType = ContentType('application', 'wasm');
+            break;
+          case '.mjs':
+            contentType = ContentType(
+              'application',
+              'javascript',
+              charset: 'utf-8',
+            );
+            break;
           default:
             contentType = ContentType('application', 'octet-stream');
         }
