@@ -21,7 +21,7 @@ class SignInPage extends ConsumerWidget {
       items: [
         AuthFormItem(
           hintText: 'User name (or company name)',
-          labelText: 'User display name. Typically the company name.',
+          labelText: 'User display name (Typically the company name)',
           autofillHints: AutofillHints.name,
           keyboardType: TextInputType.name,
           validator: FormBuilderValidators.compose([

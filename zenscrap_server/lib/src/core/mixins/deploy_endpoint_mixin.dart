@@ -1,5 +1,6 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/core/default_classes.dart';
+import 'package:zenscrap_server/src/endpoints/public/scrappable_chat_session.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 mixin DeployEndpointMixin {
@@ -33,11 +34,13 @@ mixin DeployEndpointMixin {
               t.referenceTestData.scrappableTestResult.id
                   .equals(testData.scrappableTestResult?.id) &
               t.referenceTestData.byteData.id.equals(testData.byteData?.id) &
-              t.accountId.equals(null));
+              t.accountId.equals(null),
+          transaction: transaction);
     } else {
       final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
         session,
         where: (p0) => p0.userInfoId.equals(userId),
+        transaction: transaction,
       );
       if (accountInfo == null) {
         throw defaultAuthenticationException;
@@ -48,7 +51,8 @@ mixin DeployEndpointMixin {
               t.referenceTestData.scrappableTestResult.id
                   .equals(testData.scrappableTestResult?.id) &
               t.referenceTestData.byteData.id.equals(testData.byteData?.id) &
-              t.accountId.equals(accountInfo.id));
+              t.accountId.equals(accountInfo.id),
+          transaction: transaction);
     }
 
     if (scrappable == null) {
@@ -76,5 +80,7 @@ mixin DeployEndpointMixin {
 
     await ReferenceTestData.db
         .updateRow(session, testData, transaction: transaction);
+
+    await disposeFromScrappableId(scrappable.id.toString());
   }
 }

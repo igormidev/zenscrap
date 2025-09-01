@@ -26,6 +26,12 @@ class _DeployButtonState extends ConsumerState<DeployButton> {
   final ValueNotifier<bool> _isDeployingVN = ValueNotifier(false);
 
   @override
+  void dispose() {
+    _isDeployingVN.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final isChatLoading = ref.watch(isChatLoadingProvider);
     final isLoggedIn =
@@ -44,11 +50,15 @@ class _DeployButtonState extends ConsumerState<DeployButton> {
                   ? null
                   : () async {
                       if (isLoggedIn) {
+                        await Future.delayed(
+                            const Duration(milliseconds: 1200));
                         await ref.globalLoadingSetter(() async {
+                          _isDeployingVN.value = true;
                           final deployResult = await ref
                               .read(clientProvider)
                               .deployScrappable(testData: widget.testData)
                               .toResult;
+                          _isDeployingVN.value = false;
 
                           deployResult.fold(
                             (_) {

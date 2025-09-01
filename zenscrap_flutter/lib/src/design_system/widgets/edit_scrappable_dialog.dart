@@ -288,12 +288,19 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
                       return FilledButton(
                         onPressed: hasChanges
                             ? null
-                            : () {
+                            : () async {
                                 ref.read(scrapChatProvider.notifier).reset();
                                 final router = GoRouter.of(context);
-                                Navigator.pop(context);
-                                router.push(
-                                    '/scrappable-form?id=${widget.scrappable.id.toString()}');
+                                final didChange = await router.push(
+                                  '/scrappable-form?id=${widget.scrappable.id.toString()}',
+                                );
+
+                                if (didChange == true) {
+                                  unawaited(ref
+                                      .read(userScrappables.notifier)
+                                      .getScrappables());
+                                }
+                                if (context.mounted) Navigator.pop(context);
                               },
                         child: Text('Edit scrapper extract logic'),
                       );

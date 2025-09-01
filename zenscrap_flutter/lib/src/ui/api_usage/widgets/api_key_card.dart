@@ -53,7 +53,9 @@ class _ApiKeyCardState extends State<ApiKeyCard> {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isActive
-                ? (_isHovered ? context.c.primary : context.c.outline.withAlpha(100))
+                ? (_isHovered
+                    ? context.c.primary
+                    : context.c.outline.withAlpha(100))
                 : context.c.error.withAlpha(100),
             width: _isHovered ? 2 : 1,
           ),

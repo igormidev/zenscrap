@@ -77,10 +77,6 @@ class PrivateAccountEndpoint extends Endpoint with DeployEndpointMixin {
 
           accountInfo = await AccountInfo.db
               .insertRow(session, accountInfo, transaction: transaction);
-          if (initialScrappableIfNewUser != null) {
-            await _attachScrappable(
-                session, transaction, accountInfo, initialScrappableIfNewUser);
-          }
 
           await AccountInfo.db.attachRow.accountApiUsage(
               session, accountInfo, accountApiUsage,
@@ -100,12 +96,24 @@ class PrivateAccountEndpoint extends Endpoint with DeployEndpointMixin {
             );
           }
 
+          if (initialScrappableIfNewUser != null) {
+            await _attachScrappable(
+                session, transaction, accountInfo, initialScrappableIfNewUser);
+          }
+
           return accountAdded;
         });
-      } catch (e) {
+      } catch (error, stackTrace) {
+        print('$error\n\n$stackTrace');
+        session.log(
+          'Error creating new account for userId $userId',
+          exception: error,
+          level: LogLevel.error,
+          stackTrace: stackTrace,
+        );
         throw ZenScrapException(
           title: 'Account Creation Failed',
-          description: 'Unable to create new account. Please try again later.',
+          description: 'This is a Internal error. Please try again later.',
         );
       }
     } else {
@@ -126,7 +134,9 @@ class PrivateAccountEndpoint extends Endpoint with DeployEndpointMixin {
       session,
       scrappable.id,
     );
-    if (existingScrappable == null || existingScrappable.accountId != null) {
+    if (existingScrappable == null ||
+        existingScrappable.accountId != null ||
+        existingScrappable.isDeleted) {
       // Already have a account attached, just ignore...
       return;
     }

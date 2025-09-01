@@ -45,8 +45,10 @@ class _InitialChatViewState extends ConsumerState<InitialChatView> {
   Widget build(BuildContext context) {
     final ScrapChatSessionState scrapChatState = ref.watch(scrapChatProvider);
 
-    return Scaffold(
-      body: FutureBuilder(
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        body: FutureBuilder(
           future: _initializationCompleter.future,
           builder: (context, asyncSnapshot) {
             final isLoading =
@@ -69,7 +71,9 @@ class _InitialChatViewState extends ConsumerState<InitialChatView> {
                 );
               },
             );
-          }),
+          },
+        ),
+      ),
     );
   }
 }

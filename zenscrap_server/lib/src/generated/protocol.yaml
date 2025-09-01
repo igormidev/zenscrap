@@ -36,6 +36,7 @@ scrappableApi:
   - prod:
   - test:
 scrappableChatSession:
+  - disposeSession:
   - createSession:
   - listenToScrappableRedraftSession:
   - sendPromptMessage:

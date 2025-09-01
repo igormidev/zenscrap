@@ -18,7 +18,7 @@ import '../endpoints/private/private_subscription_endpoint.dart' as _i6;
 import '../endpoints/private/private_user_scrappables_endpoint.dart' as _i7;
 import '../endpoints/public/create_scrappable.dart' as _i8;
 import '../endpoints/public/delete_scrappable_endpoint.dart' as _i9;
-import '../endpoints/public/deploy_endpoint_related.dart' as _i10;
+import '../endpoints/public/deploy_endpoint.dart' as _i10;
 import '../endpoints/public/edit_scrappable_endpoint.dart' as _i11;
 import '../endpoints/public/marketplace_endpoint.dart' as _i12;
 import '../endpoints/public/public_tier_endpoint.dart' as _i13;
@@ -681,6 +681,25 @@ class Endpoints extends _i1.EndpointDispatch {
       name: 'scrappableChatSession',
       endpoint: endpoints['scrappableChatSession']!,
       methodConnectors: {
+        'disposeSession': _i1.MethodConnector(
+          name: 'disposeSession',
+          params: {
+            'sessionId': _i1.ParameterDescription(
+              name: 'sessionId',
+              type: _i1.getType<String>(),
+              nullable: false,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['scrappableChatSession'] as _i15.ScrappableChatSession)
+                  .disposeSession(
+            session,
+            sessionId: params['sessionId'],
+          ),
+        ),
         'createSession': _i1.MethodConnector(
           name: 'createSession',
           params: {

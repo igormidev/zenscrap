@@ -380,6 +380,13 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
   @override
   String get name => 'scrappableChatSession';
 
+  _i2.Future<void> disposeSession({required String sessionId}) =>
+      caller.callServerEndpoint<void>(
+        'scrappableChatSession',
+        'disposeSession',
+        {'sessionId': sessionId},
+      );
+
   _i2.Future<_i15.CreateSessionResponse> createSession(
           {required String scrappableId}) =>
       caller.callServerEndpoint<_i15.CreateSessionResponse>(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/src/core/extensions/date_time_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/category_badge.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/edit_scrappable_dialog.dart';
@@ -203,7 +204,7 @@ class ScrappableCardIndicator extends StatelessWidget {
                 ],
                 const Spacer(),
                 Text(
-                  'Created ${_formatDate(scrappable.createdAt)}',
+                  'Last modified ${scrappable.extractRulesUpdatedAt.formatToDisplay}',
                   style: context.t.labelSmall?.copyWith(
                     color: context.c.onSurfaceVariant.withAlpha(179),
                   ),
@@ -214,28 +215,5 @@ class ScrappableCardIndicator extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _formatDate(DateTime date) {
-    final now = DateTime.now();
-    final difference = now.difference(date);
-
-    if (difference.inDays == 0) {
-      if (difference.inHours == 0) {
-        if (difference.inMinutes == 0) {
-          return 'just now';
-        }
-        return '${difference.inMinutes}m ago';
-      }
-      return '${difference.inHours}h ago';
-    } else if (difference.inDays < 7) {
-      return '${difference.inDays}d ago';
-    } else if (difference.inDays < 30) {
-      return '${(difference.inDays / 7).floor()}w ago';
-    } else if (difference.inDays < 365) {
-      return '${(difference.inDays / 30).floor()}mo ago';
-    } else {
-      return '${(difference.inDays / 365).floor()}y ago';
-    }
   }
 }

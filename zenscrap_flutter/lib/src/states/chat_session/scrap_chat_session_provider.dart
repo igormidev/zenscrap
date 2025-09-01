@@ -61,9 +61,20 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
     });
   }
 
+  Future<void> endSession() async {
+    final sessionUuid = state.mapOrNull(standard: (value) => value.sessionUuid);
+    if (sessionUuid == null) return;
+
+    await ref
+        .read(clientProvider)
+        .scrappableChatSession
+        .disposeSession(sessionId: sessionUuid);
+  }
+
   @override
   void dispose() {
     _chatResponseSubscription?.cancel();
+
     super.dispose();
   }
 

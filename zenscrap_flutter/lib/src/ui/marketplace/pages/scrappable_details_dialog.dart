@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/convert_extensions.dart';
+import 'package:zenscrap_flutter/src/core/extensions/date_time_extension.dart';
 import 'package:zenscrap_flutter/src/core/extensions/string_extension.dart';
 import 'package:zenscrap_flutter/src/core/mixins/curl_builder_mixin.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
@@ -131,7 +132,7 @@ class _ScrappableDetailsDialogState
           titlePadding: EdgeInsets.only(left: 24, right: 24, top: 24),
           contentPadding: EdgeInsets.only(left: 24, right: 24),
           content: SizedBox(
-            height: MediaQuery.sizeOf(context).height * 0.6 + 58,
+            height: MediaQuery.sizeOf(context).height * 0.6 + 92,
             width: MediaQuery.sizeOf(context).width * 0.3,
             child: Builder(builder: (context) {
               final String? result = widget.scrappable.referenceTestData
@@ -155,7 +156,6 @@ class _ScrappableDetailsDialogState
         ),
         AlertDialog(
           insetPadding: EdgeInsets.symmetric(vertical: 20),
-          actionsPadding: EdgeInsets.only(bottom: 16, left: 22, right: 22),
           titlePadding: EdgeInsets.only(left: 24, right: 24, top: 24),
           contentPadding: EdgeInsets.only(left: 24, right: 24),
           title: SizedBox(
@@ -175,7 +175,7 @@ class _ScrappableDetailsDialogState
             ),
           ),
           content: SizedBox(
-            height: MediaQuery.sizeOf(context).height * 0.6,
+            height: MediaQuery.sizeOf(context).height * 0.63,
             width: MediaQuery.sizeOf(context).width * 0.3,
             child: ListView(
               padding: EdgeInsets.only(bottom: 20, top: 6),
@@ -257,14 +257,14 @@ class _ScrappableDetailsDialogState
                       ],
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 8),
                   Text(
                     'Curl Command',
                     style: context.t.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
                   CodeBlock(
                     copyTooltipMessage: 'Copy the test cURL command',
                     code: curlCommand
@@ -305,40 +305,33 @@ class _ScrappableDetailsDialogState
                     ),
                   ),
                 ],
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
+                Text(
+                  'Created: ${_formatFullDate(widget.scrappable.createdAt)}',
+                  style: context.t.bodySmall?.copyWith(
+                    color: context.c.onSurfaceVariant,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Last logic modification: ${widget.scrappable.extractRulesUpdatedAt.formatToDisplay}',
+                  style: context.t.bodySmall?.copyWith(
+                    color: context.c.onSurfaceVariant,
+                  ),
+                ),
+                SizedBox(height: 16),
               ],
             ),
           ),
-          actionsAlignment: MainAxisAlignment.spaceBetween,
+          // actionsAlgnment: MainAxisAlignment.spaceBetween,
           actions: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 27.0),
-              child: Text(
-                'Created: ${_formatFullDate(widget.scrappable.createdAt)}',
-                style: context.t.bodySmall?.copyWith(
-                  color: context.c.onSurfaceVariant,
-                ),
+            if (isMyScrappable == false)
+              FilledButton.icon(
+                onPressed: () => _handleClone(context),
+                icon: const Icon(Icons.copy_rounded),
+                label: const Text('Clone to My Endpoints'),
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // TextButton(
-                //   onPressed: () => Navigator.of(context).pop(),
-                //   child: const Text('Close'),
-                // ),
-                // I cant clone my own scrappable
-                if (isMyScrappable == false) ...[
-                  SizedBox(width: 8),
-                  FilledButton.icon(
-                    onPressed: () => _handleClone(context),
-                    icon: const Icon(Icons.copy_rounded),
-                    label: const Text('Clone to My Endpoints'),
-                  ),
-                ],
-              ],
-            ),
+            if (isMyScrappable != false) SizedBox(height: 42)
           ],
         ),
       ],

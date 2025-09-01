@@ -23,6 +23,13 @@ String? getTestExtractRules(ScrappableId scrappableId) {
 class ScrappableChatSession extends Endpoint {
   final Uuid uuid = Uuid();
 
+  Future<void> disposeSession(
+    Session session, {
+    required RedraftSrappableSessionId sessionId,
+  }) {
+    return _disposeSession(sessionId: sessionId);
+  }
+
   Future<CreateSessionResponse> createSession(
     Session session, {
     required String scrappableId,
@@ -71,6 +78,7 @@ class ScrappableChatSession extends Endpoint {
     }
 
     final RedraftSrappableSessionId sessionUuid = uuid.v4();
+    _scrappableOpenedSessionsIds[scrappable.id.toString()] = sessionUuid;
     _scrapRedraftSessions[sessionUuid] = ReplaySubject<ChatResponse>();
     _chatSessions[sessionUuid] = ChatControllerGeminiApiImpl.create(
       scrappableId: scrappable.id,
@@ -177,6 +185,11 @@ class ScrappableChatSession extends Endpoint {
   }
 }
 
+Future<void> disposeFromScrappableId(ScrappableId scrappableId) async {
+  final sessionId = _scrappableOpenedSessionsIds[scrappableId];
+  if (sessionId != null) await _disposeSession(sessionId: sessionId);
+}
+
 Future<void> _disposeSession({
   required RedraftSrappableSessionId sessionId,
 }) async {
@@ -184,7 +197,7 @@ Future<void> _disposeSession({
   final subject = _scrapRedraftSessions.remove(sessionId);
   await subject?.close();
   _cacheTestData.remove(sessionId);
-  _scrappableOpenedSessionsIds.remove(sessionId);
+  _scrappableOpenedSessionsIds.removeWhere((key, value) => value == sessionId);
 }
 
 class TestScrappableDisposeFutureCall
