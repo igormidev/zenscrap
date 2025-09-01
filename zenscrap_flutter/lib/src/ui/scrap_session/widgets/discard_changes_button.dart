@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_messages_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 
@@ -50,16 +51,21 @@ class _DiscardChangesButtonState extends ConsumerState<DiscardChangesButton> {
                 onPressed: isDiscarding
                     ? null
                     : () async {
-                        if (hasAtLeastOneMessage == false) {
-                          return context.pop();
+                        if (hasAtLeastOneMessage) {
+                          return context.pop(true);
                         }
-                        _isDiscardingVN.value = true;
-                        try {
-                          await ref
-                              .read(scrapChatProvider.notifier)
-                              .endSession();
-                        } catch (_) {}
-                        _isDiscardingVN.value = false;
+                        await ref.globalLoadingSetter(() async {
+                          _isDiscardingVN.value = true;
+                          try {
+                            await ref
+                                .read(scrapChatProvider.notifier)
+                                .endSession();
+                          } catch (_) {}
+                          _isDiscardingVN.value = false;
+                        });
+
+                        // ignore: use_build_context_synchronously
+                        return context.pop(true);
                       },
                 label:
                     Text(hasAtLeastOneMessage ? 'Discard changes' : 'Go back'),
