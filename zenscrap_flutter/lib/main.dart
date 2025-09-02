@@ -42,7 +42,7 @@ void main() async {
   configureUrlStrategy();
 
   // IMPORTANT: Must use const with String.fromEnvironment for Flutter web release mode
-  const serverUrlFromEnv = String.fromEnvironment('SERVER_URL', defaultValue: '');
+  const serverUrlFromEnv = String.fromEnvironment('SERVER_URL');
 
   // Determine the server URL based on environment and debug mode
   final String serverUrl;
