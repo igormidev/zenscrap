@@ -103,14 +103,16 @@ class _ChatViewPageState extends ConsumerState<ChatViewPage>
                   ).animate().fadeIn(
                       duration: const Duration(seconds: 1),
                       delay: const Duration(milliseconds: 300)),
-                  Transform.translate(
-                    offset: const Offset(0, -20),
-                    child: Text(
-                      'Vibe scrap any site',
-                      style: context.t.displayMedium?.copyWith(
-                        fontStyle: FontStyle.italic,
-                        height: 1,
-                        color: context.c.primary,
+                  Center(
+                    child: Transform.translate(
+                      offset: const Offset(0, -20),
+                      child: Text(
+                        'Vibe scrap any site',
+                        style: context.t.displayMedium?.copyWith(
+                          fontStyle: FontStyle.italic,
+                          height: 1,
+                          color: context.c.primary,
+                        ),
                       ),
                     ),
                   ),
@@ -141,34 +143,36 @@ class _ChatViewPageState extends ConsumerState<ChatViewPage>
                         .build(),
                   ),
                   SizedBox(height: 32),
-                  FilledButton.tonalIcon(
-                    onPressed: _submitForm,
-                    style: FilledButton.styleFrom(
-                      iconAlignment: IconAlignment.end,
-                    ),
-                    // icon: const Icon(Icons.send),
-                    icon: ValueListenableBuilder(
-                      valueListenable: _isLoading,
-                      builder: (context, isLoading, child) {
-                        if (isLoading) {
-                          return const SizedBox(
-                            height: 20,
-                            child: AdaptiveProgressIndicator(),
-                          );
-                        }
+                  Center(
+                    child: FilledButton.tonalIcon(
+                      onPressed: _submitForm,
+                      style: FilledButton.styleFrom(
+                        iconAlignment: IconAlignment.end,
+                      ),
+                      // icon: const Icon(Icons.send),
+                      icon: ValueListenableBuilder(
+                        valueListenable: _isLoading,
+                        builder: (context, isLoading, child) {
+                          if (isLoading) {
+                            return const SizedBox(
+                              height: 20,
+                              child: AdaptiveProgressIndicator(),
+                            );
+                          }
 
-                        return const Icon(Icons.send);
-                      },
-                    ),
-                    label: ValueListenableBuilder(
-                      valueListenable: _isLoading,
-                      builder: (context, isLoading, child) {
-                        if (isLoading) {
-                          return Text('Creating scrappable...');
-                        }
+                          return const Icon(Icons.send);
+                        },
+                      ),
+                      label: ValueListenableBuilder(
+                        valueListenable: _isLoading,
+                        builder: (context, isLoading, child) {
+                          if (isLoading) {
+                            return Text('Creating scrappable...');
+                          }
 
-                        return Text('Create scrappable');
-                      },
+                          return Text('Create scrappable');
+                        },
+                      ),
                     ),
                   ),
                   SizedBox(height: 16),

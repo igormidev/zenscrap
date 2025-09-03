@@ -1,0 +1,71 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Flutter Web WASM (Debug)",
+      "type": "dart",
+      "request": "launch",
+      "program": "zenscrap_flutter/lib/main.dart",
+      "args": [
+        "--wasm"
+      ],
+      "deviceId": "chrome"
+    },
+    {
+      "name": "Flutter Web WASM (Release)",
+      "type": "dart",
+      "request": "launch",
+      "program": "zenscrap_flutter/lib/main.dart",
+      "args": [
+        "--wasm"
+      ],
+      "deviceId": "chrome",
+      "flutterMode": "release"
+    },
+    {
+      "name": "Flutter macOS (Debug)",
+      "type": "dart",
+      "request": "launch",
+      "program": "zenscrap_flutter/lib/main.dart",
+      "deviceId": "macos"
+    },
+    {
+      "name": "Flutter macOS (Release)",
+      "type": "dart",
+      "request": "launch",
+      "program": "zenscrap_flutter/lib/main.dart",
+      "deviceId": "macos",
+      "flutterMode": "release"
+    },
+    {
+      "name": "Flutter iOS Simulator (Debug)",
+      "type": "dart",
+      "request": "launch",
+      "program": "zenscrap_flutter/lib/main.dart",
+      "deviceId": "iPhone"
+    },
+    {
+      "name": "Flutter iOS Simulator (Release)",
+      "type": "dart",
+      "request": "launch",
+      "program": "zenscrap_flutter/lib/main.dart",
+      "deviceId": "iPhone",
+      "flutterMode": "release"
+    },
+    {
+      "name": "Flutter Physical iPhone (Debug)",
+      "type": "dart",
+      "request": "launch",
+      "program": "zenscrap_flutter/lib/main.dart",
+      "deviceId": "00008130-00120CC134EA001C"
+    },
+    {
+      "name": "Flutter Physical iPhone (Release)",
+      "type": "dart",
+      "request": "launch",
+      "program": "zenscrap_flutter/lib/main.dart",
+      "deviceId": "00008130-00120CC134EA001C",
+      "flutterMode": "release"
+    }
+  ]
+}
