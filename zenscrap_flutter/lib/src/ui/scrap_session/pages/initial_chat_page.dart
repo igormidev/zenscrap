@@ -88,7 +88,7 @@ class _ChatViewPageState extends ConsumerState<ChatViewPage>
             constraints: BoxConstraints(maxWidth: 600),
             child: Form(
               key: _formKey,
-              child: Column(
+              child: ListView(
                 children: [
                   SizedBox(height: 40),
                   SizedBox(
@@ -114,7 +114,7 @@ class _ChatViewPageState extends ConsumerState<ChatViewPage>
                       ),
                     ),
                   ),
-                  SizedBox(height: 40),
+                  SizedBox(height: 20),
                   ZenTextfield(
                     controller: _referenceLinkEC,
                     labelText: 'Type a reference link',
@@ -171,7 +171,7 @@ class _ChatViewPageState extends ConsumerState<ChatViewPage>
                       },
                     ),
                   ),
-                  Spacer(),
+                  SizedBox(height: 16),
                   Text(
                     'Test the platform easily'
                     '\nNo login required to test your scrap endpoint',
