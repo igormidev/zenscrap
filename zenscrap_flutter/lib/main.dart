@@ -51,8 +51,7 @@ void main() async {
   } else if (kDebugMode) {
     serverUrl = 'http://$localhost:8080/';
   } else {
-    serverUrl = 'https://zenscrap.api.serverpod.space/';
-    // serverUrl = 'https://api.zenscrap.com/';
+    serverUrl = 'https://api.zenscrap.com/';
   }
 
   client = Client(
