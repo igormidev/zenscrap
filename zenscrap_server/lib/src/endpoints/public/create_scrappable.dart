@@ -7,10 +7,10 @@ import 'package:zenscrap_server/server.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class CreateScrappableEndpoint extends Endpoint {
-  Future<Scrappable> call(
+  Stream<Scrappable> call(
     Session session, {
     required String referenceLink,
-  }) async {
+  }) async* {
     final userId = (await session.authenticated)?.userId;
 
     final GenerativeModel geminiModel = GenerativeModel(
@@ -113,7 +113,7 @@ class CreateScrappableEndpoint extends Endpoint {
               'The returned text was not a valid JSON. Try again later.');
     }
 
-    return session.db.transaction((transaction) async {
+    yield await session.db.transaction((transaction) async {
       final accountApiUsage = userId == null
           ? null
           : await AccountApiUsage.db.findFirstRow(session,

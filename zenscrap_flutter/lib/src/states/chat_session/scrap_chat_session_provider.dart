@@ -32,6 +32,7 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
       final result = await ref
           .read(clientProvider)
           .createScrappable(referenceLink: targetUrl)
+          .last
           .toResult;
 
       await result.fold(

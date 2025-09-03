@@ -229,11 +229,13 @@ class EndpointCreateScrappable extends _i1.EndpointRef {
   @override
   String get name => 'createScrappable';
 
-  _i2.Future<_i4.Scrappable> call({required String referenceLink}) =>
-      caller.callServerEndpoint<_i4.Scrappable>(
+  _i2.Stream<_i4.Scrappable> call({required String referenceLink}) =>
+      caller.callStreamingServerEndpoint<_i2.Stream<_i4.Scrappable>,
+          _i4.Scrappable>(
         'createScrappable',
         'call',
         {'referenceLink': referenceLink},
+        {},
       );
 }
 

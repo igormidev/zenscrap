@@ -433,7 +433,7 @@ class Endpoints extends _i1.EndpointDispatch {
       name: 'createScrappable',
       endpoint: endpoints['createScrappable']!,
       methodConnectors: {
-        'call': _i1.MethodConnector(
+        'call': _i1.MethodStreamConnector(
           name: 'call',
           params: {
             'referenceLink': _i1.ParameterDescription(
@@ -442,10 +442,13 @@ class Endpoints extends _i1.EndpointDispatch {
               nullable: false,
             )
           },
+          streamParams: {},
+          returnType: _i1.MethodStreamReturnType.streamType,
           call: (
             _i1.Session session,
             Map<String, dynamic> params,
-          ) async =>
+            Map<String, Stream> streamParams,
+          ) =>
               (endpoints['createScrappable'] as _i8.CreateScrappableEndpoint)
                   .call(
             session,
