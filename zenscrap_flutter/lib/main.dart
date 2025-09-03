@@ -57,7 +57,7 @@ void main() async {
   client = Client(
     serverUrl,
     authenticationKeyManager: FlutterAuthenticationKeyManager(),
-    connectionTimeout: Duration(minutes: 8),
+    connectionTimeout: Duration(minutes: 3),
   )..connectivityMonitor = FlutterConnectivityMonitor();
 
   AdaptiveDialog.instance.updateConfiguration(
