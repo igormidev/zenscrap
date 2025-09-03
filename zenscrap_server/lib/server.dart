@@ -26,23 +26,6 @@ void run(List<String> args) async {
     Endpoints(),
     authenticationHandler: auth.authenticationHandler,
   );
-  // Configure CORS after server starts
-  pod.server.httpServer.defaultResponseHeaders.add(
-    'Access-Control-Allow-Origin',
-    '*',
-  );
-  pod.server.httpServer.defaultResponseHeaders.add(
-    'Access-Control-Allow-Methods',
-    'GET, POST, PUT, DELETE, OPTIONS',
-  );
-  pod.server.httpServer.defaultResponseHeaders.add(
-    'Access-Control-Allow-Headers',
-    'Origin, Content-Type, Accept, Authorization',
-  );
-  pod.server.httpServer.defaultResponseHeaders.add(
-    'Access-Control-Allow-Credentials',
-    'true',
-  );
 
   // Register API routes FIRST (before catch-all routes)
   pod.webServer.addRoute(StripeWebhookRoute(), '/stripe/webhook');
@@ -112,24 +95,6 @@ void run(List<String> args) async {
 
   // Start the server.
   await pod.start();
-
-  // Configure CORS after server starts
-  pod.server.httpServer.defaultResponseHeaders.add(
-    'Access-Control-Allow-Origin',
-    '*',
-  );
-  pod.server.httpServer.defaultResponseHeaders.add(
-    'Access-Control-Allow-Methods',
-    'GET, POST, PUT, DELETE, OPTIONS',
-  );
-  pod.server.httpServer.defaultResponseHeaders.add(
-    'Access-Control-Allow-Headers',
-    'Origin, Content-Type, Accept, Authorization',
-  );
-  pod.server.httpServer.defaultResponseHeaders.add(
-    'Access-Control-Allow-Credentials',
-    'true',
-  );
 }
 
 final ScrapingBee scrapingBee = ScrapingBee();
