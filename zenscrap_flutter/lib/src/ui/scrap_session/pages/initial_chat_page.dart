@@ -13,26 +13,33 @@ import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/zen_textfield.dart';
 
-class ChatViewPage extends ConsumerStatefulWidget {
-  const ChatViewPage({super.key});
+class InitialChatPage extends ConsumerStatefulWidget {
+  const InitialChatPage({super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _ChatViewPageState();
 }
 
-class _ChatViewPageState extends ConsumerState<ChatViewPage>
+class _ChatViewPageState extends ConsumerState<InitialChatPage>
     with TickerProviderStateMixin {
   late AnimationController _controller;
   final ValueNotifier<bool> _isLoading = ValueNotifier(false);
-  final _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();  
+  
+  static const _backgroundLottieUrl = 'https://lottie.host/b70b435a-8472-4e19-ad03-71579dd08074/zOcB4gAPwC.lottie';
+  static const _mainLottieUrl = 'https://lottie.host/5f15ff4c-0e86-4f26-9bbc-29afbf753eb0/okRB2OAoWp.lottie';
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 22),
-    );
+      duration: const Duration(seconds: 44),
+    )..addListener(() {
+      if (_controller.value > 0.5 && _controller.isAnimating) {
+        _controller.forward(from: 0);
+      }
+    });
   }
 
   late final TextEditingController _referenceLinkEC = TextEditingController(
@@ -62,6 +69,7 @@ class _ChatViewPageState extends ConsumerState<ChatViewPage>
     _controller.dispose();
     _referenceLinkEC.dispose();
     _promptEC.dispose();
+    _isLoading.dispose();
     super.dispose();
   }
 
@@ -69,20 +77,37 @@ class _ChatViewPageState extends ConsumerState<ChatViewPage>
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        SizedBox.expand(
-          child: Lottie.network(
-            'https://lottie.host/b70b435a-8472-4e19-ad03-71579dd08074/zOcB4gAPwC.lottie',
-            decoder: customDecoder,
-            fit: BoxFit.fitWidth,
-            controller: _controller,
-            onLoaded: (composition) {
-              _controller.repeat();
-            },
-          ),
-        ).animate().fadeIn(
-              duration: const Duration(seconds: 1),
-              delay: const Duration(milliseconds: 800),
+        RepaintBoundary(
+          child: SizedBox.expand(
+            child: Lottie.network(
+              _backgroundLottieUrl,
+              decoder: customDecoder,
+              fit: BoxFit.fitWidth,
+              frameRate: FrameRate(15),
+              renderCache: RenderCache.raster,
+              filterQuality: FilterQuality.low,
+              controller: _controller,
+              onLoaded: (composition) {
+                _controller.repeat();
+              },
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        context.c.primaryContainer.withAlpha(50),
+                        context.c.secondaryContainer.withAlpha(50),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
+          ).animate().fadeIn(
+                duration: const Duration(seconds: 1),
+                delay: const Duration(milliseconds: 800),
+              ),
+        ),
         Center(
           child: ConstrainedBox(
             constraints: BoxConstraints(maxWidth: 600),
@@ -91,18 +116,30 @@ class _ChatViewPageState extends ConsumerState<ChatViewPage>
               child: ListView(
                 children: [
                   SizedBox(height: 40),
-                  SizedBox(
-                    height: 400,
-                    child: Transform.scale(
-                      scale: 1.3,
-                      child: Lottie.network(
-                        'https://lottie.host/5f15ff4c-0e86-4f26-9bbc-29afbf753eb0/okRB2OAoWp.lottie',
-                        decoder: customDecoder,
+                  RepaintBoundary(
+                    child: SizedBox(
+                      height: 400,
+                      child: Transform.scale(
+                        scale: 1.3,
+                        child: Lottie.network(
+                          _mainLottieUrl,
+                          decoder: customDecoder,
+                          frameRate: FrameRate(20),
+                          renderCache: RenderCache.raster,
+                          filterQuality: FilterQuality.medium,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(
+                              Icons.data_exploration_rounded,
+                              size: 200,
+                              color: context.c.primary.withAlpha(100),
+                            );
+                          },
+                        ),
                       ),
-                    ),
-                  ).animate().fadeIn(
-                      duration: const Duration(seconds: 1),
-                      delay: const Duration(milliseconds: 300)),
+                    ).animate().fadeIn(
+                        duration: const Duration(seconds: 1),
+                        delay: const Duration(milliseconds: 300)),
+                  ),
                   Center(
                     child: Transform.translate(
                       offset: const Offset(0, -20),

@@ -87,6 +87,22 @@
       right: 0;
     }
   </style>
+  <script>
+    // Enable hardware acceleration hints for Windows Chrome
+    if (navigator.userAgent.indexOf('Windows') !== -1) {
+      // Request high performance GPU
+      const canvas = document.createElement('canvas');
+      const gl = canvas.getContext('webgl2', {
+        powerPreference: 'high-performance',
+        antialias: false,
+        depth: false,
+        stencil: false,
+        failIfMajorPerformanceCaveat: false,
+        desynchronized: true,
+        preserveDrawingBuffer: false
+      });
+    }
+  </script>
   <script id="splash-screen-script">
     function removeSplashFromWeb() {
       document.getElementById("splash")?.remove();
@@ -101,6 +117,27 @@
       <source srcset="splash/img/dark-1x.png 1x, splash/img/dark-2x.png 2x, splash/img/dark-3x.png 3x, splash/img/dark-4x.png 4x" media="(prefers-color-scheme: dark)">
       <img class="center" aria-hidden="true" src="splash/img/light-1x.png" alt="">
   </picture>
+  <script>
+    // Configure Flutter web renderer for better performance
+    window.flutterConfiguration = {
+      canvasKitVariant: "auto",
+      renderer: "canvaskit",
+      // Enable multi-threading for better performance
+      canvasKitMaximumSurfaces: 3,
+    };
+    
+    // Preload CanvasKit for faster initial load
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(() => {
+        const link = document.createElement('link');
+        link.rel = 'preload';
+        link.as = 'fetch';
+        link.href = 'canvaskit/canvaskit.wasm';
+        link.crossOrigin = 'anonymous';
+        document.head.appendChild(link);
+      });
+    }
+  </script>
   <script src="flutter_bootstrap.js" async=""></script>
 
 
