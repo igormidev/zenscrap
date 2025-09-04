@@ -11,8 +11,7 @@ final Map<RedraftSrappableSessionId, ReplaySubject<ChatResponse>>
     _scrapRedraftSessions = {};
 final Map<RedraftSrappableSessionId, IChatController> _chatSessions = {};
 final Map<RedraftSrappableSessionId, ReferenceTestData> _cacheTestData = {};
-final Map<int, RedraftSrappableSessionId>
-    _scrappableOpenedSessionsIds = {};
+final Map<int, RedraftSrappableSessionId> _scrappableOpenedSessionsIds = {};
 
 String? getTestExtractRules(int scrappableId) {
   final ReferenceTestData? testData =
@@ -167,10 +166,12 @@ class ScrappableChatSession extends Endpoint {
       }
 
       // Check if user has at least Pro plan
-      if (account.planTier == PlanTier.none || account.planTier == PlanTier.basic) {
+      if (account.planTier == PlanTier.none ||
+          account.planTier == PlanTier.basic) {
         throw ZenScrapException(
           title: 'Upgrade Required',
-          description: 'You need at least a Pro plan to use Gemini 2.5 Pro. Upgrade your plan to access advanced AI models.',
+          description:
+              'You need at least a Pro plan to use Gemini 2.5 Pro. Upgrade your plan to access advanced AI models.',
         );
       }
     }
@@ -203,49 +204,15 @@ class ScrappableChatSession extends Endpoint {
       );
     }
 
-    final StreamController<ChatResponse> chatSeason =
-        StreamController<ChatResponse>();
-    final StreamSubscription<ChatResponse> subscription =
-        chatSeason.stream.listen((ChatResponse chatResponse) {
-      _scrapRedraftSessions[sessionId]?.add(chatResponse);
-      if (chatResponse is NewExtractRuleResponse) {
-        if (_cacheTestData.containsKey(sessionId)) {
-          _cacheTestData[sessionId] = chatResponse.referenceTestData;
-        }
-      }
-    });
-
-    chatSeason.add(MessageTextResponse(
-      role: PromptRole.user,
-      messageText: userPrompt,
-    ));
-
-    try {
-      await chatController.sendMessage(
-        session: session,
-        chatSeason: chatSeason,
-        userPromt: userPrompt,
-        referenceTestData: testData,
-      );
-    } catch (e, s) {
-      chatSeason.add(ErrorTextResponse(
-        role: PromptRole.system,
-        errorMessage: 'An error occurred while sending the message: $e',
-      ));
-      session.log(
-        'Error occurred while sending message: $e',
-        exception: e,
-        level: LogLevel.error,
-        stackTrace: s,
-      );
-      rethrow;
-    } finally {
-      if (!chatSeason.isClosed) {
-        await Future.delayed(const Duration(milliseconds: 300));
-        await subscription.cancel();
-        await chatSeason.close();
-      }
-    }
+    // Put future call
+    await session.serverpod.futureCallWithDelay(
+      'session_prompt',
+      SessionPrompt(
+        sessionId: sessionId,
+        userPrompt: userPrompt,
+      ),
+      const Duration(seconds: 1),
+    );
   }
 }
 
@@ -273,5 +240,82 @@ class TestScrappableDisposeFutureCall
   ) async {
     if (object == null) return;
     await _disposeSession(sessionId: object.sessionId);
+  }
+}
+
+class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
+  @override
+  Future<void> invoke(Session session, SessionPrompt? object) async {
+    if (object == null) return;
+
+    final String sessionId = object.sessionId;
+    final String userPrompt = object.userPrompt;
+
+    final chatController = _chatSessions[sessionId];
+    if (chatController == null) {
+      _scrapRedraftSessions[sessionId]?.add(
+        ErrorTextResponse(
+          role: PromptRole.system,
+          errorMessage: 'Session not found or has been closed.',
+        ),
+      );
+      return;
+    }
+
+    final testData = _cacheTestData[sessionId];
+    if (testData == null) {
+      _scrapRedraftSessions[sessionId]?.add(
+        ErrorTextResponse(
+          role: PromptRole.system,
+          errorMessage: 'Session test data not found or has been closed.',
+        ),
+      );
+      return;
+    }
+
+    final StreamController<ChatResponse> chatSeason =
+        StreamController<ChatResponse>();
+
+    final StreamSubscription<ChatResponse> subscription =
+        chatSeason.stream.listen((ChatResponse chatResponse) {
+      _scrapRedraftSessions[sessionId]?.add(chatResponse);
+      if (chatResponse is NewExtractRuleResponse) {
+        if (_cacheTestData.containsKey(sessionId)) {
+          _cacheTestData[sessionId] = chatResponse.referenceTestData;
+        }
+      }
+    });
+
+    chatSeason.add(MessageTextResponse(
+      role: PromptRole.user,
+      messageText: userPrompt,
+    ));
+
+    try {
+      await chatController.sendMessage(
+        session: session,
+        chatSeason: chatSeason,
+        userPromt: userPrompt,
+        referenceTestData: testData,
+      );
+    } catch (e, s) {
+      chatSeason.add(ErrorTextResponse(
+        role: PromptRole.system,
+        errorMessage: 'An error occurred while sending the message:\n$e',
+      ));
+      session.log(
+        'Error occurred while sending message: $e',
+        exception: e,
+        level: LogLevel.error,
+        stackTrace: s,
+      );
+      rethrow;
+    } finally {
+      if (!chatSeason.isClosed) {
+        await Future.delayed(const Duration(milliseconds: 300));
+        await subscription.cancel();
+        await chatSeason.close();
+      }
+    }
   }
 }

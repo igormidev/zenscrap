@@ -92,6 +92,7 @@ void run(List<String> args) async {
       TestScrappableDisposeFutureCall(), 'dispose_temporary_scrappable');
   pod.registerFutureCall(
       MonthlySubscriptionCreditsFutureCall(), 'monthly_subscription_credits');
+  pod.registerFutureCall(SessionPromptFutureCall(), 'session_prompt');
 
   // Start the server.
   await pod.start();

@@ -1,0 +1,4 @@
+class: SessionPrompt
+fields:
+  userPrompt: String
+  sessionId: String
