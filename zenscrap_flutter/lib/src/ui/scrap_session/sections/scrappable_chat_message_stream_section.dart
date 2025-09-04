@@ -280,24 +280,29 @@ class _ChatMessageBubble extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 4),
-                Container(
-                  constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * 0.75,
+                Align(
+                  alignment: isUserMessage
+                      ? Alignment.centerRight
+                      : Alignment.centerLeft,
+                  child: Container(
+                    constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * 0.75,
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: backgroundColor,
+                      borderRadius: messageBorderRadius,
+                      boxShadow: [
+                        BoxShadow(
+                          color: colorScheme.shadow.withValues(alpha: 0.08),
+                          blurRadius: 3,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                    child: messageContent,
                   ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: backgroundColor,
-                    borderRadius: messageBorderRadius,
-                    boxShadow: [
-                      BoxShadow(
-                        color: colorScheme.shadow.withValues(alpha: 0.08),
-                        blurRadius: 3,
-                        offset: const Offset(0, 1),
-                      ),
-                    ],
-                  ),
-                  child: messageContent,
                 ),
               ],
             ),
