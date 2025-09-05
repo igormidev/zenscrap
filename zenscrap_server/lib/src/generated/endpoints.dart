@@ -247,6 +247,16 @@ class Endpoints extends _i1.EndpointDispatch {
               (endpoints['privateApiUsage'] as _i3.PrivateApiUsageEndpoint)
                   .getApiUsageInfo(session),
         ),
+        'getApiKeysWithStats': _i1.MethodConnector(
+          name: 'getApiKeysWithStats',
+          params: {},
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['privateApiUsage'] as _i3.PrivateApiUsageEndpoint)
+                  .getApiKeysWithStats(session),
+        ),
       },
     );
     connectors['privateCloneScrappable'] = _i1.EndpointConnector(

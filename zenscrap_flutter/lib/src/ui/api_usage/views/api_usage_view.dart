@@ -1,9 +1,16 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
-import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
+import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
+import 'package:zenscrap_flutter/src/states/api_usage/api_usage_provider.dart';
+import 'package:zenscrap_flutter/src/states/api_usage/api_usage_state.dart';
+import 'package:zenscrap_flutter/src/states/api_usage/api_keys_provider.dart';
+import 'package:zenscrap_flutter/src/states/api_usage/api_keys_state.dart';
+import 'package:zenscrap_flutter/src/states/api_usage/credit_history_provider.dart';
+import 'package:zenscrap_flutter/src/states/api_usage/credit_history_state.dart';
 import 'package:zenscrap_flutter/src/ui/api_usage/sections/api_keys_section.dart';
 import 'package:zenscrap_flutter/src/ui/api_usage/sections/history_section.dart';
 import 'package:zenscrap_flutter/src/ui/api_usage/sections/overview_section.dart';
@@ -18,122 +25,38 @@ class ApiUsageView extends ConsumerStatefulWidget {
 }
 
 class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
-  AccountApiUsage? _apiUsage;
-  List<AccountApiKey> _apiKeys = [];
-  List<CreditHistoryItem> _creditHistory = [];
-  Map<int, int> _apiKeyUsageStats = {};
-  bool _isLoading = true;
-  bool _isLoadingMoreHistory = false;
-  int _historyOffset = 0;
-  static const int _historyLimit = 20;
-
+  final ValueNotifier<bool> _isRefreshVN = ValueNotifier<bool>(false);
   // For responsive design
   int _selectedTabIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    _loadData();
+    // Load data for all providers
+    Future.microtask(() {
+      ref.read(apiKeysProvider.notifier).loadApiKeys();
+      ref.read(creditHistoryProvider.notifier).loadCreditHistory();
+    });
   }
 
-  Future<void> _loadData() async {
-    setState(() => _isLoading = true);
-
-    final client = ref.read(clientProvider);
-
-    try {
-      // Load all data in parallel
-      final results = await Future.wait<dynamic>([
-        client.privateApiUsage.getApiUsageInfo(),
-        client.privateApiUsage.getActiveApiKeys(),
-        client.privateApiUsage
-            .getCreditHistory(offset: 0, limit: _historyLimit),
-        client.privateApiUsage.getApiKeyUsageStats(),
-      ]);
-
-      setState(() {
-        _apiUsage = results[0] as AccountApiUsage;
-        _apiKeys = results[1] as List<AccountApiKey>;
-        _creditHistory = results[2] as List<CreditHistoryItem>;
-        _apiKeyUsageStats = results[3] as Map<int, int>;
-        _historyOffset = _historyLimit;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() => _isLoading = false);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to load API usage data: $e'),
-            backgroundColor: context.c.error,
-          ),
-        );
-      }
-    }
+  @override
+  void dispose() {
+    _isRefreshVN.dispose();
+    super.dispose();
   }
 
   Future<void> _loadMoreHistory() async {
-    if (_isLoadingMoreHistory) return;
-
-    setState(() => _isLoadingMoreHistory = true);
-
-    final client = ref.read(clientProvider);
-
-    try {
-      final moreHistory = await client.privateApiUsage.getCreditHistory(
-        offset: _historyOffset,
-        limit: _historyLimit,
-      );
-
-      setState(() {
-        _creditHistory.addAll(moreHistory);
-        _historyOffset += _historyLimit;
-        _isLoadingMoreHistory = false;
-      });
-    } catch (e) {
-      setState(() => _isLoadingMoreHistory = false);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to load more history: $e'),
-            backgroundColor: context.c.error,
-          ),
-        );
-      }
-    }
+    await ref.read(creditHistoryProvider.notifier).loadMoreHistory();
   }
 
   Future<void> _createApiKey(String name) async {
-    final client = ref.read(clientProvider);
-
-    try {
-      final newKey = await client.privateApiUsage.createApiKey(name: name);
-
-      // Reload data to get updated stats
-      await _loadData();
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('API key created successfully'),
-            backgroundColor: context.c.primary,
-          ),
-        );
-        if (mounted) {
-          Navigator.of(context).pop();
-        }
-        // Show the API key in a dialog for copying
-        _showApiKeyDialog(newKey);
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to create API key: $e'),
-            backgroundColor: context.c.error,
-          ),
-        );
-      }
+    if (!mounted) return;
+    final newKey =
+        await ref.read(apiKeysProvider.notifier).createApiKey(context, name);
+    if (newKey != null && mounted) {
+      Navigator.of(context).pop();
+      // Show the API key in a dialog for copying
+      _showApiKeyDialog(newKey);
     }
   }
 
@@ -198,20 +121,20 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Deactivate API Key'),
-        content: Text(
+        title: const Text('Deactivate API Key'),
+        content: const Text(
             'Are you sure you want to deactivate this API key? This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text('Cancel'),
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: TextButton.styleFrom(
               foregroundColor: context.c.error,
             ),
-            child: Text('Deactivate'),
+            child: const Text('Deactivate'),
           ),
         ],
       ),
@@ -219,30 +142,8 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
 
     if (confirm != true) return;
 
-    final client = ref.read(clientProvider);
-
-    try {
-      await client.privateApiUsage.deactivateApiKey(apiKeyId: keyId);
-      await _loadData();
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('API key deactivated successfully'),
-            backgroundColor: context.c.primary,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to deactivate API key: $e'),
-            backgroundColor: context.c.error,
-          ),
-        );
-      }
-    }
+    if (!mounted) return;
+    await ref.read(apiKeysProvider.notifier).deactivateApiKey(context, keyId);
   }
 
   void _showCreateApiKeyDialog() {
@@ -256,13 +157,37 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return Center(
+    final apiUsageState = ref.watch(apiUsageProvider);
+    final apiKeysState = ref.watch(apiKeysProvider);
+    final creditHistoryState = ref.watch(creditHistoryProvider);
+
+    // Check if any provider is loading
+    final isLoading = apiUsageState.maybeWhen(
+          loading: () => true,
+          orElse: () => false,
+        ) ||
+        apiKeysState.maybeWhen(
+          loading: () => true,
+          orElse: () => false,
+        ) ||
+        creditHistoryState.maybeWhen(
+          loading: () => true,
+          orElse: () => false,
+        );
+
+    if (isLoading) {
+      return const Center(
         child: CircularProgressIndicator(),
       );
     }
 
-    if (_apiUsage == null) {
+    // Check for errors
+    final apiUsageError = apiUsageState.maybeWhen(
+      withError: (error) => error,
+      orElse: () => null,
+    );
+
+    if (apiUsageError != null) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -270,49 +195,105 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
             Icon(Icons.error_outline, size: 64, color: context.c.error),
             const SizedBox(height: 16),
             Text(
-              'Failed to load API usage data',
+              apiUsageError.title,
               style: context.t.headlineSmall,
             ),
             const SizedBox(height: 8),
+            Text(
+              apiUsageError.description,
+              style: context.t.bodyMedium,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: _loadData,
-              child: Text('Retry'),
+              onPressed: () {
+                ref.read(apiUsageProvider.notifier).refresh();
+                ref.read(apiKeysProvider.notifier).refresh();
+                ref.read(creditHistoryProvider.notifier).refresh();
+              },
+              child: const Text('Retry'),
             ),
           ],
         ),
       );
     }
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isMobile = constraints.maxWidth < 768;
+    // Extract data from states
+    final apiUsage = apiUsageState.maybeWhen(
+      loaded: (apiUsage) => apiUsage,
+      orElse: () => null,
+    );
 
-        if (isMobile) {
-          return MobileLayout(
-            selectedTabIndex: _selectedTabIndex,
-            onTabSelected: (index) => setState(() => _selectedTabIndex = index),
-            apiUsage: _apiUsage!,
-            apiKeys: _apiKeys,
-            apiKeyUsageStats: _apiKeyUsageStats,
-            creditHistory: _creditHistory,
-            isLoadingMoreHistory: _isLoadingMoreHistory,
-            onLoadMoreHistory: _loadMoreHistory,
-            onShowCreateApiKeyDialog: _showCreateApiKeyDialog,
-            onDeactivateApiKey: _deactivateApiKey,
-          );
-        } else {
-          return DesktopLayout(
-            apiUsage: _apiUsage!,
-            apiKeys: _apiKeys,
-            apiKeyUsageStats: _apiKeyUsageStats,
-            creditHistory: _creditHistory,
-            isLoadingMoreHistory: _isLoadingMoreHistory,
-            onLoadMoreHistory: _loadMoreHistory,
-            onShowCreateApiKeyDialog: _showCreateApiKeyDialog,
-            onDeactivateApiKey: _deactivateApiKey,
-          );
-        }
+    final apiKeys = apiKeysState.maybeWhen(
+      loaded: (apiKeys, usageStats) => apiKeys,
+      orElse: () => <AccountApiKey>[],
+    );
+
+    final apiKeyUsageStats = apiKeysState.maybeWhen(
+      loaded: (apiKeys, usageStats) => usageStats,
+      orElse: () => <int, int>{},
+    );
+
+    final creditHistory = creditHistoryState.maybeWhen(
+      loaded: (creditHistory, hasMore, isLoadingMore) => creditHistory,
+      orElse: () => <CreditHistoryItem>[],
+    );
+
+    final isLoadingMoreHistory = creditHistoryState.maybeWhen(
+      loaded: (creditHistory, hasMore, isLoadingMore) => isLoadingMore,
+      orElse: () => false,
+    );
+
+    if (apiUsage == null) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    return ValueListenableBuilder(
+      valueListenable: _isRefreshVN,
+      builder: (context, isRefresh, child) {
+        return Opacity(
+          opacity: isRefresh ? 0.5 : 1.0,
+          child: IgnorePointer(
+            ignoring: isRefresh,
+            child: child!,
+          ),
+        );
       },
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isMobile = constraints.maxWidth < 768;
+
+          if (isMobile) {
+            return MobileLayout(
+              selectedTabIndex: _selectedTabIndex,
+              onTabSelected: (index) =>
+                  setState(() => _selectedTabIndex = index),
+              apiUsage: apiUsage,
+              apiKeys: apiKeys,
+              apiKeyUsageStats: apiKeyUsageStats,
+              creditHistory: creditHistory,
+              isLoadingMoreHistory: isLoadingMoreHistory,
+              onLoadMoreHistory: _loadMoreHistory,
+              onShowCreateApiKeyDialog: _showCreateApiKeyDialog,
+              onDeactivateApiKey: _deactivateApiKey,
+            );
+          } else {
+            return DesktopLayout(
+              isRefreshVN: _isRefreshVN,
+              apiUsage: apiUsage,
+              apiKeys: apiKeys,
+              apiKeyUsageStats: apiKeyUsageStats,
+              creditHistory: creditHistory,
+              isLoadingMoreHistory: isLoadingMoreHistory,
+              onLoadMoreHistory: _loadMoreHistory,
+              onShowCreateApiKeyDialog: _showCreateApiKeyDialog,
+              onDeactivateApiKey: _deactivateApiKey,
+            );
+          }
+        },
+      ),
     );
   }
 }
@@ -399,6 +380,7 @@ class DesktopLayout extends StatelessWidget {
   final VoidCallback onLoadMoreHistory;
   final VoidCallback onShowCreateApiKeyDialog;
   final Function(int) onDeactivateApiKey;
+  final ValueNotifier<bool> isRefreshVN;
 
   const DesktopLayout({
     super.key,
@@ -410,6 +392,7 @@ class DesktopLayout extends StatelessWidget {
     required this.onLoadMoreHistory,
     required this.onShowCreateApiKeyDialog,
     required this.onDeactivateApiKey,
+    required this.isRefreshVN,
   });
 
   @override
@@ -429,11 +412,40 @@ class DesktopLayout extends StatelessWidget {
                     style: context.t.displayMedium,
                   ),
                 ),
-                FilledButton.tonalIcon(
-                  onPressed: () {},
-                  label: Text('Refresh'),
-                  icon: Icon(Icons.refresh),
-                ),
+                ValueListenableBuilder(
+                    valueListenable: isRefreshVN,
+                    builder: (context, isRefresh, _) {
+                      return Consumer(builder: (context, ref, child) {
+                        return FilledButton.tonalIcon(
+                          onPressed: isRefresh
+                              ? null
+                              : () async {
+                                  isRefreshVN.value = true;
+                                  try {
+                                    await Future.delayed(
+                                        const Duration(milliseconds: 800));
+                                    await ref.globalLoadingSetter(() async {
+                                      await ref
+                                          .read(apiUsageProvider.notifier)
+                                          .loadApiUsage();
+                                      await ref
+                                          .read(apiKeysProvider.notifier)
+                                          .loadApiKeys();
+                                      await ref
+                                          .read(creditHistoryProvider.notifier)
+                                          .loadCreditHistory();
+                                    });
+                                  } finally {
+                                    isRefreshVN.value = false;
+                                  }
+                                },
+                          label: Text('Refresh'),
+                          icon: isRefresh
+                              ? CupertinoActivityIndicator()
+                              : Icon(Icons.refresh),
+                        );
+                      });
+                    }),
               ],
             ),
             const SizedBox(height: 16),

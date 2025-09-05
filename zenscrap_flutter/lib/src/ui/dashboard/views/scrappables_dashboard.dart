@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:dart_debouncer/dart_debouncer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,6 +6,7 @@ import 'package:zenscrap_flutter/src/design_system/elements/zen_tab.dart';
 import 'package:zenscrap_flutter/src/providers/shared_preferences_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_state.dart';
+import 'package:zenscrap_flutter/src/states/api_usage/api_usage_provider.dart';
 import 'package:zenscrap_flutter/src/states/dashboard/dashboard_error_provider.dart';
 import 'package:zenscrap_flutter/src/states/dashboard/dashboard_index_provider.dart';
 import 'package:zenscrap_flutter/src/states/dashboard/dashboard_loading_provider.dart';
@@ -35,8 +34,9 @@ class DashboardTemplateState extends ConsumerState<DashboardView> {
   void initState() {
     super.initState();
     _setInitialDrawerStyle();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      unawaited(ref.read(accountProvider.notifier).getAccountInfo());
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await ref.read(accountProvider.notifier).getAccountInfo();
+      await ref.read(apiUsageProvider.notifier).loadApiUsage();
     });
   }
 

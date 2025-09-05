@@ -275,4 +275,60 @@ class PrivateApiUsageEndpoint extends Endpoint {
 
     return accountInfo.accountApiUsage!;
   }
+
+  Future<ApiKeyResponse> getApiKeysWithStats(
+    Session session,
+  ) async {
+    final authenticationInfo = await session.authenticated;
+    if (authenticationInfo == null) {
+      throw defaultAuthenticationException;
+    }
+
+    final userId = authenticationInfo.userId;
+
+    final accountInfo = await AccountInfo.db.findFirstRow(
+      session,
+      where: (p0) => p0.userInfoId.equals(userId),
+      include: AccountInfo.include(
+        accountApiUsage: AccountApiUsage.include(
+          apiKeys: AccountApiKey.includeList(
+            where: (k) => k.isActive.equals(true),
+            orderBy: (k) => k.createdAt,
+            orderDescending: true,
+          ),
+        ),
+      ),
+    );
+
+    if (accountInfo == null || accountInfo.accountApiUsage == null) {
+      throw ZenScrapException(
+        title: 'Account Not Found',
+        description: 'Unable to find account information.',
+      );
+    }
+
+    final apiKeys = accountInfo.accountApiUsage!.apiKeys ?? [];
+    
+    // Get usage stats for each API key
+    final thirtyDaysAgo = DateTime.now().subtract(Duration(days: 30));
+    final Map<int, int> usageStats = {};
+
+    for (final apiKey in apiKeys) {
+      if (apiKey.id == null) continue;
+
+      final count = await ScrappableAnalytics.db.count(
+        session,
+        where: (p0) =>
+            p0.attachedApiKey.equals(apiKey.apiKey) &
+            (p0.requestedAt >= thirtyDaysAgo),
+      );
+
+      usageStats[apiKey.id!] = count;
+    }
+
+    return ApiKeyResponse(
+      apiKeys: apiKeys,
+      usageStats: usageStats,
+    );
+  }
 }

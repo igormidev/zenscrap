@@ -1,0 +1,4 @@
+class: ApiKeyResponse
+fields:
+  apiKeys: List<AccountApiKey>
+  usageStats: Map<int, int>
