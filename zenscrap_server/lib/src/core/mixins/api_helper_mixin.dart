@@ -197,8 +197,7 @@ mixin ApiHelperMixin {
       String? accountApiKeyString) async {
     final isTest = accountApiKeyString == null;
     if (isTest) {
-      final testSessionExtractRule =
-          getTestExtractRules(scrappable.id!);
+      final testSessionExtractRule = getTestExtractRules(scrappable.id!);
       if (testSessionExtractRule == null) {
         throw _noActiveTestSessionFinded;
       }
@@ -269,7 +268,7 @@ mixin ApiHelperMixin {
         stackTrace: stackTrace,
         level: LogLevel.error,
       );
-      throw error.exception;
+      rethrow;
     } catch (error, stackTrace) {
       await _setScrappable(
           session, scrappable, RequestStatus.serverError, apiKey, nanoId);

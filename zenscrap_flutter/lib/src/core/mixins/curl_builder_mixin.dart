@@ -13,9 +13,9 @@ mixin CurlBuilderMixin {
   }) {
     if (testData == null) return 'No test data available';
 
-    // Determine the endpoint based on prod/test mode
+    // Determine the endpoint based on prod/test mode (Route format)
     final String endpoint =
-        isProd ? 'scrappableApi/prod' : 'scrappableApi/test';
+        isProd ? '/api/scrappable/prod' : '/api/scrappable/test';
     final String url = '$baseUrl$endpoint';
 
     // Parse the example payload from the test data
@@ -65,8 +65,8 @@ mixin CurlBuilderMixin {
     Map<String, dynamic>? examplePayload,
     Map<String, String>? additionalHeaders,
   }) {
-    // Always use prod endpoint for marketplace
-    final String url = '${baseUrl}api/scrappable/prod';
+    // Always use prod endpoint for marketplace (Route format)
+    final String url = '$baseUrl/api/scrappable/prod';
 
     // Build the request payload
     final Map<String, dynamic> payload = {
