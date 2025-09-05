@@ -41,6 +41,7 @@ class _DiscardChangesButtonState extends ConsumerState<DiscardChangesButton> {
         orElse: () => false,
       ),
     ));
+
     return Align(
       alignment: Alignment.topLeft,
       child: Container(

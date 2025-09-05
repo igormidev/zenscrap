@@ -23,7 +23,6 @@ class ApiKeyCard extends StatefulWidget {
 }
 
 class _ApiKeyCardState extends State<ApiKeyCard> {
-  bool _isExpanded = false;
   bool _isHovered = false;
 
   String _maskApiKey(String apiKey) {
@@ -134,13 +133,15 @@ class _ApiKeyCardState extends State<ApiKeyCard> {
                     ],
                   ),
                 ),
-                IconButton(
-                  icon: Icon(
-                    _isExpanded ? Icons.expand_less : Icons.expand_more,
-                    color: context.c.onSurface.withAlpha(150),
+                if (isActive && widget.canDelete)
+                  IconButton(
+                    tooltip: 'Deactivate API Key',
+                    icon: Icon(
+                      Icons.delete,
+                      color: context.c.error,
+                    ),
+                    onPressed: widget.onDelete,
                   ),
-                  onPressed: () => setState(() => _isExpanded = !_isExpanded),
-                ),
               ],
             ),
             const SizedBox(height: 12),
@@ -153,48 +154,37 @@ class _ApiKeyCardState extends State<ApiKeyCard> {
                   'Last 30 days',
                   context.c.primary,
                 ),
-                const SizedBox(width: 12),
-                if (isActive && widget.canDelete)
-                  _buildActionButton(
-                    context,
-                    Icons.delete_outline,
-                    'Deactivate',
-                    context.c.error,
-                    widget.onDelete,
-                  ),
-              ],
-            ),
-            if (_isExpanded) ...[
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: context.c.surfaceContainerHighest.withAlpha(30),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: context.c.outline.withAlpha(50),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'API Key',
-                      style: context.t.labelMedium?.copyWith(
-                        color: context.c.onSurface.withAlpha(150),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: context.c.surfaceContainerHighest.withAlpha(30),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: context.c.outline.withAlpha(50),
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Row(
+                    child: Row(
                       children: [
-                        Expanded(
-                          child: SelectableText(
-                            _maskApiKey(widget.apiKey.apiKey),
-                            style: context.t.bodyMedium?.copyWith(
-                              fontFamily: 'monospace',
-                              fontSize: 12,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'API Key',
+                              style: context.t.labelMedium?.copyWith(
+                                color: context.c.onSurface.withAlpha(150),
+                              ),
                             ),
-                          ),
+                            SelectableText(
+                              _maskApiKey(widget.apiKey.apiKey),
+                              style: context.t.bodyMedium?.copyWith(
+                                fontFamily: 'monospace',
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(width: 8),
                         IconButton(
@@ -218,18 +208,10 @@ class _ApiKeyCardState extends State<ApiKeyCard> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Use this key in your API requests for authentication',
-                      style: context.t.bodySmall?.copyWith(
-                        color: context.c.onSurface.withAlpha(100),
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ],
         ),
       ),
@@ -252,7 +234,7 @@ class _ApiKeyCardState extends State<ApiKeyCard> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: color),
+          Icon(icon, size: 22, color: color),
           const SizedBox(width: 8),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -273,30 +255,6 @@ class _ApiKeyCardState extends State<ApiKeyCard> {
             ],
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildActionButton(
-    BuildContext context,
-    IconData icon,
-    String label,
-    Color color,
-    VoidCallback onPressed,
-  ) {
-    return TextButton.icon(
-      onPressed: onPressed,
-      icon: Icon(icon, size: 18, color: color),
-      label: Text(
-        label,
-        style: context.t.labelMedium?.copyWith(color: color),
-      ),
-      style: TextButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-          side: BorderSide(color: color.withAlpha(50)),
-        ),
       ),
     );
   }

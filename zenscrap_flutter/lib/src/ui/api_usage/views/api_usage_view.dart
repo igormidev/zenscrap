@@ -25,7 +25,7 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
   bool _isLoadingMoreHistory = false;
   int _historyOffset = 0;
   static const int _historyLimit = 20;
-  
+
   // For responsive design
   int _selectedTabIndex = 0;
 
@@ -37,18 +37,19 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
 
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
-    
+
     final client = ref.read(clientProvider);
-    
+
     try {
       // Load all data in parallel
       final results = await Future.wait<dynamic>([
         client.privateApiUsage.getApiUsageInfo(),
         client.privateApiUsage.getActiveApiKeys(),
-        client.privateApiUsage.getCreditHistory(offset: 0, limit: _historyLimit),
+        client.privateApiUsage
+            .getCreditHistory(offset: 0, limit: _historyLimit),
         client.privateApiUsage.getApiKeyUsageStats(),
       ]);
-      
+
       setState(() {
         _apiUsage = results[0] as AccountApiUsage;
         _apiKeys = results[1] as List<AccountApiKey>;
@@ -72,17 +73,17 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
 
   Future<void> _loadMoreHistory() async {
     if (_isLoadingMoreHistory) return;
-    
+
     setState(() => _isLoadingMoreHistory = true);
-    
+
     final client = ref.read(clientProvider);
-    
+
     try {
       final moreHistory = await client.privateApiUsage.getCreditHistory(
         offset: _historyOffset,
         limit: _historyLimit,
       );
-      
+
       setState(() {
         _creditHistory.addAll(moreHistory);
         _historyOffset += _historyLimit;
@@ -103,13 +104,13 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
 
   Future<void> _createApiKey(String name) async {
     final client = ref.read(clientProvider);
-    
+
     try {
       final newKey = await client.privateApiUsage.createApiKey(name: name);
-      
+
       // Reload data to get updated stats
       await _loadData();
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -117,7 +118,9 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
             backgroundColor: context.c.primary,
           ),
         );
-        
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
         // Show the API key in a dialog for copying
         _showApiKeyDialog(newKey);
       }
@@ -195,7 +198,8 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Deactivate API Key'),
-        content: Text('Are you sure you want to deactivate this API key? This action cannot be undone.'),
+        content: Text(
+            'Are you sure you want to deactivate this API key? This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -211,15 +215,15 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
         ],
       ),
     );
-    
+
     if (confirm != true) return;
-    
+
     final client = ref.read(clientProvider);
-    
+
     try {
       await client.privateApiUsage.deactivateApiKey(apiKeyId: keyId);
       await _loadData();
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -281,7 +285,7 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isMobile = constraints.maxWidth < 768;
-        
+
         if (isMobile) {
           return _buildMobileLayout();
         } else {
@@ -343,12 +347,12 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
                 style: context.t.displayMedium,
               ),
               const SizedBox(height: 24),
-              
+
               // Overview section
               _buildOverviewSection(),
-              
+
               const SizedBox(height: 32),
-              
+
               // Two column layout for API Keys and History
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -494,7 +498,7 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
               itemBuilder: (context, index) {
                 final apiKey = _apiKeys[index];
                 final usageCount = _apiKeyUsageStats[apiKey.id] ?? 0;
-                
+
                 return ApiKeyCard(
                   apiKey: apiKey,
                   usageCount: usageCount,

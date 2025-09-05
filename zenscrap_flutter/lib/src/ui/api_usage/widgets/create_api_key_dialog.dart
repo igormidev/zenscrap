@@ -32,10 +32,8 @@ class _CreateApiKeyDialogState extends State<CreateApiKeyDialog> {
     setState(() => _isCreating = true);
 
     try {
+      await Future.delayed(const Duration(milliseconds: 800));
       await widget.onCreateApiKey(_nameController.text.trim());
-      if (mounted) {
-        Navigator.of(context).pop();
-      }
     } catch (e) {
       setState(() => _isCreating = false);
       // Error handling is done in the parent widget
@@ -174,8 +172,7 @@ class _CreateApiKeyDialogState extends State<CreateApiKeyDialog> {
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                context.c.onPrimary,
-                              ),
+                                  context.c.onPrimary),
                             ),
                           )
                         : Icon(Icons.add),
