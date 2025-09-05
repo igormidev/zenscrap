@@ -4,8 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
-import 'package:zenscrap_flutter/src/ui/api_usage/widgets/api_key_card.dart';
-import 'package:zenscrap_flutter/src/ui/api_usage/widgets/credit_history_list.dart';
+import 'package:zenscrap_flutter/src/ui/api_usage/sections/api_keys_section.dart';
+import 'package:zenscrap_flutter/src/ui/api_usage/sections/history_section.dart';
 import 'package:zenscrap_flutter/src/ui/api_usage/widgets/credits_overview_card.dart';
 import 'package:zenscrap_flutter/src/ui/api_usage/widgets/create_api_key_dialog.dart';
 
@@ -314,7 +314,6 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
       },
     );
   }
-
 }
 
 class MobileLayout extends StatelessWidget {
@@ -330,6 +329,7 @@ class MobileLayout extends StatelessWidget {
   final Function(int) onDeactivateApiKey;
 
   const MobileLayout({
+    super.key,
     required this.selectedTabIndex,
     required this.onTabSelected,
     required this.apiUsage,
@@ -400,6 +400,7 @@ class DesktopLayout extends StatelessWidget {
   final Function(int) onDeactivateApiKey;
 
   const DesktopLayout({
+    super.key,
     required this.apiUsage,
     required this.apiKeys,
     required this.apiKeyUsageStats,
@@ -412,22 +413,21 @@ class DesktopLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1200),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'API Usage',
-                style: context.t.displayMedium,
-              ),
-              const SizedBox(height: 24),
-              OverviewSection(apiUsage: apiUsage),
-              const SizedBox(height: 32),
-              Row(
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 1200),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'API Usage',
+              style: context.t.displayMedium,
+            ),
+            const SizedBox(height: 24),
+            OverviewSection(apiUsage: apiUsage),
+            const SizedBox(height: 32),
+            Expanded(
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
@@ -450,8 +450,9 @@ class DesktopLayout extends StatelessWidget {
                   ),
                 ],
               ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 20),
+          ],
         ),
       ),
     );
@@ -461,7 +462,7 @@ class DesktopLayout extends StatelessWidget {
 class OverviewTab extends StatelessWidget {
   final AccountApiUsage apiUsage;
 
-  const OverviewTab({required this.apiUsage});
+  const OverviewTab({super.key, required this.apiUsage});
 
   @override
   Widget build(BuildContext context) {
@@ -489,6 +490,7 @@ class ApiKeysTab extends StatelessWidget {
   final Function(int) onDeactivateApiKey;
 
   const ApiKeysTab({
+    super.key,
     required this.apiKeys,
     required this.apiKeyUsageStats,
     required this.onShowCreateApiKeyDialog,
@@ -525,6 +527,7 @@ class HistoryTab extends StatelessWidget {
   final VoidCallback onLoadMoreHistory;
 
   const HistoryTab({
+    super.key,
     required this.creditHistory,
     required this.isLoadingMoreHistory,
     required this.onLoadMoreHistory,
@@ -556,7 +559,7 @@ class HistoryTab extends StatelessWidget {
 class OverviewSection extends StatelessWidget {
   final AccountApiUsage apiUsage;
 
-  const OverviewSection({required this.apiUsage});
+  const OverviewSection({super.key, required this.apiUsage});
 
   @override
   Widget build(BuildContext context) {
@@ -569,131 +572,6 @@ class OverviewSection extends StatelessWidget {
           accountId: apiUsage.nanoId,
         ),
       ],
-    );
-  }
-}
-
-class ApiKeysSection extends StatelessWidget {
-  final List<AccountApiKey> apiKeys;
-  final Map<int, int> apiKeyUsageStats;
-  final VoidCallback onShowCreateApiKeyDialog;
-  final Function(int) onDeactivateApiKey;
-
-  const ApiKeysSection({
-    required this.apiKeys,
-    required this.apiKeyUsageStats,
-    required this.onShowCreateApiKeyDialog,
-    required this.onDeactivateApiKey,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: context.c.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: context.c.outline.withAlpha(50)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'API Keys',
-                style: context.t.titleLarge,
-              ),
-              ElevatedButton.icon(
-                onPressed: onShowCreateApiKeyDialog,
-                icon: const Icon(Icons.add),
-                label: const Text('Create Key'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          if (apiKeys.isEmpty)
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.all(32),
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.key_off,
-                      size: 48,
-                      color: context.c.onSurface.withAlpha(100),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'No API keys yet',
-                      style: context.t.bodyLarge?.copyWith(
-                        color: context.c.onSurface.withAlpha(150),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            )
-          else
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: apiKeys.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 12),
-              itemBuilder: (context, index) {
-                final apiKey = apiKeys[index];
-                final usageCount = apiKeyUsageStats[apiKey.id] ?? 0;
-
-                return ApiKeyCard(
-                  apiKey: apiKey,
-                  usageCount: usageCount,
-                  canDelete: apiKeys.length > 1,
-                  onDelete: () => onDeactivateApiKey(apiKey.id!),
-                );
-              },
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-class HistorySection extends StatelessWidget {
-  final List<CreditHistoryItem> creditHistory;
-  final bool isLoadingMoreHistory;
-  final VoidCallback onLoadMoreHistory;
-
-  const HistorySection({
-    required this.creditHistory,
-    required this.isLoadingMoreHistory,
-    required this.onLoadMoreHistory,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: context.c.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: context.c.outline.withAlpha(50)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Credit History',
-            style: context.t.titleLarge,
-          ),
-          const SizedBox(height: 16),
-          CreditHistoryList(
-            creditHistory: creditHistory,
-            isLoadingMore: isLoadingMoreHistory,
-            onLoadMore: onLoadMoreHistory,
-          ),
-        ],
-      ),
     );
   }
 }

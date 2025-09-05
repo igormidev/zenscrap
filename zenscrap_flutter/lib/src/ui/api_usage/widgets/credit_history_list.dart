@@ -50,8 +50,7 @@ class CreditHistoryList extends StatelessWidget {
 
     return Column(
       children: [
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxHeight: 400),
+        Expanded(
           child: ListView.separated(
             shrinkWrap: true,
             itemCount: creditHistory.length,
@@ -125,7 +124,8 @@ class CreditHistoryList extends StatelessWidget {
     } else if (isPurchase) {
       icon = Icons.shopping_cart;
       title = 'Credit Purchase';
-      subtitle = item.creaditPackagePurchase!.stripePurchaseId ?? 'Manual purchase';
+      subtitle =
+          item.creaditPackagePurchase!.stripePurchaseId ?? 'Manual purchase';
       color = context.c.secondary;
       amount = '+${item.creaditPackagePurchase!.value.toInt()}';
     } else {
