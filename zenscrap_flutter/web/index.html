@@ -124,19 +124,12 @@
       renderer: "canvaskit",
       // Enable multi-threading for better performance
       canvasKitMaximumSurfaces: 3,
+      // Increase service worker timeout to prevent timeout errors
+      serviceWorkerSettings: {
+        serviceWorkerTimeout: 10000, // 10 seconds instead of default 4 seconds
+        serviceWorkerVersion: Date.now().toString(), // Force fresh service worker
+      },
     };
-    
-    // Preload CanvasKit for faster initial load
-    if ('requestIdleCallback' in window) {
-      requestIdleCallback(() => {
-        const link = document.createElement('link');
-        link.rel = 'preload';
-        link.as = 'fetch';
-        link.href = 'canvaskit/canvaskit.wasm';
-        link.crossOrigin = 'anonymous';
-        document.head.appendChild(link);
-      });
-    }
   </script>
   <script src="flutter_bootstrap.js" async=""></script>
 
