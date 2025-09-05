@@ -6,7 +6,8 @@ import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.d
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/ui/api_usage/sections/api_keys_section.dart';
 import 'package:zenscrap_flutter/src/ui/api_usage/sections/history_section.dart';
-import 'package:zenscrap_flutter/src/ui/api_usage/widgets/credits_overview_card.dart';
+import 'package:zenscrap_flutter/src/ui/api_usage/sections/overview_section.dart';
+import 'package:zenscrap_flutter/src/ui/api_usage/sections/purchase_section.dart';
 import 'package:zenscrap_flutter/src/ui/api_usage/widgets/create_api_key_dialog.dart';
 
 class ApiUsageView extends ConsumerStatefulWidget {
@@ -419,13 +420,38 @@ class DesktopLayout extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'API Usage',
-              style: context.t.displayMedium,
+            SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'API Usage',
+                    style: context.t.displayMedium,
+                  ),
+                ),
+                FilledButton.tonalIcon(
+                  onPressed: () {},
+                  label: Text('Refresh'),
+                  icon: Icon(Icons.refresh),
+                ),
+              ],
             ),
-            const SizedBox(height: 24),
-            OverviewSection(apiUsage: apiUsage),
-            const SizedBox(height: 32),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: CreditsOverviewSection(
+                    subscriptionCredits: apiUsage.subscriptionCredits,
+                    purchasedCredits: apiUsage.purchasedCredits,
+                  ),
+                ),
+                SizedBox(width: 24),
+                Expanded(
+                  child: PurchaseSection(),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
             Expanded(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -476,7 +502,10 @@ class OverviewTab extends StatelessWidget {
             style: context.t.headlineMedium,
           ),
           const SizedBox(height: 16),
-          OverviewSection(apiUsage: apiUsage),
+          CreditsOverviewSection(
+            subscriptionCredits: apiUsage.subscriptionCredits,
+            purchasedCredits: apiUsage.purchasedCredits,
+          ),
         ],
       ),
     );
@@ -552,26 +581,6 @@ class HistoryTab extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class OverviewSection extends StatelessWidget {
-  final AccountApiUsage apiUsage;
-
-  const OverviewSection({super.key, required this.apiUsage});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        CreditsOverviewCard(
-          subscriptionCredits: apiUsage.subscriptionCredits,
-          purchasedCredits: apiUsage.purchasedCredits,
-          accountId: apiUsage.nanoId,
-        ),
-      ],
     );
   }
 }
