@@ -35,7 +35,9 @@ class _CreateApiKeyDialogState extends State<CreateApiKeyDialog> {
       await Future.delayed(const Duration(milliseconds: 800));
       await widget.onCreateApiKey(_nameController.text.trim());
     } catch (e) {
-      setState(() => _isCreating = false);
+      if (mounted) {
+        setState(() => _isCreating = false);
+      }
       // Error handling is done in the parent widget
     }
   }

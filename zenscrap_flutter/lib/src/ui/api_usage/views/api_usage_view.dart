@@ -287,32 +287,87 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
         final isMobile = constraints.maxWidth < 768;
 
         if (isMobile) {
-          return _buildMobileLayout();
+          return MobileLayout(
+            selectedTabIndex: _selectedTabIndex,
+            onTabSelected: (index) => setState(() => _selectedTabIndex = index),
+            apiUsage: _apiUsage!,
+            apiKeys: _apiKeys,
+            apiKeyUsageStats: _apiKeyUsageStats,
+            creditHistory: _creditHistory,
+            isLoadingMoreHistory: _isLoadingMoreHistory,
+            onLoadMoreHistory: _loadMoreHistory,
+            onShowCreateApiKeyDialog: _showCreateApiKeyDialog,
+            onDeactivateApiKey: _deactivateApiKey,
+          );
         } else {
-          return _buildDesktopLayout();
+          return DesktopLayout(
+            apiUsage: _apiUsage!,
+            apiKeys: _apiKeys,
+            apiKeyUsageStats: _apiKeyUsageStats,
+            creditHistory: _creditHistory,
+            isLoadingMoreHistory: _isLoadingMoreHistory,
+            onLoadMoreHistory: _loadMoreHistory,
+            onShowCreateApiKeyDialog: _showCreateApiKeyDialog,
+            onDeactivateApiKey: _deactivateApiKey,
+          );
         }
       },
     );
   }
 
-  Widget _buildMobileLayout() {
+}
+
+class MobileLayout extends StatelessWidget {
+  final int selectedTabIndex;
+  final Function(int) onTabSelected;
+  final AccountApiUsage apiUsage;
+  final List<AccountApiKey> apiKeys;
+  final Map<int, int> apiKeyUsageStats;
+  final List<CreditHistoryItem> creditHistory;
+  final bool isLoadingMoreHistory;
+  final VoidCallback onLoadMoreHistory;
+  final VoidCallback onShowCreateApiKeyDialog;
+  final Function(int) onDeactivateApiKey;
+
+  const MobileLayout({
+    required this.selectedTabIndex,
+    required this.onTabSelected,
+    required this.apiUsage,
+    required this.apiKeys,
+    required this.apiKeyUsageStats,
+    required this.creditHistory,
+    required this.isLoadingMoreHistory,
+    required this.onLoadMoreHistory,
+    required this.onShowCreateApiKeyDialog,
+    required this.onDeactivateApiKey,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     final tabs = [
-      _buildOverviewTab(),
-      _buildApiKeysTab(),
-      _buildHistoryTab(),
+      OverviewTab(apiUsage: apiUsage),
+      ApiKeysTab(
+        apiKeys: apiKeys,
+        apiKeyUsageStats: apiKeyUsageStats,
+        onShowCreateApiKeyDialog: onShowCreateApiKeyDialog,
+        onDeactivateApiKey: onDeactivateApiKey,
+      ),
+      HistoryTab(
+        creditHistory: creditHistory,
+        isLoadingMoreHistory: isLoadingMoreHistory,
+        onLoadMoreHistory: onLoadMoreHistory,
+      ),
     ];
 
     return Scaffold(
       body: IndexedStack(
-        index: _selectedTabIndex,
+        index: selectedTabIndex,
         children: tabs,
       ),
       bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedTabIndex,
-        onDestinationSelected: (index) {
-          setState(() => _selectedTabIndex = index);
-        },
-        destinations: [
+        selectedIndex: selectedTabIndex,
+        onDestinationSelected: onTabSelected,
+        destinations: const [
           NavigationDestination(
             icon: Icon(Icons.dashboard_outlined),
             selectedIcon: Icon(Icons.dashboard),
@@ -332,8 +387,31 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
       ),
     );
   }
+}
 
-  Widget _buildDesktopLayout() {
+class DesktopLayout extends StatelessWidget {
+  final AccountApiUsage apiUsage;
+  final List<AccountApiKey> apiKeys;
+  final Map<int, int> apiKeyUsageStats;
+  final List<CreditHistoryItem> creditHistory;
+  final bool isLoadingMoreHistory;
+  final VoidCallback onLoadMoreHistory;
+  final VoidCallback onShowCreateApiKeyDialog;
+  final Function(int) onDeactivateApiKey;
+
+  const DesktopLayout({
+    required this.apiUsage,
+    required this.apiKeys,
+    required this.apiKeyUsageStats,
+    required this.creditHistory,
+    required this.isLoadingMoreHistory,
+    required this.onLoadMoreHistory,
+    required this.onShowCreateApiKeyDialog,
+    required this.onDeactivateApiKey,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Center(
@@ -347,26 +425,28 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
                 style: context.t.displayMedium,
               ),
               const SizedBox(height: 24),
-
-              // Overview section
-              _buildOverviewSection(),
-
+              OverviewSection(apiUsage: apiUsage),
               const SizedBox(height: 32),
-
-              // Two column layout for API Keys and History
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // API Keys section
                   Expanded(
                     flex: 5,
-                    child: _buildApiKeysSection(),
+                    child: ApiKeysSection(
+                      apiKeys: apiKeys,
+                      apiKeyUsageStats: apiKeyUsageStats,
+                      onShowCreateApiKeyDialog: onShowCreateApiKeyDialog,
+                      onDeactivateApiKey: onDeactivateApiKey,
+                    ),
                   ),
                   const SizedBox(width: 24),
-                  // History section
                   Expanded(
                     flex: 4,
-                    child: _buildHistorySection(),
+                    child: HistorySection(
+                      creditHistory: creditHistory,
+                      isLoadingMoreHistory: isLoadingMoreHistory,
+                      onLoadMoreHistory: onLoadMoreHistory,
+                    ),
                   ),
                 ],
               ),
@@ -376,8 +456,15 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
       ),
     );
   }
+}
 
-  Widget _buildOverviewTab() {
+class OverviewTab extends StatelessWidget {
+  final AccountApiUsage apiUsage;
+
+  const OverviewTab({required this.apiUsage});
+
+  @override
+  Widget build(BuildContext context) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -388,13 +475,28 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
             style: context.t.headlineMedium,
           ),
           const SizedBox(height: 16),
-          _buildOverviewSection(),
+          OverviewSection(apiUsage: apiUsage),
         ],
       ),
     );
   }
+}
 
-  Widget _buildApiKeysTab() {
+class ApiKeysTab extends StatelessWidget {
+  final List<AccountApiKey> apiKeys;
+  final Map<int, int> apiKeyUsageStats;
+  final VoidCallback onShowCreateApiKeyDialog;
+  final Function(int) onDeactivateApiKey;
+
+  const ApiKeysTab({
+    required this.apiKeys,
+    required this.apiKeyUsageStats,
+    required this.onShowCreateApiKeyDialog,
+    required this.onDeactivateApiKey,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -405,13 +507,31 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
             style: context.t.headlineMedium,
           ),
           const SizedBox(height: 16),
-          _buildApiKeysSection(),
+          ApiKeysSection(
+            apiKeys: apiKeys,
+            apiKeyUsageStats: apiKeyUsageStats,
+            onShowCreateApiKeyDialog: onShowCreateApiKeyDialog,
+            onDeactivateApiKey: onDeactivateApiKey,
+          ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildHistoryTab() {
+class HistoryTab extends StatelessWidget {
+  final List<CreditHistoryItem> creditHistory;
+  final bool isLoadingMoreHistory;
+  final VoidCallback onLoadMoreHistory;
+
+  const HistoryTab({
+    required this.creditHistory,
+    required this.isLoadingMoreHistory,
+    required this.onLoadMoreHistory,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -422,26 +542,52 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
             style: context.t.headlineMedium,
           ),
           const SizedBox(height: 16),
-          _buildHistorySection(),
+          HistorySection(
+            creditHistory: creditHistory,
+            isLoadingMoreHistory: isLoadingMoreHistory,
+            onLoadMoreHistory: onLoadMoreHistory,
+          ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildOverviewSection() {
+class OverviewSection extends StatelessWidget {
+  final AccountApiUsage apiUsage;
+
+  const OverviewSection({required this.apiUsage});
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         CreditsOverviewCard(
-          subscriptionCredits: _apiUsage!.subscriptionCredits,
-          purchasedCredits: _apiUsage!.purchasedCredits,
-          accountId: _apiUsage!.nanoId,
+          subscriptionCredits: apiUsage.subscriptionCredits,
+          purchasedCredits: apiUsage.purchasedCredits,
+          accountId: apiUsage.nanoId,
         ),
       ],
     );
   }
+}
 
-  Widget _buildApiKeysSection() {
+class ApiKeysSection extends StatelessWidget {
+  final List<AccountApiKey> apiKeys;
+  final Map<int, int> apiKeyUsageStats;
+  final VoidCallback onShowCreateApiKeyDialog;
+  final Function(int) onDeactivateApiKey;
+
+  const ApiKeysSection({
+    required this.apiKeys,
+    required this.apiKeyUsageStats,
+    required this.onShowCreateApiKeyDialog,
+    required this.onDeactivateApiKey,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -460,14 +606,14 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
                 style: context.t.titleLarge,
               ),
               ElevatedButton.icon(
-                onPressed: _showCreateApiKeyDialog,
-                icon: Icon(Icons.add),
-                label: Text('Create Key'),
+                onPressed: onShowCreateApiKeyDialog,
+                icon: const Icon(Icons.add),
+                label: const Text('Create Key'),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          if (_apiKeys.isEmpty)
+          if (apiKeys.isEmpty)
             Center(
               child: Padding(
                 padding: const EdgeInsets.all(32),
@@ -492,18 +638,18 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
           else
             ListView.separated(
               shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: _apiKeys.length,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: apiKeys.length,
               separatorBuilder: (context, index) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
-                final apiKey = _apiKeys[index];
-                final usageCount = _apiKeyUsageStats[apiKey.id] ?? 0;
+                final apiKey = apiKeys[index];
+                final usageCount = apiKeyUsageStats[apiKey.id] ?? 0;
 
                 return ApiKeyCard(
                   apiKey: apiKey,
                   usageCount: usageCount,
-                  canDelete: _apiKeys.length > 1,
-                  onDelete: () => _deactivateApiKey(apiKey.id!),
+                  canDelete: apiKeys.length > 1,
+                  onDelete: () => onDeactivateApiKey(apiKey.id!),
                 );
               },
             ),
@@ -511,8 +657,21 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
       ),
     );
   }
+}
 
-  Widget _buildHistorySection() {
+class HistorySection extends StatelessWidget {
+  final List<CreditHistoryItem> creditHistory;
+  final bool isLoadingMoreHistory;
+  final VoidCallback onLoadMoreHistory;
+
+  const HistorySection({
+    required this.creditHistory,
+    required this.isLoadingMoreHistory,
+    required this.onLoadMoreHistory,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -529,9 +688,9 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
           ),
           const SizedBox(height: 16),
           CreditHistoryList(
-            creditHistory: _creditHistory,
-            isLoadingMore: _isLoadingMoreHistory,
-            onLoadMore: _loadMoreHistory,
+            creditHistory: creditHistory,
+            isLoadingMore: isLoadingMoreHistory,
+            onLoadMore: onLoadMoreHistory,
           ),
         ],
       ),
