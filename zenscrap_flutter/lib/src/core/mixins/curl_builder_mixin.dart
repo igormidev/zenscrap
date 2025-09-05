@@ -15,7 +15,7 @@ mixin CurlBuilderMixin {
 
     // Determine the endpoint based on prod/test mode (Route format)
     final String endpoint =
-        isProd ? '/api/scrappable/prod' : '/api/scrappable/test';
+        isProd ? 'api/scrappable/prod' : 'api/scrappable/test';
     final String url = '$baseUrl$endpoint';
 
     // Parse the example payload from the test data

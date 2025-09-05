@@ -8,6 +8,7 @@ import 'package:zenscrap_server/src/future_calls/monthly_subscription_credits_fu
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as auth;
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_gemini_api_impl.dart';
 import 'package:zenscrap_server/src/endpoints/public/scrappable_chat_session.dart';
+import 'package:zenscrap_server/src/routes/scrappable_api_route.dart';
 import 'package:zenscrap_server/src/web/routes/route_single_page_app.dart';
 import 'package:zenscrap_server/src/webhooks/stripe_webhook.dart';
 import 'src/generated/protocol.dart';
@@ -28,6 +29,10 @@ void run(List<String> args) async {
 
   // Register API routes FIRST (before catch-all routes)
   pod.webServer.addRoute(StripeWebhookRoute(), '/stripe/webhook');
+  
+  // Register Scrappable API routes
+  pod.webServer.addRoute(ScrappableApiRoute(isProd: false), '/api/scrappable/test');
+  pod.webServer.addRoute(ScrappableApiRoute(isProd: true), '/api/scrappable/prod');
 
   // Serve all files in the /static directory
   pod.webServer.addRoute(
