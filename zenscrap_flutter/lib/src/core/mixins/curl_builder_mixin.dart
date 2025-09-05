@@ -14,7 +14,8 @@ mixin CurlBuilderMixin {
     if (testData == null) return 'No test data available';
 
     // Determine the endpoint based on prod/test mode
-    final String endpoint = isProd ? 'api/scrappable/prod' : 'api/scrappable/test';
+    final String endpoint =
+        isProd ? 'scrappableApi/prod' : 'scrappableApi/test';
     final String url = '$baseUrl$endpoint';
 
     // Parse the example payload from the test data
@@ -25,7 +26,7 @@ mixin CurlBuilderMixin {
       'scrappableId': scrappableId,
       'payload': examplePayload ?? {},
     };
-    
+
     // Add API key for prod mode
     if (isProd && apiKey != null) {
       payload['apiKey'] = apiKey;
