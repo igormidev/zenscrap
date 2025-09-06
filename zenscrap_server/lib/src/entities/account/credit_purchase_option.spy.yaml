@@ -1,0 +1,5 @@
+enum: CreditPurchaseOption
+values:
+  - small # 59 per 100K
+  - medium # 199 per 1M 
+  - large # 399 per 2.5M
