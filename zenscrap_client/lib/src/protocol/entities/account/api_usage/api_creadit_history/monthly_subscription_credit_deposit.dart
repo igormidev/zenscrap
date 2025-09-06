@@ -10,24 +10,28 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
+import '../../../../entities/account/plan_tier.dart' as _i2;
 
 abstract class MonthlySubscriptionCreditDeposit
     implements _i1.SerializableModel {
   MonthlySubscriptionCreditDeposit._({
     this.id,
-    required this.value,
+    required this.creditsAmount,
+    required this.planTier,
   });
 
   factory MonthlySubscriptionCreditDeposit({
     int? id,
-    required double value,
+    required int creditsAmount,
+    required _i2.PlanTier planTier,
   }) = _MonthlySubscriptionCreditDepositImpl;
 
   factory MonthlySubscriptionCreditDeposit.fromJson(
       Map<String, dynamic> jsonSerialization) {
     return MonthlySubscriptionCreditDeposit(
       id: jsonSerialization['id'] as int?,
-      value: (jsonSerialization['value'] as num).toDouble(),
+      creditsAmount: jsonSerialization['creditsAmount'] as int,
+      planTier: _i2.PlanTier.fromJson((jsonSerialization['planTier'] as int)),
     );
   }
 
@@ -36,20 +40,24 @@ abstract class MonthlySubscriptionCreditDeposit
   /// the id will be null.
   int? id;
 
-  double value;
+  int creditsAmount;
+
+  _i2.PlanTier planTier;
 
   /// Returns a shallow copy of this [MonthlySubscriptionCreditDeposit]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   MonthlySubscriptionCreditDeposit copyWith({
     int? id,
-    double? value,
+    int? creditsAmount,
+    _i2.PlanTier? planTier,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
       if (id != null) 'id': id,
-      'value': value,
+      'creditsAmount': creditsAmount,
+      'planTier': planTier.toJson(),
     };
   }
 
@@ -65,10 +73,12 @@ class _MonthlySubscriptionCreditDepositImpl
     extends MonthlySubscriptionCreditDeposit {
   _MonthlySubscriptionCreditDepositImpl({
     int? id,
-    required double value,
+    required int creditsAmount,
+    required _i2.PlanTier planTier,
   }) : super._(
           id: id,
-          value: value,
+          creditsAmount: creditsAmount,
+          planTier: planTier,
         );
 
   /// Returns a shallow copy of this [MonthlySubscriptionCreditDeposit]
@@ -77,11 +87,13 @@ class _MonthlySubscriptionCreditDepositImpl
   @override
   MonthlySubscriptionCreditDeposit copyWith({
     Object? id = _Undefined,
-    double? value,
+    int? creditsAmount,
+    _i2.PlanTier? planTier,
   }) {
     return MonthlySubscriptionCreditDeposit(
       id: id is int? ? id : this.id,
-      value: value ?? this.value,
+      creditsAmount: creditsAmount ?? this.creditsAmount,
+      planTier: planTier ?? this.planTier,
     );
   }
 }

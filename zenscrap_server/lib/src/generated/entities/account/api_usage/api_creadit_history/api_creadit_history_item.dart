@@ -22,6 +22,7 @@ abstract class CreditHistoryItem
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   CreditHistoryItem._({
     this.id,
+    required this.date,
     this.monthlySubscriptionCreditDepositId,
     this.monthlySubscriptionCreditDeposit,
     this.creaditPackagePurchaseId,
@@ -32,6 +33,7 @@ abstract class CreditHistoryItem
 
   factory CreditHistoryItem({
     int? id,
+    required DateTime date,
     int? monthlySubscriptionCreditDepositId,
     _i2.MonthlySubscriptionCreditDeposit? monthlySubscriptionCreditDeposit,
     int? creaditPackagePurchaseId,
@@ -43,6 +45,7 @@ abstract class CreditHistoryItem
   factory CreditHistoryItem.fromJson(Map<String, dynamic> jsonSerialization) {
     return CreditHistoryItem(
       id: jsonSerialization['id'] as int?,
+      date: _i1.DateTimeJsonExtension.fromJson(jsonSerialization['date']),
       monthlySubscriptionCreditDepositId:
           jsonSerialization['monthlySubscriptionCreditDepositId'] as int?,
       monthlySubscriptionCreditDeposit:
@@ -74,6 +77,8 @@ abstract class CreditHistoryItem
   @override
   int? id;
 
+  DateTime date;
+
   int? monthlySubscriptionCreditDepositId;
 
   _i2.MonthlySubscriptionCreditDeposit? monthlySubscriptionCreditDeposit;
@@ -94,6 +99,7 @@ abstract class CreditHistoryItem
   @_i1.useResult
   CreditHistoryItem copyWith({
     int? id,
+    DateTime? date,
     int? monthlySubscriptionCreditDepositId,
     _i2.MonthlySubscriptionCreditDeposit? monthlySubscriptionCreditDeposit,
     int? creaditPackagePurchaseId,
@@ -105,6 +111,7 @@ abstract class CreditHistoryItem
   Map<String, dynamic> toJson() {
     return {
       if (id != null) 'id': id,
+      'date': date.toJson(),
       if (monthlySubscriptionCreditDepositId != null)
         'monthlySubscriptionCreditDepositId':
             monthlySubscriptionCreditDepositId,
@@ -124,6 +131,7 @@ abstract class CreditHistoryItem
   Map<String, dynamic> toJsonForProtocol() {
     return {
       if (id != null) 'id': id,
+      'date': date.toJson(),
       if (monthlySubscriptionCreditDepositId != null)
         'monthlySubscriptionCreditDepositId':
             monthlySubscriptionCreditDepositId,
@@ -184,6 +192,7 @@ class _Undefined {}
 class _CreditHistoryItemImpl extends CreditHistoryItem {
   _CreditHistoryItemImpl({
     int? id,
+    required DateTime date,
     int? monthlySubscriptionCreditDepositId,
     _i2.MonthlySubscriptionCreditDeposit? monthlySubscriptionCreditDeposit,
     int? creaditPackagePurchaseId,
@@ -192,6 +201,7 @@ class _CreditHistoryItemImpl extends CreditHistoryItem {
     _i4.AccountApiUsage? accountApiUsage,
   }) : super._(
           id: id,
+          date: date,
           monthlySubscriptionCreditDepositId:
               monthlySubscriptionCreditDepositId,
           monthlySubscriptionCreditDeposit: monthlySubscriptionCreditDeposit,
@@ -207,6 +217,7 @@ class _CreditHistoryItemImpl extends CreditHistoryItem {
   @override
   CreditHistoryItem copyWith({
     Object? id = _Undefined,
+    DateTime? date,
     Object? monthlySubscriptionCreditDepositId = _Undefined,
     Object? monthlySubscriptionCreditDeposit = _Undefined,
     Object? creaditPackagePurchaseId = _Undefined,
@@ -216,6 +227,7 @@ class _CreditHistoryItemImpl extends CreditHistoryItem {
   }) {
     return CreditHistoryItem(
       id: id is int? ? id : this.id,
+      date: date ?? this.date,
       monthlySubscriptionCreditDepositId:
           monthlySubscriptionCreditDepositId is int?
               ? monthlySubscriptionCreditDepositId
@@ -242,6 +254,10 @@ class _CreditHistoryItemImpl extends CreditHistoryItem {
 class CreditHistoryItemTable extends _i1.Table<int?> {
   CreditHistoryItemTable({super.tableRelation})
       : super(tableName: 'credit_history_item') {
+    date = _i1.ColumnDateTime(
+      'date',
+      this,
+    );
     monthlySubscriptionCreditDepositId = _i1.ColumnInt(
       'monthlySubscriptionCreditDepositId',
       this,
@@ -255,6 +271,8 @@ class CreditHistoryItemTable extends _i1.Table<int?> {
       this,
     );
   }
+
+  late final _i1.ColumnDateTime date;
 
   late final _i1.ColumnInt monthlySubscriptionCreditDepositId;
 
@@ -313,6 +331,7 @@ class CreditHistoryItemTable extends _i1.Table<int?> {
   @override
   List<_i1.Column> get columns => [
         id,
+        date,
         monthlySubscriptionCreditDepositId,
         creaditPackagePurchaseId,
         accountApiUsageId,

@@ -1,0 +1,192 @@
+{
+  "actions": [
+    {
+      "type": "deleteTable",
+      "deleteTable": "credit_history_item"
+    },
+    {
+      "type": "createTable",
+      "createTable": {
+        "name": "credit_history_item",
+        "dartName": "CreditHistoryItem",
+        "module": "zenscrap",
+        "schema": "public",
+        "columns": [
+          {
+            "name": "id",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "nextval('credit_history_item_id_seq'::regclass)",
+            "dartType": "int?"
+          },
+          {
+            "name": "date",
+            "columnType": 4,
+            "isNullable": false,
+            "dartType": "DateTime"
+          },
+          {
+            "name": "monthlySubscriptionCreditDepositId",
+            "columnType": 6,
+            "isNullable": true,
+            "dartType": "int?"
+          },
+          {
+            "name": "creaditPackagePurchaseId",
+            "columnType": 6,
+            "isNullable": true,
+            "dartType": "int?"
+          },
+          {
+            "name": "accountApiUsageId",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "int"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "constraintName": "credit_history_item_fk_0",
+            "columns": [
+              "monthlySubscriptionCreditDepositId"
+            ],
+            "referenceTable": "monthly_subscription_credit_deposit",
+            "referenceTableSchema": "public",
+            "referenceColumns": [
+              "id"
+            ],
+            "onUpdate": 3,
+            "onDelete": 3
+          },
+          {
+            "constraintName": "credit_history_item_fk_1",
+            "columns": [
+              "creaditPackagePurchaseId"
+            ],
+            "referenceTable": "credit_package_purchase",
+            "referenceTableSchema": "public",
+            "referenceColumns": [
+              "id"
+            ],
+            "onUpdate": 3,
+            "onDelete": 3
+          },
+          {
+            "constraintName": "credit_history_item_fk_2",
+            "columns": [
+              "accountApiUsageId"
+            ],
+            "referenceTable": "account_api_usage",
+            "referenceTableSchema": "public",
+            "referenceColumns": [
+              "id"
+            ],
+            "onUpdate": 3,
+            "onDelete": 3
+          }
+        ],
+        "indexes": [
+          {
+            "indexName": "credit_history_item_pkey",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "id"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": true
+          }
+        ],
+        "managed": true
+      }
+    },
+    {
+      "type": "deleteTable",
+      "deleteTable": "monthly_subscription_credit_deposit"
+    },
+    {
+      "type": "createTable",
+      "createTable": {
+        "name": "monthly_subscription_credit_deposit",
+        "dartName": "MonthlySubscriptionCreditDeposit",
+        "module": "zenscrap",
+        "schema": "public",
+        "columns": [
+          {
+            "name": "id",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "nextval('monthly_subscription_credit_deposit_id_seq'::regclass)",
+            "dartType": "int?"
+          },
+          {
+            "name": "creditsAmount",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "int"
+          },
+          {
+            "name": "currency",
+            "columnType": 0,
+            "isNullable": true,
+            "dartType": "String?"
+          },
+          {
+            "name": "planTier",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "protocol:PlanTier"
+          }
+        ],
+        "foreignKeys": [],
+        "indexes": [
+          {
+            "indexName": "monthly_subscription_credit_deposit_pkey",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "id"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": true
+          }
+        ],
+        "managed": true
+      }
+    }
+  ],
+  "warnings": [
+    {
+      "type": "tableDropped",
+      "message": "One or more columns are added to table \"credit_history_item\" which cannot be added in a table migration. The complete table will be deleted and recreated.",
+      "table": "credit_history_item",
+      "columns": [
+        "date"
+      ],
+      "destrucive": true
+    },
+    {
+      "type": "columnDropped",
+      "message": "Column \"value\" of table \"monthly_subscription_credit_deposit\" will be dropped.",
+      "table": "monthly_subscription_credit_deposit",
+      "columns": [
+        "value"
+      ],
+      "destrucive": true
+    },
+    {
+      "type": "tableDropped",
+      "message": "One or more columns are added to table \"monthly_subscription_credit_deposit\" which cannot be added in a table migration. The complete table will be deleted and recreated.",
+      "table": "monthly_subscription_credit_deposit",
+      "columns": [
+        "creditsAmount"
+      ],
+      "destrucive": true
+    }
+  ],
+  "migrationApiVersion": 1
+}

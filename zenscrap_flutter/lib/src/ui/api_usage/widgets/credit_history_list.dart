@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 
@@ -108,6 +109,10 @@ class CreditHistoryList extends StatelessWidget {
   Widget _buildHistoryItem(BuildContext context, CreditHistoryItem item) {
     final isSubscription = item.monthlySubscriptionCreditDeposit != null;
     final isPurchase = item.creaditPackagePurchase != null;
+    
+    // Format date
+    final dateFormatter = DateFormat('MMM d, y h:mm a');
+    final dateStr = dateFormatter.format(item.date);
 
     IconData icon;
     String title;
@@ -117,21 +122,21 @@ class CreditHistoryList extends StatelessWidget {
 
     if (isSubscription) {
       icon = Icons.calendar_month;
+      final deposit = item.monthlySubscriptionCreditDeposit!;
       title = 'Monthly Subscription';
-      subtitle = 'Subscription credits added';
+      subtitle = '${deposit.planTier.name.toUpperCase()} plan • $dateStr';
       color = context.c.primary;
-      amount = '+${item.monthlySubscriptionCreditDeposit!.value.toInt()}';
+      amount = '+${deposit.creditsAmount}';
     } else if (isPurchase) {
       icon = Icons.shopping_cart;
       title = 'Credit Purchase';
-      subtitle =
-          item.creaditPackagePurchase!.stripePurchaseId ?? 'Manual purchase';
+      subtitle = dateStr;
       color = context.c.secondary;
       amount = '+${item.creaditPackagePurchase!.value.toInt()}';
     } else {
       icon = Icons.help_outline;
       title = 'Unknown Transaction';
-      subtitle = 'Transaction details unavailable';
+      subtitle = dateStr;
       color = context.c.onSurface.withAlpha(150);
       amount = null;
     }

@@ -50,6 +50,25 @@ class MonthlySubscriptionCreditsFutureCall extends FutureCall {
         apiUsage.subscriptionCredits += creditsToAdd;
         await AccountApiUsage.db.updateRow(session, apiUsage);
 
+        // Create monthly subscription credit deposit record
+        final monthlyDeposit = MonthlySubscriptionCreditDeposit(
+          creditsAmount: creditsToAdd,
+          planTier: accountInfo.planTier,
+        );
+        await MonthlySubscriptionCreditDeposit.db.insertRow(
+          session,
+          monthlyDeposit,
+        );
+
+        // Create credit history item
+        final creditHistoryItem = CreditHistoryItem(
+          date: DateTime.now(),
+          monthlySubscriptionCreditDeposit: monthlyDeposit,
+          creaditPackagePurchase: null,
+          accountApiUsageId: apiUsage.id!,
+        );
+        await CreditHistoryItem.db.insertRow(session, creditHistoryItem);
+
         // Update the cached values in ApiHelperMixin
         ApiHelperMixin.resetNanoId(apiUsage.nanoId);
 

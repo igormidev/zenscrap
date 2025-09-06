@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/core/mixins/api_helper_mixin.dart';
-import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_api.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_config.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
@@ -145,16 +144,14 @@ class StripeWebhookRoute extends Route {
         ApiHelperMixin.resetNanoId(apiUsage.nanoId);
       }
 
-      // Add initial credits and schedule monthly credit addition
-      await _addSubscriptionCredits(session, accountInfo, accountInfo.planTier);
-
-      // Schedule monthly credit addition (first one in 30 days)
+      // Schedule immediate credit addition using future call for consistency
+      // This ensures all credit additions go through the same logic and create history entries
       await session.serverpod.futureCallWithDelay(
         'monthly_subscription_credits',
         MonthlyCreditsData(
           accountInfoId: accountInfo.id!,
         ),
-        const Duration(days: 30),
+        Duration.zero, // Execute immediately to give user credits right away
       );
 
       session.log(
@@ -230,18 +227,17 @@ class StripeWebhookRoute extends Route {
 
       // Add API credits for the new subscription
       if (status == 'active' || status == 'trialing') {
-        await _addSubscriptionCredits(session, accountInfo, newPlanTier);
-
-        // Schedule monthly credit addition (first one in 30 days)
+        // Schedule immediate credit addition using future call for consistency
+        // This ensures all credit additions go through the same logic and create history entries
         await session.serverpod.futureCallWithDelay(
           'monthly_subscription_credits',
           MonthlyCreditsData(
             accountInfoId: accountInfo.id!,
           ),
-          const Duration(days: 30),
+          Duration.zero, // Execute immediately to give user credits right away
         );
 
-        session.log('Scheduled monthly credits for account ${accountInfo.id}');
+        session.log('Scheduled immediate and monthly credits for account ${accountInfo.id}');
       }
 
       session.log('Subscription created for account $accountInfoId');
@@ -446,35 +442,5 @@ class StripeWebhookRoute extends Route {
     }
 
     return PlanTier.none;
-  }
-
-  Future<void> _addSubscriptionCredits(
-    Session session,
-    AccountInfo accountInfo,
-    PlanTier planTier,
-  ) async {
-    // Get the amount of credits to add based on plan tier
-    final creditsToAdd = planTier.apiCreditsToBeAddedPerMonth;
-
-    if (creditsToAdd <= 0) {
-      return;
-    }
-
-    // Update account API usage with new credits
-    final apiUsage = await AccountApiUsage.db.findById(
-      session,
-      accountInfo.accountApiUsageId,
-    );
-
-    if (apiUsage != null) {
-      apiUsage.subscriptionCredits += creditsToAdd;
-      await AccountApiUsage.db.updateRow(session, apiUsage);
-
-      // Reset cache after adding credits
-      ApiHelperMixin.resetNanoId(apiUsage.nanoId);
-
-      session.log(
-          'Added $creditsToAdd subscription credits to account ${accountInfo.id}');
-    }
   }
 }

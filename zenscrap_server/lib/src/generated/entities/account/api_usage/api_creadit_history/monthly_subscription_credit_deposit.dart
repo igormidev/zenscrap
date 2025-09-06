@@ -10,24 +10,28 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
+import '../../../../entities/account/plan_tier.dart' as _i2;
 
 abstract class MonthlySubscriptionCreditDeposit
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   MonthlySubscriptionCreditDeposit._({
     this.id,
-    required this.value,
+    required this.creditsAmount,
+    required this.planTier,
   });
 
   factory MonthlySubscriptionCreditDeposit({
     int? id,
-    required double value,
+    required int creditsAmount,
+    required _i2.PlanTier planTier,
   }) = _MonthlySubscriptionCreditDepositImpl;
 
   factory MonthlySubscriptionCreditDeposit.fromJson(
       Map<String, dynamic> jsonSerialization) {
     return MonthlySubscriptionCreditDeposit(
       id: jsonSerialization['id'] as int?,
-      value: (jsonSerialization['value'] as num).toDouble(),
+      creditsAmount: jsonSerialization['creditsAmount'] as int,
+      planTier: _i2.PlanTier.fromJson((jsonSerialization['planTier'] as int)),
     );
   }
 
@@ -38,7 +42,9 @@ abstract class MonthlySubscriptionCreditDeposit
   @override
   int? id;
 
-  double value;
+  int creditsAmount;
+
+  _i2.PlanTier planTier;
 
   @override
   _i1.Table<int?> get table => t;
@@ -48,13 +54,15 @@ abstract class MonthlySubscriptionCreditDeposit
   @_i1.useResult
   MonthlySubscriptionCreditDeposit copyWith({
     int? id,
-    double? value,
+    int? creditsAmount,
+    _i2.PlanTier? planTier,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
       if (id != null) 'id': id,
-      'value': value,
+      'creditsAmount': creditsAmount,
+      'planTier': planTier.toJson(),
     };
   }
 
@@ -62,7 +70,8 @@ abstract class MonthlySubscriptionCreditDeposit
   Map<String, dynamic> toJsonForProtocol() {
     return {
       if (id != null) 'id': id,
-      'value': value,
+      'creditsAmount': creditsAmount,
+      'planTier': planTier.toJson(),
     };
   }
 
@@ -102,10 +111,12 @@ class _MonthlySubscriptionCreditDepositImpl
     extends MonthlySubscriptionCreditDeposit {
   _MonthlySubscriptionCreditDepositImpl({
     int? id,
-    required double value,
+    required int creditsAmount,
+    required _i2.PlanTier planTier,
   }) : super._(
           id: id,
-          value: value,
+          creditsAmount: creditsAmount,
+          planTier: planTier,
         );
 
   /// Returns a shallow copy of this [MonthlySubscriptionCreditDeposit]
@@ -114,11 +125,13 @@ class _MonthlySubscriptionCreditDepositImpl
   @override
   MonthlySubscriptionCreditDeposit copyWith({
     Object? id = _Undefined,
-    double? value,
+    int? creditsAmount,
+    _i2.PlanTier? planTier,
   }) {
     return MonthlySubscriptionCreditDeposit(
       id: id is int? ? id : this.id,
-      value: value ?? this.value,
+      creditsAmount: creditsAmount ?? this.creditsAmount,
+      planTier: planTier ?? this.planTier,
     );
   }
 }
@@ -126,18 +139,26 @@ class _MonthlySubscriptionCreditDepositImpl
 class MonthlySubscriptionCreditDepositTable extends _i1.Table<int?> {
   MonthlySubscriptionCreditDepositTable({super.tableRelation})
       : super(tableName: 'monthly_subscription_credit_deposit') {
-    value = _i1.ColumnDouble(
-      'value',
+    creditsAmount = _i1.ColumnInt(
+      'creditsAmount',
       this,
+    );
+    planTier = _i1.ColumnEnum(
+      'planTier',
+      this,
+      _i1.EnumSerialization.byIndex,
     );
   }
 
-  late final _i1.ColumnDouble value;
+  late final _i1.ColumnInt creditsAmount;
+
+  late final _i1.ColumnEnum<_i2.PlanTier> planTier;
 
   @override
   List<_i1.Column> get columns => [
         id,
-        value,
+        creditsAmount,
+        planTier,
       ];
 }
 
