@@ -178,6 +178,7 @@ class PrivateApiUsageEndpoint extends Endpoint {
       where: (p0) => p0.userInfoId.equals(userId),
       include: AccountInfo.include(
         accountApiUsage: AccountApiUsage.include(
+          creditUsage: CreditUsage.include(),
           apiKeys: AccountApiKey.includeList(
             where: (k) => k.isActive.equals(true),
             orderBy: (k) => k.createdAt,
@@ -260,6 +261,7 @@ class PrivateApiUsageEndpoint extends Endpoint {
       where: (p0) => p0.userInfoId.equals(userId),
       include: AccountInfo.include(
         accountApiUsage: AccountApiUsage.include(
+          creditUsage: CreditUsage.include(),
           apiKeys: AccountApiKey.includeList(
             where: (k) => k.isActive.equals(true),
             orderBy: (k) => k.createdAt,
@@ -294,6 +296,7 @@ class PrivateApiUsageEndpoint extends Endpoint {
       where: (p0) => p0.userInfoId.equals(userId),
       include: AccountInfo.include(
         accountApiUsage: AccountApiUsage.include(
+          creditUsage: CreditUsage.include(),
           apiKeys: AccountApiKey.includeList(
             where: (k) => k.isActive.equals(true),
             orderBy: (k) => k.createdAt,

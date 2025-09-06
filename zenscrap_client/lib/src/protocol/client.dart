@@ -15,7 +15,7 @@ import 'package:zenscrap_client/src/protocol/entities/account/account.dart'
     as _i3;
 import 'package:zenscrap_client/src/protocol/entities/scrappable/scrappable.dart'
     as _i4;
-import 'package:zenscrap_client/src/protocol/entities/account/api_usage/api_creadit_history/api_creadit_history_item.dart'
+import 'package:zenscrap_client/src/protocol/entities/account/api_usage/api_credit_history/api_creadit_history_item.dart'
     as _i5;
 import 'package:zenscrap_client/src/protocol/entities/account/account_api_key.dart'
     as _i6;

@@ -469,8 +469,9 @@ class DesktopLayout extends StatelessWidget {
                 Expanded(
                   child: CreditsOverviewSection(
                     planTier: planTier,
-                    subscriptionCredits: apiUsage.subscriptionCredits,
-                    purchasedCredits: apiUsage.purchasedCredits,
+                    subscriptionCredits:
+                        apiUsage.creditUsage!.subscriptionCredits,
+                    purchasedCredits: apiUsage.creditUsage!.purchasedCredits,
                   ),
                 ),
                 SizedBox(width: 24),
@@ -534,8 +535,8 @@ class OverviewTab extends StatelessWidget {
           const SizedBox(height: 16),
           CreditsOverviewSection(
             planTier: planTier,
-            subscriptionCredits: apiUsage.subscriptionCredits,
-            purchasedCredits: apiUsage.purchasedCredits,
+            subscriptionCredits: apiUsage.creditUsage!.subscriptionCredits,
+            purchasedCredits: apiUsage.creditUsage!.purchasedCredits,
           ),
         ],
       ),

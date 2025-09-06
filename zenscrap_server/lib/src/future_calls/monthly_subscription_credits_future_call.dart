@@ -49,22 +49,25 @@ class MonthlySubscriptionCreditsFutureCall extends FutureCall {
       if (creditsToAdd > 0) {
         // Use transaction for all database operations
         await session.db.transaction((transaction) async {
-          // Reload API usage within transaction to ensure consistency
+          // Reload API usage with credit usage within transaction to ensure consistency
           final currentApiUsage = await AccountApiUsage.db.findById(
             session,
             apiUsage.id!,
             transaction: transaction,
+            include: AccountApiUsage.include(
+              creditUsage: CreditUsage.include(),
+            ),
           );
           
-          if (currentApiUsage == null) {
-            throw Exception('API usage not found during transaction');
+          if (currentApiUsage == null || currentApiUsage.creditUsage == null) {
+            throw Exception('API usage or credit usage not found during transaction');
           }
 
           // Add credits
-          currentApiUsage.subscriptionCredits += creditsToAdd;
-          await AccountApiUsage.db.updateRow(
+          currentApiUsage.creditUsage!.subscriptionCredits += creditsToAdd;
+          await CreditUsage.db.updateRow(
             session,
-            currentApiUsage,
+            currentApiUsage.creditUsage!,
             transaction: transaction,
           );
 

@@ -1,0 +1,237 @@
+{
+  "actions": [
+    {
+      "type": "deleteTable",
+      "deleteTable": "account_api_usage"
+    },
+    {
+      "type": "createTable",
+      "createTable": {
+        "name": "account_api_usage",
+        "dartName": "AccountApiUsage",
+        "module": "zenscrap",
+        "schema": "public",
+        "columns": [
+          {
+            "name": "id",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "nextval('account_api_usage_id_seq'::regclass)",
+            "dartType": "int?"
+          },
+          {
+            "name": "nanoId",
+            "columnType": 0,
+            "isNullable": false,
+            "dartType": "String"
+          },
+          {
+            "name": "creditUsageId",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "int"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "constraintName": "account_api_usage_fk_0",
+            "columns": [
+              "creditUsageId"
+            ],
+            "referenceTable": "credit_usage",
+            "referenceTableSchema": "public",
+            "referenceColumns": [
+              "id"
+            ],
+            "onUpdate": 3,
+            "onDelete": 3
+          }
+        ],
+        "indexes": [
+          {
+            "indexName": "account_api_usage_pkey",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "id"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": true
+          },
+          {
+            "indexName": "credit_usage_id_unique_idx",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "creditUsageId"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": false
+          }
+        ],
+        "managed": true
+      }
+    },
+    {
+      "type": "createTable",
+      "createTable": {
+        "name": "credit_usage",
+        "dartName": "CreditUsage",
+        "module": "zenscrap",
+        "schema": "public",
+        "columns": [
+          {
+            "name": "id",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "nextval('credit_usage_id_seq'::regclass)",
+            "dartType": "int?"
+          },
+          {
+            "name": "subscriptionCredits",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "int"
+          },
+          {
+            "name": "purchasedCredits",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "int"
+          }
+        ],
+        "foreignKeys": [],
+        "indexes": [
+          {
+            "indexName": "credit_usage_pkey",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "id"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": true
+          }
+        ],
+        "managed": true
+      }
+    },
+    {
+      "type": "alterTable",
+      "alterTable": {
+        "name": "monthly_subscription_credit_deposit",
+        "schema": "public",
+        "addColumns": [],
+        "deleteColumns": [
+          "currency"
+        ],
+        "modifyColumns": [],
+        "addIndexes": [],
+        "deleteIndexes": [],
+        "addForeignKeys": [],
+        "deleteForeignKeys": [],
+        "warnings": [
+          {
+            "type": "columnDropped",
+            "message": "Column \"subscriptionCredits\" of table \"account_api_usage\" will be dropped.",
+            "table": "account_api_usage",
+            "columns": [
+              "subscriptionCredits"
+            ],
+            "destrucive": true
+          },
+          {
+            "type": "columnDropped",
+            "message": "Column \"purchasedCredits\" of table \"account_api_usage\" will be dropped.",
+            "table": "account_api_usage",
+            "columns": [
+              "purchasedCredits"
+            ],
+            "destrucive": true
+          },
+          {
+            "type": "uniqueIndexCreated",
+            "message": "Unique index \"credit_usage_id_unique_idx\" is added to table \"account_api_usage\". If there are existing rows with duplicate values, this migration will fail.",
+            "table": "account_api_usage",
+            "columns": [
+              "creditUsageId"
+            ],
+            "destrucive": false
+          },
+          {
+            "type": "tableDropped",
+            "message": "One or more columns are added to table \"account_api_usage\" which cannot be added in a table migration. The complete table will be deleted and recreated.",
+            "table": "account_api_usage",
+            "columns": [
+              "creditUsageId"
+            ],
+            "destrucive": true
+          },
+          {
+            "type": "columnDropped",
+            "message": "Column \"currency\" of table \"monthly_subscription_credit_deposit\" will be dropped.",
+            "table": "monthly_subscription_credit_deposit",
+            "columns": [
+              "currency"
+            ],
+            "destrucive": true
+          }
+        ]
+      }
+    }
+  ],
+  "warnings": [
+    {
+      "type": "columnDropped",
+      "message": "Column \"subscriptionCredits\" of table \"account_api_usage\" will be dropped.",
+      "table": "account_api_usage",
+      "columns": [
+        "subscriptionCredits"
+      ],
+      "destrucive": true
+    },
+    {
+      "type": "columnDropped",
+      "message": "Column \"purchasedCredits\" of table \"account_api_usage\" will be dropped.",
+      "table": "account_api_usage",
+      "columns": [
+        "purchasedCredits"
+      ],
+      "destrucive": true
+    },
+    {
+      "type": "uniqueIndexCreated",
+      "message": "Unique index \"credit_usage_id_unique_idx\" is added to table \"account_api_usage\". If there are existing rows with duplicate values, this migration will fail.",
+      "table": "account_api_usage",
+      "columns": [
+        "creditUsageId"
+      ],
+      "destrucive": false
+    },
+    {
+      "type": "tableDropped",
+      "message": "One or more columns are added to table \"account_api_usage\" which cannot be added in a table migration. The complete table will be deleted and recreated.",
+      "table": "account_api_usage",
+      "columns": [
+        "creditUsageId"
+      ],
+      "destrucive": true
+    },
+    {
+      "type": "columnDropped",
+      "message": "Column \"currency\" of table \"monthly_subscription_credit_deposit\" will be dropped.",
+      "table": "monthly_subscription_credit_deposit",
+      "columns": [
+        "currency"
+      ],
+      "destrucive": true
+    }
+  ],
+  "migrationApiVersion": 1
+}

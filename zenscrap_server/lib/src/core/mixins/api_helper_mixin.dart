@@ -138,13 +138,15 @@ mixin ApiHelperMixin {
       final accountApiUsage = await AccountApiUsage.db.findFirstRow(
         session,
         where: (p0) => p0.nanoId.equals(nanoId),
-        include: AccountApiUsage.include(),
+        include: AccountApiUsage.include(
+          creditUsage: CreditUsage.include(),
+        ),
       );
-      if (accountApiUsage == null) throw _noApiFound;
+      if (accountApiUsage == null || accountApiUsage.creditUsage == null) throw _noApiFound;
 
-      _remainingPurchasedCredits[nanoId] = accountApiUsage.purchasedCredits;
+      _remainingPurchasedCredits[nanoId] = accountApiUsage.creditUsage!.purchasedCredits;
       _remainingSubscriptionCredits[nanoId] =
-          accountApiUsage.subscriptionCredits;
+          accountApiUsage.creditUsage!.subscriptionCredits;
       return discountApiTokens(session, nanoId: nanoId);
     }
 

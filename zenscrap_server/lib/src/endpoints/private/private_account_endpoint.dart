@@ -41,11 +41,21 @@ class PrivateAccountEndpoint extends Endpoint with DeployEndpointMixin {
       final acountApiKey = '$nanoId::${_uuid.v7()}';
       try {
         return await session.db.transaction((transaction) async {
+          // Create CreditUsage first
+          final creditUsage = await CreditUsage.db.insertRow(
+            session,
+            CreditUsage(
+              purchasedCredits: 0,
+              subscriptionCredits: 0,
+            ),
+            transaction: transaction,
+          );
+          
+          // Create AccountApiUsage with creditUsageId
           final accountApiUsage = await AccountApiUsage.db.insertRow(
             session,
             AccountApiUsage(
-              purchasedCredits: 0,
-              subscriptionCredits: 0,
+              creditUsageId: creditUsage.id!,
               nanoId: nanoId,
             ),
             transaction: transaction,

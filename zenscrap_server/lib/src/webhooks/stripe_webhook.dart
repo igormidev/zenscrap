@@ -215,23 +215,26 @@ class StripeWebhookRoute extends Route {
           throw Exception('Account info not found: $accountInfoId');
         }
 
-        // Get API usage to add credits
+        // Get API usage with credit usage relation
         final apiUsage = await AccountApiUsage.db.findById(
           session,
           accountInfo.accountApiUsageId,
           transaction: transaction,
+          include: AccountApiUsage.include(
+            creditUsage: CreditUsage.include(),
+          ),
         );
         
-        if (apiUsage == null) {
-          session.log('API usage not found for account $accountInfoId');
-          throw Exception('API usage not found for account $accountInfoId');
+        if (apiUsage == null || apiUsage.creditUsage == null) {
+          session.log('API usage or credit usage not found for account $accountInfoId');
+          throw Exception('API usage or credit usage not found for account $accountInfoId');
         }
 
         // Add one-time purchase credits
-        apiUsage.purchasedCredits += creditAmount;
-        await AccountApiUsage.db.updateRow(
+        apiUsage.creditUsage!.purchasedCredits += creditAmount;
+        await CreditUsage.db.updateRow(
           session,
-          apiUsage,
+          apiUsage.creditUsage!,
           transaction: transaction,
         );
 

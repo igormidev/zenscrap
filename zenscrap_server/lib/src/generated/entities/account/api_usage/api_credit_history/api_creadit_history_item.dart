@@ -12,9 +12,9 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
-import '../../../../entities/account/api_usage/api_creadit_history/monthly_subscription_credit_deposit.dart'
+import '../../../../entities/account/api_usage/api_credit_history/monthly_subscription_credit_deposit.dart'
     as _i2;
-import '../../../../entities/account/api_usage/api_creadit_history/credit_package_purchase.dart'
+import '../../../../entities/account/api_usage/api_credit_history/credit_package_purchase.dart'
     as _i3;
 import '../../../../entities/account/api_usage/account_api_usage.dart' as _i4;
 

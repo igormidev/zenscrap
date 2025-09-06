@@ -10,17 +10,18 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
-import '../../../entities/account/account.dart' as _i2;
-import '../../../entities/account/api_usage/api_creadit_history/api_creadit_history_item.dart'
-    as _i3;
-import '../../../entities/account/account_api_key.dart' as _i4;
+import '../../../entities/account/api_usage/credit_usage.dart' as _i2;
+import '../../../entities/account/account.dart' as _i3;
+import '../../../entities/account/api_usage/api_credit_history/api_creadit_history_item.dart'
+    as _i4;
+import '../../../entities/account/account_api_key.dart' as _i5;
 
 abstract class AccountApiUsage implements _i1.SerializableModel {
   AccountApiUsage._({
     this.id,
     required this.nanoId,
-    required this.subscriptionCredits,
-    required this.purchasedCredits,
+    required this.creditUsageId,
+    this.creditUsage,
     this.accountInfo,
     this.history,
     this.apiKeys,
@@ -29,29 +30,32 @@ abstract class AccountApiUsage implements _i1.SerializableModel {
   factory AccountApiUsage({
     int? id,
     required String nanoId,
-    required int subscriptionCredits,
-    required int purchasedCredits,
-    _i2.AccountInfo? accountInfo,
-    List<_i3.CreditHistoryItem>? history,
-    List<_i4.AccountApiKey>? apiKeys,
+    required int creditUsageId,
+    _i2.CreditUsage? creditUsage,
+    _i3.AccountInfo? accountInfo,
+    List<_i4.CreditHistoryItem>? history,
+    List<_i5.AccountApiKey>? apiKeys,
   }) = _AccountApiUsageImpl;
 
   factory AccountApiUsage.fromJson(Map<String, dynamic> jsonSerialization) {
     return AccountApiUsage(
       id: jsonSerialization['id'] as int?,
       nanoId: jsonSerialization['nanoId'] as String,
-      subscriptionCredits: jsonSerialization['subscriptionCredits'] as int,
-      purchasedCredits: jsonSerialization['purchasedCredits'] as int,
+      creditUsageId: jsonSerialization['creditUsageId'] as int,
+      creditUsage: jsonSerialization['creditUsage'] == null
+          ? null
+          : _i2.CreditUsage.fromJson(
+              (jsonSerialization['creditUsage'] as Map<String, dynamic>)),
       accountInfo: jsonSerialization['accountInfo'] == null
           ? null
-          : _i2.AccountInfo.fromJson(
+          : _i3.AccountInfo.fromJson(
               (jsonSerialization['accountInfo'] as Map<String, dynamic>)),
       history: (jsonSerialization['history'] as List?)
           ?.map((e) =>
-              _i3.CreditHistoryItem.fromJson((e as Map<String, dynamic>)))
+              _i4.CreditHistoryItem.fromJson((e as Map<String, dynamic>)))
           .toList(),
       apiKeys: (jsonSerialization['apiKeys'] as List?)
-          ?.map((e) => _i4.AccountApiKey.fromJson((e as Map<String, dynamic>)))
+          ?.map((e) => _i5.AccountApiKey.fromJson((e as Map<String, dynamic>)))
           .toList(),
     );
   }
@@ -63,15 +67,15 @@ abstract class AccountApiUsage implements _i1.SerializableModel {
 
   String nanoId;
 
-  int subscriptionCredits;
+  int creditUsageId;
 
-  int purchasedCredits;
+  _i2.CreditUsage? creditUsage;
 
-  _i2.AccountInfo? accountInfo;
+  _i3.AccountInfo? accountInfo;
 
-  List<_i3.CreditHistoryItem>? history;
+  List<_i4.CreditHistoryItem>? history;
 
-  List<_i4.AccountApiKey>? apiKeys;
+  List<_i5.AccountApiKey>? apiKeys;
 
   /// Returns a shallow copy of this [AccountApiUsage]
   /// with some or all fields replaced by the given arguments.
@@ -79,19 +83,19 @@ abstract class AccountApiUsage implements _i1.SerializableModel {
   AccountApiUsage copyWith({
     int? id,
     String? nanoId,
-    int? subscriptionCredits,
-    int? purchasedCredits,
-    _i2.AccountInfo? accountInfo,
-    List<_i3.CreditHistoryItem>? history,
-    List<_i4.AccountApiKey>? apiKeys,
+    int? creditUsageId,
+    _i2.CreditUsage? creditUsage,
+    _i3.AccountInfo? accountInfo,
+    List<_i4.CreditHistoryItem>? history,
+    List<_i5.AccountApiKey>? apiKeys,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
       if (id != null) 'id': id,
       'nanoId': nanoId,
-      'subscriptionCredits': subscriptionCredits,
-      'purchasedCredits': purchasedCredits,
+      'creditUsageId': creditUsageId,
+      if (creditUsage != null) 'creditUsage': creditUsage?.toJson(),
       if (accountInfo != null) 'accountInfo': accountInfo?.toJson(),
       if (history != null)
         'history': history?.toJson(valueToJson: (v) => v.toJson()),
@@ -112,16 +116,16 @@ class _AccountApiUsageImpl extends AccountApiUsage {
   _AccountApiUsageImpl({
     int? id,
     required String nanoId,
-    required int subscriptionCredits,
-    required int purchasedCredits,
-    _i2.AccountInfo? accountInfo,
-    List<_i3.CreditHistoryItem>? history,
-    List<_i4.AccountApiKey>? apiKeys,
+    required int creditUsageId,
+    _i2.CreditUsage? creditUsage,
+    _i3.AccountInfo? accountInfo,
+    List<_i4.CreditHistoryItem>? history,
+    List<_i5.AccountApiKey>? apiKeys,
   }) : super._(
           id: id,
           nanoId: nanoId,
-          subscriptionCredits: subscriptionCredits,
-          purchasedCredits: purchasedCredits,
+          creditUsageId: creditUsageId,
+          creditUsage: creditUsage,
           accountInfo: accountInfo,
           history: history,
           apiKeys: apiKeys,
@@ -134,8 +138,8 @@ class _AccountApiUsageImpl extends AccountApiUsage {
   AccountApiUsage copyWith({
     Object? id = _Undefined,
     String? nanoId,
-    int? subscriptionCredits,
-    int? purchasedCredits,
+    int? creditUsageId,
+    Object? creditUsage = _Undefined,
     Object? accountInfo = _Undefined,
     Object? history = _Undefined,
     Object? apiKeys = _Undefined,
@@ -143,15 +147,17 @@ class _AccountApiUsageImpl extends AccountApiUsage {
     return AccountApiUsage(
       id: id is int? ? id : this.id,
       nanoId: nanoId ?? this.nanoId,
-      subscriptionCredits: subscriptionCredits ?? this.subscriptionCredits,
-      purchasedCredits: purchasedCredits ?? this.purchasedCredits,
-      accountInfo: accountInfo is _i2.AccountInfo?
+      creditUsageId: creditUsageId ?? this.creditUsageId,
+      creditUsage: creditUsage is _i2.CreditUsage?
+          ? creditUsage
+          : this.creditUsage?.copyWith(),
+      accountInfo: accountInfo is _i3.AccountInfo?
           ? accountInfo
           : this.accountInfo?.copyWith(),
-      history: history is List<_i3.CreditHistoryItem>?
+      history: history is List<_i4.CreditHistoryItem>?
           ? history
           : this.history?.map((e0) => e0.copyWith()).toList(),
-      apiKeys: apiKeys is List<_i4.AccountApiKey>?
+      apiKeys: apiKeys is List<_i5.AccountApiKey>?
           ? apiKeys
           : this.apiKeys?.map((e0) => e0.copyWith()).toList(),
     );

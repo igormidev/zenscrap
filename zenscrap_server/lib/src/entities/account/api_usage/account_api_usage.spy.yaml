@@ -2,9 +2,13 @@ class: AccountApiUsage
 table: account_api_usage
 fields:
   nanoId: String
-  subscriptionCredits: int
-  purchasedCredits: int
+  creditUsageId: int
+  creditUsage: CreditUsage?, relation(name=api_usage_credits, field=creditUsageId)
   accountInfo: AccountInfo?, relation(name=user_account_api_usage)
   history: List<CreditHistoryItem>?, relation(name=api_usage_history)
   apiKeys: List<AccountApiKey>?, relation(name=api_usage_api_keys)
+indexes:
+  credit_usage_id_unique_idx:
+    fields: creditUsageId
+    unique: true
   

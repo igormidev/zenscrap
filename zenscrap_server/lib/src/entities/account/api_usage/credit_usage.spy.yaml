@@ -1,5 +1,6 @@
-class: CreditUsageSpy
-table: credit_usage_spy
+class: CreditUsage
+table: credit_usage
 fields:
   subscriptionCredits: int
   purchasedCredits: int
+  accountApiUsage: AccountApiUsage?, relation(name=api_usage_credits)
