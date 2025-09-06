@@ -1,5 +1,8 @@
 import 'package:serverpod/serverpod.dart';
+import 'package:serverpod_auth_server/serverpod_auth_server.dart' as auth;
 import 'package:zenscrap_server/src/core/default_classes.dart';
+import 'package:zenscrap_server/src/core/stripe/stripe_api.dart';
+import 'package:zenscrap_server/src/core/stripe/stripe_config.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class PrivateApiUsageEndpoint extends Endpoint {
@@ -330,5 +333,64 @@ class PrivateApiUsageEndpoint extends Endpoint {
       apiKeys: apiKeys,
       usageStats: usageStats,
     );
+  }
+
+  Future<String> createCreditPurchaseCheckout(
+    Session session, {
+    required CreditPurchaseOption creditPackage,
+  }) async {
+    final authenticationInfo = await session.authenticated;
+    if (authenticationInfo == null) {
+      throw defaultAuthenticationException;
+    }
+
+    final userId = authenticationInfo.userId;
+
+    // Get account info
+    final accountInfo = await AccountInfo.db.findFirstRow(
+      session,
+      where: (p0) => p0.userInfoId.equals(userId),
+      include: AccountInfo.include(
+        userInfo: auth.UserInfo.include(),
+      ),
+    );
+
+    if (accountInfo == null || accountInfo.userInfo == null) {
+      throw ZenScrapException(
+        title: 'Account Not Found',
+        description: 'Unable to find account information.',
+      );
+    }
+
+    // Get price ID and credit amount based on the package
+    final packageName = creditPackage.name;
+    final priceId = StripeConfig.getCreditPackagePriceId(packageName);
+    final creditAmount = StripeConfig.getCreditAmount(packageName);
+
+    // Create Stripe checkout session for one-time payment
+    final checkoutSession = await StripeApi.createCreditPurchaseCheckoutSession(
+      secretKey: StripeConfig.secretKey,
+      priceId: priceId,
+      customerEmail: accountInfo.userInfo!.email ?? '',
+      successUrl: StripeConfig.successUrl,
+      cancelUrl: StripeConfig.cancelUrl,
+      accountInfoId: accountInfo.id!,
+      creditPackage: packageName,
+      creditAmount: creditAmount,
+    );
+
+    // Return the checkout URL
+    final checkoutUrl = checkoutSession['url'] as String?;
+    
+    if (checkoutUrl == null) {
+      throw ZenScrapException(
+        title: 'Checkout Creation Failed',
+        description: 'Failed to create checkout session.',
+      );
+    }
+
+    session.log('Created credit purchase checkout for user $userId, package: $packageName');
+    
+    return checkoutUrl;
   }
 }

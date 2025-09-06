@@ -47,30 +47,54 @@ class MonthlySubscriptionCreditsFutureCall extends FutureCall {
       final creditsToAdd = accountInfo.planTier.apiCreditsToBeAddedPerMonth;
 
       if (creditsToAdd > 0) {
-        apiUsage.subscriptionCredits += creditsToAdd;
-        await AccountApiUsage.db.updateRow(session, apiUsage);
+        // Use transaction for all database operations
+        await session.db.transaction((transaction) async {
+          // Reload API usage within transaction to ensure consistency
+          final currentApiUsage = await AccountApiUsage.db.findById(
+            session,
+            apiUsage.id!,
+            transaction: transaction,
+          );
+          
+          if (currentApiUsage == null) {
+            throw Exception('API usage not found during transaction');
+          }
 
-        // Create monthly subscription credit deposit record
-        final monthlyDeposit = MonthlySubscriptionCreditDeposit(
-          creditsAmount: creditsToAdd,
-          planTier: accountInfo.planTier,
-        );
-        await MonthlySubscriptionCreditDeposit.db.insertRow(
-          session,
-          monthlyDeposit,
-        );
+          // Add credits
+          currentApiUsage.subscriptionCredits += creditsToAdd;
+          await AccountApiUsage.db.updateRow(
+            session,
+            currentApiUsage,
+            transaction: transaction,
+          );
 
-        // Create credit history item
-        final creditHistoryItem = CreditHistoryItem(
-          date: DateTime.now(),
-          monthlySubscriptionCreditDeposit: monthlyDeposit,
-          creaditPackagePurchase: null,
-          accountApiUsageId: apiUsage.id!,
-        );
-        await CreditHistoryItem.db.insertRow(session, creditHistoryItem);
+          // Create monthly subscription credit deposit record
+          final monthlyDeposit = MonthlySubscriptionCreditDeposit(
+            creditsAmount: creditsToAdd,
+            planTier: accountInfo.planTier,
+          );
+          await MonthlySubscriptionCreditDeposit.db.insertRow(
+            session,
+            monthlyDeposit,
+            transaction: transaction,
+          );
 
-        // Update the cached values in ApiHelperMixin
-        ApiHelperMixin.resetNanoId(apiUsage.nanoId);
+          // Create credit history item
+          final creditHistoryItem = CreditHistoryItem(
+            date: DateTime.now(),
+            monthlySubscriptionCreditDeposit: monthlyDeposit,
+            creaditPackagePurchase: null,
+            accountApiUsageId: currentApiUsage.id!,
+          );
+          await CreditHistoryItem.db.insertRow(
+            session,
+            creditHistoryItem,
+            transaction: transaction,
+          );
+
+          // Update the cached values in ApiHelperMixin (after transaction)
+          ApiHelperMixin.resetNanoId(currentApiUsage.nanoId);
+        });
 
         session.log(
             'Added $creditsToAdd monthly subscription credits to account ${accountInfo.id} (nanoId: ${apiUsage.nanoId})');

@@ -8,6 +8,7 @@ privateApiUsage:
   - getApiKeyUsageStats:
   - getApiUsageInfo:
   - getApiKeysWithStats:
+  - createCreditPurchaseCheckout:
 privateCloneScrappable:
   - cloneFromMarketplace:
 privateScrappableAnalytics:

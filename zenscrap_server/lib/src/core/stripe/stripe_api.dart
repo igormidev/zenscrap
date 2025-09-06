@@ -138,6 +138,59 @@ class StripeApi {
     }
   }
 
+  static Future<Map<String, dynamic>> createCreditPurchaseCheckoutSession({
+    required String secretKey,
+    required String priceId,
+    required String customerEmail,
+    required String successUrl,
+    required String cancelUrl,
+    required int accountInfoId,
+    required String creditPackage,
+    required int creditAmount,
+  }) async {
+    final client = HttpClient();
+    try {
+      final request = await client.postUrl(Uri.parse('$baseUrl/checkout/sessions'));
+      
+      // Set headers
+      request.headers.set('Authorization', 'Bearer $secretKey');
+      request.headers.set('Content-Type', 'application/x-www-form-urlencoded');
+      
+      // Build form data for one-time payment
+      final formData = {
+        'mode': 'payment',  // One-time payment mode
+        'line_items[0][price]': priceId,
+        'line_items[0][quantity]': '1',
+        'customer_email': customerEmail,
+        'success_url': successUrl,
+        'cancel_url': cancelUrl,
+        'client_reference_id': accountInfoId.toString(),
+        'metadata[account_info_id]': accountInfoId.toString(),
+        'metadata[customer_email]': customerEmail,
+        'metadata[credit_package]': creditPackage,
+        'metadata[credit_amount]': creditAmount.toString(),
+        'metadata[purchase_type]': 'credit_package',
+      };
+      
+      final body = formData.entries
+          .map((e) => '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+          .join('&');
+      
+      request.write(body);
+      
+      final response = await request.close();
+      final responseBody = await response.transform(utf8.decoder).join();
+      
+      if (response.statusCode == 200) {
+        return jsonDecode(responseBody);
+      } else {
+        throw Exception('Failed to create credit purchase checkout session: $responseBody');
+      }
+    } finally {
+      client.close();
+    }
+  }
+
   static bool verifyWebhookSignature({
     required String payload,
     required String signature,

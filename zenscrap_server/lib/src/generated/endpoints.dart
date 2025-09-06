@@ -26,15 +26,17 @@ import '../endpoints/public/scrappable_api.dart' as _i14;
 import '../endpoints/public/scrappable_chat_session.dart' as _i15;
 import 'package:zenscrap_server/src/generated/entities/scrappable/scrappable.dart'
     as _i16;
-import 'package:zenscrap_server/src/generated/entities/scrappable/reference_test_data.dart'
+import 'package:zenscrap_server/src/generated/entities/account/credit_purchase_option.dart'
     as _i17;
-import 'package:zenscrap_server/src/generated/entities/scrappable/scraper_category.dart'
+import 'package:zenscrap_server/src/generated/entities/scrappable/reference_test_data.dart'
     as _i18;
-import 'package:zenscrap_server/src/generated/entities/account/plan_tier.dart'
+import 'package:zenscrap_server/src/generated/entities/scrappable/scraper_category.dart'
     as _i19;
-import 'package:zenscrap_server/src/generated/entities/scrappable/ai_model.dart'
+import 'package:zenscrap_server/src/generated/entities/account/plan_tier.dart'
     as _i20;
-import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i21;
+import 'package:zenscrap_server/src/generated/entities/scrappable/ai_model.dart'
+    as _i21;
+import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i22;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -256,6 +258,25 @@ class Endpoints extends _i1.EndpointDispatch {
           ) async =>
               (endpoints['privateApiUsage'] as _i3.PrivateApiUsageEndpoint)
                   .getApiKeysWithStats(session),
+        ),
+        'createCreditPurchaseCheckout': _i1.MethodConnector(
+          name: 'createCreditPurchaseCheckout',
+          params: {
+            'creditPackage': _i1.ParameterDescription(
+              name: 'creditPackage',
+              type: _i1.getType<_i17.CreditPurchaseOption>(),
+              nullable: false,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['privateApiUsage'] as _i3.PrivateApiUsageEndpoint)
+                  .createCreditPurchaseCheckout(
+            session,
+            creditPackage: params['creditPackage'],
+          ),
         ),
       },
     );
@@ -501,7 +522,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'testData': _i1.ParameterDescription(
               name: 'testData',
-              type: _i1.getType<_i17.ReferenceTestData>(),
+              type: _i1.getType<_i18.ReferenceTestData>(),
               nullable: false,
             )
           },
@@ -540,7 +561,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'category': _i1.ParameterDescription(
               name: 'category',
-              type: _i1.getType<_i18.ScraperCategory?>(),
+              type: _i1.getType<_i19.ScraperCategory?>(),
               nullable: true,
             ),
             'willHideFromMarketplace': _i1.ParameterDescription(
@@ -613,7 +634,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'planTier': _i1.ParameterDescription(
               name: 'planTier',
-              type: _i1.getType<_i19.PlanTier>(),
+              type: _i1.getType<_i20.PlanTier>(),
               nullable: false,
             ),
           },
@@ -743,7 +764,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'aiModel': _i1.ParameterDescription(
               name: 'aiModel',
-              type: _i1.getType<_i20.AiModel>(),
+              type: _i1.getType<_i21.AiModel>(),
               nullable: false,
             ),
           },
@@ -807,6 +828,6 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
       },
     );
-    modules['serverpod_auth'] = _i21.Endpoints()..initializeEndpoints(server);
+    modules['serverpod_auth'] = _i22.Endpoints()..initializeEndpoints(server);
   }
 }
