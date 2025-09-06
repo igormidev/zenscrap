@@ -1,9 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:serverpod/serverpod.dart';
-import 'package:zenscrap_server/server.dart';
 import 'package:zenscrap_server/src/core/mixins/api_helper_mixin.dart';
-import 'package:zenscrap_server/src/core/scraping_bee.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class ScrappableApiRoute extends Route with ApiHelperMixin {
@@ -53,7 +51,7 @@ class ScrappableApiRoute extends Route with ApiHelperMixin {
       // Extract required parameters
       final scrappableId = requestData['scrappableId'];
       final payloadRaw = requestData['payload'];
-      
+
       // Validate scrappableId
       if (scrappableId == null || scrappableId is! int) {
         await _sendError(
@@ -75,7 +73,7 @@ class ScrappableApiRoute extends Route with ApiHelperMixin {
         );
         return true;
       }
-      
+
       // Cast payload to proper type
       final payload = Map<String, dynamic>.from(payloadRaw);
 
@@ -98,7 +96,7 @@ class ScrappableApiRoute extends Route with ApiHelperMixin {
       // Call the scraping logic
       Map<String, dynamic> result;
       try {
-        result = await _callFunc(
+        result = await callFunc(
           session,
           scrappableId: scrappableId,
           apiKey: apiKey,
@@ -116,7 +114,8 @@ class ScrappableApiRoute extends Route with ApiHelperMixin {
         return true;
       } catch (e) {
         // Handle unexpected errors
-        session.log('Unexpected error in ScrappableApiRoute: $e', level: LogLevel.error);
+        session.log('Unexpected error in ScrappableApiRoute: $e',
+            level: LogLevel.error);
         await _sendError(
           request,
           HttpStatus.internalServerError,
@@ -130,7 +129,8 @@ class ScrappableApiRoute extends Route with ApiHelperMixin {
       await _sendSuccess(request, result);
       return true;
     } catch (e) {
-      session.log('Error in ScrappableApiRoute handleCall: $e', level: LogLevel.error);
+      session.log('Error in ScrappableApiRoute handleCall: $e',
+          level: LogLevel.error);
       await _sendError(
         request,
         HttpStatus.internalServerError,
@@ -141,32 +141,6 @@ class ScrappableApiRoute extends Route with ApiHelperMixin {
     }
   }
 
-  Future<Map<String, dynamic>> _callFunc(
-    Session session, {
-    required int scrappableId,
-    String? apiKey,
-    required Map<String, dynamic> payload,
-  }) async {
-    return wrapAnalytics(session, apiKey,
-        (setScrappableCallback, nanoId) async {
-      await discountApiTokens(session, nanoId: nanoId);
-
-      final (Scrappable scrappable, ScrappableRequest targetRequest) =
-          await getScrappableById(session, scrappableId, nanoId);
-      setScrappableCallback(scrappable);
-      throwErrorIfIsATestRequestAndTestTimeExpired(apiKey, scrappable);
-      final String targetUrl = composeUrl(payload, targetRequest);
-      final extractRules = await getExtractRules(session, scrappable, apiKey);
-
-      final ExtractDataByRule result = await scrapingBee.extractByRules(
-        targetUrl: targetUrl,
-        extractRules: extractRules,
-      );
-
-      return result.when(withData: (r) => r, error: scrappingError);
-    });
-  }
-
   int _getStatusCodeForException(ZenScrapException exception) {
     // Map exception titles to appropriate HTTP status codes
     switch (exception.title) {
@@ -175,21 +149,21 @@ class ScrappableApiRoute extends Route with ApiHelperMixin {
       case 'Invalid API Key':
       case 'Invalid API Key Format':
         return HttpStatus.unauthorized;
-      
+
       case 'No Active Test Session Found':
       case 'Test Period Expired':
       case 'Missing Extract Rules':
       case 'Missing Path Parameter':
       case 'Scrappable Not Found':
         return HttpStatus.badRequest;
-      
+
       case 'No Active Plan':
       case 'Insufficient Credits':
         return HttpStatus.paymentRequired;
-      
+
       case 'Concurrency Limit Exceeded':
         return HttpStatus.tooManyRequests;
-      
+
       case 'Scraping Error':
       case 'Unexpected Error':
       default:
@@ -205,7 +179,7 @@ class ScrappableApiRoute extends Route with ApiHelperMixin {
   ) async {
     request.response.statusCode = statusCode;
     request.response.headers.contentType = ContentType.json;
-    
+
     final errorResponse = {
       'error': {
         'title': title,
@@ -213,7 +187,7 @@ class ScrappableApiRoute extends Route with ApiHelperMixin {
         'statusCode': statusCode,
       },
     };
-    
+
     request.response.write(jsonEncode(errorResponse));
     await request.response.close();
   }
@@ -224,12 +198,12 @@ class ScrappableApiRoute extends Route with ApiHelperMixin {
   ) async {
     request.response.statusCode = HttpStatus.ok;
     request.response.headers.contentType = ContentType.json;
-    
+
     final successResponse = {
       'success': true,
       'data': data,
     };
-    
+
     request.response.write(jsonEncode(successResponse));
     await request.response.close();
   }

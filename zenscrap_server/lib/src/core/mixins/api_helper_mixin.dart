@@ -1,5 +1,7 @@
 import 'package:serverpod/serverpod.dart';
+import 'package:zenscrap_server/server.dart';
 import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';
+import 'package:zenscrap_server/src/core/scraping_bee.dart';
 import 'package:zenscrap_server/src/endpoints/public/scrappable_chat_session.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
@@ -8,6 +10,7 @@ typedef NanoId = String;
 mixin ApiHelperMixin {
   static final Map<NanoId, int> _currentConcurrencyRequests = {};
   static final Map<NanoId, PlanTier> _currentAccountPlanTierCache = {};
+  // static final Map<NanoId, > _currentAccountPlanTierCache = {};
   static final Map<NanoId, int> _remainingSubscriptionCredits = {};
   static final Map<NanoId, int> _remainingPurchasedCredits = {};
   static final Map<NanoId, List<ApiKey>> _apiKeysAttachedToNanoId = {};
@@ -316,6 +319,32 @@ mixin ApiHelperMixin {
         );
       });
     }
+  }
+
+  Future<Map<String, dynamic>> callFunc(
+    Session session, {
+    required int scrappableId,
+    String? apiKey,
+    required Map<String, dynamic> payload,
+  }) async {
+    return wrapAnalytics(session, apiKey,
+        (setScrappableCallback, nanoId) async {
+      await discountApiTokens(session, nanoId: nanoId);
+
+      final (Scrappable scrappable, ScrappableRequest targetRequest) =
+          await getScrappableById(session, scrappableId, nanoId);
+      setScrappableCallback(scrappable);
+      throwErrorIfIsATestRequestAndTestTimeExpired(apiKey, scrappable);
+      final String targetUrl = composeUrl(payload, targetRequest);
+      final extractRules = await getExtractRules(session, scrappable, apiKey);
+
+      final ExtractDataByRule result = await scrapingBee.extractByRules(
+        targetUrl: targetUrl,
+        extractRules: extractRules,
+      );
+
+      return result.when(withData: (r) => r, error: scrappingError);
+    });
   }
 }
 

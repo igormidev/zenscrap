@@ -1,0 +1,5 @@
+class: CreditUsageSpy
+table: credit_usage_spy
+fields:
+  subscriptionCredits: int
+  purchasedCredits: int
