@@ -362,6 +362,14 @@ class PrivateApiUsageEndpoint extends Endpoint {
       );
     }
 
+    // Validate that user has Ultra plan
+    if (accountInfo.planTier != PlanTier.ultra) {
+      throw ZenScrapException(
+        title: 'Ultra Plan Required',
+        description: 'Credit packages are only available for Ultra plan subscribers. Please upgrade to Ultra to purchase additional credits.',
+      );
+    }
+
     // Get price ID and credit amount based on the package
     final packageName = creditPackage.name;
     final priceId = StripeConfig.getCreditPackagePriceId(packageName);

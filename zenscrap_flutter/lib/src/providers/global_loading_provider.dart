@@ -3,6 +3,9 @@ import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 
 final isGlobalLoadingProvider = StateProvider<bool>((ref) => false);
 
+typedef GlobalLoadingFunction<T> = Future<T> Function(
+    Future<T> Function() future);
+
 extension GlobalLoadingWidgetRefExt on WidgetRef {
   Future<T> globalLoadingSetter<T>(Future<T> Function() future) async {
     read(isGlobalLoadingProvider.notifier).state = true;

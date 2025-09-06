@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/src/core/extensions/plan_tier_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 
 class CreditsOverviewSection extends StatelessWidget {
   final int subscriptionCredits;
   final int purchasedCredits;
+  final PlanTier planTier;
 
   const CreditsOverviewSection({
     super.key,
     required this.subscriptionCredits,
     required this.purchasedCredits,
+    required this.planTier,
   });
 
   @override
   Widget build(BuildContext context) {
     final totalCredits = subscriptionCredits + purchasedCredits;
+    final creditsOwnedPerMonth = planTier.apiCreditsAddedPerMonth;
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
         color: context.c.surface,
         borderRadius: BorderRadius.circular(16),
@@ -25,6 +30,7 @@ class CreditsOverviewSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -39,12 +45,13 @@ class CreditsOverviewSection extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
                 child: CreditItem(
                   label: 'Total Available',
+                  description: 'Credits of purchase and subscription combined',
                   value: totalCredits.toString(),
                   icon: Icons.check_circle,
                   isHighlighted: true,
@@ -54,6 +61,9 @@ class CreditsOverviewSection extends StatelessWidget {
               Expanded(
                 child: CreditItem(
                   label: 'Subscription',
+                  description: planTier == PlanTier.none
+                      ? 'Subscribe to unlock a plan'
+                      : 'Will renew monthly $creditsOwnedPerMonth',
                   value: subscriptionCredits.toString(),
                   icon: Icons.calendar_month,
                 ),
@@ -62,12 +72,33 @@ class CreditsOverviewSection extends StatelessWidget {
               Expanded(
                 child: CreditItem(
                   label: 'Purchased',
+                  description: 'One-time purchase credits that never expire',
                   value: purchasedCredits.toString(),
                   icon: Icons.shopping_cart,
                 ),
               ),
             ],
           ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Icon(
+                Icons.info_outline_rounded,
+                size: 14,
+                color: context.c.onSurfaceVariant.withAlpha(150),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  'You can purchase additional credits • Subscription credits renew monthly',
+                  style: context.t.labelSmall?.copyWith(
+                    color: context.c.onSurfaceVariant.withAlpha(150),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
         ],
       ),
     );
@@ -77,6 +108,7 @@ class CreditsOverviewSection extends StatelessWidget {
 class CreditItem extends StatelessWidget {
   final String label;
   final String value;
+  final String description;
   final IconData icon;
   final bool isHighlighted;
 
@@ -84,6 +116,7 @@ class CreditItem extends StatelessWidget {
     super.key,
     required this.label,
     required this.value,
+    required this.description,
     required this.icon,
     this.isHighlighted = false,
   });
@@ -130,6 +163,14 @@ class CreditItem extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            description,
+            maxLines: 2,
+            style: context.t.labelSmall?.copyWith(
+              color: context.c.onSurfaceVariant.withAlpha(150),
+            ),
           ),
           const SizedBox(height: 8),
           Text(

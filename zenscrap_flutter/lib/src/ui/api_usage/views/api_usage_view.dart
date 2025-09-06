@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
+import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
+import 'package:zenscrap_flutter/src/states/account/account_state.dart';
 import 'package:zenscrap_flutter/src/states/api_usage/api_usage_provider.dart';
 import 'package:zenscrap_flutter/src/states/api_usage/api_usage_state.dart';
 import 'package:zenscrap_flutter/src/states/api_usage/api_keys_provider.dart';
@@ -157,6 +159,10 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
 
   @override
   Widget build(BuildContext context) {
+    final planTier = ref.watch(accountProvider).maybeWhen(
+          withData: (account) => account.planTier,
+          orElse: () => PlanTier.none,
+        );
     final apiUsageState = ref.watch(apiUsageProvider);
     final apiKeysState = ref.watch(apiKeysProvider);
     final creditHistoryState = ref.watch(creditHistoryProvider);
@@ -267,6 +273,7 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
 
           if (isMobile) {
             return MobileLayout(
+              planTier: planTier,
               selectedTabIndex: _selectedTabIndex,
               onTabSelected: (index) =>
                   setState(() => _selectedTabIndex = index),
@@ -286,6 +293,7 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
               apiKeys: apiKeys,
               apiKeyUsageStats: apiKeyUsageStats,
               creditHistory: creditHistory,
+              planTier: planTier,
               isLoadingMoreHistory: isLoadingMoreHistory,
               onLoadMoreHistory: _loadMoreHistory,
               onShowCreateApiKeyDialog: _showCreateApiKeyDialog,
@@ -300,6 +308,7 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
 
 class MobileLayout extends StatelessWidget {
   final int selectedTabIndex;
+  final PlanTier planTier;
   final Function(int) onTabSelected;
   final AccountApiUsage apiUsage;
   final List<AccountApiKey> apiKeys;
@@ -312,6 +321,7 @@ class MobileLayout extends StatelessWidget {
 
   const MobileLayout({
     super.key,
+    required this.planTier,
     required this.selectedTabIndex,
     required this.onTabSelected,
     required this.apiUsage,
@@ -327,7 +337,10 @@ class MobileLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tabs = [
-      OverviewTab(apiUsage: apiUsage),
+      OverviewTab(
+        apiUsage: apiUsage,
+        planTier: planTier,
+      ),
       ApiKeysTab(
         apiKeys: apiKeys,
         apiKeyUsageStats: apiKeyUsageStats,
@@ -372,6 +385,7 @@ class MobileLayout extends StatelessWidget {
 }
 
 class DesktopLayout extends StatelessWidget {
+  final PlanTier planTier;
   final AccountApiUsage apiUsage;
   final List<AccountApiKey> apiKeys;
   final Map<int, int> apiKeyUsageStats;
@@ -385,6 +399,7 @@ class DesktopLayout extends StatelessWidget {
   const DesktopLayout({
     super.key,
     required this.apiUsage,
+    required this.planTier,
     required this.apiKeys,
     required this.apiKeyUsageStats,
     required this.creditHistory,
@@ -453,6 +468,7 @@ class DesktopLayout extends StatelessWidget {
               children: [
                 Expanded(
                   child: CreditsOverviewSection(
+                    planTier: planTier,
                     subscriptionCredits: apiUsage.subscriptionCredits,
                     purchasedCredits: apiUsage.purchasedCredits,
                   ),
@@ -498,9 +514,11 @@ class DesktopLayout extends StatelessWidget {
 }
 
 class OverviewTab extends StatelessWidget {
+  final PlanTier planTier;
   final AccountApiUsage apiUsage;
 
-  const OverviewTab({super.key, required this.apiUsage});
+  const OverviewTab(
+      {super.key, required this.apiUsage, required this.planTier});
 
   @override
   Widget build(BuildContext context) {
@@ -515,6 +533,7 @@ class OverviewTab extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           CreditsOverviewSection(
+            planTier: planTier,
             subscriptionCredits: apiUsage.subscriptionCredits,
             purchasedCredits: apiUsage.purchasedCredits,
           ),

@@ -621,6 +621,18 @@ Future<void> showBasicPlanUpgradeDialog(BuildContext context, {required String m
   );
 }
 
+/// Shows upgrade dialog for Ultra plan (premium features)
+Future<void> showUltraPlanUpgradeDialog(BuildContext context, {required String mainCTAText}) async {
+  await showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) => _UpgradePlanDialog(
+      mainCTAText: mainCTAText,
+      targetPlan: PlanTier.ultra,
+    ),
+  );
+}
+
 /// Shows upgrade dialog for hiding scrappables from marketplace
 Future<void> showHideFromMarketplaceUpgradeDialog(BuildContext context) async {
   final result = await showDialog<bool>(

@@ -19,7 +19,7 @@ class ZenScrapPricingPage extends ConsumerWidget {
         backgroundColor: const Color.fromARGB(255, 224, 240, 255),
         body: PricingBackground(
           child: PricingPage(
-            width: 832,
+            width: 865,
             childAspectRatio: 0.45,
             perMonthText: 'Per month',
             perYearText: 'Per year',
@@ -78,6 +78,7 @@ class ZenScrapPricingPage extends ConsumerWidget {
                   'Priority Support',
                   'Hide your endpoints from marketplace',
                   'Copy endpoints from marketplace',
+                  'Ability to purchase one time add-on api credits',
                 ],
                 onTap: (bool isYearly) async {
                   await ref.globalLoadingSetter(() async {
