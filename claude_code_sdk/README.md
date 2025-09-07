@@ -10,6 +10,7 @@ A powerful Dart SDK for interacting with Claude Code, providing seamless integra
 - 📋 **Schema Support**: Get structured responses using JSON schemas
 - 🔄 **Session Management**: Automatic conversation continuity with --resume flag
 - 🛠️ **Auto-Installation**: Built-in methods to check and install Claude Code SDK
+- 🔌 **MCP Support**: Full Model Context Protocol integration for connecting to external tools
 - 🧹 **Resource Management**: Proper cleanup and disposal of chat sessions and temp files
 - 🔐 **Secure**: API key management with environment variable support
 - ⚡ **Reliable**: Simple Process.run based implementation (no streaming complexity)
@@ -260,6 +261,100 @@ void main() async {
   final info = await claudeSDK.getSDKInfo();
   print('SDK Info: $info');
 }
+```
+
+## MCP (Model Context Protocol) Support
+
+The SDK provides comprehensive support for MCP, allowing Claude to connect to external tools and services.
+
+### Checking MCP Installation
+
+```dart
+final mcpInfo = await claudeSDK.isMcpInstalled();
+print('MCP enabled: ${mcpInfo.hasMcpSupport}');
+print('Configured servers: ${mcpInfo.servers.length}');
+
+for (final server in mcpInfo.servers) {
+  print('  - ${server.name}: ${server.status}');
+}
+```
+
+### Installing Popular MCP Servers
+
+```dart
+// Install filesystem MCP server
+await claudeSDK.installPopularMcpServer('filesystem');
+
+// Install GitHub MCP with environment variables
+await claudeSDK.installPopularMcpServer('github', 
+  environment: {'GITHUB_TOKEN': 'your-github-token'}
+);
+
+// Available popular servers:
+// - filesystem: File system access
+// - github: GitHub integration
+// - postgres: PostgreSQL database
+// - git: Git operations
+// - puppeteer: Web automation
+// - sequential-thinking: Problem solving
+// - slack: Slack integration
+// - google-drive: Google Drive access
+```
+
+### Adding Custom MCP Servers
+
+```dart
+// Add a custom MCP server
+final customServer = McpServer(
+  name: 'my-custom-server',
+  command: 'node',
+  args: ['path/to/server.js'],
+  env: {'API_KEY': 'your-api-key'},
+);
+
+await claudeSDK.addMcpServer(
+  'my-custom-server',
+  customServer: customServer,
+);
+
+// Or add an npm package as MCP server
+await claudeSDK.addMcpServer(
+  'my-npm-server',
+  packageName: '@company/mcp-server',
+  options: McpAddOptions(
+    scope: McpScope.user,
+    useNpx: true,
+    environment: {'CONFIG': 'value'},
+  ),
+);
+```
+
+### Managing MCP Servers
+
+```dart
+// List all configured servers
+final servers = await claudeSDK.listMcpServers();
+
+// Get details about a specific server
+final details = await claudeSDK.getMcpServerDetails('filesystem');
+
+// Remove a server
+await claudeSDK.removeMcpServer('my-custom-server');
+```
+
+### Using MCP in Chat Sessions
+
+Once MCP servers are configured, they're automatically available in chat sessions:
+
+```dart
+final chat = claudeSDK.createNewChat();
+
+// Claude can now use the configured MCP tools
+final result = await chat.sendMessage([
+  ClaudeSdkContent.text(
+    'List all files in my Documents folder' // Works if filesystem MCP is installed
+  ),
+]);
 ```
 
 ## Schema Building

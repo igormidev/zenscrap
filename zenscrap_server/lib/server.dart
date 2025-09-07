@@ -4,6 +4,7 @@ import 'package:zenscrap_server/src/auth/handlers/on_send_reset_email.dart';
 import 'package:zenscrap_server/src/auth/handlers/on_send_validation_email.dart';
 import 'package:zenscrap_server/src/core/scraping_bee.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_config.dart';
+import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_claude_sdk_impl.dart';
 import 'package:zenscrap_server/src/future_calls/monthly_subscription_credits_future_call.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as auth;
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_gemini_api_impl.dart';
@@ -29,10 +30,12 @@ void run(List<String> args) async {
 
   // Register API routes FIRST (before catch-all routes)
   pod.webServer.addRoute(StripeWebhookRoute(), '/stripe/webhook');
-  
+
   // Register Scrappable API routes
-  pod.webServer.addRoute(ScrappableApiRoute(isProd: false), '/api/scrappable/test');
-  pod.webServer.addRoute(ScrappableApiRoute(isProd: true), '/api/scrappable/prod');
+  pod.webServer
+      .addRoute(ScrappableApiRoute(isProd: false), '/api/scrappable/test');
+  pod.webServer
+      .addRoute(ScrappableApiRoute(isProd: true), '/api/scrappable/prod');
 
   // Serve all files in the /static directory
   pod.webServer.addRoute(
@@ -59,10 +62,10 @@ void run(List<String> args) async {
   final String? openAiApiKey = pod.getPassword('openAiApiKey');
   openAiClient = OpenAIClient(apiKey: openAiApiKey);
 
-  // await ChatControllerClaudeSdkImpl.initialize(
-  //   claudeApiKey: pod.getPassword('claudeCodeApiKey') ?? '',
-  //   scrapingBeeApiKey: scrapingBeeApiKey ?? '',
-  // );
+  await ChatControllerClaudeSdkImpl.initialize(
+    claudeApiKey: pod.getPassword('claudeCodeApiKey') ?? '',
+    scrapingBeeApiKey: scrapingBeeApiKey ?? '',
+  );
   ChatControllerGeminiApiImpl.initialize(
     geminiApiKey: pod.getPassword('geminiApiKey') ?? '',
   );

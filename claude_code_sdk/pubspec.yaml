@@ -1,6 +1,6 @@
 name: claude_code_sdk
 description: A Dart SDK for interacting with Claude Code, providing seamless integration with AI-powered coding assistance through the Claude Code CLI.
-version: 1.0.0
+version: 1.1.0
 homepage: https://github.com/yourusername/claude_code_sdk
 repository: https://github.com/yourusername/claude_code_sdk
 

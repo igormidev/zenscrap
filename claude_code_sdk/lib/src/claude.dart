@@ -1,8 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
+import 'package:path/path.dart' as path;
 
 import 'claude_chat.dart';
 import 'exceptions/claude_exceptions.dart';
 import 'models/chat_options.dart';
+import 'models/mcp_models.dart';
 
 /// Main Claude SDK class for interacting with Claude Code
 class Claude {
@@ -277,6 +280,389 @@ class Claude {
     // Check pip
     info['pip_installed'] = await _isPipInstalled();
 
+    // Check MCP installation
+    try {
+      final mcpInfo = await isMcpInstalled();
+      info['mcp_enabled'] = mcpInfo.hasMcpSupport;
+      info['mcp_servers'] = mcpInfo.servers.length;
+      info['mcp_server_list'] = mcpInfo.servers.map((s) => s.name).toList();
+    } catch (_) {
+      info['mcp_enabled'] = false;
+      info['mcp_servers'] = 0;
+    }
+
     return info;
+  }
+
+  // ===== MCP (Model Context Protocol) Management Methods =====
+
+  /// Checks if MCP is installed and returns information about configured servers
+  Future<McpInstallationInfo> isMcpInstalled() async {
+    // Check if Claude CLI is installed
+    final isInstalled = await isClaudeCodeSDKInstalled();
+    if (!isInstalled) {
+      return McpInstallationInfo(
+        isClaudeInstalled: false,
+        servers: [],
+        hasMcpSupport: false,
+      );
+    }
+
+    // Get Claude version
+    String? claudeVersion;
+    try {
+      final versionResult = await Process.run(
+        _getShellCommand(),
+        _getShellArgs('claude --version'),
+      );
+      if (versionResult.exitCode == 0) {
+        claudeVersion = versionResult.stdout.toString().trim();
+      }
+    } catch (_) {}
+
+    // Get list of MCP servers
+    final servers = await listMcpServers();
+
+    // Determine config path
+    final configPath = _getConfigPath();
+
+    return McpInstallationInfo(
+      isClaudeInstalled: true,
+      claudeVersion: claudeVersion,
+      servers: servers,
+      hasMcpSupport: true,
+      configPath: configPath,
+    );
+  }
+
+  /// Lists all configured MCP servers
+  Future<List<McpServer>> listMcpServers() async {
+    try {
+      // Try using claude mcp list command
+      final result = await Process.run(
+        _getShellCommand(),
+        _getShellArgs('claude mcp list'),
+      );
+
+      if (result.exitCode == 0) {
+        // Parse the output to extract server information
+        final output = result.stdout.toString();
+        return _parseMcpListOutput(output);
+      }
+
+      // Fallback: read from config file
+      return await _readMcpServersFromConfig();
+    } catch (e) {
+      // If command fails, try reading config file directly
+      try {
+        return await _readMcpServersFromConfig();
+      } catch (_) {
+        return [];
+      }
+    }
+  }
+
+  /// Adds an MCP server to the configuration
+  Future<void> addMcpServer(
+    String name, {
+    String? packageName,
+    McpAddOptions? options,
+    McpServer? customServer,
+  }) async {
+    if (!await isClaudeCodeSDKInstalled()) {
+      throw ClaudeSDKException(
+        'Claude Code CLI is not installed. Run installClaudeCodeSDK() first.',
+      );
+    }
+
+    final opts = options ?? McpAddOptions();
+
+    // If custom server is provided, use it directly
+    if (customServer != null) {
+      await _addMcpServerViaConfig(customServer);
+      return;
+    }
+
+    // Check if it's a popular server
+    final popularServer = PopularMcpServers.getServer(name);
+    if (popularServer != null) {
+      await _addMcpServerViaConfig(popularServer.copyWith(name: name));
+      return;
+    }
+
+    // Otherwise, create a new server with the package name
+    if (packageName == null) {
+      throw ClaudeSDKException(
+        'Package name is required for non-popular MCP servers',
+      );
+    }
+
+    // Build the command and args
+    String command;
+    List<String> args;
+
+    if (opts.useNpx) {
+      if (Platform.isWindows && opts.windowsCmdWrapper) {
+        command = 'cmd';
+        args = ['/c', 'npx'];
+        if (opts.npxAutoYes) args.add('-y');
+        args.add(packageName);
+      } else {
+        command = 'npx';
+        args = [];
+        if (opts.npxAutoYes) args.add('-y');
+        args.add(packageName);
+      }
+    } else {
+      command = packageName;
+      args = [];
+    }
+
+    if (opts.additionalArgs != null) {
+      args.addAll(opts.additionalArgs!);
+    }
+
+    final server = McpServer(
+      name: name,
+      command: command,
+      args: args,
+      env: opts.environment,
+    );
+
+    await _addMcpServerViaConfig(server);
+  }
+
+  /// Removes an MCP server from the configuration
+  Future<void> removeMcpServer(String name) async {
+    if (!await isClaudeCodeSDKInstalled()) {
+      throw ClaudeSDKException(
+        'Claude Code CLI is not installed.',
+      );
+    }
+
+    // Try using CLI command first
+    try {
+      final result = await Process.run(
+        _getShellCommand(),
+        _getShellArgs('claude mcp remove $name'),
+      );
+
+      if (result.exitCode == 0) {
+        print('MCP server "$name" removed successfully');
+        return;
+      }
+    } catch (_) {}
+
+    // Fallback: modify config file directly
+    await _removeMcpServerViaConfig(name);
+  }
+
+  /// Gets details about a specific MCP server
+  Future<McpServer?> getMcpServerDetails(String name) async {
+    final servers = await listMcpServers();
+    return servers.firstWhere(
+      (s) => s.name == name,
+      orElse: () => throw ClaudeSDKException('MCP server "$name" not found'),
+    );
+  }
+
+  /// Gets a list of popular MCP servers that can be easily installed
+  List<String> getPopularMcpServers() {
+    return PopularMcpServers.availableServers;
+  }
+
+  /// Installs a popular MCP server by name
+  Future<void> installPopularMcpServer(
+    String serverName, {
+    Map<String, String>? environment,
+  }) async {
+    final server = PopularMcpServers.getServer(serverName);
+    if (server == null) {
+      throw ClaudeSDKException(
+        'Unknown popular server: $serverName. '
+        'Available servers: ${PopularMcpServers.availableServers.join(", ")}',
+      );
+    }
+
+    // Merge environment variables if provided
+    final finalServer = environment != null
+        ? server.copyWith(
+            env: {...?server.env, ...environment},
+          )
+        : server;
+
+    await addMcpServer(
+      serverName,
+      customServer: finalServer,
+    );
+
+    print('Installed popular MCP server: $serverName');
+    if (server.env != null && server.env!.isNotEmpty) {
+      final missingEnvVars = server.env!.entries
+          .where((e) => environment?[e.key] == null || environment![e.key]!.isEmpty)
+          .map((e) => e.key)
+          .toList();
+
+      if (missingEnvVars.isNotEmpty) {
+        print('\nNote: The following environment variables need to be configured:');
+        for (final envVar in missingEnvVars) {
+          print('  - $envVar');
+        }
+        print('\nEdit the configuration file at ${_getConfigPath()} to add these values.');
+      }
+    }
+  }
+
+  // ===== Private MCP Helper Methods =====
+
+  /// Gets the configuration file path
+  String _getConfigPath() {
+    final home = Platform.environment['HOME'] ?? Platform.environment['USERPROFILE'];
+    if (home == null) {
+      throw ClaudeSDKException('Could not determine home directory');
+    }
+    return path.join(home, '.claude', '.claude.json');
+  }
+
+  /// Reads MCP servers from the configuration file
+  Future<List<McpServer>> _readMcpServersFromConfig() async {
+    final configPath = _getConfigPath();
+    final configFile = File(configPath);
+
+    if (!await configFile.exists()) {
+      return [];
+    }
+
+    try {
+      final content = await configFile.readAsString();
+      final json = jsonDecode(content) as Map<String, dynamic>;
+      final config = McpConfig.fromJson(json);
+      return config.serverList;
+    } catch (e) {
+      print('Error reading MCP config: $e');
+      return [];
+    }
+  }
+
+  /// Adds an MCP server by modifying the config file
+  Future<void> _addMcpServerViaConfig(McpServer server) async {
+    final configPath = _getConfigPath();
+    final configFile = File(configPath);
+
+    // Ensure directory exists
+    final configDir = File(configPath).parent;
+    if (!await configDir.exists()) {
+      await configDir.create(recursive: true);
+    }
+
+    // Read existing config or create new one
+    Map<String, dynamic> configJson;
+    if (await configFile.exists()) {
+      final content = await configFile.readAsString();
+      configJson = jsonDecode(content) as Map<String, dynamic>;
+    } else {
+      configJson = {};
+    }
+
+    // Add or update the MCP server
+    configJson['mcpServers'] ??= <String, dynamic>{};
+    final mcpServers = configJson['mcpServers'] as Map<String, dynamic>;
+    mcpServers[server.name] = server.toJson();
+
+    // Write back to file
+    final encoder = JsonEncoder.withIndent('  ');
+    await configFile.writeAsString(encoder.convert(configJson));
+
+    print('MCP server "${server.name}" added successfully');
+    print('Configuration saved to: $configPath');
+  }
+
+  /// Removes an MCP server by modifying the config file
+  Future<void> _removeMcpServerViaConfig(String name) async {
+    final configPath = _getConfigPath();
+    final configFile = File(configPath);
+
+    if (!await configFile.exists()) {
+      throw ClaudeSDKException('Configuration file not found');
+    }
+
+    final content = await configFile.readAsString();
+    final configJson = jsonDecode(content) as Map<String, dynamic>;
+
+    final mcpServers = configJson['mcpServers'] as Map<String, dynamic>?;
+    if (mcpServers == null || !mcpServers.containsKey(name)) {
+      throw ClaudeSDKException('MCP server "$name" not found in configuration');
+    }
+
+    mcpServers.remove(name);
+
+    // Write back to file
+    final encoder = JsonEncoder.withIndent('  ');
+    await configFile.writeAsString(encoder.convert(configJson));
+
+    print('MCP server "$name" removed successfully');
+  }
+
+  /// Parses the output of 'claude mcp list' command
+  List<McpServer> _parseMcpListOutput(String output) {
+    final servers = <McpServer>[];
+    final lines = output.split('\n');
+
+    for (final line in lines) {
+      // Look for patterns like "• server-name: connected" or "• server-name: disconnected"
+      final match = RegExp(r'•\s+(\S+):\s+(\w+)').firstMatch(line);
+      if (match != null) {
+        final name = match.group(1)!;
+        final statusStr = match.group(2)!.toLowerCase();
+
+        McpServerStatus status;
+        switch (statusStr) {
+          case 'connected':
+            status = McpServerStatus.connected;
+            break;
+          case 'disconnected':
+            status = McpServerStatus.disconnected;
+            break;
+          case 'error':
+            status = McpServerStatus.error;
+            break;
+          default:
+            status = McpServerStatus.unknown;
+        }
+
+        servers.add(McpServer(
+          name: name,
+          command: '',  // Will be filled from config if needed
+          args: [],
+          status: status,
+        ));
+      }
+    }
+
+    // If we found servers from the list, try to get their full config
+    if (servers.isNotEmpty) {
+      _enrichServersWithConfig(servers);
+    }
+
+    return servers;
+  }
+
+  /// Enriches server list with configuration details
+  Future<void> _enrichServersWithConfig(List<McpServer> servers) async {
+    try {
+      final configServers = await _readMcpServersFromConfig();
+      for (var i = 0; i < servers.length; i++) {
+        final server = servers[i];
+        final configServer = configServers.firstWhere(
+          (s) => s.name == server.name,
+          orElse: () => server,
+        );
+        if (configServer != server) {
+          servers[i] = configServer.copyWith(status: server.status);
+        }
+      }
+    } catch (_) {
+      // Ignore errors, we'll use the basic info we have
+    }
   }
 }

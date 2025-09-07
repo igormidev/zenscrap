@@ -26,8 +26,16 @@ This package provides a Dart SDK for interacting with Claude Code, enabling deve
    - `SchemaObject` & `SchemaProperty`: JSON schema builders
    - `SchemaResult`: Structured response container
    - `ClaudeChatOptions`: Configuration for chat sessions
+   - `McpServer` & `McpConfig`: MCP server management models
+   - `McpInstallationInfo`: MCP installation status information
 
-4. **Exceptions**
+4. **MCP (Model Context Protocol) Support** (`lib/src/models/mcp_models.dart`)
+   - Manage MCP server configurations
+   - Install and remove MCP servers
+   - Query MCP installation status
+   - Support for popular MCP servers (filesystem, GitHub, PostgreSQL, etc.)
+
+5. **Exceptions**
    - Custom exception hierarchy for error handling
    - Specific exceptions for CLI issues, process errors, JSON parsing
 
@@ -56,6 +64,60 @@ Dart Application
 ```
 
 ## Key Implementation Details
+
+### MCP (Model Context Protocol) Integration
+
+The SDK provides comprehensive MCP support:
+
+#### Checking MCP Installation
+```dart
+final mcpInfo = await claude.isMcpInstalled();
+print('MCP support: ${mcpInfo.hasMcpSupport}');
+print('Configured servers: ${mcpInfo.servers.length}');
+```
+
+#### Installing Popular MCP Servers
+```dart
+// Install filesystem MCP server
+await claude.installPopularMcpServer('filesystem');
+
+// Install GitHub MCP with environment variables
+await claude.installPopularMcpServer('github', 
+  environment: {'GITHUB_TOKEN': 'your-token'}
+);
+```
+
+#### Managing Custom MCP Servers
+```dart
+// Add a custom MCP server
+final customServer = McpServer(
+  name: 'my-server',
+  command: 'node',
+  args: ['server.js'],
+  env: {'API_KEY': 'key'},
+);
+
+await claude.addMcpServer('my-server', customServer: customServer);
+
+// List all servers
+final servers = await claude.listMcpServers();
+
+// Get server details
+final details = await claude.getMcpServerDetails('my-server');
+
+// Remove a server
+await claude.removeMcpServer('my-server');
+```
+
+#### Available Popular MCP Servers
+- `filesystem` - File system access
+- `github` - GitHub integration
+- `postgres` - PostgreSQL database
+- `git` - Git operations
+- `puppeteer` - Web automation
+- `sequential-thinking` - Problem solving
+- `slack` - Slack integration
+- `google-drive` - Google Drive access
 
 ### Process Management
 
@@ -190,6 +252,9 @@ dart run example/file_analysis.dart
 
 # Schema example
 dart run example/schema_example.dart
+
+# MCP management
+dart run example/mcp_management.dart
 ```
 
 ### Publishing Updates
@@ -213,9 +278,11 @@ dart run example/schema_example.dart
 - [ ] Add retry logic for transient failures
 - [ ] Implement connection pooling for multiple chats
 - [ ] Add caching for repeated queries
-- [ ] Support for custom MCP tools
+- [x] Support for custom MCP tools
 - [ ] Better progress indicators for long operations
 - [ ] Add metrics and telemetry support
+- [ ] Desktop Extension (.dxt) support for one-click MCP installation
+- [ ] Auto-discovery of available MCP servers from npm registry
 
 ## Dependencies
 

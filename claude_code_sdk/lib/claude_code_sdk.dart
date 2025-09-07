@@ -14,6 +14,15 @@ export 'src/models/claude_sdk_content.dart'
     show ClaudeSdkContent, TextContent, FileContent, BytesContent;
 export 'src/models/schema_models.dart'
     show SchemaResult, SchemaObject, SchemaProperty;
+export 'src/models/mcp_models.dart'
+    show
+        McpServer,
+        McpConfig,
+        McpScope,
+        McpServerStatus,
+        McpInstallationInfo,
+        McpAddOptions,
+        PopularMcpServers;
 
 // Exceptions
 export 'src/exceptions/claude_exceptions.dart'

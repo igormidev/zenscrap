@@ -1,15 +1,9 @@
-I wan't you to build the ApiAnalyticsView in  @zenscrap_flutter/lib/src/ui/api_analytics/view/api_analytics_view.dart. Ultra think in this task.
+I wan't to do a refactor in the create scrappable logic - We will add in @zenscrap_server/lib/src/entities/scrappable/scrappable.spy.yaml a field called jsSenario that will be a nullable string (it is not required)
 
-This is a page that the user will be able to have a general perspective of all the requests made by his api keys. 
+My intent is to add the possibility to add in @zenscrap_server/lib/src/core/scraping_bee.dart the "js_scenario"
 
-The page will be splitted in two sections. One is the listage ScrappableRequestsAnalyticsItem and the other is the specific list of ScrappableAnalytics of one scrappable.
+VERY IMPORTANT: Use you web search tool to find the documentation of scrapingbee js_scenario parameter. The documentation is here: "https://www.scrapingbee.com/documentation/js-scenario/
+DO NOT follow without reading the documentation in the link above
 
-IMPORANT:
-If you need to generate serverpod files, use the command "serverpod generate --experimental-features=all". It need to have that flag because I am using some experimental-features... And on the flutter part you need to run the freezed build command in case you build any freezed class. At the end of the task, double-check if there are any static analysis error...
-
-Ultra think here, this is a complex task that will touch in backend and frontend.
-
-The second tab will display the NoSelectedScrappableIndicatorPage in a first moment. But if the user taps on the card of ScrappableRequestsAnalyticsItem the Scrappable of that card (ScrappableRequestsAnalyticsItem.scrappable) and will call a endpoint to get the listage of ScrappableAnalytics of that scrappable.  That endpoint does not exist, you will need to ultra think and create it inside PrivateScrappableAnalyticsEndpoint.  You will need to adapt @zenscrap_flutter/lib/src/states/analytics/selected_scrappable_analytics_state.dart and the endpoint to have support to pagination so if the user scrolls to the end there will be a load more button - note that there should be also a paginated model so the front end will know if there is a next page or not (like @zenscrap_server/lib/src/entities/analytics/scraapable_request_per_day.spy.yaml and @zenscrap_server/lib/src/entities/analytics/scrappable_requests_analytics_item.spy.yaml).
-
-In the first tab, the listage of ScrappableRequestsAnalyticsItem, use the @zenscrap_server/lib/src/endpoints/private/private_scrappable_analytics_endpoint.dart that is called in the @zenscrap_flutter/lib/src/states/analytics/analytics_provider.dart provider. It only brings 4 because this is a intensive operation to be done, so you should add in the end of the listage there should be a button to get more 4 (you will need to modify the endpoint getScrappableAnalyticsOfTheLast12Hours to get more 4 items). Please, adapt the function to return a paginated object so the ui will know if there is a next page (like @zenscrap_server/lib/src/entities/analytics/scraapable_request_per_day.spy.yaml and @zenscrap_server/lib/src/entities/analytics/scrappable_requests_analytics_item.spy.yaml). In the ui part, you should display a card with the scrappable name/description and the other data of @zenscrap_server/lib/src/entities/analytics/scrappable_requests_analytics_item.spy.yaml. The data of ScrappableRequestsAnalyticsItem.data will be displayed in columns where each column will represent the number of calls in 1 hour interval. The amount of each count will be a color. I will attach a reference ui so you can have a better ideia of what I expect from there card, use it as reference and ultra think to make a good ui:
-
+So, with that new variable in scrappable model, you will now edit @zenscrap_server/lib/src/endpoints/public/chat_controller/chat_controller_gemini_api_impl.dart 
+Here will be great part of the task - you will need to edit the schema and ultra think hard to write good prompts that explain what is the js_scenario so gemini can know how to add one if needed (remembering that it is optional). I what to emphasis that this is very important.
