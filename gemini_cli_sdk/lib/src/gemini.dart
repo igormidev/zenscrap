@@ -39,24 +39,12 @@ class GeminiSDK {
         _getShellCommand(),
         _getShellArgs('gemini --version'),
       );
-      
+
       return result.exitCode == 0;
     } catch (e) {
       // If we can't run the command, assume it's not installed
       return false;
     }
-  }
-
-  /// Checks if Gemini SDK (CLI) is installed
-  /// This is an alias for isGeminiCLIInstalled() for consistency
-  Future<bool> isGeminiSDKInstalled() async {
-    return isGeminiCLIInstalled();
-  }
-
-  /// Installs the Gemini SDK (CLI) using npm
-  /// This is an alias for installGeminiCLI() for consistency
-  Future<void> installGeminiSDK({bool global = true}) async {
-    return installGeminiCLI(global: global);
   }
 
   /// Installs the Gemini CLI using npm
@@ -123,7 +111,7 @@ class GeminiSDK {
           _getShellCommand(),
           _getShellArgs('gemini --version'),
         );
-        
+
         if (versionResult.exitCode == 0) {
           info['version'] = versionResult.stdout.toString().trim();
         }
@@ -146,7 +134,8 @@ class GeminiSDK {
   /// Checks if MCP is installed and configured
   Future<McpInstallationInfo> isMcpInstalled() async {
     try {
-      final homeDir = Platform.environment['HOME'] ?? Platform.environment['USERPROFILE'];
+      final homeDir =
+          Platform.environment['HOME'] ?? Platform.environment['USERPROFILE'];
       if (homeDir == null) {
         return const McpInstallationInfo(
           hasMcpSupport: false,
@@ -169,7 +158,7 @@ class GeminiSDK {
       final config = jsonDecode(configContent) as Map<String, dynamic>;
 
       final servers = <McpServerStatus>[];
-      
+
       if (config['mcpServers'] != null) {
         final mcpServers = config['mcpServers'] as Map<String, dynamic>;
         for (final entry in mcpServers.entries) {
@@ -194,7 +183,8 @@ class GeminiSDK {
   }
 
   /// Installs a popular MCP server
-  Future<void> installPopularMcpServer(String serverName, {
+  Future<void> installPopularMcpServer(
+    String serverName, {
     Map<String, String>? environment,
   }) async {
     final serverConfig = PopularMcpServers.getServer(serverName);
@@ -209,13 +199,14 @@ class GeminiSDK {
     if (serverConfig['requiredEnv'] != null) {
       final requiredEnv = serverConfig['requiredEnv'] as List<dynamic>;
       final missingEnv = <String>[];
-      
+
       for (final envVar in requiredEnv) {
-        if (environment?[envVar] == null && Platform.environment[envVar] == null) {
+        if (environment?[envVar] == null &&
+            Platform.environment[envVar] == null) {
           missingEnv.add(envVar as String);
         }
       }
-      
+
       if (missingEnv.isNotEmpty) {
         throw GeminiSDKException(
           'Missing required environment variables for $serverName: ${missingEnv.join(', ')}\n'
@@ -233,12 +224,13 @@ class GeminiSDK {
     );
 
     await addMcpServer(serverName, customServer: server);
-    
+
     print('Successfully installed $serverName MCP server');
   }
 
   /// Adds an MCP server to the configuration
-  Future<void> addMcpServer(String name, {
+  Future<void> addMcpServer(
+    String name, {
     String? packageName,
     McpServer? customServer,
     McpAddOptions? options,
@@ -250,9 +242,10 @@ class GeminiSDK {
     }
 
     final opts = options ?? const McpAddOptions();
-    
+
     // Determine config path based on scope
-    final homeDir = Platform.environment['HOME'] ?? Platform.environment['USERPROFILE'];
+    final homeDir =
+        Platform.environment['HOME'] ?? Platform.environment['USERPROFILE'];
     if (homeDir == null) {
       throw GeminiSDKException('Could not determine home directory');
     }
@@ -270,7 +263,7 @@ class GeminiSDK {
     // Load existing config or create new one
     Map<String, dynamic> config = {};
     final configFile = File(configPath);
-    
+
     if (await configFile.exists()) {
       final content = await configFile.readAsString();
       config = jsonDecode(content) as Map<String, dynamic>;
@@ -305,7 +298,7 @@ class GeminiSDK {
   /// Lists all configured MCP servers
   Future<List<McpServer>> listMcpServers() async {
     final mcpInfo = await isMcpInstalled();
-    
+
     if (!mcpInfo.hasMcpSupport || mcpInfo.configPath == null) {
       return [];
     }
@@ -338,7 +331,7 @@ class GeminiSDK {
   /// Gets details about a specific MCP server
   Future<McpServer?> getMcpServerDetails(String name) async {
     final servers = await listMcpServers();
-    
+
     try {
       return servers.firstWhere((s) => s.name == name);
     } catch (e) {
@@ -348,34 +341,36 @@ class GeminiSDK {
 
   /// Removes an MCP server from the configuration
   Future<void> removeMcpServer(String name) async {
-    final homeDir = Platform.environment['HOME'] ?? Platform.environment['USERPROFILE'];
+    final homeDir =
+        Platform.environment['HOME'] ?? Platform.environment['USERPROFILE'];
     if (homeDir == null) {
       throw GeminiSDKException('Could not determine home directory');
     }
 
     // Try both user and project scope
     final userConfigPath = path.join(homeDir, '.gemini', 'settings.json');
-    final projectConfigPath = path.join(Directory.current.path, '.gemini', 'settings.json');
+    final projectConfigPath =
+        path.join(Directory.current.path, '.gemini', 'settings.json');
 
     bool removed = false;
 
     for (final configPath in [userConfigPath, projectConfigPath]) {
       final configFile = File(configPath);
-      
+
       if (await configFile.exists()) {
         final content = await configFile.readAsString();
         final config = jsonDecode(content) as Map<String, dynamic>;
 
         if (config['mcpServers'] != null) {
           final mcpServers = config['mcpServers'] as Map<String, dynamic>;
-          
+
           if (mcpServers.containsKey(name)) {
             mcpServers.remove(name);
-            
+
             await configFile.writeAsString(
               const JsonEncoder.withIndent('  ').convert(config),
             );
-            
+
             removed = true;
             print('Removed MCP server "$name" from configuration');
           }

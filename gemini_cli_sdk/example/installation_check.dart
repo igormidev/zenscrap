@@ -4,32 +4,33 @@ import 'package:gemini_cli_sdk/gemini_cli_sdk.dart';
 void main() async {
   // Get API key from environment
   final apiKey = Platform.environment['GEMINI_API_KEY'] ?? 'YOUR_API_KEY';
-  
+
   if (apiKey == 'YOUR_API_KEY') {
     print('⚠️  Please set your GEMINI_API_KEY environment variable');
-    print('   You can get your API key from: https://makersuite.google.com/app/apikey');
+    print(
+        '   You can get your API key from: https://makersuite.google.com/app/apikey');
     print('');
   }
 
   final geminiSDK = GeminiSDK(apiKey);
-  
+
   print('🔍 Checking Gemini SDK installation...\n');
-  
+
   // Check if Gemini SDK is installed
-  final isInstalled = await geminiSDK.isGeminiSDKInstalled();
-  
+  final isInstalled = await geminiSDK.isGeminiCLIInstalled();
+
   if (isInstalled) {
     print('✅ Gemini SDK is installed!\n');
   } else {
     print('❌ Gemini SDK is not installed.\n');
     print('Would you like to install it now? (y/n)');
-    
+
     final response = stdin.readLineSync();
     if (response?.toLowerCase() == 'y') {
       print('\n📦 Installing Gemini SDK...\n');
-      
+
       try {
-        await geminiSDK.installGeminiSDK(global: true);
+        await geminiSDK.installGeminiCLI(global: true);
         print('\n✅ Installation complete!');
       } catch (e) {
         print('\n❌ Installation failed: $e');
@@ -47,16 +48,16 @@ void main() async {
       return;
     }
   }
-  
+
   // Get SDK information
   print('\n📊 SDK Information:\n');
   final info = await geminiSDK.getSDKInfo();
-  
+
   print('Gemini CLI: ${info['geminiCLI'] ? '✅ Installed' : '❌ Not installed'}');
   if (info['version'] != null) {
     print('Version: ${info['version']}');
   }
-  
+
   // Check MCP status
   if (info['mcp'] != null) {
     final mcp = info['mcp'] as Map<String, dynamic>;
@@ -67,11 +68,11 @@ void main() async {
       print('  Config path: ${mcp['configPath']}');
     }
   }
-  
+
   // Check MCP servers in detail
   print('\n🔌 Checking MCP servers...\n');
   final mcpInfo = await geminiSDK.isMcpInstalled();
-  
+
   if (mcpInfo.hasMcpSupport) {
     print('MCP is enabled with ${mcpInfo.servers.length} server(s):');
     for (final server in mcpInfo.servers) {
@@ -88,14 +89,15 @@ void main() async {
     print('\nExample:');
     print("  await geminiSDK.installPopularMcpServer('filesystem');");
   }
-  
+
   if (apiKey != 'YOUR_API_KEY') {
     print('\n🧪 Testing basic functionality...\n');
-    
+
     final chat = geminiSDK.createNewChat();
     try {
       final response = await chat.sendMessage([
-        GeminiSdkContent.text('Say "Hello, SDK test successful!" if you can read this.'),
+        GeminiSdkContent.text(
+            'Say "Hello, SDK test successful!" if you can read this.'),
       ]);
       print('Test response: $response');
       print('\n✅ Everything is working correctly!');
@@ -105,6 +107,6 @@ void main() async {
       await chat.dispose();
     }
   }
-  
+
   await geminiSDK.dispose();
 }
