@@ -10,13 +10,14 @@ typedef NanoId = String;
 mixin ApiHelperMixin {
   static final Map<NanoId, int> _currentConcurrencyRequests = {};
   static final Map<NanoId, PlanTier> _currentAccountPlanTierCache = {};
-  // static final Map<NanoId, > _currentAccountPlanTierCache = {};
+  static final Map<NanoId, CreditUsage> _currentCreditUsage = {};
   static final Map<NanoId, int> _remainingSubscriptionCredits = {};
   static final Map<NanoId, int> _remainingPurchasedCredits = {};
   static final Map<NanoId, List<ApiKey>> _apiKeysAttachedToNanoId = {};
 
   static void resetNanoId(NanoId nanoId) {
     _currentConcurrencyRequests.remove(nanoId);
+    _currentCreditUsage.remove(nanoId);
     _currentAccountPlanTierCache.remove(nanoId);
     _remainingSubscriptionCredits.remove(nanoId);
     _remainingPurchasedCredits.remove(nanoId);
@@ -142,9 +143,13 @@ mixin ApiHelperMixin {
           creditUsage: CreditUsage.include(),
         ),
       );
-      if (accountApiUsage == null || accountApiUsage.creditUsage == null) throw _noApiFound;
+      if (accountApiUsage == null || accountApiUsage.creditUsage == null) {
+        throw _noApiFound;
+      }
 
-      _remainingPurchasedCredits[nanoId] = accountApiUsage.creditUsage!.purchasedCredits;
+      _currentCreditUsage[nanoId] = accountApiUsage.creditUsage!;
+      _remainingPurchasedCredits[nanoId] =
+          accountApiUsage.creditUsage!.purchasedCredits;
       _remainingSubscriptionCredits[nanoId] =
           accountApiUsage.creditUsage!.subscriptionCredits;
       return discountApiTokens(session, nanoId: nanoId);
@@ -266,7 +271,8 @@ mixin ApiHelperMixin {
         scrappable = s;
       }, nanoId);
     } on _ApiError catch (error, stackTrace) {
-      await _setScrappable(session, scrappable, error.status, apiKey, nanoId);
+      await _setScrappableAnalytics(
+          session, scrappable, error.status, apiKey, nanoId);
       session.log(
         '[${error.status.name.toUpperCase()}] ${_noApiFound.exception.title}',
         exception: error.exception,
@@ -275,7 +281,7 @@ mixin ApiHelperMixin {
       );
       rethrow;
     } catch (error, stackTrace) {
-      await _setScrappable(
+      await _setScrappableAnalytics(
           session, scrappable, RequestStatus.serverError, apiKey, nanoId);
       session.log(
         'An unknown error occurred in api',
@@ -293,7 +299,7 @@ mixin ApiHelperMixin {
     }
   }
 
-  Future<void> _setScrappable(
+  Future<void> _setScrappableAnalytics(
     Session session,
     Scrappable? scrappable,
     RequestStatus status,
@@ -301,7 +307,22 @@ mixin ApiHelperMixin {
     NanoId? nanoId,
   ) async {
     if (scrappable != null && apiKey != null && nanoId != null) {
+      final CreditUsage? credit = _currentCreditUsage[nanoId];
+      if (credit == null) {
+        session.log(
+          'Credit usage not found for nanoId $nanoId when trying to log scrappable analytics',
+          level: LogLevel.error,
+        );
+        throw _noCreditUsageModelFound(apiKey);
+      }
+
       await session.db.transaction((transaction) async {
+        final newCredit = credit.copyWith(
+          subscriptionCredits: _remainingSubscriptionCredits[nanoId],
+          purchasedCredits: _remainingPurchasedCredits[nanoId],
+        );
+        await CreditUsage.db
+            .updateRow(session, newCredit, transaction: transaction);
         final analytics = await ScrappableAnalytics.db.insertRow(
             session,
             ScrappableAnalytics(
@@ -350,6 +371,15 @@ mixin ApiHelperMixin {
   }
 }
 
+_ApiError _noCreditUsageModelFound(ApiKey apiKey) => _ApiError(
+      RequestStatus.clientError,
+      ZenScrapException(
+        title: 'No Credit Usage Model Found',
+        description:
+            'No credit usage model found for the provided API key: $apiKey.\n'
+            'It could be that the account was deleted or has no plan assigned - check in your api key tab on ZenScrap site.',
+      ),
+    );
 _ApiError _apiKeyNotFound(ApiKey apiKey) => _ApiError(
       RequestStatus.clientError,
       ZenScrapException(
