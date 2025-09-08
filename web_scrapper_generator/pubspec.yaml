@@ -14,6 +14,9 @@ dependencies:
     path: ../claude_code_sdk
   gemini_cli_sdk:
     path: ../gemini_cli_sdk
+  http: ^1.2.0
+  dio: ^5.4.0
+  dart_mcp: ^0.3.3
 
 dev_dependencies:
   lints: ^5.0.0
