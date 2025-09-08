@@ -46,9 +46,19 @@ class WebScrapperRequest {
     required this.queryParam,
     required this.pathParams,
   });
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'url': url,
+      'queryParam': queryParam,
+      'pathParams': pathParams,
+    };
+  }
 }
 
 class ScrappingBeeFetchSettings {
+  // the target page URL to scrape
+  final String url;
   // stringified JSON describing what to extract (CSS/XPath selectors, lists, attributes, tables, etc.)
   final String extract_rules;
   // stringified JSON of scripted actions (click/type/scroll/infinite-scroll/etc.) to run before extraction
@@ -71,6 +81,7 @@ class ScrappingBeeFetchSettings {
   final bool? custom_google;
 
   const ScrappingBeeFetchSettings({
+    required this.url,
     required this.extract_rules,
     this.js_scenario,
     required this.render_js,
@@ -82,4 +93,20 @@ class ScrappingBeeFetchSettings {
     this.session_id,
     this.custom_google,
   });
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'url': url,
+      'extract_rules': extract_rules,
+      'js_scenario': js_scenario,
+      'render_js': render_js,
+      'wait': wait,
+      'wait_for': wait_for,
+      'wait_browser': wait_browser,
+      'premium_proxy': premium_proxy,
+      'country_code': country_code,
+      'session_id': session_id,
+      'custom_google': custom_google,
+    };
+  }
 }

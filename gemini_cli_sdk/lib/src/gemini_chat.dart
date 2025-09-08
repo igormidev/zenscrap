@@ -19,11 +19,11 @@ class GeminiChat {
   String? _sessionId;
 
   /// Whether this is the first message in the conversation
-  bool _isFirstMessage = true;
+  bool isFirstMessage = true;
 
   /// Whether the chat session has been disposed
   bool _isDisposed = false;
-  
+
   /// List of temporary files created during this session
   final List<File> _temporaryFiles = [];
 
@@ -88,7 +88,7 @@ class GeminiChat {
   /// Resets the conversation, starting a new session
   void resetConversation() {
     _sessionId = null;
-    _isFirstMessage = true;
+    isFirstMessage = true;
   }
 
   /// Builds a prompt from the provided contents
@@ -116,28 +116,28 @@ class GeminiChat {
 
     return promptParts.join('\n\n');
   }
-  
+
   /// Creates a temporary file from bytes content
   Future<File> _createTempFileFromBytes(BytesContent content) async {
     try {
       // Get system temp directory
       final tempDir = Directory.systemTemp;
-      
+
       // Generate unique filename
       const uuid = Uuid();
       final fileName = 'gemini_temp_${uuid.v4()}.${content.fileExtension}';
       final filePath = path.join(tempDir.path, fileName);
-      
+
       // Create and write to file
       final tempFile = File(filePath);
       await tempFile.writeAsBytes(content.data);
-      
+
       // Track this temporary file for cleanup
       _temporaryFiles.add(tempFile);
-      
+
       // Store reference in the BytesContent object
       content.tempFile = tempFile;
-      
+
       return tempFile;
     } catch (e) {
       throw GeminiSDKException(
@@ -206,12 +206,13 @@ Ensure your response strictly follows this schema and return only valid JSON.'''
 
       final output = result.stdout.toString();
 
-      // Extract session ID if present  
-      if (_isFirstMessage && output.contains('session:')) {
-        final sessionMatch = RegExp(r'session:\s*([a-zA-Z0-9-]+)').firstMatch(output);
+      // Extract session ID if present
+      if (isFirstMessage && output.contains('session:')) {
+        final sessionMatch =
+            RegExp(r'session:\s*([a-zA-Z0-9-]+)').firstMatch(output);
         if (sessionMatch != null) {
           _sessionId = sessionMatch.group(1);
-          _isFirstMessage = false;
+          isFirstMessage = false;
         }
       }
 
@@ -254,7 +255,7 @@ Ensure your response strictly follows this schema and return only valid JSON.'''
       );
 
       final process = _activeProcess!;
-      
+
       // Stream stdout
       final stdoutController = StreamController<String>();
       final stderrBuffer = StringBuffer();
@@ -265,14 +266,15 @@ Ensure your response strictly follows this schema and return only valid JSON.'''
           .listen(
         (line) {
           // Extract session ID if present
-          if (_isFirstMessage && line.contains('session:')) {
-            final sessionMatch = RegExp(r'session:\s*([a-zA-Z0-9-]+)').firstMatch(line);
+          if (isFirstMessage && line.contains('session:')) {
+            final sessionMatch =
+                RegExp(r'session:\s*([a-zA-Z0-9-]+)').firstMatch(line);
             if (sessionMatch != null) {
               _sessionId = sessionMatch.group(1);
-              _isFirstMessage = false;
+              isFirstMessage = false;
             }
           }
-          
+
           // Process and yield the line
           final processed = _processStreamLine(line);
           if (processed.isNotEmpty) {
@@ -292,7 +294,7 @@ Ensure your response strictly follows this schema and return only valid JSON.'''
 
       // Wait for process to complete
       final exitCode = await process.exitCode;
-      
+
       if (exitCode != 0) {
         throw ProcessException(
           'Gemini streaming command failed',
@@ -319,7 +321,7 @@ Ensure your response strictly follows this schema and return only valid JSON.'''
     if (line.startsWith('[') || line.startsWith('session:')) {
       return '';
     }
-    
+
     // Return the cleaned line
     return line;
   }
@@ -329,17 +331,17 @@ Ensure your response strictly follows this schema and return only valid JSON.'''
     // Remove any CLI metadata and return clean response
     final lines = output.split('\n');
     final responseLines = <String>[];
-    
+
     for (final line in lines) {
       // Skip metadata lines
-      if (line.startsWith('[') || 
+      if (line.startsWith('[') ||
           line.startsWith('session:') ||
           line.trim().isEmpty) {
         continue;
       }
       responseLines.add(line);
     }
-    
+
     return responseLines.join('\n').trim();
   }
 
@@ -348,7 +350,7 @@ Ensure your response strictly follows this schema and return only valid JSON.'''
     try {
       // Try to extract JSON from the response
       final jsonMatch = RegExp(r'\{[\s\S]*\}').firstMatch(response);
-      
+
       if (jsonMatch == null) {
         throw JSONDecodeException(
           'No JSON found in response',
@@ -432,6 +434,6 @@ Ensure your response strictly follows this schema and return only valid JSON.'''
 
     // Clear session
     _sessionId = null;
-    _isFirstMessage = true;
+    isFirstMessage = true;
   }
 }
