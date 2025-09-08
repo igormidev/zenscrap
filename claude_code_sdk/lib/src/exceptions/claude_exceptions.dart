@@ -43,5 +43,15 @@ class ProcessException extends ClaudeSDKException {
 
 /// Exception thrown when JSON parsing fails
 class JSONDecodeException extends ClaudeSDKException {
-  const JSONDecodeException(super.message, [super.originalError]);
+  final String rawContent;
+
+  const JSONDecodeException(String message, this.rawContent, [dynamic originalError])
+      : super(message, originalError);
+
+  @override
+  String toString() {
+    return 'JSONDecodeException: $message\n'
+        'Raw content: ${rawContent.length > 200 ? '${rawContent.substring(0, 200)}...' : rawContent}\n'
+        '${originalError != null ? 'Original error: $originalError' : ''}';
+  }
 }

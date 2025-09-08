@@ -61,8 +61,49 @@ class ClaudeChat {
     // Run the Claude CLI and get response
     final response = await _runClaudeCommand(prompt);
 
-    // Parse the response for schema data
-    return _parseSchemaResponse(response);
+    // First attempt to parse the response
+    try {
+      return _parseSchemaResponse(response);
+    } catch (firstError) {
+      // If parsing fails, give the model a second chance with error context
+      print('Warning: First schema parsing attempt failed. Retrying with error context...');
+      
+      try {
+        // Build a retry prompt with error context
+        final retryPrompt = await _buildRetrySchemaPrompt(
+          originalResponse: response,
+          error: firstError,
+          schema: schema,
+        );
+        
+        // Run the retry command
+        final retryResponse = await _runClaudeCommand(retryPrompt);
+        
+        // Try parsing the retry response
+        try {
+          return _parseSchemaResponse(retryResponse);
+        } catch (secondError) {
+          // If it still fails, throw the original error with additional context
+          throw JSONDecodeException(
+            'Failed to parse schema response after retry. '
+            'Original error: ${firstError.toString()}\n'
+            'Retry error: ${secondError.toString()}',
+            'First response: $response\nRetry response: $retryResponse',
+            secondError,
+          );
+        }
+      } catch (e) {
+        // If the retry itself fails (not just parsing), throw the original error
+        if (e is JSONDecodeException) {
+          rethrow;
+        }
+        throw JSONDecodeException(
+          'Failed to retry schema parsing: ${e.toString()}',
+          response,
+          firstError,
+        );
+      }
+    }
   }
 
   /// Gets the current session ID (if available)
@@ -141,6 +182,67 @@ $schemaJson
 
 Ensure your response strictly follows this schema.
 Return only raw json, without anything more (not even md notations like "```" in the begining... just the raw json).''';
+  }
+
+  /// Builds a retry prompt when schema parsing fails
+  Future<String> _buildRetrySchemaPrompt({
+    required String originalResponse,
+    required Object error,
+    required SchemaObject schema,
+  }) async {
+    final schemaJson = jsonEncode(schema.toJson());
+    
+    // Extract error details
+    String errorMessage = error.toString();
+    String errorDetails = '';
+    
+    if (error is JSONDecodeException) {
+      errorMessage = error.message;
+      // Limit the raw content to prevent token overflow
+      final rawContent = error.rawContent.length > 500 
+          ? '${error.rawContent.substring(0, 500)}...' 
+          : error.rawContent;
+      errorDetails = 'Your response: $rawContent';
+    } else if (error is FormatException) {
+      errorMessage = 'JSON format error: ${error.message}';
+      errorDetails = 'Invalid JSON at: ${error.source?.toString() ?? 'unknown position'}';
+    }
+
+    return '''[CRITICAL ERROR - RETRY REQUIRED]
+
+Your previous response failed to match the required JSON schema format. This is a critical issue that needs immediate correction.
+
+ERROR ENCOUNTERED:
+$errorMessage
+
+$errorDetails
+
+WHAT WENT WRONG:
+Your response either:
+1. Did not contain valid JSON
+2. Contained text mixed with JSON (JSON must be standalone)
+3. Had syntax errors in the JSON structure
+4. Did not match the required schema properties
+5. Included markdown code blocks (```) which are not allowed
+
+REQUIRED SCHEMA (YOU MUST FOLLOW THIS EXACTLY):
+$schemaJson
+
+INSTRUCTIONS FOR RETRY:
+1. Take a deep breath and carefully analyze the schema above
+2. Ensure ALL required fields are present with correct types
+3. Return ONLY valid JSON - no explanatory text before or after
+4. Do NOT wrap JSON in markdown code blocks (no ```)
+5. Validate your JSON structure before responding
+6. Double-check that property names match exactly (case-sensitive)
+
+CORRECT RESPONSE FORMAT EXAMPLE:
+{
+  "propertyName": value,
+  "anotherProperty": value
+}
+
+Please now provide a corrected response that strictly follows the schema. Return ONLY the raw JSON object, nothing else.''';
   }
 
   /// Runs the Claude CLI command and returns the response
@@ -241,7 +343,7 @@ Return only raw json, without anything more (not even md notations like "```" in
       } catch (e) {
         if (e is ClaudeSDKException) rethrow;
         throw JSONDecodeException(
-            'Failed to parse Claude response: ${e.toString()}', e);
+            'Failed to parse Claude response: ${e.toString()}', output, e);
       }
     } catch (e) {
       if (e is ClaudeSDKException ||
@@ -258,49 +360,78 @@ Return only raw json, without anything more (not even md notations like "```" in
   /// Parses a schema response and extracts structured data
   SchemaResult _parseSchemaResponse(String response) {
     try {
-      Map<String, dynamic> data = {};
-
-      // Check if response contains JSON wrapped in markdown code blocks
-      if (response.contains('```json')) {
-        // Extract JSON from markdown code blocks
-        final jsonMatch =
-            RegExp(r'```json\s*(.*?)\s*```', dotAll: true).firstMatch(response);
-        if (jsonMatch != null) {
-          final jsonContent = jsonMatch.group(1) ?? '';
-          try {
-            final parsedJson = jsonDecode(jsonContent);
-            if (parsedJson is Map<String, dynamic>) {
-              data = parsedJson;
-            }
-          } catch (_) {
-            // If parsing fails, use the whole response
-            data = {'response': response};
-          }
-        } else {
-          data = {'response': response};
-        }
-      } else {
-        // Try to parse the response as JSON directly
-        try {
-          final resultJson = jsonDecode(response);
-          if (resultJson is Map<String, dynamic>) {
-            data = resultJson;
-          } else {
-            data = {'response': response};
-          }
-        } catch (_) {
-          // If not JSON, create a simple data structure
-          data = {'response': response};
-        }
+      // First, try to clean common formatting issues
+      String cleanedResponse = response.trim();
+      
+      // Remove markdown code blocks if present
+      if (cleanedResponse.contains('```json')) {
+        cleanedResponse = cleanedResponse.replaceAll(RegExp(r'```json\s*'), '');
+        cleanedResponse = cleanedResponse.replaceAll(RegExp(r'```\s*'), '');
+      } else if (cleanedResponse.contains('```')) {
+        cleanedResponse = cleanedResponse.replaceAll(RegExp(r'```\s*'), '');
       }
-
-      return SchemaResult(
-        modelMessage: response,
-        data: data,
-      );
+      
+      // Try to extract JSON from the cleaned response
+      // First try to parse the entire response as JSON
+      try {
+        final data = jsonDecode(cleanedResponse) as Map<String, dynamic>;
+        return SchemaResult(
+          modelMessage: '',
+          data: data,
+        );
+      } catch (_) {
+        // If that fails, try to extract JSON using regex
+        final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(cleanedResponse);
+        
+        if (jsonMatch == null) {
+          // Try one more time with a more permissive regex
+          final permissiveMatch = RegExp(r'\{[\s\S]*\}').firstMatch(cleanedResponse);
+          if (permissiveMatch == null) {
+            throw JSONDecodeException(
+              'No JSON object found in response',
+              response,
+            );
+          }
+          
+          final jsonStr = permissiveMatch.group(0)!;
+          final data = jsonDecode(jsonStr) as Map<String, dynamic>;
+          
+          // Extract message if present
+          String modelMessage = '';
+          final messageIndex = cleanedResponse.indexOf(jsonStr);
+          if (messageIndex > 0) {
+            modelMessage = cleanedResponse.substring(0, messageIndex).trim();
+          }
+          
+          return SchemaResult(
+            modelMessage: modelMessage,
+            data: data,
+          );
+        }
+        
+        final jsonStr = jsonMatch.group(0)!;
+        final data = jsonDecode(jsonStr) as Map<String, dynamic>;
+        
+        // Extract message if present
+        String modelMessage = '';
+        final messageIndex = cleanedResponse.indexOf(jsonStr);
+        if (messageIndex > 0) {
+          modelMessage = cleanedResponse.substring(0, messageIndex).trim();
+        }
+        
+        return SchemaResult(
+          modelMessage: modelMessage,
+          data: data,
+        );
+      }
     } catch (e) {
+      if (e is JSONDecodeException) {
+        rethrow;
+      }
       throw JSONDecodeException(
-          'Failed to parse schema response: ${e.toString()}', e);
+          'Failed to parse schema response: ${e.toString()}', 
+          response,
+          e);
     }
   }
 
