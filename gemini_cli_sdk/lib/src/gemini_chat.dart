@@ -95,6 +95,18 @@ class GeminiChat {
   Future<String> _buildPrompt(List<GeminiSdkContent> contents) async {
     final promptParts = <String>[];
 
+    // Include system prompt if it's set
+    // This complements (not overrides) Gemini's default system prompt
+    if (options.systemPrompt != null && options.systemPrompt!.isNotEmpty) {
+      // Include system prompt either in first message only or in every message
+      if (isFirstMessage || options.repeatSystemPrompt) {
+        // Add system prompt as context
+        promptParts.add('''[Additional Context/Instructions]
+${options.systemPrompt}
+[End of Additional Context]''');
+      }
+    }
+
     for (final content in contents) {
       if (content is TextContent) {
         promptParts.add(content.text);
@@ -148,6 +160,7 @@ class GeminiChat {
   /// Builds a prompt with schema instructions
   Future<String> _buildSchemaPrompt(
       List<GeminiSdkContent> messages, SchemaObject schema) async {
+    // The system prompt is already included in _buildPrompt if needed
     final prompt = await _buildPrompt(messages);
     final schemaJson = jsonEncode(schema.toJson());
 

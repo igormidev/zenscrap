@@ -160,6 +160,37 @@ void main() {
       expect(newOptions.outputJson, isTrue);
       expect(newOptions.nonInteractive, isTrue); // Unchanged
     });
+
+    test('should handle system prompt options', () {
+      final options = GeminiChatOptions(
+        systemPrompt: 'You are a helpful assistant',
+        repeatSystemPrompt: false,
+      );
+
+      expect(options.systemPrompt, equals('You are a helpful assistant'));
+      expect(options.repeatSystemPrompt, isFalse);
+
+      // Test copyWith for system prompt
+      final newOptions = options.copyWith(
+        repeatSystemPrompt: true,
+      );
+
+      expect(newOptions.systemPrompt, equals('You are a helpful assistant'));
+      expect(newOptions.repeatSystemPrompt, isTrue);
+    });
+
+    test('should create chat with system prompt', () {
+      final sdk = GeminiSDK('test-api-key');
+      final chat = sdk.createNewChat(
+        options: GeminiChatOptions(
+          systemPrompt: 'Be concise and clear',
+          repeatSystemPrompt: true,
+        ),
+      );
+
+      expect(chat.options.systemPrompt, equals('Be concise and clear'));
+      expect(chat.options.repeatSystemPrompt, isTrue);
+    });
   });
 
   group('MCP Tests', () {

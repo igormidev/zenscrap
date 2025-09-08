@@ -4,7 +4,12 @@ class GeminiChatOptions {
   final String? model;
 
   /// System prompt to set context for the conversation
+  /// This complements (not overrides) Gemini's default system prompt
   final String? systemPrompt;
+
+  /// Whether to repeat the system prompt in every message
+  /// If false (default), the system prompt is only included in the first message
+  final bool repeatSystemPrompt;
 
   /// Maximum number of conversation turns
   final int? maxTurns;
@@ -39,6 +44,7 @@ class GeminiChatOptions {
   const GeminiChatOptions({
     this.model,
     this.systemPrompt,
+    this.repeatSystemPrompt = false,
     this.maxTurns,
     this.allowedTools,
     this.permissionMode,
@@ -55,6 +61,7 @@ class GeminiChatOptions {
   GeminiChatOptions copyWith({
     String? model,
     String? systemPrompt,
+    bool? repeatSystemPrompt,
     int? maxTurns,
     List<String>? allowedTools,
     String? permissionMode,
@@ -69,6 +76,7 @@ class GeminiChatOptions {
     return GeminiChatOptions(
       model: model ?? this.model,
       systemPrompt: systemPrompt ?? this.systemPrompt,
+      repeatSystemPrompt: repeatSystemPrompt ?? this.repeatSystemPrompt,
       maxTurns: maxTurns ?? this.maxTurns,
       allowedTools: allowedTools ?? this.allowedTools,
       permissionMode: permissionMode ?? this.permissionMode,

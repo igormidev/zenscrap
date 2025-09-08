@@ -174,6 +174,37 @@ void main() async {
 
 ## Advanced Configuration
 
+### System Prompts
+
+The SDK supports custom system prompts that **complement** (not override) Gemini's default system prompt. This allows you to add additional context or instructions to guide the model's behavior:
+
+```dart
+final geminiChat = geminiSDK.createNewChat(
+  options: GeminiChatOptions(
+    systemPrompt: '''You are a senior software engineer with expertise in Dart.
+Always consider best practices and performance implications.
+Provide code examples when relevant.''',
+    repeatSystemPrompt: false, // Only include in first message (default)
+  ),
+);
+```
+
+**System Prompt Options:**
+- `systemPrompt`: Additional context/instructions to complement Gemini's default behavior
+- `repeatSystemPrompt`: Whether to include the prompt in every message (default: `false`)
+  - `false`: Include only in the first message (maintains context through conversation)
+  - `true`: Include in every message (useful for strict formatting requirements)
+
+**Example with repeated system prompt:**
+```dart
+final chat = geminiSDK.createNewChat(
+  options: GeminiChatOptions(
+    systemPrompt: 'Always respond with exactly 3 bullet points.',
+    repeatSystemPrompt: true, // Ensures format consistency across all messages
+  ),
+);
+```
+
 ### Chat Options
 
 ```dart
@@ -181,6 +212,7 @@ final geminiChat = geminiSDK.createNewChat(
   options: GeminiChatOptions(
     model: 'gemini-2.5-flash', // or 'gemini-2.5-pro'
     systemPrompt: 'You are a helpful coding assistant',
+    repeatSystemPrompt: false, // Only in first message
     maxTurns: 5,
     allowedTools: ['Read', 'Write', 'Bash'],
     permissionMode: 'acceptEdits',
@@ -573,6 +605,7 @@ Check the `example/` directory for more comprehensive examples:
 - `example/basic_usage.dart` - Simple text messaging
 - `example/file_analysis.dart` - Analyzing files with Gemini
 - `example/schema_example.dart` - Using schemas for structured responses
+- `example/system_prompt_example.dart` - Using custom system prompts
 - `example/streaming_example.dart` - Streaming responses
 - `example/installation_check.dart` - Checking and installing dependencies
 - `example/mcp_management.dart` - Managing MCP servers

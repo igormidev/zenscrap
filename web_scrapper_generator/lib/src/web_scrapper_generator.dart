@@ -32,20 +32,16 @@ class WebScrapperGeneratorController {
   }
 
   final GeminiChat _chat;
-  final WebScrapperRequest _currentRequest;
-  final ScrappingBeeFetchSettings _currentFetchSettings;
+  final InitialPayloadData _initialPayload;
 
   WebScrapperGeneratorController._({
     required GeminiChat chat,
-    required WebScrapperRequest currentRequest,
-    required ScrappingBeeFetchSettings currentFetchSettings,
+    required InitialPayloadData initialPayload,
   }) : _chat = chat,
-       _currentRequest = currentRequest,
-       _currentFetchSettings = currentFetchSettings;
+       _initialPayload = initialPayload;
 
   static Future<WebScrapperGeneratorController> startChat({
-    required WebScrapperRequest currentRequest,
-    required ScrappingBeeFetchSettings currentFetchSettings,
+    required InitialPayloadDataCreatingFromZero currentRequest,
   }) async {
     final chat = _geminiSDK.createNewChat(
       options: GeminiChatOptions(
@@ -55,8 +51,7 @@ class WebScrapperGeneratorController {
     );
     final instance = WebScrapperGeneratorController._(
       chat: chat,
-      currentRequest: currentRequest,
-      currentFetchSettings: currentFetchSettings,
+      initialPayload: currentRequest,
     );
     return instance;
   }
@@ -68,14 +63,10 @@ class WebScrapperGeneratorController {
 
     final isFirstMessage = _chat.isFirstMessage;
     if (isFirstMessage) {
-      prefixMessages.addAll(
-        getStartConversationContextContents(
-          currentRequest: _currentRequest,
-          currentFetchSettings: _currentFetchSettings,
-        ),
-      );
+      prefixMessages.addAll(handleInitialPrompts(_initialPayload));
     }
 
+    // TODO: IMPLEMENT SCHEMA
     _chat.sendMessage([...prefixMessages, GeminiSdkContent.text(userPrompt)]);
 
     // Todo: implement this later...
@@ -95,4 +86,27 @@ enum ScrappableSource {
         return 'gemini-2.5-pro';
     }
   }
+}
+
+sealed class InitialPayloadData {
+  const InitialPayloadData();
+}
+
+final class InitialPayloadDataCreatingFromZero extends InitialPayloadData {
+  final String targetExampleUrl;
+  final WebScrapperRequest webScrapperRequest;
+  const InitialPayloadDataCreatingFromZero(
+    this.webScrapperRequest,
+    this.targetExampleUrl,
+  );
+}
+
+final class InitialPayloadDataEditingExistingWebScrapper
+    extends InitialPayloadData {
+  final WebScrapperRequest currentRequest;
+  final ScrappingBeeFetchSettings currentFetchSettings;
+  const InitialPayloadDataEditingExistingWebScrapper({
+    required this.currentRequest,
+    required this.currentFetchSettings,
+  });
 }
