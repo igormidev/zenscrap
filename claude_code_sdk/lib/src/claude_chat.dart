@@ -22,7 +22,7 @@ class ClaudeChat {
 
   /// Whether the chat session has been disposed
   bool _isDisposed = false;
-  
+
   /// List of temporary files created during this session
   final List<File> _temporaryFiles = [];
 
@@ -99,28 +99,28 @@ class ClaudeChat {
 
     return promptParts.join('\n\n');
   }
-  
+
   /// Creates a temporary file from bytes content
   Future<File> _createTempFileFromBytes(BytesContent content) async {
     try {
       // Get system temp directory using dart:io
       final tempDir = Directory.systemTemp;
-      
+
       // Generate unique filename
       const uuid = Uuid();
       final fileName = 'claude_temp_${uuid.v4()}.${content.fileExtension}';
       final filePath = path.join(tempDir.path, fileName);
-      
+
       // Create and write to file
       final tempFile = File(filePath);
       await tempFile.writeAsBytes(content.data);
-      
+
       // Track this temporary file for cleanup
       _temporaryFiles.add(tempFile);
-      
+
       // Store reference in the BytesContent object
       content.tempFile = tempFile;
-      
+
       return tempFile;
     } catch (e) {
       throw ClaudeSDKException(
@@ -139,7 +139,8 @@ class ClaudeChat {
 Please provide your response in the following JSON schema format:
 $schemaJson
 
-Ensure your response strictly follows this schema.''';
+Ensure your response strictly follows this schema.
+Return only raw json, without anything more (not even md notations like "```" in the begining... just the raw json).''';
   }
 
   /// Runs the Claude CLI command and returns the response
@@ -307,7 +308,7 @@ Ensure your response strictly follows this schema.''';
   Future<void> dispose() async {
     if (_isDisposed) return;
     _isDisposed = true;
-    
+
     // Clean up temporary files
     for (final tempFile in _temporaryFiles) {
       try {
@@ -321,7 +322,7 @@ Ensure your response strictly follows this schema.''';
     }
     _temporaryFiles.clear();
   }
-  
+
   /// Whether the chat session is disposed
   bool get isDisposed => _isDisposed;
 }

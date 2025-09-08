@@ -169,7 +169,8 @@ ${options.systemPrompt}
 Please provide your response in the following JSON schema format:
 $schemaJson
 
-Ensure your response strictly follows this schema and return only valid JSON.''';
+Ensure your response strictly follows this schema and return only valid JSON.
+Return only raw json, without anything more (not even md notations like "```" in the begining... just the raw json).''';
   }
 
   /// Runs the Gemini CLI command and returns the response

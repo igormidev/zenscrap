@@ -68,13 +68,13 @@ class ScrappingBeeFetchSettings {
   // add a fixed delay (milliseconds) before returning the response
   final int? wait;
   // wait for a specific CSS/XPath selector to appear before returning
-  final int? wait_for;
+  final String? wait_for;
   // wait for a browser event (e.g., domcontentloaded) before returning
-  final int? wait_browser;
+  final String? wait_browser;
   // will use residencial proxy, for more scrapper-resident sites
   final bool premium_proxy;
   // proxy geolocation (e.g., us, de, br)
-  final bool? country_code;
+  final String? country_code;
   // keep the same IP across multiple requests (sticky sessions).
   final String? session_id;
   // enable Google-specific handling, this should allways be true if the url is from a google domain
