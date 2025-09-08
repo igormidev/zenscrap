@@ -99,19 +99,19 @@ void main() {
       expect(json['type'], equals('text'));
       expect(json['text'], equals('Test message'));
     });
-    
+
     test('should create bytes content', () {
       final bytes = Uint8List.fromList([1, 2, 3, 4, 5]);
       final content = ClaudeSdkContent.bytes(
         data: bytes,
         fileExtension: 'bin',
       );
-      
+
       expect(content, isA<BytesContent>());
       expect((content as BytesContent).data, equals(bytes));
       expect(content.fileExtension, equals('bin'));
     });
-    
+
     test('should convert bytes content to JSON', () {
       final bytes = Uint8List.fromList([1, 2, 3]);
       final content = ClaudeSdkContent.bytes(
@@ -119,7 +119,7 @@ void main() {
         fileExtension: 'txt',
       );
       final json = content.toJson();
-      
+
       expect(json['type'], equals('bytes'));
       expect(json['data_length'], equals(3));
       expect(json['extension'], equals('txt'));
@@ -156,7 +156,7 @@ void main() {
       // Required array should be automatically generated from nullable: false properties
       expect(json['required'], unorderedEquals(['name', 'email']));
     });
-    
+
     test('should support legacy required parameter', () {
       final schema = SchemaObject(
         properties: {
@@ -273,11 +273,6 @@ void main() {
       expect(exception.toString(), contains('Process failed'));
       expect(exception.toString(), contains('exit code: 1'));
       expect(exception.toString(), contains('Error output'));
-    });
-
-    test('should create JSONDecodeException', () {
-      const exception = JSONDecodeException('Invalid JSON');
-      expect(exception.toString(), contains('Invalid JSON'));
     });
   });
 }

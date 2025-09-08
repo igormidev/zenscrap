@@ -40,9 +40,9 @@ class WebScrapperGeneratorController {
   }) : _chat = chat,
        _initialPayload = initialPayload;
 
-  static Future<WebScrapperGeneratorController> startChat({
+  static WebScrapperGeneratorController startChat({
     required InitialPayloadDataCreatingFromZero currentRequest,
-  }) async {
+  }) {
     final chat = _geminiSDK.createNewChat(
       options: GeminiChatOptions(
         systemPrompt: systemPrompt,

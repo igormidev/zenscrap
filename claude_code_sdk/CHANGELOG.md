@@ -1,3 +1,33 @@
+## 1.3.0
+
+### New Features
+- **Smart Schema Retry Mechanism**: Automatically retries schema parsing with error context when initial parsing fails
+  - First attempt uses normal schema parsing
+  - On failure, sends detailed error feedback to Claude for correction
+  - Provides clear instructions about what went wrong (markdown blocks, mixed content, syntax errors)
+  - Includes the original error and response for context
+  - Significantly improves reliability of schema-based responses
+
+### Improvements
+- **Enhanced JSON Parsing**: Improved `_parseSchemaResponse` method with multiple strategies
+  - Automatically removes markdown code blocks (```)
+  - Tries to parse entire response as JSON first
+  - Falls back to regex extraction for mixed content
+  - Multiple regex patterns for better JSON detection
+  - Handles common formatting issues automatically
+
+- **Better Error Handling**: Enhanced `JSONDecodeException` class
+  - Now includes `rawContent` field for debugging
+  - Truncates long content to prevent token overflow
+  - Provides more detailed error messages
+  - Better toString() implementation with context
+
+### Technical Details
+- Added `_buildRetrySchemaPrompt()` method for intelligent retry prompts
+- Modified `sendMessageWithSchema()` to implement two-attempt strategy
+- Updated exception handling to support new error information
+- Maintains backward compatibility with existing code
+
 ## 1.2.0
 
 ### New Features
