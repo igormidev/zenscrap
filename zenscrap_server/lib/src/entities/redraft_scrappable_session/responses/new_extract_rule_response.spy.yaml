@@ -3,3 +3,5 @@ extends: ChatResponse
 fields:
   messageText: String
   referenceTestData: ReferenceTestData
+  scrappingBeeExtractLogic: ScrappingBeeExtractLogic
+  scrapperRequest: ScrappableRequest

@@ -4,7 +4,7 @@ fields:
   referenceLinkUsed: String
   referenceQueryParametersJson: String
   byteData: ByteTestData?, relation
-  scrappableTestResult: ScrappableTestResult?, relation(name=test_result_reference)
+  testExtractJsonResult: String?
   scrappable: Scrappable?, relation(name=test_scrappable)
 indexes:
   reference_test_data_byte_data_id_idx:

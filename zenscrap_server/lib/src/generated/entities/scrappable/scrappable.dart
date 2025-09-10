@@ -12,10 +12,11 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
-import '../../entities/scrappable/scrappable_request.dart' as _i2;
-import '../../entities/scrappable/reference_test_data.dart' as _i3;
-import '../../entities/scrappable/scrappable_analytics.dart' as _i4;
-import '../../entities/scrappable/scraper_category.dart' as _i5;
+import '../../entities/scrappable/scrapping_bee_extract_logic.dart' as _i2;
+import '../../entities/scrappable/scrappable_request.dart' as _i3;
+import '../../entities/scrappable/reference_test_data.dart' as _i4;
+import '../../entities/scrappable/scrappable_analytics.dart' as _i5;
+import '../../entities/scrappable/scraper_category.dart' as _i6;
 
 abstract class Scrappable
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -29,7 +30,7 @@ abstract class Scrappable
     required this.name,
     required this.description,
     this.testEndpointAvailableUntil,
-    this.scrappingRules,
+    this.scrappingBeeExtractRules,
     required this.willHideFromMarketplace,
     required this.targetRequestId,
     this.targetRequest,
@@ -50,14 +51,14 @@ abstract class Scrappable
     required String name,
     required String description,
     DateTime? testEndpointAvailableUntil,
-    String? scrappingRules,
+    _i2.ScrappingBeeExtractLogic? scrappingBeeExtractRules,
     required bool willHideFromMarketplace,
     required int targetRequestId,
-    _i2.ScrappableRequest? targetRequest,
+    _i3.ScrappableRequest? targetRequest,
     required int referenceTestDataId,
-    _i3.ReferenceTestData? referenceTestData,
-    List<_i4.ScrappableAnalytics>? scrappableAnalytics,
-    required _i5.ScraperCategory category,
+    _i4.ReferenceTestData? referenceTestData,
+    List<_i5.ScrappableAnalytics>? scrappableAnalytics,
+    required _i6.ScraperCategory category,
     required bool isDeleted,
   }) = _ScrappableImpl;
 
@@ -79,25 +80,30 @@ abstract class Scrappable
               ? null
               : _i1.DateTimeJsonExtension.fromJson(
                   jsonSerialization['testEndpointAvailableUntil']),
-      scrappingRules: jsonSerialization['scrappingRules'] as String?,
+      scrappingBeeExtractRules:
+          jsonSerialization['scrappingBeeExtractRules'] == null
+              ? null
+              : _i2.ScrappingBeeExtractLogic.fromJson(
+                  (jsonSerialization['scrappingBeeExtractRules']
+                      as Map<String, dynamic>)),
       willHideFromMarketplace:
           jsonSerialization['willHideFromMarketplace'] as bool,
       targetRequestId: jsonSerialization['targetRequestId'] as int,
       targetRequest: jsonSerialization['targetRequest'] == null
           ? null
-          : _i2.ScrappableRequest.fromJson(
+          : _i3.ScrappableRequest.fromJson(
               (jsonSerialization['targetRequest'] as Map<String, dynamic>)),
       referenceTestDataId: jsonSerialization['referenceTestDataId'] as int,
       referenceTestData: jsonSerialization['referenceTestData'] == null
           ? null
-          : _i3.ReferenceTestData.fromJson(
+          : _i4.ReferenceTestData.fromJson(
               (jsonSerialization['referenceTestData'] as Map<String, dynamic>)),
       scrappableAnalytics: (jsonSerialization['scrappableAnalytics'] as List?)
           ?.map((e) =>
-              _i4.ScrappableAnalytics.fromJson((e as Map<String, dynamic>)))
+              _i5.ScrappableAnalytics.fromJson((e as Map<String, dynamic>)))
           .toList(),
       category:
-          _i5.ScraperCategory.fromJson((jsonSerialization['category'] as int)),
+          _i6.ScraperCategory.fromJson((jsonSerialization['category'] as int)),
       isDeleted: jsonSerialization['isDeleted'] as bool,
     );
   }
@@ -125,21 +131,21 @@ abstract class Scrappable
 
   DateTime? testEndpointAvailableUntil;
 
-  String? scrappingRules;
+  _i2.ScrappingBeeExtractLogic? scrappingBeeExtractRules;
 
   bool willHideFromMarketplace;
 
   int targetRequestId;
 
-  _i2.ScrappableRequest? targetRequest;
+  _i3.ScrappableRequest? targetRequest;
 
   int referenceTestDataId;
 
-  _i3.ReferenceTestData? referenceTestData;
+  _i4.ReferenceTestData? referenceTestData;
 
-  List<_i4.ScrappableAnalytics>? scrappableAnalytics;
+  List<_i5.ScrappableAnalytics>? scrappableAnalytics;
 
-  _i5.ScraperCategory category;
+  _i6.ScraperCategory category;
 
   bool isDeleted;
 
@@ -159,14 +165,14 @@ abstract class Scrappable
     String? name,
     String? description,
     DateTime? testEndpointAvailableUntil,
-    String? scrappingRules,
+    _i2.ScrappingBeeExtractLogic? scrappingBeeExtractRules,
     bool? willHideFromMarketplace,
     int? targetRequestId,
-    _i2.ScrappableRequest? targetRequest,
+    _i3.ScrappableRequest? targetRequest,
     int? referenceTestDataId,
-    _i3.ReferenceTestData? referenceTestData,
-    List<_i4.ScrappableAnalytics>? scrappableAnalytics,
-    _i5.ScraperCategory? category,
+    _i4.ReferenceTestData? referenceTestData,
+    List<_i5.ScrappableAnalytics>? scrappableAnalytics,
+    _i6.ScraperCategory? category,
     bool? isDeleted,
   });
   @override
@@ -183,7 +189,8 @@ abstract class Scrappable
       'description': description,
       if (testEndpointAvailableUntil != null)
         'testEndpointAvailableUntil': testEndpointAvailableUntil?.toJson(),
-      if (scrappingRules != null) 'scrappingRules': scrappingRules,
+      if (scrappingBeeExtractRules != null)
+        'scrappingBeeExtractRules': scrappingBeeExtractRules?.toJson(),
       'willHideFromMarketplace': willHideFromMarketplace,
       'targetRequestId': targetRequestId,
       if (targetRequest != null) 'targetRequest': targetRequest?.toJson(),
@@ -210,7 +217,9 @@ abstract class Scrappable
       'description': description,
       if (testEndpointAvailableUntil != null)
         'testEndpointAvailableUntil': testEndpointAvailableUntil?.toJson(),
-      if (scrappingRules != null) 'scrappingRules': scrappingRules,
+      if (scrappingBeeExtractRules != null)
+        'scrappingBeeExtractRules':
+            scrappingBeeExtractRules?.toJsonForProtocol(),
       'willHideFromMarketplace': willHideFromMarketplace,
       'targetRequestId': targetRequestId,
       if (targetRequest != null)
@@ -227,11 +236,13 @@ abstract class Scrappable
   }
 
   static ScrappableInclude include({
-    _i2.ScrappableRequestInclude? targetRequest,
-    _i3.ReferenceTestDataInclude? referenceTestData,
-    _i4.ScrappableAnalyticsIncludeList? scrappableAnalytics,
+    _i2.ScrappingBeeExtractLogicInclude? scrappingBeeExtractRules,
+    _i3.ScrappableRequestInclude? targetRequest,
+    _i4.ReferenceTestDataInclude? referenceTestData,
+    _i5.ScrappableAnalyticsIncludeList? scrappableAnalytics,
   }) {
     return ScrappableInclude._(
+      scrappingBeeExtractRules: scrappingBeeExtractRules,
       targetRequest: targetRequest,
       referenceTestData: referenceTestData,
       scrappableAnalytics: scrappableAnalytics,
@@ -277,14 +288,14 @@ class _ScrappableImpl extends Scrappable {
     required String name,
     required String description,
     DateTime? testEndpointAvailableUntil,
-    String? scrappingRules,
+    _i2.ScrappingBeeExtractLogic? scrappingBeeExtractRules,
     required bool willHideFromMarketplace,
     required int targetRequestId,
-    _i2.ScrappableRequest? targetRequest,
+    _i3.ScrappableRequest? targetRequest,
     required int referenceTestDataId,
-    _i3.ReferenceTestData? referenceTestData,
-    List<_i4.ScrappableAnalytics>? scrappableAnalytics,
-    required _i5.ScraperCategory category,
+    _i4.ReferenceTestData? referenceTestData,
+    List<_i5.ScrappableAnalytics>? scrappableAnalytics,
+    required _i6.ScraperCategory category,
     required bool isDeleted,
   }) : super._(
           id: id,
@@ -296,7 +307,7 @@ class _ScrappableImpl extends Scrappable {
           name: name,
           description: description,
           testEndpointAvailableUntil: testEndpointAvailableUntil,
-          scrappingRules: scrappingRules,
+          scrappingBeeExtractRules: scrappingBeeExtractRules,
           willHideFromMarketplace: willHideFromMarketplace,
           targetRequestId: targetRequestId,
           targetRequest: targetRequest,
@@ -321,14 +332,14 @@ class _ScrappableImpl extends Scrappable {
     String? name,
     String? description,
     Object? testEndpointAvailableUntil = _Undefined,
-    Object? scrappingRules = _Undefined,
+    Object? scrappingBeeExtractRules = _Undefined,
     bool? willHideFromMarketplace,
     int? targetRequestId,
     Object? targetRequest = _Undefined,
     int? referenceTestDataId,
     Object? referenceTestData = _Undefined,
     Object? scrappableAnalytics = _Undefined,
-    _i5.ScraperCategory? category,
+    _i6.ScraperCategory? category,
     bool? isDeleted,
   }) {
     return Scrappable(
@@ -347,19 +358,21 @@ class _ScrappableImpl extends Scrappable {
       testEndpointAvailableUntil: testEndpointAvailableUntil is DateTime?
           ? testEndpointAvailableUntil
           : this.testEndpointAvailableUntil,
-      scrappingRules:
-          scrappingRules is String? ? scrappingRules : this.scrappingRules,
+      scrappingBeeExtractRules:
+          scrappingBeeExtractRules is _i2.ScrappingBeeExtractLogic?
+              ? scrappingBeeExtractRules
+              : this.scrappingBeeExtractRules?.copyWith(),
       willHideFromMarketplace:
           willHideFromMarketplace ?? this.willHideFromMarketplace,
       targetRequestId: targetRequestId ?? this.targetRequestId,
-      targetRequest: targetRequest is _i2.ScrappableRequest?
+      targetRequest: targetRequest is _i3.ScrappableRequest?
           ? targetRequest
           : this.targetRequest?.copyWith(),
       referenceTestDataId: referenceTestDataId ?? this.referenceTestDataId,
-      referenceTestData: referenceTestData is _i3.ReferenceTestData?
+      referenceTestData: referenceTestData is _i4.ReferenceTestData?
           ? referenceTestData
           : this.referenceTestData?.copyWith(),
-      scrappableAnalytics: scrappableAnalytics is List<_i4.ScrappableAnalytics>?
+      scrappableAnalytics: scrappableAnalytics is List<_i5.ScrappableAnalytics>?
           ? scrappableAnalytics
           : this.scrappableAnalytics?.map((e0) => e0.copyWith()).toList(),
       category: category ?? this.category,
@@ -402,10 +415,6 @@ class ScrappableTable extends _i1.Table<int?> {
       'testEndpointAvailableUntil',
       this,
     );
-    scrappingRules = _i1.ColumnString(
-      'scrappingRules',
-      this,
-    );
     willHideFromMarketplace = _i1.ColumnBool(
       'willHideFromMarketplace',
       this,
@@ -445,78 +454,91 @@ class ScrappableTable extends _i1.Table<int?> {
 
   late final _i1.ColumnDateTime testEndpointAvailableUntil;
 
-  late final _i1.ColumnString scrappingRules;
+  _i2.ScrappingBeeExtractLogicTable? _scrappingBeeExtractRules;
 
   late final _i1.ColumnBool willHideFromMarketplace;
 
   late final _i1.ColumnInt targetRequestId;
 
-  _i2.ScrappableRequestTable? _targetRequest;
+  _i3.ScrappableRequestTable? _targetRequest;
 
   late final _i1.ColumnInt referenceTestDataId;
 
-  _i3.ReferenceTestDataTable? _referenceTestData;
+  _i4.ReferenceTestDataTable? _referenceTestData;
 
-  _i4.ScrappableAnalyticsTable? ___scrappableAnalytics;
+  _i5.ScrappableAnalyticsTable? ___scrappableAnalytics;
 
-  _i1.ManyRelation<_i4.ScrappableAnalyticsTable>? _scrappableAnalytics;
+  _i1.ManyRelation<_i5.ScrappableAnalyticsTable>? _scrappableAnalytics;
 
-  late final _i1.ColumnEnum<_i5.ScraperCategory> category;
+  late final _i1.ColumnEnum<_i6.ScraperCategory> category;
 
   late final _i1.ColumnBool isDeleted;
 
-  _i2.ScrappableRequestTable get targetRequest {
+  _i2.ScrappingBeeExtractLogicTable get scrappingBeeExtractRules {
+    if (_scrappingBeeExtractRules != null) return _scrappingBeeExtractRules!;
+    _scrappingBeeExtractRules = _i1.createRelationTable(
+      relationFieldName: 'scrappingBeeExtractRules',
+      field: Scrappable.t.id,
+      foreignField: _i2.ScrappingBeeExtractLogic.t.scrappableId,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) => _i2.ScrappingBeeExtractLogicTable(
+          tableRelation: foreignTableRelation),
+    );
+    return _scrappingBeeExtractRules!;
+  }
+
+  _i3.ScrappableRequestTable get targetRequest {
     if (_targetRequest != null) return _targetRequest!;
     _targetRequest = _i1.createRelationTable(
       relationFieldName: 'targetRequest',
       field: Scrappable.t.targetRequestId,
-      foreignField: _i2.ScrappableRequest.t.id,
+      foreignField: _i3.ScrappableRequest.t.id,
       tableRelation: tableRelation,
       createTable: (foreignTableRelation) =>
-          _i2.ScrappableRequestTable(tableRelation: foreignTableRelation),
+          _i3.ScrappableRequestTable(tableRelation: foreignTableRelation),
     );
     return _targetRequest!;
   }
 
-  _i3.ReferenceTestDataTable get referenceTestData {
+  _i4.ReferenceTestDataTable get referenceTestData {
     if (_referenceTestData != null) return _referenceTestData!;
     _referenceTestData = _i1.createRelationTable(
       relationFieldName: 'referenceTestData',
       field: Scrappable.t.referenceTestDataId,
-      foreignField: _i3.ReferenceTestData.t.id,
+      foreignField: _i4.ReferenceTestData.t.id,
       tableRelation: tableRelation,
       createTable: (foreignTableRelation) =>
-          _i3.ReferenceTestDataTable(tableRelation: foreignTableRelation),
+          _i4.ReferenceTestDataTable(tableRelation: foreignTableRelation),
     );
     return _referenceTestData!;
   }
 
-  _i4.ScrappableAnalyticsTable get __scrappableAnalytics {
+  _i5.ScrappableAnalyticsTable get __scrappableAnalytics {
     if (___scrappableAnalytics != null) return ___scrappableAnalytics!;
     ___scrappableAnalytics = _i1.createRelationTable(
       relationFieldName: '__scrappableAnalytics',
       field: Scrappable.t.id,
-      foreignField: _i4.ScrappableAnalytics.t.scrappableId,
+      foreignField: _i5.ScrappableAnalytics.t.scrappableId,
       tableRelation: tableRelation,
       createTable: (foreignTableRelation) =>
-          _i4.ScrappableAnalyticsTable(tableRelation: foreignTableRelation),
+          _i5.ScrappableAnalyticsTable(tableRelation: foreignTableRelation),
     );
     return ___scrappableAnalytics!;
   }
 
-  _i1.ManyRelation<_i4.ScrappableAnalyticsTable> get scrappableAnalytics {
+  _i1.ManyRelation<_i5.ScrappableAnalyticsTable> get scrappableAnalytics {
     if (_scrappableAnalytics != null) return _scrappableAnalytics!;
     var relationTable = _i1.createRelationTable(
       relationFieldName: 'scrappableAnalytics',
       field: Scrappable.t.id,
-      foreignField: _i4.ScrappableAnalytics.t.scrappableId,
+      foreignField: _i5.ScrappableAnalytics.t.scrappableId,
       tableRelation: tableRelation,
       createTable: (foreignTableRelation) =>
-          _i4.ScrappableAnalyticsTable(tableRelation: foreignTableRelation),
+          _i5.ScrappableAnalyticsTable(tableRelation: foreignTableRelation),
     );
-    _scrappableAnalytics = _i1.ManyRelation<_i4.ScrappableAnalyticsTable>(
+    _scrappableAnalytics = _i1.ManyRelation<_i5.ScrappableAnalyticsTable>(
       tableWithRelations: relationTable,
-      table: _i4.ScrappableAnalyticsTable(
+      table: _i5.ScrappableAnalyticsTable(
           tableRelation: relationTable.tableRelation!.lastRelation),
     );
     return _scrappableAnalytics!;
@@ -533,7 +555,6 @@ class ScrappableTable extends _i1.Table<int?> {
         name,
         description,
         testEndpointAvailableUntil,
-        scrappingRules,
         willHideFromMarketplace,
         targetRequestId,
         referenceTestDataId,
@@ -543,6 +564,9 @@ class ScrappableTable extends _i1.Table<int?> {
 
   @override
   _i1.Table? getRelationTable(String relationField) {
+    if (relationField == 'scrappingBeeExtractRules') {
+      return scrappingBeeExtractRules;
+    }
     if (relationField == 'targetRequest') {
       return targetRequest;
     }
@@ -558,23 +582,28 @@ class ScrappableTable extends _i1.Table<int?> {
 
 class ScrappableInclude extends _i1.IncludeObject {
   ScrappableInclude._({
-    _i2.ScrappableRequestInclude? targetRequest,
-    _i3.ReferenceTestDataInclude? referenceTestData,
-    _i4.ScrappableAnalyticsIncludeList? scrappableAnalytics,
+    _i2.ScrappingBeeExtractLogicInclude? scrappingBeeExtractRules,
+    _i3.ScrappableRequestInclude? targetRequest,
+    _i4.ReferenceTestDataInclude? referenceTestData,
+    _i5.ScrappableAnalyticsIncludeList? scrappableAnalytics,
   }) {
+    _scrappingBeeExtractRules = scrappingBeeExtractRules;
     _targetRequest = targetRequest;
     _referenceTestData = referenceTestData;
     _scrappableAnalytics = scrappableAnalytics;
   }
 
-  _i2.ScrappableRequestInclude? _targetRequest;
+  _i2.ScrappingBeeExtractLogicInclude? _scrappingBeeExtractRules;
 
-  _i3.ReferenceTestDataInclude? _referenceTestData;
+  _i3.ScrappableRequestInclude? _targetRequest;
 
-  _i4.ScrappableAnalyticsIncludeList? _scrappableAnalytics;
+  _i4.ReferenceTestDataInclude? _referenceTestData;
+
+  _i5.ScrappableAnalyticsIncludeList? _scrappableAnalytics;
 
   @override
   Map<String, _i1.Include?> get includes => {
+        'scrappingBeeExtractRules': _scrappingBeeExtractRules,
         'targetRequest': _targetRequest,
         'referenceTestData': _referenceTestData,
         'scrappableAnalytics': _scrappableAnalytics,
@@ -839,7 +868,7 @@ class ScrappableAttachRepository {
   Future<void> scrappableAnalytics(
     _i1.Session session,
     Scrappable scrappable,
-    List<_i4.ScrappableAnalytics> scrappableAnalytics, {
+    List<_i5.ScrappableAnalytics> scrappableAnalytics, {
     _i1.Transaction? transaction,
   }) async {
     if (scrappableAnalytics.any((e) => e.id == null)) {
@@ -852,9 +881,9 @@ class ScrappableAttachRepository {
     var $scrappableAnalytics = scrappableAnalytics
         .map((e) => e.copyWith(scrappableId: scrappable.id))
         .toList();
-    await session.db.update<_i4.ScrappableAnalytics>(
+    await session.db.update<_i5.ScrappableAnalytics>(
       $scrappableAnalytics,
-      columns: [_i4.ScrappableAnalytics.t.scrappableId],
+      columns: [_i5.ScrappableAnalytics.t.scrappableId],
       transaction: transaction,
     );
   }
@@ -863,12 +892,36 @@ class ScrappableAttachRepository {
 class ScrappableAttachRowRepository {
   const ScrappableAttachRowRepository._();
 
+  /// Creates a relation between the given [Scrappable] and [ScrappingBeeExtractLogic]
+  /// by setting the [Scrappable]'s foreign key `id` to refer to the [ScrappingBeeExtractLogic].
+  Future<void> scrappingBeeExtractRules(
+    _i1.Session session,
+    Scrappable scrappable,
+    _i2.ScrappingBeeExtractLogic scrappingBeeExtractRules, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (scrappingBeeExtractRules.id == null) {
+      throw ArgumentError.notNull('scrappingBeeExtractRules.id');
+    }
+    if (scrappable.id == null) {
+      throw ArgumentError.notNull('scrappable.id');
+    }
+
+    var $scrappingBeeExtractRules =
+        scrappingBeeExtractRules.copyWith(scrappableId: scrappable.id);
+    await session.db.updateRow<_i2.ScrappingBeeExtractLogic>(
+      $scrappingBeeExtractRules,
+      columns: [_i2.ScrappingBeeExtractLogic.t.scrappableId],
+      transaction: transaction,
+    );
+  }
+
   /// Creates a relation between the given [Scrappable] and [ScrappableRequest]
   /// by setting the [Scrappable]'s foreign key `targetRequestId` to refer to the [ScrappableRequest].
   Future<void> targetRequest(
     _i1.Session session,
     Scrappable scrappable,
-    _i2.ScrappableRequest targetRequest, {
+    _i3.ScrappableRequest targetRequest, {
     _i1.Transaction? transaction,
   }) async {
     if (scrappable.id == null) {
@@ -891,7 +944,7 @@ class ScrappableAttachRowRepository {
   Future<void> referenceTestData(
     _i1.Session session,
     Scrappable scrappable,
-    _i3.ReferenceTestData referenceTestData, {
+    _i4.ReferenceTestData referenceTestData, {
     _i1.Transaction? transaction,
   }) async {
     if (scrappable.id == null) {
@@ -915,7 +968,7 @@ class ScrappableAttachRowRepository {
   Future<void> scrappableAnalytics(
     _i1.Session session,
     Scrappable scrappable,
-    _i4.ScrappableAnalytics scrappableAnalytics, {
+    _i5.ScrappableAnalytics scrappableAnalytics, {
     _i1.Transaction? transaction,
   }) async {
     if (scrappableAnalytics.id == null) {
@@ -927,9 +980,9 @@ class ScrappableAttachRowRepository {
 
     var $scrappableAnalytics =
         scrappableAnalytics.copyWith(scrappableId: scrappable.id);
-    await session.db.updateRow<_i4.ScrappableAnalytics>(
+    await session.db.updateRow<_i5.ScrappableAnalytics>(
       $scrappableAnalytics,
-      columns: [_i4.ScrappableAnalytics.t.scrappableId],
+      columns: [_i5.ScrappableAnalytics.t.scrappableId],
       transaction: transaction,
     );
   }
@@ -945,7 +998,7 @@ class ScrappableDetachRepository {
   /// the related record.
   Future<void> scrappableAnalytics(
     _i1.Session session,
-    List<_i4.ScrappableAnalytics> scrappableAnalytics, {
+    List<_i5.ScrappableAnalytics> scrappableAnalytics, {
     _i1.Transaction? transaction,
   }) async {
     if (scrappableAnalytics.any((e) => e.id == null)) {
@@ -954,9 +1007,9 @@ class ScrappableDetachRepository {
 
     var $scrappableAnalytics =
         scrappableAnalytics.map((e) => e.copyWith(scrappableId: null)).toList();
-    await session.db.update<_i4.ScrappableAnalytics>(
+    await session.db.update<_i5.ScrappableAnalytics>(
       $scrappableAnalytics,
-      columns: [_i4.ScrappableAnalytics.t.scrappableId],
+      columns: [_i5.ScrappableAnalytics.t.scrappableId],
       transaction: transaction,
     );
   }
@@ -965,6 +1018,37 @@ class ScrappableDetachRepository {
 class ScrappableDetachRowRepository {
   const ScrappableDetachRowRepository._();
 
+  /// Detaches the relation between this [Scrappable] and the [ScrappingBeeExtractLogic] set in `scrappingBeeExtractRules`
+  /// by setting the [Scrappable]'s foreign key `id` to `null`.
+  ///
+  /// This removes the association between the two models without deleting
+  /// the related record.
+  Future<void> scrappingBeeExtractRules(
+    _i1.Session session,
+    Scrappable scrappable, {
+    _i1.Transaction? transaction,
+  }) async {
+    var $scrappingBeeExtractRules = scrappable.scrappingBeeExtractRules;
+
+    if ($scrappingBeeExtractRules == null) {
+      throw ArgumentError.notNull('scrappable.scrappingBeeExtractRules');
+    }
+    if ($scrappingBeeExtractRules.id == null) {
+      throw ArgumentError.notNull('scrappable.scrappingBeeExtractRules.id');
+    }
+    if (scrappable.id == null) {
+      throw ArgumentError.notNull('scrappable.id');
+    }
+
+    var $$scrappingBeeExtractRules =
+        $scrappingBeeExtractRules.copyWith(scrappableId: null);
+    await session.db.updateRow<_i2.ScrappingBeeExtractLogic>(
+      $$scrappingBeeExtractRules,
+      columns: [_i2.ScrappingBeeExtractLogic.t.scrappableId],
+      transaction: transaction,
+    );
+  }
+
   /// Detaches the relation between this [Scrappable] and the given [ScrappableAnalytics]
   /// by setting the [ScrappableAnalytics]'s foreign key `scrappableId` to `null`.
   ///
@@ -972,7 +1056,7 @@ class ScrappableDetachRowRepository {
   /// the related record.
   Future<void> scrappableAnalytics(
     _i1.Session session,
-    _i4.ScrappableAnalytics scrappableAnalytics, {
+    _i5.ScrappableAnalytics scrappableAnalytics, {
     _i1.Transaction? transaction,
   }) async {
     if (scrappableAnalytics.id == null) {
@@ -980,9 +1064,9 @@ class ScrappableDetachRowRepository {
     }
 
     var $scrappableAnalytics = scrappableAnalytics.copyWith(scrappableId: null);
-    await session.db.updateRow<_i4.ScrappableAnalytics>(
+    await session.db.updateRow<_i5.ScrappableAnalytics>(
       $scrappableAnalytics,
-      columns: [_i4.ScrappableAnalytics.t.scrappableId],
+      columns: [_i5.ScrappableAnalytics.t.scrappableId],
       transaction: transaction,
     );
   }

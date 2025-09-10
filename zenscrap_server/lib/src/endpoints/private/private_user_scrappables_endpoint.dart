@@ -20,9 +20,8 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
           scrappables: Scrappable.includeList(
             include: Scrappable.include(
               targetRequest: ScrappableRequest.include(),
-              referenceTestData: ReferenceTestData.include(
-                scrappableTestResult: ScrappableTestResult.include(),
-              ),
+              scrappingBeeExtractRules: ScrappingBeeExtractLogic.include(),
+              referenceTestData: ReferenceTestData.include(),
             ),
           ),
         ));
@@ -67,9 +66,9 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
       scrappableId,
       include: Scrappable.include(
         targetRequest: ScrappableRequest.include(),
+        scrappingBeeExtractRules: ScrappingBeeExtractLogic.include(),
         referenceTestData: ReferenceTestData.include(
           byteData: ByteTestData.include(),
-          scrappableTestResult: ScrappableTestResult.include(),
         ),
       ),
     );

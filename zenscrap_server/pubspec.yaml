@@ -22,8 +22,10 @@ dependencies:
   json_annotation: ^4.9.0
   collection: ^1.19.1
   crypto: ^3.0.5
-  claude_code_sdk: ^1.0.0
+  # claude_code_sdk: ^1.0.0
   path: ^1.9.1
+  web_scrapper_generator:
+    path: ../web_scrapper_generator
   # claude_code_sdk:
   #   path: ../claude_code_sdk
 

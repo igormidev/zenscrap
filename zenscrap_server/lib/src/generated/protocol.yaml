@@ -22,8 +22,6 @@ privateSubscription:
 privateUserScrappables:
   - call:
   - getScrappableById:
-createScrappable:
-  - call:
 deleteScrappable:
   - call:
 deployScrappable:
@@ -37,9 +35,3 @@ publicTier:
 scrappableApi:
   - prod:
   - test:
-scrappableChatSession:
-  - disposeSession:
-  - createSession:
-  - listenToScrappableRedraftSession:
-  - changeChatModel:
-  - sendPromptMessage:

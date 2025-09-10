@@ -43,7 +43,7 @@ import 'entities/scrappable/scraper_category.dart' as _i28;
 import 'entities/scrappable/scrappable.dart' as _i29;
 import 'entities/scrappable/scrappable_analytics.dart' as _i30;
 import 'entities/scrappable/scrappable_request.dart' as _i31;
-import 'entities/scrappable/scrappable_test_result.dart' as _i32;
+import 'entities/scrappable/scrapping_bee_extract_logic.dart' as _i32;
 import 'entities/account/api_usage/api_credit_history/monthly_subscription_credit_deposit.dart'
     as _i33;
 import 'package:zenscrap_client/src/protocol/entities/account/api_usage/api_credit_history/api_creadit_history_item.dart'
@@ -83,7 +83,7 @@ export 'entities/scrappable/scraper_category.dart';
 export 'entities/scrappable/scrappable.dart';
 export 'entities/scrappable/scrappable_analytics.dart';
 export 'entities/scrappable/scrappable_request.dart';
-export 'entities/scrappable/scrappable_test_result.dart';
+export 'entities/scrappable/scrapping_bee_extract_logic.dart';
 export 'entities/zenscrap_exception.dart';
 export 'client.dart';
 
@@ -103,11 +103,11 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i2.NewExtractRuleResponse) {
       return _i2.NewExtractRuleResponse.fromJson(data) as T;
     }
-    if (t == _i2.MessageTextAndNewExtractRulesResponse) {
-      return _i2.MessageTextAndNewExtractRulesResponse.fromJson(data) as T;
-    }
     if (t == _i2.ErrorTextResponse) {
       return _i2.ErrorTextResponse.fromJson(data) as T;
+    }
+    if (t == _i2.CandidateExtractLogicUpdate) {
+      return _i2.CandidateExtractLogicUpdate.fromJson(data) as T;
     }
     if (t == _i2.MessageTextResponse) {
       return _i2.MessageTextResponse.fromJson(data) as T;
@@ -199,8 +199,8 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i31.ScrappableRequest) {
       return _i31.ScrappableRequest.fromJson(data) as T;
     }
-    if (t == _i32.ScrappableTestResult) {
-      return _i32.ScrappableTestResult.fromJson(data) as T;
+    if (t == _i32.ScrappingBeeExtractLogic) {
+      return _i32.ScrappingBeeExtractLogic.fromJson(data) as T;
     }
     if (t == _i33.MonthlySubscriptionCreditDeposit) {
       return _i33.MonthlySubscriptionCreditDeposit.fromJson(data) as T;
@@ -209,13 +209,13 @@ class Protocol extends _i1.SerializationManager {
       return (data != null ? _i2.NewExtractRuleResponse.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i2.MessageTextAndNewExtractRulesResponse?>()) {
-      return (data != null
-          ? _i2.MessageTextAndNewExtractRulesResponse.fromJson(data)
-          : null) as T;
-    }
     if (t == _i1.getType<_i2.ErrorTextResponse?>()) {
       return (data != null ? _i2.ErrorTextResponse.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i2.CandidateExtractLogicUpdate?>()) {
+      return (data != null
+          ? _i2.CandidateExtractLogicUpdate.fromJson(data)
+          : null) as T;
     }
     if (t == _i1.getType<_i2.MessageTextResponse?>()) {
       return (data != null ? _i2.MessageTextResponse.fromJson(data) : null)
@@ -326,9 +326,10 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i1.getType<_i31.ScrappableRequest?>()) {
       return (data != null ? _i31.ScrappableRequest.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i32.ScrappableTestResult?>()) {
-      return (data != null ? _i32.ScrappableTestResult.fromJson(data) : null)
-          as T;
+    if (t == _i1.getType<_i32.ScrappingBeeExtractLogic?>()) {
+      return (data != null
+          ? _i32.ScrappingBeeExtractLogic.fromJson(data)
+          : null) as T;
     }
     if (t == _i1.getType<_i33.MonthlySubscriptionCreditDeposit?>()) {
       return (data != null
@@ -432,11 +433,11 @@ class Protocol extends _i1.SerializationManager {
     if (data is _i2.NewExtractRuleResponse) {
       return 'NewExtractRuleResponse';
     }
-    if (data is _i2.MessageTextAndNewExtractRulesResponse) {
-      return 'MessageTextAndNewExtractRulesResponse';
-    }
     if (data is _i2.ErrorTextResponse) {
       return 'ErrorTextResponse';
+    }
+    if (data is _i2.CandidateExtractLogicUpdate) {
+      return 'CandidateExtractLogicUpdate';
     }
     if (data is _i2.MessageTextResponse) {
       return 'MessageTextResponse';
@@ -528,8 +529,8 @@ class Protocol extends _i1.SerializationManager {
     if (data is _i31.ScrappableRequest) {
       return 'ScrappableRequest';
     }
-    if (data is _i32.ScrappableTestResult) {
-      return 'ScrappableTestResult';
+    if (data is _i32.ScrappingBeeExtractLogic) {
+      return 'ScrappingBeeExtractLogic';
     }
     if (data is _i33.MonthlySubscriptionCreditDeposit) {
       return 'MonthlySubscriptionCreditDeposit';
@@ -550,12 +551,11 @@ class Protocol extends _i1.SerializationManager {
     if (dataClassName == 'NewExtractRuleResponse') {
       return deserialize<_i2.NewExtractRuleResponse>(data['data']);
     }
-    if (dataClassName == 'MessageTextAndNewExtractRulesResponse') {
-      return deserialize<_i2.MessageTextAndNewExtractRulesResponse>(
-          data['data']);
-    }
     if (dataClassName == 'ErrorTextResponse') {
       return deserialize<_i2.ErrorTextResponse>(data['data']);
+    }
+    if (dataClassName == 'CandidateExtractLogicUpdate') {
+      return deserialize<_i2.CandidateExtractLogicUpdate>(data['data']);
     }
     if (dataClassName == 'MessageTextResponse') {
       return deserialize<_i2.MessageTextResponse>(data['data']);
@@ -648,8 +648,8 @@ class Protocol extends _i1.SerializationManager {
     if (dataClassName == 'ScrappableRequest') {
       return deserialize<_i31.ScrappableRequest>(data['data']);
     }
-    if (dataClassName == 'ScrappableTestResult') {
-      return deserialize<_i32.ScrappableTestResult>(data['data']);
+    if (dataClassName == 'ScrappingBeeExtractLogic') {
+      return deserialize<_i32.ScrappingBeeExtractLogic>(data['data']);
     }
     if (dataClassName == 'MonthlySubscriptionCreditDeposit') {
       return deserialize<_i33.MonthlySubscriptionCreditDeposit>(data['data']);

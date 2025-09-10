@@ -10,10 +10,11 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
-import '../../entities/scrappable/scrappable_request.dart' as _i2;
-import '../../entities/scrappable/reference_test_data.dart' as _i3;
-import '../../entities/scrappable/scrappable_analytics.dart' as _i4;
-import '../../entities/scrappable/scraper_category.dart' as _i5;
+import '../../entities/scrappable/scrapping_bee_extract_logic.dart' as _i2;
+import '../../entities/scrappable/scrappable_request.dart' as _i3;
+import '../../entities/scrappable/reference_test_data.dart' as _i4;
+import '../../entities/scrappable/scrappable_analytics.dart' as _i5;
+import '../../entities/scrappable/scraper_category.dart' as _i6;
 
 abstract class Scrappable implements _i1.SerializableModel {
   Scrappable._({
@@ -25,7 +26,7 @@ abstract class Scrappable implements _i1.SerializableModel {
     required this.name,
     required this.description,
     this.testEndpointAvailableUntil,
-    this.scrappingRules,
+    this.scrappingBeeExtractRules,
     required this.willHideFromMarketplace,
     required this.targetRequestId,
     this.targetRequest,
@@ -45,14 +46,14 @@ abstract class Scrappable implements _i1.SerializableModel {
     required String name,
     required String description,
     DateTime? testEndpointAvailableUntil,
-    String? scrappingRules,
+    _i2.ScrappingBeeExtractLogic? scrappingBeeExtractRules,
     required bool willHideFromMarketplace,
     required int targetRequestId,
-    _i2.ScrappableRequest? targetRequest,
+    _i3.ScrappableRequest? targetRequest,
     required int referenceTestDataId,
-    _i3.ReferenceTestData? referenceTestData,
-    List<_i4.ScrappableAnalytics>? scrappableAnalytics,
-    required _i5.ScraperCategory category,
+    _i4.ReferenceTestData? referenceTestData,
+    List<_i5.ScrappableAnalytics>? scrappableAnalytics,
+    required _i6.ScraperCategory category,
     required bool isDeleted,
   }) = _ScrappableImpl;
 
@@ -73,25 +74,30 @@ abstract class Scrappable implements _i1.SerializableModel {
               ? null
               : _i1.DateTimeJsonExtension.fromJson(
                   jsonSerialization['testEndpointAvailableUntil']),
-      scrappingRules: jsonSerialization['scrappingRules'] as String?,
+      scrappingBeeExtractRules:
+          jsonSerialization['scrappingBeeExtractRules'] == null
+              ? null
+              : _i2.ScrappingBeeExtractLogic.fromJson(
+                  (jsonSerialization['scrappingBeeExtractRules']
+                      as Map<String, dynamic>)),
       willHideFromMarketplace:
           jsonSerialization['willHideFromMarketplace'] as bool,
       targetRequestId: jsonSerialization['targetRequestId'] as int,
       targetRequest: jsonSerialization['targetRequest'] == null
           ? null
-          : _i2.ScrappableRequest.fromJson(
+          : _i3.ScrappableRequest.fromJson(
               (jsonSerialization['targetRequest'] as Map<String, dynamic>)),
       referenceTestDataId: jsonSerialization['referenceTestDataId'] as int,
       referenceTestData: jsonSerialization['referenceTestData'] == null
           ? null
-          : _i3.ReferenceTestData.fromJson(
+          : _i4.ReferenceTestData.fromJson(
               (jsonSerialization['referenceTestData'] as Map<String, dynamic>)),
       scrappableAnalytics: (jsonSerialization['scrappableAnalytics'] as List?)
           ?.map((e) =>
-              _i4.ScrappableAnalytics.fromJson((e as Map<String, dynamic>)))
+              _i5.ScrappableAnalytics.fromJson((e as Map<String, dynamic>)))
           .toList(),
       category:
-          _i5.ScraperCategory.fromJson((jsonSerialization['category'] as int)),
+          _i6.ScraperCategory.fromJson((jsonSerialization['category'] as int)),
       isDeleted: jsonSerialization['isDeleted'] as bool,
     );
   }
@@ -115,21 +121,21 @@ abstract class Scrappable implements _i1.SerializableModel {
 
   DateTime? testEndpointAvailableUntil;
 
-  String? scrappingRules;
+  _i2.ScrappingBeeExtractLogic? scrappingBeeExtractRules;
 
   bool willHideFromMarketplace;
 
   int targetRequestId;
 
-  _i2.ScrappableRequest? targetRequest;
+  _i3.ScrappableRequest? targetRequest;
 
   int referenceTestDataId;
 
-  _i3.ReferenceTestData? referenceTestData;
+  _i4.ReferenceTestData? referenceTestData;
 
-  List<_i4.ScrappableAnalytics>? scrappableAnalytics;
+  List<_i5.ScrappableAnalytics>? scrappableAnalytics;
 
-  _i5.ScraperCategory category;
+  _i6.ScraperCategory category;
 
   bool isDeleted;
 
@@ -145,14 +151,14 @@ abstract class Scrappable implements _i1.SerializableModel {
     String? name,
     String? description,
     DateTime? testEndpointAvailableUntil,
-    String? scrappingRules,
+    _i2.ScrappingBeeExtractLogic? scrappingBeeExtractRules,
     bool? willHideFromMarketplace,
     int? targetRequestId,
-    _i2.ScrappableRequest? targetRequest,
+    _i3.ScrappableRequest? targetRequest,
     int? referenceTestDataId,
-    _i3.ReferenceTestData? referenceTestData,
-    List<_i4.ScrappableAnalytics>? scrappableAnalytics,
-    _i5.ScraperCategory? category,
+    _i4.ReferenceTestData? referenceTestData,
+    List<_i5.ScrappableAnalytics>? scrappableAnalytics,
+    _i6.ScraperCategory? category,
     bool? isDeleted,
   });
   @override
@@ -167,7 +173,8 @@ abstract class Scrappable implements _i1.SerializableModel {
       'description': description,
       if (testEndpointAvailableUntil != null)
         'testEndpointAvailableUntil': testEndpointAvailableUntil?.toJson(),
-      if (scrappingRules != null) 'scrappingRules': scrappingRules,
+      if (scrappingBeeExtractRules != null)
+        'scrappingBeeExtractRules': scrappingBeeExtractRules?.toJson(),
       'willHideFromMarketplace': willHideFromMarketplace,
       'targetRequestId': targetRequestId,
       if (targetRequest != null) 'targetRequest': targetRequest?.toJson(),
@@ -200,14 +207,14 @@ class _ScrappableImpl extends Scrappable {
     required String name,
     required String description,
     DateTime? testEndpointAvailableUntil,
-    String? scrappingRules,
+    _i2.ScrappingBeeExtractLogic? scrappingBeeExtractRules,
     required bool willHideFromMarketplace,
     required int targetRequestId,
-    _i2.ScrappableRequest? targetRequest,
+    _i3.ScrappableRequest? targetRequest,
     required int referenceTestDataId,
-    _i3.ReferenceTestData? referenceTestData,
-    List<_i4.ScrappableAnalytics>? scrappableAnalytics,
-    required _i5.ScraperCategory category,
+    _i4.ReferenceTestData? referenceTestData,
+    List<_i5.ScrappableAnalytics>? scrappableAnalytics,
+    required _i6.ScraperCategory category,
     required bool isDeleted,
   }) : super._(
           id: id,
@@ -218,7 +225,7 @@ class _ScrappableImpl extends Scrappable {
           name: name,
           description: description,
           testEndpointAvailableUntil: testEndpointAvailableUntil,
-          scrappingRules: scrappingRules,
+          scrappingBeeExtractRules: scrappingBeeExtractRules,
           willHideFromMarketplace: willHideFromMarketplace,
           targetRequestId: targetRequestId,
           targetRequest: targetRequest,
@@ -242,14 +249,14 @@ class _ScrappableImpl extends Scrappable {
     String? name,
     String? description,
     Object? testEndpointAvailableUntil = _Undefined,
-    Object? scrappingRules = _Undefined,
+    Object? scrappingBeeExtractRules = _Undefined,
     bool? willHideFromMarketplace,
     int? targetRequestId,
     Object? targetRequest = _Undefined,
     int? referenceTestDataId,
     Object? referenceTestData = _Undefined,
     Object? scrappableAnalytics = _Undefined,
-    _i5.ScraperCategory? category,
+    _i6.ScraperCategory? category,
     bool? isDeleted,
   }) {
     return Scrappable(
@@ -265,19 +272,21 @@ class _ScrappableImpl extends Scrappable {
       testEndpointAvailableUntil: testEndpointAvailableUntil is DateTime?
           ? testEndpointAvailableUntil
           : this.testEndpointAvailableUntil,
-      scrappingRules:
-          scrappingRules is String? ? scrappingRules : this.scrappingRules,
+      scrappingBeeExtractRules:
+          scrappingBeeExtractRules is _i2.ScrappingBeeExtractLogic?
+              ? scrappingBeeExtractRules
+              : this.scrappingBeeExtractRules?.copyWith(),
       willHideFromMarketplace:
           willHideFromMarketplace ?? this.willHideFromMarketplace,
       targetRequestId: targetRequestId ?? this.targetRequestId,
-      targetRequest: targetRequest is _i2.ScrappableRequest?
+      targetRequest: targetRequest is _i3.ScrappableRequest?
           ? targetRequest
           : this.targetRequest?.copyWith(),
       referenceTestDataId: referenceTestDataId ?? this.referenceTestDataId,
-      referenceTestData: referenceTestData is _i3.ReferenceTestData?
+      referenceTestData: referenceTestData is _i4.ReferenceTestData?
           ? referenceTestData
           : this.referenceTestData?.copyWith(),
-      scrappableAnalytics: scrappableAnalytics is List<_i4.ScrappableAnalytics>?
+      scrappableAnalytics: scrappableAnalytics is List<_i5.ScrappableAnalytics>?
           ? scrappableAnalytics
           : this.scrappableAnalytics?.map((e0) => e0.copyWith()).toList(),
       category: category ?? this.category,

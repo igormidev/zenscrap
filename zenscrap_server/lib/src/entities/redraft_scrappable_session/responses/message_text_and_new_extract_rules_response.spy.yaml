@@ -1,5 +1,0 @@
-class: MessageTextAndNewExtractRulesResponse
-extends: ChatResponse
-fields:
-    messageText: String
-    newExtractRules: String

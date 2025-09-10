@@ -296,10 +296,10 @@ sealed class InitialPayloadData {
 final class InitialPayloadDataCreatingFromZero extends InitialPayloadData {
   final String targetExampleUrl;
   final WebScrapperRequest webScrapperRequest;
-  const InitialPayloadDataCreatingFromZero(
-    this.webScrapperRequest,
-    this.targetExampleUrl,
-  );
+  const InitialPayloadDataCreatingFromZero({
+    required this.webScrapperRequest,
+    required this.targetExampleUrl,
+  });
 }
 
 final class InitialPayloadDataEditingExistingWebScrapper

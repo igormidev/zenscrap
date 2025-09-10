@@ -1,0 +1,6 @@
+class: CandidateExtractLogicUpdate
+extends: ChatResponse
+fields:
+    messageText: String
+    scrappingBeeExtractLogic: ScrappingBeeExtractLogic
+    scrapperRequest: ScrappableRequest

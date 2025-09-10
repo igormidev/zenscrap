@@ -13,8 +13,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../entities/scrappable/byte_test_data.dart' as _i2;
-import '../../entities/scrappable/scrappable_test_result.dart' as _i3;
-import '../../entities/scrappable/scrappable.dart' as _i4;
+import '../../entities/scrappable/scrappable.dart' as _i3;
 
 abstract class ReferenceTestData
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -24,7 +23,7 @@ abstract class ReferenceTestData
     required this.referenceQueryParametersJson,
     required this.byteDataId,
     this.byteData,
-    this.scrappableTestResult,
+    this.testExtractJsonResult,
     this.scrappable,
   });
 
@@ -34,8 +33,8 @@ abstract class ReferenceTestData
     required String referenceQueryParametersJson,
     required int byteDataId,
     _i2.ByteTestData? byteData,
-    _i3.ScrappableTestResult? scrappableTestResult,
-    _i4.Scrappable? scrappable,
+    String? testExtractJsonResult,
+    _i3.Scrappable? scrappable,
   }) = _ReferenceTestDataImpl;
 
   factory ReferenceTestData.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -49,14 +48,11 @@ abstract class ReferenceTestData
           ? null
           : _i2.ByteTestData.fromJson(
               (jsonSerialization['byteData'] as Map<String, dynamic>)),
-      scrappableTestResult: jsonSerialization['scrappableTestResult'] == null
-          ? null
-          : _i3.ScrappableTestResult.fromJson(
-              (jsonSerialization['scrappableTestResult']
-                  as Map<String, dynamic>)),
+      testExtractJsonResult:
+          jsonSerialization['testExtractJsonResult'] as String?,
       scrappable: jsonSerialization['scrappable'] == null
           ? null
-          : _i4.Scrappable.fromJson(
+          : _i3.Scrappable.fromJson(
               (jsonSerialization['scrappable'] as Map<String, dynamic>)),
     );
   }
@@ -76,9 +72,9 @@ abstract class ReferenceTestData
 
   _i2.ByteTestData? byteData;
 
-  _i3.ScrappableTestResult? scrappableTestResult;
+  String? testExtractJsonResult;
 
-  _i4.Scrappable? scrappable;
+  _i3.Scrappable? scrappable;
 
   @override
   _i1.Table<int?> get table => t;
@@ -92,8 +88,8 @@ abstract class ReferenceTestData
     String? referenceQueryParametersJson,
     int? byteDataId,
     _i2.ByteTestData? byteData,
-    _i3.ScrappableTestResult? scrappableTestResult,
-    _i4.Scrappable? scrappable,
+    String? testExtractJsonResult,
+    _i3.Scrappable? scrappable,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -103,8 +99,8 @@ abstract class ReferenceTestData
       'referenceQueryParametersJson': referenceQueryParametersJson,
       'byteDataId': byteDataId,
       if (byteData != null) 'byteData': byteData?.toJson(),
-      if (scrappableTestResult != null)
-        'scrappableTestResult': scrappableTestResult?.toJson(),
+      if (testExtractJsonResult != null)
+        'testExtractJsonResult': testExtractJsonResult,
       if (scrappable != null) 'scrappable': scrappable?.toJson(),
     };
   }
@@ -117,20 +113,18 @@ abstract class ReferenceTestData
       'referenceQueryParametersJson': referenceQueryParametersJson,
       'byteDataId': byteDataId,
       if (byteData != null) 'byteData': byteData?.toJsonForProtocol(),
-      if (scrappableTestResult != null)
-        'scrappableTestResult': scrappableTestResult?.toJsonForProtocol(),
+      if (testExtractJsonResult != null)
+        'testExtractJsonResult': testExtractJsonResult,
       if (scrappable != null) 'scrappable': scrappable?.toJsonForProtocol(),
     };
   }
 
   static ReferenceTestDataInclude include({
     _i2.ByteTestDataInclude? byteData,
-    _i3.ScrappableTestResultInclude? scrappableTestResult,
-    _i4.ScrappableInclude? scrappable,
+    _i3.ScrappableInclude? scrappable,
   }) {
     return ReferenceTestDataInclude._(
       byteData: byteData,
-      scrappableTestResult: scrappableTestResult,
       scrappable: scrappable,
     );
   }
@@ -170,15 +164,15 @@ class _ReferenceTestDataImpl extends ReferenceTestData {
     required String referenceQueryParametersJson,
     required int byteDataId,
     _i2.ByteTestData? byteData,
-    _i3.ScrappableTestResult? scrappableTestResult,
-    _i4.Scrappable? scrappable,
+    String? testExtractJsonResult,
+    _i3.Scrappable? scrappable,
   }) : super._(
           id: id,
           referenceLinkUsed: referenceLinkUsed,
           referenceQueryParametersJson: referenceQueryParametersJson,
           byteDataId: byteDataId,
           byteData: byteData,
-          scrappableTestResult: scrappableTestResult,
+          testExtractJsonResult: testExtractJsonResult,
           scrappable: scrappable,
         );
 
@@ -192,7 +186,7 @@ class _ReferenceTestDataImpl extends ReferenceTestData {
     String? referenceQueryParametersJson,
     int? byteDataId,
     Object? byteData = _Undefined,
-    Object? scrappableTestResult = _Undefined,
+    Object? testExtractJsonResult = _Undefined,
     Object? scrappable = _Undefined,
   }) {
     return ReferenceTestData(
@@ -203,10 +197,10 @@ class _ReferenceTestDataImpl extends ReferenceTestData {
       byteDataId: byteDataId ?? this.byteDataId,
       byteData:
           byteData is _i2.ByteTestData? ? byteData : this.byteData?.copyWith(),
-      scrappableTestResult: scrappableTestResult is _i3.ScrappableTestResult?
-          ? scrappableTestResult
-          : this.scrappableTestResult?.copyWith(),
-      scrappable: scrappable is _i4.Scrappable?
+      testExtractJsonResult: testExtractJsonResult is String?
+          ? testExtractJsonResult
+          : this.testExtractJsonResult,
+      scrappable: scrappable is _i3.Scrappable?
           ? scrappable
           : this.scrappable?.copyWith(),
     );
@@ -228,6 +222,10 @@ class ReferenceTestDataTable extends _i1.Table<int?> {
       'byteDataId',
       this,
     );
+    testExtractJsonResult = _i1.ColumnString(
+      'testExtractJsonResult',
+      this,
+    );
   }
 
   late final _i1.ColumnString referenceLinkUsed;
@@ -238,9 +236,9 @@ class ReferenceTestDataTable extends _i1.Table<int?> {
 
   _i2.ByteTestDataTable? _byteData;
 
-  _i3.ScrappableTestResultTable? _scrappableTestResult;
+  late final _i1.ColumnString testExtractJsonResult;
 
-  _i4.ScrappableTable? _scrappable;
+  _i3.ScrappableTable? _scrappable;
 
   _i2.ByteTestDataTable get byteData {
     if (_byteData != null) return _byteData!;
@@ -255,28 +253,15 @@ class ReferenceTestDataTable extends _i1.Table<int?> {
     return _byteData!;
   }
 
-  _i3.ScrappableTestResultTable get scrappableTestResult {
-    if (_scrappableTestResult != null) return _scrappableTestResult!;
-    _scrappableTestResult = _i1.createRelationTable(
-      relationFieldName: 'scrappableTestResult',
-      field: ReferenceTestData.t.id,
-      foreignField: _i3.ScrappableTestResult.t.referenceTestDataId,
-      tableRelation: tableRelation,
-      createTable: (foreignTableRelation) =>
-          _i3.ScrappableTestResultTable(tableRelation: foreignTableRelation),
-    );
-    return _scrappableTestResult!;
-  }
-
-  _i4.ScrappableTable get scrappable {
+  _i3.ScrappableTable get scrappable {
     if (_scrappable != null) return _scrappable!;
     _scrappable = _i1.createRelationTable(
       relationFieldName: 'scrappable',
       field: ReferenceTestData.t.id,
-      foreignField: _i4.Scrappable.t.referenceTestDataId,
+      foreignField: _i3.Scrappable.t.referenceTestDataId,
       tableRelation: tableRelation,
       createTable: (foreignTableRelation) =>
-          _i4.ScrappableTable(tableRelation: foreignTableRelation),
+          _i3.ScrappableTable(tableRelation: foreignTableRelation),
     );
     return _scrappable!;
   }
@@ -287,15 +272,13 @@ class ReferenceTestDataTable extends _i1.Table<int?> {
         referenceLinkUsed,
         referenceQueryParametersJson,
         byteDataId,
+        testExtractJsonResult,
       ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
     if (relationField == 'byteData') {
       return byteData;
-    }
-    if (relationField == 'scrappableTestResult') {
-      return scrappableTestResult;
     }
     if (relationField == 'scrappable') {
       return scrappable;
@@ -307,24 +290,19 @@ class ReferenceTestDataTable extends _i1.Table<int?> {
 class ReferenceTestDataInclude extends _i1.IncludeObject {
   ReferenceTestDataInclude._({
     _i2.ByteTestDataInclude? byteData,
-    _i3.ScrappableTestResultInclude? scrappableTestResult,
-    _i4.ScrappableInclude? scrappable,
+    _i3.ScrappableInclude? scrappable,
   }) {
     _byteData = byteData;
-    _scrappableTestResult = scrappableTestResult;
     _scrappable = scrappable;
   }
 
   _i2.ByteTestDataInclude? _byteData;
 
-  _i3.ScrappableTestResultInclude? _scrappableTestResult;
-
-  _i4.ScrappableInclude? _scrappable;
+  _i3.ScrappableInclude? _scrappable;
 
   @override
   Map<String, _i1.Include?> get includes => {
         'byteData': _byteData,
-        'scrappableTestResult': _scrappableTestResult,
         'scrappable': _scrappable,
       };
 
@@ -602,36 +580,12 @@ class ReferenceTestDataAttachRowRepository {
     );
   }
 
-  /// Creates a relation between the given [ReferenceTestData] and [ScrappableTestResult]
-  /// by setting the [ReferenceTestData]'s foreign key `id` to refer to the [ScrappableTestResult].
-  Future<void> scrappableTestResult(
-    _i1.Session session,
-    ReferenceTestData referenceTestData,
-    _i3.ScrappableTestResult scrappableTestResult, {
-    _i1.Transaction? transaction,
-  }) async {
-    if (scrappableTestResult.id == null) {
-      throw ArgumentError.notNull('scrappableTestResult.id');
-    }
-    if (referenceTestData.id == null) {
-      throw ArgumentError.notNull('referenceTestData.id');
-    }
-
-    var $scrappableTestResult = scrappableTestResult.copyWith(
-        referenceTestDataId: referenceTestData.id);
-    await session.db.updateRow<_i3.ScrappableTestResult>(
-      $scrappableTestResult,
-      columns: [_i3.ScrappableTestResult.t.referenceTestDataId],
-      transaction: transaction,
-    );
-  }
-
   /// Creates a relation between the given [ReferenceTestData] and [Scrappable]
   /// by setting the [ReferenceTestData]'s foreign key `id` to refer to the [Scrappable].
   Future<void> scrappable(
     _i1.Session session,
     ReferenceTestData referenceTestData,
-    _i4.Scrappable scrappable, {
+    _i3.Scrappable scrappable, {
     _i1.Transaction? transaction,
   }) async {
     if (scrappable.id == null) {
@@ -643,9 +597,9 @@ class ReferenceTestDataAttachRowRepository {
 
     var $scrappable =
         scrappable.copyWith(referenceTestDataId: referenceTestData.id);
-    await session.db.updateRow<_i4.Scrappable>(
+    await session.db.updateRow<_i3.Scrappable>(
       $scrappable,
-      columns: [_i4.Scrappable.t.referenceTestDataId],
+      columns: [_i3.Scrappable.t.referenceTestDataId],
       transaction: transaction,
     );
   }
@@ -653,37 +607,6 @@ class ReferenceTestDataAttachRowRepository {
 
 class ReferenceTestDataDetachRowRepository {
   const ReferenceTestDataDetachRowRepository._();
-
-  /// Detaches the relation between this [ReferenceTestData] and the [ScrappableTestResult] set in `scrappableTestResult`
-  /// by setting the [ReferenceTestData]'s foreign key `id` to `null`.
-  ///
-  /// This removes the association between the two models without deleting
-  /// the related record.
-  Future<void> scrappableTestResult(
-    _i1.Session session,
-    ReferenceTestData referencetestdata, {
-    _i1.Transaction? transaction,
-  }) async {
-    var $scrappableTestResult = referencetestdata.scrappableTestResult;
-
-    if ($scrappableTestResult == null) {
-      throw ArgumentError.notNull('referencetestdata.scrappableTestResult');
-    }
-    if ($scrappableTestResult.id == null) {
-      throw ArgumentError.notNull('referencetestdata.scrappableTestResult.id');
-    }
-    if (referencetestdata.id == null) {
-      throw ArgumentError.notNull('referencetestdata.id');
-    }
-
-    var $$scrappableTestResult =
-        $scrappableTestResult.copyWith(referenceTestDataId: null);
-    await session.db.updateRow<_i3.ScrappableTestResult>(
-      $$scrappableTestResult,
-      columns: [_i3.ScrappableTestResult.t.referenceTestDataId],
-      transaction: transaction,
-    );
-  }
 
   /// Detaches the relation between this [ReferenceTestData] and the [Scrappable] set in `scrappable`
   /// by setting the [ReferenceTestData]'s foreign key `id` to `null`.
@@ -708,9 +631,9 @@ class ReferenceTestDataDetachRowRepository {
     }
 
     var $$scrappable = $scrappable.copyWith(referenceTestDataId: null);
-    await session.db.updateRow<_i4.Scrappable>(
+    await session.db.updateRow<_i3.Scrappable>(
       $$scrappable,
-      columns: [_i4.Scrappable.t.referenceTestDataId],
+      columns: [_i3.Scrappable.t.referenceTestDataId],
       transaction: transaction,
     );
   }

@@ -203,7 +203,7 @@ mixin ApiHelperMixin {
     return (scrappable, targetRequest);
   }
 
-  Future<String> getExtractRules(Session session, Scrappable scrappable,
+  Future<String> _getExtractRules(Session session, Scrappable scrappable,
       String? accountApiKeyString) async {
     final isTest = accountApiKeyString == null;
     if (isTest) {
@@ -361,7 +361,8 @@ mixin ApiHelperMixin {
       final String targetUrl = composeUrl(payload, targetRequest);
       final extractRules = await getExtractRules(session, scrappable, apiKey);
 
-      final ExtractDataByRule result = await scrapingBee.extractByRules(
+      final ExtractDataByRule result =
+          await scrapingBeeDeprecated.extractByRules(
         targetUrl: targetUrl,
         extractRules: extractRules,
       );

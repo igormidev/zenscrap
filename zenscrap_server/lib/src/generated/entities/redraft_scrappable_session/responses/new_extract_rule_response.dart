@@ -16,12 +16,16 @@ abstract class NewExtractRuleResponse extends _i1.ChatResponse
     required super.role,
     required this.messageText,
     required this.referenceTestData,
+    required this.scrappingBeeExtractLogic,
+    required this.scrapperRequest,
   });
 
   factory NewExtractRuleResponse({
     required _i3.PromptRole role,
     required String messageText,
-    required _i4.ReferenceTestData referenceTestData,
+    required _i6.ReferenceTestData referenceTestData,
+    required _i4.ScrappingBeeExtractLogic scrappingBeeExtractLogic,
+    required _i5.ScrappableRequest scrapperRequest,
   }) = _NewExtractRuleResponseImpl;
 
   factory NewExtractRuleResponse.fromJson(
@@ -29,14 +33,23 @@ abstract class NewExtractRuleResponse extends _i1.ChatResponse
     return NewExtractRuleResponse(
       role: _i3.PromptRole.fromJson((jsonSerialization['role'] as String)),
       messageText: jsonSerialization['messageText'] as String,
-      referenceTestData: _i4.ReferenceTestData.fromJson(
+      referenceTestData: _i6.ReferenceTestData.fromJson(
           (jsonSerialization['referenceTestData'] as Map<String, dynamic>)),
+      scrappingBeeExtractLogic: _i4.ScrappingBeeExtractLogic.fromJson(
+          (jsonSerialization['scrappingBeeExtractLogic']
+              as Map<String, dynamic>)),
+      scrapperRequest: _i5.ScrappableRequest.fromJson(
+          (jsonSerialization['scrapperRequest'] as Map<String, dynamic>)),
     );
   }
 
   String messageText;
 
-  _i4.ReferenceTestData referenceTestData;
+  _i6.ReferenceTestData referenceTestData;
+
+  _i4.ScrappingBeeExtractLogic scrappingBeeExtractLogic;
+
+  _i5.ScrappableRequest scrapperRequest;
 
   /// Returns a shallow copy of this [NewExtractRuleResponse]
   /// with some or all fields replaced by the given arguments.
@@ -44,7 +57,9 @@ abstract class NewExtractRuleResponse extends _i1.ChatResponse
   NewExtractRuleResponse copyWith({
     _i3.PromptRole? role,
     String? messageText,
-    _i4.ReferenceTestData? referenceTestData,
+    _i6.ReferenceTestData? referenceTestData,
+    _i4.ScrappingBeeExtractLogic? scrappingBeeExtractLogic,
+    _i5.ScrappableRequest? scrapperRequest,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -52,6 +67,8 @@ abstract class NewExtractRuleResponse extends _i1.ChatResponse
       'role': role.toJson(),
       'messageText': messageText,
       'referenceTestData': referenceTestData.toJson(),
+      'scrappingBeeExtractLogic': scrappingBeeExtractLogic.toJson(),
+      'scrapperRequest': scrapperRequest.toJson(),
     };
   }
 
@@ -61,6 +78,8 @@ abstract class NewExtractRuleResponse extends _i1.ChatResponse
       'role': role.toJson(),
       'messageText': messageText,
       'referenceTestData': referenceTestData.toJsonForProtocol(),
+      'scrappingBeeExtractLogic': scrappingBeeExtractLogic.toJsonForProtocol(),
+      'scrapperRequest': scrapperRequest.toJsonForProtocol(),
     };
   }
 
@@ -74,11 +93,15 @@ class _NewExtractRuleResponseImpl extends NewExtractRuleResponse {
   _NewExtractRuleResponseImpl({
     required _i3.PromptRole role,
     required String messageText,
-    required _i4.ReferenceTestData referenceTestData,
+    required _i6.ReferenceTestData referenceTestData,
+    required _i4.ScrappingBeeExtractLogic scrappingBeeExtractLogic,
+    required _i5.ScrappableRequest scrapperRequest,
   }) : super._(
           role: role,
           messageText: messageText,
           referenceTestData: referenceTestData,
+          scrappingBeeExtractLogic: scrappingBeeExtractLogic,
+          scrapperRequest: scrapperRequest,
         );
 
   /// Returns a shallow copy of this [NewExtractRuleResponse]
@@ -88,12 +111,17 @@ class _NewExtractRuleResponseImpl extends NewExtractRuleResponse {
   NewExtractRuleResponse copyWith({
     _i3.PromptRole? role,
     String? messageText,
-    _i4.ReferenceTestData? referenceTestData,
+    _i6.ReferenceTestData? referenceTestData,
+    _i4.ScrappingBeeExtractLogic? scrappingBeeExtractLogic,
+    _i5.ScrappableRequest? scrapperRequest,
   }) {
     return NewExtractRuleResponse(
       role: role ?? this.role,
       messageText: messageText ?? this.messageText,
       referenceTestData: referenceTestData ?? this.referenceTestData.copyWith(),
+      scrappingBeeExtractLogic:
+          scrappingBeeExtractLogic ?? this.scrappingBeeExtractLogic.copyWith(),
+      scrapperRequest: scrapperRequest ?? this.scrapperRequest.copyWith(),
     );
   }
 }

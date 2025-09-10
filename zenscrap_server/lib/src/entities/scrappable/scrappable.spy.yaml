@@ -10,7 +10,7 @@ fields:
   name: String
   description: String
   testEndpointAvailableUntil: DateTime?
-  scrappingRules: String?
+  scrappingBeeExtractRules: ScrappingBeeExtractLogic?, relation(name=scrappable_scrapping_bee_extract_logic)
   willHideFromMarketplace: bool
   targetRequestId: int
   targetRequest: ScrappableRequest?, relation(name=request_scrappable, field=targetRequestId)

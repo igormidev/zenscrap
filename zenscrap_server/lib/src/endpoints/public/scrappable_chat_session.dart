@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:serverpod/serverpod.dart';
-import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_gemini_api_impl.dart';
+import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_gemini_sdk_impl.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/i_chat_controller.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
@@ -10,13 +10,17 @@ typedef RedraftSrappableSessionId = String;
 final Map<RedraftSrappableSessionId, ReplaySubject<ChatResponse>>
     _scrapRedraftSessions = {};
 final Map<RedraftSrappableSessionId, IChatController> _chatSessions = {};
-final Map<RedraftSrappableSessionId, ReferenceTestData> _cacheTestData = {};
 final Map<int, RedraftSrappableSessionId> _scrappableOpenedSessionsIds = {};
+final Map<RedraftSrappableSessionId, ReferenceTestData> _cacheRefTestData = {};
+final Map<RedraftSrappableSessionId, ScrappingBeeExtractLogic>
+    _cacheScrappingBeeExtractLogic = {};
+final Map<RedraftSrappableSessionId, ScrappableRequest>
+    _cacheScrappableRequest = {};
 
 String? getTestExtractRules(int scrappableId) {
   final ReferenceTestData? testData =
-      _cacheTestData[_scrappableOpenedSessionsIds[scrappableId]];
-  return testData?.scrappableTestResult?.testExtractRule;
+      _cacheRefTestData[_scrappableOpenedSessionsIds[scrappableId]];
+  return testData?.testExtractJsonResult;
 }
 
 class ScrappableChatSession extends Endpoint {
@@ -39,13 +43,16 @@ class ScrappableChatSession extends Endpoint {
       scrappableId,
       include: Scrappable.include(
         targetRequest: ScrappableRequest.include(),
+        scrappingBeeExtractRules: ScrappingBeeExtractLogic.include(),
         referenceTestData: ReferenceTestData.include(
           byteData: ByteTestData.include(),
-          scrappableTestResult: ScrappableTestResult.include(),
         ),
       ),
     );
     final ReferenceTestData? referenceTestData = scrappable?.referenceTestData;
+    final ScrappableRequest? scrapperRequest = scrappable?.targetRequest;
+    final ScrappingBeeExtractLogic? scrappingBeeExtractLogic =
+        scrappable?.scrappingBeeExtractRules;
     if (scrappable == null) {
       session.log(
         'No scrappable found with id $scrappableId.',
@@ -67,6 +74,28 @@ class ScrappableChatSession extends Endpoint {
             'No reference test data found for scrappable with id ${scrappable.id}.',
       );
     }
+    if (scrapperRequest == null) {
+      session.log(
+        'No target request found for scrappable with id ${scrappable.id}.',
+        level: LogLevel.error,
+      );
+      throw ZenScrapException(
+        title: 'Target Request Not Found',
+        description:
+            'No target request found for scrappable with id ${scrappable.id}.',
+      );
+    }
+    if (scrappingBeeExtractLogic == null) {
+      session.log(
+        'No scrapping bee extract logic found for scrappable with id ${scrappable.id}.',
+        level: LogLevel.error,
+      );
+      throw ZenScrapException(
+        title: 'Scrapping Bee Extract Logic Not Found',
+        description:
+            'No scrapping bee extract logic found for scrappable with id ${scrappable.id}.',
+      );
+    }
     final bool isAlreadyAnyOpenedSession =
         _scrappableOpenedSessionsIds.containsKey(scrappable.id!);
     if (isAlreadyAnyOpenedSession) {
@@ -80,12 +109,13 @@ class ScrappableChatSession extends Endpoint {
     final RedraftSrappableSessionId sessionUuid = uuid.v4();
     _scrappableOpenedSessionsIds[scrappable.id!] = sessionUuid;
     _scrapRedraftSessions[sessionUuid] = ReplaySubject<ChatResponse>();
-    _chatSessions[sessionUuid] = ChatControllerGeminiApiImpl.create(
-      scrappableId: scrappable.id!,
+    _chatSessions[sessionUuid] = ChatControllerGeminiSdkImpl.startChat(
+      scrapperRequest: scrapperRequest,
       referenceTestData: referenceTestData,
-      aiModel: aiModel,
     );
-    _cacheTestData[sessionUuid] = referenceTestData;
+    _cacheRefTestData[sessionUuid] = referenceTestData;
+    _cacheScrappingBeeExtractLogic[sessionUuid] = scrappingBeeExtractLogic;
+    _cacheScrappableRequest[sessionUuid] = scrapperRequest;
     final duration = const Duration(hours: 1);
     final response = CreateSessionResponse(
       expiresIn: duration,
@@ -99,8 +129,7 @@ class ScrappableChatSession extends Endpoint {
     await Scrappable.db.updateRow(
         session,
         scrappable.copyWith(
-          testEndpointAvailableUntil: DateTime.now().add(duration),
-        ));
+            testEndpointAvailableUntil: DateTime.now().add(duration)));
     return response;
   }
 
@@ -109,7 +138,6 @@ class ScrappableChatSession extends Endpoint {
     required RedraftSrappableSessionId sessionUuid,
   }) {
     session.addWillCloseListener((session) async {
-      print('disposed session $sessionUuid');
       await _disposeSession(sessionId: sessionUuid);
     });
     final subject = _scrapRedraftSessions[sessionUuid];
@@ -177,7 +205,7 @@ class ScrappableChatSession extends Endpoint {
     }
 
     _chatSessions.remove(sessionUuid);
-    _chatSessions[sessionUuid] = ChatControllerGeminiApiImpl.create(
+    _chatSessions[sessionUuid] = ChatControllerGeminiSdkImpl.create(
       scrappableId: scrappableId,
       referenceTestData: referenceTestData,
       aiModel: aiModel,
@@ -196,8 +224,12 @@ class ScrappableChatSession extends Endpoint {
         description: 'No active session found for uuid $sessionId.',
       );
     }
-    final testData = _cacheTestData[sessionId];
-    if (testData == null) {
+    final testData = _cacheRefTestData[sessionId];
+    final scrapperRequest = _cacheScrappableRequest[sessionId];
+    final scrappingBeeExtractLogic = _cacheScrappingBeeExtractLogic[sessionId];
+    if (testData == null ||
+        scrapperRequest == null ||
+        scrappingBeeExtractLogic == null) {
       throw ZenScrapException(
         title: 'Cache Test Data Not Found',
         description: 'No cache test data found for session $sessionId.',
@@ -227,7 +259,9 @@ Future<void> _disposeSession({
   _chatSessions.remove(sessionId);
   final subject = _scrapRedraftSessions.remove(sessionId);
   await subject?.close();
-  _cacheTestData.remove(sessionId);
+  _cacheRefTestData.remove(sessionId);
+  _cacheScrappingBeeExtractLogic.remove(sessionId);
+  _cacheScrappableRequest.remove(sessionId);
   _scrappableOpenedSessionsIds.removeWhere((key, value) => value == sessionId);
 }
 
@@ -262,8 +296,12 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
       return;
     }
 
-    final testData = _cacheTestData[sessionId];
-    if (testData == null) {
+    final testData = _cacheRefTestData[sessionId];
+    final scrapperRequest = _cacheScrappableRequest[sessionId];
+    final scrappingBeeExtractLogic = _cacheScrappingBeeExtractLogic[sessionId];
+    if (testData == null ||
+        scrapperRequest == null ||
+        scrappingBeeExtractLogic == null) {
       _scrapRedraftSessions[sessionId]?.add(
         ErrorTextResponse(
           role: PromptRole.system,
@@ -280,8 +318,15 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
         chatSeason.stream.listen((ChatResponse chatResponse) {
       _scrapRedraftSessions[sessionId]?.add(chatResponse);
       if (chatResponse is NewExtractRuleResponse) {
-        if (_cacheTestData.containsKey(sessionId)) {
-          _cacheTestData[sessionId] = chatResponse.referenceTestData;
+        if (_cacheRefTestData.containsKey(sessionId)) {
+          _cacheRefTestData[sessionId] = chatResponse.referenceTestData;
+        }
+        if (_cacheScrappableRequest.containsKey(sessionId)) {
+          _cacheScrappableRequest[sessionId] = chatResponse.scrapperRequest;
+        }
+        if (_cacheScrappingBeeExtractLogic.containsKey(sessionId)) {
+          _cacheScrappingBeeExtractLogic[sessionId] =
+              chatResponse.scrappingBeeExtractLogic;
         }
       }
     });
@@ -295,8 +340,10 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
       await chatController.sendMessage(
         session: session,
         chatSeason: chatSeason,
-        userPromt: userPrompt,
+        userPrompt: userPrompt,
         referenceTestData: testData,
+        scrapperRequest: scrapperRequest,
+        scrappingBeeExtractLogic: scrappingBeeExtractLogic,
       );
     } catch (e, s) {
       chatSeason.add(ErrorTextResponse(

@@ -129,7 +129,6 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
         name: '${sourceScrappable.name} (Copy)',
         description: sourceScrappable.description,
         testEndpointAvailableUntil: null,
-        scrappingRules: sourceScrappable.scrappingRules,
         willHideFromMarketplace: false,
         isDeleted: false,
         targetRequestId: clonedRequest.id!,

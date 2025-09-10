@@ -58,6 +58,7 @@ void run(List<String> args) async {
   ));
 
   final String? scrapingBeeApiKey = pod.getPassword('scrapingBeeApiKey');
+  ScrapingBeeDeprecated.initialize(scrapingBeeApiKey ?? '');
   ScrapingBee.initialize(scrapingBeeApiKey ?? '');
   final String? openAiApiKey = pod.getPassword('openAiApiKey');
   openAiClient = OpenAIClient(apiKey: openAiApiKey);
@@ -103,5 +104,6 @@ void run(List<String> args) async {
   await pod.start();
 }
 
-final ScrapingBee scrapingBee = ScrapingBee();
+final ScrapingBeeDeprecated scrapingBeeDeprecated = ScrapingBeeDeprecated();
+final ScrapingBee scrappingBee = ScrapingBee();
 late final OpenAIClient openAiClient;

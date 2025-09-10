@@ -46,7 +46,7 @@ import 'entities/scrappable/scraper_category.dart' as _i30;
 import 'entities/scrappable/scrappable.dart' as _i31;
 import 'entities/scrappable/scrappable_analytics.dart' as _i32;
 import 'entities/scrappable/scrappable_request.dart' as _i33;
-import 'entities/scrappable/scrappable_test_result.dart' as _i34;
+import 'entities/scrappable/scrapping_bee_extract_logic.dart' as _i34;
 import 'entities/account/api_usage/api_credit_history/monthly_subscription_credit_deposit.dart'
     as _i35;
 import 'package:zenscrap_server/src/generated/entities/account/api_usage/api_credit_history/api_creadit_history_item.dart'
@@ -85,7 +85,7 @@ export 'entities/scrappable/scraper_category.dart';
 export 'entities/scrappable/scrappable.dart';
 export 'entities/scrappable/scrappable_analytics.dart';
 export 'entities/scrappable/scrappable_request.dart';
-export 'entities/scrappable/scrappable_test_result.dart';
+export 'entities/scrappable/scrapping_bee_extract_logic.dart';
 export 'entities/zenscrap_exception.dart';
 
 class Protocol extends _i1.SerializationManagerServer {
@@ -699,12 +699,6 @@ class Protocol extends _i1.SerializationManagerServer {
           dartType: 'DateTime?',
         ),
         _i2.ColumnDefinition(
-          name: 'scrappingRules',
-          columnType: _i2.ColumnType.text,
-          isNullable: true,
-          dartType: 'String?',
-        ),
-        _i2.ColumnDefinition(
           name: 'willHideFromMarketplace',
           columnType: _i2.ColumnType.boolean,
           isNullable: false,
@@ -991,6 +985,12 @@ class Protocol extends _i1.SerializationManagerServer {
           isNullable: false,
           dartType: 'int',
         ),
+        _i2.ColumnDefinition(
+          name: 'testExtractJsonResult',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
       ],
       foreignKeys: [
         _i2.ForeignKeyDefinition(
@@ -1035,8 +1035,8 @@ class Protocol extends _i1.SerializationManagerServer {
       managed: true,
     ),
     _i2.TableDefinition(
-      name: 'scrappable_test_result',
-      dartName: 'ScrappableTestResult',
+      name: 'scrapping_bee_extract_logic',
+      dartName: 'ScrappingBeeExtractLogic',
       schema: 'public',
       module: 'zenscrap',
       columns: [
@@ -1045,38 +1045,81 @@ class Protocol extends _i1.SerializationManagerServer {
           columnType: _i2.ColumnType.bigint,
           isNullable: false,
           dartType: 'int?',
-          columnDefault: 'nextval(\'scrappable_test_result_id_seq\'::regclass)',
-        ),
-        _i2.ColumnDefinition(
-          name: 'testExtractRule',
-          columnType: _i2.ColumnType.text,
-          isNullable: false,
-          dartType: 'String',
-        ),
-        _i2.ColumnDefinition(
-          name: 'extractJsonResult',
-          columnType: _i2.ColumnType.text,
-          isNullable: false,
-          dartType: 'String',
+          columnDefault:
+              'nextval(\'scrapping_bee_extract_logic_id_seq\'::regclass)',
         ),
         _i2.ColumnDefinition(
           name: 'scrappableId',
           columnType: _i2.ColumnType.bigint,
-          isNullable: false,
-          dartType: 'int',
+          isNullable: true,
+          dartType: 'int?',
         ),
         _i2.ColumnDefinition(
-          name: 'referenceTestDataId',
+          name: 'extractRules',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'jsScenario',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'renderJs',
+          columnType: _i2.ColumnType.boolean,
+          isNullable: false,
+          dartType: 'bool',
+        ),
+        _i2.ColumnDefinition(
+          name: 'wait',
           columnType: _i2.ColumnType.bigint,
           isNullable: true,
           dartType: 'int?',
         ),
+        _i2.ColumnDefinition(
+          name: 'waitFor',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'waitBrowser',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'premiumProxy',
+          columnType: _i2.ColumnType.boolean,
+          isNullable: false,
+          dartType: 'bool',
+        ),
+        _i2.ColumnDefinition(
+          name: 'countryCode',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'sessionId',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'customGoogle',
+          columnType: _i2.ColumnType.boolean,
+          isNullable: true,
+          dartType: 'bool?',
+        ),
       ],
       foreignKeys: [
         _i2.ForeignKeyDefinition(
-          constraintName: 'scrappable_test_result_fk_0',
-          columns: ['referenceTestDataId'],
-          referenceTable: 'scrappable_test_data',
+          constraintName: 'scrapping_bee_extract_logic_fk_0',
+          columns: ['scrappableId'],
+          referenceTable: 'scrappable',
           referenceTableSchema: 'public',
           referenceColumns: ['id'],
           onUpdate: _i2.ForeignKeyAction.noAction,
@@ -1086,7 +1129,7 @@ class Protocol extends _i1.SerializationManagerServer {
       ],
       indexes: [
         _i2.IndexDefinition(
-          indexName: 'scrappable_test_result_pkey',
+          indexName: 'scrapping_bee_extract_logic_pkey',
           tableSpace: null,
           elements: [
             _i2.IndexElementDefinition(
@@ -1105,19 +1148,6 @@ class Protocol extends _i1.SerializationManagerServer {
             _i2.IndexElementDefinition(
               type: _i2.IndexElementDefinitionType.column,
               definition: 'scrappableId',
-            )
-          ],
-          type: 'btree',
-          isUnique: false,
-          isPrimary: false,
-        ),
-        _i2.IndexDefinition(
-          indexName: 'reference_test_data_unique_idx',
-          tableSpace: null,
-          elements: [
-            _i2.IndexElementDefinition(
-              type: _i2.IndexElementDefinitionType.column,
-              definition: 'referenceTestDataId',
             )
           ],
           type: 'btree',
@@ -1140,11 +1170,11 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i4.NewExtractRuleResponse) {
       return _i4.NewExtractRuleResponse.fromJson(data) as T;
     }
-    if (t == _i4.MessageTextAndNewExtractRulesResponse) {
-      return _i4.MessageTextAndNewExtractRulesResponse.fromJson(data) as T;
-    }
     if (t == _i4.ErrorTextResponse) {
       return _i4.ErrorTextResponse.fromJson(data) as T;
+    }
+    if (t == _i4.CandidateExtractLogicUpdate) {
+      return _i4.CandidateExtractLogicUpdate.fromJson(data) as T;
     }
     if (t == _i4.MessageTextResponse) {
       return _i4.MessageTextResponse.fromJson(data) as T;
@@ -1236,8 +1266,8 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i33.ScrappableRequest) {
       return _i33.ScrappableRequest.fromJson(data) as T;
     }
-    if (t == _i34.ScrappableTestResult) {
-      return _i34.ScrappableTestResult.fromJson(data) as T;
+    if (t == _i34.ScrappingBeeExtractLogic) {
+      return _i34.ScrappingBeeExtractLogic.fromJson(data) as T;
     }
     if (t == _i35.MonthlySubscriptionCreditDeposit) {
       return _i35.MonthlySubscriptionCreditDeposit.fromJson(data) as T;
@@ -1246,13 +1276,13 @@ class Protocol extends _i1.SerializationManagerServer {
       return (data != null ? _i4.NewExtractRuleResponse.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i4.MessageTextAndNewExtractRulesResponse?>()) {
-      return (data != null
-          ? _i4.MessageTextAndNewExtractRulesResponse.fromJson(data)
-          : null) as T;
-    }
     if (t == _i1.getType<_i4.ErrorTextResponse?>()) {
       return (data != null ? _i4.ErrorTextResponse.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i4.CandidateExtractLogicUpdate?>()) {
+      return (data != null
+          ? _i4.CandidateExtractLogicUpdate.fromJson(data)
+          : null) as T;
     }
     if (t == _i1.getType<_i4.MessageTextResponse?>()) {
       return (data != null ? _i4.MessageTextResponse.fromJson(data) : null)
@@ -1363,9 +1393,10 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i1.getType<_i33.ScrappableRequest?>()) {
       return (data != null ? _i33.ScrappableRequest.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i34.ScrappableTestResult?>()) {
-      return (data != null ? _i34.ScrappableTestResult.fromJson(data) : null)
-          as T;
+    if (t == _i1.getType<_i34.ScrappingBeeExtractLogic?>()) {
+      return (data != null
+          ? _i34.ScrappingBeeExtractLogic.fromJson(data)
+          : null) as T;
     }
     if (t == _i1.getType<_i35.MonthlySubscriptionCreditDeposit?>()) {
       return (data != null
@@ -1472,11 +1503,11 @@ class Protocol extends _i1.SerializationManagerServer {
     if (data is _i4.NewExtractRuleResponse) {
       return 'NewExtractRuleResponse';
     }
-    if (data is _i4.MessageTextAndNewExtractRulesResponse) {
-      return 'MessageTextAndNewExtractRulesResponse';
-    }
     if (data is _i4.ErrorTextResponse) {
       return 'ErrorTextResponse';
+    }
+    if (data is _i4.CandidateExtractLogicUpdate) {
+      return 'CandidateExtractLogicUpdate';
     }
     if (data is _i4.MessageTextResponse) {
       return 'MessageTextResponse';
@@ -1568,8 +1599,8 @@ class Protocol extends _i1.SerializationManagerServer {
     if (data is _i33.ScrappableRequest) {
       return 'ScrappableRequest';
     }
-    if (data is _i34.ScrappableTestResult) {
-      return 'ScrappableTestResult';
+    if (data is _i34.ScrappingBeeExtractLogic) {
+      return 'ScrappingBeeExtractLogic';
     }
     if (data is _i35.MonthlySubscriptionCreditDeposit) {
       return 'MonthlySubscriptionCreditDeposit';
@@ -1594,12 +1625,11 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName == 'NewExtractRuleResponse') {
       return deserialize<_i4.NewExtractRuleResponse>(data['data']);
     }
-    if (dataClassName == 'MessageTextAndNewExtractRulesResponse') {
-      return deserialize<_i4.MessageTextAndNewExtractRulesResponse>(
-          data['data']);
-    }
     if (dataClassName == 'ErrorTextResponse') {
       return deserialize<_i4.ErrorTextResponse>(data['data']);
+    }
+    if (dataClassName == 'CandidateExtractLogicUpdate') {
+      return deserialize<_i4.CandidateExtractLogicUpdate>(data['data']);
     }
     if (dataClassName == 'MessageTextResponse') {
       return deserialize<_i4.MessageTextResponse>(data['data']);
@@ -1692,8 +1722,8 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName == 'ScrappableRequest') {
       return deserialize<_i33.ScrappableRequest>(data['data']);
     }
-    if (dataClassName == 'ScrappableTestResult') {
-      return deserialize<_i34.ScrappableTestResult>(data['data']);
+    if (dataClassName == 'ScrappingBeeExtractLogic') {
+      return deserialize<_i34.ScrappingBeeExtractLogic>(data['data']);
     }
     if (dataClassName == 'MonthlySubscriptionCreditDeposit') {
       return deserialize<_i35.MonthlySubscriptionCreditDeposit>(data['data']);
@@ -1748,8 +1778,8 @@ class Protocol extends _i1.SerializationManagerServer {
         return _i32.ScrappableAnalytics.t;
       case _i33.ScrappableRequest:
         return _i33.ScrappableRequest.t;
-      case _i34.ScrappableTestResult:
-        return _i34.ScrappableTestResult.t;
+      case _i34.ScrappingBeeExtractLogic:
+        return _i34.ScrappingBeeExtractLogic.t;
     }
     return null;
   }

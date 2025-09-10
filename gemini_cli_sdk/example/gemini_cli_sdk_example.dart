@@ -86,6 +86,31 @@ void main() async {
     print('  Use Case: ${schemaResult.data['useCase']}');
     print('  Popularity: ${schemaResult.data['popularity'] ?? 'Not specified'}');
     
+    // Example 3: Dynamic model switching
+    print('\n🔄 Example 3: Dynamic model switching');
+    print('-' * 40);
+    
+    // Start with flash model for simple task
+    print('Current model: ${chat.currentModel ?? 'default'}');
+    
+    final simpleResponse = await chat.sendMessage([
+      GeminiSdkContent.text('What is 2+2?'),
+    ]);
+    print('Simple task response: $simpleResponse');
+    
+    // Switch to a more capable model for complex tasks
+    print('\n🎯 Switching to gemini-2.5-pro for complex task...');
+    chat.changeModel('gemini-2.5-pro');
+    print('New model: ${chat.currentModel}');
+    
+    final complexResponse = await chat.sendMessage([
+      GeminiSdkContent.text('Explain the implications of quantum computing on cryptography in detail.'),
+    ]);
+    print('Complex task response (first 200 chars): ${complexResponse.substring(0, complexResponse.length > 200 ? 200 : complexResponse.length)}...');
+    
+    // You can switch to ultra for the most demanding tasks
+    // chat.changeModel('gemini-2.5-ultra');
+    
     // Check MCP status
     print('\n🔌 MCP Status:');
     print('-' * 40);

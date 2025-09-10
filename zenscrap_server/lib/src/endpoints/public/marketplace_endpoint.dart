@@ -64,9 +64,8 @@ class MarketplaceEndpoint extends Endpoint {
       offset: offset,
       include: Scrappable.include(
         targetRequest: ScrappableRequest.include(),
-        referenceTestData: ReferenceTestData.include(
-          scrappableTestResult: ScrappableTestResult.include(),
-        ),
+        scrappingBeeExtractRules: ScrappingBeeExtractLogic.include(),
+        referenceTestData: ReferenceTestData.include(),
       ),
     );
 
@@ -75,8 +74,7 @@ class MarketplaceEndpoint extends Endpoint {
     for (final Scrappable scrappable in scrappables) {
       int? count;
 
-      final DateTime? dataCache =
-          _usageCountDateCache[scrappable.id!];
+      final DateTime? dataCache = _usageCountDateCache[scrappable.id!];
 
       final bool isCacheOutdated = dataCache == null ||
           dataCache.isBefore(now.subtract(const Duration(hours: 2)));

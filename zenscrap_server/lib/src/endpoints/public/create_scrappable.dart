@@ -54,7 +54,7 @@ class CreateScrappableEndpoint extends Endpoint {
     late final ScraperCategory category;
 
     final scrapingResult =
-        await scrapingBee.fetchHtmlAndScreenshot(referenceLink);
+        await scrapingBeeDeprecated.fetchHtmlAndScreenshot(referenceLink);
 
     if (scrapingResult == null) {
       // Handle the error case - throw an exception
@@ -65,7 +65,7 @@ class CreateScrappableEndpoint extends Endpoint {
       );
     }
 
-    var (String html, Uint8List pageFullscreenScreenshot) = scrapingResult;
+    final (String html, Uint8List pageFullscreenScreenshot) = scrapingResult;
 
     // Convert HTML to bytes for file-like upload
     final Uint8List htmlBytes = utf8.encode(html);

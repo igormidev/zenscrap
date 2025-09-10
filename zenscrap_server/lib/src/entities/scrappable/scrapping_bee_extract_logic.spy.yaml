@@ -1,0 +1,21 @@
+class: ScrappingBeeExtractLogic
+table: scrapping_bee_extract_logic
+fields:
+  scrappableId: int?
+  scrappable: Scrappable?, relation(name=scrappable_scrapping_bee_extract_logic, field=scrappableId, onDelete=cascade)
+
+  extractRules: String # stringified JSON describing what to extract (CSS/XPath selectors, lists, attributes, tables, etc.)
+  jsScenario: String? # stringified JSON of scripted actions (click/type/scroll/infinite-scroll/etc.) to run before extraction
+  renderJs: bool # enable a headless browser to execute JavaScript before extraction
+  wait: int? # add a fixed delay (milliseconds) before returning the response
+  waitFor: String? # wait for a specific CSS/XPath selector to appear before returning
+  waitBrowser: String? # wait for a browser event (e.g., domcontentloaded) before returning
+  premiumProxy: bool # will use residencial proxy, for more scrapper-resident sites
+  countryCode: String? # proxy geolocation (e.g., us, de, br)
+  sessionId: String? # keep the same IP across multiple requests (sticky sessions).
+  customGoogle: bool? # enable Google-specific handling, this should allways be true if the url is from a google domain
+
+indexes:
+    scrappable_id_idx:
+        fields: scrappableId
+        unique: true

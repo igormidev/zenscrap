@@ -13,7 +13,7 @@ import 'models/schema_models.dart';
 /// Represents a chat session with Gemini
 class GeminiChat {
   final String apiKey;
-  final GeminiChatOptions options;
+  GeminiChatOptions options;
 
   /// The session ID for conversation continuity
   String? _sessionId;
@@ -34,6 +34,18 @@ class GeminiChat {
     required this.apiKey,
     GeminiChatOptions? options,
   }) : options = options ?? const GeminiChatOptions();
+
+  /// Gets the current model being used
+  String? get currentModel => options.model;
+
+  /// Changes the model for future interactions
+  /// Common models include:
+  /// - 'gemini-2.5-flash' (fast, efficient for most tasks)
+  /// - 'gemini-2.5-pro' (balanced performance)
+  /// - 'gemini-2.5-ultra' (highest capability for complex tasks)
+  void changeModel(String model) {
+    options = options.copyWith(model: model);
+  }
 
   /// Sends a message to Gemini and returns the response
   Future<String> sendMessage(List<GeminiSdkContent> contents) async {
