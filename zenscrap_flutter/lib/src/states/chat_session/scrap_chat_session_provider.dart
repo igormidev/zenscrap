@@ -84,16 +84,18 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
       state.mapOrNull(
         standard: (value) {
           state = value.copyWith(
-              data: value.data
-                  .copyWith(referenceTestData: chatResponse.referenceTestData));
+            data: value.data.copyWith(
+              referenceTestData: chatResponse.referenceTestData,
+              scrappingBeeExtractRules: chatResponse.scrappingBeeExtractLogic,
+              targetRequest: chatResponse.scrapperRequest,
+            ),
+          );
         },
       );
     }
     ref.read(chatMessagesProvider.notifier).state =
         ref.read(chatMessagesProvider).maybeMap(
-              data: (data) => AsyncValue.data(
-                [...data.value, chatResponse],
-              ),
+              data: (data) => AsyncValue.data([...data.value, chatResponse]),
               orElse: () => AsyncValue.data([chatResponse]),
             );
   }

@@ -18,6 +18,8 @@ class ScrappableEditSessionView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ScrappableRequest? request = scrappable.targetRequest;
+    final ScrappingBeeExtractLogic? extractLogic =
+        scrappable.scrappingBeeExtractRules;
     final ReferenceTestData? testData = scrappable.referenceTestData;
     if (request == null) return SizedBox.fromSize();
 
@@ -54,6 +56,8 @@ class ScrappableEditSessionView extends StatelessWidget {
                   targetTime: testExpirationDate,
                   scrappableId: scrappable.id!,
                   testData: testData,
+                  scrappingBeeExtractLogic: extractLogic,
+                  scrappableRequest: request,
                 ),
                 SizedBox(height: 8),
                 Expanded(

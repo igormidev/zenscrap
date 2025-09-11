@@ -233,11 +233,11 @@ class _ChatMessageBubble extends StatelessWidget {
         errorMessage: errorMessage.errorMessage,
         textColor: textColor,
       );
-    } else if (message is MessageTextAndNewExtractRulesResponse) {
-      final extractMessage = message as MessageTextAndNewExtractRulesResponse;
+    } else if (message is CandidateExtractLogicUpdate) {
+      final extractMessage = message as CandidateExtractLogicUpdate;
       messageContent = _ExtractRulesMessage(
         messageText: extractMessage.messageText,
-        extractRules: extractMessage.newExtractRules,
+        extractRules: extractMessage.scrappingBeeExtractLogic.extractRules,
         textColor: textColor,
         backgroundColor: backgroundColor,
       );

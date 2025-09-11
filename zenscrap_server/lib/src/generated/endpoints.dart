@@ -16,23 +16,31 @@ import '../endpoints/private/private_clone_scrappable_endpoint.dart' as _i4;
 import '../endpoints/private/private_scrappable_analytics_endpoint.dart' as _i5;
 import '../endpoints/private/private_subscription_endpoint.dart' as _i6;
 import '../endpoints/private/private_user_scrappables_endpoint.dart' as _i7;
-import '../endpoints/public/delete_scrappable_endpoint.dart' as _i8;
-import '../endpoints/public/deploy_endpoint.dart' as _i9;
-import '../endpoints/public/edit_scrappable_endpoint.dart' as _i10;
-import '../endpoints/public/marketplace_endpoint.dart' as _i11;
-import '../endpoints/public/public_tier_endpoint.dart' as _i12;
-import '../endpoints/public/scrappable_api.dart' as _i13;
+import '../endpoints/public/create_scrappable.dart' as _i8;
+import '../endpoints/public/delete_scrappable_endpoint.dart' as _i9;
+import '../endpoints/public/deploy_endpoint.dart' as _i10;
+import '../endpoints/public/edit_scrappable_endpoint.dart' as _i11;
+import '../endpoints/public/marketplace_endpoint.dart' as _i12;
+import '../endpoints/public/public_tier_endpoint.dart' as _i13;
+import '../endpoints/public/scrappable_api.dart' as _i14;
+import '../endpoints/public/scrappable_chat_session.dart' as _i15;
 import 'package:zenscrap_server/src/generated/entities/scrappable/scrappable.dart'
-    as _i14;
-import 'package:zenscrap_server/src/generated/entities/account/credit_purchase_option.dart'
-    as _i15;
-import 'package:zenscrap_server/src/generated/entities/scrappable/reference_test_data.dart'
     as _i16;
-import 'package:zenscrap_server/src/generated/entities/scrappable/scraper_category.dart'
+import 'package:zenscrap_server/src/generated/entities/account/credit_purchase_option.dart'
     as _i17;
-import 'package:zenscrap_server/src/generated/entities/account/plan_tier.dart'
+import 'package:zenscrap_server/src/generated/entities/scrappable/reference_test_data.dart'
     as _i18;
-import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i19;
+import 'package:zenscrap_server/src/generated/entities/scrappable/scrapping_bee_extract_logic.dart'
+    as _i19;
+import 'package:zenscrap_server/src/generated/entities/scrappable/scrappable_request.dart'
+    as _i20;
+import 'package:zenscrap_server/src/generated/entities/scrappable/scraper_category.dart'
+    as _i21;
+import 'package:zenscrap_server/src/generated/entities/account/plan_tier.dart'
+    as _i22;
+import 'package:zenscrap_server/src/generated/entities/scrappable/ai_model.dart'
+    as _i23;
+import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i24;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -74,40 +82,52 @@ class Endpoints extends _i1.EndpointDispatch {
           'privateUserScrappables',
           null,
         ),
-      'deleteScrappable': _i8.DeleteScrappableEndpoint()
+      'createScrappable': _i8.CreateScrappableEndpoint()
+        ..initialize(
+          server,
+          'createScrappable',
+          null,
+        ),
+      'deleteScrappable': _i9.DeleteScrappableEndpoint()
         ..initialize(
           server,
           'deleteScrappable',
           null,
         ),
-      'deployScrappable': _i9.DeployScrappable()
+      'deployScrappable': _i10.DeployScrappable()
         ..initialize(
           server,
           'deployScrappable',
           null,
         ),
-      'editScrappable': _i10.EditScrappableEndpoint()
+      'editScrappable': _i11.EditScrappableEndpoint()
         ..initialize(
           server,
           'editScrappable',
           null,
         ),
-      'marketplace': _i11.MarketplaceEndpoint()
+      'marketplace': _i12.MarketplaceEndpoint()
         ..initialize(
           server,
           'marketplace',
           null,
         ),
-      'publicTier': _i12.PublicTierEndpoint()
+      'publicTier': _i13.PublicTierEndpoint()
         ..initialize(
           server,
           'publicTier',
           null,
         ),
-      'scrappableApi': _i13.ScrappableApiEndpoint()
+      'scrappableApi': _i14.ScrappableApiEndpoint()
         ..initialize(
           server,
           'scrappableApi',
+          null,
+        ),
+      'scrappableChatSession': _i15.ScrappableChatSession()
+        ..initialize(
+          server,
+          'scrappableChatSession',
           null,
         ),
     };
@@ -120,7 +140,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'initialScrappableIfNewUser': _i1.ParameterDescription(
               name: 'initialScrappableIfNewUser',
-              type: _i1.getType<_i14.Scrappable?>(),
+              type: _i1.getType<_i16.Scrappable?>(),
               nullable: true,
             )
           },
@@ -248,7 +268,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'creditPackage': _i1.ParameterDescription(
               name: 'creditPackage',
-              type: _i1.getType<_i15.CreditPurchaseOption>(),
+              type: _i1.getType<_i17.CreditPurchaseOption>(),
               nullable: false,
             )
           },
@@ -444,6 +464,34 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
       },
     );
+    connectors['createScrappable'] = _i1.EndpointConnector(
+      name: 'createScrappable',
+      endpoint: endpoints['createScrappable']!,
+      methodConnectors: {
+        'call': _i1.MethodStreamConnector(
+          name: 'call',
+          params: {
+            'referenceLink': _i1.ParameterDescription(
+              name: 'referenceLink',
+              type: _i1.getType<String>(),
+              nullable: false,
+            )
+          },
+          streamParams: {},
+          returnType: _i1.MethodStreamReturnType.streamType,
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+            Map<String, Stream> streamParams,
+          ) =>
+              (endpoints['createScrappable'] as _i8.CreateScrappableEndpoint)
+                  .call(
+            session,
+            referenceLink: params['referenceLink'],
+          ),
+        )
+      },
+    );
     connectors['deleteScrappable'] = _i1.EndpointConnector(
       name: 'deleteScrappable',
       endpoint: endpoints['deleteScrappable']!,
@@ -461,7 +509,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['deleteScrappable'] as _i8.DeleteScrappableEndpoint)
+              (endpoints['deleteScrappable'] as _i9.DeleteScrappableEndpoint)
                   .call(
             session,
             scrappableId: params['scrappableId'],
@@ -478,17 +526,29 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'testData': _i1.ParameterDescription(
               name: 'testData',
-              type: _i1.getType<_i16.ReferenceTestData>(),
+              type: _i1.getType<_i18.ReferenceTestData>(),
               nullable: false,
-            )
+            ),
+            'scrappingBeeExtractLogic': _i1.ParameterDescription(
+              name: 'scrappingBeeExtractLogic',
+              type: _i1.getType<_i19.ScrappingBeeExtractLogic>(),
+              nullable: false,
+            ),
+            'scrappableRequest': _i1.ParameterDescription(
+              name: 'scrappableRequest',
+              type: _i1.getType<_i20.ScrappableRequest>(),
+              nullable: false,
+            ),
           },
           call: (
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['deployScrappable'] as _i9.DeployScrappable).call(
+              (endpoints['deployScrappable'] as _i10.DeployScrappable).call(
             session,
             testData: params['testData'],
+            scrappingBeeExtractLogic: params['scrappingBeeExtractLogic'],
+            scrappableRequest: params['scrappableRequest'],
           ),
         )
       },
@@ -517,7 +577,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'category': _i1.ParameterDescription(
               name: 'category',
-              type: _i1.getType<_i17.ScraperCategory?>(),
+              type: _i1.getType<_i21.ScraperCategory?>(),
               nullable: true,
             ),
             'willHideFromMarketplace': _i1.ParameterDescription(
@@ -530,7 +590,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['editScrappable'] as _i10.EditScrappableEndpoint).call(
+              (endpoints['editScrappable'] as _i11.EditScrappableEndpoint).call(
             session,
             scrappableId: params['scrappableId'],
             name: params['name'],
@@ -563,7 +623,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['marketplace'] as _i11.MarketplaceEndpoint).getItems(
+              (endpoints['marketplace'] as _i12.MarketplaceEndpoint).getItems(
             session,
             page: params['page'],
             searchQuery: params['searchQuery'],
@@ -590,7 +650,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'planTier': _i1.ParameterDescription(
               name: 'planTier',
-              type: _i1.getType<_i18.PlanTier>(),
+              type: _i1.getType<_i22.PlanTier>(),
               nullable: false,
             ),
           },
@@ -598,7 +658,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['publicTier'] as _i12.PublicTierEndpoint)
+              (endpoints['publicTier'] as _i13.PublicTierEndpoint)
                   .updatePlayerTier(
             session,
             email: params['email'],
@@ -635,7 +695,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['scrappableApi'] as _i13.ScrappableApiEndpoint).prod(
+              (endpoints['scrappableApi'] as _i14.ScrappableApiEndpoint).prod(
             session,
             scrappableId: params['scrappableId'],
             apiKey: params['apiKey'],
@@ -660,7 +720,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['scrappableApi'] as _i13.ScrappableApiEndpoint).test(
+              (endpoints['scrappableApi'] as _i14.ScrappableApiEndpoint).test(
             session,
             scrappableId: params['scrappableId'],
             payload: params['payload'],
@@ -668,6 +728,122 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
       },
     );
-    modules['serverpod_auth'] = _i19.Endpoints()..initializeEndpoints(server);
+    connectors['scrappableChatSession'] = _i1.EndpointConnector(
+      name: 'scrappableChatSession',
+      endpoint: endpoints['scrappableChatSession']!,
+      methodConnectors: {
+        'disposeSession': _i1.MethodConnector(
+          name: 'disposeSession',
+          params: {
+            'sessionId': _i1.ParameterDescription(
+              name: 'sessionId',
+              type: _i1.getType<String>(),
+              nullable: false,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['scrappableChatSession'] as _i15.ScrappableChatSession)
+                  .disposeSession(
+            session,
+            sessionId: params['sessionId'],
+          ),
+        ),
+        'createSession': _i1.MethodConnector(
+          name: 'createSession',
+          params: {
+            'scrappableId': _i1.ParameterDescription(
+              name: 'scrappableId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['scrappableChatSession'] as _i15.ScrappableChatSession)
+                  .createSession(
+            session,
+            scrappableId: params['scrappableId'],
+          ),
+        ),
+        'changeChatModel': _i1.MethodConnector(
+          name: 'changeChatModel',
+          params: {
+            'sessionUuid': _i1.ParameterDescription(
+              name: 'sessionUuid',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'aiModel': _i1.ParameterDescription(
+              name: 'aiModel',
+              type: _i1.getType<_i23.AiModel>(),
+              nullable: false,
+            ),
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['scrappableChatSession'] as _i15.ScrappableChatSession)
+                  .changeChatModel(
+            session,
+            sessionUuid: params['sessionUuid'],
+            aiModel: params['aiModel'],
+          ),
+        ),
+        'sendPromptMessage': _i1.MethodConnector(
+          name: 'sendPromptMessage',
+          params: {
+            'sessionId': _i1.ParameterDescription(
+              name: 'sessionId',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'userPrompt': _i1.ParameterDescription(
+              name: 'userPrompt',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['scrappableChatSession'] as _i15.ScrappableChatSession)
+                  .sendPromptMessage(
+            session,
+            sessionId: params['sessionId'],
+            userPrompt: params['userPrompt'],
+          ),
+        ),
+        'listenToScrappableRedraftSession': _i1.MethodStreamConnector(
+          name: 'listenToScrappableRedraftSession',
+          params: {
+            'sessionUuid': _i1.ParameterDescription(
+              name: 'sessionUuid',
+              type: _i1.getType<String>(),
+              nullable: false,
+            )
+          },
+          streamParams: {},
+          returnType: _i1.MethodStreamReturnType.streamType,
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+            Map<String, Stream> streamParams,
+          ) =>
+              (endpoints['scrappableChatSession'] as _i15.ScrappableChatSession)
+                  .listenToScrappableRedraftSession(
+            session,
+            sessionUuid: params['sessionUuid'],
+          ),
+        ),
+      },
+    );
+    modules['serverpod_auth'] = _i24.Endpoints()..initializeEndpoints(server);
   }
 }

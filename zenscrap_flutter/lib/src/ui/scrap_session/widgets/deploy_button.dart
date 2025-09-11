@@ -13,9 +13,13 @@ import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.da
 
 class DeployButton extends ConsumerStatefulWidget {
   final ReferenceTestData testData;
+  final ScrappingBeeExtractLogic scrappingBeeExtractLogic;
+  final ScrappableRequest scrappableRequest;
   const DeployButton({
     super.key,
     required this.testData,
+    required this.scrappingBeeExtractLogic,
+    required this.scrappableRequest,
   });
 
   @override
@@ -56,7 +60,12 @@ class _DeployButtonState extends ConsumerState<DeployButton> {
                           _isDeployingVN.value = true;
                           final deployResult = await ref
                               .read(clientProvider)
-                              .deployScrappable(testData: widget.testData)
+                              .deployScrappable(
+                                testData: widget.testData,
+                                scrappableRequest: widget.scrappableRequest,
+                                scrappingBeeExtractLogic:
+                                    widget.scrappingBeeExtractLogic,
+                              )
                               .toResult;
                           _isDeployingVN.value = false;
 

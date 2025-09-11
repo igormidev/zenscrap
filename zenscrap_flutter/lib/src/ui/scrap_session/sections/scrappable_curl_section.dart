@@ -12,11 +12,15 @@ class ScrappableCurlSection extends ConsumerStatefulWidget {
   final int scrappableId;
   final DateTime targetTime;
   final ReferenceTestData? testData;
+  final ScrappingBeeExtractLogic? scrappingBeeExtractLogic;
+  final ScrappableRequest? scrappableRequest;
   const ScrappableCurlSection({
     super.key,
     required this.scrappableId,
     required this.targetTime,
     required this.testData,
+    required this.scrappingBeeExtractLogic,
+    required this.scrappableRequest,
   });
 
   @override
@@ -52,7 +56,13 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection>
           child: CodeBlock(
             code: code,
             leadingWidgets: [RemainingTimeIndicator(widget.targetTime)],
-            trailingWidgets: [DeployButton(testData: widget.testData!)],
+            trailingWidgets: [
+              DeployButton(
+                testData: widget.testData!,
+                scrappingBeeExtractLogic: widget.scrappingBeeExtractLogic!,
+                scrappableRequest: widget.scrappableRequest!,
+              )
+            ],
           ),
         ),
       );
@@ -63,7 +73,13 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection>
       code: code.replaceAll(r'\"', '"'),
       copyCode: code,
       leadingWidgets: [RemainingTimeIndicator(widget.targetTime)],
-      trailingWidgets: [DeployButton(testData: widget.testData!)],
+      trailingWidgets: [
+        DeployButton(
+          testData: widget.testData!,
+          scrappingBeeExtractLogic: widget.scrappingBeeExtractLogic!,
+          scrappableRequest: widget.scrappableRequest!,
+        )
+      ],
     );
   }
 }
