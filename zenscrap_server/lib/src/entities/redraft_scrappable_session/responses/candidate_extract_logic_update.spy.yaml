@@ -4,3 +4,4 @@ fields:
     messageText: String
     scrappingBeeExtractLogic: ScrappingBeeExtractLogic
     scrapperRequest: ScrappableRequest
+    referenceTestData: ReferenceTestData

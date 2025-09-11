@@ -72,10 +72,8 @@ mixin DeployEndpointMixin {
         .updateRow(session, scrappingBeeExtractLogic, transaction: transaction);
     await ScrappableRequest.db
         .updateRow(session, scrappableRequest, transaction: transaction);
-
     await ByteTestData.db
         .updateRow(session, testData.byteData!, transaction: transaction);
-
     await ReferenceTestData.db
         .updateRow(session, testData, transaction: transaction);
 

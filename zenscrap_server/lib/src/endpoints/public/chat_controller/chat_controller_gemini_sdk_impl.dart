@@ -84,8 +84,8 @@ class ChatControllerGeminiSdkImpl extends IChatController {
     required ScrappingBeeExtractLogic scrappingBeeExtractLogic,
     required StreamController<ChatResponse> chatSeason,
   }) async {
-    final resp =
-        response.toChatResponse(scrapperRequest, scrappingBeeExtractLogic);
+    final resp = response.toChatResponse(
+        scrapperRequest, scrappingBeeExtractLogic, referenceTestData);
     chatSeason.add(resp);
 
     chatSeason.add(MessageTextResponse(
@@ -169,6 +169,7 @@ extension WebScrapperChatAIResponseMapExt on WebScrapperChatAIResponse {
   ChatResponse toChatResponse(
     ScrappableRequest scrapperRequest,
     ScrappingBeeExtractLogic scrappingBeeExtractLogic,
+    ReferenceTestData referenceTestData,
   ) {
     return switch (this) {
       WebScrapperChatAIResponseJustMessage(:final String message) =>
@@ -188,6 +189,7 @@ extension WebScrapperChatAIResponseMapExt on WebScrapperChatAIResponse {
       ) =>
         CandidateExtractLogicUpdate(
           role: PromptRole.model,
+          referenceTestData: referenceTestData,
           scrapperRequest: scrapperRequest.copyWith(
             id: scrapperRequest.id,
             url: request?.url,

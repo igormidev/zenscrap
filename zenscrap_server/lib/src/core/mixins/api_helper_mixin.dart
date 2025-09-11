@@ -186,6 +186,7 @@ mixin ApiHelperMixin {
                       t.apiUsageOwnerNanoId.equals(nanoId))),
       include: Scrappable.include(
         targetRequest: ScrappableRequest.include(),
+        scrappingBeeExtractRules: ScrappingBeeExtractLogic.include(),
       ),
     );
 
@@ -203,8 +204,8 @@ mixin ApiHelperMixin {
     return (scrappable, targetRequest);
   }
 
-  Future<String> _getExtractRules(Session session, Scrappable scrappable,
-      String? accountApiKeyString) async {
+  Future<ScrappingBeeExtractLogic> _getExtractRules(Session session,
+      Scrappable scrappable, String? accountApiKeyString) async {
     final isTest = accountApiKeyString == null;
     if (isTest) {
       final testSessionExtractRule = getTestExtractRules(scrappable.id!);
@@ -215,12 +216,10 @@ mixin ApiHelperMixin {
       return testSessionExtractRule;
     }
 
-    final String? extractRules =
-        scrappable.scrappingBeeExtractRules?.extractRules;
+    final ScrappingBeeExtractLogic? extractRules =
+        scrappable.scrappingBeeExtractRules;
 
-    if (extractRules == null || extractRules.isEmpty) {
-      throw _missingExtractRules;
-    }
+    if (extractRules == null) throw _missingExtractRules;
 
     return extractRules;
   }
@@ -356,13 +355,12 @@ mixin ApiHelperMixin {
       setScrappableCallback(scrappable);
       throwErrorIfIsATestRequestAndTestTimeExpired(apiKey, scrappable);
       final String targetUrl = composeUrl(payload, targetRequest);
-      final String extractRules =
+      final ScrappingBeeExtractLogic extractRules =
           await _getExtractRules(session, scrappable, apiKey);
 
-      final ExtractDataByRule result =
-          await scrapingBeeDeprecated.extractByRules(
+      final ExtractDataByRule result = await scrappingBee.extractByRules(
         targetUrl: targetUrl,
-        extractRules: extractRules,
+        scrappingBeeExtractLogic: extractRules,
       );
 
       return result.when(withData: (r) => r, error: scrappingError);

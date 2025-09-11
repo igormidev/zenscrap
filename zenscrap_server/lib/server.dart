@@ -5,7 +5,6 @@ import 'package:zenscrap_server/src/auth/handlers/on_send_reset_email.dart';
 import 'package:zenscrap_server/src/auth/handlers/on_send_validation_email.dart';
 import 'package:zenscrap_server/src/core/scraping_bee.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_config.dart';
-import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_gemini_sdk_impl.dart';
 import 'package:zenscrap_server/src/future_calls/monthly_subscription_credits_future_call.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as auth;
 import 'package:zenscrap_server/src/endpoints/public/scrappable_chat_session.dart';
@@ -59,15 +58,23 @@ void run(List<String> args) async {
 
   final String? scrapingBeeApiKey = pod.getPassword('scrapingBeeApiKey');
   ScrapingBee.initialize(scrapingBeeApiKey ?? '');
-  ScrapingBee.initialize(scrapingBeeApiKey ?? '');
   final String? openAiApiKey = pod.getPassword('openAiApiKey');
   openAiClient = OpenAIClient(apiKey: openAiApiKey);
 
-  // await WebScrapperGeneratorController.init(
-  //   pod.getPassword('geminiApiKey') ?? '',
-  //   scrappingBeeApiKey,
-  //   proxyConfig,
-  // );
+  // Initialize WebScrapperGeneratorController with proper proxy configuration
+  final proxyConfig = ScrappingBeeProxyConfig(
+    apiKey: scrapingBeeApiKey ?? '',
+    stealthProxy: true, // Enable rotating IPs for better scraping
+    renderJs: false, // JS rendering handled by extraction rules
+    premiumProxy: true, // Use premium proxies for better success rate
+    countryCode: 'us', // Default to US geo-targeting
+  );
+
+  await WebScrapperGeneratorController.init(
+    pod.getPassword('geminiApiKey') ?? '',
+    scrapingBeeApiKey ?? '',
+    proxyConfig,
+  );
 
   // Initialize Stripe configuration
   StripeConfig.initialize({
@@ -102,6 +109,5 @@ void run(List<String> args) async {
   await pod.start();
 }
 
-final ScrapingBeeDeprecated scrapingBeeDeprecated = ScrapingBeeDeprecated();
 final ScrapingBee scrappingBee = ScrapingBee();
 late final OpenAIClient openAiClient;

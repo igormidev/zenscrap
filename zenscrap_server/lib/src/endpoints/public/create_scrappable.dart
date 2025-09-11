@@ -1,9 +1,6 @@
 import 'dart:convert';
-import 'dart:typed_data';
-
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:serverpod/serverpod.dart';
-import 'package:zenscrap_server/server.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class CreateScrappableEndpoint extends Endpoint {
@@ -53,25 +50,25 @@ class CreateScrappableEndpoint extends Endpoint {
     late final Map<String, String> referenceLinkPathParameters;
     late final ScraperCategory category;
 
-    final scrapingResult =
-        await scrapingBeeDeprecated.fetchHtmlAndScreenshot(referenceLink);
+    // final scrapingResult =
+    //     await scrappingBee.fetchHtmlAndScreenshot(targetUrl: referenceLink,);
 
-    if (scrapingResult == null) {
-      // Handle the error case - throw an exception
-      throw ZenScrapException(
-        title: 'Failed to fetch webpage',
-        description:
-            'Could not retrieve webpage content from ScrapingBee API. The service may be temporarily unavailable.',
-      );
-    }
+    // if (scrapingResult == null) {
+    //   // Handle the error case - throw an exception
+    //   throw ZenScrapException(
+    //     title: 'Failed to fetch webpage',
+    //     description:
+    //         'Could not retrieve webpage content from ScrapingBee API. The service may be temporarily unavailable.',
+    //   );
+    // }
 
-    final (String html, Uint8List pageFullscreenScreenshot) = scrapingResult;
+    // final (String html, Uint8List pageFullscreenScreenshot) = scrapingResult;
 
-    // Convert HTML to bytes for file-like upload
-    final Uint8List htmlBytes = utf8.encode(html);
-    final ByteData htmlByteData = ByteData.view(htmlBytes.buffer);
-    final ByteData screenshotByteData =
-        ByteData.view(pageFullscreenScreenshot.buffer);
+    // // Convert HTML to bytes for file-like upload
+    // final Uint8List htmlBytes = utf8.encode(html);
+    // final ByteData htmlByteData = ByteData.view(htmlBytes.buffer);
+    // final ByteData screenshotByteData =
+    //     ByteData.view(pageFullscreenScreenshot.buffer);
 
     try {
       final Map<String, dynamic> convertedData =
@@ -133,28 +130,16 @@ class CreateScrappableEndpoint extends Endpoint {
         transaction: transaction,
       );
 
-      final ByteTestData testData = await ByteTestData.db.insertRow(
-          session,
-          ByteTestData(
-            referenceHtmlPage: htmlByteData,
-            referenceSiteScreenshot: screenshotByteData,
-          ),
-          transaction: transaction);
       final ReferenceTestData referenceTestData =
           await ReferenceTestData.db.insertRow(
               session,
               ReferenceTestData(
                 referenceLinkUsed: referenceLink,
-                byteDataId: testData.id!,
-                byteData: testData,
                 referenceQueryParametersJson:
                     jsonEncode(referenceLinkPathParameters),
               ),
               transaction: transaction);
 
-      await ReferenceTestData.db.attachRow.byteData(
-          session, referenceTestData, testData,
-          transaction: transaction);
       final now = DateTime.now();
       final Scrappable scrappable = await Scrappable.db.insertRow(
         session,

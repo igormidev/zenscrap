@@ -17,10 +17,9 @@ final Map<RedraftSrappableSessionId, ScrappingBeeExtractLogic>
 final Map<RedraftSrappableSessionId, ScrappableRequest>
     _cacheScrappableRequest = {};
 
-String? getTestExtractRules(int scrappableId) {
-  final ReferenceTestData? testData =
-      _cacheRefTestData[_scrappableOpenedSessionsIds[scrappableId]];
-  return testData?.testExtractJsonResult;
+ScrappingBeeExtractLogic? getTestExtractRules(int scrappableId) {
+  return _cacheScrappingBeeExtractLogic[
+      _scrappableOpenedSessionsIds[scrappableId]];
 }
 
 class ScrappableChatSession extends Endpoint {
