@@ -21,6 +21,7 @@ abstract class ReferenceTestData
     this.id,
     required this.referenceLinkUsed,
     required this.referenceQueryParametersJson,
+    this.scrapResultJson,
     this.byteDataId,
     this.byteData,
     this.scrappable,
@@ -30,6 +31,7 @@ abstract class ReferenceTestData
     int? id,
     required String referenceLinkUsed,
     required String referenceQueryParametersJson,
+    String? scrapResultJson,
     int? byteDataId,
     _i2.ByteTestData? byteData,
     _i3.Scrappable? scrappable,
@@ -41,6 +43,7 @@ abstract class ReferenceTestData
       referenceLinkUsed: jsonSerialization['referenceLinkUsed'] as String,
       referenceQueryParametersJson:
           jsonSerialization['referenceQueryParametersJson'] as String,
+      scrapResultJson: jsonSerialization['scrapResultJson'] as String?,
       byteDataId: jsonSerialization['byteDataId'] as int?,
       byteData: jsonSerialization['byteData'] == null
           ? null
@@ -64,6 +67,8 @@ abstract class ReferenceTestData
 
   String referenceQueryParametersJson;
 
+  String? scrapResultJson;
+
   int? byteDataId;
 
   _i2.ByteTestData? byteData;
@@ -80,6 +85,7 @@ abstract class ReferenceTestData
     int? id,
     String? referenceLinkUsed,
     String? referenceQueryParametersJson,
+    String? scrapResultJson,
     int? byteDataId,
     _i2.ByteTestData? byteData,
     _i3.Scrappable? scrappable,
@@ -90,6 +96,7 @@ abstract class ReferenceTestData
       if (id != null) 'id': id,
       'referenceLinkUsed': referenceLinkUsed,
       'referenceQueryParametersJson': referenceQueryParametersJson,
+      if (scrapResultJson != null) 'scrapResultJson': scrapResultJson,
       if (byteDataId != null) 'byteDataId': byteDataId,
       if (byteData != null) 'byteData': byteData?.toJson(),
       if (scrappable != null) 'scrappable': scrappable?.toJson(),
@@ -102,6 +109,7 @@ abstract class ReferenceTestData
       if (id != null) 'id': id,
       'referenceLinkUsed': referenceLinkUsed,
       'referenceQueryParametersJson': referenceQueryParametersJson,
+      if (scrapResultJson != null) 'scrapResultJson': scrapResultJson,
       if (byteDataId != null) 'byteDataId': byteDataId,
       if (byteData != null) 'byteData': byteData?.toJsonForProtocol(),
       if (scrappable != null) 'scrappable': scrappable?.toJsonForProtocol(),
@@ -151,6 +159,7 @@ class _ReferenceTestDataImpl extends ReferenceTestData {
     int? id,
     required String referenceLinkUsed,
     required String referenceQueryParametersJson,
+    String? scrapResultJson,
     int? byteDataId,
     _i2.ByteTestData? byteData,
     _i3.Scrappable? scrappable,
@@ -158,6 +167,7 @@ class _ReferenceTestDataImpl extends ReferenceTestData {
           id: id,
           referenceLinkUsed: referenceLinkUsed,
           referenceQueryParametersJson: referenceQueryParametersJson,
+          scrapResultJson: scrapResultJson,
           byteDataId: byteDataId,
           byteData: byteData,
           scrappable: scrappable,
@@ -171,6 +181,7 @@ class _ReferenceTestDataImpl extends ReferenceTestData {
     Object? id = _Undefined,
     String? referenceLinkUsed,
     String? referenceQueryParametersJson,
+    Object? scrapResultJson = _Undefined,
     Object? byteDataId = _Undefined,
     Object? byteData = _Undefined,
     Object? scrappable = _Undefined,
@@ -180,6 +191,8 @@ class _ReferenceTestDataImpl extends ReferenceTestData {
       referenceLinkUsed: referenceLinkUsed ?? this.referenceLinkUsed,
       referenceQueryParametersJson:
           referenceQueryParametersJson ?? this.referenceQueryParametersJson,
+      scrapResultJson:
+          scrapResultJson is String? ? scrapResultJson : this.scrapResultJson,
       byteDataId: byteDataId is int? ? byteDataId : this.byteDataId,
       byteData:
           byteData is _i2.ByteTestData? ? byteData : this.byteData?.copyWith(),
@@ -201,6 +214,10 @@ class ReferenceTestDataTable extends _i1.Table<int?> {
       'referenceQueryParametersJson',
       this,
     );
+    scrapResultJson = _i1.ColumnString(
+      'scrapResultJson',
+      this,
+    );
     byteDataId = _i1.ColumnInt(
       'byteDataId',
       this,
@@ -210,6 +227,8 @@ class ReferenceTestDataTable extends _i1.Table<int?> {
   late final _i1.ColumnString referenceLinkUsed;
 
   late final _i1.ColumnString referenceQueryParametersJson;
+
+  late final _i1.ColumnString scrapResultJson;
 
   late final _i1.ColumnInt byteDataId;
 
@@ -248,6 +267,7 @@ class ReferenceTestDataTable extends _i1.Table<int?> {
         id,
         referenceLinkUsed,
         referenceQueryParametersJson,
+        scrapResultJson,
         byteDataId,
       ];
 

@@ -15,7 +15,7 @@ class ScrapingBee {
 
   final Dio _dio;
 
-  Future<(String html, Uint8List screenshot)?> fetchHtmlAndScreenshot({
+  Future<ExtractFullDataByRule> fetchHtmlAndScreenshot({
     required String targetUrl,
     required ScrappingBeeExtractLogic scrappingBeeExtractLogic,
   }) async {
@@ -27,6 +27,7 @@ class ScrapingBee {
         'screenshot_full_page': 'true',
         'json_response': 'true',
         'render_js': scrappingBeeExtractLogic.renderJs ? 'true' : 'false',
+        'extract_rules': scrappingBeeExtractLogic.extractRules,
       };
 
       // Add optional JavaScript scenario
@@ -82,13 +83,22 @@ class ScrapingBee {
 
       final body = (res.data?['body'] as String?) ?? '';
       final b64 = (res.data?['screenshot'] as String?) ?? '';
-      return (body, base64Decode(b64));
-    } on DioException catch (_) {
-      // Return null for any Dio errors (including 500 status codes)
-      return null;
-    } catch (_) {
-      // Return null for any other unexpected errors
-      return null;
+      final bodyExtract = (res.data?['body_extract'] as Map<String, dynamic>?) ?? {};
+      return ExtractFullDataByRule.withData(
+        result: bodyExtract,
+        html: body,
+        screenshot: base64Decode(b64),
+      );
+    } on DioException catch (e) {
+      // Return error for any Dio errors (including 500 status codes)
+      return ExtractFullDataByRule.error(
+        errorMessage: e.response?.data?.toString() ?? e.message ?? 'Failed to fetch data from ScrapingBee',
+      );
+    } catch (e) {
+      // Return error for any other unexpected errors
+      return ExtractFullDataByRule.error(
+        errorMessage: e.toString(),
+      );
     }
   }
 
@@ -163,7 +173,7 @@ class ScrapingBee {
 
           return ExtractDataByRule.withData(result: resultData?['body'] ?? {});
         } catch (e) {
-          return ExtractDataByRule.erorr(
+          return ExtractDataByRule.error(
             errorMessage: 'Failed to parse response: $e',
           );
         }
@@ -175,7 +185,7 @@ class ScrapingBee {
               errorResponse =
                   jsonDecode(response.data as String) as Map<String, dynamic>;
             } catch (_) {
-              return ExtractDataByRule.erorr(
+              return ExtractDataByRule.error(
                 errorMessage:
                     'ScrapingBee API error: ${response.data} (Status: ${response.statusCode})',
               );
@@ -183,12 +193,12 @@ class ScrapingBee {
           } else {
             errorResponse = response.data as Map<String, dynamic>;
           }
-          return ExtractDataByRule.erorr(
+          return ExtractDataByRule.error(
             errorMessage:
                 'ScrapingBee API error: ${errorResponse['message'] ?? 'Unknown error'} (Status: ${response.statusCode})',
           );
         } catch (e) {
-          return ExtractDataByRule.erorr(
+          return ExtractDataByRule.error(
             errorMessage:
                 'ScrapingBee API error (Status: ${response.statusCode})',
           );
@@ -203,7 +213,7 @@ class ScrapingBee {
               errorResponse = jsonDecode(e.response!.data as String)
                   as Map<String, dynamic>;
             } catch (_) {
-              return ExtractDataByRule.erorr(
+              return ExtractDataByRule.error(
                 errorMessage:
                     'ScrapingBee API error: ${e.response!.data} (Status: ${e.response!.statusCode})',
               );
@@ -211,22 +221,22 @@ class ScrapingBee {
           } else {
             errorResponse = e.response!.data as Map<String, dynamic>;
           }
-          return ExtractDataByRule.erorr(
+          return ExtractDataByRule.error(
             errorMessage:
                 'ScrapingBee API error: ${errorResponse['message'] ?? 'Unknown error'} (Status: ${e.response!.statusCode})',
           );
         } catch (_) {
-          return ExtractDataByRule.erorr(
+          return ExtractDataByRule.error(
             errorMessage:
                 'ScrapingBee API error (Status: ${e.response!.statusCode})',
           );
         }
       }
-      return ExtractDataByRule.erorr(
+      return ExtractDataByRule.error(
         errorMessage: 'Failed to scrape data: ${e.message}',
       );
     } catch (e) {
-      return ExtractDataByRule.erorr(
+      return ExtractDataByRule.error(
         errorMessage: 'Failed to scrape data: $e',
       );
     }
@@ -241,7 +251,22 @@ class ExtractDataByRule with _$ExtractDataByRule {
     required Map<String, dynamic> result,
   }) = _ExtractDataByRuleWithData;
 
-  const factory ExtractDataByRule.erorr({
+  const factory ExtractDataByRule.error({
     required String errorMessage,
   }) = _ExtractDataByRuleWithError;
+}
+
+@freezed
+class ExtractFullDataByRule with _$ExtractFullDataByRule {
+  const ExtractFullDataByRule._();
+
+  const factory ExtractFullDataByRule.withData({
+    required Map<String, dynamic> result,
+    required String html,
+    required Uint8List screenshot,
+  }) = _ExtractFullDataByRuleWithData;
+
+  const factory ExtractFullDataByRule.error({
+    required String errorMessage,
+  }) = _ExtractFullDataByRuleWithError;
 }

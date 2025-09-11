@@ -50,19 +50,25 @@ class CreateScrappableEndpoint extends Endpoint {
     late final Map<String, String> referenceLinkPathParameters;
     late final ScraperCategory category;
 
-    // final scrapingResult =
-    //     await scrappingBee.fetchHtmlAndScreenshot(targetUrl: referenceLink,);
+    // final scrapingResult = await scrappingBee.fetchHtmlAndScreenshot(
+    //   targetUrl: referenceLink,
+    //   scrappingBeeExtractLogic: extractLogic,
+    // );
 
-    // if (scrapingResult == null) {
-    //   // Handle the error case - throw an exception
-    //   throw ZenScrapException(
-    //     title: 'Failed to fetch webpage',
-    //     description:
-    //         'Could not retrieve webpage content from ScrapingBee API. The service may be temporarily unavailable.',
-    //   );
-    // }
-
-    // final (String html, Uint8List pageFullscreenScreenshot) = scrapingResult;
+    // scrapingResult.when(
+    //   withData: (result, html, pageFullscreenScreenshot) {
+    //     // Process the successful result
+    //     final Map<String, dynamic> extractedData = result;
+    //     final String htmlContent = html;
+    //     final Uint8List screenshot = pageFullscreenScreenshot;
+    //   },
+    //   error: (errorMessage) {
+    //     throw ZenScrapException(
+    //       title: 'Failed to fetch webpage',
+    //       description: errorMessage,
+    //     );
+    //   },
+    // );
 
     // // Convert HTML to bytes for file-like upload
     // final Uint8List htmlBytes = utf8.encode(html);

@@ -18,6 +18,7 @@ abstract class ReferenceTestData implements _i1.SerializableModel {
     this.id,
     required this.referenceLinkUsed,
     required this.referenceQueryParametersJson,
+    this.scrapResultJson,
     this.byteDataId,
     this.byteData,
     this.scrappable,
@@ -27,6 +28,7 @@ abstract class ReferenceTestData implements _i1.SerializableModel {
     int? id,
     required String referenceLinkUsed,
     required String referenceQueryParametersJson,
+    String? scrapResultJson,
     int? byteDataId,
     _i2.ByteTestData? byteData,
     _i3.Scrappable? scrappable,
@@ -38,6 +40,7 @@ abstract class ReferenceTestData implements _i1.SerializableModel {
       referenceLinkUsed: jsonSerialization['referenceLinkUsed'] as String,
       referenceQueryParametersJson:
           jsonSerialization['referenceQueryParametersJson'] as String,
+      scrapResultJson: jsonSerialization['scrapResultJson'] as String?,
       byteDataId: jsonSerialization['byteDataId'] as int?,
       byteData: jsonSerialization['byteData'] == null
           ? null
@@ -59,6 +62,8 @@ abstract class ReferenceTestData implements _i1.SerializableModel {
 
   String referenceQueryParametersJson;
 
+  String? scrapResultJson;
+
   int? byteDataId;
 
   _i2.ByteTestData? byteData;
@@ -72,6 +77,7 @@ abstract class ReferenceTestData implements _i1.SerializableModel {
     int? id,
     String? referenceLinkUsed,
     String? referenceQueryParametersJson,
+    String? scrapResultJson,
     int? byteDataId,
     _i2.ByteTestData? byteData,
     _i3.Scrappable? scrappable,
@@ -82,6 +88,7 @@ abstract class ReferenceTestData implements _i1.SerializableModel {
       if (id != null) 'id': id,
       'referenceLinkUsed': referenceLinkUsed,
       'referenceQueryParametersJson': referenceQueryParametersJson,
+      if (scrapResultJson != null) 'scrapResultJson': scrapResultJson,
       if (byteDataId != null) 'byteDataId': byteDataId,
       if (byteData != null) 'byteData': byteData?.toJson(),
       if (scrappable != null) 'scrappable': scrappable?.toJson(),
@@ -101,6 +108,7 @@ class _ReferenceTestDataImpl extends ReferenceTestData {
     int? id,
     required String referenceLinkUsed,
     required String referenceQueryParametersJson,
+    String? scrapResultJson,
     int? byteDataId,
     _i2.ByteTestData? byteData,
     _i3.Scrappable? scrappable,
@@ -108,6 +116,7 @@ class _ReferenceTestDataImpl extends ReferenceTestData {
           id: id,
           referenceLinkUsed: referenceLinkUsed,
           referenceQueryParametersJson: referenceQueryParametersJson,
+          scrapResultJson: scrapResultJson,
           byteDataId: byteDataId,
           byteData: byteData,
           scrappable: scrappable,
@@ -121,6 +130,7 @@ class _ReferenceTestDataImpl extends ReferenceTestData {
     Object? id = _Undefined,
     String? referenceLinkUsed,
     String? referenceQueryParametersJson,
+    Object? scrapResultJson = _Undefined,
     Object? byteDataId = _Undefined,
     Object? byteData = _Undefined,
     Object? scrappable = _Undefined,
@@ -130,6 +140,8 @@ class _ReferenceTestDataImpl extends ReferenceTestData {
       referenceLinkUsed: referenceLinkUsed ?? this.referenceLinkUsed,
       referenceQueryParametersJson:
           referenceQueryParametersJson ?? this.referenceQueryParametersJson,
+      scrapResultJson:
+          scrapResultJson is String? ? scrapResultJson : this.scrapResultJson,
       byteDataId: byteDataId is int? ? byteDataId : this.byteDataId,
       byteData:
           byteData is _i2.ByteTestData? ? byteData : this.byteData?.copyWith(),

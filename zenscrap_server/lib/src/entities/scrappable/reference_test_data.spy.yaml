@@ -3,5 +3,6 @@ table: scrappable_test_data
 fields:
   referenceLinkUsed: String
   referenceQueryParametersJson: String
+  scrapResultJson: String?
   byteData: ByteTestData?, relation(optional)
   scrappable: Scrappable?, relation(name=test_scrappable)
