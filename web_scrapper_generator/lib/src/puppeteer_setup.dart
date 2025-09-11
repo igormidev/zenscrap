@@ -11,7 +11,8 @@ class PuppeteerSetup {
 
   /// Ensures Puppeteer and its MCP integration are properly installed and configured
   /// 
-  /// [proxyConfig] Optional ScrapingBee proxy configuration for web scraping
+  /// Note: Proxy configuration is now handled dynamically by the AI through launchOptions
+  /// when calling puppeteer_navigate, not during setup.
   Future<void> setupIfNeeded(
     GeminiSDK geminiSDK, {
     ScrappingBeeProxyConfig? proxyConfig,
@@ -54,15 +55,15 @@ class PuppeteerSetup {
         print('✅ MCP Puppeteer server is already configured\n');
       }
 
-      // Step 4: Setup proxy configuration if provided
+      // Note: Proxy configuration is now handled dynamically by the AI
+      // The proxyConfig parameter is kept for backward compatibility but not used
       if (proxyConfig != null) {
-        print('🔐 Configuring ScrapingBee proxy...');
-        await _setupProxyConfiguration(proxyConfig);
-        print('✅ Proxy configuration complete\n');
+        print('ℹ️ Proxy configuration is now handled dynamically by the AI\n');
+        print('   The AI will pass proxy settings through launchOptions when needed.\n');
       }
 
-      // Step 5: Verify the setup
-      await _verifySetup(geminiSDK, proxyConfig: proxyConfig);
+      // Step 4: Verify the setup
+      await _verifySetup(geminiSDK);
 
       print('🎉 Puppeteer setup complete! Ready for web scraping.\n');
     } catch (e) {
@@ -84,270 +85,79 @@ class PuppeteerSetup {
     }
   }
 
-  /// Checks if puppeteer is installed locally in the project
+  /// Checks if puppeteer is installed locally
   Future<bool> _isPuppeteerInstalled() async {
     try {
-      // Check in local node_modules
-      final nodeModulesPath = path.join(
+      // Check if node_modules/puppeteer exists
+      final puppeteerPath = path.join(
         Directory.current.path,
         'node_modules',
         'puppeteer',
       );
-      final puppeteerDir = Directory(nodeModulesPath);
-
-      if (await puppeteerDir.exists()) {
-        return true;
-      }
-
-      // Also check if package.json exists and contains puppeteer
-      final packageJsonFile = File(
-        path.join(Directory.current.path, 'package.json'),
-      );
-      if (await packageJsonFile.exists()) {
-        final content = await packageJsonFile.readAsString();
-        return content.contains('"puppeteer"');
-      }
-
-      return false;
+      return Directory(puppeteerPath).existsSync();
     } catch (e) {
       return false;
     }
   }
 
-  /// Installs puppeteer and MCP SDK locally
+  /// Installs puppeteer locally
   Future<void> _installPuppeteer() async {
-    // First, ensure package.json exists
-    final packageJsonFile = File(
-      path.join(Directory.current.path, 'package.json'),
-    );
-    if (!await packageJsonFile.exists()) {
-      print('📝 Initializing npm project...');
+    try {
+      print('  Installing puppeteer...');
+      final result = await Process.run(
+        Platform.isWindows ? 'cmd.exe' : 'sh',
+        Platform.isWindows
+            ? ['/c', 'npm install puppeteer']
+            : ['-c', 'npm install puppeteer'],
+        workingDirectory: Directory.current.path,
+      );
 
-      // Create a basic package.json
-      await packageJsonFile.writeAsString('''{
-  "name": "web-scrapper-generator",
-  "version": "1.0.0",
-  "description": "Web scrapper generator with Puppeteer support",
-  "private": true,
-  "dependencies": {}
-}''');
+      if (result.exitCode != 0) {
+        throw Exception(
+          'Failed to install puppeteer:\n${result.stderr}',
+        );
+      }
+
+      // Also install the MCP server-puppeteer globally if not already installed
+      print('  Installing @modelcontextprotocol/server-puppeteer...');
+      final mcpResult = await Process.run(
+        Platform.isWindows ? 'cmd.exe' : 'sh',
+        Platform.isWindows
+            ? ['/c', 'npm install -g @modelcontextprotocol/server-puppeteer']
+            : ['-c', 'npm install -g @modelcontextprotocol/server-puppeteer'],
+      );
+
+      if (mcpResult.exitCode != 0) {
+        // Try local installation if global fails
+        print('  Global installation failed, trying local installation...');
+        await Process.run(
+          Platform.isWindows ? 'cmd.exe' : 'sh',
+          Platform.isWindows
+              ? ['/c', 'npm install @modelcontextprotocol/server-puppeteer']
+              : ['-c', 'npm install @modelcontextprotocol/server-puppeteer'],
+          workingDirectory: Directory.current.path,
+        );
+      }
+    } catch (e) {
+      throw Exception('Failed to install puppeteer: $e');
     }
-
-    // Install puppeteer and the MCP puppeteer server
-    print('📦 Installing puppeteer and dependencies...');
-
-    final process = await Process.start(
-      Platform.isWindows ? 'cmd.exe' : 'sh',
-      Platform.isWindows
-          ? [
-              '/c',
-              'npm install puppeteer @modelcontextprotocol/server-puppeteer --save',
-            ]
-          : [
-              '-c',
-              'npm install puppeteer @modelcontextprotocol/server-puppeteer --save',
-            ],
-    );
-
-    // Stream output
-    process.stdout.listen((data) {
-      stdout.write(String.fromCharCodes(data));
-    });
-
-    process.stderr.listen((data) {
-      stderr.write(String.fromCharCodes(data));
-    });
-
-    final exitCode = await process.exitCode;
-
-    if (exitCode != 0) {
-      throw Exception('Failed to install puppeteer. Exit code: $exitCode');
-    }
-
-    // Also ensure Chrome/Chromium is downloaded
-    print('🌐 Ensuring Chromium is downloaded...');
-    final downloadProcess = await Process.start(
-      Platform.isWindows ? 'cmd.exe' : 'sh',
-      Platform.isWindows
-          ? ['/c', 'npx puppeteer browsers install chrome']
-          : ['-c', 'npx puppeteer browsers install chrome'],
-    );
-
-    await downloadProcess.exitCode;
   }
 
   /// Checks if MCP puppeteer server is configured
   Future<bool> _isMcpPuppeteerConfigured(GeminiSDK geminiSDK) async {
     try {
-      final servers = await geminiSDK.listMcpServers();
-      return servers.any(
-        (server) =>
-            server.name == 'puppeteer' ||
-            server.command.contains('puppeteer') ||
-            (server.args.isNotEmpty &&
-                server.args.any((arg) => arg.contains('puppeteer'))),
-      );
+      final mcpInfo = await geminiSDK.isMcpInstalled();
+      if (!mcpInfo.hasMcpSupport) {
+        return false;
+      }
+
+      // Check if puppeteer server is in the list
+      return mcpInfo.servers.any((server) =>
+          server.name.toLowerCase().contains('puppeteer') ||
+          server.name.contains('mcp-puppeteer'));
     } catch (e) {
       return false;
     }
-  }
-
-  /// Sets up proxy configuration for Puppeteer
-  Future<void> _setupProxyConfiguration(ScrappingBeeProxyConfig config) async {
-    try {
-      // Create a configuration file for the proxy
-      final proxyConfigFile = File(
-        path.join(Directory.current.path, 'puppeteer-proxy-config.js'),
-      );
-      
-      // Generate the Puppeteer configuration with proxy settings
-      final configContent = '''
-// Puppeteer configuration with ScrapingBee proxy
-module.exports = {
-  proxyUrl: '${config.proxyUrl}',
-  launchOptions: {
-    headless: 'new',
-    args: [
-      '--proxy-server=${config.proxyHost}:${config.proxyPort}',
-      '--ignore-certificate-errors',
-      '--ignore-certificate-errors-spki-list',
-      '--disable-web-security',
-      '--disable-features=IsolateOrigins',
-      '--disable-site-isolation-trials',
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-    ],
-    ignoreHTTPSErrors: true,
-  },
-  // Authentication for ScrapingBee proxy
-  authenticate: async (page) => {
-    await page.authenticate({
-      username: '${config.apiKey}',
-      password: '${config._buildParameters()}',
-    });
-  },
-  // Block unnecessary resources to save API credits
-  blockResources: ${!config.renderJs},
-  blockedResourceTypes: [
-    'image',
-    'media',
-    'font',
-    'texttrack',
-    'object',
-    'beacon',
-    'csp_report',
-    'imageset',
-  ],
-  // ScrapingBee specific settings
-  scrapingBeeConfig: {
-    apiKey: '${config.apiKey}',
-    stealthProxy: ${config.stealthProxy},
-    renderJs: ${config.renderJs},
-    premiumProxy: ${config.premiumProxy},
-    ${config.countryCode != null ? "countryCode: '${config.countryCode}'," : ''}
-  },
-};
-''';
-      
-      await proxyConfigFile.writeAsString(configContent);
-      print('  \u2713 Created proxy configuration file');
-      
-      // Also create a helper script for using the proxy
-      final helperScriptFile = File(
-        path.join(Directory.current.path, 'puppeteer-proxy-helper.js'),
-      );
-      
-      final helperScript = '''
-// Helper functions for ScrapingBee proxy with Puppeteer
-const config = require('./puppeteer-proxy-config.js');
-
-async function launchBrowserWithProxy() {
-  const puppeteer = require('puppeteer');
-  const browser = await puppeteer.launch(config.launchOptions);
-  const page = await browser.newPage();
-  
-  // Authenticate with proxy
-  await config.authenticate(page);
-  
-  // Block resources if configured
-  if (config.blockResources) {
-    await page.setRequestInterception(true);
-    page.on('request', (request) => {
-      if (config.blockedResourceTypes.includes(request.resourceType())) {
-        request.abort();
-      } else {
-        request.continue();
-      }
-    });
-  }
-  
-  return { browser, page };
-}
-
-module.exports = { launchBrowserWithProxy, config };
-''';
-      
-      await helperScriptFile.writeAsString(helperScript);
-      print('  \u2713 Created proxy helper script');
-      
-    } catch (e) {
-      throw Exception('Failed to setup proxy configuration: $e');
-    }
-  }
-
-  /// Generates a test script for proxy configuration
-  String _generateProxyTestScript(ScrappingBeeProxyConfig config) {
-    return '''
-const puppeteer = require('puppeteer');
-(async () => {
-  try {
-    // Launch browser with proxy configuration
-    const browser = await puppeteer.launch({
-      headless: 'new',
-      args: [
-        '--proxy-server=${config.proxyHost}:${config.proxyPort}',
-        '--ignore-certificate-errors',
-        '--ignore-certificate-errors-spki-list',
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-      ],
-      ignoreHTTPSErrors: true,
-    });
-    
-    const page = await browser.newPage();
-    
-    // Authenticate with ScrapingBee proxy
-    await page.authenticate({
-      username: '${config.apiKey}',
-      password: '${config._buildParameters()}',
-    });
-    
-    // Test by navigating to a simple page
-    await page.goto('https://httpbin.org/ip', { waitUntil: 'networkidle2' });
-    const content = await page.content();
-    
-    // Check if we got a response (proxy is working)
-    if (content.includes('origin')) {
-      console.log('SUCCESS: Proxy connection established');
-      const ipData = await page.evaluate(() => {
-        const pre = document.querySelector('pre');
-        return pre ? pre.textContent : null;
-      });
-      if (ipData) {
-        console.log('Proxy IP info:', ipData);
-      }
-    } else {
-      console.log('ERROR: Could not verify proxy connection');
-    }
-    
-    await browser.close();
-    process.exit(0);
-  } catch (error) {
-    console.error('ERROR: ' + error.message);
-    process.exit(1);
-  }
-})();
-''';
   }
 
   /// Configures the MCP puppeteer server
@@ -391,26 +201,23 @@ const puppeteer = require('puppeteer');
     }
   }
 
-  /// Verifies that the setup is complete and working
+  /// Verifies that the Puppeteer setup is working
   Future<void> _verifySetup(
-    GeminiSDK geminiSDK, {
-    ScrappingBeeProxyConfig? proxyConfig,
-  }) async {
+    GeminiSDK geminiSDK,
+  ) async {
     print('🔍 Verifying Puppeteer setup...');
 
-    // Test if puppeteer can be run
+    // Verify Puppeteer installation by creating a simple test script
     try {
-      final testScript = proxyConfig != null
-          ? _generateProxyTestScript(proxyConfig)
-          : '''
+      final testScript = '''
 const puppeteer = require('puppeteer');
 (async () => {
   try {
     const browser = await puppeteer.launch({ headless: 'new' });
     const page = await browser.newPage();
-    await page.goto('https://example.com');
+    await page.goto('https://example.com', { waitUntil: 'networkidle2' });
     const title = await page.title();
-    console.log('SUCCESS: ' + title);
+    console.log('SUCCESS: Page title is: ' + title);
     await browser.close();
     process.exit(0);
   } catch (error) {
@@ -477,8 +284,6 @@ const puppeteer = require('puppeteer');
     // Cleanup any temporary files if needed
     final filesToClean = [
       '_puppeteer_test.js',
-      'puppeteer-proxy-config.js',
-      'puppeteer-proxy-helper.js',
     ];
     
     for (final fileName in filesToClean) {
@@ -513,38 +318,17 @@ const puppeteer = require('puppeteer');
           }
         }
       } catch (e) {
-        info['puppeteer_version'] = 'unknown';
+        // Ignore errors in version checking
       }
     }
-    
-    // Check proxy configuration
-    final proxyConfigFile = File(
-      path.join(Directory.current.path, 'puppeteer-proxy-config.js'),
-    );
-    info['proxy_configured'] = await proxyConfigFile.exists();
-    
-    // Check for ScrapingBee server-puppeteer
-    if (info['puppeteer_installed']) {
-      final scrapingBeeServerPath = path.join(
-        Directory.current.path,
-        'node_modules',
-        '@modelcontextprotocol',
-        'server-puppeteer',
-      );
-      info['scrapingbee_mcp_installed'] = await Directory(scrapingBeeServerPath).exists();
-    }
-
-    info['node_modules_path'] = path.join(
-      Directory.current.path,
-      'node_modules',
-    );
-    info['project_path'] = Directory.current.path;
 
     return info;
   }
 }
 
 /// Configuration for ScrapingBee proxy service
+/// Note: This is now primarily used for the ScrapingBee MCP server.
+/// For Puppeteer, proxy settings are passed dynamically through launchOptions.
 class ScrappingBeeProxyConfig {
   /// Your ScrapingBee API key
   final String apiKey;
@@ -558,21 +342,21 @@ class ScrappingBeeProxyConfig {
   /// Protocol to use (http, https, or socks5)
   final ProxyProtocol protocol;
   
-  /// Parameters to pass to ScrapingBee (e.g., render_js, premium_proxy)
+  /// Custom parameters to pass to ScrapingBee
   final Map<String, String> parameters;
   
-  /// Whether to use stealth proxy (rotating IPs)
+  /// Use stealth proxy for better success rates (rotating IPs)
   final bool stealthProxy;
   
-  /// Whether to render JavaScript (default: false for proxy mode)
+  /// Enable JavaScript rendering
   final bool renderJs;
   
-  /// Whether to use premium proxy
+  /// Use premium residential proxies
   final bool premiumProxy;
   
-  /// Country code for geo-targeted requests
+  /// Country code for geo-targeting (e.g., 'us', 'de', 'br')
   final String? countryCode;
-  
+
   const ScrappingBeeProxyConfig({
     required this.apiKey,
     this.proxyHost = 'proxy.scrapingbee.com',
@@ -580,54 +364,46 @@ class ScrappingBeeProxyConfig {
     this.protocol = ProxyProtocol.http,
     this.parameters = const {},
     this.stealthProxy = true,
-    this.renderJs = false,
-    this.premiumProxy = false,
+    this.renderJs = true,
+    this.premiumProxy = true,
     this.countryCode,
   });
 
-  /// Generates the proxy URL for Puppeteer
-  String get proxyUrl {
-    final params = _buildParameters();
+  /// Generates the proxy URL for browser configuration
+  /// Format: http://apikey:params@proxy.scrapingbee.com:port
+  String buildProxyUrl({String? dynamicCountryCode}) {
+    final country = dynamicCountryCode ?? countryCode ?? 'us';
+    final params = _buildParameters(countryCode: country);
     final auth = params.isEmpty ? apiKey : '$apiKey:$params';
     final scheme = protocol == ProxyProtocol.socks5 ? 'socks5' : protocol.name;
     return '$scheme://$auth@$proxyHost:$proxyPort';
   }
   
   /// Builds the parameter string for authentication
-  String _buildParameters() {
-    final allParams = Map<String, String>.from(parameters);
+  String _buildParameters({String? countryCode}) {
+    final params = <String, String>{};
     
-    // Add default parameters based on configuration
-    allParams['render_js'] = renderJs.toString();
+    // Always set these for proxy mode
+    params['render_js'] = renderJs ? 'True' : 'False';
+    params['premium_proxy'] = premiumProxy ? 'True' : 'False';
     
     if (stealthProxy) {
-      allParams['stealth_proxy'] = 'true';
+      params['stealth_proxy'] = 'True';
     }
     
-    if (premiumProxy) {
-      allParams['premium_proxy'] = 'true';
+    // Use provided country code or fall back to configured one
+    final country = countryCode ?? this.countryCode;
+    if (country != null) {
+      params['country_code'] = country;
     }
     
-    if (countryCode != null) {
-      allParams['country_code'] = countryCode!;
-    }
+    // Add any custom parameters
+    params.addAll(parameters);
     
-    // Join parameters with & delimiter
-    return allParams.entries
+    // Format as key1=value1&key2=value2
+    return params.entries
         .map((e) => '${e.key}=${e.value}')
         .join('&');
-  }
-  
-  /// Gets the appropriate port based on protocol
-  int get defaultPort {
-    switch (protocol) {
-      case ProxyProtocol.http:
-        return 8886;
-      case ProxyProtocol.https:
-        return 8887;
-      case ProxyProtocol.socks5:
-        return 8888;
-    }
   }
 
   ScrappingBeeProxyConfig copyWith({

@@ -36,6 +36,92 @@ Use this to test your extraction rules with the actual ScrapingBee API.
 - **session_id** (integer, optional): Maintain same IP across requests (sticky session)
 - **custom_google** (boolean, optional): MUST be true for Google domains (google.com, news.google.com, etc.)
 
+## Dynamic Country Proxy Selection (IMPORTANT)
+
+### Supported Country Codes
+ScrapingBee supports proxies from 195+ countries using ISO 3166-1 alpha-2 codes:
+**Major Markets**: us (United States), gb (United Kingdom), de (Germany), fr (France), ca (Canada), au (Australia), jp (Japan), kr (South Korea), cn (China), in (India), br (Brazil), mx (Mexico), es (Spain), it (Italy), nl (Netherlands), se (Sweden), pl (Poland), ru (Russia), za (South Africa), ae (United Arab Emirates)
+
+**Europe**: at (Austria), be (Belgium), bg (Bulgaria), hr (Croatia), cy (Cyprus), cz (Czech Republic), dk (Denmark), ee (Estonia), fi (Finland), gr (Greece), hu (Hungary), ie (Ireland), lv (Latvia), lt (Lithuania), lu (Luxembourg), mt (Malta), no (Norway), pt (Portugal), ro (Romania), sk (Slovakia), si (Slovenia), ch (Switzerland), ua (Ukraine)
+
+**Americas**: ar (Argentina), bo (Bolivia), cl (Chile), co (Colombia), cr (Costa Rica), do (Dominican Republic), ec (Ecuador), gt (Guatemala), hn (Honduras), jm (Jamaica), ni (Nicaragua), pa (Panama), py (Paraguay), pe (Peru), pr (Puerto Rico), sv (El Salvador), uy (Uruguay), ve (Venezuela)
+
+**Asia-Pacific**: bd (Bangladesh), hk (Hong Kong), id (Indonesia), il (Israel), my (Malaysia), nz (New Zealand), pk (Pakistan), ph (Philippines), sg (Singapore), tw (Taiwan), th (Thailand), vn (Vietnam)
+
+**Africa & Middle East**: dz (Algeria), eg (Egypt), et (Ethiopia), gh (Ghana), ke (Kenya), ma (Morocco), ng (Nigeria), sa (Saudi Arabia), tn (Tunisia), tr (Turkey)
+
+### When to Use Specific Countries (CRITICAL)
+
+**You MUST analyze the target URL and user request to determine the appropriate country:**
+
+1. **E-commerce Sites with Regional Versions**:
+   - Amazon.de → Use 'de' (Germany)
+   - Amazon.co.uk → Use 'gb' (United Kingdom)
+   - Amazon.com.br → Use 'br' (Brazil)
+   - Mercadolibre.com.ar → Use 'ar' (Argentina)
+
+2. **News and Media Sites**:
+   - BBC.co.uk → Use 'gb'
+   - lemonde.fr → Use 'fr'
+   - globo.com → Use 'br'
+   - timesofindia.com → Use 'in'
+
+3. **Local Services and Classifieds**:
+   - leboncoin.fr (French classifieds) → Use 'fr'
+   - marktplaats.nl (Dutch marketplace) → Use 'nl'
+   - gumtree.com.au → Use 'au'
+
+4. **User Explicit Requests**:
+   - "Get prices from the German version" → Use 'de'
+   - "Access this Brazilian-only content" → Use 'br'
+   - "This site blocks US IPs, try from Europe" → Try 'de', 'fr', or 'gb'
+
+5. **Domain TLD Indicators**:
+   - .de domains → Consider 'de'
+   - .fr domains → Consider 'fr'
+   - .co.uk domains → Consider 'gb'
+   - .com.br domains → Consider 'br'
+   - .jp domains → Consider 'jp'
+
+6. **Language Detection in URL or Content**:
+   - /de/, /de-DE/, lang=de → Use 'de'
+   - /pt-BR/, /brazil/ → Use 'br'
+   - /es-MX/, /mexico/ → Use 'mx'
+
+### Dynamic Proxy Configuration for Puppeteer
+
+When using Puppeteer MCP, you can dynamically set the proxy country by passing launchOptions:
+
+```json
+{
+  "url": "https://example.com",
+  "launchOptions": {
+    "args": ["--proxy-server=http://YOUR_API_KEY:render_js=False&premium_proxy=True&country_code=de@proxy.scrapingbee.com:8886"]
+  }
+}
+```
+
+**IMPORTANT PROXY SETTINGS**:
+- ALWAYS use `premium_proxy=True` for proxy mode
+- ALWAYS use `stealth_proxy=True` for better success rates
+- ALWAYS use `render_js=True` for JavaScript-heavy sites
+- Country code is DYNAMIC based on your analysis
+
+### Default Country Selection
+
+**DEFAULT TO 'us' UNLESS**:
+1. The target domain clearly indicates another country
+2. The user explicitly requests a different country
+3. The site content is region-locked
+4. You encounter access issues with US proxy
+
+**Example Decision Process**:
+- walmart.com → Use 'us' (default)
+- walmart.ca → Use 'ca' (Canadian site)
+- "Scrape Walmart Canada prices" → Use 'ca' (explicit request)
+- mercadolibre.com.mx → Use 'mx' (Mexican marketplace)
+- "This European site blocks US traffic" → Try 'de' or 'fr'
+
 ## Cost Optimization Strategy (CRITICAL)
 
 ScrapingBee charges different credit amounts based on parameters:

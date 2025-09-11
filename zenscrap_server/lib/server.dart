@@ -64,10 +64,10 @@ void run(List<String> args) async {
   // Initialize WebScrapperGeneratorController with proper proxy configuration
   final proxyConfig = ScrappingBeeProxyConfig(
     apiKey: scrapingBeeApiKey ?? '',
-    stealthProxy: true, // Enable rotating IPs for better scraping
-    renderJs: false, // JS rendering handled by extraction rules
-    premiumProxy: true, // Use premium proxies for better success rate
-    countryCode: 'us', // Default to US geo-targeting
+    stealthProxy: true,
+    renderJs: true,
+    premiumProxy: true,
+    countryCode: 'us',
   );
 
   await WebScrapperGeneratorController.init(
