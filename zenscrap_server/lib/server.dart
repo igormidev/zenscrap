@@ -1,13 +1,13 @@
 import 'package:openai_dart/openai_dart.dart';
 import 'package:serverpod/serverpod.dart';
+import 'package:web_scrapper_generator/web_scrapper_generator.dart';
 import 'package:zenscrap_server/src/auth/handlers/on_send_reset_email.dart';
 import 'package:zenscrap_server/src/auth/handlers/on_send_validation_email.dart';
 import 'package:zenscrap_server/src/core/scraping_bee.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_config.dart';
-import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_claude_sdk_impl.dart';
+import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_gemini_sdk_impl.dart';
 import 'package:zenscrap_server/src/future_calls/monthly_subscription_credits_future_call.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as auth;
-import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_gemini_api_impl.dart';
 import 'package:zenscrap_server/src/endpoints/public/scrappable_chat_session.dart';
 import 'package:zenscrap_server/src/routes/scrappable_api_route.dart';
 import 'package:zenscrap_server/src/web/routes/route_single_page_app.dart';
@@ -58,18 +58,16 @@ void run(List<String> args) async {
   ));
 
   final String? scrapingBeeApiKey = pod.getPassword('scrapingBeeApiKey');
-  ScrapingBeeDeprecated.initialize(scrapingBeeApiKey ?? '');
+  ScrapingBee.initialize(scrapingBeeApiKey ?? '');
   ScrapingBee.initialize(scrapingBeeApiKey ?? '');
   final String? openAiApiKey = pod.getPassword('openAiApiKey');
   openAiClient = OpenAIClient(apiKey: openAiApiKey);
 
-  await ChatControllerClaudeSdkImpl.initialize(
-    claudeApiKey: pod.getPassword('claudeCodeApiKey') ?? '',
-    scrapingBeeApiKey: scrapingBeeApiKey ?? '',
-  );
-  ChatControllerGeminiApiImpl.initialize(
-    geminiApiKey: pod.getPassword('geminiApiKey') ?? '',
-  );
+  // await WebScrapperGeneratorController.init(
+  //   pod.getPassword('geminiApiKey') ?? '',
+  //   scrappingBeeApiKey,
+  //   proxyConfig,
+  // );
 
   // Initialize Stripe configuration
   StripeConfig.initialize({

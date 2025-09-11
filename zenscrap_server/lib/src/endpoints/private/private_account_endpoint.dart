@@ -50,7 +50,7 @@ class PrivateAccountEndpoint extends Endpoint with DeployEndpointMixin {
             ),
             transaction: transaction,
           );
-          
+
           // Create AccountApiUsage with creditUsageId
           final accountApiUsage = await AccountApiUsage.db.insertRow(
             session,
@@ -114,7 +114,6 @@ class PrivateAccountEndpoint extends Endpoint with DeployEndpointMixin {
           return accountAdded;
         });
       } catch (error, stackTrace) {
-        print('$error\n\n$stackTrace');
         session.log(
           'Error creating new account for userId $userId',
           exception: error,
@@ -138,8 +137,12 @@ class PrivateAccountEndpoint extends Endpoint with DeployEndpointMixin {
     return accountInfo;
   }
 
-  Future<void> _attachScrappable(Session session, Transaction transaction,
-      AccountInfo accountInfo, Scrappable scrappable) async {
+  Future<void> _attachScrappable(
+    Session session,
+    Transaction transaction,
+    AccountInfo accountInfo,
+    Scrappable scrappable,
+  ) async {
     final Scrappable? existingScrappable = await Scrappable.db.findById(
       session,
       scrappable.id!,
@@ -159,6 +162,8 @@ class PrivateAccountEndpoint extends Endpoint with DeployEndpointMixin {
       session: session,
       transaction: transaction,
       testData: scrappable.referenceTestData!,
+      scrappingBeeExtractLogic: scrappable.scrappingBeeExtractRules!,
+      scrappableRequest: scrappable.targetRequest!,
     );
   }
 

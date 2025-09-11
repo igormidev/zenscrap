@@ -56,6 +56,13 @@ class WebScrapperGeneratorController {
     return instance;
   }
 
+  Future<void> changeModel(ScrappableSource source) async {
+    _chat.changeModel(switch (source) {
+      ScrappableSource.gemini_2_5_flash => 'gemini-2.5-flash',
+      ScrappableSource.gemini_2_5_pro => 'gemini-2.5-pro',
+    });
+  }
+
   Future<WebScrapperChatAIResponse> sendMessage({
     required String userPrompt,
   }) async {

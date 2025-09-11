@@ -27,6 +27,7 @@ class ChatControllerGeminiSdkImpl extends IChatController {
         webScrapperRequest: webScrapperRequest,
       ),
     );
+
     return ChatControllerGeminiSdkImpl._(controller: controller);
   }
 
@@ -152,6 +153,14 @@ Please generate new extraction rules with extreme attention to detail. Take your
 **ULTRA THINK:** Analyze the HTML structure methodically, verify each selector component exists, and ensure the extraction rules will successfully capture the requested data.''';
       },
     );
+  }
+
+  @override
+  Future<void> changeModel(AiModel aiModel) {
+    return controller.changeModel(switch (aiModel) {
+      AiModel.gemini_2_5_flash => ScrappableSource.gemini_2_5_flash,
+      AiModel.gemini_2_5_pro => ScrappableSource.gemini_2_5_pro,
+    });
   }
 }
 

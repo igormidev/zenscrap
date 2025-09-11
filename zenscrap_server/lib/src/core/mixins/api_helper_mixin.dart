@@ -215,11 +215,8 @@ mixin ApiHelperMixin {
       return testSessionExtractRule;
     }
 
-    final String? extractRules = (await ScrappableTestResult.db.findFirstRow(
-      session,
-      where: (p0) => p0.scrappableId.equals(scrappable.id),
-    ))
-        ?.testExtractRule;
+    final String? extractRules =
+        scrappable.scrappingBeeExtractRules?.extractRules;
 
     if (extractRules == null || extractRules.isEmpty) {
       throw _missingExtractRules;
@@ -359,7 +356,8 @@ mixin ApiHelperMixin {
       setScrappableCallback(scrappable);
       throwErrorIfIsATestRequestAndTestTimeExpired(apiKey, scrappable);
       final String targetUrl = composeUrl(payload, targetRequest);
-      final extractRules = await getExtractRules(session, scrappable, apiKey);
+      final String extractRules =
+          await _getExtractRules(session, scrappable, apiKey);
 
       final ExtractDataByRule result =
           await scrapingBeeDeprecated.extractByRules(

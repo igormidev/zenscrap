@@ -37,7 +37,6 @@ class ScrappableChatSession extends Endpoint {
     Session session, {
     required int scrappableId,
   }) async {
-    AiModel aiModel = AiModel.gemini_2_5_flash;
     final Scrappable? scrappable = await Scrappable.db.findById(
       session,
       scrappableId,
@@ -165,8 +164,7 @@ class ScrappableChatSession extends Endpoint {
     final scrappableId = _scrappableOpenedSessionsIds.entries
         .firstWhereOrNull((element) => element.value == sessionUuid)
         ?.key;
-    final referenceTestData = _cacheTestData[sessionUuid];
-    if (scrappableId == null || referenceTestData == null) {
+    if (scrappableId == null) {
       throw sessionNotFount;
     }
 
@@ -205,11 +203,7 @@ class ScrappableChatSession extends Endpoint {
     }
 
     _chatSessions.remove(sessionUuid);
-    _chatSessions[sessionUuid] = ChatControllerGeminiSdkImpl.create(
-      scrappableId: scrappableId,
-      referenceTestData: referenceTestData,
-      aiModel: aiModel,
-    );
+    await _chatSessions[sessionUuid]?.changeModel(aiModel);
   }
 
   Future<void> sendPromptMessage(

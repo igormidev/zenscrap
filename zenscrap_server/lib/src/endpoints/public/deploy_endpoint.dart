@@ -6,12 +6,16 @@ class DeployScrappable extends Endpoint with DeployEndpointMixin {
   Future<void> call(
     Session session, {
     required ReferenceTestData testData,
+    required ScrappingBeeExtractLogic scrappingBeeExtractLogic,
+    required ScrappableRequest scrappableRequest,
   }) async {
     return session.db.transaction((transaction) {
       return deployReferenceTestData(
         session: session,
         transaction: transaction,
         testData: testData,
+        scrappingBeeExtractLogic: scrappingBeeExtractLogic,
+        scrappableRequest: scrappableRequest,
       );
     });
   }
