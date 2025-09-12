@@ -33,8 +33,8 @@ class _ScrappableTestResponseState extends State<ScrappableTestResponse>
   Widget build(BuildContext context) {
     final testData = widget.testData;
     if (testData == null) return SizedBox.fromSize();
-    final String? extractedJsonResult =
-        widget.scrappable.scrappingBeeExtractRules?.extractRules;
+    final String? extractedJsonResult = widget.testData?.scrapResultJson;
+    // widget.scrappable.scrappingBeeExtractRules?.extractRules;
     final Map<String, dynamic>? mappedResponse = tryDecode(extractedJsonResult);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

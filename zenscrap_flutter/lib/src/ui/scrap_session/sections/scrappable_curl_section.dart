@@ -58,9 +58,9 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection>
             leadingWidgets: [RemainingTimeIndicator(widget.targetTime)],
             trailingWidgets: [
               DeployButton(
-                testData: widget.testData!,
-                scrappingBeeExtractLogic: widget.scrappingBeeExtractLogic!,
-                scrappableRequest: widget.scrappableRequest!,
+                testData: widget.testData,
+                scrappingBeeExtractLogic: widget.scrappingBeeExtractLogic,
+                scrappableRequest: widget.scrappableRequest,
               )
             ],
           ),
@@ -75,9 +75,9 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection>
       leadingWidgets: [RemainingTimeIndicator(widget.targetTime)],
       trailingWidgets: [
         DeployButton(
-          testData: widget.testData!,
-          scrappingBeeExtractLogic: widget.scrappingBeeExtractLogic!,
-          scrappableRequest: widget.scrappableRequest!,
+          testData: widget.testData,
+          scrappingBeeExtractLogic: widget.scrappingBeeExtractLogic,
+          scrappableRequest: widget.scrappableRequest,
         )
       ],
     );

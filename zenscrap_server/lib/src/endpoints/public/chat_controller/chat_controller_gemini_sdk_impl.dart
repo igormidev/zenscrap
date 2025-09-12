@@ -39,7 +39,7 @@ class ChatControllerGeminiSdkImpl extends IChatController {
     required String userPrompt,
     required ReferenceTestData referenceTestData,
     required ScrappableRequest scrapperRequest,
-    required ScrappingBeeExtractLogic scrappingBeeExtractLogic,
+    required ScrappingBeeExtractLogic? scrappingBeeExtractLogic,
     required StreamController<ChatResponse> chatSeason,
   }) async {
     try {

@@ -82,7 +82,7 @@ SPEC CHECKSUMS:
   dynamic_color: 5fdff3953fb3457311091863f72914fc76ea3209
   file_picker: e716a70a9fe5fd9e09ebc922d7541464289443af
   file_selector_macos: cc3858c981fe6889f364731200d6232dac1d812d
-  FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
+  FlutterMacOS: d0db08ddef1a9af05a5ec4b724367152bb0500b1
   macos_ui: 50a2048b7ef82bde42570e2775f50907537a0eeb
   macos_window_utils: 721df4da91cb4bde7b2b7b6ae93cdead4851118f
   package_info_plus: 12f1c5c2cfe8727ca46cbd0b26677728972d9a5b

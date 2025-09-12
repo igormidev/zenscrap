@@ -12,9 +12,9 @@ import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
 
 class DeployButton extends ConsumerStatefulWidget {
-  final ReferenceTestData testData;
-  final ScrappingBeeExtractLogic scrappingBeeExtractLogic;
-  final ScrappableRequest scrappableRequest;
+  final ReferenceTestData? testData;
+  final ScrappingBeeExtractLogic? scrappingBeeExtractLogic;
+  final ScrappableRequest? scrappableRequest;
   const DeployButton({
     super.key,
     required this.testData,
@@ -50,7 +50,11 @@ class _DeployButtonState extends ConsumerState<DeployButton> {
           valueListenable: _isDeployingVN,
           builder: (context, isDeploying, child) {
             return FilledButton.icon(
-              onPressed: isChatLoading || isDeploying
+              onPressed: isChatLoading ||
+                      isDeploying ||
+                      widget.testData == null ||
+                      widget.scrappableRequest == null ||
+                      widget.scrappingBeeExtractLogic == null
                   ? null
                   : () async {
                       if (isLoggedIn) {
@@ -61,10 +65,10 @@ class _DeployButtonState extends ConsumerState<DeployButton> {
                           final deployResult = await ref
                               .read(clientProvider)
                               .deployScrappable(
-                                testData: widget.testData,
-                                scrappableRequest: widget.scrappableRequest,
+                                testData: widget.testData!,
+                                scrappableRequest: widget.scrappableRequest!,
                                 scrappingBeeExtractLogic:
-                                    widget.scrappingBeeExtractLogic,
+                                    widget.scrappingBeeExtractLogic!,
                               )
                               .toResult;
                           _isDeployingVN.value = false;

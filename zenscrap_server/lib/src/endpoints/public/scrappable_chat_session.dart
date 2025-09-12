@@ -12,7 +12,7 @@ final Map<RedraftSrappableSessionId, ReplaySubject<ChatResponse>>
 final Map<RedraftSrappableSessionId, IChatController> _chatSessions = {};
 final Map<int, RedraftSrappableSessionId> _scrappableOpenedSessionsIds = {};
 final Map<RedraftSrappableSessionId, ReferenceTestData> _cacheRefTestData = {};
-final Map<RedraftSrappableSessionId, ScrappingBeeExtractLogic>
+final Map<RedraftSrappableSessionId, ScrappingBeeExtractLogic?>
     _cacheScrappingBeeExtractLogic = {};
 final Map<RedraftSrappableSessionId, ScrappableRequest>
     _cacheScrappableRequest = {};
@@ -81,17 +81,6 @@ class ScrappableChatSession extends Endpoint {
         title: 'Target Request Not Found',
         description:
             'No target request found for scrappable with id ${scrappable.id}.',
-      );
-    }
-    if (scrappingBeeExtractLogic == null) {
-      session.log(
-        'No scrapping bee extract logic found for scrappable with id ${scrappable.id}.',
-        level: LogLevel.error,
-      );
-      throw ZenScrapException(
-        title: 'Scrapping Bee Extract Logic Not Found',
-        description:
-            'No scrapping bee extract logic found for scrappable with id ${scrappable.id}.',
       );
     }
     final bool isAlreadyAnyOpenedSession =
@@ -217,12 +206,10 @@ class ScrappableChatSession extends Endpoint {
         description: 'No active session found for uuid $sessionId.',
       );
     }
-    final testData = _cacheRefTestData[sessionId];
-    final scrapperRequest = _cacheScrappableRequest[sessionId];
-    final scrappingBeeExtractLogic = _cacheScrappingBeeExtractLogic[sessionId];
-    if (testData == null ||
-        scrapperRequest == null ||
-        scrappingBeeExtractLogic == null) {
+
+    if (!_cacheRefTestData.containsKey(sessionId) ||
+        !_cacheScrappableRequest.containsKey(sessionId) ||
+        !_cacheScrappingBeeExtractLogic.containsKey(sessionId)) {
       throw ZenScrapException(
         title: 'Cache Test Data Not Found',
         description: 'No cache test data found for session $sessionId.',
@@ -294,7 +281,7 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
     final scrappingBeeExtractLogic = _cacheScrappingBeeExtractLogic[sessionId];
     if (testData == null ||
         scrapperRequest == null ||
-        scrappingBeeExtractLogic == null) {
+        !_cacheScrappingBeeExtractLogic.containsKey(sessionId)) {
       _scrapRedraftSessions[sessionId]?.add(
         ErrorTextResponse(
           role: PromptRole.system,
