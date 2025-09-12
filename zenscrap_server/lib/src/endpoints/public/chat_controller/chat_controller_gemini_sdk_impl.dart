@@ -50,8 +50,11 @@ class ChatControllerGeminiSdkImpl extends IChatController {
       while (attempt < maxAttempts) {
         attempt++;
 
+        print('✨ starting attempt #$attempt');
+
         final WebScrapperChatAIResponse response =
             await controller.sendMessage(userPrompt: userPrompt);
+        print('✨ ending attempt #$attempt');
 
         retryContent = await _handleSendMessage(
           session: session,
