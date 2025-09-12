@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:dart_mcp/server.dart';
 import 'package:dart_mcp/stdio.dart';
@@ -466,16 +467,34 @@ class ScrapingBeeMcpServerSetup {
     }
   }
 
+  /// Resolves the package root directory for web_scrapper_generator
+  static Future<String> _resolvePackageRoot() async {
+    // Try to resolve the package URI to find the actual package location
+    final packageUri = Uri.parse('package:web_scrapper_generator/web_scrapper_generator.dart');
+    final resolvedUri = await Isolate.resolvePackageUri(packageUri);
+    
+    if (resolvedUri != null) {
+      // Get the directory path from the resolved URI
+      // The URI points to lib/web_scrapper_generator.dart, so we need to go up to the package root
+      final libPath = resolvedUri.toFilePath();
+      final packageRoot = path.dirname(path.dirname(libPath)); // Go up from lib/file.dart to package root
+      return packageRoot;
+    }
+    
+    // Fallback to current directory if resolution fails
+    return Directory.current.path;
+  }
+  
   /// Compiles the MCP server executable if needed
   static Future<void> _compileServerIfNeeded() async {
-    final projectPath = Directory.current.path;
+    final packagePath = await _resolvePackageRoot();
     final serverScriptPath = path.join(
-      projectPath,
+      packagePath,
       'bin',
       'scraping_bee_mcp_server.dart',
     );
     final compiledPath = path.join(
-      projectPath,
+      packagePath,
       'bin',
       Platform.isWindows
           ? 'scraping_bee_mcp_server.exe'
@@ -523,9 +542,9 @@ class ScrapingBeeMcpServerSetup {
   /// Configures the ScrapingBee MCP server in Gemini CLI
   static Future<void> _configureMcpScrapingBee(GeminiSDK geminiSDK) async {
     try {
-      final projectPath = Directory.current.path;
+      final packagePath = await _resolvePackageRoot();
       final executablePath = path.join(
-        projectPath,
+        packagePath,
         'bin',
         Platform.isWindows
             ? 'scraping_bee_mcp_server.exe'
@@ -547,7 +566,7 @@ class ScrapingBeeMcpServerSetup {
       } else {
         // Fallback to dart run
         final serverScriptPath = path.join(
-          projectPath,
+          packagePath,
           'bin',
           'scraping_bee_mcp_server.dart',
         );
@@ -564,9 +583,9 @@ class ScrapingBeeMcpServerSetup {
     } catch (e) {
       // If adding to user config fails, try project scope
       try {
-        final projectPath = Directory.current.path;
+        final packagePath = await _resolvePackageRoot();
         final serverScriptPath = path.join(
-          projectPath,
+          packagePath,
           'bin',
           'scraping_bee_mcp_server.dart',
         );
@@ -618,9 +637,9 @@ class ScrapingBeeMcpServerSetup {
 
     info['mcp_configured'] = await _isMcpScrapingBeeConfigured(geminiSDK);
 
-    final projectPath = Directory.current.path;
+    final packagePath = await _resolvePackageRoot();
     final executablePath = path.join(
-      projectPath,
+      packagePath,
       'bin',
       Platform.isWindows
           ? 'scraping_bee_mcp_server.exe'
@@ -631,14 +650,14 @@ class ScrapingBeeMcpServerSetup {
     info['executable_path'] = executablePath;
 
     final serverScriptPath = path.join(
-      projectPath,
+      packagePath,
       'bin',
       'scraping_bee_mcp_server.dart',
     );
     info['script_exists'] = await File(serverScriptPath).exists();
     info['script_path'] = serverScriptPath;
 
-    info['project_path'] = projectPath;
+    info['project_path'] = packagePath;
 
     return info;
   }
