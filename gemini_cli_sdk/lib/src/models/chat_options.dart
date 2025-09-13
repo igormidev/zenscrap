@@ -1,7 +1,8 @@
 /// Configuration options for a Gemini chat session
 class GeminiChatOptions {
   /// The model to use (e.g., 'gemini-2.5-flash', 'gemini-2.5-pro')
-  final String? model;
+  /// Defaults to 'gemini-2.5-flash'
+  final String model;
 
   /// System prompt to set context for the conversation
   /// This complements (not overrides) Gemini's default system prompt
@@ -42,7 +43,7 @@ class GeminiChatOptions {
   final bool nonInteractive;
 
   const GeminiChatOptions({
-    this.model,
+    this.model = 'gemini-2.5-flash',
     this.systemPrompt,
     this.repeatSystemPrompt = false,
     this.maxTurns,
@@ -94,13 +95,7 @@ class GeminiChatOptions {
   List<String> buildArgs() {
     final args = <String>[];
 
-    if (model != null) {
-      args.addAll(['-m', model!]);
-    }
-
-    if (nonInteractive) {
-      args.addAll(['-p']);
-    }
+    args.addAll(['-m', model]);
 
     if (includeDirectories && directories != null) {
       for (final dir in directories!) {

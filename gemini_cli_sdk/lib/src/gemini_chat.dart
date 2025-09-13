@@ -36,7 +36,7 @@ class GeminiChat {
   }) : options = options ?? const GeminiChatOptions();
 
   /// Gets the current model being used
-  String? get currentModel => options.model;
+  String get currentModel => options.model;
 
   /// Changes the model for future interactions
   /// Common models include:

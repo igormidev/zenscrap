@@ -91,7 +91,7 @@ void main() async {
     print('-' * 40);
     
     // Start with flash model for simple task
-    print('Current model: ${chat.currentModel ?? 'default'}');
+    print('Current model: ${chat.currentModel}');
     
     final simpleResponse = await chat.sendMessage([
       GeminiSdkContent.text('What is 2+2?'),
