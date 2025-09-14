@@ -3,7 +3,7 @@ import 'package:web_scrapper_generator/web_scrapper_generator.dart';
 
 void main() {
   test(
-    'Web scrapper generator with Gemini implementation',
+    'Web scrapper generator with Claude implementation',
     () async {
       // Get API key from environment or use a test key
       final claudeCodeSdkApiKey =
@@ -21,7 +21,7 @@ void main() {
       );
 
       if (claudeCodeSdkApiKey == 'YOUR_API_KEY') {
-        print('Please set your GEMINI_API_KEY environment variable');
+        print('Please set your CLAUDE_API_KEY environment variable');
         print(
           'You can get your API key from: https://makersuite.google.com/app/apikey',
         );
@@ -36,8 +36,7 @@ void main() {
       );
 
       // Create a new chat session with Claude
-      final geminiChat = WebScrapperClaudeImpl.startChat(
-        // final geminiChat = WebScrapperGeminiImpl.startChat(
+      final claudeChat = WebScrapperClaudeImpl.startChat(
         initialPayload: InitialPayloadDataCreatingFromZero(
           targetExampleUrl:
               'https://www.transfermarkt.com/neymar/profil/spieler/68290',
@@ -52,7 +51,7 @@ void main() {
       );
 
       print('Sending message to Claude Code...\n');
-      final WebScrapperChatAIResponse result = await geminiChat.sendMessage(
+      final WebScrapperChatAIResponse result = await claudeChat.sendMessage(
         userPrompt:
             'This is a player page. Extract the player name, his current club name and also the current club image url',
       );
@@ -88,7 +87,7 @@ Fetch settings used:
       });
 
       // Clean up
-      await geminiChat.dispose();
+      await claudeChat.dispose();
     },
     timeout: const Timeout(Duration(minutes: 6)),
   );
