@@ -298,8 +298,16 @@ Please now provide a corrected response that strictly follows the schema. Return
     // Add options
     args.addAll(options.buildArgs());
 
-    // Add escaped prompt
-    args.add(_escapeForShell(prompt));
+    // Check if we need to use stdin for prompt (when MCP servers are allowed)
+    final usesStdin = (options.allowedMcpServerNames != null &&
+                       options.allowedMcpServerNames!.isNotEmpty) ||
+                      (options.allowedTools != null &&
+                       options.allowedTools!.isNotEmpty);
+
+    if (!usesStdin) {
+      // Add escaped prompt as positional argument
+      args.add(_escapeForShell(prompt));
+    }
 
     // Set up environment with API key
     final environment = Map<String, String>.from(Platform.environment);
@@ -317,34 +325,78 @@ Please now provide a corrected response that strictly follows the schema. Return
         throw CLINotFoundException();
       }
 
-      // Run the actual command
-      final result = await Process.run(
-        _getShellCommand(),
-        _getShellArgs(args.join(' ')),
-        environment: environment,
-      );
+      // Build the command
+      final command = args.join(' ');
 
-      if (result.exitCode != 0) {
-        throw ProcessException(
-          'Gemini command failed',
-          exitCode: result.exitCode,
-          stderr: result.stderr.toString(),
+      if (usesStdin) {
+        // Use Process.start and write to stdin
+        final process = await Process.start(
+          _getShellCommand(),
+          _getShellArgs(command),
+          environment: environment,
         );
-      }
 
-      final output = result.stdout.toString();
+        // Write prompt to stdin with proper encoding
+        process.stdin.write(prompt);
+        await process.stdin.close();
 
-      // Extract session ID if present
-      if (isFirstMessage && output.contains('session:')) {
-        final sessionMatch =
-            RegExp(r'session:\s*([a-zA-Z0-9-]+)').firstMatch(output);
-        if (sessionMatch != null) {
-          _sessionId = sessionMatch.group(1);
-          isFirstMessage = false;
+        // Collect output
+        final stdout = await process.stdout.transform(utf8.decoder).join();
+        final stderr = await process.stderr.transform(utf8.decoder).join();
+        final exitCode = await process.exitCode;
+
+
+        if (exitCode != 0) {
+          throw ProcessException(
+            'Gemini command failed',
+            exitCode: exitCode,
+            stderr: stderr,
+          );
         }
-      }
 
-      return _extractResponse(output);
+        final output = stdout;
+
+        // Extract session ID if present
+        if (isFirstMessage && output.contains('session:')) {
+          final sessionMatch =
+              RegExp(r'session:\s*([a-zA-Z0-9-]+)').firstMatch(output);
+          if (sessionMatch != null) {
+            _sessionId = sessionMatch.group(1);
+            isFirstMessage = false;
+          }
+        }
+
+        return _extractResponse(output);
+      } else {
+        // Run the actual command with positional argument
+        final result = await Process.run(
+          _getShellCommand(),
+          _getShellArgs(command),
+          environment: environment,
+        );
+
+        if (result.exitCode != 0) {
+          throw ProcessException(
+            'Gemini command failed',
+            exitCode: result.exitCode,
+            stderr: result.stderr.toString(),
+          );
+        }
+
+        final output = result.stdout.toString();
+
+        // Extract session ID if present
+        if (isFirstMessage && output.contains('session:')) {
+          final sessionMatch =
+              RegExp(r'session:\s*([a-zA-Z0-9-]+)').firstMatch(output);
+          if (sessionMatch != null) {
+            _sessionId = sessionMatch.group(1);
+            isFirstMessage = false;
+          }
+        }
+
+        return _extractResponse(output);
+      }
     } catch (e) {
       if (e is GeminiSDKException) {
         rethrow;
@@ -367,8 +419,16 @@ Please now provide a corrected response that strictly follows the schema. Return
     // Add options
     args.addAll(options.buildArgs());
 
-    // Add escaped prompt
-    args.add(_escapeForShell(prompt));
+    // Check if we need to use stdin for prompt (when MCP servers are allowed)
+    final usesStdin = (options.allowedMcpServerNames != null &&
+                       options.allowedMcpServerNames!.isNotEmpty) ||
+                      (options.allowedTools != null &&
+                       options.allowedTools!.isNotEmpty);
+
+    if (!usesStdin) {
+      // Add escaped prompt as positional argument
+      args.add(_escapeForShell(prompt));
+    }
 
     // Set up environment with API key
     final environment = Map<String, String>.from(Platform.environment);
@@ -383,6 +443,12 @@ Please now provide a corrected response that strictly follows the schema. Return
       );
 
       final process = _activeProcess!;
+
+      // If using stdin, write the prompt
+      if (usesStdin) {
+        process.stdin.write(prompt);
+        await process.stdin.close();
+      }
 
       // Stream stdout
       final stdoutController = StreamController<String>();
@@ -456,6 +522,11 @@ Please now provide a corrected response that strictly follows the schema. Return
 
   /// Extracts the response from the CLI output
   String _extractResponse(String output) {
+    // Handle empty responses gracefully when MCP is involved
+    if (output.trim().isEmpty) {
+      return '';
+    }
+
     // Remove any CLI metadata and return clean response
     final lines = output.split('\n');
     final responseLines = <String>[];

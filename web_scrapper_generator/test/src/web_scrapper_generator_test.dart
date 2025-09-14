@@ -47,7 +47,8 @@ void main() {
     print('Sending message to Gemini...\n');
     final WebScrapperChatAIResponse result = await geminiChat.sendMessage(
       userPrompt:
-          'This is a coach page. Extract the coach name, his current club name and also the current club image url',
+          'This is a player page. Extract the player name, his current club name and also the current club image url',
+      // 'This is a coach page. Extract the coach name, his current club name and also the current club image url',
     );
     print('Response:\n');
     print(switch (result) {
@@ -81,9 +82,3 @@ Fetch settings used:
     });
   }, timeout: const Timeout(Duration(minutes: 6)));
 }
-
-// Start request:
-// {"id":8,"url":"https://www.transfermarkt.com.br/{trainerSlug}/profil/trainer/{trainerId}","queryParams":{},"pathParams":["trainerSlug","trainerId"]}
-
-// Reference Test Data json:
-// {"id":8,"referenceLinkUsed":"https://www.transfermarkt.com.br/cuca/profil/trainer/4732","referenceQueryParametersJson":"{\"trainerSlug\":\"cuca\",\"trainerId\":\"4732\"}"}

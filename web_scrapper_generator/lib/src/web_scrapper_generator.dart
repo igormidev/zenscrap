@@ -47,6 +47,9 @@ class WebScrapperGeneratorController {
       options: GeminiChatOptions(
         systemPrompt: systemPrompt,
         model: ScrappableSource.gemini_2_5_pro.apiName,
+        allowedMcpServerNames: ['puppeteer', 'scraping-bee-mcp'],
+        allowedTools: ['*'], // Allow all tools from the allowed MCP servers
+        approvalMode: 'yolo', // Automatically approve all tool usage
       ),
     );
     final instance = WebScrapperGeneratorController._(

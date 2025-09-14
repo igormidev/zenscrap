@@ -18,8 +18,14 @@ class GeminiChatOptions {
   /// Allowed tools for the model to use
   final List<String>? allowedTools;
 
+  /// Allowed MCP server names
+  final List<String>? allowedMcpServerNames;
+
   /// Permission mode for tool usage ('allow', 'deny', 'acceptEdits')
   final String? permissionMode;
+
+  /// Approval mode for tools ('default', 'auto_edit', 'yolo')
+  final String? approvalMode;
 
   /// Working directory for file operations
   final String? cwd;
@@ -48,7 +54,9 @@ class GeminiChatOptions {
     this.repeatSystemPrompt = false,
     this.maxTurns,
     this.allowedTools,
+    this.allowedMcpServerNames,
     this.permissionMode,
+    this.approvalMode,
     this.cwd,
     this.outputJson = false,
     this.streamJson = false,
@@ -65,7 +73,9 @@ class GeminiChatOptions {
     bool? repeatSystemPrompt,
     int? maxTurns,
     List<String>? allowedTools,
+    List<String>? allowedMcpServerNames,
     String? permissionMode,
+    String? approvalMode,
     String? cwd,
     bool? outputJson,
     bool? streamJson,
@@ -80,7 +90,9 @@ class GeminiChatOptions {
       repeatSystemPrompt: repeatSystemPrompt ?? this.repeatSystemPrompt,
       maxTurns: maxTurns ?? this.maxTurns,
       allowedTools: allowedTools ?? this.allowedTools,
+      allowedMcpServerNames: allowedMcpServerNames ?? this.allowedMcpServerNames,
       permissionMode: permissionMode ?? this.permissionMode,
+      approvalMode: approvalMode ?? this.approvalMode,
       cwd: cwd ?? this.cwd,
       outputJson: outputJson ?? this.outputJson,
       streamJson: streamJson ?? this.streamJson,
@@ -96,6 +108,24 @@ class GeminiChatOptions {
     final args = <String>[];
 
     args.addAll(['-m', model]);
+
+    if (allowedTools != null && allowedTools!.isNotEmpty) {
+      for (final tool in allowedTools!) {
+        // Quote the tool if it contains special characters
+        final quotedTool = tool.contains('*') ? '"$tool"' : tool;
+        args.addAll(['--allowed-tools', quotedTool]);
+      }
+    }
+
+    if (allowedMcpServerNames != null && allowedMcpServerNames!.isNotEmpty) {
+      for (final server in allowedMcpServerNames!) {
+        args.addAll(['--allowed-mcp-server-names', server]);
+      }
+    }
+
+    if (approvalMode != null) {
+      args.addAll(['--approval-mode', approvalMode!]);
+    }
 
     if (includeDirectories && directories != null) {
       for (final dir in directories!) {
