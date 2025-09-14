@@ -29,7 +29,7 @@ class ChangeAiModelButton extends ConsumerStatefulWidget {
 class _ChangeAiModelButtonState extends ConsumerState<ChangeAiModelButton> {
   final ValueNotifier<bool> _isChangingVN = ValueNotifier(false);
   final OverlayPortalController _overlayController = OverlayPortalController();
-  AiModel aiModel = AiModel.gemini_2_5_flash;
+  AiModel aiModel = AiModel.normal;
 
   @override
   void dispose() {
@@ -112,14 +112,14 @@ class _ChangeAiModelButtonState extends ConsumerState<ChangeAiModelButton> {
               notSignedIn: (_) => false,
             )));
 
-    // If selecting Gemini 2.5 Pro and not logged in
-    if (aiModel == AiModel.gemini_2_5_pro && !isLoggedIn) {
+    // If selecting Powerful model and not logged in
+    if (aiModel == AiModel.powerful && !isLoggedIn) {
       await _showSignInDialog();
       return;
     }
 
-    // If logged in and selecting Gemini 2.5 Pro, check plan
-    if (aiModel == AiModel.gemini_2_5_pro && isLoggedIn) {
+    // If logged in and selecting Powerful model, check plan
+    if (aiModel == AiModel.powerful && isLoggedIn) {
       final accountState = ref.read(accountProvider);
       final planTier = accountState.maybeWhen(
         withData: (accountInfo) => accountInfo.planTier,
@@ -131,7 +131,7 @@ class _ChangeAiModelButtonState extends ConsumerState<ChangeAiModelButton> {
         await showProPlanUpgradeDialog(
           context,
           mainCTAText:
-              'Unlock access to Gemini 2.5 Pro for superior extraction accuracy and better understanding of complex web pages. Perfect for advanced scraping needs.',
+              'Unlock access to the Powerful AI model for superior extraction accuracy and better understanding of complex web pages. Perfect for advanced scraping needs.',
         );
         return;
       }
@@ -167,7 +167,7 @@ class _ChangeAiModelButtonState extends ConsumerState<ChangeAiModelButton> {
               _SignInBenefit(
                 icon: Icons.psychology_rounded,
                 title: 'Advanced AI Models',
-                description: 'Access Gemini 2.5 Pro and other premium models',
+                description: 'Access Powerful AI models and other premium features',
               ),
               const SizedBox(height: 12),
               _SignInBenefit(

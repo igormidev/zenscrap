@@ -156,8 +156,8 @@ class ScrappableChatSession extends Endpoint {
       throw sessionNotFount;
     }
 
-    // Validate plan for Gemini 2.5 Pro
-    if (aiModel == AiModel.gemini_2_5_pro) {
+    // Validate plan for powerful model
+    if (aiModel == AiModel.powerful) {
       final authenticationInfo = await session.authenticated;
       if (authenticationInfo == null) {
         throw ZenScrapException(

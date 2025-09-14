@@ -15,7 +15,7 @@ class CodexChat {
   final String apiKey;
 
   /// Options for this chat session
-  final CodexChatOptions? options;
+  CodexChatOptions? options;
 
   /// The current session ID (generated after first message)
   String? _sessionId;
@@ -273,6 +273,20 @@ Format your response as JSON with these fields:
   /// The stream controller for streaming responses (for testing)
   @visibleForTesting
   StreamController<String>? streamController;
+
+  /// Changes the model for this chat session
+  /// This will reset the conversation as Claude Code requires a new session for model changes
+  void changeModel(String model) {
+    if (_isDisposed) {
+      throw CodexSDKException('Chat session has been disposed');
+    }
+
+    // Update the options with the new model
+    options = (options ?? const CodexChatOptions()).copyWith(model: model);
+
+    // Reset the session ID to start a new conversation with the new model
+    _sessionId = null;
+  }
 
   /// Resets the conversation, starting a new session
   void resetConversation() {

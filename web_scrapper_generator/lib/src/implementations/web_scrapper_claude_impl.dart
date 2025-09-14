@@ -67,10 +67,10 @@ class WebScrapperClaudeImpl extends WebScrapperGeneratorController<ClaudeModel> 
 
   @override
   Future<void> changeModel(ClaudeModel model) async {
-    // Claude doesn't have a direct changeModel method like Gemini
-    // We would need to create a new chat with the new model
-    print('Model changed to: ${model.displayName}');
-    print('Note: Claude requires creating a new chat session for model changes.');
+    // Change the model using the new changeModel method
+    _chat.changeModel(model.apiName);
+    print('✨ Model changed to: ${model.displayName}');
+    print('Note: This will start a new conversation session.');
   }
 
   @override

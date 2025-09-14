@@ -83,8 +83,8 @@ class ChatControllerGeminiSdkImpl extends IChatController
   @override
   Future<void> changeModel(AiModel aiModel) {
     return controller.changeModel(switch (aiModel) {
-      AiModel.gemini_2_5_flash => GeminiModel.gemini25Flash,
-      AiModel.gemini_2_5_pro => GeminiModel.gemini25Pro,
+      AiModel.normal => GeminiModel.gemini25Flash,
+      AiModel.powerful => GeminiModel.gemini25Pro,
     });
   }
 }

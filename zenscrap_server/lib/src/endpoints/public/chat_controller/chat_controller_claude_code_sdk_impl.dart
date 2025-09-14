@@ -80,19 +80,14 @@ class ChatControllerClaudeCodeSdkImpl extends IChatController
     }
   }
 
-
   @override
   Future<void> changeModel(AiModel aiModel) async {
-    // Claude doesn't support changing models mid-conversation in the same way as Gemini
-    // For now, we'll map the Gemini models to appropriate Claude models
+    // Map the normal/powerful models to appropriate Claude models
     final claudeModel = switch (aiModel) {
-      AiModel.gemini_2_5_flash => ClaudeModel.claude35Haiku, // Fast model
-      AiModel.gemini_2_5_pro => ClaudeModel.claudeSonnet4,  // Latest balanced model
+      AiModel.normal => ClaudeModel.claude35Haiku, // Fast model
+      AiModel.powerful => ClaudeModel.claudeSonnet4, // Latest balanced model
     };
 
     await controller.changeModel(claudeModel);
-
-    // Note: This would require creating a new chat session with Claude
-    // The controller.changeModel method should handle this appropriately
   }
 }

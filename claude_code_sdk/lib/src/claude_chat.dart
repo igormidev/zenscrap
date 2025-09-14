@@ -12,7 +12,7 @@ import 'models/schema_models.dart';
 /// Represents a chat session with Claude
 class ClaudeChat {
   final String apiKey;
-  final ClaudeChatOptions options;
+  ClaudeChatOptions options;
 
   /// The session ID from Claude CLI, used for conversation continuity
   String? _sessionId;
@@ -447,6 +447,21 @@ Please now provide a corrected response that strictly follows the schema. Return
           response,
           e);
     }
+  }
+
+  /// Changes the model for this chat session
+  /// This will reset the conversation as Claude Code requires a new session for model changes
+  void changeModel(String model) {
+    if (_isDisposed) {
+      throw ClaudeSDKException('Chat session has been disposed');
+    }
+
+    // Update the options with the new model
+    options = options.copyWith(model: model);
+
+    // Reset the session ID to start a new conversation with the new model
+    _sessionId = null;
+    _isFirstMessage = true;
   }
 
   /// Disposes of the chat session
