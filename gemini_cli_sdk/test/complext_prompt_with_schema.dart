@@ -36,20 +36,26 @@ void main() async {
       print('Gemini response:');
       print(result);
 
-      final scrappingTest = await geminiChat.sendMessageWithSchema(messages: [
+      // Continue the conversation
+      print('\n---\nAsking follow-up question...\n');
+
+      final followUp = await geminiChat.sendMessageWithSchema(messages: [
         GeminiSdkContent.text(
-            '''Great! So, use scrapingbee mcp to test extraction rules and puppeteer mcp to explore and interact with pages so you can better understand the html structure and dynamic content to then create better extraction rules/js_scenario.
-
-Now, please extract the follwoing link: https://www.transfermarkt.com/neymar/profil/spieler/68290 (This is a coach page)
-
-
-From that transfermarkt link, Return me the player name, player image url, current team name and current team url as well.'''),
+            'Great! Give me one more confirmation; Do you have access to the ScrapingBee MCP server? And puppeteer MCP server? Please confirm.'),
       ], schema: _buildResponseSchema());
 
-      print('Scrapping test response:');
-      print(scrappingTest);
+      print('Follow-up response:');
+      print(followUp);
+
+      final secondFollowUp = await geminiChat.sendMessageWithSchema(messages: [
+        GeminiSdkContent.text(
+            'Got it. One more thing: Can you get the html content of a page after all JavaScript has executed with puppeteer MCP? Please confirm.\nAlso, what are the parameters you can use with the scrappingbee mcp server? List them all.'),
+      ], schema: _buildResponseSchema());
+
+      print('Second follow-up response:');
+      print(secondFollowUp);
     },
-    timeout: const Timeout(Duration(minutes: 6)),
+    timeout: const Timeout(Duration(minutes: 1)),
   );
 }
 

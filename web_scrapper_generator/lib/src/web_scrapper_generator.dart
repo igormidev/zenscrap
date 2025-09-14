@@ -8,11 +8,11 @@ import 'puppeteer_setup.dart';
 class WebScrapperGeneratorController {
   static late final GeminiSDK _geminiSDK;
 
-  static Future<void> init(
-    String geminiApiKey,
-    String scrappingBeeApiKey,
-    ScrappingBeeProxyConfig proxyConfig,
-  ) async {
+  static Future<void> init({
+    required String geminiApiKey,
+    required String scrappingBeeApiKey,
+    required ScrappingBeeProxyConfig proxyConfig,
+  }) async {
     _geminiSDK = GeminiSDK(geminiApiKey);
 
     // Ensure Gemini CLI is installed
@@ -78,7 +78,7 @@ class WebScrapperGeneratorController {
     messages.add(GeminiSdkContent.text(userPrompt));
 
     // Define the response schema for structured output
-    final responseSchema = _buildResponseSchema();
+    final responseSchema = buildResponseSchema();
 
     try {
       // Send message with schema for structured response
@@ -98,7 +98,7 @@ class WebScrapperGeneratorController {
   }
 
   /// Builds the schema for the AI response
-  SchemaObject _buildResponseSchema() {
+  SchemaObject buildResponseSchema() {
     return SchemaObject(
       properties: {
         'responseType': SchemaProperty.string(

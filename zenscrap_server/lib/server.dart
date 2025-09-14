@@ -71,9 +71,9 @@ void run(List<String> args) async {
   );
 
   await WebScrapperGeneratorController.init(
-    pod.getPassword('geminiApiKey') ?? '',
-    scrapingBeeApiKey ?? '',
-    proxyConfig,
+    geminiApiKey: pod.getPassword('geminiApiKey') ?? '',
+    scrappingBeeApiKey: scrapingBeeApiKey ?? '',
+    proxyConfig: proxyConfig,
   );
 
   // Initialize Stripe configuration

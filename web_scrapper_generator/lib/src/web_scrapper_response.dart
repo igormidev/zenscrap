@@ -54,6 +54,10 @@ class WebScrapperRequest {
       'pathParams': pathParams,
     };
   }
+
+  @override
+  String toString() =>
+      'WebScrapperRequest(url: $url, queryParam: $queryParam, pathParams: $pathParams)';
 }
 
 class ScrappingBeeFetchSettings {
@@ -108,5 +112,10 @@ class ScrappingBeeFetchSettings {
       'session_id': session_id,
       'custom_google': custom_google,
     };
+  }
+
+  @override
+  String toString() {
+    return 'ScrappingBeeFetchSettings(url: $url, extract_rules: $extract_rules, js_scenario: $js_scenario, render_js: $render_js, wait: $wait, wait_for: $wait_for, wait_browser: $wait_browser, premium_proxy: $premium_proxy, country_code: $country_code, session_id: $session_id, custom_google: $custom_google)';
   }
 }
