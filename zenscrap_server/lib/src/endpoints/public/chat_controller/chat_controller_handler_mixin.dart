@@ -11,6 +11,60 @@ typedef RetryText = String;
 
 /// Mixin that provides shared functionality for chat controller implementations
 mixin ChatControllerHandlerMixin {
+  /// Abstract getter for the controller - must be implemented by classes using this mixin
+  WebScrapperGeneratorController get controller;
+
+  /// Abstract getter for the provider name - must be implemented by classes using this mixin
+  String get providerName;
+
+  /// Common implementation of sendMessage with retry logic
+  Future<void> sendMessage({
+    required Session session,
+    required String userPrompt,
+    required ReferenceTestData referenceTestData,
+    required ScrappableRequest scrapperRequest,
+    required ScrappingBeeExtractLogic? scrappingBeeExtractLogic,
+    required StreamController<ChatResponse> chatSeason,
+  }) async {
+    try {
+      const int maxAttempts = 3;
+      int attempt = 0;
+      RetryText? retryContent;
+
+      while (attempt < maxAttempts) {
+        attempt++;
+
+        session.log('Starting attempt #$attempt');
+
+        final WebScrapperChatAIResponse response =
+            await controller.sendMessage(userPrompt: userPrompt);
+        session.log('Ending attempt #$attempt');
+
+        retryContent = await handleSendMessage(
+          session: session,
+          response: response,
+          referenceTestData: referenceTestData,
+          scrapperRequest: scrapperRequest,
+          currentScrappingBeeExtractLogic: scrappingBeeExtractLogic,
+          chatSeason: chatSeason,
+          attemptNumber: attempt,
+        );
+
+        if (retryContent == null) {
+          // No retry needed, exit the loop
+          return;
+        }
+      }
+    } catch (error, stackTrace) {
+      session.log('Error occurred while generating extract rules with $providerName',
+          exception: error, stackTrace: stackTrace, level: LogLevel.error);
+      chatSeason.add(ErrorTextResponse(
+        role: PromptRole.system,
+        errorMessage:
+            '[ FATAL ]\nAn internal error occurred while generating extract rules:\n$error',
+      ));
+    }
+  }
   /// Handles the send message response and validates extraction rules
   Future<RetryText?> handleSendMessage({
     required Session session,
