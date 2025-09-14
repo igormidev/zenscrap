@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:gemini_cli_sdk/gemini_cli_sdk.dart';
-import 'package:web_scrapper_generator/web_scrapper_generator.dart';
+import 'package:web_scrapper_generator/src/web_scrapper_generator_interface.dart';
+import 'package:web_scrapper_generator/src/web_scrapper_response.dart';
 
 const String systemPrompt =
     '''You are a world-class expert in web scraping, web automation, and web data extraction with deep knowledge of HTML, CSS, JavaScript, HTTP protocols, and modern web scraping techniques.

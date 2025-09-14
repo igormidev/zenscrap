@@ -1,0 +1,118 @@
+import 'package:gemini_cli_sdk/gemini_cli_sdk.dart';
+import 'package:web_scrapper_generator/src/prompts.dart';
+import 'package:web_scrapper_generator/src/web_scrapper_generator_interface.dart';
+import 'package:web_scrapper_generator/src/web_scrapper_response.dart';
+import 'package:web_scrapper_generator/src/models/ai_models.dart';
+import 'package:web_scrapper_generator/src/scraping_bee_mcp.dart';
+import '../puppeteer_setup.dart';
+
+/// Gemini implementation of the web scrapper generator
+class WebScrapperGeminiImpl extends WebScrapperGeneratorController<GeminiModel> {
+  static late final GeminiSDK _geminiSDK;
+  
+  /// Initialize the Gemini SDK and its MCP servers
+  static Future<void> initGemini({
+    required String geminiApiKey,
+    required String scrappingBeeApiKey,
+    required ScrappingBeeProxyConfig proxyConfig,
+  }) async {
+    // Initialize shared resources first
+    await WebScrapperGeneratorController.initShared(
+      scrappingBeeApiKey: scrappingBeeApiKey,
+      proxyConfig: proxyConfig,
+    );
+    
+    print('🚀 Initializing Gemini SDK for web scraper generator...\n');
+    _geminiSDK = GeminiSDK(geminiApiKey);
+
+    // Ensure Gemini CLI is installed
+    final bool isInstalled = await _geminiSDK.isGeminiCLIInstalled();
+    if (!isInstalled) {
+      await _geminiSDK.installGeminiCLI(global: true);
+    }
+
+    // Setup Puppeteer and its MCP integration
+    await PuppeteerSetup.instance.setupIfNeeded(
+      _geminiSDK,
+      proxyConfig: proxyConfig,
+    );
+
+    // Initialize ScrapingBee MCP server
+    await ScrapingBeeMcpServerSetup.instance.setupIfNeeded(_geminiSDK);
+  }
+
+  final GeminiChat _chat;
+
+  WebScrapperGeminiImpl._(
+    InitialPayloadData initialPayload,
+    GeminiChat chat,
+  ) : _chat = chat,
+      super(initialPayload: initialPayload);
+
+  /// Factory method to create a new chat instance
+  static WebScrapperGeminiImpl startChat({
+    required InitialPayloadData initialPayload,
+    GeminiModel model = GeminiModel.gemini25Flash,
+  }) {
+    final chat = _geminiSDK.createNewChat(
+      options: GeminiChatOptions(
+        systemPrompt: systemPrompt,
+        model: model.apiName,
+        allowedMcpServerNames: ['puppeteer', 'scraping-bee-mcp'],
+        allowedTools: ['*'], // Allow all tools from the allowed MCP servers
+        approvalMode: 'yolo', // Automatically approve all tool usage
+      ),
+    );
+
+    final instance = WebScrapperGeminiImpl._(
+      initialPayload,
+      chat,
+    );
+    return instance;
+  }
+
+  @override
+  Future<void> changeModel(GeminiModel model) async {
+    _chat.changeModel(model.apiName);
+  }
+
+  @override
+  Future<WebScrapperChatAIResponse> sendMessage({
+    required String userPrompt,
+  }) async {
+    List<GeminiSdkContent> messages = [];
+
+    // Add initial prompts if this is the first message
+    final isFirstMessage = _chat.isFirstMessage;
+    if (isFirstMessage) {
+      messages.addAll(handleInitialPrompts(initialPayload));
+    }
+
+    // Add the user's prompt
+    messages.add(GeminiSdkContent.text(userPrompt));
+
+    // Define the response schema for structured output
+    final responseSchema = buildGeminiResponseSchema();
+
+    try {
+      // Send message with schema for structured response
+      final result = await _chat.sendMessageWithSchema(
+        messages: messages,
+        schema: responseSchema,
+      );
+
+      // Parse the structured response
+      return parseStructuredResponse(result.data);
+    } catch (e) {
+      // If there's an error, return an error response
+      return WebScrapperChatAIResponseErrorMessage(
+        'Failed to process your request: ${e.toString()}',
+      );
+    }
+  }
+
+  @override
+  Future<void> dispose() async {
+    await _chat.dispose();
+  }
+}

@@ -10,28 +10,29 @@ import 'package:zenscrap_server/src/generated/protocol.dart';
 
 typedef RetryText = String;
 
-class ChatControllerGeminiSdkImpl extends IChatController {
-  final WebScrapperGeminiImpl controller;
-  const ChatControllerGeminiSdkImpl._({required this.controller});
+class ChatControllerClaudeCodeSdkImpl extends IChatController {
+  final WebScrapperClaudeImpl controller;
+  const ChatControllerClaudeCodeSdkImpl._({required this.controller});
 
-  factory ChatControllerGeminiSdkImpl.startChat({
+  factory ChatControllerClaudeCodeSdkImpl.startChat({
     required ReferenceTestData referenceTestData,
     required ScrappableRequest scrapperRequest,
+    ClaudeModel model = ClaudeModel.claude35Sonnet,
   }) {
     final webScrapperRequest = WebScrapperRequest(
       url: scrapperRequest.url,
       pathParams: scrapperRequest.pathParams,
       queryParam: scrapperRequest.queryParams,
     );
-    final controller = WebScrapperGeminiImpl.startChat(
+    final controller = WebScrapperClaudeImpl.startChat(
       initialPayload: InitialPayloadDataCreatingFromZero(
         targetExampleUrl: referenceTestData.referenceLinkUsed,
         webScrapperRequest: webScrapperRequest,
       ),
-      model: GeminiModel.gemini25Flash,
+      model: model,
     );
 
-    return ChatControllerGeminiSdkImpl._(controller: controller);
+    return ChatControllerClaudeCodeSdkImpl._(controller: controller);
   }
 
   @override
@@ -51,11 +52,11 @@ class ChatControllerGeminiSdkImpl extends IChatController {
       while (attempt < maxAttempts) {
         attempt++;
 
-        print('✨ starting attempt #$attempt');
+        session.log('( Claude: starting attempt #$attempt');
 
         final WebScrapperChatAIResponse response =
             await controller.sendMessage(userPrompt: userPrompt);
-        print('✨ ending attempt #$attempt');
+        session.log('( Claude: ending attempt #$attempt');
 
         retryContent = await _handleSendMessage(
           session: session,
@@ -73,7 +74,7 @@ class ChatControllerGeminiSdkImpl extends IChatController {
         }
       }
     } catch (error, stackTrace) {
-      session.log('Error occurred while generating extract rules',
+      session.log('Error occurred while generating extract rules with Claude',
           exception: error, stackTrace: stackTrace, level: LogLevel.error);
       chatSeason.add(ErrorTextResponse(
         role: PromptRole.system,
@@ -107,7 +108,7 @@ class ChatControllerGeminiSdkImpl extends IChatController {
     chatSeason.add(MessageTextResponse(
       role: PromptRole.system,
       messageText:
-          'Great, I will now test the extract rules you created to se if it works in the reference link we are using for testing.\n'
+          'Great, I will now test the extract rules you created to see if it works in the reference link we are using for testing.\n'
           'Please wait a moment...',
     ));
 
@@ -123,7 +124,7 @@ class ChatControllerGeminiSdkImpl extends IChatController {
         chatSeason.add(MessageTextResponse(
           role: PromptRole.system,
           messageText:
-              'New rules where tested and did not present any errors! I\'ll update the test endpoint...',
+              'New rules were tested and did not present any errors! I\'ll update the test endpoint...',
         ));
         final Uint8List htmlBytes = utf8.encode(html);
         final ByteData htmlByteData = ByteData.view(htmlBytes.buffer);
@@ -169,7 +170,7 @@ class ChatControllerGeminiSdkImpl extends IChatController {
         chatSeason.add(NewExtractRuleResponse(
             role: PromptRole.system,
             messageText:
-                'New rules where tested and did not present any errors',
+                'New rules were tested and did not present any errors',
             scrapperRequest: scrapperRequest,
             referenceTestData: newReferenceTestData,
             scrappingBeeExtractLogic: scrappingBeeExtractLogic));
@@ -181,7 +182,7 @@ class ChatControllerGeminiSdkImpl extends IChatController {
         chatSeason.add(ErrorTextResponse(
           role: PromptRole.system,
           errorMessage:
-              'The extraction rules failed in my quality-assurance test validation. I will ask the AI to fix the selectors and try again.',
+              'The extraction rules failed in my quality-assurance test validation. I will ask Claude to fix the selectors and try again.',
         ));
         return '''${attempt}When I tried calling the scrapping bee API with the new extract rule that you just generated, I got the following error from the scrapping bee endpoint:
 ```log
@@ -213,16 +214,23 @@ Please generate new extraction rules with extreme attention to detail. Take your
   }
 
   @override
-  Future<void> changeModel(AiModel aiModel) {
-    return controller.changeModel(switch (aiModel) {
-      AiModel.gemini_2_5_flash => GeminiModel.gemini25Flash,
-      AiModel.gemini_2_5_pro => GeminiModel.gemini25Pro,
-    });
+  Future<void> changeModel(AiModel aiModel) async {
+    // Claude doesn't support changing models mid-conversation in the same way as Gemini
+    // For now, we'll map the Gemini models to appropriate Claude models
+    final claudeModel = switch (aiModel) {
+      AiModel.gemini_2_5_flash => ClaudeModel.claude35Haiku, // Fast model
+      AiModel.gemini_2_5_pro => ClaudeModel.claude35Sonnet,  // Balanced model
+    };
+
+    await controller.changeModel(claudeModel);
+
+    // Note: This would require creating a new chat session with Claude
+    // The controller.changeModel method should handle this appropriately
   }
 }
 
+// Extension to convert WebScrapperChatAIResponse to ChatResponse
 extension WebScrapperChatAIResponseMapExt on WebScrapperChatAIResponse {
-  // ChatResponse get toChatResponse {
   (ChatResponse chatResponse, ScrappingBeeExtractLogic? newExtractLogic)
       toChatResponse({
     required ScrappableRequest scrapperRequest,

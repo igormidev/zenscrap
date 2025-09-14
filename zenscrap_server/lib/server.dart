@@ -61,7 +61,7 @@ void run(List<String> args) async {
   final String? openAiApiKey = pod.getPassword('openAiApiKey');
   openAiClient = OpenAIClient(apiKey: openAiApiKey);
 
-  // Initialize WebScrapperGeneratorController with proper proxy configuration
+  // Initialize WebScrapper implementations with proper proxy configuration
   final proxyConfig = ScrappingBeeProxyConfig(
     apiKey: scrapingBeeApiKey ?? '',
     stealthProxy: true,
@@ -70,11 +70,22 @@ void run(List<String> args) async {
     countryCode: 'us',
   );
 
-  await WebScrapperGeneratorController.init(
+  // Initialize Gemini implementation
+  await WebScrapperGeminiImpl.initGemini(
     geminiApiKey: pod.getPassword('geminiApiKey') ?? '',
     scrappingBeeApiKey: scrapingBeeApiKey ?? '',
     proxyConfig: proxyConfig,
   );
+
+  // Initialize Claude implementation (if Claude API key is available)
+  final claudeApiKey = pod.getPassword('claudeApiKey');
+  if (claudeApiKey != null && claudeApiKey.isNotEmpty) {
+    await WebScrapperClaudeImpl.initClaude(
+      claudeApiKey: claudeApiKey,
+      scrappingBeeApiKey: scrapingBeeApiKey ?? '',
+      proxyConfig: proxyConfig,
+    );
+  }
 
   // Initialize Stripe configuration
   StripeConfig.initialize({
