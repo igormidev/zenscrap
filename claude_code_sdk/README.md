@@ -35,7 +35,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  claude_code_sdk: ^1.0.0
+  claude_code_sdk: ^2.0.0
 ```
 
 Then run:
@@ -43,6 +43,29 @@ Then run:
 ```bash
 dart pub get
 ```
+
+## Available Models
+
+As of version 2.0.0, the SDK supports the latest Claude models:
+
+### Claude 4 Family (Latest - Recommended)
+- **Claude Sonnet 4** (`claude-sonnet-4-20250514`) - Default model, balanced performance
+- **Claude Opus 4** (`claude-opus-4-20250514`) - Most powerful, best for complex tasks
+- **Claude Opus 4.1** (`claude-opus-4-1-20250805`) - Latest incremental update with enhanced capabilities
+
+### Claude 3.7 Family
+- **Claude 3.7 Sonnet** (`claude-3-7-sonnet-20250219`) - Hybrid reasoning model with step-by-step thinking
+
+### Claude 3.5 Family
+- **Claude 3.5 Sonnet** (`claude-3-5-sonnet-20241022`) - Fast and smart
+- **Claude 3.5 Haiku** (`claude-3-5-haiku-20241022`) - Ultra-fast responses
+
+### Claude 3 Family (Legacy)
+- **Claude 3 Opus** (`claude-3-opus-20240229`) - Powerful but older
+- **Claude 3 Sonnet** (`claude-3-sonnet-20240229`) - Balanced but older
+- **Claude 3 Haiku** (`claude-3-haiku-20240307`) - Fast but older
+
+**Note**: Claude Sonnet 4 is the default model as of v2.0.0, offering the best balance of performance, cost, and capabilities.
 
 ## Quick Start
 
@@ -229,7 +252,7 @@ final claudeChat = claudeSDK.createNewChat(
     allowedTools: ['Read', 'Write', 'Bash'],
     permissionMode: 'acceptEdits',
     cwd: '/path/to/project',
-    model: 'claude-3.5-sonnet',
+    model: 'claude-sonnet-4-20250514',  // Or omit for default (Sonnet 4)
     outputJson: true,
     timeoutMs: 30000,
   ),

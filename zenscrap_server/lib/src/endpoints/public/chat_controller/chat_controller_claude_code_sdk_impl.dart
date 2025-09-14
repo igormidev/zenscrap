@@ -17,7 +17,7 @@ class ChatControllerClaudeCodeSdkImpl extends IChatController {
   factory ChatControllerClaudeCodeSdkImpl.startChat({
     required ReferenceTestData referenceTestData,
     required ScrappableRequest scrapperRequest,
-    ClaudeModel model = ClaudeModel.claude35Sonnet,
+    ClaudeModel model = ClaudeModel.claudeSonnet4,
   }) {
     final webScrapperRequest = WebScrapperRequest(
       url: scrapperRequest.url,
@@ -219,7 +219,7 @@ Please generate new extraction rules with extreme attention to detail. Take your
     // For now, we'll map the Gemini models to appropriate Claude models
     final claudeModel = switch (aiModel) {
       AiModel.gemini_2_5_flash => ClaudeModel.claude35Haiku, // Fast model
-      AiModel.gemini_2_5_pro => ClaudeModel.claude35Sonnet,  // Balanced model
+      AiModel.gemini_2_5_pro => ClaudeModel.claudeSonnet4,  // Latest balanced model
     };
 
     await controller.changeModel(claudeModel);

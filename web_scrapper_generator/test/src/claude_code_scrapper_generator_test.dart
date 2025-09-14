@@ -47,7 +47,7 @@ void main() {
             pathParams: ['trainerSlug', 'trainerId'],
           ),
         ),
-        model: ClaudeModel.claude37Sonnet,
+        model: ClaudeModel.claudeSonnet4,
       );
 
       print('Sending message to Claude Code...\n');

@@ -1,3 +1,39 @@
+## 2.0.0
+
+### Breaking Changes
+- **Default Model Changed**: Claude Sonnet 4 (`claude-sonnet-4-20250514`) is now the default model
+  - Previous default was Claude 3.5 Sonnet
+  - Sonnet 4 offers significantly better performance and capabilities
+  - To use the old default, explicitly specify `model: 'claude-3-5-sonnet-20241022'`
+
+### New Features
+- **Claude 4 Models Support**: Added support for the latest Claude 4 family
+  - Claude Sonnet 4 (`claude-sonnet-4-20250514`) - Balanced performance, now the default
+  - Claude Opus 4 (`claude-opus-4-20250514`) - Most powerful for complex tasks
+  - Claude Opus 4.1 (`claude-opus-4-1-20250805`) - Latest incremental update
+
+- **Claude 3.7 Support**: Added Claude 3.7 Sonnet
+  - `claude-3-7-sonnet-20250219` - Hybrid reasoning model with step-by-step thinking
+
+### Model Updates
+- All latest model IDs verified from official Anthropic documentation
+- Models use exact API identifiers (e.g., `claude-opus-4-1-20250805`)
+- Added comprehensive model documentation in README
+- Legacy Claude 3 models marked as deprecated but still available
+
+### Improvements
+- Better error messages when model is not found
+- Improved model validation and error handling
+- Updated documentation with model selection guide
+- Performance improvements with newer models
+
+### Migration Guide
+- If you were using the default model, your code will automatically use Claude Sonnet 4
+- For specific model requirements, update your model strings:
+  - `claude-3.5-sonnet` → `claude-3-5-sonnet-20241022`
+  - `claude-3.5-haiku` → `claude-3-5-haiku-20241022`
+- Consider upgrading to Claude 4 models for better performance
+
 ## 1.3.0
 
 ### New Features

@@ -308,10 +308,24 @@ Please now provide a corrected response that strictly follows the schema. Return
 
       // Check exit code
       if (result.exitCode != 0) {
+        final stderr = result.stderr.toString();
+        final stdout = result.stdout.toString();
+        // Try to parse error from stdout if it's JSON
+        String errorMessage = 'Claude process exited with code ${result.exitCode}';
+        try {
+          if (stdout.isNotEmpty) {
+            final json = jsonDecode(stdout) as Map<String, dynamic>;
+            if (json['is_error'] == true && json['result'] != null) {
+              errorMessage = json['result'].toString();
+            }
+          }
+        } catch (_) {
+          // If parsing fails, use the original error message
+        }
         throw ProcessException(
-          'Claude process exited with code ${result.exitCode}',
+          errorMessage,
           exitCode: result.exitCode,
-          stderr: result.stderr.toString(),
+          stderr: stderr,
         );
       }
 
