@@ -1,8 +1,10 @@
+import 'dart:io';
+
 import 'package:gemini_cli_sdk/gemini_cli_sdk.dart';
 
 void main() async {
   // Get API key from environment or use a test key
-  final apiKey = 'AIzaSyAk2TIoAFf99fVORelCV_KEcg3cJ_GI9AA';
+  final apiKey = Platform.environment['GEMINI_API_KEY'] ?? '';
 
   if (apiKey == 'YOUR_API_KEY') {
     print('Please set your GEMINI_API_KEY environment variable');
