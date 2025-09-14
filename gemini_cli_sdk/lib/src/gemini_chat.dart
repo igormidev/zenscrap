@@ -298,8 +298,8 @@ Please now provide a corrected response that strictly follows the schema. Return
     // Add options
     args.addAll(options.buildArgs());
 
-    // Add prompt
-    args.add(prompt);
+    // Add escaped prompt
+    args.add(_escapeForShell(prompt));
 
     // Set up environment with API key
     final environment = Map<String, String>.from(Platform.environment);
@@ -367,8 +367,8 @@ Please now provide a corrected response that strictly follows the schema. Return
     // Add options
     args.addAll(options.buildArgs());
 
-    // Add prompt
-    args.add(prompt);
+    // Add escaped prompt
+    args.add(_escapeForShell(prompt));
 
     // Set up environment with API key
     final environment = Map<String, String>.from(Platform.environment);
@@ -566,6 +566,17 @@ Please now provide a corrected response that strictly follows the schema. Return
       return ['/c', command];
     }
     return ['-c', command];
+  }
+
+  /// Escapes a string for safe shell execution
+  String _escapeForShell(String input) {
+    if (Platform.isWindows) {
+      // For Windows, escape double quotes and wrap in double quotes
+      return '"${input.replaceAll('"', '\\"')}"';
+    } else {
+      // For Unix-like systems, escape single quotes and wrap in single quotes
+      return "'${input.replaceAll("'", "'\\''")}'";
+    }
   }
 
   /// Cleans up temporary files
