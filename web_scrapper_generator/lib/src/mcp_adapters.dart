@@ -348,7 +348,6 @@ class UnifiedScrapingBeeSetup {
         'exe',
         path.join(
           projectRoot,
-          'web_scrapper_generator',
           'lib',
           'src',
           'scraping_bee_mcp.dart',

@@ -72,27 +72,20 @@ class CodexChatOptions {
   List<String> toCliArgs() {
     final args = <String>[];
 
-    // Mode selection
-    if (mode != null) {
-      switch (mode) {
-        case 'suggest':
-          args.add('--suggest');
-          break;
-        case 'auto-edit':
-          args.add('--auto-edit');
-          break;
-        case 'full-auto':
-          args.add('--full-auto');
-          break;
-      }
+    // Mode selection - only full-auto is supported by Codex CLI
+    if (mode != null && mode == 'full-auto') {
+      args.add('--full-auto');
     }
 
     if (model != null) {
       args.addAll(['--model', model!]);
     }
 
+    // Note: Codex CLI doesn't support --reasoning-effort flag
+    // We can pass it as a config override if needed
     if (reasoningEffort != null) {
-      args.addAll(['--reasoning-effort', reasoningEffort!]);
+      // Use -c flag to override configuration
+      args.addAll(['-c', 'reasoning_effort="$reasoningEffort"']);
     }
 
     if (profile != null) {
@@ -100,26 +93,12 @@ class CodexChatOptions {
     }
 
     if (cwd != null) {
-      args.addAll(['--cwd', cwd!]);
+      // Codex uses --cd instead of --cwd
+      args.addAll(['--cd', cwd!]);
     }
 
-    if (quiet == true) {
-      args.add('--quiet');
-    }
-
-    if (outputJson == true || quiet == true) {
-      args.add('--json');
-    }
-
-    if (continueLastSession == true) {
-      args.add('--continue');
-    }
-
-    if (resumeSessionId != null && continueLastSession != true) {
-      args.add('--resume');
-      // Note: The session ID selection might be interactive,
-      // so we might need to handle this differently
-    }
+    // Note: Codex exec doesn't support --quiet, --json, --continue, or --resume flags
+    // These features would need to be handled differently or removed
 
     if (configPath != null) {
       args.addAll(['--config', configPath!]);
@@ -134,12 +113,8 @@ class CodexChatOptions {
       args.addAll(['-c', 'system_prompt="${systemPrompt!}"']);
     }
 
-    if (allowedDirectories != null && allowedDirectories!.isNotEmpty) {
-      // This might need to be handled differently depending on Codex's actual syntax
-      for (final dir in allowedDirectories!) {
-        args.addAll(['--allow-dir', dir]);
-      }
-    }
+    // Note: Codex exec doesn't support --allow-dir flag
+    // Directory permissions would need to be handled through sandbox settings
 
     return args;
   }

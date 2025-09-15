@@ -125,24 +125,39 @@ Format your response as JSON with these fields:
       ...messages,
     ];
 
-    // Send the message with JSON output enabled
-    final optionsWithJson = (options ?? const CodexChatOptions()).copyWith(
-      outputJson: true,
-      quiet: true, // Use quiet mode for JSON output
-    );
-
-    // Create a new chat with JSON options
+    // Note: Codex CLI doesn't support JSON output flags
+    // We'll try to extract JSON from the plain text response
     final jsonChat = CodexChat(
       apiKey: apiKey,
-      options: optionsWithJson,
+      options: options, // Use regular options without JSON flags
     );
 
     try {
       final response = await jsonChat.sendMessage(combinedMessages);
 
-      // Parse the JSON response
+      // Try to extract JSON from the response
+      // Look for JSON blocks in the response
       try {
-        final jsonResponse = jsonDecode(response);
+        // Try to find JSON in code blocks
+        final jsonPattern = RegExp(r'```json?\s*\n?([\s\S]*?)\n?```', multiLine: true);
+        final match = jsonPattern.firstMatch(response);
+
+        String jsonStr;
+        if (match != null) {
+          jsonStr = match.group(1)!.trim();
+        } else {
+          // Try to find raw JSON in the response
+          final braceStart = response.indexOf('{');
+          final braceEnd = response.lastIndexOf('}');
+          if (braceStart >= 0 && braceEnd > braceStart) {
+            jsonStr = response.substring(braceStart, braceEnd + 1);
+          } else {
+            // Last resort: assume entire response is JSON
+            jsonStr = response.trim();
+          }
+        }
+
+        final jsonResponse = jsonDecode(jsonStr);
 
         // Extract model message and data
         String modelMessage = '';
@@ -163,10 +178,13 @@ Format your response as JSON with these fields:
           data: data,
         );
       } catch (e) {
-        throw JSONDecodeException(
-          'Failed to parse schema response',
-          response,
-          e,
+        // If we can't parse JSON, return a simple message structure
+        return SchemaResult(
+          modelMessage: response,
+          data: {
+            'responseType': 'message',
+            'message': response,
+          },
         );
       }
     } finally {

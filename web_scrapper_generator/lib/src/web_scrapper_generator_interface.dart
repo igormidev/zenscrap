@@ -239,7 +239,13 @@ abstract class WebScrapperGeneratorController<TModel> {
 
   /// Parse the structured response from the AI
   WebScrapperChatAIResponse parseStructuredResponse(Map<String, dynamic> data) {
-    final responseType = data['responseType'] as String;
+    final responseType = data['responseType'] as String?;
+
+    if (responseType == null) {
+      return const WebScrapperChatAIResponseErrorMessage(
+        'Invalid response: missing responseType field',
+      );
+    }
 
     switch (responseType) {
       case 'message':

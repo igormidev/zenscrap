@@ -36,15 +36,16 @@ class ChatControllerCodexSdkImpl extends IChatController
 
   @override
   Future<void> changeModel(AiModel aiModel) async {
-    return switch (aiModel) {
-      AiModel.normal => await controller.changeModelWithEffort(
-          CodexModel.gptOss120b,
-          'high',
-        ),
-      AiModel.powerful => await controller.changeModelWithEffort(
-          CodexModel.gpt5,
-          'medium',
-        ),
-    };
+    // Map the normal/powerful models to appropriate Codex models
+    switch (aiModel) {
+      case AiModel.normal:
+        // GPT-OSS-120B for balanced performance
+        await controller.changeModel(CodexModel.gptOss120b);
+        break;
+      case AiModel.powerful:
+        // GPT-5 for maximum capability
+        await controller.changeModel(CodexModel.gpt5);
+        break;
+    }
   }
 }

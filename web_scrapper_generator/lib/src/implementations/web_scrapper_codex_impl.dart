@@ -63,10 +63,10 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
       options: CodexChatOptions(
         systemPrompt: _convertSystemPromptForCodex(),
         model: model.apiName,
-        reasoningEffort: 'high', // Default to high reasoning effort
+        // Note: Removed reasoningEffort as it may not be supported by Codex CLI
         timeoutMs: 180000, // 3 minutes timeout
         enableMcp: true, // Enable MCP support
-        mode: 'auto-edit', // Use auto-edit mode for file operations
+        // Note: Removed mode as Codex exec doesn't support --auto-edit
         outputJson: false, // We'll use schema for structured output
       ),
     );
