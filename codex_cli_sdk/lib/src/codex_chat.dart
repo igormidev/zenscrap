@@ -135,11 +135,15 @@ Format your response as JSON with these fields:
     try {
       final response = await jsonChat.sendMessage(combinedMessages);
 
+      print('\x1B[33m### RESPONSE:\x1B[0m');
+      print('\x1B[33m$response\x1B[0m');
+
       // Try to extract JSON from the response
       // Look for JSON blocks in the response
       try {
         // Try to find JSON in code blocks
-        final jsonPattern = RegExp(r'```json?\s*\n?([\s\S]*?)\n?```', multiLine: true);
+        final jsonPattern =
+            RegExp(r'```json?\s*\n?([\s\S]*?)\n?```', multiLine: true);
         final match = jsonPattern.firstMatch(response);
 
         String jsonStr;
@@ -165,12 +169,13 @@ Format your response as JSON with these fields:
 
         if (jsonResponse is Map<String, dynamic>) {
           modelMessage = jsonResponse['modelMessage']?.toString() ??
-                        jsonResponse['message']?.toString() ??
-                        jsonResponse['response']?.toString() ?? '';
+              jsonResponse['message']?.toString() ??
+              jsonResponse['response']?.toString() ??
+              '';
 
           data = jsonResponse['data'] as Map<String, dynamic>? ??
-                 jsonResponse['result'] as Map<String, dynamic>? ??
-                 jsonResponse;
+              jsonResponse['result'] as Map<String, dynamic>? ??
+              jsonResponse;
         }
 
         return SchemaResult(
@@ -434,9 +439,9 @@ Format your response as JSON with these fields:
         final json = jsonDecode(output);
         if (json is Map<String, dynamic>) {
           return json['response']?.toString() ??
-                 json['message']?.toString() ??
-                 json['content']?.toString() ??
-                 output;
+              json['message']?.toString() ??
+              json['content']?.toString() ??
+              output;
         }
       } catch (_) {
         // If JSON parsing fails, return raw output
@@ -451,7 +456,8 @@ Format your response as JSON with these fields:
     // This might be in logs or metadata
 
     // Look for session ID patterns in the response
-    final sessionPattern = RegExp(r'session[_\-]?id[:\s]+([a-f0-9\-]+)', caseSensitive: false);
+    final sessionPattern =
+        RegExp(r'session[_\-]?id[:\s]+([a-f0-9\-]+)', caseSensitive: false);
     final match = sessionPattern.firstMatch(response);
 
     if (match != null) {
