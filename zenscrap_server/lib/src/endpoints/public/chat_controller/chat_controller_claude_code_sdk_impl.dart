@@ -34,8 +34,6 @@ class ChatControllerClaudeCodeSdkImpl extends IChatController
     return ChatControllerClaudeCodeSdkImpl._(controller: controller);
   }
 
-  // The sendMessage method is now provided by ChatControllerHandlerMixin
-
   @override
   Future<void> changeModel(AiModel aiModel) async {
     // Map the normal/powerful models to appropriate Claude models
