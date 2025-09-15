@@ -45,7 +45,7 @@ void main() async {
   // Start a chat session with Codex
   final codexChat = WebScrapperCodexImpl.startChat(
     initialPayload: initialPayload,
-    model: CodexModel.gpt5, // Use GPT-5 for fast reasoning
+    model: CodexModel.gptOss120b, // Use GPT-OSS-120B with high reasoning by default
   );
 
   try {
@@ -100,8 +100,8 @@ void main() async {
     }
 
     // Example: Change model mid-conversation
-    print('\n🔄 Switching to Codex-1 model for more detailed analysis...\n');
-    await codexChat.changeModel(CodexModel.codex1);
+    print('\n🔄 Switching to GPT-5 model for faster analysis...\n');
+    await codexChat.changeModel(CodexModel.gpt5);
 
     // Send another message with the new model
     final refinedResponse = await codexChat.sendMessage(
@@ -113,11 +113,11 @@ void main() async {
 
     switch (refinedResponse) {
       case WebScrapperChatAIResponseJustMessage(:final message):
-        print('📝 Codex-1 says: $message\n');
+        print('📝 GPT-5 says: $message\n');
         break;
 
       case WebScrapperChatAIResponseWithDataResponse(:final resumeActionMessage):
-        print('✅ Codex-1 updated the configuration: $resumeActionMessage\n');
+        print('✅ GPT-5 updated the configuration: $resumeActionMessage\n');
         break;
 
       case WebScrapperChatAIResponseErrorMessage(:final errorDescription):

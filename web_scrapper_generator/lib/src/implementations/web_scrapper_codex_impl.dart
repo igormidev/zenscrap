@@ -57,12 +57,13 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
   /// Factory method to create a new chat instance
   static WebScrapperCodexImpl startChat({
     required InitialPayloadData initialPayload,
-    CodexModel model = CodexModel.gpt5,
+    CodexModel model = CodexModel.gptOss120b,
   }) {
     final chat = _codexSDK.createNewChat(
       options: CodexChatOptions(
         systemPrompt: _convertSystemPromptForCodex(),
         model: model.apiName,
+        reasoningEffort: 'high', // Default to high reasoning effort
         timeoutMs: 180000, // 3 minutes timeout
         enableMcp: true, // Enable MCP support
         mode: 'auto-edit', // Use auto-edit mode for file operations
@@ -81,6 +82,13 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
     // Change the model using the changeModel method
     _chat.changeModel(model.apiName);
     print('✨ Model changed to: ${model.displayName}');
+    print('Note: This will start a new conversation session.');
+  }
+
+  /// Changes the model with a specific reasoning effort level
+  Future<void> changeModelWithEffort(CodexModel model, String reasoningEffort) async {
+    _chat.changeModelWithEffort(model.apiName, reasoningEffort);
+    print('✨ Model changed to: ${model.displayName} with $reasoningEffort reasoning effort');
     print('Note: This will start a new conversation session.');
   }
 

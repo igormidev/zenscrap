@@ -56,12 +56,8 @@ enum ClaudeModel {
 
 /// Available Codex models for web scraping
 enum CodexModel {
-  // GPT models
   gpt5('gpt-5'),
-
-  // Codex-specific models
-  codexMiniLatest('codex-mini-latest'),
-  codex1('codex-1');
+  gptOss120b('gpt-oss-120b');
 
   final String apiName;
   const CodexModel(this.apiName);
@@ -71,10 +67,8 @@ enum CodexModel {
     switch (this) {
       case CodexModel.gpt5:
         return 'GPT-5 (Fast Reasoning)';
-      case CodexModel.codexMiniLatest:
-        return 'Codex Mini (Fine-tuned for Code)';
-      case CodexModel.codex1:
-        return 'Codex-1 (Software Engineering)';
+      case CodexModel.gptOss120b:
+        return 'GPT-OSS-120B (High Reasoning)';
     }
   }
 }

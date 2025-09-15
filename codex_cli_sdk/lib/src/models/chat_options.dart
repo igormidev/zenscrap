@@ -45,6 +45,10 @@ class CodexChatOptions {
   /// Custom configuration file path
   final String? configPath;
 
+  /// Reasoning effort level ('minimal', 'medium', 'high')
+  /// Controls the depth of reasoning for the model
+  final String? reasoningEffort;
+
   const CodexChatOptions({
     this.systemPrompt,
     this.maxTurns,
@@ -61,6 +65,7 @@ class CodexChatOptions {
     this.enableMcp,
     this.allowedDirectories,
     this.configPath,
+    this.reasoningEffort,
   });
 
   /// Converts options to command line arguments
@@ -84,6 +89,10 @@ class CodexChatOptions {
 
     if (model != null) {
       args.addAll(['--model', model!]);
+    }
+
+    if (reasoningEffort != null) {
+      args.addAll(['--reasoning-effort', reasoningEffort!]);
     }
 
     if (profile != null) {
@@ -152,6 +161,7 @@ class CodexChatOptions {
     bool? enableMcp,
     List<String>? allowedDirectories,
     String? configPath,
+    String? reasoningEffort,
   }) {
     return CodexChatOptions(
       systemPrompt: systemPrompt ?? this.systemPrompt,
@@ -169,6 +179,7 @@ class CodexChatOptions {
       enableMcp: enableMcp ?? this.enableMcp,
       allowedDirectories: allowedDirectories ?? this.allowedDirectories,
       configPath: configPath ?? this.configPath,
+      reasoningEffort: reasoningEffort ?? this.reasoningEffort,
     );
   }
 }

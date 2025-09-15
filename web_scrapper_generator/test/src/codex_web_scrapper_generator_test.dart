@@ -1,5 +1,4 @@
 import 'package:test/test.dart';
-import 'package:web_scrapper_generator/src/implementations/web_scrapper_codex_impl.dart';
 import 'package:web_scrapper_generator/web_scrapper_generator.dart';
 
 void main() {
@@ -22,22 +21,21 @@ void main() {
       );
 
       if (codexApiKey == 'YOUR_API_KEY') {
-        print('Please set your CLAUDE_API_KEY environment variable');
+        print('Please set your OPENAI_API_KEY environment variable');
         print(
-          'You can get your API key from: https://makersuite.google.com/app/apikey',
+          'You can get your API key from: https://platform.openai.com/api-keys',
         );
         return;
       }
 
-      // Initialize Claude implementation
-      await WebScrapperClaudeImpl.initClaude(
-        claudeApiKey: codexApiKey,
+      // Initialize Codex implementation
+      await WebScrapperCodexImpl.initCodex(
+        codexApiKey: codexApiKey,
         scrappingBeeApiKey: scrapingBeeApiKey,
         proxyConfig: proxyConfig,
       );
 
-      // Create a new chat session with Claude
-      // final claudeChat = WebScrapperClaudeImpl.startChat(
+      // Create a new chat session with Codex
       final codexChat = WebScrapperCodexImpl.startChat(
         initialPayload: InitialPayloadDataCreatingFromZero(
           targetExampleUrl:
@@ -49,10 +47,10 @@ void main() {
             pathParams: ['trainerSlug', 'trainerId'],
           ),
         ),
-        model: CodexModel.gpt5,
+        model: CodexModel.gptOss120b,
       );
 
-      print('Sending message to Claude Code...\n');
+      print('Sending message to Codex...\n');
       final WebScrapperChatAIResponse result = await codexChat.sendMessage(
         userPrompt:
             'This is a player page. Extract the player name, his current club name and also the current club image url',

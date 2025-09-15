@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.1.0
+
+### Added
+- **Reasoning Effort Support**
+  - Added `reasoningEffort` field to `CodexChatOptions` for controlling model reasoning depth
+  - Support for 'minimal', 'medium', and 'high' reasoning effort levels
+  - Added `changeModelWithEffort()` method to change both model and reasoning effort
+  - Automatically passes `--reasoning-effort` flag to Codex CLI when specified
+
+### Enhanced
+- Better support for GPT-5 and GPT-OSS-120B models with configurable reasoning effort
+- Improved model switching capabilities with reasoning effort control
+
 ## 1.0.0
 
 ### Initial Release

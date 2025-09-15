@@ -38,7 +38,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  codex_cli_sdk: ^1.0.0
+  codex_cli_sdk: ^1.1.0
 ```
 
 Then run:
@@ -52,8 +52,32 @@ dart pub get
 The SDK supports the latest OpenAI models through Codex CLI:
 
 - **GPT-5** - Default model for fast reasoning
+- **gpt-oss-120b** - Open-source 117B parameter model with high reasoning capabilities
 - **codex-mini-latest** - Fine-tuned version of o4-mini for Codex CLI
 - **codex-1** - Version of o3 optimized for software engineering
+
+## Reasoning Effort (v1.1.0+)
+
+The SDK now supports configurable reasoning effort levels for models that support it:
+
+- **minimal** - Fast responses without extensive reasoning
+- **medium** - Balanced speed and reasoning depth (default)
+- **high** - Deep and detailed analysis for complex tasks
+
+### Using Reasoning Effort
+
+```dart
+// Create a chat with specific reasoning effort
+final chat = codexSDK.createNewChat(
+  options: CodexChatOptions(
+    model: 'gpt-oss-120b',
+    reasoningEffort: 'high', // For complex tasks requiring deep analysis
+  ),
+);
+
+// Or change model and effort during conversation
+chat.changeModelWithEffort('gpt-5', 'medium');
+```
 
 ## Quick Start
 

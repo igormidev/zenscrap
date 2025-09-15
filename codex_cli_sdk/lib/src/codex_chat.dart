@@ -288,6 +288,23 @@ Format your response as JSON with these fields:
     _sessionId = null;
   }
 
+  /// Changes the model and reasoning effort for this chat session
+  /// This will reset the conversation as Codex requires a new session for model changes
+  void changeModelWithEffort(String model, String? reasoningEffort) {
+    if (_isDisposed) {
+      throw CodexSDKException('Chat session has been disposed');
+    }
+
+    // Update the options with the new model and reasoning effort
+    options = (options ?? const CodexChatOptions()).copyWith(
+      model: model,
+      reasoningEffort: reasoningEffort,
+    );
+
+    // Reset the session ID to start a new conversation with the new model
+    _sessionId = null;
+  }
+
   /// Resets the conversation, starting a new session
   void resetConversation() {
     _sessionId = null;

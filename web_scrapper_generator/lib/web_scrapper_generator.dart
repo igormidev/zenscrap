@@ -12,3 +12,4 @@ export 'src/schema_constants.dart';
 // Implementations
 export 'src/implementations/web_scrapper_gemini_impl.dart';
 export 'src/implementations/web_scrapper_claude_impl.dart';
+export 'src/implementations/web_scrapper_codex_impl.dart';
