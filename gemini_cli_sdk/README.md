@@ -129,20 +129,20 @@ void main() async {
       },
     );
     
-    // Send message with schema
-    final result = await geminiChat.sendMessageWithSchema(
+    // Send message with schema - returns a record with llmMessage and structuredSchemaData
+    final (:llmMessage, :structuredSchemaData) = await geminiChat.sendMessageWithSchema(
       messages: [
         GeminiSdkContent.text('Extract user information from this HTML file'),
         GeminiSdkContent.file(File('profile.html')),
       ],
       schema: schema,
     );
-    
-    print('Model message: ${result.modelMessage}');
-    print('Extracted data: ${result.data}');
-    
+
+    print('Model message: $llmMessage');
+    print('Extracted data: $structuredSchemaData');
+
     // Access specific fields
-    final userName = result.data['userName'];
+    final userName = structuredSchemaData['userName'];
     print('User name: $userName');
   } finally {
     await geminiChat.dispose();
@@ -562,7 +562,7 @@ await geminiSDK.dispose(); // Disposes all active sessions
 ### GeminiChat Class
 
 - `sendMessage(List<GeminiSdkContent> contents)` - Sends a message and returns the response
-- `sendMessageWithSchema({messages, schema})` - Sends a message with a schema for structured response
+- `sendMessageWithSchema({messages, schema})` - Sends a message with a schema and returns `({String llmMessage, Map<String, dynamic> structuredSchemaData})`
 - `streamResponse(List<GeminiSdkContent> contents)` - Streams the response
 - `get sessionId` - Gets the current session ID (null until first message)
 - `resetConversation()` - Resets the conversation, starting a new session

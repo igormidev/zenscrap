@@ -82,9 +82,9 @@ void main() async {
     );
     
     print('Structured data received:');
-    print('  Language: ${schemaResult.data['language']}');
-    print('  Use Case: ${schemaResult.data['useCase']}');
-    print('  Popularity: ${schemaResult.data['popularity'] ?? 'Not specified'}');
+    print('  Language: ${schemaResult.structuredSchemaData['language']}');
+    print('  Use Case: ${schemaResult.structuredSchemaData['useCase']}');
+    print('  Popularity: ${schemaResult.structuredSchemaData['popularity'] ?? 'Not specified'}');
     
     // Example 3: Dynamic model switching
     print('\n🔄 Example 3: Dynamic model switching');

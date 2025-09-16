@@ -1,5 +1,33 @@
 # Changelog
 
+## 2.0.0 - 2025-09-15
+
+### Breaking Changes
+- **BREAKING**: Changed `sendMessageWithSchema` return type from `SchemaResult` to a record `({String llmMessage, Map<String, dynamic> structuredSchemaData})`
+- **BREAKING**: Completely redesigned schema handling to use file-based approach for improved reliability
+
+### Major Improvements
+- Implemented file-based JSON schema approach to fix issues with Codex CLI returning extra text
+- Added comprehensive schema validation with proper type checking
+- Added automatic retry mechanism with error feedback (2 attempts for JSON parsing, 2 for schema validation)
+- Temporary JSON files are now created for schema responses and cleaned up automatically
+
+### New Features
+- Added `_validateSchemaResponse` method for thorough schema validation
+- Added `_validateFieldType` method for recursive type checking
+- Added JSON parsing error recovery with detailed error messages
+- Added schema validation error recovery with helpful prompts
+
+### Bug Fixes
+- Fixed critical issue where Codex CLI would prepend timestamps and other text to JSON responses
+- Resolved "Invalid response: missing responseType field" errors
+- Fixed problems with schema responses containing conversational text
+
+### Internal Changes
+- Added helper methods for file-based schema handling
+- Improved error messages and debugging output
+- Better alignment with gemini_cli_sdk and claude_code_sdk implementations
+
 ## 1.2.0
 
 ### Added

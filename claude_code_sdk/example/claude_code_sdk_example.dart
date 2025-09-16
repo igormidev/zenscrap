@@ -66,9 +66,9 @@ void main() async {
     );
 
     print('Structured response:');
-    print('  Greeting: ${schemaResult.data['greeting']}');
-    print('  Name: ${schemaResult.data['name']}');
-    print('  Capabilities: ${schemaResult.data['capabilities']}');
+    print('  Greeting: ${schemaResult.structuredSchemaData['greeting']}');
+    print('  Name: ${schemaResult.structuredSchemaData['name']}');
+    print('  Capabilities: ${schemaResult.structuredSchemaData['capabilities']}');
     
   } catch (e) {
     print('Error: $e');

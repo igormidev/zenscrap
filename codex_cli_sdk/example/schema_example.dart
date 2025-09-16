@@ -57,18 +57,18 @@ void main() async {
     );
 
     print('Model explanation:');
-    print('${result.modelMessage}\n');
+    print('${result.llmMessage}\n');
 
     print('Structured data:');
-    print('Title: ${result.data['title']}');
-    print('Author: ${result.data['author']}');
-    print('Year: ${result.data['year']}');
-    print('Genre: ${result.data['genre']}');
-    print('Summary: ${result.data['summary']}');
+    print('Title: ${result.structuredSchemaData['title']}');
+    print('Author: ${result.structuredSchemaData['author']}');
+    print('Year: ${result.structuredSchemaData['year']}');
+    print('Genre: ${result.structuredSchemaData['genre']}');
+    print('Summary: ${result.structuredSchemaData['summary']}');
 
-    if (result.data['themes'] != null) {
+    if (result.structuredSchemaData['themes'] != null) {
       print('Themes:');
-      for (final theme in result.data['themes']) {
+      for (final theme in result.structuredSchemaData['themes']) {
         print('  - $theme');
       }
     }
@@ -124,9 +124,13 @@ void main() async {
       schema: userSchema,
     );
 
+    // Extract the record fields for user result
+    final userLlmMessage = userResult.llmMessage;
+    final userSchemaData = userResult.structuredSchemaData;
+
     print('Generated User Profile:');
-    print('${userResult.modelMessage}\n');
-    print('Data: ${userResult.data}');
+    print('$userLlmMessage\n');
+    print('Data: $userSchemaData');
   } catch (e) {
     print('Error: $e');
   } finally {

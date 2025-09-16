@@ -1,3 +1,31 @@
+## 2.0.0 - 2025-09-15
+
+### Breaking Changes
+- **BREAKING**: Changed `sendMessageWithSchema` return type from `SchemaResult` to a record `({String llmMessage, Map<String, dynamic> structuredSchemaData})`
+- **BREAKING**: Completely redesigned schema handling to use file-based approach for improved reliability
+
+### Major Improvements
+- Implemented file-based JSON schema approach to resolve issues with Gemini CLI's schema parsing
+- Added comprehensive schema validation with proper type checking
+- Added automatic retry mechanism with error feedback (2 attempts for JSON parsing, 2 for schema validation)
+- Temporary JSON files are now created for schema responses and cleaned up automatically
+
+### New Features
+- Added `_validateSchemaResponse` method for thorough schema validation
+- Added `_validateFieldType` method for recursive type checking
+- Added JSON parsing error recovery with detailed error messages
+- Added schema validation error recovery with helpful prompts
+
+### Bug Fixes
+- Fixed issue where Gemini CLI would not return properly formatted JSON responses
+- Resolved problems with schema responses containing additional text
+- Fixed JSON parsing failures due to markdown code blocks in responses
+
+### Internal Changes
+- Removed deprecated `_parseSchemaResponse`, `_buildSchemaPrompt`, and `_buildRetrySchemaPrompt` methods
+- Added new helper methods for file-based schema handling
+- Improved error messages and debugging output
+
 ## 1.1.0
 
 ### New Features

@@ -180,8 +180,8 @@ void main() {
           ),
         );
         
-        print('Schema result: ${result.data}');
-        expect(result.data, isNotEmpty);
+        print('Schema result: ${result.structuredSchemaData}');
+        expect(result.structuredSchemaData, isNotEmpty);
         
       } finally {
         await chat.dispose();

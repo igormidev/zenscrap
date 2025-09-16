@@ -92,8 +92,8 @@ void main() async {
       );
 
       print('\nStructured response:');
-      print('Message: ${schemaResult.modelMessage}');
-      print('Data: ${schemaResult.data}');
+      print('Message: ${schemaResult.llmMessage}');
+      print('Data: ${schemaResult.structuredSchemaData}');
     } finally {
       await chat.dispose();
     }

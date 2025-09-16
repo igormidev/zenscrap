@@ -91,7 +91,8 @@ class CodexChat {
   }
 
   /// Sends a message with a schema for structured response
-  Future<SchemaResult> sendMessageWithSchema({
+  Future<({String llmMessage, Map<String, dynamic> structuredSchemaData})>
+      sendMessageWithSchema({
     required List<CodexSdkContent> messages,
     required SchemaObject schema,
   }) async {
@@ -99,101 +100,92 @@ class CodexChat {
       throw CodexSDKException('Chat session has been disposed');
     }
 
-    // Build the schema prompt
-    final schemaJson = jsonEncode(schema.toJson());
-    final schemaPrompt = '''
-Please provide a structured response according to this JSON schema:
+    // Ensure schema is always an object type
+    if (schema.type != 'object') {
+      throw CodexSDKException('Schema must be of type "object"');
+    }
 
-```json
-$schemaJson
-```
-
-IMPORTANT: Your response must include:
-1. A brief explanation of what you found/did
-2. The structured data matching the schema
-
-Format your response as JSON with these fields:
-{
-  "modelMessage": "Your explanation here",
-  "data": { /* Your structured data matching the schema */ }
-}
-''';
-
-    // Combine schema prompt with user messages
-    final combinedMessages = [
-      CodexSdkContent.text(schemaPrompt),
-      ...messages,
-    ];
-
-    // Note: Codex CLI doesn't support JSON output flags
-    // We'll try to extract JSON from the plain text response
-    final jsonChat = CodexChat(
-      apiKey: apiKey,
-      options: options, // Use regular options without JSON flags
-    );
+    // Create temporary JSON file for schema output
+    final tempJsonFile = await _createSchemaOutputFile();
 
     try {
-      final response = await jsonChat.sendMessage(combinedMessages);
+      // Build the prompt with file-based instructions
+      final filePrompt = await _buildSchemaFilePrompt(
+        messages: messages,
+        schema: schema,
+        tempFile: tempJsonFile,
+      );
 
-      print('\x1B[33m### RESPONSE:\x1B[0m');
-      print('\x1B[33m$response\x1B[0m');
+      // Send message to Codex
+      final response = await sendMessage([CodexSdkContent.text(filePrompt)]);
 
-      // Try to extract JSON from the response
-      // Look for JSON blocks in the response
+      // Read and parse the JSON file content with retries
+      Map<String, dynamic> structuredData;
       try {
-        // Try to find JSON in code blocks
-        final jsonPattern =
-            RegExp(r'```json?\s*\n?([\s\S]*?)\n?```', multiLine: true);
-        final match = jsonPattern.firstMatch(response);
+        structuredData = await _parseJsonFileContent(tempJsonFile);
+      } catch (firstJsonError) {
+        // Retry with error feedback
+        print(
+            'Warning: First JSON parsing attempt failed. Retrying with error context...');
 
-        String jsonStr;
-        if (match != null) {
-          jsonStr = match.group(1)!.trim();
-        } else {
-          // Try to find raw JSON in the response
-          final braceStart = response.indexOf('{');
-          final braceEnd = response.lastIndexOf('}');
-          if (braceStart >= 0 && braceEnd > braceStart) {
-            jsonStr = response.substring(braceStart, braceEnd + 1);
-          } else {
-            // Last resort: assume entire response is JSON
-            jsonStr = response.trim();
-          }
-        }
-
-        final jsonResponse = jsonDecode(jsonStr);
-
-        // Extract model message and data
-        String modelMessage = '';
-        Map<String, dynamic> data = {};
-
-        if (jsonResponse is Map<String, dynamic>) {
-          modelMessage = jsonResponse['modelMessage']?.toString() ??
-              jsonResponse['message']?.toString() ??
-              jsonResponse['response']?.toString() ??
-              '';
-
-          data = jsonResponse['data'] as Map<String, dynamic>? ??
-              jsonResponse['result'] as Map<String, dynamic>? ??
-              jsonResponse;
-        }
-
-        return SchemaResult(
-          modelMessage: modelMessage,
-          data: data,
+        final retryPrompt = await _buildJsonRetryPrompt(
+          originalError: firstJsonError,
+          tempFile: tempJsonFile,
         );
-      } catch (e) {
-        // If we can't parse JSON, return a simple message structure
-        return SchemaResult(
-          modelMessage: response,
-          data: {
-            'responseType': 'message',
-            'message': response,
-          },
-        );
+
+        await sendMessage([CodexSdkContent.text(retryPrompt)]);
+
+        // Try parsing again
+        try {
+          structuredData = await _parseJsonFileContent(tempJsonFile);
+        } catch (secondJsonError) {
+          // If JSON parsing still fails, try schema validation retry
+          throw JSONDecodeException(
+            'Failed to parse JSON file after retry',
+            'JSON parsing errors: $firstJsonError, $secondJsonError',
+            secondJsonError,
+          );
+        }
       }
+
+      // Validate against schema with retries
+      try {
+        _validateSchemaResponse(structuredData, schema);
+      } catch (firstSchemaError) {
+        // Retry with schema validation feedback
+        print(
+            'Warning: Schema validation failed. Retrying with error context...');
+
+        final retryPrompt = await _buildSchemaRetryPrompt(
+          originalResponse: structuredData,
+          error: firstSchemaError,
+          schema: schema,
+          tempFile: tempJsonFile,
+        );
+
+        await sendMessage([CodexSdkContent.text(retryPrompt)]);
+
+        // Try parsing and validating again
+        try {
+          structuredData = await _parseJsonFileContent(tempJsonFile);
+          _validateSchemaResponse(structuredData, schema);
+        } catch (secondSchemaError) {
+          throw JSONDecodeException(
+            'Failed to validate schema after retry',
+            'Schema validation errors: $firstSchemaError, $secondSchemaError',
+            secondSchemaError,
+          );
+        }
+      }
+
+      // Return the structured response as a record
+      return (
+        llmMessage: response,
+        structuredSchemaData: structuredData,
+      );
     } finally {
-      await jsonChat.dispose();
+      // Clean up temporary file
+      await _cleanupTempFile(tempJsonFile);
     }
   }
 
@@ -470,6 +462,255 @@ Format your response as JSON with these fields:
 
   /// Annotation for testing visibility
   static const visibleForTesting = _VisibleForTesting();
+
+  // New helper methods for file-based schema handling
+
+  /// Creates a temporary JSON file for schema output
+  Future<File> _createSchemaOutputFile() async {
+    final tempDir = Directory.systemTemp;
+    final fileName = 'codex_schema_${_uuid.v4()}.json';
+    final tempFile = File(path.join(tempDir.path, fileName));
+
+    // Create empty JSON object as initial content
+    await tempFile.writeAsString('{}');
+    _tempFiles.add(tempFile);
+
+    return tempFile;
+  }
+
+  /// Builds the prompt for file-based schema output
+  Future<String> _buildSchemaFilePrompt({
+    required List<CodexSdkContent> messages,
+    required SchemaObject schema,
+    required File tempFile,
+  }) async {
+    final userPrompt = await _prepareMessage(messages);
+    final schemaJson = jsonEncode(schema.toJson());
+
+    return '''[STRUCTURED OUTPUT REQUEST]
+
+IMPORTANT INSTRUCTIONS:
+1. You must write your structured response to the file: ${tempFile.absolute.path}
+2. The file must contain ONLY valid JSON matching the schema below
+3. Do NOT include the JSON in your text response
+4. Your text response should summarize what you did and found
+
+==== JSON SCHEMA SPECIFICATION ====
+$schemaJson
+==== END OF SCHEMA ====
+
+==== FILE OUTPUT RULES ====
+- Write ONLY valid JSON to the file (no markdown, no comments, no extra text)
+- Ensure all required fields are present with correct types
+- Use null for optional fields that have no value
+- Arrays must contain items of the specified type
+- Property names must match exactly (case-sensitive)
+==== END OF RULES ====
+
+==== USER REQUEST ====
+$userPrompt
+==== END OF REQUEST ====
+
+Now process the request and:
+1. Write the structured JSON data to: ${tempFile.absolute.path}
+2. Provide a summary of your findings in your text response
+
+Remember: The JSON goes in the file, so WRITE IT IN the file, NOT in your response text.''';
+  }
+
+  /// Parses JSON content from a file
+  Future<Map<String, dynamic>> _parseJsonFileContent(File file) async {
+    if (!file.existsSync()) {
+      throw CodexSDKException(
+          'Schema output file does not exist: ${file.path}');
+    }
+
+    final content = await file.readAsString();
+    if (content.trim().isEmpty) {
+      throw CodexSDKException('Schema output file is empty');
+    }
+
+    try {
+      final parsed = jsonDecode(content);
+      if (parsed is! Map<String, dynamic>) {
+        throw CodexSDKException('JSON content is not an object');
+      }
+      return parsed;
+    } catch (e) {
+      if (e is CodexSDKException) rethrow;
+      throw JSONDecodeException(
+        'Failed to parse JSON from file',
+        content,
+        e,
+      );
+    }
+  }
+
+  /// Builds a retry prompt for JSON parsing errors
+  Future<String> _buildJsonRetryPrompt({
+    required dynamic originalError,
+    required File tempFile,
+  }) async {
+    String errorDetails = originalError.toString();
+    String fileContent = '';
+
+    try {
+      fileContent = await tempFile.readAsString();
+    } catch (_) {
+      fileContent = '<unable to read file>';
+    }
+
+    return '''[JSON PARSING ERROR - CORRECTION REQUIRED]
+
+The JSON file you created has syntax errors and cannot be parsed.
+
+ERROR: $errorDetails
+
+FILE CONTENT:
+$fileContent
+
+COMMON JSON ERRORS TO CHECK:
+1. Missing or extra commas
+2. Unclosed brackets or braces
+3. Unquoted property names
+4. Single quotes instead of double quotes
+5. Trailing commas in arrays or objects
+6. Invalid escape sequences in strings
+
+Please fix the JSON syntax in the file: ${tempFile.absolute.path}
+
+Write ONLY valid JSON to the file. Do not include any markdown formatting or comments.''';
+  }
+
+  /// Builds a retry prompt for schema validation errors
+  Future<String> _buildSchemaRetryPrompt({
+    required Map<String, dynamic> originalResponse,
+    required dynamic error,
+    required SchemaObject schema,
+    required File tempFile,
+  }) async {
+    final schemaJson = jsonEncode(schema.toJson());
+    final responseJson = jsonEncode(originalResponse);
+
+    return '''[SCHEMA VALIDATION ERROR - CORRECTION REQUIRED]
+
+Your JSON structure does not match the required schema.
+
+ERROR: ${error.toString()}
+
+YOUR JSON:
+$responseJson
+
+REQUIRED SCHEMA:
+$schemaJson
+
+VALIDATION ISSUES TO FIX:
+1. Check that all required fields are present
+2. Verify field types match the schema (string, number, boolean, etc.)
+3. Ensure property names match exactly (case-sensitive)
+4. Arrays must contain items of the correct type
+5. Nested objects must match their schema definitions
+
+Please correct the JSON in the file: ${tempFile.absolute.path}
+
+Make sure the JSON structure exactly matches the schema requirements.''';
+  }
+
+  /// Validates that the response matches the schema
+  void _validateSchemaResponse(Map<String, dynamic> data, SchemaObject schema) {
+    // Get required fields from schema
+    final requiredFields = <String>[];
+    schema.properties.forEach((key, property) {
+      if (!property.nullable) {
+        requiredFields.add(key);
+      }
+    });
+
+    // Check for required fields
+    for (final field in requiredFields) {
+      if (!data.containsKey(field) || data[field] == null) {
+        throw CodexSDKException('Required field "$field" is missing or null');
+      }
+    }
+
+    // Validate field types
+    schema.properties.forEach((key, property) {
+      if (data.containsKey(key) && data[key] != null) {
+        _validateFieldType(key, data[key], property);
+      }
+    });
+  }
+
+  /// Validates a field matches its schema type
+  void _validateFieldType(
+      String fieldName, dynamic value, SchemaProperty property) {
+    switch (property.type) {
+      case 'string':
+        if (value is! String) {
+          throw CodexSDKException(
+              'Field "$fieldName" must be a string, got ${value.runtimeType}');
+        }
+        if (property.enumValues != null &&
+            !property.enumValues!.contains(value)) {
+          throw CodexSDKException(
+              'Field "$fieldName" must be one of ${property.enumValues}');
+        }
+        break;
+      case 'number':
+        if (value is! num) {
+          throw CodexSDKException(
+              'Field "$fieldName" must be a number, got ${value.runtimeType}');
+        }
+        break;
+      case 'boolean':
+        if (value is! bool) {
+          throw CodexSDKException(
+              'Field "$fieldName" must be a boolean, got ${value.runtimeType}');
+        }
+        break;
+      case 'array':
+        if (value is! List) {
+          throw CodexSDKException(
+              'Field "$fieldName" must be an array, got ${value.runtimeType}');
+        }
+        if (property.items != null) {
+          for (int i = 0; i < value.length; i++) {
+            _validateFieldType('$fieldName[$i]', value[i], property.items!);
+          }
+        }
+        break;
+      case 'object':
+        if (value is! Map<String, dynamic>) {
+          throw CodexSDKException(
+              'Field "$fieldName" must be an object, got ${value.runtimeType}');
+        }
+        if (property.properties != null) {
+          property.properties!.forEach((subKey, subProperty) {
+            if (value.containsKey(subKey) && value[subKey] != null) {
+              _validateFieldType(
+                  '$fieldName.$subKey', value[subKey], subProperty);
+            } else if (!subProperty.nullable) {
+              throw CodexSDKException(
+                  'Required field "$fieldName.$subKey" is missing');
+            }
+          });
+        }
+        break;
+    }
+  }
+
+  /// Cleans up a temporary file safely
+  Future<void> _cleanupTempFile(File file) async {
+    try {
+      if (file.existsSync()) {
+        await file.delete();
+        _tempFiles.remove(file);
+      }
+    } catch (e) {
+      // Log but don't throw - cleanup errors shouldn't break the flow
+      print('Warning: Failed to delete temp file ${file.path}: $e');
+    }
+  }
 }
 
 /// Annotation to mark members that are only visible for testing

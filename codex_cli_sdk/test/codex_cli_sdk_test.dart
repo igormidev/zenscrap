@@ -92,27 +92,30 @@ void main() {
 
     test('should convert to CLI arguments', () {
       const options = CodexChatOptions(
-        mode: 'suggest',
+        mode: 'full-auto',
         model: 'gpt-5',
         quiet: true,
       );
 
       final args = options.toCliArgs();
-      expect(args, contains('--suggest'));
+      expect(args, contains('--full-auto'));
       expect(args, contains('--model'));
       expect(args, contains('gpt-5'));
-      expect(args, contains('--quiet'));
+      // Note: Codex CLI doesn't support --quiet flag
+      expect(args, isNot(contains('--quiet')));
     });
 
     test('should handle all operation modes', () {
-      final suggestOptions = const CodexChatOptions(mode: 'suggest');
-      expect(suggestOptions.toCliArgs(), contains('--suggest'));
-
-      final autoEditOptions = const CodexChatOptions(mode: 'auto-edit');
-      expect(autoEditOptions.toCliArgs(), contains('--auto-edit'));
-
+      // Only full-auto mode is supported by Codex CLI
       final fullAutoOptions = const CodexChatOptions(mode: 'full-auto');
       expect(fullAutoOptions.toCliArgs(), contains('--full-auto'));
+
+      // Other modes should not add any mode flags
+      final suggestOptions = const CodexChatOptions(mode: 'suggest');
+      expect(suggestOptions.toCliArgs(), isNot(contains('--suggest')));
+
+      final autoEditOptions = const CodexChatOptions(mode: 'auto-edit');
+      expect(autoEditOptions.toCliArgs(), isNot(contains('--auto-edit')));
     });
 
     test('should copy with new values', () {

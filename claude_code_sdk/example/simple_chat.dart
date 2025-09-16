@@ -63,7 +63,7 @@ void main() async {
         },
       ),
     );
-    print('Schema result data: ${schemaResult.data}');
+    print('Schema result data: ${schemaResult.structuredSchemaData}');
 
   } catch (e) {
     print('Error: $e');

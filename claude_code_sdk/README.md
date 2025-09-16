@@ -35,7 +35,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  claude_code_sdk: ^2.1.0
+  claude_code_sdk: ^3.0.0
 ```
 
 Then run:

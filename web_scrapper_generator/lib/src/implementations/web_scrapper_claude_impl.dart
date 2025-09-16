@@ -98,13 +98,13 @@ class WebScrapperClaudeImpl extends WebScrapperGeneratorController<ClaudeModel> 
 
     try {
       // Send message with schema for structured response
-      final result = await _chat.sendMessageWithSchema(
+      final (:llmMessage, :structuredSchemaData) = await _chat.sendMessageWithSchema(
         messages: messages,
         schema: responseSchema,
       );
 
       // Parse the structured response
-      return parseStructuredResponse(result.data);
+      return parseStructuredResponse(structuredSchemaData);
     } catch (e) {
       // If there's an error, return an error response
       return WebScrapperChatAIResponseErrorMessage(

@@ -63,7 +63,8 @@ class GeminiChat {
   }
 
   /// Sends a message with a schema and returns structured data
-  Future<SchemaResult> sendMessageWithSchema({
+  Future<({String llmMessage, Map<String, dynamic> structuredSchemaData})>
+      sendMessageWithSchema({
     required List<GeminiSdkContent> messages,
     required SchemaObject schema,
   }) async {
@@ -71,55 +72,92 @@ class GeminiChat {
       throw GeminiSDKException('Chat session has been disposed');
     }
 
-    // Build the prompt with schema instructions
-    final prompt = await _buildSchemaPrompt(messages, schema);
+    // Ensure schema is always an object type
+    if (schema.type != 'object') {
+      throw GeminiSDKException('Schema must be of type "object"');
+    }
 
-    // Run the Gemini CLI and get response
-    final response = await _runGeminiCommand(prompt);
+    // Create temporary JSON file for schema output
+    final tempJsonFile = await _createSchemaOutputFile();
 
-    // First attempt to parse the response
     try {
-      return _parseSchemaResponse(response);
-    } catch (firstError) {
-      // If parsing fails, give the model a second chance with error context
-      print(
-          'Warning: First schema parsing attempt failed. Retrying with error context...');
+      // Build the prompt with file-based instructions
+      final filePrompt = await _buildSchemaFilePrompt(
+        messages: messages,
+        schema: schema,
+        tempFile: tempJsonFile,
+      );
 
+      // Send message to Gemini
+      final response = await sendMessage([GeminiSdkContent.text(filePrompt)]);
+
+      // Read and parse the JSON file content with retries
+      Map<String, dynamic> structuredData;
       try {
-        // Build a retry prompt with error context
-        final retryPrompt = await _buildRetrySchemaPrompt(
-          originalResponse: response,
-          error: firstError,
-          schema: schema,
+        structuredData = await _parseJsonFileContent(tempJsonFile);
+      } catch (firstJsonError) {
+        // Retry with error feedback
+        print(
+            'Warning: First JSON parsing attempt failed. Retrying with error context...');
+
+        final retryPrompt = await _buildJsonRetryPrompt(
+          originalError: firstJsonError,
+          tempFile: tempJsonFile,
         );
 
-        // Run the retry command
-        final retryResponse = await _runGeminiCommand(retryPrompt);
+        await sendMessage([GeminiSdkContent.text(retryPrompt)]);
 
-        // Try parsing the retry response
+        // Try parsing again
         try {
-          return _parseSchemaResponse(retryResponse);
-        } catch (secondError) {
-          // If it still fails, throw the original error with additional context
+          structuredData = await _parseJsonFileContent(tempJsonFile);
+        } catch (secondJsonError) {
+          // If JSON parsing still fails, try schema validation retry
           throw JSONDecodeException(
-            'Failed to parse schema response after retry. '
-                'Original error: ${firstError.toString()}\n'
-                'Retry error: ${secondError.toString()}',
-            'First response: $response\nRetry response: $retryResponse',
-            secondError,
+            'Failed to parse JSON file after retry',
+            'JSON parsing errors: $firstJsonError, $secondJsonError',
+            secondJsonError,
           );
         }
-      } catch (e) {
-        // If the retry itself fails (not just parsing), throw the original error
-        if (e is JSONDecodeException) {
-          rethrow;
-        }
-        throw JSONDecodeException(
-          'Failed to retry schema parsing: ${e.toString()}',
-          response,
-          firstError,
-        );
       }
+
+      // Validate against schema with retries
+      try {
+        _validateSchemaResponse(structuredData, schema);
+      } catch (firstSchemaError) {
+        // Retry with schema validation feedback
+        print(
+            'Warning: Schema validation failed. Retrying with error context...');
+
+        final retryPrompt = await _buildSchemaValidationRetryPrompt(
+          originalResponse: structuredData,
+          error: firstSchemaError,
+          schema: schema,
+          tempFile: tempJsonFile,
+        );
+
+        await sendMessage([GeminiSdkContent.text(retryPrompt)]);
+
+        // Try parsing and validating again
+        try {
+          structuredData = await _parseJsonFileContent(tempJsonFile);
+          _validateSchemaResponse(structuredData, schema);
+        } catch (secondSchemaError) {
+          throw JSONDecodeException(
+            'Failed to validate schema after retry',
+            'Schema validation errors: $firstSchemaError, $secondSchemaError',
+            secondSchemaError,
+          );
+        }
+      }
+
+      // Return the structured response as a record
+      return (
+        llmMessage: response,
+        structuredSchemaData: structuredData,
+      );
+    } finally {
+      // Clean up temporary file
+      await _cleanupSchemaFile(tempJsonFile);
     }
   }
 
@@ -209,84 +247,6 @@ ${options.systemPrompt}
       throw GeminiSDKException(
           'Failed to create temporary file: ${e.toString()}', e);
     }
-  }
-
-  /// Builds a prompt with schema instructions
-  Future<String> _buildSchemaPrompt(
-      List<GeminiSdkContent> messages, SchemaObject schema) async {
-    // The system prompt is already included in _buildPrompt if needed
-    final prompt = await _buildPrompt(messages);
-    final schemaJson = jsonEncode(schema.toJson());
-
-    return '''$prompt
-
-Please provide your response in the following JSON schema format:
-$schemaJson
-
-Ensure your response strictly follows this schema and return only valid JSON.
-Return only raw json, without anything more (not even md notations like "```" in the begining... just the raw json).''';
-  }
-
-  /// Builds a retry prompt when schema parsing fails
-  Future<String> _buildRetrySchemaPrompt({
-    required String originalResponse,
-    required Object error,
-    required SchemaObject schema,
-  }) async {
-    final schemaJson = jsonEncode(schema.toJson());
-
-    // Extract error details
-    String errorMessage = error.toString();
-    String errorDetails = '';
-
-    if (error is JSONDecodeException) {
-      errorMessage = error.message;
-      // Limit the raw content to prevent token overflow
-      final rawContent = error.rawContent.length > 500
-          ? '${error.rawContent.substring(0, 500)}...'
-          : error.rawContent;
-      errorDetails = 'Your response: $rawContent';
-    } else if (error is FormatException) {
-      errorMessage = 'JSON format error: ${error.message}';
-      errorDetails =
-          'Invalid JSON at: ${error.source?.toString() ?? 'unknown position'}';
-    }
-
-    return '''[CRITICAL ERROR - RETRY REQUIRED]
-
-Your previous response failed to match the required JSON schema format. This is a critical issue that needs immediate correction.
-
-ERROR ENCOUNTERED:
-$errorMessage
-
-$errorDetails
-
-WHAT WENT WRONG:
-Your response either:
-1. Did not contain valid JSON
-2. Contained text mixed with JSON (JSON must be standalone)
-3. Had syntax errors in the JSON structure
-4. Did not match the required schema properties
-5. Included markdown code blocks (```) which are not allowed
-
-REQUIRED SCHEMA (YOU MUST FOLLOW THIS EXACTLY):
-$schemaJson
-
-INSTRUCTIONS FOR RETRY:
-1. Take a deep breath and carefully analyze the schema above
-2. Ensure ALL required fields are present with correct types
-3. Return ONLY valid JSON - no explanatory text before or after
-4. Do NOT wrap JSON in markdown code blocks (no ```)
-5. Validate your JSON structure before responding
-6. Double-check that property names match exactly (case-sensitive)
-
-CORRECT RESPONSE FORMAT EXAMPLE:
-{
-  "propertyName": value,
-  "anotherProperty": value
-}
-
-Please now provide a corrected response that strictly follows the schema. Return ONLY the raw JSON object, nothing else.''';
   }
 
   /// Runs the Gemini CLI command and returns the response
@@ -543,87 +503,6 @@ Please now provide a corrected response that strictly follows the schema. Return
     return responseLines.join('\n').trim();
   }
 
-  /// Parses the schema response
-  SchemaResult _parseSchemaResponse(String response) {
-    try {
-      // First, try to clean common formatting issues
-      String cleanedResponse = response.trim();
-
-      // Remove markdown code blocks if present
-      if (cleanedResponse.contains('```json')) {
-        cleanedResponse = cleanedResponse.replaceAll(RegExp(r'```json\s*'), '');
-        cleanedResponse = cleanedResponse.replaceAll(RegExp(r'```\s*'), '');
-      } else if (cleanedResponse.contains('```')) {
-        cleanedResponse = cleanedResponse.replaceAll(RegExp(r'```\s*'), '');
-      }
-
-      // Try to extract JSON from the cleaned response
-      // First try to parse the entire response as JSON
-      try {
-        final data = jsonDecode(cleanedResponse) as Map<String, dynamic>;
-        return SchemaResult(
-          modelMessage: '',
-          data: data,
-        );
-      } catch (_) {
-        // If that fails, try to extract JSON using regex
-        final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}')
-            .firstMatch(cleanedResponse);
-
-        if (jsonMatch == null) {
-          // Try one more time with a more permissive regex
-          final permissiveMatch =
-              RegExp(r'\{[\s\S]*\}').firstMatch(cleanedResponse);
-          if (permissiveMatch == null) {
-            throw JSONDecodeException(
-              'No JSON object found in response',
-              response,
-            );
-          }
-
-          final jsonStr = permissiveMatch.group(0)!;
-          final data = jsonDecode(jsonStr) as Map<String, dynamic>;
-
-          // Extract message if present
-          String modelMessage = '';
-          final messageIndex = cleanedResponse.indexOf(jsonStr);
-          if (messageIndex > 0) {
-            modelMessage = cleanedResponse.substring(0, messageIndex).trim();
-          }
-
-          return SchemaResult(
-            modelMessage: modelMessage,
-            data: data,
-          );
-        }
-
-        final jsonStr = jsonMatch.group(0)!;
-        final data = jsonDecode(jsonStr) as Map<String, dynamic>;
-
-        // Extract message if present
-        String modelMessage = '';
-        final messageIndex = cleanedResponse.indexOf(jsonStr);
-        if (messageIndex > 0) {
-          modelMessage = cleanedResponse.substring(0, messageIndex).trim();
-        }
-
-        return SchemaResult(
-          modelMessage: modelMessage,
-          data: data,
-        );
-      }
-    } catch (e) {
-      if (e is JSONDecodeException) {
-        rethrow;
-      }
-      throw JSONDecodeException(
-        'Failed to parse schema response: ${e.toString()}',
-        response,
-        e,
-      );
-    }
-  }
-
   /// Gets the appropriate shell command for the platform
   String _getShellCommand() {
     if (Platform.isWindows) {
@@ -686,5 +565,255 @@ Please now provide a corrected response that strictly follows the schema. Return
     // Clear session
     _sessionId = null;
     isFirstMessage = true;
+  }
+
+  // New helper methods for file-based schema handling
+
+  /// Creates a temporary JSON file for schema output
+  Future<File> _createSchemaOutputFile() async {
+    final tempDir = Directory.systemTemp;
+    const uuid = Uuid();
+    final fileName = 'gemini_schema_${uuid.v4()}.json';
+    final tempFile = File(path.join(tempDir.path, fileName));
+
+    // Create empty JSON object as initial content
+    await tempFile.writeAsString('{}');
+    _temporaryFiles.add(tempFile);
+
+    return tempFile;
+  }
+
+  /// Builds the prompt for file-based schema output
+  Future<String> _buildSchemaFilePrompt({
+    required List<GeminiSdkContent> messages,
+    required SchemaObject schema,
+    required File tempFile,
+  }) async {
+    final userPrompt = await _buildPrompt(messages);
+    final schemaJson = jsonEncode(schema.toJson());
+
+    return '''[STRUCTURED OUTPUT REQUEST]
+
+IMPORTANT INSTRUCTIONS:
+1. You must write your structured response to the file: ${tempFile.absolute.path}
+2. The file must contain ONLY valid JSON matching the schema below
+3. Do NOT include the JSON in your text response
+4. Your text response should summarize what you did and found
+
+==== JSON SCHEMA SPECIFICATION ====
+$schemaJson
+==== END OF SCHEMA ====
+
+==== FILE OUTPUT RULES ====
+- Write ONLY valid JSON to the file (no markdown, no comments, no extra text)
+- Ensure all required fields are present with correct types
+- Use null for optional fields that have no value
+- Arrays must contain items of the specified type
+- Property names must match exactly (case-sensitive)
+==== END OF RULES ====
+
+==== USER REQUEST ====
+$userPrompt
+==== END OF REQUEST ====
+
+Now process the request and:
+1. Write the structured JSON data to: ${tempFile.absolute.path}
+2. Provide a summary of your findings in your text response
+
+Remember: The JSON goes in the file, so WRITE IT IN the file, NOT in your response text.''';
+  }
+
+  /// Parses JSON content from a file
+  Future<Map<String, dynamic>> _parseJsonFileContent(File file) async {
+    if (!await file.exists()) {
+      throw GeminiSDKException(
+          'Schema output file does not exist: ${file.path}');
+    }
+
+    final content = await file.readAsString();
+    if (content.trim().isEmpty) {
+      throw GeminiSDKException('Schema output file is empty');
+    }
+
+    try {
+      final parsed = jsonDecode(content);
+      if (parsed is! Map<String, dynamic>) {
+        throw GeminiSDKException('JSON content is not an object');
+      }
+      return parsed;
+    } catch (e) {
+      if (e is GeminiSDKException) rethrow;
+      throw JSONDecodeException(
+        'Failed to parse JSON from file',
+        content,
+        e,
+      );
+    }
+  }
+
+  /// Builds a retry prompt for JSON parsing errors
+  Future<String> _buildJsonRetryPrompt({
+    required dynamic originalError,
+    required File tempFile,
+  }) async {
+    String errorDetails = originalError.toString();
+    String fileContent = '';
+
+    try {
+      fileContent = await tempFile.readAsString();
+    } catch (_) {
+      fileContent = '<unable to read file>';
+    }
+
+    return '''[JSON PARSING ERROR - CORRECTION REQUIRED]
+
+The JSON file you created has syntax errors and cannot be parsed.
+
+ERROR: $errorDetails
+
+FILE CONTENT:
+$fileContent
+
+COMMON JSON ERRORS TO CHECK:
+1. Missing or extra commas
+2. Unclosed brackets or braces
+3. Unquoted property names
+4. Single quotes instead of double quotes
+5. Trailing commas in arrays or objects
+6. Invalid escape sequences in strings
+
+Please fix the JSON syntax in the file: ${tempFile.absolute.path}
+
+Write ONLY valid JSON to the file. Do not include any markdown formatting or comments.''';
+  }
+
+  /// Builds a retry prompt for schema validation errors
+  Future<String> _buildSchemaValidationRetryPrompt({
+    required Map<String, dynamic> originalResponse,
+    required dynamic error,
+    required SchemaObject schema,
+    required File tempFile,
+  }) async {
+    final schemaJson = jsonEncode(schema.toJson());
+    final responseJson = jsonEncode(originalResponse);
+
+    return '''[SCHEMA VALIDATION ERROR - CORRECTION REQUIRED]
+
+Your JSON structure does not match the required schema.
+
+ERROR: ${error.toString()}
+
+YOUR JSON:
+$responseJson
+
+REQUIRED SCHEMA:
+$schemaJson
+
+VALIDATION ISSUES TO FIX:
+1. Check that all required fields are present
+2. Verify field types match the schema (string, number, boolean, etc.)
+3. Ensure property names match exactly (case-sensitive)
+4. Arrays must contain items of the correct type
+5. Nested objects must match their schema definitions
+
+Please correct the JSON in the file: ${tempFile.absolute.path}
+
+Make sure the JSON structure exactly matches the schema requirements.''';
+  }
+
+  /// Validates that the response matches the schema
+  void _validateSchemaResponse(Map<String, dynamic> data, SchemaObject schema) {
+    // Get required fields from schema
+    final requiredFields = <String>[];
+    schema.properties.forEach((key, property) {
+      if (!property.nullable) {
+        requiredFields.add(key);
+      }
+    });
+
+    // Check for required fields
+    for (final field in requiredFields) {
+      if (!data.containsKey(field) || data[field] == null) {
+        throw GeminiSDKException('Required field "$field" is missing or null');
+      }
+    }
+
+    // Validate field types
+    schema.properties.forEach((key, property) {
+      if (data.containsKey(key) && data[key] != null) {
+        _validateFieldType(key, data[key], property);
+      }
+    });
+  }
+
+  /// Validates a field matches its schema type
+  void _validateFieldType(
+      String fieldName, dynamic value, SchemaProperty property) {
+    switch (property.type) {
+      case 'string':
+        if (value is! String) {
+          throw GeminiSDKException(
+              'Field "$fieldName" must be a string, got ${value.runtimeType}');
+        }
+        if (property.enumValues != null &&
+            !property.enumValues!.contains(value)) {
+          throw GeminiSDKException(
+              'Field "$fieldName" must be one of ${property.enumValues}');
+        }
+        break;
+      case 'number':
+        if (value is! num) {
+          throw GeminiSDKException(
+              'Field "$fieldName" must be a number, got ${value.runtimeType}');
+        }
+        break;
+      case 'boolean':
+        if (value is! bool) {
+          throw GeminiSDKException(
+              'Field "$fieldName" must be a boolean, got ${value.runtimeType}');
+        }
+        break;
+      case 'array':
+        if (value is! List) {
+          throw GeminiSDKException(
+              'Field "$fieldName" must be an array, got ${value.runtimeType}');
+        }
+        if (property.items != null) {
+          for (int i = 0; i < value.length; i++) {
+            _validateFieldType('$fieldName[$i]', value[i], property.items!);
+          }
+        }
+        break;
+      case 'object':
+        if (value is! Map<String, dynamic>) {
+          throw GeminiSDKException(
+              'Field "$fieldName" must be an object, got ${value.runtimeType}');
+        }
+        if (property.properties != null) {
+          property.properties!.forEach((subKey, subProperty) {
+            if (value.containsKey(subKey) && value[subKey] != null) {
+              _validateFieldType(
+                  '$fieldName.$subKey', value[subKey], subProperty);
+            } else if (!subProperty.nullable) {
+              throw GeminiSDKException(
+                  'Required field "$fieldName.$subKey" is missing');
+            }
+          });
+        }
+        break;
+    }
+  }
+
+  /// Cleans up a temporary schema file safely
+  Future<void> _cleanupSchemaFile(File file) async {
+    try {
+      if (await file.exists()) {
+        await file.delete();
+        _temporaryFiles.remove(file);
+      }
+    } catch (e) {
+      // Log but don't throw - cleanup errors shouldn't break the flow
+      print('Warning: Failed to delete schema file ${file.path}: $e');
+    }
   }
 }

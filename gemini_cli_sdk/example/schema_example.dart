@@ -95,18 +95,18 @@ void main() async {
       schema: schema,
     );
     
-    print('Model message: ${result.modelMessage}\n');
+    print('Model message: ${result.llmMessage}\n');
     print('Extracted data:');
-    print('  Name: ${result.data['name']}');
-    print('  Email: ${result.data['email']}');
-    print('  Phone: ${result.data['phone'] ?? 'Not provided'}');
-    print('  Job Title: ${result.data['jobTitle']}');
-    print('  Department: ${result.data['department'] ?? 'Not provided'}');
-    print('  Years of Experience: ${result.data['yearsOfExperience'] ?? 'Not provided'}');
+    print('  Name: ${result.structuredSchemaData['name']}');
+    print('  Email: ${result.structuredSchemaData['email']}');
+    print('  Phone: ${result.structuredSchemaData['phone'] ?? 'Not provided'}');
+    print('  Job Title: ${result.structuredSchemaData['jobTitle']}');
+    print('  Department: ${result.structuredSchemaData['department'] ?? 'Not provided'}');
+    print('  Years of Experience: ${result.structuredSchemaData['yearsOfExperience'] ?? 'Not provided'}');
     
-    if (result.data['skills'] != null) {
+    if (result.structuredSchemaData['skills'] != null) {
       print('  Skills:');
-      for (final skill in result.data['skills']) {
+      for (final skill in result.structuredSchemaData['skills']) {
         print('    - $skill');
       }
     }
