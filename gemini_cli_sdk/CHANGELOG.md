@@ -1,3 +1,18 @@
+## 1.1.0
+
+### New Features
+- **Auto-Update Functionality**: Added `updateToNewestVersionIfNeeded()` method
+  - Automatically checks for CLI updates
+  - Compares installed version with latest npm version
+  - Updates to newest version if available
+  - Falls back to reinstall if update fails
+
+### Improvements
+- Better version management for Gemini CLI
+- Automatic handling of outdated installations
+- Improved error handling during updates
+- Fixed README documentation to use correct method names (`isGeminiCLIInstalled()` and `installGeminiCLI()`)
+
 ## 1.0.0
 
 ### Initial Release

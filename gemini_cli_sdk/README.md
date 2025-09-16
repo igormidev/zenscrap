@@ -39,7 +39,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  gemini_cli_sdk: ^1.0.0
+  gemini_cli_sdk: ^1.1.0
 ```
 
 Then run:
@@ -231,25 +231,43 @@ final geminiChat = geminiSDK.createNewChat(
 ```dart
 void main() async {
   final geminiSDK = GeminiSDK('YOUR_API_KEY');
-  
-  // Check if Gemini SDK is installed
-  final isInstalled = await geminiSDK.isGeminiSDKInstalled();
-  
+
+  // Check if Gemini CLI is installed
+  final isInstalled = await geminiSDK.isGeminiCLIInstalled();
+
   if (!isInstalled) {
-    print('Gemini SDK is not installed. Installing...');
-    
+    print('Gemini CLI is not installed. Installing...');
+
     try {
-      // Install the SDK globally
-      await geminiSDK.installGeminiSDK(global: true);
+      // Install the CLI globally
+      await geminiSDK.installGeminiCLI(global: true);
       print('Installation complete!');
     } catch (e) {
       print('Installation failed: $e');
     }
   }
-  
+
   // Get SDK information
   final info = await geminiSDK.getSDKInfo();
   print('SDK Info: $info');
+}
+```
+
+### Auto-Update SDK
+
+The SDK provides a convenient method to automatically check for and install updates:
+
+```dart
+void main() async {
+  final geminiSDK = GeminiSDK('YOUR_API_KEY');
+
+  // Automatically check for updates and install if needed
+  await geminiSDK.updateToNewestVersionIfNeeded(global: true);
+
+  // The function will:
+  // 1. Check if CLI is installed (installs if not)
+  // 2. Compare current version with latest npm version
+  // 3. Update if a newer version is available
 }
 ```
 
@@ -529,10 +547,9 @@ await geminiSDK.dispose(); // Disposes all active sessions
 
 - `GeminiSDK(String apiKey)` - Creates a new SDK instance
 - `createNewChat({GeminiChatOptions? options})` - Creates a new chat session
-- `isGeminiSDKInstalled()` - Checks if Gemini SDK is installed
-- `installGeminiSDK({bool global = true})` - Installs the Gemini SDK
 - `isGeminiCLIInstalled()` - Checks if Gemini CLI is installed
 - `installGeminiCLI({bool global = true})` - Installs the Gemini CLI
+- `updateToNewestVersionIfNeeded({bool global = true})` - Updates SDK to newest version if available
 - `getSDKInfo()` - Gets information about installed SDKs
 - `isMcpInstalled()` - Checks MCP installation status
 - `listMcpServers()` - Lists all configured MCP servers

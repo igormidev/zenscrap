@@ -38,7 +38,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  codex_cli_sdk: ^1.1.0
+  codex_cli_sdk: ^1.2.0
 ```
 
 Then run:
@@ -335,6 +335,24 @@ void main() async {
 }
 ```
 
+### Auto-Update SDK
+
+The SDK provides a convenient method to automatically check for and install updates:
+
+```dart
+void main() async {
+  final codexSDK = Codex('YOUR_API_KEY');
+
+  // Automatically check for updates and install if needed
+  await codexSDK.updateToNewestVersionIfNeeded(global: true);
+
+  // The function will:
+  // 1. Check if CLI is installed (installs if not)
+  // 2. Compare current version with latest npm version
+  // 3. Update if a newer version is available
+}
+```
+
 ## MCP (Model Context Protocol) Support
 
 The SDK provides comprehensive support for MCP, allowing Codex to connect to external tools and services.
@@ -547,6 +565,7 @@ await codexSDK.dispose(); // Disposes all active sessions
 - `createNewChat({CodexChatOptions? options})` - Creates a new chat session
 - `isCodexCLIInstalled()` - Checks if Codex CLI is installed
 - `installCodexCLI({bool global = true})` - Installs the Codex CLI
+- `updateToNewestVersionIfNeeded({bool global = true})` - Updates SDK to newest version if available
 - `getSDKInfo()` - Gets information about installed SDKs
 - `isMcpInstalled()` - Checks MCP installation status
 - `listMcpServers()` - Lists all configured MCP servers

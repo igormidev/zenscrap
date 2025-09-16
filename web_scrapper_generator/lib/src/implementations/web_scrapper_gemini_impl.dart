@@ -25,11 +25,8 @@ class WebScrapperGeminiImpl extends WebScrapperGeneratorController<GeminiModel> 
     print('🚀 Initializing Gemini SDK for web scraper generator...\n');
     _geminiSDK = GeminiSDK(geminiApiKey);
 
-    // Ensure Gemini CLI is installed
-    final bool isInstalled = await _geminiSDK.isGeminiCLIInstalled();
-    if (!isInstalled) {
-      await _geminiSDK.installGeminiCLI(global: true);
-    }
+    // Ensure Gemini CLI is installed and up to date
+    await _geminiSDK.updateToNewestVersionIfNeeded(global: true);
 
     // Setup Puppeteer and its MCP integration
     await PuppeteerSetup.instance.setupIfNeeded(

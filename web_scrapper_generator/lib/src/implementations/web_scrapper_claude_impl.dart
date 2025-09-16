@@ -25,11 +25,8 @@ class WebScrapperClaudeImpl extends WebScrapperGeneratorController<ClaudeModel> 
     print('🚀 Initializing Claude SDK for web scraper generator...\n');
     _claudeSDK = Claude(claudeApiKey);
 
-    // Ensure Claude Code CLI is installed
-    final bool isInstalled = await _claudeSDK.isClaudeCodeSDKInstalled();
-    if (!isInstalled) {
-      await _claudeSDK.installClaudeCodeSDK(global: true);
-    }
+    // Ensure Claude Code CLI is installed and up to date
+    await _claudeSDK.updateToNewestVersionIfNeeded(global: true);
 
     // TODO: Setup Puppeteer and ScrapingBee MCP servers for Claude
     // Note: Claude uses a different MCP setup process than Gemini

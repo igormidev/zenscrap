@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.2.0
+
+### Added
+- **Auto-Update Functionality**: Added `updateToNewestVersionIfNeeded()` method
+  - Automatically checks for CLI updates
+  - Compares installed version with latest npm version
+  - Updates to newest version if available
+  - Falls back to reinstall if update fails
+
+### Improvements
+- Better version management for Codex CLI
+- Automatic handling of outdated installations
+- Improved error handling during updates
+
 ## 1.1.0
 
 ### Added

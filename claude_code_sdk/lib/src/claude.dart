@@ -111,6 +111,152 @@ class Claude {
     }
   }
 
+  /// Updates the Claude Code SDK to the newest version if needed
+  Future<void> updateToNewestVersionIfNeeded({bool global = true}) async {
+    // First check if CLI is installed
+    final isInstalled = await isClaudeCodeSDKInstalled();
+    if (!isInstalled) {
+      print('Claude Code SDK is not installed. Installing...');
+      await installClaudeCodeSDK(global: global);
+      return;
+    }
+
+    // Check if npm is installed
+    final npmInstalled = await _isNpmInstalled();
+    if (!npmInstalled) {
+      throw ClaudeSDKException(
+        'npm is not installed. Please install Node.js and npm first.\n'
+        'Visit https://nodejs.org/ to download and install Node.js.',
+      );
+    }
+
+    try {
+      // Get current installed version
+      final currentVersionResult = await Process.run(
+        _getShellCommand(),
+        _getShellArgs('claude --version'),
+      );
+
+      String currentVersion = '';
+      if (currentVersionResult.exitCode == 0) {
+        // Extract version number from output (e.g., "1.2.3" from "claude-code 1.2.3")
+        final output = currentVersionResult.stdout.toString().trim();
+        final versionMatch = RegExp(r'(\d+\.\d+\.\d+)').firstMatch(output);
+        if (versionMatch != null) {
+          currentVersion = versionMatch.group(1) ?? '';
+        }
+      }
+
+      // Get latest available version from npm
+      final latestVersionResult = await Process.run(
+        _getShellCommand(),
+        _getShellArgs('npm view @anthropic-ai/claude-code version'),
+      );
+
+      if (latestVersionResult.exitCode != 0) {
+        print('Failed to check for updates.');
+        return;
+      }
+
+      final latestVersion = latestVersionResult.stdout.toString().trim();
+
+      if (currentVersion.isEmpty) {
+        print('Could not determine current version. Reinstalling...');
+        await installClaudeCodeSDK(global: global);
+        return;
+      }
+
+      // Compare versions
+      if (_isNewerVersion(currentVersion, latestVersion)) {
+        print('Updating Claude Code SDK from v$currentVersion to v$latestVersion...');
+
+        final updateCommand = global
+            ? 'npm update -g @anthropic-ai/claude-code'
+            : 'npm update @anthropic-ai/claude-code';
+
+        final process = await Process.start(
+          _getShellCommand(),
+          _getShellArgs(updateCommand),
+        );
+
+        // Stream output to console
+        process.stdout.listen((data) {
+          stdout.write(String.fromCharCodes(data));
+        });
+
+        process.stderr.listen((data) {
+          stderr.write(String.fromCharCodes(data));
+        });
+
+        final exitCode = await process.exitCode;
+
+        if (exitCode != 0) {
+          print('Update failed. Attempting reinstall...');
+          await installClaudeCodeSDK(global: global);
+        } else {
+          print('\nClaude Code SDK updated successfully to v$latestVersion!');
+
+          // Also update Python SDK if needed
+          await _updatePythonSDKIfNeeded();
+        }
+      } else {
+        print('Claude Code SDK is up to date (v$currentVersion).');
+      }
+    } catch (e) {
+      print('Error checking for updates: $e');
+      print('You can manually update with: npm update -g @anthropic-ai/claude-code');
+    }
+  }
+
+  /// Helper method to compare version strings
+  bool _isNewerVersion(String current, String latest) {
+    try {
+      final currentParts = current.split('.').map(int.parse).toList();
+      final latestParts = latest.split('.').map(int.parse).toList();
+
+      for (int i = 0; i < 3; i++) {
+        final currentPart = i < currentParts.length ? currentParts[i] : 0;
+        final latestPart = i < latestParts.length ? latestParts[i] : 0;
+
+        if (latestPart > currentPart) return true;
+        if (latestPart < currentPart) return false;
+      }
+
+      return false;
+    } catch (e) {
+      // If version parsing fails, assume update is needed
+      return true;
+    }
+  }
+
+  /// Updates Python SDK if a newer version is available
+  Future<void> _updatePythonSDKIfNeeded() async {
+    try {
+      final pipInstalled = await _isPipInstalled();
+      if (!pipInstalled) {
+        return;
+      }
+
+      final pythonSdkInstalled = await _isPythonSDKInstalled();
+      if (!pythonSdkInstalled) {
+        return;
+      }
+
+      print('Checking Python SDK for updates...');
+
+      final result = await Process.run(
+        _getShellCommand(),
+        _getShellArgs('pip install --upgrade claude-code-sdk'),
+      );
+
+      if (result.exitCode == 0) {
+        print('Python SDK updated successfully.');
+      }
+    } catch (e) {
+      print('Could not update Python SDK: $e');
+    }
+  }
+
   /// Checks and installs Python SDK if needed
   Future<void> _checkAndInstallPythonSDK() async {
     print('\nChecking Python SDK...');

@@ -27,11 +27,8 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
     print('🚀 Initializing Codex SDK for web scraper generator...\n');
     _codexSDK = Codex(codexApiKey);
 
-    // Ensure Codex CLI is installed
-    final bool isInstalled = await _codexSDK.isCodexCLIInstalled();
-    if (!isInstalled) {
-      await _codexSDK.installCodexCLI(global: true);
-    }
+    // Ensure Codex CLI is installed and up to date
+    await _codexSDK.updateToNewestVersionIfNeeded(global: true);
 
     // Create adapter for MCP setup
     final adapter = CodexMcpAdapter(_codexSDK);

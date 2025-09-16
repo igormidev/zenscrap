@@ -35,7 +35,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  claude_code_sdk: ^2.0.0
+  claude_code_sdk: ^2.1.0
 ```
 
 Then run:
@@ -286,6 +286,25 @@ void main() async {
 }
 ```
 
+### Auto-Update SDK
+
+The SDK provides a convenient method to automatically check for and install updates:
+
+```dart
+void main() async {
+  final claudeSDK = Claude('YOUR_API_KEY');
+
+  // Automatically check for updates and install if needed
+  await claudeSDK.updateToNewestVersionIfNeeded(global: true);
+
+  // The function will:
+  // 1. Check if CLI is installed (installs if not)
+  // 2. Compare current version with latest npm version
+  // 3. Update if a newer version is available
+  // 4. Also updates Python SDK if installed
+}
+```
+
 ## MCP (Model Context Protocol) Support
 
 The SDK provides comprehensive support for MCP, allowing Claude to connect to external tools and services.
@@ -500,6 +519,7 @@ await claudeSDK.dispose(); // Disposes all active sessions
 - `createNewChat({ClaudeChatOptions? options})` - Creates a new chat session
 - `isClaudeCodeSDKInstalled()` - Checks if Claude Code CLI is installed
 - `installClaudeCodeSDK({bool global = true})` - Installs the Claude Code SDK
+- `updateToNewestVersionIfNeeded({bool global = true})` - Updates SDK to newest version if available
 - `getSDKInfo()` - Gets information about installed SDKs
 - `dispose()` - Disposes all active chat sessions
 

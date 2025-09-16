@@ -1,3 +1,18 @@
+## 2.1.0
+
+### New Features
+- **Auto-Update Functionality**: Added `updateToNewestVersionIfNeeded()` method
+  - Automatically checks for CLI updates
+  - Compares installed version with latest npm version
+  - Updates to newest version if available
+  - Also updates Python SDK if installed
+  - Falls back to reinstall if update fails
+
+### Improvements
+- Better version management for Claude Code CLI
+- Automatic handling of outdated installations
+- Improved error handling during updates
+
 ## 2.0.0
 
 ### Breaking Changes

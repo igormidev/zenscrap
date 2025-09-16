@@ -97,6 +97,121 @@ class GeminiSDK {
     }
   }
 
+  /// Updates the Gemini CLI to the newest version if needed
+  Future<void> updateToNewestVersionIfNeeded({bool global = true}) async {
+    // First check if CLI is installed
+    final isInstalled = await isGeminiCLIInstalled();
+    if (!isInstalled) {
+      print('Gemini CLI is not installed. Installing...');
+      await installGeminiCLI(global: global);
+      return;
+    }
+
+    // Check if npm is installed
+    final npmInstalled = await _isNpmInstalled();
+    if (!npmInstalled) {
+      throw GeminiSDKException(
+        'npm is not installed. Please install Node.js and npm first.\n'
+        'Visit https://nodejs.org/ to download and install Node.js.',
+      );
+    }
+
+    try {
+      // Get current installed version
+      final currentVersionResult = await Process.run(
+        _getShellCommand(),
+        _getShellArgs('gemini --version'),
+      );
+
+      String currentVersion = '';
+      if (currentVersionResult.exitCode == 0) {
+        // Extract version number from output (e.g., "1.2.3" from "gemini 1.2.3")
+        final output = currentVersionResult.stdout.toString().trim();
+        final versionMatch = RegExp(r'(\d+\.\d+\.\d+)').firstMatch(output);
+        if (versionMatch != null) {
+          currentVersion = versionMatch.group(1) ?? '';
+        }
+      }
+
+      // Get latest available version from npm
+      final latestVersionResult = await Process.run(
+        _getShellCommand(),
+        _getShellArgs('npm view @google/gemini-cli version'),
+      );
+
+      if (latestVersionResult.exitCode != 0) {
+        print('Failed to check for updates.');
+        return;
+      }
+
+      final latestVersion = latestVersionResult.stdout.toString().trim();
+
+      if (currentVersion.isEmpty) {
+        print('Could not determine current version. Reinstalling...');
+        await installGeminiCLI(global: global);
+        return;
+      }
+
+      // Compare versions
+      if (_isNewerVersion(currentVersion, latestVersion)) {
+        print('Updating Gemini CLI from v$currentVersion to v$latestVersion...');
+
+        final updateCommand = global
+            ? 'npm update -g @google/gemini-cli'
+            : 'npm update @google/gemini-cli';
+
+        final process = await Process.start(
+          _getShellCommand(),
+          _getShellArgs(updateCommand),
+        );
+
+        // Stream output to console
+        process.stdout.listen((data) {
+          stdout.write(String.fromCharCodes(data));
+        });
+
+        process.stderr.listen((data) {
+          stderr.write(String.fromCharCodes(data));
+        });
+
+        final exitCode = await process.exitCode;
+
+        if (exitCode != 0) {
+          print('Update failed. Attempting reinstall...');
+          await installGeminiCLI(global: global);
+        } else {
+          print('\nGemini CLI updated successfully to v$latestVersion!');
+        }
+      } else {
+        print('Gemini CLI is up to date (v$currentVersion).');
+      }
+    } catch (e) {
+      print('Error checking for updates: $e');
+      print('You can manually update with: npm update -g @google/gemini-cli');
+    }
+  }
+
+  /// Helper method to compare version strings
+  bool _isNewerVersion(String current, String latest) {
+    try {
+      final currentParts = current.split('.').map(int.parse).toList();
+      final latestParts = latest.split('.').map(int.parse).toList();
+
+      for (int i = 0; i < 3; i++) {
+        final currentPart = i < currentParts.length ? currentParts[i] : 0;
+        final latestPart = i < latestParts.length ? latestParts[i] : 0;
+
+        if (latestPart > currentPart) return true;
+        if (latestPart < currentPart) return false;
+      }
+
+      return false;
+    } catch (e) {
+      // If version parsing fails, assume update is needed
+      return true;
+    }
+  }
+
   /// Gets information about installed Gemini CLI
   Future<Map<String, dynamic>> getSDKInfo() async {
     final info = <String, dynamic>{};
