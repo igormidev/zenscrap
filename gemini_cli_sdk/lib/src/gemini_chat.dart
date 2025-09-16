@@ -82,8 +82,9 @@ class GeminiChat {
       return _parseSchemaResponse(response);
     } catch (firstError) {
       // If parsing fails, give the model a second chance with error context
-      print('Warning: First schema parsing attempt failed. Retrying with error context...');
-      
+      print(
+          'Warning: First schema parsing attempt failed. Retrying with error context...');
+
       try {
         // Build a retry prompt with error context
         final retryPrompt = await _buildRetrySchemaPrompt(
@@ -91,10 +92,10 @@ class GeminiChat {
           error: firstError,
           schema: schema,
         );
-        
+
         // Run the retry command
         final retryResponse = await _runGeminiCommand(retryPrompt);
-        
+
         // Try parsing the retry response
         try {
           return _parseSchemaResponse(retryResponse);
@@ -102,8 +103,8 @@ class GeminiChat {
           // If it still fails, throw the original error with additional context
           throw JSONDecodeException(
             'Failed to parse schema response after retry. '
-            'Original error: ${firstError.toString()}\n'
-            'Retry error: ${secondError.toString()}',
+                'Original error: ${firstError.toString()}\n'
+                'Retry error: ${secondError.toString()}',
             'First response: $response\nRetry response: $retryResponse',
             secondError,
           );
@@ -233,21 +234,22 @@ Return only raw json, without anything more (not even md notations like "```" in
     required SchemaObject schema,
   }) async {
     final schemaJson = jsonEncode(schema.toJson());
-    
+
     // Extract error details
     String errorMessage = error.toString();
     String errorDetails = '';
-    
+
     if (error is JSONDecodeException) {
       errorMessage = error.message;
       // Limit the raw content to prevent token overflow
-      final rawContent = error.rawContent.length > 500 
-          ? '${error.rawContent.substring(0, 500)}...' 
+      final rawContent = error.rawContent.length > 500
+          ? '${error.rawContent.substring(0, 500)}...'
           : error.rawContent;
       errorDetails = 'Your response: $rawContent';
     } else if (error is FormatException) {
       errorMessage = 'JSON format error: ${error.message}';
-      errorDetails = 'Invalid JSON at: ${error.source?.toString() ?? 'unknown position'}';
+      errorDetails =
+          'Invalid JSON at: ${error.source?.toString() ?? 'unknown position'}';
     }
 
     return '''[CRITICAL ERROR - RETRY REQUIRED]
@@ -300,9 +302,8 @@ Please now provide a corrected response that strictly follows the schema. Return
 
     // Check if we need to use stdin for prompt (when MCP servers are allowed)
     final usesStdin = (options.allowedMcpServerNames != null &&
-                       options.allowedMcpServerNames!.isNotEmpty) ||
-                      (options.allowedTools != null &&
-                       options.allowedTools!.isNotEmpty);
+            options.allowedMcpServerNames!.isNotEmpty) ||
+        (options.allowedTools != null && options.allowedTools!.isNotEmpty);
 
     if (!usesStdin) {
       // Add escaped prompt as positional argument
@@ -344,7 +345,6 @@ Please now provide a corrected response that strictly follows the schema. Return
         final stdout = await process.stdout.transform(utf8.decoder).join();
         final stderr = await process.stderr.transform(utf8.decoder).join();
         final exitCode = await process.exitCode;
-
 
         if (exitCode != 0) {
           throw ProcessException(
@@ -421,9 +421,8 @@ Please now provide a corrected response that strictly follows the schema. Return
 
     // Check if we need to use stdin for prompt (when MCP servers are allowed)
     final usesStdin = (options.allowedMcpServerNames != null &&
-                       options.allowedMcpServerNames!.isNotEmpty) ||
-                      (options.allowedTools != null &&
-                       options.allowedTools!.isNotEmpty);
+            options.allowedMcpServerNames!.isNotEmpty) ||
+        (options.allowedTools != null && options.allowedTools!.isNotEmpty);
 
     if (!usesStdin) {
       // Add escaped prompt as positional argument
@@ -549,7 +548,7 @@ Please now provide a corrected response that strictly follows the schema. Return
     try {
       // First, try to clean common formatting issues
       String cleanedResponse = response.trim();
-      
+
       // Remove markdown code blocks if present
       if (cleanedResponse.contains('```json')) {
         cleanedResponse = cleanedResponse.replaceAll(RegExp(r'```json\s*'), '');
@@ -557,7 +556,7 @@ Please now provide a corrected response that strictly follows the schema. Return
       } else if (cleanedResponse.contains('```')) {
         cleanedResponse = cleanedResponse.replaceAll(RegExp(r'```\s*'), '');
       }
-      
+
       // Try to extract JSON from the cleaned response
       // First try to parse the entire response as JSON
       try {
@@ -568,44 +567,46 @@ Please now provide a corrected response that strictly follows the schema. Return
         );
       } catch (_) {
         // If that fails, try to extract JSON using regex
-        final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(cleanedResponse);
-        
+        final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}')
+            .firstMatch(cleanedResponse);
+
         if (jsonMatch == null) {
           // Try one more time with a more permissive regex
-          final permissiveMatch = RegExp(r'\{[\s\S]*\}').firstMatch(cleanedResponse);
+          final permissiveMatch =
+              RegExp(r'\{[\s\S]*\}').firstMatch(cleanedResponse);
           if (permissiveMatch == null) {
             throw JSONDecodeException(
               'No JSON object found in response',
               response,
             );
           }
-          
+
           final jsonStr = permissiveMatch.group(0)!;
           final data = jsonDecode(jsonStr) as Map<String, dynamic>;
-          
+
           // Extract message if present
           String modelMessage = '';
           final messageIndex = cleanedResponse.indexOf(jsonStr);
           if (messageIndex > 0) {
             modelMessage = cleanedResponse.substring(0, messageIndex).trim();
           }
-          
+
           return SchemaResult(
             modelMessage: modelMessage,
             data: data,
           );
         }
-        
+
         final jsonStr = jsonMatch.group(0)!;
         final data = jsonDecode(jsonStr) as Map<String, dynamic>;
-        
+
         // Extract message if present
         String modelMessage = '';
         final messageIndex = cleanedResponse.indexOf(jsonStr);
         if (messageIndex > 0) {
           modelMessage = cleanedResponse.substring(0, messageIndex).trim();
         }
-        
+
         return SchemaResult(
           modelMessage: modelMessage,
           data: data,

@@ -47,7 +47,7 @@ void main() {
             pathParams: ['trainerSlug', 'trainerId'],
           ),
         ),
-        model: CodexModel.gptOss120b,
+        model: CodexModel.gpt5,
       );
 
       print('Sending message to Codex...\n');
