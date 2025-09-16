@@ -5,6 +5,7 @@ import 'package:web_scrapper_generator/src/web_scrapper_generator_interface.dart
 import 'package:web_scrapper_generator/src/web_scrapper_response.dart';
 import 'package:web_scrapper_generator/src/models/ai_models.dart';
 import '../puppeteer_setup.dart';
+import '../mcp_adapters.dart';
 
 /// Claude Code SDK implementation of the web scrapper generator
 class WebScrapperClaudeImpl extends WebScrapperGeneratorController<ClaudeModel> {
@@ -28,9 +29,17 @@ class WebScrapperClaudeImpl extends WebScrapperGeneratorController<ClaudeModel> 
     // Ensure Claude Code CLI is installed and up to date
     await _claudeSDK.updateToNewestVersionIfNeeded(global: true);
 
-    // TODO: Setup Puppeteer and ScrapingBee MCP servers for Claude
-    // Note: Claude uses a different MCP setup process than Gemini
-    // We'll need to adapt the MCP server configurations
+    // Create adapter for MCP setup
+    final adapter = ClaudeMcpAdapter(_claudeSDK);
+
+    // Setup Puppeteer MCP integration using the unified setup
+    await UnifiedPuppeteerSetup.instance.setupWithAdapter(
+      adapter,
+      proxyConfig: proxyConfig,
+    );
+
+    // Setup ScrapingBee MCP server using the unified setup
+    await UnifiedScrapingBeeSetup.instance.setupWithAdapter(adapter);
   }
 
   final ClaudeChat _chat;
@@ -51,8 +60,7 @@ class WebScrapperClaudeImpl extends WebScrapperGeneratorController<ClaudeModel> 
         systemPrompt: _convertSystemPromptForClaude(),
         model: model.apiName,
         timeoutMs: 180000, // 3 minutes timeout for Claude
-        // Claude MCP configuration will be different
-        // TODO: Configure MCP servers for Claude
+        // MCP servers are configured at SDK level in initClaude
       ),
     );
     
