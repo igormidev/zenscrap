@@ -7,9 +7,10 @@ import 'package:web_scrapper_generator/src/scraping_bee_mcp.dart';
 import '../puppeteer_setup.dart';
 
 /// Gemini implementation of the web scrapper generator
-class WebScrapperGeminiImpl extends WebScrapperGeneratorController<GeminiModel> {
+class WebScrapperGeminiImpl
+    extends WebScrapperGeneratorController<GeminiModel> {
   static late final GeminiSDK _geminiSDK;
-  
+
   /// Initialize the Gemini SDK and its MCP servers
   static Future<void> initGemini({
     required String geminiApiKey,
@@ -21,7 +22,7 @@ class WebScrapperGeminiImpl extends WebScrapperGeneratorController<GeminiModel> 
       scrappingBeeApiKey: scrappingBeeApiKey,
       proxyConfig: proxyConfig,
     );
-    
+
     print('🚀 Initializing Gemini SDK for web scraper generator...\n');
     _geminiSDK = GeminiSDK(geminiApiKey);
 
@@ -40,10 +41,8 @@ class WebScrapperGeminiImpl extends WebScrapperGeneratorController<GeminiModel> 
 
   final GeminiChat _chat;
 
-  WebScrapperGeminiImpl._(
-    InitialPayloadData initialPayload,
-    GeminiChat chat,
-  ) : _chat = chat,
+  WebScrapperGeminiImpl._(InitialPayloadData initialPayload, GeminiChat chat)
+    : _chat = chat,
       super(initialPayload: initialPayload);
 
   /// Factory method to create a new chat instance
@@ -61,10 +60,7 @@ class WebScrapperGeminiImpl extends WebScrapperGeneratorController<GeminiModel> 
       ),
     );
 
-    final instance = WebScrapperGeminiImpl._(
-      initialPayload,
-      chat,
-    );
+    final instance = WebScrapperGeminiImpl._(initialPayload, chat);
     return instance;
   }
 
@@ -112,4 +108,14 @@ class WebScrapperGeminiImpl extends WebScrapperGeneratorController<GeminiModel> 
   Future<void> dispose() async {
     await _chat.dispose();
   }
+}
+
+class AsyncClaudeSdkResponse {
+  final String llmMessage;
+  final Map<String, dynamic> structuredSchemaData;
+
+  const AsyncClaudeSdkResponse({
+    required this.llmMessage,
+    required this.structuredSchemaData,
+  });
 }
