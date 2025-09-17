@@ -1,0 +1,17 @@
+{
+    "player_name": {
+        "selector": "h1.data-header__headline-wrapper",
+        "type": "item",
+        "output": "text"
+    },
+    "club_name": {
+        "selector": ".data-header__club a",
+        "type": "item",
+        "output": "text"
+    },
+    "club_image": {
+        "selector": ".data-header__badge img",
+        "type": "item",
+        "output": "@src"
+    }
+}

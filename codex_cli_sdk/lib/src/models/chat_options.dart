@@ -75,10 +75,13 @@ class CodexChatOptions {
     // Mode selection - only full-auto is supported by Codex CLI
     if (mode != null && mode == 'full-auto') {
       args.add('--full-auto');
+    } else {
+      // Default to workspace-write sandbox for file operations
+      args.addAll(['--sandbox', 'workspace-write']);
     }
 
     if (model != null) {
-      args.addAll(['--model', model!]);
+      args.addAll(['-m', model!]);
     }
 
     // Note: Codex CLI doesn't support --reasoning-effort flag
@@ -93,24 +96,30 @@ class CodexChatOptions {
     }
 
     if (cwd != null) {
-      // Codex uses --cd instead of --cwd
-      args.addAll(['--cd', cwd!]);
+      // Codex uses -C for working directory
+      args.addAll(['-C', cwd!]);
     }
 
     // Note: Codex exec doesn't support --quiet, --json, --continue, or --resume flags
     // These features would need to be handled differently or removed
 
+    // Note: Codex uses -c for configuration overrides, not file paths
+    // The config file is loaded from ~/.codex/config.toml automatically
     if (configPath != null) {
-      args.addAll(['--config', configPath!]);
+      // This would need special handling - Codex doesn't support custom config paths
+      // We'll skip this for now
     }
 
     if (maxTurns != null) {
       args.addAll(['-c', 'max_turns=$maxTurns']);
     }
 
-    if (systemPrompt != null) {
-      // Using the -c flag to override config temporarily
-      args.addAll(['-c', 'system_prompt="${systemPrompt!}"']);
+    // Note: System prompts can be very long and may cause issues with command line length limits
+    // Consider including them in the user message instead
+    if (systemPrompt != null && systemPrompt!.length < 500) {
+      // Only add short system prompts via -c flag
+      final escapedPrompt = systemPrompt!.replaceAll('"', '\\"').replaceAll('\n', '\\n');
+      args.addAll(['-c', 'system_prompt="$escapedPrompt"']);
     }
 
     // Note: Codex exec doesn't support --allow-dir flag

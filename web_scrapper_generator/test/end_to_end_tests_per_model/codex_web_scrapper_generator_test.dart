@@ -86,6 +86,8 @@ Fetch settings used:
 }''',
       });
 
+      expect(result, isA<WebScrapperChatAIResponseWithDataResponse>());
+
       // Clean up
       await codexChat.dispose();
     },

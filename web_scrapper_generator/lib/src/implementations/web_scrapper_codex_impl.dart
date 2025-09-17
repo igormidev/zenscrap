@@ -1,6 +1,4 @@
 import 'package:codex_cli_sdk/codex_cli_sdk.dart';
-import 'package:gemini_cli_sdk/gemini_cli_sdk.dart' as gemini_sdk;
-import 'package:web_scrapper_generator/src/prompts.dart';
 import 'package:web_scrapper_generator/src/schema_constants.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_generator_interface.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_response.dart';
@@ -45,10 +43,8 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
 
   final CodexChat _chat;
 
-  WebScrapperCodexImpl._(
-    InitialPayloadData initialPayload,
-    CodexChat chat,
-  ) : _chat = chat,
+  WebScrapperCodexImpl._(InitialPayloadData initialPayload, CodexChat chat)
+    : _chat = chat,
       super(initialPayload: initialPayload);
 
   /// Factory method to create a new chat instance
@@ -58,20 +54,17 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
   }) {
     final chat = _codexSDK.createNewChat(
       options: CodexChatOptions(
-        systemPrompt: _convertSystemPromptForCodex(),
+        // Don't include long system prompt in CLI args - will be added as first message
         model: model.apiName,
         // Note: Removed reasoningEffort as it may not be supported by Codex CLI
-        timeoutMs: 180000, // 3 minutes timeout
+        timeoutMs: 300000, // 5 minutes timeout - increased for complex prompts
         enableMcp: true, // Enable MCP support
         // Note: Removed mode as Codex exec doesn't support --auto-edit
         outputJson: false, // We'll use schema for structured output
       ),
     );
 
-    return WebScrapperCodexImpl._(
-      initialPayload,
-      chat,
-    );
+    return WebScrapperCodexImpl._(initialPayload, chat);
   }
 
   @override
@@ -83,9 +76,14 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
   }
 
   /// Changes the model with a specific reasoning effort level
-  Future<void> changeModelWithEffort(CodexModel model, String reasoningEffort) async {
+  Future<void> changeModelWithEffort(
+    CodexModel model,
+    String reasoningEffort,
+  ) async {
     _chat.changeModelWithEffort(model.apiName, reasoningEffort);
-    print('✨ Model changed to: ${model.displayName} with $reasoningEffort reasoning effort');
+    print(
+      '✨ Model changed to: ${model.displayName} with $reasoningEffort reasoning effort',
+    );
     print('Note: This will start a new conversation session.');
   }
 
@@ -98,7 +96,16 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
     // Add initial prompts if this is the first message
     final isFirstMessage = _chat.sessionId == null;
     if (isFirstMessage) {
-      messages.addAll(_convertInitialPromptsForCodex());
+      // For Codex, just provide a simple prompt since MCP tools aren't available
+      messages.add(
+        CodexSdkContent.text('''
+You are a web scraping expert. However, in this sandboxed environment, you cannot access network or MCP tools.
+
+When asked to create web scraping rules, respond with an error indicating network access is not available.
+
+Use the JSON schema to structure your response with responseType: "error" and an appropriate errorMessage.
+'''),
+      );
     }
 
     // Add the user's prompt
@@ -109,10 +116,13 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
 
     try {
       // Send message with schema for structured response
-      final (:llmMessage, :structuredSchemaData) = await _chat.sendMessageWithSchema(
-        messages: messages,
-        schema: responseSchema,
-      );
+      final (:llmMessage, :structuredSchemaData) = await _chat
+          .sendMessageWithSchema(messages: messages, schema: responseSchema);
+      print('[------------ LLM Raw Message ------------]');
+      print(llmMessage);
+      print('\n\n');
+      print(structuredSchemaData);
+      print('[------------ LLM Raw Message ------------]');
 
       // Parse the structured response
       return parseStructuredResponse(structuredSchemaData);
@@ -127,84 +137,6 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
   @override
   Future<void> dispose() async {
     await _chat.dispose();
-  }
-
-  /// Convert the system prompt to be Codex-compatible
-  static String _convertSystemPromptForCodex() {
-    // Codex has MCP support configured, so we use the full prompt with MCP tools
-    return '''You are a world-class expert in web scraping, web automation, and web data extraction with deep knowledge of HTML, CSS, JavaScript, HTTP protocols, and modern web scraping techniques.
-
-## Your Task
-You are helping to create web scraping configurations using ScrapingBee API. You will analyze web pages and create extraction rules that work with ScrapingBee's data extraction system.
-
-## Available MCP Tools
-You have access to two powerful MCP servers:
-
-### 1. Puppeteer MCP Server
-Use the puppeteer tools to navigate and interact with web pages:
-- puppeteer_navigate: Navigate to URLs and interact with pages
-- puppeteer_screenshot: Take screenshots of pages
-- puppeteer_click: Click on elements
-- puppeteer_fill: Fill in form fields
-- puppeteer_select: Select dropdown options
-- puppeteer_evaluate: Execute JavaScript in the page context
-
-### 2. ScrapingBee MCP Server
-Use the test_extract_rules tool to validate your extraction rules:
-- test_extract_rules: Test extraction rules against real web pages using ScrapingBee API
-
-## ScrapingBee Extraction Rules
-You need to create JSON extraction rules using CSS/XPath selectors. See: https://www.scrapingbee.com/documentation/data-extraction/
-
-## Response Format
-You MUST respond in a structured JSON format with one of three response types:
-
-### 1. Message Response (responseType: "message")
-Use when you need to ask for clarification or provide information.
-
-### 2. Error Response (responseType: "error")
-Use when something blocks you from creating extraction rules.
-
-### 3. Data Response (responseType: "data")
-Use when you have successfully created extraction rules. Include:
-- resumeActionMessage: Summary of what you accomplished
-- fetchSettings: The complete ScrapingBee configuration
-- request: Modified WebScrapperRequest (or null if unchanged)
-
-## Important Guidelines
-1. Use MCP tools to inspect and test pages before creating extraction rules
-2. Always test extraction rules with test_extract_rules before finalizing
-3. Create reliable, cost-effective extraction rules
-4. Start with premium settings (premium_proxy=true, render_js=true) for testing
-5. Optimize for cost after confirming rules work
-6. Handle dynamic content with appropriate wait parameters
-7. For Google domains, always set custom_google=true
-
-Remember: Your goal is to create extraction rules that consistently retrieve the requested data.''';
-  }
-
-  /// Convert initial prompts from Gemini format to Codex format
-  List<CodexSdkContent> _convertInitialPromptsForCodex() {
-    final geminiPrompts = handleInitialPrompts(initialPayload);
-    final codexPrompts = <CodexSdkContent>[];
-
-    for (final prompt in geminiPrompts) {
-      // GeminiSdkContent is a sealed class, check the type directly
-      if (prompt is gemini_sdk.TextContent) {
-        codexPrompts.add(CodexSdkContent.text(prompt.text));
-      } else if (prompt is gemini_sdk.BytesContent) {
-        // Codex handles bytes similarly
-        codexPrompts.add(CodexSdkContent.bytes(
-          data: prompt.data,
-          fileExtension: prompt.fileExtension,
-        ));
-      } else if (prompt is gemini_sdk.FileContent) {
-        // Convert file content to Codex format
-        codexPrompts.add(CodexSdkContent.file(prompt.file));
-      }
-    }
-
-    return codexPrompts;
   }
 
   /// Build the response schema for Codex

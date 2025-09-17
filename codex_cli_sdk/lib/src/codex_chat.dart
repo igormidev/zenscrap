@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math' as math;
 import 'package:path/path.dart' as path;
 import 'package:uuid/uuid.dart';
 
@@ -54,6 +55,7 @@ class CodexChat {
     // Build command arguments
     final args = _buildCommandArgs(message);
 
+
     try {
       // Run the command
       final result = await Process.run(
@@ -105,43 +107,40 @@ class CodexChat {
       throw CodexSDKException('Schema must be of type "object"');
     }
 
-    // Create temporary JSON file for schema output
-    final tempJsonFile = await _createSchemaOutputFile();
-
     try {
-      // Build the prompt with file-based instructions
-      final filePrompt = await _buildSchemaFilePrompt(
+      // Build the prompt with direct JSON response instructions
+      final directPrompt = await _buildDirectSchemaPrompt(
         messages: messages,
         schema: schema,
-        tempFile: tempJsonFile,
       );
 
       // Send message to Codex
-      final response = await sendMessage([CodexSdkContent.text(filePrompt)]);
+      final response = await sendMessage([CodexSdkContent.text(directPrompt)]);
 
-      // Read and parse the JSON file content with retries
+      // Parse JSON directly from the response with retries
       Map<String, dynamic> structuredData;
       try {
-        structuredData = await _parseJsonFileContent(tempJsonFile);
+        structuredData = _parseJsonFromResponse(response);
       } catch (firstJsonError) {
         // Retry with error feedback
         print(
             'Warning: First JSON parsing attempt failed. Retrying with error context...');
+        print('[DEBUG] First parse error: $firstJsonError');
 
-        final retryPrompt = await _buildJsonRetryPrompt(
+        final retryPrompt = _buildDirectJsonRetryPrompt(
+          originalResponse: response,
           originalError: firstJsonError,
-          tempFile: tempJsonFile,
         );
 
-        await sendMessage([CodexSdkContent.text(retryPrompt)]);
+        final retryResponse = await sendMessage([CodexSdkContent.text(retryPrompt)]);
 
         // Try parsing again
         try {
-          structuredData = await _parseJsonFileContent(tempJsonFile);
+          structuredData = _parseJsonFromResponse(retryResponse);
         } catch (secondJsonError) {
           // If JSON parsing still fails, try schema validation retry
           throw JSONDecodeException(
-            'Failed to parse JSON file after retry',
+            'Failed to parse JSON after retry',
             'JSON parsing errors: $firstJsonError, $secondJsonError',
             secondJsonError,
           );
@@ -156,18 +155,17 @@ class CodexChat {
         print(
             'Warning: Schema validation failed. Retrying with error context...');
 
-        final retryPrompt = await _buildSchemaRetryPrompt(
+        final retryPrompt = _buildDirectSchemaRetryPrompt(
           originalResponse: structuredData,
           error: firstSchemaError,
           schema: schema,
-          tempFile: tempJsonFile,
         );
 
-        await sendMessage([CodexSdkContent.text(retryPrompt)]);
+        final retryResponse = await sendMessage([CodexSdkContent.text(retryPrompt)]);
 
         // Try parsing and validating again
         try {
-          structuredData = await _parseJsonFileContent(tempJsonFile);
+          structuredData = _parseJsonFromResponse(retryResponse);
           _validateSchemaResponse(structuredData, schema);
         } catch (secondSchemaError) {
           throw JSONDecodeException(
@@ -183,9 +181,9 @@ class CodexChat {
         llmMessage: response,
         structuredSchemaData: structuredData,
       );
-    } finally {
-      // Clean up temporary file
-      await _cleanupTempFile(tempJsonFile);
+    } catch (e) {
+      // Re-throw the exception
+      rethrow;
     }
   }
 
@@ -399,10 +397,8 @@ class CodexChat {
       }
     }
 
-    // Add resume session if we have a session ID
-    if (_sessionId != null && options?.continueLastSession != true) {
-      args.addAll(['--session', _sessionId!]);
-    }
+    // Note: Codex exec doesn't support sessions - each execution is independent
+    // Sessions are only available in interactive mode, not exec mode
 
     // Add the message as the last argument
     args.add(message);
@@ -463,138 +459,234 @@ class CodexChat {
   /// Annotation for testing visibility
   static const visibleForTesting = _VisibleForTesting();
 
-  // New helper methods for file-based schema handling
+  // Helper methods for direct schema handling
 
-  /// Creates a temporary JSON file for schema output
-  Future<File> _createSchemaOutputFile() async {
-    final tempDir = Directory.systemTemp;
-    final fileName = 'codex_schema_${_uuid.v4()}.json';
-    final tempFile = File(path.join(tempDir.path, fileName));
-
-    // Create empty JSON object as initial content
-    await tempFile.writeAsString('{}');
-    _tempFiles.add(tempFile);
-
-    return tempFile;
-  }
-
-  /// Builds the prompt for file-based schema output
-  Future<String> _buildSchemaFilePrompt({
+  /// Builds the prompt for direct JSON schema output
+  Future<String> _buildDirectSchemaPrompt({
     required List<CodexSdkContent> messages,
     required SchemaObject schema,
-    required File tempFile,
   }) async {
     final userPrompt = await _prepareMessage(messages);
     final schemaJson = jsonEncode(schema.toJson());
 
     return '''[STRUCTURED OUTPUT REQUEST]
 
-IMPORTANT INSTRUCTIONS:
-1. You must write your structured response to the file: ${tempFile.absolute.path}
-2. The file must contain ONLY valid JSON matching the schema below
-3. Do NOT include the JSON in your text response
-4. Your text response should summarize what you did and found
+IMPORTANT: You must respond with valid JSON that matches the schema below.
 
 ==== JSON SCHEMA SPECIFICATION ====
 $schemaJson
 ==== END OF SCHEMA ====
 
-==== FILE OUTPUT RULES ====
-- Write ONLY valid JSON to the file (no markdown, no comments, no extra text)
-- Ensure all required fields are present with correct types
-- Use null for optional fields that have no value
-- Arrays must contain items of the specified type
-- Property names must match exactly (case-sensitive)
-==== END OF RULES ====
+==== OUTPUT FORMAT ====
+Your response MUST contain a valid JSON object somewhere in your response.
+The JSON should be properly formatted and complete.
+You can include explanatory text before or after the JSON, but the JSON itself must be valid and complete.
+
+Example format:
+Here is the structured response:
+```json
+{
+  "field1": "value1",
+  "field2": "value2"
+}
+```
+==== END OF FORMAT ====
 
 ==== USER REQUEST ====
 $userPrompt
 ==== END OF REQUEST ====
 
-Now process the request and:
-1. Write the structured JSON data to: ${tempFile.absolute.path}
-2. Provide a summary of your findings in your text response
-
-Remember: The JSON goes in the file, so WRITE IT IN the file, NOT in your response text.''';
+Process this request and provide the structured JSON response.''';
   }
 
-  /// Parses JSON content from a file
-  Future<Map<String, dynamic>> _parseJsonFileContent(File file) async {
-    if (!file.existsSync()) {
-      throw CodexSDKException(
-          'Schema output file does not exist: ${file.path}');
+
+  /// Parses JSON directly from response text
+  Map<String, dynamic> _parseJsonFromResponse(String response) {
+    // Codex response format:
+    // [timestamp] OpenAI Codex version...
+    // --------
+    // metadata...
+    // --------
+    // [timestamp] User instructions:
+    // ... user prompt ...
+    // [timestamp] thinking (optional)
+    // ... thinking content ...
+    // [timestamp] codex
+    // ... actual AI response with JSON ...
+    // [timestamp] tokens used: ...
+
+    // Find where the actual AI response starts
+    // Look for the last occurrence of a line like "[timestamp] codex"
+    // The content after this is the actual response
+
+    final lines = response.split('\n');
+    int responseStartIndex = -1;
+
+    // Find all "[timestamp] codex" lines
+    final codexLineIndices = <int>[];
+    for (int i = 0; i < lines.length; i++) {
+      if (RegExp(r'^\[\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\]\s+codex\s*$').hasMatch(lines[i])) {
+        codexLineIndices.add(i);
+      }
     }
 
-    final content = await file.readAsString();
-    if (content.trim().isEmpty) {
-      throw CodexSDKException('Schema output file is empty');
+    // Try to find the last codex block that contains actual content
+    for (int idx = codexLineIndices.length - 1; idx >= 0; idx--) {
+      int codexLineIdx = codexLineIndices[idx];
+
+      // Look for content after this codex line
+      for (int j = codexLineIdx + 1; j < lines.length; j++) {
+        final line = lines[j].trim();
+
+        // Stop at the next timestamp or "tokens used"
+        if (line.startsWith('[') && line.contains(']')) break;
+        if (line.contains('tokens used:')) break;
+
+        // Skip empty lines and reasoning blocks
+        if (line.isEmpty) continue;
+        if (line.startsWith('**') && line.endsWith('**')) continue;
+
+        // Found actual content
+        responseStartIndex = j;
+        break;
+      }
+
+      if (responseStartIndex >= 0) break;
+    }
+
+    String cleanedResponse;
+    if (responseStartIndex >= 0) {
+      // Extract from the response start to the end or until "tokens used"
+      final responseLines = <String>[];
+      for (int i = responseStartIndex; i < lines.length; i++) {
+        // Stop at "tokens used" line
+        if (lines[i].contains('tokens used:')) {
+          break;
+        }
+        responseLines.add(lines[i]);
+      }
+      cleanedResponse = responseLines.join('\n').trim();
+    } else {
+      // Fallback: try to find JSON in the entire response
+      cleanedResponse = response;
+    }
+
+
+    // Try multiple strategies to find JSON
+
+    String? jsonStr;
+
+    // Strategy 1: Look for markdown-wrapped JSON
+    final markdownJsonPattern = RegExp(r'```(?:json)?\s*\n?([\s\S]*?)\n?```');
+    final markdownMatches = markdownJsonPattern.allMatches(cleanedResponse);
+
+    for (final match in markdownMatches) {
+      final candidateJson = match.group(1)?.trim();
+      if (candidateJson != null && candidateJson.startsWith('{')) {
+        jsonStr = candidateJson;
+        break;
+      }
+    }
+
+    // Strategy 2: Look for raw JSON object
+    if (jsonStr == null || jsonStr.isEmpty) {
+      // Find all potential JSON start positions
+      final jsonStarts = <int>[];
+      for (int i = 0; i < cleanedResponse.length; i++) {
+        if (cleanedResponse[i] == '{') {
+          jsonStarts.add(i);
+        }
+      }
+
+      // Try each potential start position
+      for (final startIdx in jsonStarts) {
+        int braceCount = 0;
+        for (int i = startIdx; i < cleanedResponse.length; i++) {
+          if (cleanedResponse[i] == '{') braceCount++;
+          if (cleanedResponse[i] == '}') braceCount--;
+
+          if (braceCount == 0 && i > startIdx) {
+            final candidate = cleanedResponse.substring(startIdx, i + 1);
+            // Try to parse it to verify it's valid JSON
+            try {
+              final test = jsonDecode(candidate);
+              if (test is Map<String, dynamic>) {
+                jsonStr = candidate;
+                break;
+              }
+            } catch (_) {
+              // Not valid JSON, try next candidate
+              continue;
+            }
+          }
+        }
+        if (jsonStr != null) break;
+      }
+    }
+
+    if (jsonStr == null || jsonStr.isEmpty) {
+      throw JSONDecodeException(
+        'No JSON found in response',
+        'Could not find JSON in cleaned response. Response start: ${cleanedResponse.substring(0, math.min(500, cleanedResponse.length))}...',
+        null,
+      );
     }
 
     try {
-      final parsed = jsonDecode(content);
-      if (parsed is! Map<String, dynamic>) {
-        throw CodexSDKException('JSON content is not an object');
+      final decoded = jsonDecode(jsonStr);
+      if (decoded is! Map<String, dynamic>) {
+        throw JSONDecodeException(
+          'JSON is not an object',
+          'Expected JSON object, got ${decoded.runtimeType}',
+          null,
+        );
       }
-      return parsed;
+      return decoded;
     } catch (e) {
-      if (e is CodexSDKException) rethrow;
       throw JSONDecodeException(
-        'Failed to parse JSON from file',
-        content,
+        'Failed to parse JSON',
+        'JSON parsing error: $e\nJSON string: ${jsonStr.substring(0, math.min(500, jsonStr.length))}...',
         e,
       );
     }
   }
 
-  /// Builds a retry prompt for JSON parsing errors
-  Future<String> _buildJsonRetryPrompt({
+  /// Builds a retry prompt for direct JSON parsing errors
+  String _buildDirectJsonRetryPrompt({
+    required String originalResponse,
     required dynamic originalError,
-    required File tempFile,
-  }) async {
-    String errorDetails = originalError.toString();
-    String fileContent = '';
-
-    try {
-      fileContent = await tempFile.readAsString();
-    } catch (_) {
-      fileContent = '<unable to read file>';
-    }
-
+  }) {
     return '''[JSON PARSING ERROR - CORRECTION REQUIRED]
 
-The JSON file you created has syntax errors and cannot be parsed.
+Your previous response could not be parsed as valid JSON.
 
-ERROR: $errorDetails
+ERROR: ${originalError.toString()}
 
-FILE CONTENT:
-$fileContent
+YOUR RESPONSE:
+${originalResponse.substring(0, math.min(500, originalResponse.length))}...
 
-COMMON JSON ERRORS TO CHECK:
+COMMON JSON ISSUES TO FIX:
 1. Missing or extra commas
-2. Unclosed brackets or braces
-3. Unquoted property names
-4. Single quotes instead of double quotes
-5. Trailing commas in arrays or objects
-6. Invalid escape sequences in strings
+2. Unescaped quotes in strings (use ")
+3. Trailing commas before closing brackets
+4. Missing closing brackets or braces
+5. Invalid escape sequences
 
-Please fix the JSON syntax in the file: ${tempFile.absolute.path}
-
-Write ONLY valid JSON to the file. Do not include any markdown formatting or comments.''';
+Please provide a corrected response with VALID JSON that can be parsed.''';
   }
 
-  /// Builds a retry prompt for schema validation errors
-  Future<String> _buildSchemaRetryPrompt({
+  /// Builds a retry prompt for direct schema validation errors
+  String _buildDirectSchemaRetryPrompt({
     required Map<String, dynamic> originalResponse,
     required dynamic error,
     required SchemaObject schema,
-    required File tempFile,
-  }) async {
+  }) {
     final schemaJson = jsonEncode(schema.toJson());
     final responseJson = jsonEncode(originalResponse);
 
     return '''[SCHEMA VALIDATION ERROR - CORRECTION REQUIRED]
 
-Your JSON structure does not match the required schema.
+Your JSON does not match the required schema.
 
 ERROR: ${error.toString()}
 
@@ -604,16 +696,7 @@ $responseJson
 REQUIRED SCHEMA:
 $schemaJson
 
-VALIDATION ISSUES TO FIX:
-1. Check that all required fields are present
-2. Verify field types match the schema (string, number, boolean, etc.)
-3. Ensure property names match exactly (case-sensitive)
-4. Arrays must contain items of the correct type
-5. Nested objects must match their schema definitions
-
-Please correct the JSON in the file: ${tempFile.absolute.path}
-
-Make sure the JSON structure exactly matches the schema requirements.''';
+Please provide corrected JSON that matches the schema exactly.''';
   }
 
   /// Validates that the response matches the schema
@@ -673,8 +756,9 @@ Make sure the JSON structure exactly matches the schema requirements.''';
           throw CodexSDKException(
               'Field "$fieldName" must be an array, got ${value.runtimeType}');
         }
+        // Validate array items if items schema is provided
         if (property.items != null) {
-          for (int i = 0; i < value.length; i++) {
+          for (var i = 0; i < value.length; i++) {
             _validateFieldType('$fieldName[$i]', value[i], property.items!);
           }
         }
@@ -684,36 +768,20 @@ Make sure the JSON structure exactly matches the schema requirements.''';
           throw CodexSDKException(
               'Field "$fieldName" must be an object, got ${value.runtimeType}');
         }
+        // Validate nested object properties if provided
         if (property.properties != null) {
-          property.properties!.forEach((subKey, subProperty) {
-            if (value.containsKey(subKey) && value[subKey] != null) {
-              _validateFieldType(
-                  '$fieldName.$subKey', value[subKey], subProperty);
-            } else if (!subProperty.nullable) {
-              throw CodexSDKException(
-                  'Required field "$fieldName.$subKey" is missing');
-            }
-          });
+          _validateSchemaResponse(value, SchemaObject(
+            properties: property.properties!,
+            description: property.description,
+          ));
         }
         break;
     }
   }
 
-  /// Cleans up a temporary file safely
-  Future<void> _cleanupTempFile(File file) async {
-    try {
-      if (file.existsSync()) {
-        await file.delete();
-        _tempFiles.remove(file);
-      }
-    } catch (e) {
-      // Log but don't throw - cleanup errors shouldn't break the flow
-      print('Warning: Failed to delete temp file ${file.path}: $e');
-    }
-  }
 }
 
-/// Annotation to mark members that are only visible for testing
+/// Annotation class for visible for testing
 class _VisibleForTesting {
   const _VisibleForTesting();
 }

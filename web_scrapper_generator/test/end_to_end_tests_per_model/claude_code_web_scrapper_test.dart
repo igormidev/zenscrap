@@ -56,7 +56,7 @@ void main() {
             'This is a player page. Extract the player name, his current club name and also the current club image url',
       );
       print('Response:\n');
-      print(switch (result) {
+      final String response = switch (result) {
         WebScrapperChatAIResponseJustMessage(:final String message) => message,
         WebScrapperChatAIResponseErrorMessage(:final String errorDescription) =>
           errorDescription,
@@ -84,11 +84,15 @@ Fetch settings used:
   'session_id': ${fetchSettings.session_id},
   'custom_google': ${fetchSettings.custom_google},
 }''',
-      });
+      };
+
+      print(response);
+
+      expect(result, isA<WebScrapperChatAIResponseWithDataResponse>());
 
       // Clean up
       await claudeChat.dispose();
     },
-    timeout: const Timeout(Duration(minutes: 6)),
+    timeout: const Timeout(Duration(minutes: 10)),
   );
 }
