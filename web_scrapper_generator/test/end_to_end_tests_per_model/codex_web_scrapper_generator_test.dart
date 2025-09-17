@@ -85,6 +85,10 @@ Fetch settings used:
   'custom_google': ${fetchSettings.custom_google},
 }''',
       });
+      if (result is! WebScrapperChatAIResponseWithDataResponse) {
+        await codexChat.dispose();
+        throw result;
+      }
 
       expect(result, isA<WebScrapperChatAIResponseWithDataResponse>());
 

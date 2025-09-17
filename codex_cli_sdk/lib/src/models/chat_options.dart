@@ -49,6 +49,13 @@ class CodexChatOptions {
   /// Controls the depth of reasoning for the model
   final String? reasoningEffort;
 
+  /// Sandbox mode for controlling access permissions
+  /// Options: 'read-only', 'workspace-write', 'danger-full-access'
+  /// - 'read-only': Can only read files, no write or network access
+  /// - 'workspace-write': Can read/write files in workspace, no network access (default)
+  /// - 'danger-full-access': Full access including network, file system, and shell commands
+  final String? sandbox;
+
   const CodexChatOptions({
     this.systemPrompt,
     this.maxTurns,
@@ -66,6 +73,7 @@ class CodexChatOptions {
     this.allowedDirectories,
     this.configPath,
     this.reasoningEffort,
+    this.sandbox,
   });
 
   /// Converts options to command line arguments
@@ -76,8 +84,9 @@ class CodexChatOptions {
     if (mode != null && mode == 'full-auto') {
       args.add('--full-auto');
     } else {
-      // Default to workspace-write sandbox for file operations
-      args.addAll(['--sandbox', 'workspace-write']);
+      // Use provided sandbox mode or default to workspace-write
+      final sandboxMode = sandbox ?? 'workspace-write';
+      args.addAll(['--sandbox', sandboxMode]);
     }
 
     if (model != null) {
@@ -146,6 +155,7 @@ class CodexChatOptions {
     List<String>? allowedDirectories,
     String? configPath,
     String? reasoningEffort,
+    String? sandbox,
   }) {
     return CodexChatOptions(
       systemPrompt: systemPrompt ?? this.systemPrompt,
@@ -164,6 +174,7 @@ class CodexChatOptions {
       allowedDirectories: allowedDirectories ?? this.allowedDirectories,
       configPath: configPath ?? this.configPath,
       reasoningEffort: reasoningEffort ?? this.reasoningEffort,
+      sandbox: sandbox ?? this.sandbox,
     );
   }
 }

@@ -76,6 +76,18 @@ void run(List<String> args) async {
     scrappingBeeApiKey: scrapingBeeApiKey ?? '',
     proxyConfig: proxyConfig,
   );
+  // Initialize Codex implementation
+  await WebScrapperCodexImpl.initCodex(
+    codexApiKey: pod.getPassword('openAiApiKey') ?? '',
+    scrappingBeeApiKey: scrapingBeeApiKey ?? '',
+    proxyConfig: proxyConfig,
+  );
+  // Initialize Claude implementation
+  await WebScrapperClaudeImpl.initClaude(
+    claudeApiKey: pod.getPassword('claudeApiKey') ?? '',
+    scrappingBeeApiKey: scrapingBeeApiKey ?? '',
+    proxyConfig: proxyConfig,
+  );
 
   // Initialize Claude implementation (if Claude API key is available)
   final claudeApiKey = pod.getPassword('claudeApiKey');

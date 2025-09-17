@@ -1,4 +1,6 @@
 import 'package:codex_cli_sdk/codex_cli_sdk.dart';
+import 'package:gemini_cli_sdk/gemini_cli_sdk.dart' as gemini_sdk;
+import 'package:web_scrapper_generator/src/prompts.dart';
 import 'package:web_scrapper_generator/src/schema_constants.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_generator_interface.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_response.dart';
@@ -52,7 +54,7 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
     required InitialPayloadData initialPayload,
     CodexModel model = CodexModel.gptOss120b,
   }) {
-    final chat = _codexSDK.createNewChat(
+    final CodexChat chat = _codexSDK.createNewChat(
       options: CodexChatOptions(
         // Don't include long system prompt in CLI args - will be added as first message
         model: model.apiName,
@@ -61,6 +63,7 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
         enableMcp: true, // Enable MCP support
         // Note: Removed mode as Codex exec doesn't support --auto-edit
         outputJson: false, // We'll use schema for structured output
+        sandbox: 'danger-full-access', // Enable full network access
       ),
     );
 
@@ -96,16 +99,11 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
     // Add initial prompts if this is the first message
     final isFirstMessage = _chat.sessionId == null;
     if (isFirstMessage) {
-      // For Codex, just provide a simple prompt since MCP tools aren't available
+      // Include system context and initial prompts
       messages.add(
-        CodexSdkContent.text('''
-You are a web scraping expert. However, in this sandboxed environment, you cannot access network or MCP tools.
-
-When asked to create web scraping rules, respond with an error indicating network access is not available.
-
-Use the JSON schema to structure your response with responseType: "error" and an appropriate errorMessage.
-'''),
+        CodexSdkContent.text(_buildSystemPrompt()),
       );
+      messages.addAll(_convertInitialPromptsForCodex());
     }
 
     // Add the user's prompt
@@ -137,6 +135,50 @@ Use the JSON schema to structure your response with responseType: "error" and an
   @override
   Future<void> dispose() async {
     await _chat.dispose();
+  }
+
+  /// Build system prompt for Codex
+  String _buildSystemPrompt() {
+    // Use a simplified version for Codex to avoid timeout issues
+    return '''You are a web scraping expert. You have access to MCP tools for Puppeteer and ScrapingBee.
+
+Use Puppeteer MCP to navigate and analyze web pages.
+Use ScrapingBee test_extract_rules to validate extraction rules.
+
+Create extraction rules in this format:
+{
+  "field_name": {
+    "selector": "CSS_SELECTOR",
+    "type": "item",
+    "output": "text" or "@attribute_name"
+  }
+}
+
+Respond with JSON matching the schema: responseType ("message", "error", or "data"), and appropriate fields.''';
+  }
+
+  /// Convert initial prompts from Gemini format to Codex format
+  List<CodexSdkContent> _convertInitialPromptsForCodex() {
+    final geminiPrompts = handleInitialPrompts(initialPayload);
+    final codexPrompts = <CodexSdkContent>[];
+
+    for (final prompt in geminiPrompts) {
+      // GeminiSdkContent is a sealed class, check the type directly
+      if (prompt is gemini_sdk.TextContent) {
+        codexPrompts.add(CodexSdkContent.text(prompt.text));
+      } else if (prompt is gemini_sdk.BytesContent) {
+        // Codex handles bytes similarly
+        codexPrompts.add(CodexSdkContent.bytes(
+          data: prompt.data,
+          fileExtension: prompt.fileExtension,
+        ));
+      } else if (prompt is gemini_sdk.FileContent) {
+        // Convert file content to Codex format
+        codexPrompts.add(CodexSdkContent.file(prompt.file));
+      }
+    }
+
+    return codexPrompts;
   }
 
   /// Build the response schema for Codex

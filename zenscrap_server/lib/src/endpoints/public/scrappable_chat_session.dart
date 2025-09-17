@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:serverpod/serverpod.dart';
-import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_gemini_sdk_impl.dart';
+import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_codex_sdk_impl.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/i_chat_controller.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
@@ -96,7 +96,7 @@ class ScrappableChatSession extends Endpoint {
     final RedraftSrappableSessionId sessionUuid = uuid.v4();
     _scrappableOpenedSessionsIds[scrappable.id!] = sessionUuid;
     _scrapRedraftSessions[sessionUuid] = ReplaySubject<ChatResponse>();
-    _chatSessions[sessionUuid] = ChatControllerGeminiSdkImpl.startChat(
+    _chatSessions[sessionUuid] = ChatControllerCodexSdkImpl.startChat(
       scrapperRequest: scrapperRequest,
       referenceTestData: referenceTestData,
     );
