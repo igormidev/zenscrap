@@ -26,8 +26,13 @@ dependencies:
   path: ^1.9.1
   web_scrapper_generator:
     path: ../web_scrapper_generator
-  # claude_code_sdk:
-  #   path: ../claude_code_sdk
+  claude_code_sdk:
+    path: ../claude_code_sdk
+  codex_cli_sdk:
+    path: ../codex_cli_sdk
+  gemini_cli_sdk:
+    path: ../gemini_cli_sdk
+  dart_mcp: ^0.3.3
 
 dev_dependencies:
   lints: '>=3.0.0 <7.0.0'

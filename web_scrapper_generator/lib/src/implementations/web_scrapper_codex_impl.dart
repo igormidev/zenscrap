@@ -100,9 +100,7 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
     final isFirstMessage = _chat.sessionId == null;
     if (isFirstMessage) {
       // Include system context and initial prompts
-      messages.add(
-        CodexSdkContent.text(_buildSystemPrompt()),
-      );
+      messages.add(CodexSdkContent.text(_buildSystemPrompt()));
       messages.addAll(_convertInitialPromptsForCodex());
     }
 
@@ -143,7 +141,7 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
     return '''You are a web scraping expert. You have access to MCP tools for Puppeteer and ScrapingBee.
 
 Use Puppeteer MCP to navigate and analyze web pages.
-Use ScrapingBee test_extract_rules to validate extraction rules.
+Use ScrapingBee MPC test_extract_rules tool to validate extraction rules.
 
 Create extraction rules in this format:
 {
@@ -168,10 +166,12 @@ Respond with JSON matching the schema: responseType ("message", "error", or "dat
         codexPrompts.add(CodexSdkContent.text(prompt.text));
       } else if (prompt is gemini_sdk.BytesContent) {
         // Codex handles bytes similarly
-        codexPrompts.add(CodexSdkContent.bytes(
-          data: prompt.data,
-          fileExtension: prompt.fileExtension,
-        ));
+        codexPrompts.add(
+          CodexSdkContent.bytes(
+            data: prompt.data,
+            fileExtension: prompt.fileExtension,
+          ),
+        );
       } else if (prompt is gemini_sdk.FileContent) {
         // Convert file content to Codex format
         codexPrompts.add(CodexSdkContent.file(prompt.file));
