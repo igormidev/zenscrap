@@ -1,17 +1,18 @@
+import 'dart:async';
+
 import 'package:gemini_cli_sdk/gemini_cli_sdk.dart' as gemini_sdk;
 import 'package:claude_code_sdk/claude_code_sdk.dart' as claude_sdk;
 import 'package:web_scrapper_generator/src/schema_constants.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_response.dart';
-import 'package:web_scrapper_generator/src/puppeteer_setup.dart' show ScrappingBeeProxyConfig;
+import 'package:web_scrapper_generator/src/puppeteer_setup.dart'
+    show ScrappingBeeProxyConfig;
 
 /// Abstract interface for web scrapper generator controllers
 abstract class WebScrapperGeneratorController<TModel> {
   /// The initial payload data for the conversation
   final InitialPayloadData initialPayload;
 
-  WebScrapperGeneratorController({
-    required this.initialPayload,
-  });
+  WebScrapperGeneratorController({required this.initialPayload});
 
   /// Static initialization for all implementations
   /// Sets up shared resources like MCP servers
@@ -25,9 +26,14 @@ abstract class WebScrapperGeneratorController<TModel> {
   }
 
   /// Send a message to the AI and get a response
-  Future<WebScrapperChatAIResponse> sendMessage({
-    required String userPrompt,
-  });
+  Future<WebScrapperChatAIResponse> sendMessage({required String userPrompt});
+
+  /// Send a message to the AI and get a response
+  ({
+    Stream<String> llmMessage,
+    Future<WebScrapperChatAIResponse> structuredSchemaDataCompleter,
+  })
+  streamMessage({required String userPrompt});
 
   /// Change the AI model being used
   Future<void> changeModel(TModel model);

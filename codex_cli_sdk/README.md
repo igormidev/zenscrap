@@ -211,11 +211,11 @@ void main() async {
       schema: schema,
     );
 
-    print('Model message: ${result.modelMessage}');
-    print('Extracted data: ${result.data}');
+    print('Model message: ${result.llmMessage}');
+    print('Extracted data: ${result.structuredSchemaData}');
 
     // Access specific fields
-    final userName = result.data['userName'];
+    final userName = result.structuredSchemaData['userName'];
     print('User name: $userName');
   } finally {
     await codexChat.dispose();
@@ -578,8 +578,9 @@ await codexSDK.dispose(); // Disposes all active sessions
 ### CodexChat Class
 
 - `sendMessage(List<CodexSdkContent> contents)` - Sends a message and returns the response
-- `sendMessageWithSchema({messages, schema})` - Sends a message with a schema for structured response
+- `sendMessageWithSchema({messages, schema})` - Returns a record with the LLM summary and parsed structured data
 - `streamResponse(List<CodexSdkContent> contents)` - Streams the response
+- `streamResponseWithSchema({messages, schema})` - Streams the LLM output while resolving structured data asynchronously
 - `get sessionId` - Gets the current session ID (null until first message)
 - `resetConversation()` - Resets the conversation, starting a new session
 - `dispose()` - Disposes the chat session and cleans up resources (including temp files)

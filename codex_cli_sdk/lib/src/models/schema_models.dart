@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 /// Result returned when using schema-based message sending
+@Deprecated('Use the record returned by sendMessageWithSchema().')
 class SchemaResult {
   /// The message from the model explaining the result
   final String modelMessage;

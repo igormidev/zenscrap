@@ -1,3 +1,17 @@
+## 2.0.0
+
+### Breaking
+- `sendMessageWithSchema()` now returns a record `({String llmMessage, Map<String, dynamic> structuredSchemaData})`
+- Schema responses are generated via a temporary JSON file with validation and retry logic
+
+### Added
+- `streamResponseWithSchema()` companion API that streams Gemini output while structured data is produced
+- Strong schema validation with descriptive error messages when required fields are missing or types mismatch
+
+### Improved
+- File-system workflow now leverages the `write_file` tool and guarantees cleanup of temporary schema files
+- Better diagnostics when JSON parsing fails
+
 ## 1.1.0
 
 ### New Features

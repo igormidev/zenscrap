@@ -1,3 +1,17 @@
+## 3.0.0
+
+### Breaking
+- `sendMessageWithSchema()` now returns a record `({String llmMessage, Map<String, dynamic> structuredSchemaData})`
+- Structured responses are persisted to a temporary JSON file with validation and automatic retries
+
+### Added
+- `streamResponseWithSchema()` API for streaming Claude output while structured data is produced
+- Schema validation with detailed feedback when non-nullable fields are missing or types mismatch
+
+### Improved
+- Temporary schema files are always cleaned up even when requests fail
+- Streaming pipeline now surfaces partial `content_block_delta` updates
+
 ## 2.1.0
 
 ### New Features

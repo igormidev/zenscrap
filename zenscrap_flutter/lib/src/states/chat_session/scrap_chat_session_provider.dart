@@ -17,7 +17,15 @@ final scrapChatProvider =
 class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
   final Ref ref;
   StreamSubscription<ChatResponse>? _chatResponseSubscription;
+  StreamSubscription<String>? _aiCurrentThinkingSubscription;
   ScrapChatSessionNotifier(this.ref) : super(ScrapChatSessionState.blank());
+
+  @override
+  void dispose() {
+    _chatResponseSubscription?.cancel();
+    _aiCurrentThinkingSubscription?.cancel();
+    super.dispose();
+  }
 
   void reset() {
     ref.read(chatMessagesProvider.notifier).state = const AsyncValue.data([]);
@@ -51,15 +59,39 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
     final sessionUuid = state.mapOrNull(standard: (value) => value.sessionUuid);
     if (sessionUuid == null) return;
 
-    final sessionResult = await ref
+    await ref
         .read(clientProvider)
         .scrappableChatSession
         .sendPromptMessage(sessionId: sessionUuid, userPrompt: userPrompt)
-        .toResult;
-
-    sessionResult.onFailure((failure) {
-      state = ScrapChatSessionState.withError(error: failure);
-    });
+        .toRawResult(
+      (Stream<String> llmThinkingStream) {
+        _aiCurrentThinkingSubscription = llmThinkingStream.listen(
+            (thinking) {
+              state.mapOrNull(standard: (value) {
+                final currentStream = value.llmThinkingStream ?? [];
+                state = value.copyWith(
+                  llmThinkingStream: [...currentStream, thinking],
+                );
+              });
+            },
+            onDone: () {
+              _aiCurrentThinkingSubscription?.cancel();
+              state.mapOrNull(standard: (value) {
+                state = value.copyWith(llmThinkingStream: null);
+              });
+            },
+            cancelOnError: true,
+            onError: (error) {
+              if (error is ZenScrapException) {
+                state = ScrapChatSessionState.withError(error: error);
+              } else {
+                state =
+                    ScrapChatSessionState.withError(error: defaultException);
+              }
+            });
+      },
+      (failure) => state = ScrapChatSessionState.withError(error: failure),
+    );
   }
 
   Future<void> endSession() async {
@@ -70,13 +102,6 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
         .read(clientProvider)
         .scrappableChatSession
         .disposeSession(sessionId: sessionUuid);
-  }
-
-  @override
-  void dispose() {
-    _chatResponseSubscription?.cancel();
-
-    super.dispose();
   }
 
   void onChange(ChatResponse chatResponse) {
@@ -159,6 +184,7 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
           data: scrappable,
           sessionUuid: createdSessionResponse.sessionId,
           testExpirationDate: expirationDate,
+          llmThinkingStream: null,
         );
       } catch (error, stackTrace) {
         talker.error(

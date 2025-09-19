@@ -53,7 +53,7 @@ void main() async {
       ],
       schema: userSchema,
     );
-    print('Extracted user data: ${result1.data}\n');
+    print('Extracted user data: ${result1.structuredSchemaData}\n');
 
     // Example 2: Nested schema with nullable objects and arrays
     print('Example 2: Product information with nested nullable properties\n');
@@ -113,7 +113,7 @@ void main() async {
       ],
       schema: productSchema,
     );
-    print('Extracted product data: ${result2.data}\n');
+    print('Extracted product data: ${result2.structuredSchemaData}\n');
 
     // Example 3: Schema with enum and default values
     print('Example 3: Order status with enums and defaults\n');
@@ -159,7 +159,7 @@ void main() async {
       ],
       schema: orderSchema,
     );
-    print('Extracted order data: ${result3.data}\n');
+    print('Extracted order data: ${result3.structuredSchemaData}\n');
 
   } catch (e) {
     print('Error: $e');

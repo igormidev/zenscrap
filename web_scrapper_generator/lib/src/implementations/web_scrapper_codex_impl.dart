@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:codex_cli_sdk/codex_cli_sdk.dart';
 import 'package:gemini_cli_sdk/gemini_cli_sdk.dart' as gemini_sdk;
 import 'package:web_scrapper_generator/src/prompts.dart';
@@ -45,10 +47,8 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
 
   final CodexChat _chat;
 
-  WebScrapperCodexImpl._(
-    InitialPayloadData initialPayload,
-    CodexChat chat,
-  ) : _chat = chat,
+  WebScrapperCodexImpl._(InitialPayloadData initialPayload, CodexChat chat)
+    : _chat = chat,
       super(initialPayload: initialPayload);
 
   /// Factory method to create a new chat instance
@@ -63,15 +63,14 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
         // Note: Removed reasoningEffort as it may not be supported by Codex CLI
         timeoutMs: 180000, // 3 minutes timeout
         enableMcp: true, // Enable MCP support
+        sandboxMode: 'danger-full-access',
+        approvalPolicy: 'never',
         // Note: Removed mode as Codex exec doesn't support --auto-edit
         outputJson: false, // We'll use schema for structured output
       ),
     );
 
-    return WebScrapperCodexImpl._(
-      initialPayload,
-      chat,
-    );
+    return WebScrapperCodexImpl._(initialPayload, chat);
   }
 
   @override
@@ -83,9 +82,14 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
   }
 
   /// Changes the model with a specific reasoning effort level
-  Future<void> changeModelWithEffort(CodexModel model, String reasoningEffort) async {
+  Future<void> changeModelWithEffort(
+    CodexModel model,
+    String reasoningEffort,
+  ) async {
     _chat.changeModelWithEffort(model.apiName, reasoningEffort);
-    print('✨ Model changed to: ${model.displayName} with $reasoningEffort reasoning effort');
+    print(
+      '✨ Model changed to: ${model.displayName} with $reasoningEffort reasoning effort',
+    );
     print('Note: This will start a new conversation session.');
   }
 
@@ -115,11 +119,64 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
       );
 
       // Parse the structured response
-      return parseStructuredResponse(result.data);
+      return parseStructuredResponse(result.structuredSchemaData);
     } catch (e) {
       // If there's an error, return an error response
       return WebScrapperChatAIResponseErrorMessage(
         'Failed to process your request: ${e.toString()}',
+      );
+    }
+  }
+
+  @override
+  ({
+    Stream<String> llmMessage,
+    Future<WebScrapperChatAIResponse> structuredSchemaDataCompleter,
+  })
+  streamMessage({required String userPrompt}) {
+    List<CodexSdkContent> messages = [];
+
+    // Add initial prompts if this is the first message
+    final isFirstMessage = _chat.sessionId == null;
+    if (isFirstMessage) {
+      messages.addAll(_convertInitialPromptsForCodex());
+    }
+
+    // Add the user's prompt
+    messages.add(CodexSdkContent.text(userPrompt));
+
+    // Define the response schema for structured output
+    final responseSchema = buildCodexResponseSchema();
+
+    try {
+      // Send message with schema for structured response
+      final (
+        :Stream<String> llmMessage,
+        :Completer<Map<String, dynamic>> structuredSchemaData,
+      ) = _chat.streamResponseWithSchema(
+        messages: messages,
+        schema: responseSchema,
+      );
+
+      return (
+        llmMessage: llmMessage,
+        structuredSchemaDataCompleter: Future(() async {
+          return parseStructuredResponse(await structuredSchemaData.future);
+        }),
+      );
+      // parseStructuredResponse(result.structuredSchemaData);
+    } catch (e) {
+      // If there's an error, return an error response
+      final structuredSchema = WebScrapperChatAIResponseErrorMessage(
+        'Failed to process your request: ${e.toString()}',
+      );
+
+      final controller = StreamController<String>();
+      controller.addError(e);
+      controller.close();
+      return (
+        llmMessage: controller.stream,
+        structuredSchemaDataCompleter: Future.value(structuredSchema),
       );
     }
   }
@@ -194,10 +251,12 @@ Remember: Your goal is to create extraction rules that consistently retrieve the
         codexPrompts.add(CodexSdkContent.text(prompt.text));
       } else if (prompt is gemini_sdk.BytesContent) {
         // Codex handles bytes similarly
-        codexPrompts.add(CodexSdkContent.bytes(
-          data: prompt.data,
-          fileExtension: prompt.fileExtension,
-        ));
+        codexPrompts.add(
+          CodexSdkContent.bytes(
+            data: prompt.data,
+            fileExtension: prompt.fileExtension,
+          ),
+        );
       } else if (prompt is gemini_sdk.FileContent) {
         // Convert file content to Codex format
         codexPrompts.add(CodexSdkContent.file(prompt.file));

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:claude_code_sdk/claude_code_sdk.dart';
 import 'package:gemini_cli_sdk/gemini_cli_sdk.dart' as gemini_sdk;
 import 'package:web_scrapper_generator/src/prompts.dart';
@@ -8,9 +10,10 @@ import '../puppeteer_setup.dart';
 import '../mcp_adapters.dart';
 
 /// Claude Code SDK implementation of the web scrapper generator
-class WebScrapperClaudeImpl extends WebScrapperGeneratorController<ClaudeModel> {
+class WebScrapperClaudeImpl
+    extends WebScrapperGeneratorController<ClaudeModel> {
   static late final Claude _claudeSDK;
-  
+
   /// Initialize the Claude SDK and its MCP servers
   static Future<void> initClaude({
     required String claudeApiKey,
@@ -22,7 +25,7 @@ class WebScrapperClaudeImpl extends WebScrapperGeneratorController<ClaudeModel> 
       scrappingBeeApiKey: scrappingBeeApiKey,
       proxyConfig: proxyConfig,
     );
-    
+
     print('🚀 Initializing Claude SDK for web scraper generator...\n');
     _claudeSDK = Claude(claudeApiKey);
 
@@ -44,10 +47,8 @@ class WebScrapperClaudeImpl extends WebScrapperGeneratorController<ClaudeModel> 
 
   final ClaudeChat _chat;
 
-  WebScrapperClaudeImpl._(
-    InitialPayloadData initialPayload,
-    ClaudeChat chat,
-  ) : _chat = chat,
+  WebScrapperClaudeImpl._(InitialPayloadData initialPayload, ClaudeChat chat)
+    : _chat = chat,
       super(initialPayload: initialPayload);
 
   /// Factory method to create a new chat instance
@@ -63,11 +64,8 @@ class WebScrapperClaudeImpl extends WebScrapperGeneratorController<ClaudeModel> 
         // MCP servers are configured at SDK level in initClaude
       ),
     );
-    
-    return WebScrapperClaudeImpl._(
-      initialPayload,
-      chat,
-    );
+
+    return WebScrapperClaudeImpl._(initialPayload, chat);
   }
 
   @override
@@ -104,11 +102,64 @@ class WebScrapperClaudeImpl extends WebScrapperGeneratorController<ClaudeModel> 
       );
 
       // Parse the structured response
-      return parseStructuredResponse(result.data);
+      return parseStructuredResponse(result.structuredSchemaData);
     } catch (e) {
       // If there's an error, return an error response
       return WebScrapperChatAIResponseErrorMessage(
         'Failed to process your request: ${e.toString()}',
+      );
+    }
+  }
+
+  @override
+  ({
+    Stream<String> llmMessage,
+    Future<WebScrapperChatAIResponse> structuredSchemaDataCompleter,
+  })
+  streamMessage({required String userPrompt}) {
+    List<ClaudeSdkContent> messages = [];
+
+    // Add initial prompts if this is the first message
+    final isFirstMessage = _chat.sessionId == null;
+    if (isFirstMessage) {
+      messages.addAll(_convertInitialPromptsForClaude());
+    }
+
+    // Add the user's prompt
+    messages.add(ClaudeSdkContent.text(userPrompt));
+
+    // Define the response schema for structured output
+    final responseSchema = buildClaudeResponseSchema();
+
+    try {
+      // Send message with schema for structured response
+      final (
+        :Stream<String> llmMessage,
+        :Completer<Map<String, dynamic>> structuredSchemaData,
+      ) = _chat.streamResponseWithSchema(
+        messages: messages,
+        schema: responseSchema,
+      );
+
+      return (
+        llmMessage: llmMessage,
+        structuredSchemaDataCompleter: Future(() async {
+          return parseStructuredResponse(await structuredSchemaData.future);
+        }),
+      );
+      // parseStructuredResponse(result.structuredSchemaData);
+    } catch (e) {
+      // If there's an error, return an error response
+      final structuredSchema = WebScrapperChatAIResponseErrorMessage(
+        'Failed to process your request: ${e.toString()}',
+      );
+
+      final controller = StreamController<String>();
+      controller.addError(e);
+      controller.close();
+      return (
+        llmMessage: controller.stream,
+        structuredSchemaDataCompleter: Future.value(structuredSchema),
       );
     }
   }
@@ -165,10 +216,12 @@ Remember: Your goal is to create extraction rules that consistently retrieve the
         claudePrompts.add(ClaudeSdkContent.text(prompt.text));
       } else if (prompt is gemini_sdk.BytesContent) {
         // Claude handles bytes similarly
-        claudePrompts.add(ClaudeSdkContent.bytes(
-          data: prompt.data,
-          fileExtension: prompt.fileExtension,
-        ));
+        claudePrompts.add(
+          ClaudeSdkContent.bytes(
+            data: prompt.data,
+            fileExtension: prompt.fileExtension,
+          ),
+        );
       } else if (prompt is gemini_sdk.FileContent) {
         // Convert file content to Claude format
         claudePrompts.add(ClaudeSdkContent.file(prompt.file));

@@ -55,3 +55,33 @@ class JSONDecodeException extends CodexSDKException {
         '${originalError != null ? 'Original error: $originalError' : ''}';
   }
 }
+
+/// Exception thrown when JSON content fails schema validation
+class SchemaValidationException extends CodexSDKException {
+  final List<String> issues;
+
+  const SchemaValidationException(
+    String message,
+    this.issues, [
+    dynamic originalError,
+  ]) : super(message, originalError);
+
+  @override
+  String toString() {
+    final issuesDescription = issues.isEmpty
+        ? ''
+        : issues.map((issue) => '- $issue').join('\n');
+    if (issuesDescription.isEmpty && originalError == null) {
+      return 'SchemaValidationException: $message';
+    }
+
+    final buffer = StringBuffer('SchemaValidationException: $message');
+    if (issuesDescription.isNotEmpty) {
+      buffer.write('\n$issuesDescription');
+    }
+    if (originalError != null) {
+      buffer.write('\nOriginal error: ${originalError.toString()}');
+    }
+    return buffer.toString();
+  }
+}

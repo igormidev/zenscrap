@@ -162,8 +162,8 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? blank,
     TResult Function()? creatingSessionState,
-    TResult Function(
-            Scrappable data, DateTime testExpirationDate, String sessionUuid)?
+    TResult Function(Scrappable data, DateTime testExpirationDate,
+            String sessionUuid, List<String>? llmThinkingStream)?
         standard,
     TResult Function(ZenScrapException error)? withError,
     required TResult orElse(),
@@ -176,8 +176,8 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
           when creatingSessionState != null:
         return creatingSessionState();
       case _ScrapChatSessionStateStandard() when standard != null:
-        return standard(
-            _that.data, _that.testExpirationDate, _that.sessionUuid);
+        return standard(_that.data, _that.testExpirationDate, _that.sessionUuid,
+            _that.llmThinkingStream);
       case _ScrapChatSessionStateWithError() when withError != null:
         return withError(_that.error);
       case _:
@@ -202,8 +202,8 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
   TResult when<TResult extends Object?>({
     required TResult Function() blank,
     required TResult Function() creatingSessionState,
-    required TResult Function(
-            Scrappable data, DateTime testExpirationDate, String sessionUuid)
+    required TResult Function(Scrappable data, DateTime testExpirationDate,
+            String sessionUuid, List<String>? llmThinkingStream)
         standard,
     required TResult Function(ZenScrapException error) withError,
   }) {
@@ -214,8 +214,8 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
       case _ScrapChatSessionStateCreatingSessionState():
         return creatingSessionState();
       case _ScrapChatSessionStateStandard():
-        return standard(
-            _that.data, _that.testExpirationDate, _that.sessionUuid);
+        return standard(_that.data, _that.testExpirationDate, _that.sessionUuid,
+            _that.llmThinkingStream);
       case _ScrapChatSessionStateWithError():
         return withError(_that.error);
       case _:
@@ -239,8 +239,8 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? blank,
     TResult? Function()? creatingSessionState,
-    TResult? Function(
-            Scrappable data, DateTime testExpirationDate, String sessionUuid)?
+    TResult? Function(Scrappable data, DateTime testExpirationDate,
+            String sessionUuid, List<String>? llmThinkingStream)?
         standard,
     TResult? Function(ZenScrapException error)? withError,
   }) {
@@ -252,8 +252,8 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
           when creatingSessionState != null:
         return creatingSessionState();
       case _ScrapChatSessionStateStandard() when standard != null:
-        return standard(
-            _that.data, _that.testExpirationDate, _that.sessionUuid);
+        return standard(_that.data, _that.testExpirationDate, _that.sessionUuid,
+            _that.llmThinkingStream);
       case _ScrapChatSessionStateWithError() when withError != null:
         return withError(_that.error);
       case _:
@@ -311,11 +311,22 @@ class _ScrapChatSessionStateStandard implements ScrapChatSessionState {
   _ScrapChatSessionStateStandard(
       {required this.data,
       required this.testExpirationDate,
-      required this.sessionUuid});
+      required this.sessionUuid,
+      required final List<String>? llmThinkingStream})
+      : _llmThinkingStream = llmThinkingStream;
 
   final Scrappable data;
   final DateTime testExpirationDate;
   final String sessionUuid;
+  final List<String>? _llmThinkingStream;
+  List<String>? get llmThinkingStream {
+    final value = _llmThinkingStream;
+    if (value == null) return null;
+    if (_llmThinkingStream is EqualUnmodifiableListView)
+      return _llmThinkingStream;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
 
   /// Create a copy of ScrapChatSessionState
   /// with the given fields replaced by the non-null parameter values.
@@ -334,16 +345,18 @@ class _ScrapChatSessionStateStandard implements ScrapChatSessionState {
             (identical(other.testExpirationDate, testExpirationDate) ||
                 other.testExpirationDate == testExpirationDate) &&
             (identical(other.sessionUuid, sessionUuid) ||
-                other.sessionUuid == sessionUuid));
+                other.sessionUuid == sessionUuid) &&
+            const DeepCollectionEquality()
+                .equals(other._llmThinkingStream, _llmThinkingStream));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, data, testExpirationDate, sessionUuid);
+  int get hashCode => Object.hash(runtimeType, data, testExpirationDate,
+      sessionUuid, const DeepCollectionEquality().hash(_llmThinkingStream));
 
   @override
   String toString() {
-    return 'ScrapChatSessionState.standard(data: $data, testExpirationDate: $testExpirationDate, sessionUuid: $sessionUuid)';
+    return 'ScrapChatSessionState.standard(data: $data, testExpirationDate: $testExpirationDate, sessionUuid: $sessionUuid, llmThinkingStream: $llmThinkingStream)';
   }
 }
 
@@ -355,7 +368,11 @@ abstract mixin class _$ScrapChatSessionStateStandardCopyWith<$Res>
           $Res Function(_ScrapChatSessionStateStandard) _then) =
       __$ScrapChatSessionStateStandardCopyWithImpl;
   @useResult
-  $Res call({Scrappable data, DateTime testExpirationDate, String sessionUuid});
+  $Res call(
+      {Scrappable data,
+      DateTime testExpirationDate,
+      String sessionUuid,
+      List<String>? llmThinkingStream});
 }
 
 /// @nodoc
@@ -373,6 +390,7 @@ class __$ScrapChatSessionStateStandardCopyWithImpl<$Res>
     Object? data = null,
     Object? testExpirationDate = null,
     Object? sessionUuid = null,
+    Object? llmThinkingStream = freezed,
   }) {
     return _then(_ScrapChatSessionStateStandard(
       data: null == data
@@ -387,6 +405,10 @@ class __$ScrapChatSessionStateStandardCopyWithImpl<$Res>
           ? _self.sessionUuid
           : sessionUuid // ignore: cast_nullable_to_non_nullable
               as String,
+      llmThinkingStream: freezed == llmThinkingStream
+          ? _self._llmThinkingStream
+          : llmThinkingStream // ignore: cast_nullable_to_non_nullable
+              as List<String>?,
     ));
   }
 }

@@ -795,31 +795,6 @@ class Endpoints extends _i1.EndpointDispatch {
             aiModel: params['aiModel'],
           ),
         ),
-        'sendPromptMessage': _i1.MethodConnector(
-          name: 'sendPromptMessage',
-          params: {
-            'sessionId': _i1.ParameterDescription(
-              name: 'sessionId',
-              type: _i1.getType<String>(),
-              nullable: false,
-            ),
-            'userPrompt': _i1.ParameterDescription(
-              name: 'userPrompt',
-              type: _i1.getType<String>(),
-              nullable: false,
-            ),
-          },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['scrappableChatSession'] as _i15.ScrappableChatSession)
-                  .sendPromptMessage(
-            session,
-            sessionId: params['sessionId'],
-            userPrompt: params['userPrompt'],
-          ),
-        ),
         'listenToScrappableRedraftSession': _i1.MethodStreamConnector(
           name: 'listenToScrappableRedraftSession',
           params: {
@@ -840,6 +815,34 @@ class Endpoints extends _i1.EndpointDispatch {
                   .listenToScrappableRedraftSession(
             session,
             sessionUuid: params['sessionUuid'],
+          ),
+        ),
+        'sendPromptMessage': _i1.MethodStreamConnector(
+          name: 'sendPromptMessage',
+          params: {
+            'sessionId': _i1.ParameterDescription(
+              name: 'sessionId',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'userPrompt': _i1.ParameterDescription(
+              name: 'userPrompt',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          streamParams: {},
+          returnType: _i1.MethodStreamReturnType.streamType,
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+            Map<String, Stream> streamParams,
+          ) =>
+              (endpoints['scrappableChatSession'] as _i15.ScrappableChatSession)
+                  .sendPromptMessage(
+            session,
+            sessionId: params['sessionId'],
+            userPrompt: params['userPrompt'],
           ),
         ),
       },

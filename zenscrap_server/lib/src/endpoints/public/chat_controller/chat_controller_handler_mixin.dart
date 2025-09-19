@@ -25,7 +25,9 @@ mixin ChatControllerHandlerMixin {
     required ScrappableRequest scrapperRequest,
     required ScrappingBeeExtractLogic? scrappingBeeExtractLogic,
     required StreamController<ChatResponse> chatSeason,
+    required StreamController<String> thinkingStream,
   }) async {
+    StreamSubscription<String>? sub;
     try {
       const int maxAttempts = 3;
       int attempt = 0;
@@ -36,13 +38,29 @@ mixin ChatControllerHandlerMixin {
 
         session.log('Starting attempt #$attempt');
 
-        final WebScrapperChatAIResponse response =
-            await controller.sendMessage(userPrompt: userPrompt);
-        session.log('Ending attempt #$attempt');
+        final (
+          :Stream<String> llmMessage,
+          :Future<WebScrapperChatAIResponse> structuredSchemaDataCompleter,
+        ) = controller.streamMessage(userPrompt: userPrompt);
+
+        // final WebScrapperChatAIResponse response =
+        //     await controller.sendMessage(userPrompt: userPrompt);
+
+        // Stream all llm messages to [thinkingStream]
+        sub = llmMessage.listen(
+          (chunk) => thinkingStream.add(chunk),
+          onError: (error, stackTrace) {
+            session.log(
+                'Error occurred while streaming messages from $providerName',
+                exception: error,
+                stackTrace: stackTrace,
+                level: LogLevel.error);
+          },
+        );
 
         retryContent = await handleSendMessage(
           session: session,
-          response: response,
+          response: await structuredSchemaDataCompleter,
           referenceTestData: referenceTestData,
           scrapperRequest: scrapperRequest,
           currentScrappingBeeExtractLogic: scrappingBeeExtractLogic,
@@ -51,20 +69,28 @@ mixin ChatControllerHandlerMixin {
         );
 
         if (retryContent == null) {
+          await sub.cancel();
+          sub = null;
           // No retry needed, exit the loop
           return;
         }
       }
     } catch (error, stackTrace) {
-      session.log('Error occurred while generating extract rules with $providerName',
-          exception: error, stackTrace: stackTrace, level: LogLevel.error);
+      session.log(
+          'Error occurred while generating extract rules with $providerName',
+          exception: error,
+          stackTrace: stackTrace,
+          level: LogLevel.error);
       chatSeason.add(ErrorTextResponse(
         role: PromptRole.system,
         errorMessage:
             '[ FATAL ]\nAn internal error occurred while generating extract rules:\n$error',
       ));
+    } finally {
+      await sub?.cancel();
     }
   }
+
   /// Handles the send message response and validates extraction rules
   Future<RetryText?> handleSendMessage({
     required Session session,
@@ -151,8 +177,7 @@ mixin ChatControllerHandlerMixin {
         await Future.delayed(const Duration(milliseconds: 800));
         chatSeason.add(NewExtractRuleResponse(
             role: PromptRole.system,
-            messageText:
-                'New rules were tested and did not present any errors',
+            messageText: 'New rules were tested and did not present any errors',
             scrapperRequest: scrapperRequest,
             referenceTestData: newReferenceTestData,
             scrappingBeeExtractLogic: scrappingBeeExtractLogic));

@@ -24,7 +24,7 @@ This package provides a Dart SDK for interacting with Claude Code, enabling deve
    - `ClaudeSdkContent`: Abstract class for message content
    - `TextContent` & `FileContent`: Concrete content implementations
    - `SchemaObject` & `SchemaProperty`: JSON schema builders
-   - `SchemaResult`: Structured response container
+   - `({String llmMessage, Map<String, dynamic> structuredSchemaData})`: Structured response record returned by `sendMessageWithSchema()`
    - `ClaudeChatOptions`: Configuration for chat sessions
    - `McpServer` & `McpConfig`: MCP server management models
    - `McpInstallationInfo`: MCP installation status information
@@ -150,7 +150,7 @@ Schema-based messaging:
 1. Converts `SchemaObject` to JSON
 2. Includes schema in prompt with instructions
 3. Parses structured response from JSON output
-4. Returns `SchemaResult` with parsed data
+4. Returns a record with `llmMessage` and `structuredSchemaData` once parsing succeeds
 
 ## Testing Guidelines
 

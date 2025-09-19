@@ -1298,36 +1298,39 @@ class _ScrappableChatSession {
     });
   }
 
-  _i3.Future<void> sendPromptMessage(
+  _i3.Stream<String> sendPromptMessage(
     _i1.TestSessionBuilder sessionBuilder, {
     required String sessionId,
     required String userPrompt,
-  }) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
-      var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
-        endpoint: 'scrappableChatSession',
-        method: 'sendPromptMessage',
-      );
-      try {
-        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+  }) {
+    var _localTestStreamManager = _i1.TestStreamManager<String>();
+    _i1.callStreamFunctionAndHandleExceptions(
+      () async {
+        var _localUniqueSession =
+            (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          endpoint: 'scrappableChatSession',
+          method: 'sendPromptMessage',
+        );
+        var _localCallContext =
+            await _endpointDispatch.getMethodStreamCallContext(
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'scrappableChatSession',
           methodName: 'sendPromptMessage',
-          parameters: _i1.testObjectToJson({
+          arguments: {
             'sessionId': sessionId,
             'userPrompt': userPrompt,
-          }),
+          },
+          requestedInputStreams: [],
           serializationManager: _serializationManager,
         );
-        var _localReturnValue = await (_localCallContext.method.call(
+        await _localTestStreamManager.callStreamMethod(
+          _localCallContext,
           _localUniqueSession,
-          _localCallContext.arguments,
-        ) as _i3.Future<void>);
-        return _localReturnValue;
-      } finally {
-        await _localUniqueSession.close();
-      }
-    });
+          {},
+        );
+      },
+      _localTestStreamManager.outputStreamController,
+    );
+    return _localTestStreamManager.outputStreamController.stream;
   }
 }

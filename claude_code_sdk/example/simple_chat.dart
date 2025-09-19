@@ -42,7 +42,7 @@ void main() async {
 
     // Example with schema using new nullable pattern
     print('\nSending message with schema...');
-    final schemaResult = await chat.sendMessageWithSchema(
+    final result = await chat.sendMessageWithSchema(
       messages: [
         ClaudeSdkContent.text('Extract the numbers from: "I have 5 apples and 3 oranges"'),
       ],
@@ -63,7 +63,7 @@ void main() async {
         },
       ),
     );
-    print('Schema result data: ${schemaResult.data}');
+    print('Schema result data: ${result.structuredSchemaData}');
 
   } catch (e) {
     print('Error: $e');

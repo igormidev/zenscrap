@@ -58,7 +58,7 @@ void main() async {
     );
 
     print('\nSending message with schema...');
-    final schemaResult = await chat.sendMessageWithSchema(
+    final result = await chat.sendMessageWithSchema(
       messages: [
         ClaudeSdkContent.text('Please introduce yourself'),
       ],
@@ -66,9 +66,9 @@ void main() async {
     );
 
     print('Structured response:');
-    print('  Greeting: ${schemaResult.data['greeting']}');
-    print('  Name: ${schemaResult.data['name']}');
-    print('  Capabilities: ${schemaResult.data['capabilities']}');
+    print('  Greeting: ${result.structuredSchemaData['greeting']}');
+    print('  Name: ${result.structuredSchemaData['name']}');
+    print('  Capabilities: ${result.structuredSchemaData['capabilities']}');
     
   } catch (e) {
     print('Error: $e');

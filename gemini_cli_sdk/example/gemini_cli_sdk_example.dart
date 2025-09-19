@@ -74,7 +74,7 @@ void main() async {
       },
     );
     
-    final schemaResult = await chat.sendMessageWithSchema(
+    final result = await chat.sendMessageWithSchema(
       messages: [
         GeminiSdkContent.text('Tell me about the Dart programming language'),
       ],
@@ -82,9 +82,9 @@ void main() async {
     );
     
     print('Structured data received:');
-    print('  Language: ${schemaResult.data['language']}');
-    print('  Use Case: ${schemaResult.data['useCase']}');
-    print('  Popularity: ${schemaResult.data['popularity'] ?? 'Not specified'}');
+    print('  Language: ${result.structuredSchemaData['language']}');
+    print('  Use Case: ${result.structuredSchemaData['useCase']}');
+    print('  Popularity: ${result.structuredSchemaData['popularity'] ?? 'Not specified'}');
     
     // Example 3: Dynamic model switching
     print('\n🔄 Example 3: Dynamic model switching');

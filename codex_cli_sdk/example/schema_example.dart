@@ -47,7 +47,7 @@ void main() async {
 
     print('Requesting structured book information...\n');
 
-    final result = await chat.sendMessageWithSchema(
+    final bookResult = await chat.sendMessageWithSchema(
       messages: [
         CodexSdkContent.text(
           'Give me information about the book "1984" by George Orwell',
@@ -57,18 +57,20 @@ void main() async {
     );
 
     print('Model explanation:');
-    print('${result.modelMessage}\n');
+    print('${bookResult.llmMessage}\n');
 
     print('Structured data:');
-    print('Title: ${result.data['title']}');
-    print('Author: ${result.data['author']}');
-    print('Year: ${result.data['year']}');
-    print('Genre: ${result.data['genre']}');
-    print('Summary: ${result.data['summary']}');
+    final bookData = bookResult.structuredSchemaData;
+    print('Title: ${bookData['title']}');
+    print('Author: ${bookData['author']}');
+    print('Year: ${bookData['year']}');
+    print('Genre: ${bookData['genre']}');
+    print('Summary: ${bookData['summary']}');
 
-    if (result.data['themes'] != null) {
+    final themes = bookData['themes'];
+    if (themes is List) {
       print('Themes:');
-      for (final theme in result.data['themes']) {
+      for (final theme in themes) {
         print('  - $theme');
       }
     }
@@ -125,8 +127,8 @@ void main() async {
     );
 
     print('Generated User Profile:');
-    print('${userResult.modelMessage}\n');
-    print('Data: ${userResult.data}');
+    print('${userResult.llmMessage}\n');
+    print('Data: ${userResult.structuredSchemaData}');
   } catch (e) {
     print('Error: $e');
   } finally {

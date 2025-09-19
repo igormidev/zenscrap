@@ -16,17 +16,20 @@ abstract class SessionPrompt
   SessionPrompt._({
     required this.userPrompt,
     required this.sessionId,
+    required this.thinkingSessionId,
   });
 
   factory SessionPrompt({
     required String userPrompt,
     required String sessionId,
+    required String thinkingSessionId,
   }) = _SessionPromptImpl;
 
   factory SessionPrompt.fromJson(Map<String, dynamic> jsonSerialization) {
     return SessionPrompt(
       userPrompt: jsonSerialization['userPrompt'] as String,
       sessionId: jsonSerialization['sessionId'] as String,
+      thinkingSessionId: jsonSerialization['thinkingSessionId'] as String,
     );
   }
 
@@ -34,18 +37,22 @@ abstract class SessionPrompt
 
   String sessionId;
 
+  String thinkingSessionId;
+
   /// Returns a shallow copy of this [SessionPrompt]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   SessionPrompt copyWith({
     String? userPrompt,
     String? sessionId,
+    String? thinkingSessionId,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
       'userPrompt': userPrompt,
       'sessionId': sessionId,
+      'thinkingSessionId': thinkingSessionId,
     };
   }
 
@@ -54,6 +61,7 @@ abstract class SessionPrompt
     return {
       'userPrompt': userPrompt,
       'sessionId': sessionId,
+      'thinkingSessionId': thinkingSessionId,
     };
   }
 
@@ -67,9 +75,11 @@ class _SessionPromptImpl extends SessionPrompt {
   _SessionPromptImpl({
     required String userPrompt,
     required String sessionId,
+    required String thinkingSessionId,
   }) : super._(
           userPrompt: userPrompt,
           sessionId: sessionId,
+          thinkingSessionId: thinkingSessionId,
         );
 
   /// Returns a shallow copy of this [SessionPrompt]
@@ -79,10 +89,12 @@ class _SessionPromptImpl extends SessionPrompt {
   SessionPrompt copyWith({
     String? userPrompt,
     String? sessionId,
+    String? thinkingSessionId,
   }) {
     return SessionPrompt(
       userPrompt: userPrompt ?? this.userPrompt,
       sessionId: sessionId ?? this.sessionId,
+      thinkingSessionId: thinkingSessionId ?? this.thinkingSessionId,
     );
   }
 }

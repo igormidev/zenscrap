@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:path/path.dart' as path;
 import 'package:uuid/uuid.dart';
 
@@ -29,10 +30,10 @@ class CodexChat {
   /// UUID generator for session IDs and temp files
   final _uuid = const Uuid();
 
-  /// Gets the current session ID (null until first message)
+  /// Current session identifier provided by Codex CLI (if any)
   String? get sessionId => _sessionId;
 
-  /// Creates a new CodexChat instance
+
   CodexChat({
     required this.apiKey,
     this.options,
@@ -40,291 +41,133 @@ class CodexChat {
 
   /// Sends a message to Codex and returns the response
   Future<String> sendMessage(List<CodexSdkContent> contents) async {
-    if (_isDisposed) {
-      throw CodexSDKException('Chat session has been disposed');
-    }
+    _ensureNotDisposed();
 
     if (contents.isEmpty) {
       throw CodexSDKException('Cannot send empty message');
     }
 
-    // Prepare the message
     final message = await _prepareMessage(contents);
+    final rawOutput = await _runCodexCommand(message);
+    final response = _parseResponse(rawOutput);
 
-    // Build command arguments
-    final args = _buildCommandArgs(message);
-
-    try {
-      // Run the command
-      final result = await Process.run(
-        'codex',
-        args,
-        environment: _buildEnvironment(),
-        workingDirectory: options?.cwd,
-      );
-
-      if (result.exitCode != 0) {
-        throw ProcessException(
-          'Codex command failed',
-          exitCode: result.exitCode,
-          stderr: result.stderr.toString(),
-        );
-      }
-
-      // Parse the response
-      final response = _parseResponse(result.stdout.toString());
-
-      // Extract session ID if this is the first message
-      if (_sessionId == null && options?.continueLastSession != true) {
-        _sessionId = _extractSessionId(response);
-      }
-
-      return response;
-    } on ProcessException {
-      rethrow;
-    } catch (e) {
-      throw ProcessException(
-        'Failed to run Codex command',
-        originalError: e,
-      );
-    }
-  }
-
-  /// Sends a message with a schema for structured response
-  Future<SchemaResult> sendMessageWithSchema({
-    required List<CodexSdkContent> messages,
-    required SchemaObject schema,
-  }) async {
-    if (_isDisposed) {
-      throw CodexSDKException('Chat session has been disposed');
+    if (_sessionId == null && options?.continueLastSession != true) {
+      _sessionId = _extractSessionId(response) ?? _sessionId;
     }
 
-    // Build the schema prompt
-    final schemaJson = jsonEncode(schema.toJson());
-    final schemaPrompt = '''
-Please provide a structured response according to this JSON schema:
-
-```json
-$schemaJson
-```
-
-IMPORTANT: Your response must include:
-1. A brief explanation of what you found/did
-2. The structured data matching the schema
-
-Format your response as JSON with these fields:
-{
-  "modelMessage": "Your explanation here",
-  "data": { /* Your structured data matching the schema */ }
-}
-''';
-
-    // Combine schema prompt with user messages
-    final combinedMessages = [
-      CodexSdkContent.text(schemaPrompt),
-      ...messages,
-    ];
-
-    // Note: Codex CLI doesn't support JSON output flags
-    // We'll try to extract JSON from the plain text response
-    final jsonChat = CodexChat(
-      apiKey: apiKey,
-      options: options, // Use regular options without JSON flags
-    );
-
-    try {
-      final response = await jsonChat.sendMessage(combinedMessages);
-
-      print('\x1B[33m### RESPONSE:\x1B[0m');
-      print('\x1B[33m$response\x1B[0m');
-
-      // Try to extract JSON from the response
-      // Look for JSON blocks in the response
-      try {
-        // Try to find JSON in code blocks
-        final jsonPattern =
-            RegExp(r'```json?\s*\n?([\s\S]*?)\n?```', multiLine: true);
-        final match = jsonPattern.firstMatch(response);
-
-        String jsonStr;
-        if (match != null) {
-          jsonStr = match.group(1)!.trim();
-        } else {
-          // Try to find raw JSON in the response
-          final braceStart = response.indexOf('{');
-          final braceEnd = response.lastIndexOf('}');
-          if (braceStart >= 0 && braceEnd > braceStart) {
-            jsonStr = response.substring(braceStart, braceEnd + 1);
-          } else {
-            // Last resort: assume entire response is JSON
-            jsonStr = response.trim();
-          }
-        }
-
-        final jsonResponse = jsonDecode(jsonStr);
-
-        // Extract model message and data
-        String modelMessage = '';
-        Map<String, dynamic> data = {};
-
-        if (jsonResponse is Map<String, dynamic>) {
-          modelMessage = jsonResponse['modelMessage']?.toString() ??
-              jsonResponse['message']?.toString() ??
-              jsonResponse['response']?.toString() ??
-              '';
-
-          data = jsonResponse['data'] as Map<String, dynamic>? ??
-              jsonResponse['result'] as Map<String, dynamic>? ??
-              jsonResponse;
-        }
-
-        return SchemaResult(
-          modelMessage: modelMessage,
-          data: data,
-        );
-      } catch (e) {
-        // If we can't parse JSON, return a simple message structure
-        return SchemaResult(
-          modelMessage: response,
-          data: {
-            'responseType': 'message',
-            'message': response,
-          },
-        );
-      }
-    } finally {
-      await jsonChat.dispose();
-    }
+    return response.trim();
   }
 
   /// Streams the response from Codex
-  Stream<String> streamResponse(List<CodexSdkContent> contents) async* {
-    if (_isDisposed) {
-      throw CodexSDKException('Chat session has been disposed');
-    }
+  Stream<String> streamResponse(List<CodexSdkContent> contents) {
+    _ensureNotDisposed();
 
     if (contents.isEmpty) {
       throw CodexSDKException('Cannot send empty message');
     }
 
-    // Prepare the message
-    final message = await _prepareMessage(contents);
+    final controller = StreamController<String>();
 
-    // Build command arguments (without quiet mode for streaming)
-    final args = _buildCommandArgs(message, forStreaming: true);
-
-    Process? process;
-    StreamSubscription<List<int>>? stdoutSub;
-    StreamSubscription<List<int>>? stderrSub;
-
-    try {
-      // Start the process
-      process = await Process.start(
-        'codex',
-        args,
-        environment: _buildEnvironment(),
-        workingDirectory: options?.cwd,
-      );
-
-      final completer = Completer<void>();
-      final errorBuffer = StringBuffer();
-      var hasError = false;
-
-      // Handle stderr
-      stderrSub = process.stderr.listen(
-        (data) {
-          final error = utf8.decode(data);
-          errorBuffer.write(error);
-          // Print to console for debugging
-          if (error.isNotEmpty && !error.contains('[INFO]')) {
-            stderr.write(error);
-          }
-        },
-        onError: (e) {
-          hasError = true;
-          completer.completeError(e);
-        },
-      );
-
-      // Handle stdout and yield chunks
-      stdoutSub = process.stdout.listen(
-        (data) {
-          final chunk = utf8.decode(data, allowMalformed: true);
-          // Yield the chunk to the stream
-          if (chunk.isNotEmpty) {
-            // ignore: invalid_use_of_visible_for_testing_member
-            streamController?.add(chunk);
-          }
-        },
-        onError: (e) {
-          hasError = true;
-          completer.completeError(e);
-        },
-        onDone: () {
-          if (!completer.isCompleted) {
-            completer.complete();
-          }
-        },
-      );
-
-      // Wait for process to complete
-      final exitCode = await process.exitCode;
-
-      if (exitCode != 0 && !hasError) {
-        throw ProcessException(
-          'Codex streaming failed',
-          exitCode: exitCode,
-          stderr: errorBuffer.toString(),
+    () async {
+      try {
+        final message = await _prepareMessage(contents);
+        await _runCodexCommand(
+          message,
+          streamSink: controller.sink,
         );
+      } catch (error, stackTrace) {
+        if (!controller.isClosed) {
+          controller.addError(error, stackTrace);
+        }
+      } finally {
+        if (!controller.isClosed) {
+          await controller.close();
+        }
       }
+    }();
 
-      // Wait for streams to complete
-      await completer.future;
-
-      // Extract session ID if this is the first message
-      if (_sessionId == null && options?.continueLastSession != true) {
-        // Try to extract from the full output
-        // Note: This might not work well with streaming
-      }
-    } finally {
-      await stdoutSub?.cancel();
-      await stderrSub?.cancel();
-      process?.kill();
-    }
+    return controller.stream;
   }
 
-  /// The stream controller for streaming responses (for testing)
-  @visibleForTesting
-  StreamController<String>? streamController;
+  /// Sends a message with a schema and returns structured data
+  Future<({String llmMessage, Map<String, dynamic> structuredSchemaData})>
+      sendMessageWithSchema({
+    required List<CodexSdkContent> messages,
+    required SchemaObject schema,
+  }) async {
+    _ensureNotDisposed();
+
+    final result = await _runSchemaWorkflow(
+      messages: messages,
+      schema: schema,
+    );
+
+    return (
+      llmMessage: result.llmMessage.trim(),
+      structuredSchemaData: result.structuredSchemaData,
+    );
+  }
+
+  /// Streams a response with schema parsing support
+  ({Stream<String> llmMessage, Completer<Map<String, dynamic>> structuredSchemaData})
+      streamResponseWithSchema({
+    required List<CodexSdkContent> messages,
+    required SchemaObject schema,
+  }) {
+    _ensureNotDisposed();
+
+    final controller = StreamController<String>();
+    final schemaCompleter = Completer<Map<String, dynamic>>();
+
+    () async {
+      try {
+        final result = await _runSchemaWorkflow(
+          messages: messages,
+          schema: schema,
+          streamSink: controller.sink,
+        );
+
+        if (!schemaCompleter.isCompleted) {
+          schemaCompleter.complete(result.structuredSchemaData);
+        }
+      } catch (error, stackTrace) {
+        if (!schemaCompleter.isCompleted) {
+          schemaCompleter.completeError(error, stackTrace);
+        }
+        if (!controller.isClosed) {
+          controller.addError(error, stackTrace);
+        }
+      } finally {
+        if (!controller.isClosed) {
+          await controller.close();
+        }
+      }
+    }();
+
+    return (
+      llmMessage: controller.stream,
+      structuredSchemaData: schemaCompleter,
+    );
+  }
 
   /// Changes the model for this chat session
-  /// This will reset the conversation as Claude Code requires a new session for model changes
+  /// This will reset the conversation as Codex requires a new session for model changes
   void changeModel(String model) {
-    if (_isDisposed) {
-      throw CodexSDKException('Chat session has been disposed');
-    }
+    _ensureNotDisposed();
 
-    // Update the options with the new model
     options = (options ?? const CodexChatOptions()).copyWith(model: model);
-
-    // Reset the session ID to start a new conversation with the new model
     _sessionId = null;
   }
 
   /// Changes the model and reasoning effort for this chat session
   /// This will reset the conversation as Codex requires a new session for model changes
   void changeModelWithEffort(String model, String? reasoningEffort) {
-    if (_isDisposed) {
-      throw CodexSDKException('Chat session has been disposed');
-    }
+    _ensureNotDisposed();
 
-    // Update the options with the new model and reasoning effort
     options = (options ?? const CodexChatOptions()).copyWith(
       model: model,
       reasoningEffort: reasoningEffort,
     );
-
-    // Reset the session ID to start a new conversation with the new model
     _sessionId = null;
   }
 
@@ -337,15 +180,13 @@ Format your response as JSON with these fields:
   Future<void> dispose() async {
     if (_isDisposed) return;
 
-    // Clean up temporary files
     for (final file in _tempFiles) {
       try {
-        if (file.existsSync()) {
+        if (await file.exists()) {
           await file.delete();
         }
-      } catch (e) {
-        // Ignore deletion errors
-        print('Warning: Failed to delete temp file ${file.path}: $e');
+      } catch (_) {
+        // Ignore cleanup errors
       }
     }
     _tempFiles.clear();
@@ -353,7 +194,191 @@ Format your response as JSON with these fields:
     _isDisposed = true;
   }
 
-  // Private helper methods
+  void _ensureNotDisposed() {
+    if (_isDisposed) {
+      throw CodexSDKException('Chat session has been disposed');
+    }
+  }
+
+  Future<String> _runCodexCommand(
+    String message, {
+    StreamSink<String>? streamSink,
+  }) async {
+    final args = _buildCommandArgs(
+      message,
+      forStreaming: streamSink != null,
+    );
+
+    final environment = _buildEnvironment();
+
+    if (streamSink != null) {
+      final process = await Process.start(
+        'codex',
+        args,
+        environment: environment,
+        workingDirectory: options?.cwd,
+      );
+
+      final stdoutBuffer = StringBuffer();
+      final stderrBuffer = StringBuffer();
+      final stdoutDone = Completer<void>();
+      final stderrDone = Completer<void>();
+
+      process.stdout.listen(
+        (data) {
+          final chunk = utf8.decode(data, allowMalformed: true);
+          stdoutBuffer.write(chunk);
+          streamSink.add(chunk);
+        },
+        onDone: () => stdoutDone.complete(),
+        onError: (error, stackTrace) {
+          if (!stdoutDone.isCompleted) {
+            stdoutDone.completeError(error, stackTrace);
+          }
+        },
+      );
+
+      process.stderr.listen(
+        (data) {
+          stderrBuffer.write(utf8.decode(data, allowMalformed: true));
+        },
+        onDone: () => stderrDone.complete(),
+        onError: (error, stackTrace) {
+          if (!stderrDone.isCompleted) {
+            stderrDone.completeError(error, stackTrace);
+          }
+        },
+      );
+
+      final exitCode = await process.exitCode;
+      await stdoutDone.future;
+      await stderrDone.future;
+
+      if (exitCode != 0) {
+        throw ProcessException(
+          'Codex command failed',
+          exitCode: exitCode,
+          stderr: stderrBuffer.toString(),
+        );
+      }
+
+      return stdoutBuffer.toString();
+    }
+
+    final result = await Process.run(
+      'codex',
+      args,
+      environment: environment,
+      workingDirectory: options?.cwd,
+    );
+
+    if (result.exitCode != 0) {
+      throw ProcessException(
+        'Codex command failed',
+        exitCode: result.exitCode,
+        stderr: result.stderr.toString(),
+      );
+    }
+
+    return result.stdout.toString();
+  }
+
+  Future<_SchemaWorkflowResult> _runSchemaWorkflow({
+    required List<CodexSdkContent> messages,
+    required SchemaObject schema,
+    StreamSink<String>? streamSink,
+  }) async {
+    if (messages.isEmpty) {
+      throw CodexSDKException('Cannot send empty message');
+    }
+
+    final schemaFile = await _createSchemaTempJsonFile();
+    final schemaJsonPretty = const JsonEncoder.withIndent('  ').convert(schema.toJson());
+    final schemaFilePath = schemaFile.absolute.path;
+
+    String instruction = _buildSchemaInstruction(
+      schemaJsonPretty: schemaJsonPretty,
+      schemaFilePath: schemaFilePath,
+    );
+
+    String prompt = await _prepareMessage([
+      CodexSdkContent.text(instruction),
+      ...messages,
+    ]);
+
+    var jsonAttempts = 0;
+    var schemaAttempts = 0;
+    String llmMessage = '';
+
+    try {
+      while (true) {
+        jsonAttempts += 1;
+        await _resetSchemaTempFile(schemaFile);
+
+        final rawOutput = await _runCodexCommand(
+          prompt,
+          streamSink: streamSink,
+        );
+        llmMessage = _parseResponse(rawOutput).trim();
+
+        Map<String, dynamic> parsedJson;
+        try {
+          parsedJson = await _parseJsonFromTempFile(schemaFile);
+        } on JSONDecodeException catch (jsonError) {
+          if (jsonAttempts >= 2) {
+            throw JSONDecodeException(
+              'Failed to parse Codex JSON output after retry: ${jsonError.message}',
+              jsonError.rawContent,
+              jsonError,
+            );
+          }
+
+          final currentContent = await _safeReadFile(schemaFile);
+          instruction = _buildSchemaInstruction(
+            schemaJsonPretty: schemaJsonPretty,
+            schemaFilePath: schemaFilePath,
+            jsonErrorMessage: jsonError.message,
+            currentFileContent: currentContent,
+          );
+
+          prompt = await _prepareMessage([
+            CodexSdkContent.text(instruction),
+            ...messages,
+          ]);
+          continue;
+        }
+
+        try {
+          final validated = _validateSchemaResponse(parsedJson, schema);
+          return _SchemaWorkflowResult(
+            llmMessage: llmMessage,
+            structuredSchemaData: validated,
+          );
+        } on SchemaValidationException catch (validationError) {
+          schemaAttempts += 1;
+          if (schemaAttempts >= 2) {
+            rethrow;
+          }
+
+          jsonAttempts = 0;
+          final prettyJson = const JsonEncoder.withIndent('  ').convert(parsedJson);
+          instruction = _buildSchemaInstruction(
+            schemaJsonPretty: schemaJsonPretty,
+            schemaFilePath: schemaFilePath,
+            validationError: validationError,
+            lastJsonPretty: prettyJson,
+          );
+
+          prompt = await _prepareMessage([
+            CodexSdkContent.text(instruction),
+            ...messages,
+          ]);
+        }
+      }
+    } finally {
+      await _deleteSchemaTempFile(schemaFile);
+    }
+  }
 
   Future<String> _prepareMessage(List<CodexSdkContent> contents) async {
     final buffer = StringBuffer();
@@ -367,7 +392,6 @@ Format your response as JSON with these fields:
         }
         buffer.writeln('File: ${content.file.absolute.path}');
       } else if (content is BytesContent) {
-        // Create temporary file for bytes content
         final tempFile = await _createTempFile(content);
         buffer.writeln('File: ${tempFile.absolute.path}');
       }
@@ -388,31 +412,284 @@ Format your response as JSON with these fields:
     return tempFile;
   }
 
-  List<String> _buildCommandArgs(String message, {bool forStreaming = false}) {
-    final args = <String>[];
+  Future<File> _createSchemaTempJsonFile() async {
+    final baseDir = options?.cwd != null
+        ? Directory(options!.cwd!).absolute
+        : Directory.current.absolute;
 
-    // Add exec command for non-interactive execution
-    args.add('exec');
+    final fileName = 'codex_schema_${_uuid.v4()}.json';
+    final file = File(path.join(baseDir.path, fileName));
+    await file.create(recursive: true);
+    _tempFiles.add(file);
+    return file;
+  }
 
-    // Add options from CodexChatOptions
-    if (options != null) {
-      // Don't add quiet flag for streaming
-      if (!forStreaming) {
-        args.addAll(options!.toCliArgs());
-      } else {
-        // For streaming, filter out quiet and json flags
-        final streamingArgs = options!.toCliArgs()
-          ..removeWhere((arg) => arg == '--quiet' || arg == '--json');
-        args.addAll(streamingArgs);
+  Future<void> _resetSchemaTempFile(File file) async {
+    await file.writeAsString('{}', flush: true);
+  }
+
+  Future<void> _deleteSchemaTempFile(File file) async {
+    try {
+      if (await file.exists()) {
+        await file.delete();
       }
+    } catch (_) {
+      // Ignore cleanup failures
+    } finally {
+      _tempFiles.remove(file);
+    }
+  }
+
+  Future<Map<String, dynamic>> _parseJsonFromTempFile(File file) async {
+    final content = await file.readAsString();
+    if (content.trim().isEmpty) {
+      throw JSONDecodeException('JSON file is empty', content);
     }
 
-    // Add resume session if we have a session ID
+    try {
+      final decoded = jsonDecode(content);
+      if (decoded is! Map) {
+        throw JSONDecodeException(
+          'Expected JSON object at root level',
+          content,
+        );
+      }
+      return Map<String, dynamic>.from(decoded);
+    } on FormatException catch (error) {
+      throw JSONDecodeException(
+        'Invalid JSON format: ${error.message}',
+        content,
+        error,
+      );
+    }
+  }
+
+  String _buildSchemaInstruction({
+    required String schemaJsonPretty,
+    required String schemaFilePath,
+    String? jsonErrorMessage,
+    String? currentFileContent,
+    SchemaValidationException? validationError,
+    String? lastJsonPretty,
+  }) {
+    final buffer = StringBuffer();
+
+    buffer
+      ..writeln('You must produce structured JSON that matches the schema below.')
+      ..writeln('Write the JSON object directly into this file (overwrite existing contents):')
+      ..writeln(schemaFilePath)
+      ..writeln()
+      ..writeln('You can run shell commands (e.g. `cat <<\'EOF\' > $schemaFilePath`) or use Codex editing tools to write the file.')
+      ..writeln('Do not include the JSON in your assistant reply; only provide a concise summary of your work.')
+      ..writeln()
+      ..writeln('JSON schema:')
+      ..writeln('```json')
+      ..writeln(schemaJsonPretty)
+      ..writeln('```');
+
+    if (jsonErrorMessage != null) {
+      buffer
+        ..writeln()
+        ..writeln('[Previous attempt produced invalid JSON.]')
+        ..writeln('Parser error: $jsonErrorMessage');
+      if (currentFileContent != null && currentFileContent.isNotEmpty) {
+        buffer
+          ..writeln('Current file contents:')
+          ..writeln('```json')
+          ..writeln(_truncate(currentFileContent))
+          ..writeln('```');
+      }
+      buffer.writeln('Please regenerate the JSON and overwrite the entire file.');
+    }
+
+    if (validationError != null) {
+      buffer
+        ..writeln()
+        ..writeln('[Previous attempt failed schema validation.]');
+      if (validationError.issues.isNotEmpty) {
+        buffer.writeln('Issues detected:');
+        for (final issue in validationError.issues) {
+          buffer.writeln('- $issue');
+        }
+      }
+      if (lastJsonPretty != null && lastJsonPretty.isNotEmpty) {
+        buffer
+          ..writeln('Last JSON content:')
+          ..writeln('```json')
+          ..writeln(_truncate(lastJsonPretty))
+          ..writeln('```');
+      }
+      buffer.writeln('Fix these issues and overwrite the file with a corrected JSON object.');
+    }
+
+    buffer
+      ..writeln()
+      ..writeln('After saving, double-check the file and then respond with a short summary of what was generated.');
+
+    return buffer.toString();
+  }
+
+  Map<String, dynamic> _validateSchemaResponse(
+    Map<String, dynamic> json,
+    SchemaObject schema,
+  ) {
+    if (schema.type != 'object') {
+      throw SchemaValidationException(
+        'Root schema type must be an object',
+        ['Unsupported schema root type: ${schema.type}'],
+      );
+    }
+
+    final errors = <String>[];
+
+    late final void Function(
+      Map<String, dynamic> value,
+      Map<String, SchemaProperty> properties,
+      String path,
+    ) validateMap;
+
+    late final void Function(
+      String propertyPath,
+      dynamic value,
+      SchemaProperty property,
+    ) validateValue;
+
+    validateMap = (value, properties, path) {
+      for (final entry in properties.entries) {
+        final key = entry.key;
+        final property = entry.value;
+        final propertyPath = path.isEmpty ? key : '$path.$key';
+
+        if (!value.containsKey(key)) {
+          if (!property.nullable) {
+            errors.add('Missing required property "$propertyPath"');
+          }
+          continue;
+        }
+
+        final fieldValue = value[key];
+        if (fieldValue == null) {
+          if (!property.nullable) {
+            errors.add('Property "$propertyPath" cannot be null');
+          }
+          continue;
+        }
+
+        validateValue(propertyPath, fieldValue, property);
+      }
+    };
+
+    validateValue = (propertyPath, value, property) {
+      switch (property.type) {
+        case 'string':
+          if (value is! String) {
+            errors.add(
+              'Property "$propertyPath" must be a string but received ${value.runtimeType}',
+            );
+            return;
+          }
+          if (property.enumValues != null &&
+              property.enumValues!.isNotEmpty &&
+              !property.enumValues!.contains(value)) {
+            errors.add(
+              'Property "$propertyPath" must be one of ${property.enumValues} but received "$value"',
+            );
+          }
+          return;
+        case 'number':
+          if (value is! num) {
+            errors.add(
+              'Property "$propertyPath" must be a number but received ${value.runtimeType}',
+            );
+          }
+          return;
+        case 'integer':
+          if (value is int) {
+            return;
+          }
+          if (value is num && value % 1 == 0) {
+            return;
+          }
+          errors.add(
+            'Property "$propertyPath" must be an integer but received ${value.runtimeType}',
+          );
+          return;
+        case 'boolean':
+          if (value is! bool) {
+            errors.add(
+              'Property "$propertyPath" must be a boolean but received ${value.runtimeType}',
+            );
+          }
+          return;
+        case 'array':
+          if (value is! List) {
+            errors.add(
+              'Property "$propertyPath" must be an array but received ${value.runtimeType}',
+            );
+            return;
+          }
+          if (property.items != null) {
+            for (var index = 0; index < value.length; index++) {
+              final element = value[index];
+              if (element == null) {
+                errors.add('Array element "$propertyPath[$index]" cannot be null');
+                continue;
+              }
+              validateValue('$propertyPath[$index]', element, property.items!);
+            }
+          }
+          return;
+        case 'object':
+          if (value is! Map) {
+            errors.add(
+              'Property "$propertyPath" must be an object but received ${value.runtimeType}',
+            );
+            return;
+          }
+          Map<String, dynamic> mapValue;
+          try {
+            mapValue = Map<String, dynamic>.from(value);
+          } catch (_) {
+            errors.add(
+              'Property "$propertyPath" must be a JSON object with string keys',
+            );
+            return;
+          }
+          if (property.properties != null && property.properties!.isNotEmpty) {
+            validateMap(mapValue, property.properties!, propertyPath);
+          }
+          return;
+        default:
+          return;
+      }
+    };
+
+    validateMap(json, schema.properties, '');
+
+    if (errors.isNotEmpty) {
+      throw SchemaValidationException('Schema validation failed', errors);
+    }
+
+    return json;
+  }
+
+  List<String> _buildCommandArgs(String message, {bool forStreaming = false}) {
+    final args = <String>['exec'];
+
+    if (options != null) {
+      final optionArgs = options!.toCliArgs();
+      if (forStreaming) {
+        optionArgs.removeWhere(
+          (arg) => arg == '--quiet' || arg == '--json',
+        );
+      }
+      args.addAll(optionArgs);
+    }
+
     if (_sessionId != null && options?.continueLastSession != true) {
       args.addAll(['--session', _sessionId!]);
     }
 
-    // Add the message as the last argument
     args.add(message);
 
     return args;
@@ -420,11 +697,8 @@ Format your response as JSON with these fields:
 
   Map<String, String> _buildEnvironment() {
     final env = Map<String, String>.from(Platform.environment);
-
-    // Add API key
     env['OPENAI_API_KEY'] = apiKey;
 
-    // Add custom environment variables
     if (options?.environment != null) {
       env.addAll(options!.environment!);
     }
@@ -434,7 +708,6 @@ Format your response as JSON with these fields:
 
   String _parseResponse(String output) {
     if (options?.outputJson == true || options?.quiet == true) {
-      // In JSON mode, parse and extract the response
       try {
         final json = jsonDecode(output);
         if (json is Map<String, dynamic>) {
@@ -444,7 +717,7 @@ Format your response as JSON with these fields:
               output;
         }
       } catch (_) {
-        // If JSON parsing fails, return raw output
+        // Ignore parse errors and fall back to raw output
       }
     }
 
@@ -452,27 +725,42 @@ Format your response as JSON with these fields:
   }
 
   String? _extractSessionId(String response) {
-    // Try to extract session ID from response
-    // This might be in logs or metadata
-
-    // Look for session ID patterns in the response
     final sessionPattern =
-        RegExp(r'session[_\-]?id[:\s]+([a-f0-9\-]+)', caseSensitive: false);
+        RegExp(r'session[_\\-]?id[:\\s]+([a-f0-9\\-]+)', caseSensitive: false);
     final match = sessionPattern.firstMatch(response);
 
     if (match != null) {
       return match.group(1);
     }
 
-    // If no session ID found, generate one
-    return _uuid.v4();
+    return null;
   }
 
-  /// Annotation for testing visibility
-  static const visibleForTesting = _VisibleForTesting();
+  Future<String> _safeReadFile(File file) async {
+    try {
+      if (!await file.exists()) {
+        return '';
+      }
+      return await file.readAsString();
+    } catch (_) {
+      return '';
+    }
+  }
+
+  String _truncate(String value, [int maxLength = 1500]) {
+    if (value.length <= maxLength) {
+      return value;
+    }
+    return '${value.substring(0, maxLength)}...';
+  }
 }
 
-/// Annotation to mark members that are only visible for testing
-class _VisibleForTesting {
-  const _VisibleForTesting();
+class _SchemaWorkflowResult {
+  final String llmMessage;
+  final Map<String, dynamic> structuredSchemaData;
+
+  const _SchemaWorkflowResult({
+    required this.llmMessage,
+    required this.structuredSchemaData,
+  });
 }

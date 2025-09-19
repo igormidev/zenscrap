@@ -9,10 +9,12 @@ import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/zen_chat_textfield
 class ScrappableEditSessionView extends StatelessWidget {
   final Scrappable scrappable;
   final DateTime testExpirationDate;
+  final List<String>? llmThinkingStream;
   const ScrappableEditSessionView({
     super.key,
     required this.scrappable,
     required this.testExpirationDate,
+    required this.llmThinkingStream,
   });
 
   @override
@@ -33,7 +35,11 @@ class ScrappableEditSessionView extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 20, left: 20),
                   child: Column(
                     children: [
-                      Expanded(child: ScrappableChatMessageStreamSection()),
+                      Expanded(
+                        child: ScrappableChatMessageStreamSection(
+                          llmThinkingStream: llmThinkingStream,
+                        ),
+                      ),
                       ZenChatTextfield(
                         targetTime: testExpirationDate,
                       ),

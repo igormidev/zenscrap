@@ -37,7 +37,7 @@ This is additional context that complements your default behavior.''',
     
     print('First response (with system prompt):');
     print(response1);
-    print('\n' + '-' * 40 + '\n');
+    print("\n${'-' * 40}\n");
     
     // Second message - system prompt won't be included (conversation continues)
     final response2 = await chatWithSystemPrompt.sendMessage([
@@ -52,7 +52,7 @@ This is additional context that complements your default behavior.''',
   }
   
   // Example 2: Chat with system prompt repeated in every message
-  print('\n' + '=' * 50);
+  print("\n${'=' * 50}");
   print('\n📝 Example 2: System prompt repeated in every message\n');
   
   final chatWithRepeatedPrompt = geminiSDK.createNewChat(
@@ -72,7 +72,7 @@ Be concise and clear.''',
     
     print('First response:');
     print(response1);
-    print('\n' + '-' * 40 + '\n');
+    print("\n${'-' * 40}\n");
     
     // Second message - system prompt will be included again
     final response2 = await chatWithRepeatedPrompt.sendMessage([
@@ -87,7 +87,7 @@ Be concise and clear.''',
   }
   
   // Example 3: Technical assistant with system prompt
-  print('\n' + '=' * 50);
+  print("\n${'=' * 50}");
   print('\n📝 Example 3: Technical assistant with detailed system prompt\n');
   
   final technicalChat = geminiSDK.createNewChat(
@@ -116,7 +116,7 @@ Remember: This complements your existing knowledge, not replaces it.''',
   }
   
   // Example 4: Comparing with and without system prompt
-  print('\n' + '=' * 50);
+  print("\n${'=' * 50}");
   print('\n📝 Example 4: Comparing responses with and without system prompt\n');
   
   const question = 'Write a haiku about coding';
@@ -135,7 +135,7 @@ Remember: This complements your existing knowledge, not replaces it.''',
     await normalChat.dispose();
   }
   
-  print('\n' + '-' * 40 + '\n');
+  print("\n${'-' * 40}\n");
   
   // With system prompt
   final poeticChat = geminiSDK.createNewChat(

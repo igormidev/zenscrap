@@ -84,7 +84,7 @@ void main() async {
         description: 'Information about a programming language',
       );
 
-      final schemaResult = await chat.sendMessageWithSchema(
+      final result = await chat.sendMessageWithSchema(
         messages: [
           CodexSdkContent.text('Give me information about the Dart programming language'),
         ],
@@ -92,8 +92,8 @@ void main() async {
       );
 
       print('\nStructured response:');
-      print('Message: ${schemaResult.modelMessage}');
-      print('Data: ${schemaResult.data}');
+      print('Message: ${result.llmMessage}');
+      print('Data: ${result.structuredSchemaData}');
     } finally {
       await chat.dispose();
     }

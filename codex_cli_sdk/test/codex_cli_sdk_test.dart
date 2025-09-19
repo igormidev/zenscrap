@@ -92,24 +92,26 @@ void main() {
 
     test('should convert to CLI arguments', () {
       const options = CodexChatOptions(
-        mode: 'suggest',
         model: 'gpt-5',
-        quiet: true,
+        sandboxMode: 'danger-full-access',
+        approvalPolicy: 'never',
       );
 
       final args = options.toCliArgs();
-      expect(args, contains('--suggest'));
       expect(args, contains('--model'));
       expect(args, contains('gpt-5'));
-      expect(args, contains('--quiet'));
+      expect(args, contains('--sandbox'));
+      expect(args, contains('danger-full-access'));
+      expect(args, contains('--ask-for-approval'));
+      expect(args, contains('never'));
     });
 
-    test('should handle all operation modes', () {
+    test('should handle operation modes', () {
       final suggestOptions = const CodexChatOptions(mode: 'suggest');
-      expect(suggestOptions.toCliArgs(), contains('--suggest'));
+      expect(suggestOptions.toCliArgs(), isEmpty);
 
       final autoEditOptions = const CodexChatOptions(mode: 'auto-edit');
-      expect(autoEditOptions.toCliArgs(), contains('--auto-edit'));
+      expect(autoEditOptions.toCliArgs(), isEmpty);
 
       final fullAutoOptions = const CodexChatOptions(mode: 'full-auto');
       expect(fullAutoOptions.toCliArgs(), contains('--full-auto'));
@@ -248,6 +250,7 @@ void main() {
     });
 
     test('should handle schema result', () {
+      // ignore: deprecated_member_use_from_same_package
       final result = SchemaResult(
         modelMessage: 'Here is the data',
         data: {'key': 'value'},
@@ -260,6 +263,7 @@ void main() {
       expect(json['modelMessage'], equals('Here is the data'));
       expect(json['data'], equals({'key': 'value'}));
 
+      // ignore: deprecated_member_use_from_same_package
       final fromJson = SchemaResult.fromJson(json);
       expect(fromJson.modelMessage, equals(result.modelMessage));
       expect(fromJson.data, equals(result.data));

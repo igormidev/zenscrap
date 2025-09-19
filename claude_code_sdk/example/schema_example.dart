@@ -114,27 +114,27 @@ void main() async {
     );
 
     print('Model Message:');
-    print(result.modelMessage);
+    print(result.llmMessage);
     print('\n---\n');
 
     print('Extracted Data (JSON):');
-    print(const JsonEncoder.withIndent('  ').convert(result.data));
+    print(const JsonEncoder.withIndent('  ').convert(result.structuredSchemaData));
     print('\n---\n');
 
     // Access specific fields
     print('Accessing specific fields:');
-    print('Name: ${result.data['name']}');
-    print('Email: ${result.data['email']}');
-    print('Position: ${result.data['position']}');
+    print('Name: ${result.structuredSchemaData['name']}');
+    print('Email: ${result.structuredSchemaData['email']}');
+    print('Position: ${result.structuredSchemaData['position']}');
 
-    if (result.data['office'] != null) {
-      final office = result.data['office'] as Map<String, dynamic>;
+    if (result.structuredSchemaData['office'] != null) {
+      final office = result.structuredSchemaData['office'] as Map<String, dynamic>;
       print(
           'Office: ${office['city']}, ${office['building']}, Floor ${office['floor']}');
     }
 
-    if (result.data['skills'] != null) {
-      final skills = result.data['skills'] as List;
+    if (result.structuredSchemaData['skills'] != null) {
+      final skills = result.structuredSchemaData['skills'] as List;
       print('Skills: ${skills.join(', ')}');
     }
 

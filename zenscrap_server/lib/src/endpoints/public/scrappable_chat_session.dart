@@ -2,13 +2,16 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:serverpod/serverpod.dart';
-import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_gemini_sdk_impl.dart';
+import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_codex_sdk_impl.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/i_chat_controller.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 typedef RedraftSrappableSessionId = String;
+typedef ThinkingSessionId = String;
+
 final Map<RedraftSrappableSessionId, ReplaySubject<ChatResponse>>
     _scrapRedraftSessions = {};
+final Map<ThinkingSessionId, StreamController<String>> _thinkingStream = {};
 final Map<RedraftSrappableSessionId, IChatController> _chatSessions = {};
 final Map<int, RedraftSrappableSessionId> _scrappableOpenedSessionsIds = {};
 final Map<RedraftSrappableSessionId, ReferenceTestData> _cacheRefTestData = {};
@@ -96,7 +99,7 @@ class ScrappableChatSession extends Endpoint {
     final RedraftSrappableSessionId sessionUuid = uuid.v4();
     _scrappableOpenedSessionsIds[scrappable.id!] = sessionUuid;
     _scrapRedraftSessions[sessionUuid] = ReplaySubject<ChatResponse>();
-    _chatSessions[sessionUuid] = ChatControllerGeminiSdkImpl.startChat(
+    _chatSessions[sessionUuid] = ChatControllerCodexSdkImpl.startChat(
       scrapperRequest: scrapperRequest,
       referenceTestData: referenceTestData,
     );
@@ -194,11 +197,11 @@ class ScrappableChatSession extends Endpoint {
     await _chatSessions[sessionUuid]?.changeModel(aiModel);
   }
 
-  Future<void> sendPromptMessage(
+  Stream<String> sendPromptMessage(
     Session session, {
     required RedraftSrappableSessionId sessionId,
     required String userPrompt,
-  }) async {
+  }) async* {
     final chatController = _chatSessions[sessionId];
     if (chatController == null) {
       throw ZenScrapException(
@@ -216,12 +219,16 @@ class ScrappableChatSession extends Endpoint {
       );
     }
 
+    final ThinkingSessionId thinkingSessionId = uuid.v7();
+    _thinkingStream[thinkingSessionId] = StreamController<ThinkingSessionId>();
+
     // Put future call
     await session.serverpod.futureCallWithDelay(
       'session_prompt',
       SessionPrompt(
         sessionId: sessionId,
         userPrompt: userPrompt,
+        thinkingSessionId: thinkingSessionId,
       ),
       const Duration(seconds: 1),
     );
@@ -261,7 +268,7 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
   @override
   Future<void> invoke(Session session, SessionPrompt? object) async {
     if (object == null) return;
-
+    final ThinkingSessionId thinkingSessionId = object.thinkingSessionId;
     final String sessionId = object.sessionId;
     final String userPrompt = object.userPrompt;
 
@@ -291,10 +298,11 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
       return;
     }
 
+    final StreamController<String> llmThinking = StreamController<String>();
     final StreamController<ChatResponse> chatSeason =
         StreamController<ChatResponse>();
 
-    final StreamSubscription<ChatResponse> subscription =
+    final StreamSubscription<ChatResponse> subsChatSeason =
         chatSeason.stream.listen((ChatResponse chatResponse) {
       _scrapRedraftSessions[sessionId]?.add(chatResponse);
       if (chatResponse is NewExtractRuleResponse) {
@@ -311,6 +319,12 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
       }
     });
 
+    final StreamSubscription<String> subLlmThinking = llmThinking.stream.listen(
+      (event) {
+        _thinkingStream[thinkingSessionId]?.add(event);
+      },
+    );
+
     chatSeason.add(MessageTextResponse(
       role: PromptRole.user,
       messageText: userPrompt,
@@ -324,6 +338,7 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
         referenceTestData: testData,
         scrapperRequest: scrapperRequest,
         scrappingBeeExtractLogic: scrappingBeeExtractLogic,
+        thinkingStream: llmThinking,
       );
     } catch (e, s) {
       chatSeason.add(ErrorTextResponse(
@@ -338,11 +353,18 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
       );
       rethrow;
     } finally {
+      await Future.delayed(const Duration(milliseconds: 300));
       if (!chatSeason.isClosed) {
-        await Future.delayed(const Duration(milliseconds: 300));
-        await subscription.cancel();
+        await subsChatSeason.cancel();
         await chatSeason.close();
       }
+      if (!llmThinking.isClosed) {
+        await subLlmThinking.cancel();
+        await llmThinking.close();
+      }
+
+      await _thinkingStream[thinkingSessionId]?.close();
+      _thinkingStream.remove(thinkingSessionId);
     }
   }
 }

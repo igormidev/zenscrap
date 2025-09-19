@@ -14,7 +14,11 @@ import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_messages_pro
 import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
 
 class ScrappableChatMessageStreamSection extends ConsumerStatefulWidget {
-  const ScrappableChatMessageStreamSection({super.key});
+  final List<String>? llmThinkingStream;
+  const ScrappableChatMessageStreamSection({
+    super.key,
+    required this.llmThinkingStream,
+  });
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -101,6 +105,22 @@ class _ScrappableChatMessageStreamSectionState
           itemCount: messages.length + (willHideLoading ? 0 : 1),
           itemBuilder: (context, index) {
             final bool isLastIndex = index == messages.length;
+            if (isLastIndex &&
+                widget.llmThinkingStream != null &&
+                widget.llmThinkingStream!.isNotEmpty) {
+              return Text(
+                widget.llmThinkingStream!.join(),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      height: 1.4,
+                      fontSize: 14,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.9),
+                    ),
+              );
+            }
+
             if (isLastIndex && !willHideLoading) {
               return Align(
                 alignment: Alignment.centerLeft,

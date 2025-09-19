@@ -15,5 +15,6 @@ abstract class IChatController {
     required ScrappableRequest scrapperRequest,
     required ScrappingBeeExtractLogic? scrappingBeeExtractLogic,
     required StreamController<ChatResponse> chatSeason,
+    required StreamController<String> thinkingStream,
   });
 }

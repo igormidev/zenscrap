@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -47,7 +48,8 @@ class ClaudeChat {
   }
 
   /// Sends a message with a schema and returns structured data
-  Future<SchemaResult> sendMessageWithSchema({
+  Future<({String llmMessage, Map<String, dynamic> structuredSchemaData})>
+      sendMessageWithSchema({
     required List<ClaudeSdkContent> messages,
     required SchemaObject schema,
   }) async {
@@ -55,55 +57,58 @@ class ClaudeChat {
       throw ClaudeSDKException('Chat session has been disposed');
     }
 
-    // Build the prompt with schema instructions
-    final prompt = await _buildSchemaPrompt(messages, schema);
+    final result = await _runSchemaWorkflow(
+      messages: messages,
+      schema: schema,
+    );
 
-    // Run the Claude CLI and get response
-    final response = await _runClaudeCommand(prompt);
+    return (
+      llmMessage: result.llmMessage.trim(),
+      structuredSchemaData: result.structuredSchemaData,
+    );
+  }
 
-    // First attempt to parse the response
-    try {
-      return _parseSchemaResponse(response);
-    } catch (firstError) {
-      // If parsing fails, give the model a second chance with error context
-      print('Warning: First schema parsing attempt failed. Retrying with error context...');
-      
-      try {
-        // Build a retry prompt with error context
-        final retryPrompt = await _buildRetrySchemaPrompt(
-          originalResponse: response,
-          error: firstError,
-          schema: schema,
-        );
-        
-        // Run the retry command
-        final retryResponse = await _runClaudeCommand(retryPrompt);
-        
-        // Try parsing the retry response
-        try {
-          return _parseSchemaResponse(retryResponse);
-        } catch (secondError) {
-          // If it still fails, throw the original error with additional context
-          throw JSONDecodeException(
-            'Failed to parse schema response after retry. '
-            'Original error: ${firstError.toString()}\n'
-            'Retry error: ${secondError.toString()}',
-            'First response: $response\nRetry response: $retryResponse',
-            secondError,
-          );
-        }
-      } catch (e) {
-        // If the retry itself fails (not just parsing), throw the original error
-        if (e is JSONDecodeException) {
-          rethrow;
-        }
-        throw JSONDecodeException(
-          'Failed to retry schema parsing: ${e.toString()}',
-          response,
-          firstError,
-        );
-      }
+  ({Stream<String> llmMessage, Completer<Map<String, dynamic>> structuredSchemaData})
+      streamResponseWithSchema({
+    required List<ClaudeSdkContent> messages,
+    required SchemaObject schema,
+  }) {
+    if (_isDisposed) {
+      throw ClaudeSDKException('Chat session has been disposed');
     }
+
+    final controller = StreamController<String>();
+    final schemaCompleter = Completer<Map<String, dynamic>>();
+
+    () async {
+      try {
+        final result = await _runSchemaWorkflow(
+          messages: messages,
+          schema: schema,
+          streamSink: controller.sink,
+        );
+
+        if (!schemaCompleter.isCompleted) {
+          schemaCompleter.complete(result.structuredSchemaData);
+        }
+      } catch (error, stackTrace) {
+        if (!schemaCompleter.isCompleted) {
+          schemaCompleter.completeError(error, stackTrace);
+        }
+        if (!controller.isClosed) {
+          controller.addError(error, stackTrace);
+        }
+      } finally {
+        if (!controller.isClosed) {
+          await controller.close();
+        }
+      }
+    }();
+
+    return (
+      llmMessage: controller.stream,
+      structuredSchemaData: schemaCompleter,
+    );
   }
 
   /// Gets the current session ID (if available)
@@ -169,110 +174,57 @@ class ClaudeChat {
     }
   }
 
-  /// Builds a prompt with schema instructions
-  Future<String> _buildSchemaPrompt(
-      List<ClaudeSdkContent> messages, SchemaObject schema) async {
-    final prompt = await _buildPrompt(messages);
-    final schemaJson = jsonEncode(schema.toJson());
-
-    return '''$prompt
-
-Please provide your response in the following JSON schema format:
-$schemaJson
-
-Ensure your response strictly follows this schema.
-Return only raw json, without anything more (not even md notations like "```" in the begining... just the raw json).''';
-  }
-
-  /// Builds a retry prompt when schema parsing fails
-  Future<String> _buildRetrySchemaPrompt({
-    required String originalResponse,
-    required Object error,
-    required SchemaObject schema,
+  Future<String> _runClaudeCommand(
+    String prompt, {
+    StreamSink<String>? streamSink,
   }) async {
-    final schemaJson = jsonEncode(schema.toJson());
-    
-    // Extract error details
-    String errorMessage = error.toString();
-    String errorDetails = '';
-    
-    if (error is JSONDecodeException) {
-      errorMessage = error.message;
-      // Limit the raw content to prevent token overflow
-      final rawContent = error.rawContent.length > 500 
-          ? '${error.rawContent.substring(0, 500)}...' 
-          : error.rawContent;
-      errorDetails = 'Your response: $rawContent';
-    } else if (error is FormatException) {
-      errorMessage = 'JSON format error: ${error.message}';
-      errorDetails = 'Invalid JSON at: ${error.source?.toString() ?? 'unknown position'}';
-    }
-
-    return '''[CRITICAL ERROR - RETRY REQUIRED]
-
-Your previous response failed to match the required JSON schema format. This is a critical issue that needs immediate correction.
-
-ERROR ENCOUNTERED:
-$errorMessage
-
-$errorDetails
-
-WHAT WENT WRONG:
-Your response either:
-1. Did not contain valid JSON
-2. Contained text mixed with JSON (JSON must be standalone)
-3. Had syntax errors in the JSON structure
-4. Did not match the required schema properties
-5. Included markdown code blocks (```) which are not allowed
-
-REQUIRED SCHEMA (YOU MUST FOLLOW THIS EXACTLY):
-$schemaJson
-
-INSTRUCTIONS FOR RETRY:
-1. Take a deep breath and carefully analyze the schema above
-2. Ensure ALL required fields are present with correct types
-3. Return ONLY valid JSON - no explanatory text before or after
-4. Do NOT wrap JSON in markdown code blocks (no ```)
-5. Validate your JSON structure before responding
-6. Double-check that property names match exactly (case-sensitive)
-
-CORRECT RESPONSE FORMAT EXAMPLE:
-{
-  "propertyName": value,
-  "anotherProperty": value
-}
-
-Please now provide a corrected response that strictly follows the schema. Return ONLY the raw JSON object, nothing else.''';
-  }
-
-  /// Runs the Claude CLI command and returns the response
-  Future<String> _runClaudeCommand(String prompt) async {
-    // Build command arguments
     final args = <String>[];
 
-    // If we have a session ID, use --resume to continue the conversation
     if (_sessionId != null && !_isFirstMessage) {
       args.addAll(['--resume', _sessionId!]);
     }
 
-    // Add the prompt with -p flag
     args.addAll(['-p', prompt]);
 
-    // Always use JSON output for consistent parsing
-    args.addAll(['--output-format', 'json']);
+    if (streamSink != null) {
+      args
+          .addAll(['--output-format', 'stream-json', '--include-partial-messages']);
+    } else {
+      args.addAll(['--output-format', 'json']);
+    }
 
-    // Add any additional options
     args.addAll(options.toCliArgs());
 
-    // Set up environment
     final environment = Map<String, String>.from(Platform.environment);
     environment['ANTHROPIC_API_KEY'] = apiKey;
     if (options.environment != null) {
       environment.addAll(options.environment!);
     }
 
+    final timeout = Duration(milliseconds: options.timeoutMs ?? 60000);
+
+    if (streamSink != null) {
+      return _runClaudeStreamCommand(
+        args: args,
+        environment: environment,
+        timeout: timeout,
+        streamSink: streamSink,
+      );
+    }
+
+    return _runClaudeBlockingCommand(
+      args: args,
+      environment: environment,
+      timeout: timeout,
+    );
+  }
+
+  Future<String> _runClaudeBlockingCommand({
+    required List<String> args,
+    required Map<String, String> environment,
+    required Duration timeout,
+  }) async {
     try {
-      // Try to run claude command first
       ProcessResult result;
       try {
         result = await Process.run(
@@ -281,14 +233,13 @@ Please now provide a corrected response that strictly follows the schema. Return
           environment: environment,
           workingDirectory: options.cwd,
         ).timeout(
-          Duration(milliseconds: options.timeoutMs ?? 60000),
+          timeout,
           onTimeout: () => throw ClaudeSDKException(
-              'Request timed out after ${options.timeoutMs ?? 60000}ms'),
+            'Request timed out after ${timeout.inMilliseconds}ms',
+          ),
         );
-      } catch (e) {
-        if (e is ClaudeSDKException) rethrow;
-
-        // Try claude-code as fallback
+      } catch (error) {
+        if (error is ClaudeSDKException) rethrow;
         try {
           result = await Process.run(
             'claude-code',
@@ -296,22 +247,21 @@ Please now provide a corrected response that strictly follows the schema. Return
             environment: environment,
             workingDirectory: options.cwd,
           ).timeout(
-            Duration(milliseconds: options.timeoutMs ?? 60000),
+            timeout,
             onTimeout: () => throw ClaudeSDKException(
-                'Request timed out after ${options.timeoutMs ?? 60000}ms'),
+              'Request timed out after ${timeout.inMilliseconds}ms',
+            ),
           );
-        } catch (e2) {
-          if (e2 is ClaudeSDKException) rethrow;
+        } catch (_) {
           throw const CLINotFoundException();
         }
       }
 
-      // Check exit code
       if (result.exitCode != 0) {
         final stderr = result.stderr.toString();
         final stdout = result.stdout.toString();
-        // Try to parse error from stdout if it's JSON
-        String errorMessage = 'Claude process exited with code ${result.exitCode}';
+        var errorMessage =
+            'Claude process exited with code ${result.exitCode}';
         try {
           if (stdout.isNotEmpty) {
             final json = jsonDecode(stdout) as Map<String, dynamic>;
@@ -319,9 +269,7 @@ Please now provide a corrected response that strictly follows the schema. Return
               errorMessage = json['result'].toString();
             }
           }
-        } catch (_) {
-          // If parsing fails, use the original error message
-        }
+        } catch (_) {}
         throw ProcessException(
           errorMessage,
           exitCode: result.exitCode,
@@ -329,7 +277,6 @@ Please now provide a corrected response that strictly follows the schema. Return
         );
       }
 
-      // Parse the JSON response
       final output = result.stdout.toString();
       if (output.isEmpty) {
         throw ClaudeSDKException('Empty response from Claude CLI');
@@ -338,117 +285,642 @@ Please now provide a corrected response that strictly follows the schema. Return
       try {
         final json = jsonDecode(output) as Map<String, dynamic>;
 
-        // Extract session ID from the response (for first message)
         if (_isFirstMessage && json['session_id'] != null) {
           _sessionId = json['session_id'] as String;
           _isFirstMessage = false;
         }
 
-        // Extract the actual result
         if (json['type'] == 'result') {
           return json['result']?.toString() ?? '';
-        } else if (json['error'] != null) {
-          throw ClaudeSDKException(
-              'Claude returned an error: ${json['error']}');
-        } else {
-          throw ClaudeSDKException(
-              'Unexpected response format: ${json['type']}');
         }
-      } catch (e) {
-        if (e is ClaudeSDKException) rethrow;
+
+        if (json['error'] != null) {
+          throw ClaudeSDKException(
+            'Claude returned an error: ${json['error']}',
+          );
+        }
+
+        throw ClaudeSDKException(
+          'Unexpected response format: ${json['type']}',
+        );
+      } catch (error) {
+        if (error is ClaudeSDKException) rethrow;
         throw JSONDecodeException(
-            'Failed to parse Claude response: ${e.toString()}', output, e);
+          'Failed to parse Claude response: ${error.toString()}',
+          output,
+          error,
+        );
       }
-    } catch (e) {
-      if (e is ClaudeSDKException ||
-          e is CLINotFoundException ||
-          e is ProcessException ||
-          e is JSONDecodeException) {
+    } catch (error) {
+      if (error is ClaudeSDKException ||
+          error is CLINotFoundException ||
+          error is ProcessException ||
+          error is JSONDecodeException) {
         rethrow;
       }
       throw ClaudeSDKException(
-          'Failed to execute Claude command: ${e.toString()}', e);
+        'Failed to execute Claude command: ${error.toString()}',
+        error,
+      );
     }
   }
 
-  /// Parses a schema response and extracts structured data
-  SchemaResult _parseSchemaResponse(String response) {
+  Future<String> _runClaudeStreamCommand({
+    required List<String> args,
+    required Map<String, String> environment,
+    required Duration timeout,
+    required StreamSink<String> streamSink,
+  }) async {
+    Process process;
     try {
-      // First, try to clean common formatting issues
-      String cleanedResponse = response.trim();
-      
-      // Remove markdown code blocks if present
-      if (cleanedResponse.contains('```json')) {
-        cleanedResponse = cleanedResponse.replaceAll(RegExp(r'```json\s*'), '');
-        cleanedResponse = cleanedResponse.replaceAll(RegExp(r'```\s*'), '');
-      } else if (cleanedResponse.contains('```')) {
-        cleanedResponse = cleanedResponse.replaceAll(RegExp(r'```\s*'), '');
-      }
-      
-      // Try to extract JSON from the cleaned response
-      // First try to parse the entire response as JSON
+      process = await Process.start(
+        'claude',
+        args,
+        environment: environment,
+        workingDirectory: options.cwd,
+      );
+    } catch (_) {
       try {
-        final data = jsonDecode(cleanedResponse) as Map<String, dynamic>;
-        return SchemaResult(
-          modelMessage: '',
-          data: data,
+        process = await Process.start(
+          'claude-code',
+          args,
+          environment: environment,
+          workingDirectory: options.cwd,
         );
       } catch (_) {
-        // If that fails, try to extract JSON using regex
-        final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(cleanedResponse);
-        
-        if (jsonMatch == null) {
-          // Try one more time with a more permissive regex
-          final permissiveMatch = RegExp(r'\{[\s\S]*\}').firstMatch(cleanedResponse);
-          if (permissiveMatch == null) {
-            throw JSONDecodeException(
-              'No JSON object found in response',
-              response,
-            );
-          }
-          
-          final jsonStr = permissiveMatch.group(0)!;
-          final data = jsonDecode(jsonStr) as Map<String, dynamic>;
-          
-          // Extract message if present
-          String modelMessage = '';
-          final messageIndex = cleanedResponse.indexOf(jsonStr);
-          if (messageIndex > 0) {
-            modelMessage = cleanedResponse.substring(0, messageIndex).trim();
-          }
-          
-          return SchemaResult(
-            modelMessage: modelMessage,
-            data: data,
-          );
+        throw const CLINotFoundException();
+      }
+    }
+
+    final stdoutLines = <String>[];
+    final llmBuffer = StringBuffer();
+    final stderrBuffer = StringBuffer();
+    final stdoutDone = Completer<void>();
+    final stderrDone = Completer<void>();
+
+    process.stdout
+        .transform(utf8.decoder)
+        .transform(const LineSplitter())
+        .listen(
+      (line) {
+        if (line.trim().isEmpty) {
+          return;
         }
-        
-        final jsonStr = jsonMatch.group(0)!;
-        final data = jsonDecode(jsonStr) as Map<String, dynamic>;
-        
-        // Extract message if present
-        String modelMessage = '';
-        final messageIndex = cleanedResponse.indexOf(jsonStr);
-        if (messageIndex > 0) {
-          modelMessage = cleanedResponse.substring(0, messageIndex).trim();
+        stdoutLines.add(line);
+        _handleClaudeStreamLine(line, streamSink, llmBuffer);
+      },
+      onError: (error, stackTrace) {
+        if (!stdoutDone.isCompleted) {
+          stdoutDone.completeError(error, stackTrace);
         }
-        
-        return SchemaResult(
-          modelMessage: modelMessage,
-          data: data,
+      },
+      onDone: () {
+        if (!stdoutDone.isCompleted) {
+          stdoutDone.complete();
+        }
+      },
+    );
+
+    process.stderr.transform(utf8.decoder).listen(
+      (data) => stderrBuffer.write(data),
+      onError: (error, stackTrace) {
+        if (!stderrDone.isCompleted) {
+          stderrDone.completeError(error, stackTrace);
+        }
+      },
+      onDone: () {
+        if (!stderrDone.isCompleted) {
+          stderrDone.complete();
+        }
+      },
+    );
+
+    final exitCode = await process.exitCode.timeout(
+      timeout,
+      onTimeout: () {
+        process.kill();
+        throw ClaudeSDKException(
+          'Request timed out after ${timeout.inMilliseconds}ms',
         );
+      },
+    );
+
+    await stdoutDone.future;
+    await stderrDone.future;
+
+    if (exitCode != 0) {
+      throw ProcessException(
+        'Claude process exited with code $exitCode',
+        exitCode: exitCode,
+        stderr: stderrBuffer.toString(),
+      );
+    }
+
+    _tryUpdateSessionFromStream(stdoutLines);
+    if (_isFirstMessage) {
+      _isFirstMessage = false;
+    }
+
+    if (llmBuffer.isEmpty) {
+      final extracted = _extractResultFromStream(stdoutLines);
+      if (extracted != null) {
+        streamSink.add(extracted);
+        llmBuffer.write(extracted);
       }
-    } catch (e) {
-      if (e is JSONDecodeException) {
-        rethrow;
+    }
+
+    return llmBuffer.toString();
+  }
+  void _handleClaudeStreamLine(
+    String line,
+    StreamSink<String> streamSink,
+    StringBuffer llmBuffer,
+  ) {
+    try {
+      final event = jsonDecode(line);
+      if (event is! Map<String, dynamic>) {
+        streamSink.add('$line\n');
+        llmBuffer.write('$line\n');
+        return;
       }
-      throw JSONDecodeException(
-          'Failed to parse schema response: ${e.toString()}', 
-          response,
-          e);
+
+      final type = event['type'];
+      if (type == 'content_block_delta') {
+        final delta = event['delta'];
+        if (delta is Map<String, dynamic> && delta['type'] == 'text_delta') {
+          final text = delta['text']?.toString() ?? '';
+          if (text.isNotEmpty) {
+            streamSink.add(text);
+            llmBuffer.write(text);
+          }
+        }
+        return;
+      }
+
+      if (type == 'message_delta') {
+        final delta = event['delta'];
+        if (delta is Map<String, dynamic> && delta['type'] == 'text_delta') {
+          final text = delta['text']?.toString() ?? '';
+          if (text.isNotEmpty) {
+            streamSink.add(text);
+            llmBuffer.write(text);
+          }
+        }
+        return;
+      }
+
+      if (type == 'result' && event['result'] != null) {
+        final text = event['result'].toString();
+        if (text.isNotEmpty) {
+          streamSink.add(text);
+          llmBuffer.write(text);
+        }
+        return;
+      }
+
+      if (type == 'message' && event['message'] is Map<String, dynamic>) {
+        final message = event['message'] as Map<String, dynamic>;
+        if (message['type'] == 'text' && message['text'] != null) {
+          final text = message['text'].toString();
+          if (text.isNotEmpty) {
+            streamSink.add(text);
+            llmBuffer.write(text);
+          }
+          return;
+        }
+      }
+
+      streamSink.add('$line\n');
+      llmBuffer.write('$line\n');
+    } catch (_) {
+      streamSink.add('$line\n');
+      llmBuffer.write('$line\n');
     }
   }
 
+  void _tryUpdateSessionFromStream(List<String> lines) {
+    if (!_isFirstMessage) {
+      return;
+    }
+
+    for (final line in lines.reversed) {
+      try {
+        final event = jsonDecode(line);
+        if (event is! Map<String, dynamic>) {
+          continue;
+        }
+
+        if (event['session_id'] is String) {
+          _sessionId = event['session_id'] as String;
+          _isFirstMessage = false;
+          return;
+        }
+
+        final message = event['message'];
+        if (message is Map<String, dynamic> && message['session_id'] is String) {
+          _sessionId = message['session_id'] as String;
+          _isFirstMessage = false;
+          return;
+        }
+      } catch (_) {
+        continue;
+      }
+    }
+  }
+
+  String? _extractResultFromStream(List<String> lines) {
+    for (final line in lines.reversed) {
+      try {
+        final event = jsonDecode(line);
+        if (event is! Map<String, dynamic>) {
+          continue;
+        }
+
+        if (event['type'] == 'result' && event['result'] != null) {
+          return event['result'].toString();
+        }
+
+        final message = event['message'];
+        if (message is Map<String, dynamic> && message['type'] == 'text') {
+          return message['text']?.toString();
+        }
+      } catch (_) {
+        continue;
+      }
+    }
+    return null;
+  }
+
+  Future<_SchemaWorkflowResult> _runSchemaWorkflow({
+    required List<ClaudeSdkContent> messages,
+    required SchemaObject schema,
+    StreamSink<String>? streamSink,
+  }) async {
+    if (messages.isEmpty) {
+      throw ClaudeSDKException('Cannot send empty message');
+    }
+
+    final schemaFile = await _createSchemaTempFile();
+    final schemaJsonPretty = const JsonEncoder.withIndent('  ').convert(
+      schema.toJson(),
+    );
+    final fileReference = '@${schemaFile.absolute.path}/';
+
+    String instruction = _buildSchemaInstruction(
+      schemaJsonPretty: schemaJsonPretty,
+      fileReference: fileReference,
+    );
+
+    Future<String> buildPrompt() {
+      final combined = <ClaudeSdkContent>[
+        ...messages,
+        ClaudeSdkContent.text(instruction),
+      ];
+      return _buildPrompt(combined);
+    }
+
+    String prompt = await buildPrompt();
+
+    var jsonAttempts = 0;
+    var schemaAttempts = 0;
+    String llmMessage = '';
+
+    try {
+      while (true) {
+        jsonAttempts += 1;
+        await _resetSchemaTempFile(schemaFile);
+
+        final rawOutput = await _runClaudeCommand(
+          prompt,
+          streamSink: streamSink,
+        );
+        llmMessage = rawOutput.trim();
+
+        Map<String, dynamic> parsedJson;
+        try {
+          parsedJson = await _parseJsonFromTempFile(schemaFile);
+        } on JSONDecodeException catch (jsonError) {
+          if (jsonAttempts >= 2) {
+            throw JSONDecodeException(
+              'Failed to parse Claude JSON output after retry: ${jsonError.message}',
+              jsonError.rawContent,
+              jsonError,
+            );
+          }
+
+          final currentContent = await _safeReadFile(schemaFile);
+          instruction = _buildSchemaInstruction(
+            schemaJsonPretty: schemaJsonPretty,
+            fileReference: fileReference,
+            jsonErrorMessage: jsonError.message,
+            currentFileContent: currentContent,
+          );
+          prompt = await buildPrompt();
+          continue;
+        }
+
+        try {
+          final validated = _validateSchemaResponse(parsedJson, schema);
+          return _SchemaWorkflowResult(
+            llmMessage: llmMessage,
+            structuredSchemaData: validated,
+          );
+        } on SchemaValidationException catch (validationError) {
+          schemaAttempts += 1;
+          if (schemaAttempts >= 2) {
+            rethrow;
+          }
+
+          jsonAttempts = 0;
+          final prettyJson = const JsonEncoder.withIndent('  ').convert(parsedJson);
+          instruction = _buildSchemaInstruction(
+            schemaJsonPretty: schemaJsonPretty,
+            fileReference: fileReference,
+            validationError: validationError,
+            lastJsonPretty: prettyJson,
+          );
+          prompt = await buildPrompt();
+        }
+      }
+    } finally {
+      await _deleteSchemaTempFile(schemaFile);
+    }
+  }
+
+  Future<File> _createSchemaTempFile() async {
+    final baseDir = options.cwd != null
+        ? Directory(options.cwd!).absolute
+        : Directory.current.absolute;
+    final fileName = 'claude_schema_${const Uuid().v4()}.json';
+    final file = File(path.join(baseDir.path, fileName));
+    await file.create(recursive: true);
+    _temporaryFiles.add(file);
+    return file;
+  }
+
+  Future<void> _resetSchemaTempFile(File file) async {
+    await file.writeAsString('{}', flush: true);
+  }
+
+  Future<void> _deleteSchemaTempFile(File file) async {
+    try {
+      if (await file.exists()) {
+        await file.delete();
+      }
+    } catch (_) {
+      // Ignore cleanup errors
+    } finally {
+      _temporaryFiles.remove(file);
+    }
+  }
+
+  Future<Map<String, dynamic>> _parseJsonFromTempFile(File file) async {
+    final content = await file.readAsString();
+    if (content.trim().isEmpty) {
+      throw JSONDecodeException('JSON file is empty', content);
+    }
+
+    try {
+      final decoded = jsonDecode(content);
+      if (decoded is! Map) {
+        throw JSONDecodeException(
+          'Expected JSON object at root level',
+          content,
+        );
+      }
+      return Map<String, dynamic>.from(decoded);
+    } on FormatException catch (error) {
+      throw JSONDecodeException(
+        'Invalid JSON format: ${error.message}',
+        content,
+        error,
+      );
+    }
+  }
+
+  String _buildSchemaInstruction({
+    required String schemaJsonPretty,
+    required String fileReference,
+    String? jsonErrorMessage,
+    String? currentFileContent,
+    SchemaValidationException? validationError,
+    String? lastJsonPretty,
+  }) {
+    final buffer = StringBuffer();
+
+    buffer
+      ..writeln('You must produce structured JSON matching the schema below.')
+      ..writeln('Open the file reference $fileReference and overwrite its contents with the JSON object.')
+      ..writeln('Do not include the JSON in your assistant reply; only share a concise summary of your actions.')
+      ..writeln()
+      ..writeln('JSON schema:')
+      ..writeln('```json')
+      ..writeln(schemaJsonPretty)
+      ..writeln('```');
+
+    if (jsonErrorMessage != null) {
+      buffer
+        ..writeln()
+        ..writeln('[Previous attempt produced invalid JSON.]')
+        ..writeln('Parser error: $jsonErrorMessage');
+      if (currentFileContent != null && currentFileContent.isNotEmpty) {
+        buffer
+          ..writeln('Current file contents:')
+          ..writeln('```json')
+          ..writeln(_truncate(currentFileContent))
+          ..writeln('```');
+      }
+      buffer.writeln('Regenerate valid JSON and overwrite the file reference.');
+    }
+
+    if (validationError != null) {
+      buffer
+        ..writeln()
+        ..writeln('[Previous attempt failed schema validation.]');
+      if (validationError.issues.isNotEmpty) {
+        buffer.writeln('Issues detected:');
+        for (final issue in validationError.issues) {
+          buffer.writeln('- $issue');
+        }
+      }
+      if (lastJsonPretty != null && lastJsonPretty.isNotEmpty) {
+        buffer
+          ..writeln('Last JSON content:')
+          ..writeln('```json')
+          ..writeln(_truncate(lastJsonPretty))
+          ..writeln('```');
+      }
+      buffer.writeln('Fix these issues and overwrite the file with the corrected JSON.');
+    }
+
+    buffer
+      ..writeln()
+      ..writeln('After saving, verify the file and respond with a brief summary of the generated data.');
+
+    return buffer.toString();
+  }
+
+  Map<String, dynamic> _validateSchemaResponse(
+    Map<String, dynamic> json,
+    SchemaObject schema,
+  ) {
+    if (schema.type != 'object') {
+      throw SchemaValidationException(
+        'Root schema type must be an object',
+        ['Unsupported schema root type: ${schema.type}'],
+      );
+    }
+
+    final errors = <String>[];
+
+    late final void Function(
+      Map<String, dynamic> value,
+      Map<String, SchemaProperty> properties,
+      String path,
+    ) validateMap;
+
+    late final void Function(
+      String propertyPath,
+      dynamic value,
+      SchemaProperty property,
+    ) validateValue;
+
+    validateMap = (value, properties, path) {
+      for (final entry in properties.entries) {
+        final key = entry.key;
+        final property = entry.value;
+        final propertyPath = path.isEmpty ? key : '$path.$key';
+
+        if (!value.containsKey(key)) {
+          if (!property.nullable) {
+            errors.add('Missing required property "$propertyPath"');
+          }
+          continue;
+        }
+
+        final fieldValue = value[key];
+        if (fieldValue == null) {
+          if (!property.nullable) {
+            errors.add('Property "$propertyPath" cannot be null');
+          }
+          continue;
+        }
+
+        validateValue(propertyPath, fieldValue, property);
+      }
+    };
+
+    validateValue = (propertyPath, value, property) {
+      switch (property.type) {
+        case 'string':
+          if (value is! String) {
+            errors.add(
+              'Property "$propertyPath" must be a string but received ${value.runtimeType}',
+            );
+            return;
+          }
+          if (property.enumValues != null &&
+              property.enumValues!.isNotEmpty &&
+              !property.enumValues!.contains(value)) {
+            errors.add(
+              'Property "$propertyPath" must be one of ${property.enumValues} but received "$value"',
+            );
+          }
+          return;
+        case 'number':
+          if (value is! num) {
+            errors.add(
+              'Property "$propertyPath" must be a number but received ${value.runtimeType}',
+            );
+          }
+          return;
+        case 'integer':
+          if (value is int) {
+            return;
+          }
+          if (value is num && value % 1 == 0) {
+            return;
+          }
+          errors.add(
+            'Property "$propertyPath" must be an integer but received ${value.runtimeType}',
+          );
+          return;
+        case 'boolean':
+          if (value is! bool) {
+            errors.add(
+              'Property "$propertyPath" must be a boolean but received ${value.runtimeType}',
+            );
+          }
+          return;
+        case 'array':
+          if (value is! List) {
+            errors.add(
+              'Property "$propertyPath" must be an array but received ${value.runtimeType}',
+            );
+            return;
+          }
+          if (property.items != null) {
+            for (var index = 0; index < value.length; index++) {
+              final element = value[index];
+              if (element == null) {
+                errors.add('Array element "$propertyPath[$index]" cannot be null');
+                continue;
+              }
+              validateValue('$propertyPath[$index]', element, property.items!);
+            }
+          }
+          return;
+        case 'object':
+          if (value is! Map) {
+            errors.add(
+              'Property "$propertyPath" must be an object but received ${value.runtimeType}',
+            );
+            return;
+          }
+          Map<String, dynamic> mapValue;
+          try {
+            mapValue = Map<String, dynamic>.from(value);
+          } catch (_) {
+            errors.add(
+              'Property "$propertyPath" must be a JSON object with string keys',
+            );
+            return;
+          }
+          if (property.properties != null && property.properties!.isNotEmpty) {
+            validateMap(mapValue, property.properties!, propertyPath);
+          }
+          return;
+        default:
+          return;
+      }
+    };
+
+    validateMap(json, schema.properties, '');
+
+    if (errors.isNotEmpty) {
+      throw SchemaValidationException('Schema validation failed', errors);
+    }
+
+    return json;
+  }
+
+  Future<String> _safeReadFile(File file) async {
+    try {
+      if (!await file.exists()) {
+        return '';
+      }
+      return await file.readAsString();
+    } catch (_) {
+      return '';
+    }
+  }
+
+  String _truncate(String value, [int maxLength = 1500]) {
+    if (value.length <= maxLength) {
+      return value;
+    }
+    return value.substring(0, maxLength) + '...';
+  }
   /// Changes the model for this chat session
   /// This will reset the conversation as Claude Code requires a new session for model changes
   void changeModel(String model) {
@@ -485,4 +957,15 @@ Please now provide a corrected response that strictly follows the schema. Return
 
   /// Whether the chat session is disposed
   bool get isDisposed => _isDisposed;
+}
+
+
+class _SchemaWorkflowResult {
+  final String llmMessage;
+  final Map<String, dynamic> structuredSchemaData;
+
+  const _SchemaWorkflowResult({
+    required this.llmMessage,
+    required this.structuredSchemaData,
+  });
 }

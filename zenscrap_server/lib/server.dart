@@ -70,6 +70,12 @@ void run(List<String> args) async {
     countryCode: 'us',
   );
 
+  // Initialize Codex implementation
+  await WebScrapperCodexImpl.initCodex(
+    codexApiKey: pod.getPassword('openAiApiKey') ?? '',
+    scrappingBeeApiKey: scrapingBeeApiKey ?? '',
+    proxyConfig: proxyConfig,
+  );
   // Initialize Gemini implementation
   await WebScrapperGeminiImpl.initGemini(
     geminiApiKey: pod.getPassword('geminiApiKey') ?? '',
@@ -114,7 +120,6 @@ void run(List<String> args) async {
       TestScrappableDisposeFutureCall(), 'dispose_temporary_scrappable');
   pod.registerFutureCall(
       MonthlySubscriptionCreditsFutureCall(), 'monthly_subscription_credits');
-  pod.registerFutureCall(SessionPromptFutureCall(), 'session_prompt');
 
   // Start the server.
   await pod.start();

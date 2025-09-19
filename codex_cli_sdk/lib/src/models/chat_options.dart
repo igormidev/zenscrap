@@ -39,11 +39,20 @@ class CodexChatOptions {
   /// Whether to include MCP servers
   final bool? enableMcp;
 
+  /// Sandbox mode to run Codex under (e.g. 'workspace-write', 'danger-full-access')
+  final String? sandboxMode;
+
+  /// Approval policy for Codex actions (e.g. 'never', 'on-request')
+  final String? approvalPolicy;
+
   /// List of allowed directories for file operations
   final List<String>? allowedDirectories;
 
   /// Custom configuration file path
   final String? configPath;
+
+  /// Additional command line arguments passed verbatim to Codex CLI
+  final List<String>? additionalArgs;
 
   /// Reasoning effort level ('minimal', 'medium', 'high')
   /// Controls the depth of reasoning for the model
@@ -63,8 +72,11 @@ class CodexChatOptions {
     this.quiet,
     this.continueLastSession,
     this.enableMcp,
+    this.sandboxMode,
+    this.approvalPolicy,
     this.allowedDirectories,
     this.configPath,
+    this.additionalArgs,
     this.reasoningEffort,
   });
 
@@ -113,6 +125,18 @@ class CodexChatOptions {
       args.addAll(['-c', 'system_prompt="${systemPrompt!}"']);
     }
 
+    if (sandboxMode != null) {
+      args.addAll(['--sandbox', sandboxMode!]);
+    }
+
+    if (approvalPolicy != null) {
+      args.addAll(['-c', 'approval_policy="$approvalPolicy"']);
+    }
+
+    if (additionalArgs != null && additionalArgs!.isNotEmpty) {
+      args.addAll(additionalArgs!);
+    }
+
     // Note: Codex exec doesn't support --allow-dir flag
     // Directory permissions would need to be handled through sandbox settings
 
@@ -134,8 +158,11 @@ class CodexChatOptions {
     bool? quiet,
     bool? continueLastSession,
     bool? enableMcp,
+    String? sandboxMode,
+    String? approvalPolicy,
     List<String>? allowedDirectories,
     String? configPath,
+    List<String>? additionalArgs,
     String? reasoningEffort,
   }) {
     return CodexChatOptions(
@@ -152,8 +179,11 @@ class CodexChatOptions {
       quiet: quiet ?? this.quiet,
       continueLastSession: continueLastSession ?? this.continueLastSession,
       enableMcp: enableMcp ?? this.enableMcp,
+      sandboxMode: sandboxMode ?? this.sandboxMode,
+      approvalPolicy: approvalPolicy ?? this.approvalPolicy,
       allowedDirectories: allowedDirectories ?? this.allowedDirectories,
       configPath: configPath ?? this.configPath,
+      additionalArgs: additionalArgs ?? this.additionalArgs,
       reasoningEffort: reasoningEffort ?? this.reasoningEffort,
     );
   }

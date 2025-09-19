@@ -73,3 +73,33 @@ class JSONDecodeException extends GeminiSDKException {
         '${originalError != null ? 'Original error: $originalError' : ''}';
   }
 }
+
+/// Exception thrown when JSON content fails schema validation
+class SchemaValidationException extends GeminiSDKException {
+  final List<String> issues;
+
+  SchemaValidationException(
+    String message,
+    this.issues, [
+    Object? originalError,
+  ]) : super(message, originalError);
+
+  @override
+  String toString() {
+    final issuesDescription = issues.isEmpty
+        ? ''
+        : issues.map((issue) => '- $issue').join('\n');
+    if (issuesDescription.isEmpty && originalError == null) {
+      return 'SchemaValidationException: $message';
+    }
+
+    final buffer = StringBuffer('SchemaValidationException: $message');
+    if (issuesDescription.isNotEmpty) {
+      buffer.write('\n$issuesDescription');
+    }
+    if (originalError != null) {
+      buffer.write('\nOriginal error: ${originalError.toString()}');
+    }
+    return buffer.toString();
+  }
+}

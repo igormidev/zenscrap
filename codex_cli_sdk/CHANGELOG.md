@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.0.0
+
+### Breaking
+- `sendMessageWithSchema()` now returns a record `({String llmMessage, Map<String, dynamic> structuredSchemaData})` instead of `SchemaResult`
+- Schema generation uses a temporary JSON file with automatic validation and retry logic
+
+### Added
+- `streamResponseWithSchema()` for streaming LLM output while structured data is generated
+- Strong schema validation with detailed error feedback when required fields or types mismatch
+- `CodexChatOptions` now supports `sandboxMode`, `approvalPolicy`, and additional CLI arguments for full-autonomy workflows
+
+### Improved
+- CLI interactions now clean up generated schema files even on failure
+- Better safety and diagnostics when JSON parsing fails
+
 ## 1.2.0
 
 ### Added
