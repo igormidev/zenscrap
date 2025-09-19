@@ -336,6 +336,9 @@ class Protocol extends _i1.SerializationManager {
           ? _i33.MonthlySubscriptionCreditDeposit.fromJson(data)
           : null) as T;
     }
+    if (t == List<String>) {
+      return (data as List).map((e) => deserialize<String>(e)).toList() as T;
+    }
     if (t == List<_i10.ScrappableRequestPerHour>) {
       return (data as List)
           .map((e) => deserialize<_i10.ScrappableRequestPerHour>(e))
@@ -394,9 +397,6 @@ class Protocol extends _i1.SerializationManager {
     if (t == Map<String, String?>) {
       return (data as Map).map((k, v) =>
           MapEntry(deserialize<String>(k), deserialize<String?>(v))) as T;
-    }
-    if (t == List<String>) {
-      return (data as List).map((e) => deserialize<String>(e)).toList() as T;
     }
     if (t == List<_i34.CreditHistoryItem>) {
       return (data as List)

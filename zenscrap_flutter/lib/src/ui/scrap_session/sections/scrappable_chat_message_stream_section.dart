@@ -115,7 +115,7 @@ class _ScrappableChatMessageStreamSectionState
                       fontSize: 14,
                       color: Theme.of(context)
                           .colorScheme
-                          .onSurface
+                          .outline
                           .withValues(alpha: 0.9),
                     ),
               );

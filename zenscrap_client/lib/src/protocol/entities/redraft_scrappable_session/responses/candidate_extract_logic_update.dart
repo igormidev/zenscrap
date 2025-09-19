@@ -15,6 +15,7 @@ abstract class CandidateExtractLogicUpdate extends _i1.ChatResponse
   CandidateExtractLogicUpdate._({
     required super.role,
     required this.messageText,
+    required this.thinkingSentences,
     required this.scrappingBeeExtractLogic,
     required this.scrapperRequest,
     required this.referenceTestData,
@@ -23,6 +24,7 @@ abstract class CandidateExtractLogicUpdate extends _i1.ChatResponse
   factory CandidateExtractLogicUpdate({
     required _i3.PromptRole role,
     required String messageText,
+    required List<String> thinkingSentences,
     required _i4.ScrappingBeeExtractLogic scrappingBeeExtractLogic,
     required _i5.ScrappableRequest scrapperRequest,
     required _i6.ReferenceTestData referenceTestData,
@@ -33,6 +35,9 @@ abstract class CandidateExtractLogicUpdate extends _i1.ChatResponse
     return CandidateExtractLogicUpdate(
       role: _i3.PromptRole.fromJson((jsonSerialization['role'] as String)),
       messageText: jsonSerialization['messageText'] as String,
+      thinkingSentences: (jsonSerialization['thinkingSentences'] as List)
+          .map((e) => e as String)
+          .toList(),
       scrappingBeeExtractLogic: _i4.ScrappingBeeExtractLogic.fromJson(
           (jsonSerialization['scrappingBeeExtractLogic']
               as Map<String, dynamic>)),
@@ -44,6 +49,8 @@ abstract class CandidateExtractLogicUpdate extends _i1.ChatResponse
   }
 
   String messageText;
+
+  List<String> thinkingSentences;
 
   _i4.ScrappingBeeExtractLogic scrappingBeeExtractLogic;
 
@@ -57,6 +64,7 @@ abstract class CandidateExtractLogicUpdate extends _i1.ChatResponse
   CandidateExtractLogicUpdate copyWith({
     _i3.PromptRole? role,
     String? messageText,
+    List<String>? thinkingSentences,
     _i4.ScrappingBeeExtractLogic? scrappingBeeExtractLogic,
     _i5.ScrappableRequest? scrapperRequest,
     _i6.ReferenceTestData? referenceTestData,
@@ -66,6 +74,7 @@ abstract class CandidateExtractLogicUpdate extends _i1.ChatResponse
     return {
       'role': role.toJson(),
       'messageText': messageText,
+      'thinkingSentences': thinkingSentences.toJson(),
       'scrappingBeeExtractLogic': scrappingBeeExtractLogic.toJson(),
       'scrapperRequest': scrapperRequest.toJson(),
       'referenceTestData': referenceTestData.toJson(),
@@ -82,12 +91,14 @@ class _CandidateExtractLogicUpdateImpl extends CandidateExtractLogicUpdate {
   _CandidateExtractLogicUpdateImpl({
     required _i3.PromptRole role,
     required String messageText,
+    required List<String> thinkingSentences,
     required _i4.ScrappingBeeExtractLogic scrappingBeeExtractLogic,
     required _i5.ScrappableRequest scrapperRequest,
     required _i6.ReferenceTestData referenceTestData,
   }) : super._(
           role: role,
           messageText: messageText,
+          thinkingSentences: thinkingSentences,
           scrappingBeeExtractLogic: scrappingBeeExtractLogic,
           scrapperRequest: scrapperRequest,
           referenceTestData: referenceTestData,
@@ -100,6 +111,7 @@ class _CandidateExtractLogicUpdateImpl extends CandidateExtractLogicUpdate {
   CandidateExtractLogicUpdate copyWith({
     _i3.PromptRole? role,
     String? messageText,
+    List<String>? thinkingSentences,
     _i4.ScrappingBeeExtractLogic? scrappingBeeExtractLogic,
     _i5.ScrappableRequest? scrapperRequest,
     _i6.ReferenceTestData? referenceTestData,
@@ -107,6 +119,8 @@ class _CandidateExtractLogicUpdateImpl extends CandidateExtractLogicUpdate {
     return CandidateExtractLogicUpdate(
       role: role ?? this.role,
       messageText: messageText ?? this.messageText,
+      thinkingSentences:
+          thinkingSentences ?? this.thinkingSentences.map((e0) => e0).toList(),
       scrappingBeeExtractLogic:
           scrappingBeeExtractLogic ?? this.scrappingBeeExtractLogic.copyWith(),
       scrapperRequest: scrapperRequest ?? this.scrapperRequest.copyWith(),

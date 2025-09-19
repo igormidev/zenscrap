@@ -43,8 +43,7 @@ mixin ChatControllerHandlerMixin {
           :Future<WebScrapperChatAIResponse> structuredSchemaDataCompleter,
         ) = controller.streamMessage(userPrompt: userPrompt);
 
-        // final WebScrapperChatAIResponse response =
-        //     await controller.sendMessage(userPrompt: userPrompt);
+        // final WebScrapperChatAIResponse response = await controller.sendMessage(userPrompt: userPrompt);
 
         // Stream all llm messages to [thinkingStream]
         sub = llmMessage.listen(
@@ -58,6 +57,7 @@ mixin ChatControllerHandlerMixin {
           },
         );
 
+        final List<String> thinkingSentences = await llmMessage.toList();
         retryContent = await handleSendMessage(
           session: session,
           response: await structuredSchemaDataCompleter,
@@ -66,6 +66,7 @@ mixin ChatControllerHandlerMixin {
           currentScrappingBeeExtractLogic: scrappingBeeExtractLogic,
           chatSeason: chatSeason,
           attemptNumber: attempt,
+          thinkingSentences: thinkingSentences,
         );
 
         if (retryContent == null) {
@@ -100,11 +101,13 @@ mixin ChatControllerHandlerMixin {
     required int attemptNumber,
     required ScrappingBeeExtractLogic? currentScrappingBeeExtractLogic,
     required StreamController<ChatResponse> chatSeason,
+    required List<String> thinkingSentences,
   }) async {
     final resp = response.toChatResponse(
       referenceTestData: referenceTestData,
       scrapperRequest: scrapperRequest,
       scrappingBeeExtractLogic: currentScrappingBeeExtractLogic,
+      thinkingSentences: thinkingSentences,
     );
     chatSeason.add(resp.$1);
     final scrappingBeeExtractLogic = resp.$2;
@@ -245,6 +248,7 @@ extension WebScrapperChatAIResponseMapExt on WebScrapperChatAIResponse {
     required ScrappableRequest scrapperRequest,
     required ReferenceTestData referenceTestData,
     required ScrappingBeeExtractLogic? scrappingBeeExtractLogic,
+    required List<String> thinkingSentences,
   }) {
     return switch (this) {
       WebScrapperChatAIResponseJustMessage(:final String message) => (
@@ -294,14 +298,15 @@ extension WebScrapperChatAIResponseMapExt on WebScrapperChatAIResponse {
                   );
           return (
             CandidateExtractLogicUpdate(
-              role: PromptRole.model,
-              referenceTestData: referenceTestData,
               scrapperRequest: scrapperRequest.copyWith(
                 id: scrapperRequest.id,
                 url: request?.url,
                 pathParams: request?.pathParams,
                 queryParams: request?.queryParam,
               ),
+              thinkingSentences: thinkingSentences,
+              role: PromptRole.model,
+              referenceTestData: referenceTestData,
               messageText: resumeActionMessage,
               scrappingBeeExtractLogic: scrappingBeeNewExtractRules,
             ),

@@ -2,6 +2,7 @@ class: CandidateExtractLogicUpdate
 extends: ChatResponse
 fields:
     messageText: String
+    thinkingSentences: List<String>
     scrappingBeeExtractLogic: ScrappingBeeExtractLogic
     scrapperRequest: ScrappableRequest
     referenceTestData: ReferenceTestData
