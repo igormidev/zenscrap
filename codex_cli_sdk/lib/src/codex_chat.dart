@@ -33,7 +33,6 @@ class CodexChat {
   /// Current session identifier provided by Codex CLI (if any)
   String? get sessionId => _sessionId;
 
-
   CodexChat({
     required this.apiKey,
     this.options,
@@ -109,14 +108,16 @@ class CodexChat {
   }
 
   /// Streams a response with schema parsing support
-  ({Stream<String> llmMessage, Completer<Map<String, dynamic>> structuredSchemaData})
-      streamResponseWithSchema({
+  ({
+    Stream<String> llmMessage,
+    Completer<Map<String, dynamic>> structuredSchemaData
+  }) streamResponseWithSchema({
     required List<CodexSdkContent> messages,
     required SchemaObject schema,
   }) {
     _ensureNotDisposed();
 
-    final controller = StreamController<String>();
+    final controller = StreamController<String>.broadcast();
     final schemaCompleter = Completer<Map<String, dynamic>>();
 
     () async {
@@ -293,7 +294,8 @@ class CodexChat {
     }
 
     final schemaFile = await _createSchemaTempJsonFile();
-    final schemaJsonPretty = const JsonEncoder.withIndent('  ').convert(schema.toJson());
+    final schemaJsonPretty =
+        const JsonEncoder.withIndent('  ').convert(schema.toJson());
     final schemaFilePath = schemaFile.absolute.path;
 
     String instruction = _buildSchemaInstruction(
@@ -361,7 +363,8 @@ class CodexChat {
           }
 
           jsonAttempts = 0;
-          final prettyJson = const JsonEncoder.withIndent('  ').convert(parsedJson);
+          final prettyJson =
+              const JsonEncoder.withIndent('  ').convert(parsedJson);
           instruction = _buildSchemaInstruction(
             schemaJsonPretty: schemaJsonPretty,
             schemaFilePath: schemaFilePath,
@@ -475,12 +478,15 @@ class CodexChat {
     final buffer = StringBuffer();
 
     buffer
-      ..writeln('You must produce structured JSON that matches the schema below.')
-      ..writeln('Write the JSON object directly into this file (overwrite existing contents):')
+      ..writeln(
+          'You must produce structured JSON that matches the schema below.')
+      ..writeln(
+          'Write the JSON object directly into this file (overwrite existing contents):')
       ..writeln(schemaFilePath)
       ..writeln()
-      ..writeln('You can run shell commands (e.g. `cat <<\'EOF\' > $schemaFilePath`) or use Codex editing tools to write the file.')
-      ..writeln('Do not include the JSON in your assistant reply; only provide a concise summary of your work.')
+      ..writeln('Use Codex editing tools to write the file.')
+      ..writeln(
+          'Do not include the JSON in your assistant reply; only provide a concise summary of your work.')
       ..writeln()
       ..writeln('JSON schema:')
       ..writeln('```json')
@@ -499,7 +505,8 @@ class CodexChat {
           ..writeln(_truncate(currentFileContent))
           ..writeln('```');
       }
-      buffer.writeln('Please regenerate the JSON and overwrite the entire file.');
+      buffer
+          .writeln('Please regenerate the JSON and overwrite the entire file.');
     }
 
     if (validationError != null) {
@@ -519,12 +526,14 @@ class CodexChat {
           ..writeln(_truncate(lastJsonPretty))
           ..writeln('```');
       }
-      buffer.writeln('Fix these issues and overwrite the file with a corrected JSON object.');
+      buffer.writeln(
+          'Fix these issues and overwrite the file with a corrected JSON object.');
     }
 
     buffer
       ..writeln()
-      ..writeln('After saving, double-check the file and then respond with a short summary of what was generated.');
+      ..writeln(
+          'After saving, double-check the file and then respond with a short summary of what was generated.');
 
     return buffer.toString();
   }
@@ -632,7 +641,8 @@ class CodexChat {
             for (var index = 0; index < value.length; index++) {
               final element = value[index];
               if (element == null) {
-                errors.add('Array element "$propertyPath[$index]" cannot be null');
+                errors.add(
+                    'Array element "$propertyPath[$index]" cannot be null');
                 continue;
               }
               validateValue('$propertyPath[$index]', element, property.items!);

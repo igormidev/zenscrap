@@ -68,8 +68,10 @@ class ClaudeChat {
     );
   }
 
-  ({Stream<String> llmMessage, Completer<Map<String, dynamic>> structuredSchemaData})
-      streamResponseWithSchema({
+  ({
+    Stream<String> llmMessage,
+    Completer<Map<String, dynamic>> structuredSchemaData
+  }) streamResponseWithSchema({
     required List<ClaudeSdkContent> messages,
     required SchemaObject schema,
   }) {
@@ -77,7 +79,7 @@ class ClaudeChat {
       throw ClaudeSDKException('Chat session has been disposed');
     }
 
-    final controller = StreamController<String>();
+    final controller = StreamController<String>.broadcast();
     final schemaCompleter = Completer<Map<String, dynamic>>();
 
     () async {
@@ -187,8 +189,8 @@ class ClaudeChat {
     args.addAll(['-p', prompt]);
 
     if (streamSink != null) {
-      args
-          .addAll(['--output-format', 'stream-json', '--include-partial-messages']);
+      args.addAll(
+          ['--output-format', 'stream-json', '--include-partial-messages']);
     } else {
       args.addAll(['--output-format', 'json']);
     }
@@ -260,8 +262,7 @@ class ClaudeChat {
       if (result.exitCode != 0) {
         final stderr = result.stderr.toString();
         final stdout = result.stdout.toString();
-        var errorMessage =
-            'Claude process exited with code ${result.exitCode}';
+        var errorMessage = 'Claude process exited with code ${result.exitCode}';
         try {
           if (stdout.isNotEmpty) {
             final json = jsonDecode(stdout) as Map<String, dynamic>;
@@ -431,6 +432,7 @@ class ClaudeChat {
 
     return llmBuffer.toString();
   }
+
   void _handleClaudeStreamLine(
     String line,
     StreamSink<String> streamSink,
@@ -517,7 +519,8 @@ class ClaudeChat {
         }
 
         final message = event['message'];
-        if (message is Map<String, dynamic> && message['session_id'] is String) {
+        if (message is Map<String, dynamic> &&
+            message['session_id'] is String) {
           _sessionId = message['session_id'] as String;
           _isFirstMessage = false;
           return;
@@ -632,7 +635,8 @@ class ClaudeChat {
           }
 
           jsonAttempts = 0;
-          final prettyJson = const JsonEncoder.withIndent('  ').convert(parsedJson);
+          final prettyJson =
+              const JsonEncoder.withIndent('  ').convert(parsedJson);
           instruction = _buildSchemaInstruction(
             schemaJsonPretty: schemaJsonPretty,
             fileReference: fileReference,
@@ -710,8 +714,10 @@ class ClaudeChat {
 
     buffer
       ..writeln('You must produce structured JSON matching the schema below.')
-      ..writeln('Open the file reference $fileReference and overwrite its contents with the JSON object.')
-      ..writeln('Do not include the JSON in your assistant reply; only share a concise summary of your actions.')
+      ..writeln(
+          'Open the file reference $fileReference and overwrite its contents with the JSON object.')
+      ..writeln(
+          'Do not include the JSON in your assistant reply; only share a concise summary of your actions.')
       ..writeln()
       ..writeln('JSON schema:')
       ..writeln('```json')
@@ -750,12 +756,14 @@ class ClaudeChat {
           ..writeln(_truncate(lastJsonPretty))
           ..writeln('```');
       }
-      buffer.writeln('Fix these issues and overwrite the file with the corrected JSON.');
+      buffer.writeln(
+          'Fix these issues and overwrite the file with the corrected JSON.');
     }
 
     buffer
       ..writeln()
-      ..writeln('After saving, verify the file and respond with a brief summary of the generated data.');
+      ..writeln(
+          'After saving, verify the file and respond with a brief summary of the generated data.');
 
     return buffer.toString();
   }
@@ -863,7 +871,8 @@ class ClaudeChat {
             for (var index = 0; index < value.length; index++) {
               final element = value[index];
               if (element == null) {
-                errors.add('Array element "$propertyPath[$index]" cannot be null');
+                errors.add(
+                    'Array element "$propertyPath[$index]" cannot be null');
                 continue;
               }
               validateValue('$propertyPath[$index]', element, property.items!);
@@ -921,6 +930,7 @@ class ClaudeChat {
     }
     return value.substring(0, maxLength) + '...';
   }
+
   /// Changes the model for this chat session
   /// This will reset the conversation as Claude Code requires a new session for model changes
   void changeModel(String model) {
@@ -958,7 +968,6 @@ class ClaudeChat {
   /// Whether the chat session is disposed
   bool get isDisposed => _isDisposed;
 }
-
 
 class _SchemaWorkflowResult {
   final String llmMessage;

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -36,7 +37,14 @@ class _ScrappableChatMessageStreamSectionState
 
     return messagesAsync.when(
       loading: () => const Center(
-        child: CircularProgressIndicator(),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text('Syncing...', textAlign: TextAlign.center),
+          ],
+        ),
       ),
       error: (error, stack) => Center(
         child: Column(
@@ -108,6 +116,8 @@ class _ScrappableChatMessageStreamSectionState
             if (isLastIndex &&
                 widget.llmThinkingStream != null &&
                 widget.llmThinkingStream!.isNotEmpty) {
+              Clipboard.setData(
+                  ClipboardData(text: widget.llmThinkingStream!.join()));
               return Text(
                 widget.llmThinkingStream!.join(),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(

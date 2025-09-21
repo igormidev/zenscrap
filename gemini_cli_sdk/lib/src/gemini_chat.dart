@@ -83,8 +83,10 @@ class GeminiChat {
     );
   }
 
-  ({Stream<String> llmMessage, Completer<Map<String, dynamic>> structuredSchemaData})
-      streamResponseWithSchema({
+  ({
+    Stream<String> llmMessage,
+    Completer<Map<String, dynamic>> structuredSchemaData
+  }) streamResponseWithSchema({
     required List<GeminiSdkContent> messages,
     required SchemaObject schema,
   }) {
@@ -92,7 +94,7 @@ class GeminiChat {
       throw GeminiSDKException('Chat session has been disposed');
     }
 
-    final controller = StreamController<String>();
+    final controller = StreamController<String>.broadcast();
     final schemaCompleter = Completer<Map<String, dynamic>>();
 
     () async {
@@ -317,7 +319,8 @@ ${options.systemPrompt}
           }
 
           jsonAttempts = 0;
-          final prettyJson = const JsonEncoder.withIndent('  ').convert(parsedJson);
+          final prettyJson =
+              const JsonEncoder.withIndent('  ').convert(parsedJson);
           instruction = _buildSchemaInstruction(
             schemaJsonPretty: schemaJsonPretty,
             schemaFilePath: schemaFilePath,
@@ -398,8 +401,10 @@ ${options.systemPrompt}
       ..writeln('Use the `write_file` tool to overwrite the file at:')
       ..writeln(schemaFilePath)
       ..writeln()
-      ..writeln('When calling `write_file`, provide the JSON object as the `content` value and ensure the file is overwritten in a single call.')
-      ..writeln('Do not print the JSON in your assistant message; respond with a brief summary instead.')
+      ..writeln(
+          'When calling `write_file`, provide the JSON object as the `content` value and ensure the file is overwritten in a single call.')
+      ..writeln(
+          'Do not print the JSON in your assistant message; respond with a brief summary instead.')
       ..writeln()
       ..writeln('JSON schema:')
       ..writeln('```json')
@@ -418,7 +423,8 @@ ${options.systemPrompt}
           ..writeln(_truncate(currentFileContent))
           ..writeln('```');
       }
-      buffer.writeln('Regenerate valid JSON and call `write_file` again with the corrected content.');
+      buffer.writeln(
+          'Regenerate valid JSON and call `write_file` again with the corrected content.');
     }
 
     if (validationError != null) {
@@ -438,12 +444,14 @@ ${options.systemPrompt}
           ..writeln(_truncate(lastJsonPretty))
           ..writeln('```');
       }
-      buffer.writeln('Fix these issues and overwrite the file with the corrected JSON.');
+      buffer.writeln(
+          'Fix these issues and overwrite the file with the corrected JSON.');
     }
 
     buffer
       ..writeln()
-      ..writeln('After writing the file, double-check the contents and respond with a concise summary of what was generated.');
+      ..writeln(
+          'After writing the file, double-check the contents and respond with a concise summary of what was generated.');
 
     return buffer.toString();
   }
@@ -551,7 +559,8 @@ ${options.systemPrompt}
             for (var index = 0; index < value.length; index++) {
               final element = value[index];
               if (element == null) {
-                errors.add('Array element "$propertyPath[$index]" cannot be null');
+                errors.add(
+                    'Array element "$propertyPath[$index]" cannot be null');
                 continue;
               }
               validateValue('$propertyPath[$index]', element, property.items!);
@@ -609,6 +618,7 @@ ${options.systemPrompt}
     }
     return '${value.substring(0, maxLength)}...';
   }
+
   /// Runs the Gemini CLI command and returns the response
   Future<String> _runGeminiCommand(String prompt) async {
     // Build command arguments
@@ -928,7 +938,6 @@ ${options.systemPrompt}
     isFirstMessage = true;
   }
 }
-
 
 class _SchemaWorkflowResult {
   final String llmMessage;

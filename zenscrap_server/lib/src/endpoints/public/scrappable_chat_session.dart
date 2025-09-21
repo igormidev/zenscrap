@@ -111,15 +111,18 @@ class ScrappableChatSession extends Endpoint {
       expiresIn: duration,
       sessionId: sessionUuid,
     );
+    print('Created session $sessionUuid for scrappable ${scrappable.id}');
     await session.serverpod.futureCallWithDelay(
       'dispose_temporary_scrappable',
       response,
       duration + Duration(minutes: 1),
     );
+    print('Scheduled dispose for session $sessionUuid');
     await Scrappable.db.updateRow(
         session,
         scrappable.copyWith(
             testEndpointAvailableUntil: DateTime.now().add(duration)));
+    print('Updated scrappable ${scrappable.id} expiration');
     return response;
   }
 
@@ -127,7 +130,9 @@ class ScrappableChatSession extends Endpoint {
     Session session, {
     required RedraftSrappableSessionId sessionUuid,
   }) {
+    print('listening to session $sessionUuid');
     session.addWillCloseListener((session) async {
+      print('disposing session $sessionUuid');
       await _disposeSession(sessionId: sessionUuid);
     });
     final subject = _scrapRedraftSessions[sessionUuid];
@@ -202,6 +207,7 @@ class ScrappableChatSession extends Endpoint {
     required RedraftSrappableSessionId sessionId,
     required String userPrompt,
   }) async* {
+    print('Received message');
     final chatController = _chatSessions[sessionId];
     if (chatController == null) {
       throw ZenScrapException(
@@ -232,6 +238,8 @@ class ScrappableChatSession extends Endpoint {
       ),
       const Duration(seconds: 1),
     );
+
+    yield* _thinkingStream[thinkingSessionId]!.stream;
   }
 }
 

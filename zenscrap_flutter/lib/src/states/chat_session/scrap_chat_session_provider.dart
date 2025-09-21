@@ -65,6 +65,7 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
         .sendPromptMessage(sessionId: sessionUuid, userPrompt: userPrompt)
         .toRawResult(
       (Stream<String> llmThinkingStream) {
+        print('stream setted');
         _aiCurrentThinkingSubscription = llmThinkingStream.listen(
             (thinking) {
               state.mapOrNull(standard: (value) {
