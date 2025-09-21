@@ -145,6 +145,7 @@ void main() {
           ClaudeSdkContent.text('Can you read this file?'),
           ClaudeSdkContent.bytes(
             data: bytes,
+            fileName: 'test',
             fileExtension: 'txt',
           ),
         ]);

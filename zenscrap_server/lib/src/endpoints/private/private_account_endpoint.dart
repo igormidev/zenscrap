@@ -37,7 +37,7 @@ class PrivateAccountEndpoint extends Endpoint with DeployEndpointMixin {
     }
 
     if (accountInfo == null) {
-      final String nanoId = nanoid();
+      final String nanoId = nanoid(length: 8);
       final acountApiKey = '$nanoId::${_uuid.v7()}';
       try {
         return await session.db.transaction((transaction) async {

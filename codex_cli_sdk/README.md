@@ -150,6 +150,7 @@ void main() async {
       CodexSdkContent.text('What is in this image?'),
       CodexSdkContent.bytes(
         data: imageBytes,
+        fileName: 'image',
         fileExtension: 'jpg',
       ),
     ]);
@@ -161,6 +162,7 @@ void main() async {
       CodexSdkContent.text('Read this text:'),
       CodexSdkContent.bytes(
         data: textBytes,
+        fileName: 'text',
         fileExtension: 'txt',
       ),
     ]);
@@ -589,7 +591,7 @@ await codexSDK.dispose(); // Disposes all active sessions
 
 - `CodexSdkContent.text(String text)` - Creates text content
 - `CodexSdkContent.file(File file)` - Creates file content
-- `CodexSdkContent.bytes({data, fileExtension})` - Creates content from bytes (temporary file)
+- `CodexSdkContent.bytes({data, fileName, fileExtension})` - Creates content from bytes (temporary file)
 
 ## Environment Variables
 

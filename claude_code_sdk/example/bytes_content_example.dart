@@ -26,6 +26,7 @@ void main() async {
       ClaudeSdkContent.text('What type of file format does this data represent?'),
       ClaudeSdkContent.bytes(
         data: binaryData,
+        fileName: 'image',
         fileExtension: 'png',
       ),
     ]);
@@ -40,6 +41,7 @@ void main() async {
       ClaudeSdkContent.text('Can you read the content of this text file?'),
       ClaudeSdkContent.bytes(
         data: textBytes,
+        fileName: 'data',
         fileExtension: 'txt',
       ),
     ]);
@@ -57,6 +59,7 @@ Bob,35,Chicago''';
       ClaudeSdkContent.text('Please analyze this CSV data and tell me the average age'),
       ClaudeSdkContent.bytes(
         data: csvBytes,
+        fileName: 'data',
         fileExtension: 'csv',
       ),
     ]);

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:nanoid2/nanoid2.dart';
 import 'package:path/path.dart' as path;
 import 'package:uuid/uuid.dart';
 
@@ -26,9 +27,6 @@ class CodexChat {
 
   /// Whether the chat has been disposed
   bool _isDisposed = false;
-
-  /// UUID generator for session IDs and temp files
-  final _uuid = const Uuid();
 
   /// Current session identifier provided by Codex CLI (if any)
   String? get sessionId => _sessionId;
@@ -181,18 +179,25 @@ class CodexChat {
   Future<void> dispose() async {
     if (_isDisposed) return;
 
-    for (final file in _tempFiles) {
-      try {
-        if (await file.exists()) {
-          await file.delete();
+    // Clean up temporary files - guarantee cleanup
+    try {
+      for (final file in _tempFiles) {
+        try {
+          if (await file.exists()) {
+            await file.delete();
+          }
+        } catch (e) {
+          // Log but don't throw - cleanup is best effort
+          print('Warning: Failed to delete temp file ${file.path}: $e');
         }
-      } catch (_) {
-        // Ignore cleanup errors
       }
+    } catch (e) {
+      // Log but don't throw - cleanup must complete
+      print('Warning: Failed during cleanup: $e');
+    } finally {
+      _tempFiles.clear();
+      _isDisposed = true;
     }
-    _tempFiles.clear();
-
-    _isDisposed = true;
   }
 
   void _ensureNotDisposed() {
@@ -388,41 +393,74 @@ class CodexChat {
 
     for (final content in contents) {
       if (content is TextContent) {
-        buffer.writeln(content.text);
+        buffer.writeln(content.toCliString());
       } else if (content is FileContent) {
         if (!content.exists) {
           throw CodexSDKException('File does not exist: ${content.file.path}');
         }
-        buffer.writeln('File: ${content.file.absolute.path}');
+        // Clone file to working directory
+        await _cloneFileToWorkingDirectory(content);
+        buffer.writeln(content.toCliString());
       } else if (content is BytesContent) {
-        final tempFile = await _createTempFile(content);
-        buffer.writeln('File: ${tempFile.absolute.path}');
+        // Create temporary file from bytes
+        await _createTempFile(content);
+        buffer.writeln(content.toCliString());
       }
     }
 
     return buffer.toString().trim();
   }
 
-  Future<File> _createTempFile(BytesContent content) async {
-    
-    final fileName = 'codex_temp_${_uuid.v4()}.${content.fileExtension}';
-    final tempFile = File(path.join(baseDir.path, fileName));
+  Future<void> _createTempFile(BytesContent content) async {
+    try {
+      // Generate unique filename with nanoid
+      final nanoId = nanoid(length: 3);
+      final fileName = '${content.fileName}_$nanoId.${content.fileExtension}';
+      final tempFile = File(path.join(baseDir.path, fileName));
 
-    await tempFile.writeAsBytes(content.data);
-    content.tempFile = tempFile;
-    _tempFiles.add(tempFile);
-
-    return tempFile;
+      await tempFile.writeAsBytes(content.data);
+      content.tempFile = tempFile;
+      _tempFiles.add(tempFile);
+    } catch (e) {
+      throw CodexSDKException(
+          'Failed to create temporary file: ${e.toString()}');
+    }
   }
 
-  
+  /// Clones a file to the working directory with a unique name
+  Future<void> _cloneFileToWorkingDirectory(FileContent content) async {
+    try {
+      // Read the original file
+      final originalData = await content.file.readAsBytes();
 
-    Directory get baseDir => options?.cwd != null
-        ? Directory(options!.cwd!).absolute
-        : Directory.current.absolute;
+      // Generate unique filename with nanoid
+      final nanoId = nanoid(length: 3);
+      final originalName = content.fileName;
+      final extension = path.extension(originalName);
+      final baseName = path.basenameWithoutExtension(originalName);
+      final newFileName = '${baseName}_$nanoId$extension';
+      final filePath = path.join(baseDir.path, newFileName);
+
+      // Create and write to file
+      final tempFile = File(filePath);
+      await tempFile.writeAsBytes(originalData);
+
+      // Track this temporary file for cleanup
+      _tempFiles.add(tempFile);
+
+      // Store reference in the FileContent object
+      content.tempFile = tempFile;
+    } catch (e) {
+      throw CodexSDKException(
+          'Failed to clone file to working directory: ${e.toString()}');
+    }
+  }
+
+  Directory get baseDir => options?.cwd != null
+      ? Directory(options!.cwd!).absolute
+      : Directory.current.absolute;
   Future<File> _createSchemaTempJsonFile() async {
-
-    final fileName = 'codex_schema_${_uuid.v4()}.json';
+    final fileName = 'codex_schema_${const Uuid().v4()}.json';
     final file = File(path.join(baseDir.path, fileName));
     await file.create(recursive: true);
     _tempFiles.add(file);

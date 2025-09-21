@@ -266,7 +266,11 @@ You need to create extraction rules for a new web scraper from scratch.
 **Initial Request Configuration**:
 The following JSON contains the initial WebScrapperRequest configuration that was automatically generated from the URL. You can modify these if the user requests changes (e.g., adding query parameters, changing the URL pattern).
 '''),
-    GeminiSdkContent.bytes(data: inputBytes, fileExtension: 'json'),
+    GeminiSdkContent.bytes(
+      data: inputBytes,
+      fileName: 'request_config',
+      fileExtension: 'json',
+    ),
     GeminiSdkContent.text('''
 ## Your Process:
 
@@ -324,7 +328,11 @@ The following JSON contains:
 1. **currentRequest**: The current WebScrapperRequest (URL pattern, query params, path params)
 2. **currentFetchSettings**: The current ScrapingBee settings that are successfully extracting data
 '''),
-    GeminiSdkContent.bytes(data: inputBytes, fileExtension: 'json'),
+    GeminiSdkContent.bytes(
+      data: inputBytes,
+      fileName: 'current_config',
+      fileExtension: 'json',
+    ),
     GeminiSdkContent.text('''
 ## Your Process:
 

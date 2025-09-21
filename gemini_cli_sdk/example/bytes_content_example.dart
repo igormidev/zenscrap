@@ -49,6 +49,7 @@ void main() async {
       GeminiSdkContent.text('Please analyze this markdown document and summarize its main points:'),
       GeminiSdkContent.bytes(
         data: textBytes,
+        fileName: 'document',
         fileExtension: 'md',
       ),
     ]);
@@ -96,6 +97,7 @@ void main() async {
       GeminiSdkContent.text('Analyze this JSON data and tell me: How many active users are there? What are their roles?'),
       GeminiSdkContent.bytes(
         data: jsonBytes,
+        fileName: 'data',
         fileExtension: 'json',
       ),
     ]);
@@ -123,6 +125,7 @@ Desk Lamp,Furniture,49.99,40
       GeminiSdkContent.text('Analyze this CSV data and tell me: What is the most expensive product? What category has the most items?'),
       GeminiSdkContent.bytes(
         data: csvBytes,
+        fileName: 'products',
         fileExtension: 'csv',
       ),
     ]);
@@ -143,6 +146,7 @@ Desk Lamp,Furniture,49.99,40
 //   GeminiSdkContent.text('What is in this image?'),
 //   GeminiSdkContent.bytes(
 //     data: imageBytes,
+//     fileName: 'image',
 //     fileExtension: 'jpg',
 //   ),
 // ]);

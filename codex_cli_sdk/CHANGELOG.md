@@ -1,5 +1,27 @@
 # Changelog
 
+## 2.1.0
+
+### Breaking Changes
+- `CodexSdkContent.bytes()` now requires a `fileName` parameter for proper file identification
+- Files passed via `CodexSdkContent.file()` are now cloned to the working directory to ensure CLI access
+- Temporary files are automatically cleaned up in `dispose()` method
+
+### Added
+- **File Management Improvements**:
+  - Automatic file cloning to working directory for CLI accessibility
+  - Unique file naming using nanoid2 to prevent conflicts
+  - Guaranteed cleanup of temporary files in dispose()
+- **New Parameters**:
+  - `fileName` parameter (required) for `CodexSdkContent.bytes()`
+  - `fileDescription` parameter (optional) for both `bytes()` and `file()` methods
+- **CLI-specific formatting**: Added `toCliString()` method for proper file references
+
+### Fixed
+- CLI tools can now access files from any location by cloning them to the working directory
+- Prevents file access errors when files are outside the CLI's scope
+- Ensures consistent file handling across different operating systems
+
 ## 2.0.0
 
 ### Breaking

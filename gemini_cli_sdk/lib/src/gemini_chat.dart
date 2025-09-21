@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:nanoid2/nanoid2.dart';
 import 'package:path/path.dart' as path;
 import 'package:uuid/uuid.dart';
 
@@ -168,20 +169,20 @@ ${options.systemPrompt}
 
     for (final content in contents) {
       if (content is TextContent) {
-        promptParts.add(content.text);
+        promptParts.add(content.toCliString());
       } else if (content is FileContent) {
         if (!content.exists) {
           throw GeminiSDKException('File does not exist: ${content.file.path}');
         }
-        // Include file reference in the prompt
-        promptParts
-            .add('Please analyze the file at: ${content.file.absolute.path}');
+        // Clone file to working directory
+        await _cloneFileToWorkingDirectory(content);
+        // Use the CLI string representation
+        promptParts.add(content.toCliString());
       } else if (content is BytesContent) {
         // Create temporary file from bytes
-        final tempFile = await _createTempFileFromBytes(content);
-        // Include file reference in the prompt
-        promptParts
-            .add('Please analyze the file at: ${tempFile.absolute.path}');
+        await _createTempFileFromBytes(content);
+        // Use the CLI string representation
+        promptParts.add(content.toCliString());
       }
     }
 
@@ -189,15 +190,12 @@ ${options.systemPrompt}
   }
 
   /// Creates a temporary file from bytes content
-  Future<File> _createTempFileFromBytes(BytesContent content) async {
+  Future<void> _createTempFileFromBytes(BytesContent content) async {
     try {
-      // Get system temp directory
-      final tempDir = Directory.current.absolute;
-
-      // Generate unique filename
-      const uuid = Uuid();
-      final fileName = 'gemini_temp_${uuid.v4()}.${content.fileExtension}';
-      final filePath = path.join(tempDir.path, fileName);
+      // Generate unique filename with nanoid
+      final nanoId = nanoid(length: 3);
+      final fileName = '${content.fileName}_$nanoId.${content.fileExtension}';
+      final filePath = path.join(baseDir.path, fileName);
 
       // Create and write to file
       final tempFile = File(filePath);
@@ -208,11 +206,38 @@ ${options.systemPrompt}
 
       // Store reference in the BytesContent object
       content.tempFile = tempFile;
-
-      return tempFile;
     } catch (e) {
       throw GeminiSDKException(
           'Failed to create temporary file: ${e.toString()}', e);
+    }
+  }
+
+  /// Clones a file to the working directory with a unique name
+  Future<void> _cloneFileToWorkingDirectory(FileContent content) async {
+    try {
+      // Read the original file
+      final originalData = await content.file.readAsBytes();
+
+      // Generate unique filename with nanoid
+      final nanoId = nanoid(length: 3);
+      final originalName = content.fileName;
+      final extension = path.extension(originalName);
+      final baseName = path.basenameWithoutExtension(originalName);
+      final newFileName = '${baseName}_$nanoId$extension';
+      final filePath = path.join(baseDir.path, newFileName);
+
+      // Create and write to file
+      final tempFile = File(filePath);
+      await tempFile.writeAsBytes(originalData);
+
+      // Track this temporary file for cleanup
+      _temporaryFiles.add(tempFile);
+
+      // Store reference in the FileContent object
+      content.tempFile = tempFile;
+    } catch (e) {
+      throw GeminiSDKException(
+          'Failed to clone file to working directory: ${e.toString()}', e);
     }
   }
 
@@ -925,14 +950,24 @@ ${options.systemPrompt}
 
     _isDisposed = true;
 
-    // Kill any active process
-    if (_activeProcess != null) {
-      _activeProcess!.kill();
-      _activeProcess = null;
+    try {
+      // Kill any active process
+      if (_activeProcess != null) {
+        _activeProcess!.kill();
+        _activeProcess = null;
+      }
+    } catch (e) {
+      // Log but don't throw - cleanup must continue
+      print('Warning: Failed to kill process: $e');
     }
 
-    // Clean up temporary files
-    await _cleanupTempFiles();
+    // Clean up temporary files - guarantee cleanup
+    try {
+      await _cleanupTempFiles();
+    } catch (e) {
+      // Log but don't throw - cleanup is best effort
+      print('Warning: Failed to cleanup temp files: $e');
+    }
 
     // Clear session
     _sessionId = null;

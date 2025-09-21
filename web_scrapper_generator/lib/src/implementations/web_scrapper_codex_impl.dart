@@ -254,12 +254,17 @@ Remember: Your goal is to create extraction rules that consistently retrieve the
         codexPrompts.add(
           CodexSdkContent.bytes(
             data: prompt.data,
+            fileName: prompt.fileName,
             fileExtension: prompt.fileExtension,
+            fileDescription: prompt.fileDescription,
           ),
         );
       } else if (prompt is gemini_sdk.FileContent) {
         // Convert file content to Codex format
-        codexPrompts.add(CodexSdkContent.file(prompt.file));
+        codexPrompts.add(CodexSdkContent.file(
+          prompt.file,
+          fileDescription: prompt.fileDescription,
+        ));
       }
     }
 

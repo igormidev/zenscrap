@@ -104,6 +104,7 @@ void main() {
       final bytes = Uint8List.fromList([1, 2, 3, 4, 5]);
       final content = ClaudeSdkContent.bytes(
         data: bytes,
+        fileName: 'test',
         fileExtension: 'bin',
       );
 
@@ -116,6 +117,7 @@ void main() {
       final bytes = Uint8List.fromList([1, 2, 3]);
       final content = ClaudeSdkContent.bytes(
         data: bytes,
+        fileName: 'test',
         fileExtension: 'txt',
       );
       final json = content.toJson();

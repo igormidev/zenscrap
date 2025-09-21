@@ -14,6 +14,7 @@ void main() {
       final testData = Uint8List.fromList('Test data'.codeUnits);
       final bytesContent = ClaudeSdkContent.bytes(
         data: testData,
+        fileName: 'test',
         fileExtension: 'txt',
       ) as BytesContent;
       
@@ -49,6 +50,7 @@ void main() {
       final data = Uint8List.fromList([1, 2, 3, 4, 5]);
       final content = ClaudeSdkContent.bytes(
         data: data,
+        fileName: 'data',
         fileExtension: 'bin',
       ) as BytesContent;
       
@@ -61,6 +63,7 @@ void main() {
       final data = Uint8List.fromList([10, 20, 30]);
       final content = ClaudeSdkContent.bytes(
         data: data,
+        fileName: 'data',
         fileExtension: 'dat',
       );
       
@@ -74,6 +77,7 @@ void main() {
     test('BytesContent toCliString should indicate file status', () {
       final content = ClaudeSdkContent.bytes(
         data: Uint8List.fromList([1, 2, 3]),
+        fileName: 'test',
         fileExtension: 'txt',
       ) as BytesContent;
       

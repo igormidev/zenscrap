@@ -138,6 +138,7 @@ void main() async {
       ClaudeSdkContent.text('What is in this image?'),
       ClaudeSdkContent.bytes(
         data: imageBytes,
+        fileName: 'image',
         fileExtension: 'jpg',
       ),
     ]);
@@ -149,6 +150,7 @@ void main() async {
       ClaudeSdkContent.text('Read this text:'),
       ClaudeSdkContent.bytes(
         data: textBytes,
+        fileName: 'text',
         fileExtension: 'txt',
       ),
     ]);
@@ -535,7 +537,7 @@ await claudeSDK.dispose(); // Disposes all active sessions
 
 - `ClaudeSdkContent.text(String text)` - Creates text content
 - `ClaudeSdkContent.file(File file)` - Creates file content
-- `ClaudeSdkContent.bytes({data, fileExtension})` - Creates content from bytes (temporary file)
+- `ClaudeSdkContent.bytes({data, fileName, fileExtension})` - Creates content from bytes (temporary file)
 
 ## Environment Variables
 

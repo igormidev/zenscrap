@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:nanoid2/nanoid2.dart';
 import 'package:path/path.dart' as path;
 import 'package:uuid/uuid.dart';
 
@@ -128,20 +129,20 @@ class ClaudeChat {
 
     for (final content in contents) {
       if (content is TextContent) {
-        promptParts.add(content.text);
+        promptParts.add(content.toCliString());
       } else if (content is FileContent) {
         if (!content.exists) {
           throw ClaudeSDKException('File does not exist: ${content.file.path}');
         }
-        // Include file reference in the prompt
-        promptParts
-            .add('Please analyze the file at: ${content.file.absolute.path}');
+        // Clone file to working directory
+        await _cloneFileToWorkingDirectory(content);
+        // Use the CLI string representation
+        promptParts.add(content.toCliString());
       } else if (content is BytesContent) {
         // Create temporary file from bytes
-        final tempFile = await _createTempFileFromBytes(content);
-        // Include file reference in the prompt
-        promptParts
-            .add('Please analyze the file at: ${tempFile.absolute.path}');
+        await _createTempFileFromBytes(content);
+        // Use the CLI string representation
+        promptParts.add(content.toCliString());
       }
     }
 
@@ -149,15 +150,15 @@ class ClaudeChat {
   }
 
   Directory get baseDir => options.cwd != null
-        ? Directory(options.cwd!).absolute
-        : Directory.current.absolute;
+      ? Directory(options.cwd!).absolute
+      : Directory.current.absolute;
 
   /// Creates a temporary file from bytes content
-  Future<File> _createTempFileFromBytes(BytesContent content) async {
-    try { 
-      // Generate unique filename
-      const uuid = Uuid();
-      final fileName = 'claude_temp_${uuid.v4()}.${content.fileExtension}';
+  Future<void> _createTempFileFromBytes(BytesContent content) async {
+    try {
+      // Generate unique filename with nanoid
+      final nanoId = nanoid(length: 3);
+      final fileName = '${content.fileName}_$nanoId.${content.fileExtension}';
       final filePath = path.join(baseDir.path, fileName);
 
       // Create and write to file
@@ -169,11 +170,38 @@ class ClaudeChat {
 
       // Store reference in the BytesContent object
       content.tempFile = tempFile;
-
-      return tempFile;
     } catch (e) {
       throw ClaudeSDKException(
           'Failed to create temporary file: ${e.toString()}', e);
+    }
+  }
+
+  /// Clones a file to the working directory with a unique name
+  Future<void> _cloneFileToWorkingDirectory(FileContent content) async {
+    try {
+      // Read the original file
+      final originalData = await content.file.readAsBytes();
+
+      // Generate unique filename with nanoid
+      final nanoId = nanoid(length: 3);
+      final originalName = content.fileName;
+      final extension = path.extension(originalName);
+      final baseName = path.basenameWithoutExtension(originalName);
+      final newFileName = '${baseName}_$nanoId$extension';
+      final filePath = path.join(baseDir.path, newFileName);
+
+      // Create and write to file
+      final tempFile = File(filePath);
+      await tempFile.writeAsBytes(originalData);
+
+      // Track this temporary file for cleanup
+      _temporaryFiles.add(tempFile);
+
+      // Store reference in the FileContent object
+      content.tempFile = tempFile;
+    } catch (e) {
+      throw ClaudeSDKException(
+          'Failed to clone file to working directory: ${e.toString()}', e);
     }
   }
 
@@ -652,10 +680,6 @@ class ClaudeChat {
     }
   }
 
-  Directory get baseDir => options.cwd != null
-        ? Directory(options.cwd!).absolute
-        : Directory.current.absolute;
-
   Future<File> _createSchemaTempFile() async {
     final fileName = 'claude_schema_${const Uuid().v4()}.json';
     final file = File(path.join(baseDir.path, fileName));
@@ -953,18 +977,24 @@ class ClaudeChat {
     if (_isDisposed) return;
     _isDisposed = true;
 
-    // Clean up temporary files
-    for (final tempFile in _temporaryFiles) {
-      try {
-        if (await tempFile.exists()) {
-          await tempFile.delete();
+    // Clean up temporary files - guarantee cleanup
+    try {
+      for (final tempFile in _temporaryFiles) {
+        try {
+          if (await tempFile.exists()) {
+            await tempFile.delete();
+          }
+        } catch (e) {
+          // Log but don't throw - cleanup is best effort
+          print('Warning: Failed to delete temp file ${tempFile.path}: $e');
         }
-      } catch (e) {
-        // Silently ignore cleanup errors
-        // Files will be cleaned up by the OS eventually
       }
+    } catch (e) {
+      // Log but don't throw - cleanup must complete
+      print('Warning: Failed during cleanup: $e');
+    } finally {
+      _temporaryFiles.clear();
     }
-    _temporaryFiles.clear();
   }
 
   /// Whether the chat session is disposed

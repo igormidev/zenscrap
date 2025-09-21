@@ -219,12 +219,17 @@ Remember: Your goal is to create extraction rules that consistently retrieve the
         claudePrompts.add(
           ClaudeSdkContent.bytes(
             data: prompt.data,
+            fileName: prompt.fileName,
             fileExtension: prompt.fileExtension,
+            fileDescription: prompt.fileDescription,
           ),
         );
       } else if (prompt is gemini_sdk.FileContent) {
         // Convert file content to Claude format
-        claudePrompts.add(ClaudeSdkContent.file(prompt.file));
+        claudePrompts.add(ClaudeSdkContent.file(
+          prompt.file,
+          fileDescription: prompt.fileDescription,
+        ));
       }
     }
 
