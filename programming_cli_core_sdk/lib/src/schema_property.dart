@@ -121,6 +121,62 @@ class SchemaPropertyStructuredObjectWithDefinedProperties
   // If a field is required (not nullable) it must be present
   // If a field is nullable it can be absent or null, but if it is present it must follow the schema
   bool validateIdJsonFollowsSchemaStructure(Map<String, dynamic> model) {
-    return true;
+    return _validateValueForSchema(this, model);
+  }
+
+  static bool _validateValueForSchema(SchemaProperty schema, dynamic value) {
+    if (value == null) {
+      return schema.nullable;
+    }
+
+    switch (schema) {
+      case SchemaPropertyString():
+        return value is String;
+      case SchemaPropertyInteger():
+        return value is int;
+      case SchemaPropertyDouble():
+        return value is num;
+      case SchemaPropertyBoolean():
+        return value is bool;
+      case SchemaPropertyEnum(:final enumValues):
+        return value is String && enumValues.contains(value);
+      case SchemaPropertyArray(:final items):
+        if (value is! List) {
+          return false;
+        }
+        for (final element in value) {
+          if (!_validateValueForSchema(items, element)) {
+            return false;
+          }
+        }
+        return true;
+      case SchemaPropertyObjectWithUndefinedProperties():
+        return value is Map<String, dynamic>;
+      case SchemaPropertyStructuredObjectWithDefinedProperties(
+        :final properties,
+      ):
+        if (value is! Map<String, dynamic>) {
+          return false;
+        }
+
+        for (final entry in properties.entries) {
+          final key = entry.key;
+          final propertySchema = entry.value;
+          final hasKey = value.containsKey(key);
+
+          if (!hasKey) {
+            if (!propertySchema.nullable) {
+              return false;
+            }
+            continue;
+          }
+
+          final propertyValue = value[key];
+          if (!_validateValueForSchema(propertySchema, propertyValue)) {
+            return false;
+          }
+        }
+        return true;
+    }
   }
 }
