@@ -25,7 +25,7 @@ void main() {
       // So we'll test the cleanup logic directly
       
       // Simulate what would happen in sendMessage by creating a temp file
-      final tempDir = Directory.systemTemp;
+      final tempDir = Directory.current;
       final tempFile = File('${tempDir.path}/test_temp_file.txt');
       await tempFile.writeAsBytes(testData);
       

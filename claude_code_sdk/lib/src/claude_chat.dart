@@ -148,16 +148,17 @@ class ClaudeChat {
     return promptParts.join('\n\n');
   }
 
+  Directory get baseDir => options.cwd != null
+        ? Directory(options.cwd!).absolute
+        : Directory.current.absolute;
+
   /// Creates a temporary file from bytes content
   Future<File> _createTempFileFromBytes(BytesContent content) async {
-    try {
-      // Get system temp directory using dart:io
-      final tempDir = Directory.systemTemp;
-
+    try { 
       // Generate unique filename
       const uuid = Uuid();
       final fileName = 'claude_temp_${uuid.v4()}.${content.fileExtension}';
-      final filePath = path.join(tempDir.path, fileName);
+      final filePath = path.join(baseDir.path, fileName);
 
       // Create and write to file
       final tempFile = File(filePath);
@@ -651,10 +652,11 @@ class ClaudeChat {
     }
   }
 
-  Future<File> _createSchemaTempFile() async {
-    final baseDir = options.cwd != null
+  Directory get baseDir => options.cwd != null
         ? Directory(options.cwd!).absolute
         : Directory.current.absolute;
+
+  Future<File> _createSchemaTempFile() async {
     final fileName = 'claude_schema_${const Uuid().v4()}.json';
     final file = File(path.join(baseDir.path, fileName));
     await file.create(recursive: true);

@@ -404,9 +404,9 @@ class CodexChat {
   }
 
   Future<File> _createTempFile(BytesContent content) async {
-    final tempDir = Directory.systemTemp;
+    
     final fileName = 'codex_temp_${_uuid.v4()}.${content.fileExtension}';
-    final tempFile = File(path.join(tempDir.path, fileName));
+    final tempFile = File(path.join(baseDir.path, fileName));
 
     await tempFile.writeAsBytes(content.data);
     content.tempFile = tempFile;
@@ -415,10 +415,12 @@ class CodexChat {
     return tempFile;
   }
 
-  Future<File> _createSchemaTempJsonFile() async {
-    final baseDir = options?.cwd != null
+  
+
+    Directory get baseDir => options?.cwd != null
         ? Directory(options!.cwd!).absolute
         : Directory.current.absolute;
+  Future<File> _createSchemaTempJsonFile() async {
 
     final fileName = 'codex_schema_${_uuid.v4()}.json';
     final file = File(path.join(baseDir.path, fileName));

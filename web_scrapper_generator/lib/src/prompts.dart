@@ -285,7 +285,8 @@ The following JSON contains the initial WebScrapperRequest configuration that wa
 - Set custom_google=true for any Google domain
 - The final ScrappingBeeFetchSettings.url will be the URL you actually tested against
 
-The user will now describe what data they want to extract from this site.'''),
+The user will now describe what data they want to extract from this site, ALL (without exception) the following texts beelow are instructions typed from the user of that should be extract, make sure you read them carefully and understand them before starting your work.
+User prompt:'''),
   ];
 }
 

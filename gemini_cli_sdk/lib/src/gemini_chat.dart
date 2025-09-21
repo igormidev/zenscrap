@@ -192,7 +192,7 @@ ${options.systemPrompt}
   Future<File> _createTempFileFromBytes(BytesContent content) async {
     try {
       // Get system temp directory
-      final tempDir = Directory.systemTemp;
+      final tempDir = Directory.current.absolute;
 
       // Generate unique filename
       const uuid = Uuid();
@@ -335,10 +335,11 @@ ${options.systemPrompt}
     }
   }
 
+  Directory get baseDir => options.cwd != null
+      ? Directory(options.cwd!).absolute
+      : Directory.current.absolute;
+
   Future<File> _createSchemaTempFile() async {
-    final baseDir = options.cwd != null
-        ? Directory(options.cwd!).absolute
-        : Directory.current.absolute;
     final fileName = 'gemini_schema_${const Uuid().v4()}.json';
     final file = File(path.join(baseDir.path, fileName));
     await file.create(recursive: true);
