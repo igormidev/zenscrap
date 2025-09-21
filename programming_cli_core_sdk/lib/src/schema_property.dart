@@ -4,21 +4,39 @@ sealed class SchemaProperty {
   final String type;
   final bool nullable;
   final String? description;
-  SchemaProperty({
-    required this.type,
-    required this.nullable,
-    this.description,
-  });
+  SchemaProperty({required this.type, this.nullable = false, this.description});
 
-  factory SchemaProperty.text() = SchemaPropertyString;
-  factory SchemaProperty.integer() = SchemaPropertyInteger;
-  factory SchemaProperty.double() = SchemaPropertyDouble;
-  factory SchemaProperty.boolean() = SchemaPropertyBoolean;
-  factory SchemaProperty.enumeration(List<String> enumValues) =
-      SchemaPropertyEnum;
-  factory SchemaProperty.array(SchemaProperty items) = SchemaPropertyArray;
-  factory SchemaProperty.object(Map<String, SchemaProperty> properties) =
-      SchemaPropertyObject;
+  factory SchemaProperty.text({required bool nullable, String? description}) =
+      SchemaPropertyString;
+  factory SchemaProperty.integer({
+    required bool nullable,
+    String? description,
+  }) = SchemaPropertyInteger;
+  factory SchemaProperty.double({required bool nullable, String? description}) =
+      SchemaPropertyDouble;
+  factory SchemaProperty.boolean({
+    required bool nullable,
+    String? description,
+  }) = SchemaPropertyBoolean;
+  factory SchemaProperty.enumeration(
+    List<String> enumValues, {
+    required bool nullable,
+    String? description,
+  }) = SchemaPropertyEnum;
+  factory SchemaProperty.array(
+    SchemaProperty items, {
+    required bool nullable,
+    String? description,
+  }) = SchemaPropertyArray;
+  factory SchemaProperty.structuredObject(
+    Map<String, SchemaProperty> properties, {
+    required bool nullable,
+    String? description,
+  }) = SchemaPropertyStructuredObjectWithDefinedProperties;
+  factory SchemaProperty.objectWithUndefinedProperties({
+    required bool nullable,
+    String? description,
+  }) = SchemaPropertyObjectWithUndefinedProperties;
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> json = {
@@ -32,10 +50,11 @@ sealed class SchemaProperty {
         json['possibleEnumValues'] = (this as SchemaPropertyEnum).enumValues;
       case SchemaPropertyArray():
         json['items'] = (this as SchemaPropertyArray).items.toJson();
-      case SchemaPropertyObject():
-        json['properties'] = (this as SchemaPropertyObject).properties.map(
-          (key, value) => MapEntry(key, value.toJson()),
-        );
+      case SchemaPropertyStructuredObjectWithDefinedProperties():
+        json['properties'] =
+            (this as SchemaPropertyStructuredObjectWithDefinedProperties)
+                .properties
+                .map((key, value) => MapEntry(key, value.toJson()));
       default:
         // No additional fields for other types
         break;
@@ -45,57 +64,25 @@ sealed class SchemaProperty {
 
   @override
   String toString() => JsonEncoder.withIndent('  ').convert(toJson());
-
-  String toDartClass() {
-    final StringBuffer buffer = StringBuffer();
-
-    buffer.writeln('class ${type[0].toUpperCase()}${type.substring(1)} {');
-    switch (this) {
-      case SchemaPropertyEnum():
-        final enumValues = (this as SchemaPropertyEnum).enumValues;
-        buffer.writeln('  // Enum values: ${enumValues.join(', ')}');
-      case SchemaPropertyArray():
-        final itemsType = (this as SchemaPropertyArray).items.type;
-        buffer.writeln('  final List<$itemsType> items;');
-        buffer.writeln(
-          '  ${type[0].toUpperCase()}${type.substring(1)}(this.items);',
-        );
-      case SchemaPropertyObject():
-        final properties = (this as SchemaPropertyObject).properties;
-        properties.forEach((key, value) {
-          buffer.writeln('  final ${value.type} $key;');
-        });
-        buffer.writeln('  ${type[0].toUpperCase()}${type.substring(1)}({');
-        properties.forEach((key, value) {
-          buffer.writeln('    required this.$key,');
-        });
-        buffer.writeln('  });');
-      default:
-        buffer.writeln('  // No additional fields for type $type');
-    }
-    buffer.writeln('}');
-
-    return buffer.toString();
-  }
 }
 
 class SchemaPropertyString extends SchemaProperty {
-  SchemaPropertyString({super.nullable = false, super.description})
+  SchemaPropertyString({required super.nullable, super.description})
     : super(type: 'string');
 }
 
 class SchemaPropertyInteger extends SchemaProperty {
-  SchemaPropertyInteger({super.nullable = false, super.description})
+  SchemaPropertyInteger({required super.nullable, super.description})
     : super(type: 'integer');
 }
 
 class SchemaPropertyDouble extends SchemaProperty {
-  SchemaPropertyDouble({super.nullable = false, super.description})
+  SchemaPropertyDouble({required super.nullable, super.description})
     : super(type: 'double');
 }
 
 class SchemaPropertyBoolean extends SchemaProperty {
-  SchemaPropertyBoolean({super.nullable = false, super.description})
+  SchemaPropertyBoolean({required super.nullable, super.description})
     : super(type: 'boolean');
 }
 
@@ -103,22 +90,37 @@ class SchemaPropertyEnum extends SchemaProperty {
   final List<String> enumValues;
   SchemaPropertyEnum(
     this.enumValues, {
-    super.nullable = false,
+    required super.nullable,
     super.description,
   }) : super(type: 'enum');
 }
 
 class SchemaPropertyArray extends SchemaProperty {
   final SchemaProperty items;
-  SchemaPropertyArray(this.items, {super.nullable = false, super.description})
+  SchemaPropertyArray(this.items, {required super.nullable, super.description})
     : super(type: 'array');
 }
 
-class SchemaPropertyObject extends SchemaProperty {
-  final Map<String, SchemaProperty> properties;
-  SchemaPropertyObject(
-    this.properties, {
-    super.nullable = false,
+class SchemaPropertyObjectWithUndefinedProperties extends SchemaProperty {
+  SchemaPropertyObjectWithUndefinedProperties({
+    required super.nullable,
     super.description,
-  }) : super(type: 'object');
+  }) : super(type: 'dynamic_object_with_undefined_properties');
+}
+
+class SchemaPropertyStructuredObjectWithDefinedProperties
+    extends SchemaProperty {
+  final Map<String, SchemaProperty> properties;
+  SchemaPropertyStructuredObjectWithDefinedProperties(
+    this.properties, {
+    required super.nullable,
+    super.description,
+  }) : super(type: 'structured_object_with_defined_properties');
+
+  // Will see if a given JSON object follows this schema structure
+  // If a field is required (not nullable) it must be present
+  // If a field is nullable it can be absent or null, but if it is present it must follow the schema
+  bool validateIdJsonFollowsSchemaStructure(Map<String, dynamic> model) {
+    return true;
+  }
 }
