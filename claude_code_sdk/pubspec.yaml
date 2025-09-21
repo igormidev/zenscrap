@@ -11,6 +11,8 @@ dependencies:
   path: ^1.8.0
   uuid: ^4.0.0
   nanoid2: ^2.0.1
+  programming_cli_core_sdk:
+    path: ../programming_cli_core_sdk/
 
 dev_dependencies:
   lints: ^3.0.0
