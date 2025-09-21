@@ -18,9 +18,9 @@ void main() {
 
 SchemaPropertyStructuredObjectWithDefinedProperties getTestSchema() {
   return SchemaProperty.structuredObject(
-        {
+        properties: {
           'responseType': SchemaProperty.enumeration(
-            ['message', 'error', 'data'],
+            enumValues: ['message', 'error', 'data'],
             description: 'The type of response: "message", "error", or "data"',
             nullable: false,
           ),
@@ -39,14 +39,14 @@ SchemaPropertyStructuredObjectWithDefinedProperties getTestSchema() {
             nullable: true,
           ),
           'request': SchemaProperty.structuredObject(
-            {
+            properties: {
               'url': SchemaProperty.text(
                 description:
                     'URL pattern with {paramName} placeholders for dynamic segments',
                 nullable: false,
               ),
               'queryParam': SchemaProperty.structuredObject(
-                {
+                properties: {
                   '__dynamic__': SchemaProperty.text(
                     description: 'Dynamic key-value pairs for query parameters',
                     nullable: true,
@@ -56,7 +56,7 @@ SchemaPropertyStructuredObjectWithDefinedProperties getTestSchema() {
                 nullable: false,
               ),
               'pathParams': SchemaProperty.array(
-                SchemaProperty.text(nullable: false),
+                items: SchemaProperty.text(nullable: false),
                 description: 'List of path parameter names',
                 nullable: false,
               ),
@@ -66,7 +66,7 @@ SchemaPropertyStructuredObjectWithDefinedProperties getTestSchema() {
             nullable: true,
           ),
           'fetchSettings': SchemaProperty.structuredObject(
-            {
+            properties: {
               'url': SchemaProperty.text(
                 description: 'The target URL for scraping',
                 nullable: false,

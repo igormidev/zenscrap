@@ -18,18 +18,18 @@ sealed class SchemaProperty {
     required bool nullable,
     String? description,
   }) = SchemaPropertyBoolean;
-  factory SchemaProperty.enumeration(
-    List<String> enumValues, {
+  factory SchemaProperty.enumeration({
+    required List<String> enumValues,
     required bool nullable,
     String? description,
   }) = SchemaPropertyEnum;
-  factory SchemaProperty.array(
-    SchemaProperty items, {
+  factory SchemaProperty.array({
+    required SchemaProperty items,
     required bool nullable,
     String? description,
   }) = SchemaPropertyArray;
-  factory SchemaProperty.structuredObject(
-    Map<String, SchemaProperty> properties, {
+  factory SchemaProperty.structuredObject({
+    required Map<String, SchemaProperty> properties,
     required bool nullable,
     String? description,
   }) = SchemaPropertyStructuredObjectWithDefinedProperties;
@@ -88,8 +88,8 @@ class SchemaPropertyBoolean extends SchemaProperty {
 
 class SchemaPropertyEnum extends SchemaProperty {
   final List<String> enumValues;
-  SchemaPropertyEnum(
-    this.enumValues, {
+  SchemaPropertyEnum({
+    required this.enumValues,
     required super.nullable,
     super.description,
   }) : super(type: 'enum');
@@ -97,8 +97,11 @@ class SchemaPropertyEnum extends SchemaProperty {
 
 class SchemaPropertyArray extends SchemaProperty {
   final SchemaProperty items;
-  SchemaPropertyArray(this.items, {required super.nullable, super.description})
-    : super(type: 'array');
+  SchemaPropertyArray({
+    required this.items,
+    required super.nullable,
+    super.description,
+  }) : super(type: 'array');
 }
 
 class SchemaPropertyObjectWithUndefinedProperties extends SchemaProperty {
@@ -111,8 +114,8 @@ class SchemaPropertyObjectWithUndefinedProperties extends SchemaProperty {
 class SchemaPropertyStructuredObjectWithDefinedProperties
     extends SchemaProperty {
   final Map<String, SchemaProperty> properties;
-  SchemaPropertyStructuredObjectWithDefinedProperties(
-    this.properties, {
+  SchemaPropertyStructuredObjectWithDefinedProperties({
+    required this.properties,
     required super.nullable,
     super.description,
   }) : super(type: 'structured_object_with_defined_properties');
@@ -178,5 +181,135 @@ class SchemaPropertyStructuredObjectWithDefinedProperties
         }
         return true;
     }
+  }
+
+  // This will be a Dart class declaration. This will be a extremely basic and naive implementation.
+  String get toDartClassDeclaration {
+    return _toCode(this, 0);
+  }
+
+  static String _escape(String value) => value.replaceAll("'", r"\'");
+
+  static String _toCode(SchemaProperty schema, int indentLevel) {
+    final buffer = StringBuffer();
+    final indent = '  ' * indentLevel;
+    final childIndent = '  ' * (indentLevel + 1);
+
+    void writeDescriptionLine() {
+      if (schema.description != null) {
+        buffer.writeln(
+          "${childIndent}description: '${_escape(schema.description!)}',",
+        );
+      }
+    }
+
+    switch (schema) {
+      case SchemaPropertyString():
+        buffer.writeln('${indent}SchemaProperty.text(');
+        writeDescriptionLine();
+        buffer.writeln('${childIndent}nullable: ${schema.nullable},');
+        buffer.write('$indent)');
+        break;
+      case SchemaPropertyInteger():
+        buffer.writeln('${indent}SchemaProperty.integer(');
+        writeDescriptionLine();
+        buffer.writeln('${childIndent}nullable: ${schema.nullable},');
+        buffer.write('$indent)');
+        break;
+      case SchemaPropertyDouble():
+        buffer.writeln('${indent}SchemaProperty.double(');
+        writeDescriptionLine();
+        buffer.writeln('${childIndent}nullable: ${schema.nullable},');
+        buffer.write('$indent)');
+        break;
+      case SchemaPropertyBoolean():
+        buffer.writeln('${indent}SchemaProperty.boolean(');
+        writeDescriptionLine();
+        buffer.writeln('${childIndent}nullable: ${schema.nullable},');
+        buffer.write('$indent)');
+        break;
+      case SchemaPropertyEnum():
+        final enumValues = schema.enumValues
+            .map((value) => "'${_escape(value)}'")
+            .join(', ');
+        buffer.writeln('${indent}SchemaProperty.enumeration(');
+        buffer.writeln('${childIndent}enumValues: [$enumValues],');
+        writeDescriptionLine();
+        buffer.writeln('${childIndent}nullable: ${schema.nullable},');
+        buffer.write('$indent)');
+        break;
+      case SchemaPropertyArray():
+        buffer.writeln('${indent}SchemaProperty.array(');
+        final itemCode = _toCode(schema.items, indentLevel + 1);
+        final itemLines = itemCode.split('\n');
+        final trimPrefix = '  ' * (indentLevel + 1);
+        for (var i = 0; i < itemLines.length; i++) {
+          final line = itemLines[i];
+          final trimmed = line.startsWith(trimPrefix)
+              ? line.substring(trimPrefix.length)
+              : line;
+          final isLastLine = i == itemLines.length - 1;
+          String prefix;
+          if (i == 0) {
+            prefix = '${childIndent}items: ';
+          } else if (isLastLine) {
+            prefix = childIndent;
+          } else {
+            prefix = '$childIndent  ';
+          }
+          final content = (i > 0 && trimmed.startsWith('  '))
+              ? trimmed.substring(2)
+              : trimmed;
+          final suffix = i == itemLines.length - 1 ? ',' : '';
+          buffer.writeln('$prefix$content$suffix');
+        }
+        if (schema.description != null) {
+          buffer.writeln(
+            "${childIndent}description: '${_escape(schema.description!)}',",
+          );
+        }
+        buffer.writeln('${childIndent}nullable: ${schema.nullable},');
+        buffer.write('$indent)');
+        break;
+      case SchemaPropertyObjectWithUndefinedProperties():
+        buffer.writeln(
+          '${indent}SchemaProperty.objectWithUndefinedProperties(',
+        );
+        writeDescriptionLine();
+        buffer.writeln('${childIndent}nullable: ${schema.nullable},');
+        buffer.write('$indent)');
+        break;
+      case SchemaPropertyStructuredObjectWithDefinedProperties():
+        final objectSchema = schema;
+        buffer.writeln('${indent}SchemaProperty.structuredObject(');
+        buffer.writeln('${childIndent}properties: {');
+        objectSchema.properties.forEach((key, value) {
+          final valueCode = _toCode(value, indentLevel + 2);
+          final valueLines = valueCode.split('\n');
+          final valueTrimPrefix = '  ' * (indentLevel + 2);
+          for (var i = 0; i < valueLines.length; i++) {
+            final line = valueLines[i];
+            final trimmed = line.startsWith(valueTrimPrefix)
+                ? line.substring(valueTrimPrefix.length)
+                : line;
+            final prefix = i == 0
+                ? "$childIndent  '${_escape(key)}': "
+                : '$childIndent  ';
+            final suffix = i == valueLines.length - 1 ? ',' : '';
+            buffer.writeln('$prefix$trimmed$suffix');
+          }
+        });
+        buffer.writeln('$childIndent},');
+        if (schema.description != null) {
+          buffer.writeln(
+            "${childIndent}description: '${_escape(schema.description!)}',",
+          );
+        }
+        buffer.writeln('${childIndent}nullable: ${schema.nullable},');
+        buffer.write('$indent)');
+        break;
+    }
+
+    return buffer.toString();
   }
 }

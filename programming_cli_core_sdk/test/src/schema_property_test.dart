@@ -2,141 +2,147 @@ import 'package:programming_cli_core_sdk/src/schema_property.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('validateIdJsonFollowsSchemaStructure', () {
-    final schema = SchemaProperty.structuredObject(
-      {
-        'id': SchemaProperty.integer(
-          description: 'Unique identifier for the entity',
-          nullable: false,
-        ),
-        'name': SchemaProperty.text(
-          description: 'Display name',
-          nullable: false,
-        ),
-        'status': SchemaProperty.enumeration(
-          ['draft', 'active', 'archived'],
-          description: 'Lifecycle status',
-          nullable: false,
-        ),
-        'tags': SchemaProperty.array(
-          SchemaProperty.text(nullable: false),
-          description: 'List of tags',
-          nullable: false,
-        ),
-        'metadata': SchemaProperty.structuredObject(
-          {
-            'owner': SchemaProperty.text(
-              description: 'Owner responsible for the entity',
-              nullable: false,
-            ),
-            'notes': SchemaProperty.text(
-              description: 'Optional notes',
-              nullable: true,
-            ),
-            'flags': SchemaProperty.array(
-              SchemaProperty.boolean(nullable: false),
-              description: 'Optional list of flags for the entity',
-              nullable: true,
-            ),
-            'preferences': SchemaProperty.structuredObject(
-              {
-                'notifications': SchemaProperty.boolean(
-                  description: 'If true, notifications are enabled',
-                  nullable: false,
-                ),
-                'theme': SchemaProperty.enumeration(
-                  ['light', 'dark'],
-                  description: 'Preferred theme',
-                  nullable: true,
-                ),
-              },
-              description: 'User preferences',
-              nullable: false,
-            ),
-          },
-          description: 'Owner metadata information',
-          nullable: false,
-        ),
-        'sessions': SchemaProperty.array(
-          SchemaProperty.structuredObject(
-            {
-              'sessionId': SchemaProperty.text(
-                description: 'Session identifier',
+  final schema =
+      SchemaProperty.structuredObject(
+            properties: {
+              'id': SchemaProperty.integer(
+                description: 'Unique identifier for the entity',
                 nullable: false,
               ),
-              'active': SchemaProperty.boolean(
-                description: 'Whether the session is active',
+              'name': SchemaProperty.text(
+                description: 'Display name',
                 nullable: false,
               ),
-              'metrics': SchemaProperty.structuredObject(
-                {
-                  'attempts': SchemaProperty.integer(
-                    description: 'Number of attempts',
+              'status': SchemaProperty.enumeration(
+                enumValues: ['draft', 'active', 'archived'],
+                description: 'Lifecycle status',
+                nullable: false,
+              ),
+              'tags': SchemaProperty.array(
+                items: SchemaProperty.text(nullable: false),
+                description: 'List of tags',
+                nullable: false,
+              ),
+              'metadata': SchemaProperty.structuredObject(
+                properties: {
+                  'owner': SchemaProperty.text(
+                    description: 'Owner responsible for the entity',
                     nullable: false,
                   ),
-                  'duration': SchemaProperty.double(
-                    description: 'Session duration in seconds',
+                  'notes': SchemaProperty.text(
+                    description: 'Optional notes',
                     nullable: true,
                   ),
-                  'history': SchemaProperty.array(
-                    SchemaProperty.structuredObject(
-                      {
-                        'timestamp': SchemaProperty.text(
-                          description: 'History timestamp in ISO8601',
-                          nullable: false,
-                        ),
-                        'success': SchemaProperty.boolean(
-                          description: 'Whether the attempt succeeded',
-                          nullable: false,
-                        ),
-                      },
-                      description: 'Single history entry',
-                      nullable: false,
-                    ),
-                    description: 'Chronological history entries',
+                  'flags': SchemaProperty.array(
+                    items: SchemaProperty.boolean(nullable: false),
+                    description: 'Optional list of flags for the entity',
+                    nullable: true,
+                  ),
+                  'preferences': SchemaProperty.structuredObject(
+                    properties: {
+                      'notifications': SchemaProperty.boolean(
+                        description: 'If true, notifications are enabled',
+                        nullable: false,
+                      ),
+                      'theme': SchemaProperty.enumeration(
+                        enumValues: ['light', 'dark'],
+                        description: 'Preferred theme',
+                        nullable: true,
+                      ),
+                    },
+                    description: 'User preferences',
                     nullable: false,
                   ),
                 },
-                description: 'Aggregated session metrics',
+                description: 'Owner metadata information',
                 nullable: false,
               ),
-            },
-            description: 'Session details',
-            nullable: false,
-          ),
-          description: 'Collection of sessions',
-          nullable: false,
-        ),
-        'optionalPayload': SchemaProperty.structuredObject(
-          {
-            'payloadType': SchemaProperty.enumeration(
-              ['basic', 'advanced'],
-              description: 'Payload type flag',
-              nullable: false,
-            ),
-            'details': SchemaProperty.structuredObject(
-              {
-                'description': SchemaProperty.text(
-                  description: 'Detailed description',
+              'sessions': SchemaProperty.array(
+                items: SchemaProperty.structuredObject(
+                  properties: {
+                    'sessionId': SchemaProperty.text(
+                      description: 'Session identifier',
+                      nullable: false,
+                    ),
+                    'active': SchemaProperty.boolean(
+                      description: 'Whether the session is active',
+                      nullable: false,
+                    ),
+                    'metrics': SchemaProperty.structuredObject(
+                      properties: {
+                        'attempts': SchemaProperty.integer(
+                          description: 'Number of attempts',
+                          nullable: false,
+                        ),
+                        'duration': SchemaProperty.double(
+                          description: 'Session duration in seconds',
+                          nullable: true,
+                        ),
+                        'history': SchemaProperty.array(
+                          items: SchemaProperty.structuredObject(
+                            properties: {
+                              'timestamp': SchemaProperty.text(
+                                description: 'History timestamp in ISO8601',
+                                nullable: false,
+                              ),
+                              'success': SchemaProperty.boolean(
+                                description: 'Whether the attempt succeeded',
+                                nullable: false,
+                              ),
+                            },
+                            description: 'Single history entry',
+                            nullable: false,
+                          ),
+                          description: 'Chronological history entries',
+                          nullable: false,
+                        ),
+                      },
+                      description: 'Aggregated session metrics',
+                      nullable: false,
+                    ),
+                  },
+                  description: 'Session details',
                   nullable: false,
                 ),
-                'score': SchemaProperty.double(
-                  description: 'Optional score',
-                  nullable: true,
-                ),
-              },
-              description: 'Payload details',
-              nullable: true,
-            ),
-          },
-          description: 'Optional payload data',
-          nullable: true,
-        ),
-      },
-      description: 'Complex schema for validation testing',
-      nullable: false,
-    ) as SchemaPropertyStructuredObjectWithDefinedProperties;
+                description: 'Collection of sessions',
+                nullable: false,
+              ),
+              'optionalPayload': SchemaProperty.structuredObject(
+                properties: {
+                  'payloadType': SchemaProperty.enumeration(
+                    enumValues: ['basic', 'advanced'],
+                    description: 'Payload type flag',
+                    nullable: false,
+                  ),
+                  'details': SchemaProperty.structuredObject(
+                    properties: {
+                      'description': SchemaProperty.text(
+                        description: 'Detailed description',
+                        nullable: false,
+                      ),
+                      'score': SchemaProperty.double(
+                        description: 'Optional score',
+                        nullable: true,
+                      ),
+                    },
+                    description: 'Payload details',
+                    nullable: true,
+                  ),
+                },
+                description: 'Optional payload data',
+                nullable: true,
+              ),
+            },
+            description: 'Complex schema for validation testing',
+            nullable: false,
+          )
+          as SchemaPropertyStructuredObjectWithDefinedProperties;
 
+  test('Should print exact Dart class declaration', () {
+    final dartClass = schema.toDartClassDeclaration;
+    expect(dartClass, expectedClassDeclaration);
+  });
+  group('validateIdJsonFollowsSchemaStructure', () {
     Map<String, dynamic> buildValidModel() {
       return {
         'id': 42,
@@ -147,10 +153,7 @@ void main() {
           'owner': 'owner-id',
           'notes': 'Important context',
           'flags': [true, false, true],
-          'preferences': {
-            'notifications': true,
-            'theme': 'dark',
-          },
+          'preferences': {'notifications': true, 'theme': 'dark'},
         },
         'sessions': [
           {
@@ -160,14 +163,8 @@ void main() {
               'attempts': 3,
               'duration': 12.75,
               'history': [
-                {
-                  'timestamp': '2024-06-01T12:00:00Z',
-                  'success': true,
-                },
-                {
-                  'timestamp': '2024-06-01T12:05:00Z',
-                  'success': false,
-                },
+                {'timestamp': '2024-06-01T12:00:00Z', 'success': true},
+                {'timestamp': '2024-06-01T12:05:00Z', 'success': false},
               ],
             },
           },
@@ -178,20 +175,14 @@ void main() {
               'attempts': 1,
               'duration': null,
               'history': [
-                {
-                  'timestamp': '2024-06-01T14:00:00Z',
-                  'success': true,
-                },
+                {'timestamp': '2024-06-01T14:00:00Z', 'success': true},
               ],
             },
           },
         ],
         'optionalPayload': {
           'payloadType': 'basic',
-          'details': {
-            'description': 'Payload data',
-            'score': 98.5,
-          },
+          'details': {'description': 'Payload data', 'score': 98.5},
         },
       };
     }
@@ -210,11 +201,17 @@ void main() {
     test('accepts when nullable object is null or absent', () {
       final modelWithNull = buildValidModel();
       modelWithNull['optionalPayload'] = null;
-      expect(schema.validateIdJsonFollowsSchemaStructure(modelWithNull), isTrue);
+      expect(
+        schema.validateIdJsonFollowsSchemaStructure(modelWithNull),
+        isTrue,
+      );
 
       final modelWithoutKey = buildValidModel();
       modelWithoutKey.remove('optionalPayload');
-      expect(schema.validateIdJsonFollowsSchemaStructure(modelWithoutKey), isTrue);
+      expect(
+        schema.validateIdJsonFollowsSchemaStructure(modelWithoutKey),
+        isTrue,
+      );
     });
 
     test('rejects incorrect primitive types deep in the tree', () {
@@ -270,3 +267,141 @@ void main() {
     });
   });
 }
+
+const expectedClassDeclaration = """SchemaProperty.structuredObject(
+  properties: {
+    'id': SchemaProperty.integer(
+      description: 'Unique identifier for the entity',
+      nullable: false,
+    ),
+    'name': SchemaProperty.text(
+      description: 'Display name',
+      nullable: false,
+    ),
+    'status': SchemaProperty.enumeration(
+      enumValues: ['draft', 'active', 'archived'],
+      description: 'Lifecycle status',
+      nullable: false,
+    ),
+    'tags': SchemaProperty.array(
+      items: SchemaProperty.text(
+        nullable: false,
+      ),
+      description: 'List of tags',
+      nullable: false,
+    ),
+    'metadata': SchemaProperty.structuredObject(
+      properties: {
+        'owner': SchemaProperty.text(
+          description: 'Owner responsible for the entity',
+          nullable: false,
+        ),
+        'notes': SchemaProperty.text(
+          description: 'Optional notes',
+          nullable: true,
+        ),
+        'flags': SchemaProperty.array(
+          items: SchemaProperty.boolean(
+            nullable: false,
+          ),
+          description: 'Optional list of flags for the entity',
+          nullable: true,
+        ),
+        'preferences': SchemaProperty.structuredObject(
+          properties: {
+            'notifications': SchemaProperty.boolean(
+              description: 'If true, notifications are enabled',
+              nullable: false,
+            ),
+            'theme': SchemaProperty.enumeration(
+              enumValues: ['light', 'dark'],
+              description: 'Preferred theme',
+              nullable: true,
+            ),
+          },
+          description: 'User preferences',
+          nullable: false,
+        ),
+      },
+      description: 'Owner metadata information',
+      nullable: false,
+    ),
+    'sessions': SchemaProperty.array(
+      items: SchemaProperty.structuredObject(
+        properties: {
+          'sessionId': SchemaProperty.text(
+            description: 'Session identifier',
+            nullable: false,
+          ),
+          'active': SchemaProperty.boolean(
+            description: 'Whether the session is active',
+            nullable: false,
+          ),
+          'metrics': SchemaProperty.structuredObject(
+            properties: {
+              'attempts': SchemaProperty.integer(
+                description: 'Number of attempts',
+                nullable: false,
+              ),
+              'duration': SchemaProperty.double(
+                description: 'Session duration in seconds',
+                nullable: true,
+              ),
+              'history': SchemaProperty.array(
+                items: SchemaProperty.structuredObject(
+                  properties: {
+                    'timestamp': SchemaProperty.text(
+                      description: 'History timestamp in ISO8601',
+                      nullable: false,
+                    ),
+                    'success': SchemaProperty.boolean(
+                      description: 'Whether the attempt succeeded',
+                      nullable: false,
+                    ),
+                  },
+                  description: 'Single history entry',
+                  nullable: false,
+                ),
+                description: 'Chronological history entries',
+                nullable: false,
+              ),
+            },
+            description: 'Aggregated session metrics',
+            nullable: false,
+          ),
+        },
+        description: 'Session details',
+        nullable: false,
+      ),
+      description: 'Collection of sessions',
+      nullable: false,
+    ),
+    'optionalPayload': SchemaProperty.structuredObject(
+      properties: {
+        'payloadType': SchemaProperty.enumeration(
+          enumValues: ['basic', 'advanced'],
+          description: 'Payload type flag',
+          nullable: false,
+        ),
+        'details': SchemaProperty.structuredObject(
+          properties: {
+            'description': SchemaProperty.text(
+              description: 'Detailed description',
+              nullable: false,
+            ),
+            'score': SchemaProperty.double(
+              description: 'Optional score',
+              nullable: true,
+            ),
+          },
+          description: 'Payload details',
+          nullable: true,
+        ),
+      },
+      description: 'Optional payload data',
+      nullable: true,
+    ),
+  },
+  description: 'Complex schema for validation testing',
+  nullable: false,
+)""";

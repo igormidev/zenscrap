@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:nanoid2/nanoid2.dart';
@@ -18,6 +19,25 @@ abstract class PromptContent {
   /// The file will be cloned to the current working directory for CLI access
   factory PromptContent.file(File file, {String? fileDescription}) =
       FileContent;
+
+  /// Creates a file content
+  /// The file will be cloned to the current working directory for CLI access
+  factory PromptContent.json(
+    Map<String, dynamic> json, {
+    required String fileName,
+    String? fileDescription,
+  }) {
+    final jsonString = const JsonEncoder.withIndent('  ').convert(json);
+
+    final bytes = utf8.encode(jsonString);
+    final String cleanFileName = p.basenameWithoutExtension(fileName);
+    return PromptContent.bytes(
+      data: bytes,
+      fileDescription: fileDescription,
+      fileExtension: 'json',
+      fileName: cleanFileName,
+    );
+  }
 
   /// Creates content from bytes that will be written to a temporary file
   factory PromptContent.bytes({
