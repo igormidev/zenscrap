@@ -4,8 +4,8 @@ import 'dart:typed_data';
 import 'package:nanoid2/nanoid2.dart';
 import 'package:path/path.dart' as p;
 
-String filePreffix =
-    ''; // In some cli's, like claude code, files are prefixed with @ - so we can change it here
+/// In some cli's, like claude code, files are prefixed with @ - so we can change it here
+String filePreffix = '';
 
 abstract class PromptContent {
   PromptContent() : contentNanoId = nanoid(length: 6);
@@ -49,6 +49,9 @@ abstract class PromptContent {
 
   /// Converts the content to a string representation for the CLI
   String toCliString();
+
+  @override
+  String toString() => toCliString();
 }
 
 /// Text content to be sent to Codex

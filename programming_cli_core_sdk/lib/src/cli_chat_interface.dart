@@ -1,5 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
+import 'package:meta/meta.dart';
+import 'package:programming_cli_core_sdk/src/coding_cli_interface.dart';
 import 'package:programming_cli_core_sdk/src/temporary_files.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:nanoid2/nanoid2.dart';
@@ -8,10 +12,9 @@ import 'package:programming_cli_core_sdk/src/schema_property.dart';
 
 typedef SchemaObject = SchemaPropertyStructuredObjectWithDefinedProperties;
 
-abstract class CliChatInterface {
-  CliChatInterface({required this.systemPrompt});
-
-  final String systemPrompt;
+abstract class CliChatInterface<T extends CliChatOptions> {
+  CliChatInterface({required this.options});
+  T? options;
 
   bool get didSendFirstMessage;
 
@@ -20,6 +23,23 @@ abstract class CliChatInterface {
   String? get sessionId;
 
   final List<TemporaryFiles> _temporaryFiles = [];
+
+  Future<void> dispose() async {
+    await _cleanupTemporaryFiles();
+    await _removeSchemaFiles();
+  }
+
+  @protected
+  Future<SchemaWorkflowResult> runSchemaWorkflow({
+    required List<PromptContent> messages,
+    StreamSink<String>? streamSink,
+  });
+
+  @protected
+  Future<void> runCodexCommand({
+    required String message,
+    required StreamSink<String> streamSink,
+  });
 
   Directory get baseDir;
   Future<String> sendMessage(List<PromptContent> contents);
@@ -74,24 +94,31 @@ final SchemaPropertyStructuredObjectWithDefinedProperties schema = ${schema.toDa
   }
 
   Future<void> _removeSchemaFiles() async {
-    await File(schemaResponseFilePath).delete();
-    await File(schemaTestFilePath).delete();
+    try {
+      await File(schemaResponseFilePath).delete();
+      await File(schemaTestFilePath).delete();
+    } catch (_) {
+      // Ignore errors during cleanup
+    }
   }
 
-  Future<String> _generateSchemaPrompt<T>({
-    required SchemaObject schema,
-  }) async {
+  Future<String> _generateSchemaPrompt({required SchemaObject schema}) async {
     return '''----------- SCHEMA INSTRUCTIONS [START] -----------
     
-I wan't the output in a json format. But not in any json format.
+I wan't the output in a json format. 
+I wan't you to write the output in the json file located at: $filePreffix$schemaResponseFilePath
+
+But I don't wan't the json in any random format.
 It should be in a specific schema that I will provide you below.
 You MUST follow the schema EXACTLY as I provide you.
 If you don't follow the schema, I will not be able to parse it.
 Because of that, since I need 100% of certainty, I created a dart test code that will validate if you followed the schema or not.
 The test code is located at: $filePreffix$schemaTestFilePath
-Read the test file to have an idea of how the schema is structured so you can pass in the test.
-If the test fails, you can be sure you did not follow the schema - so see the errors logs of the test and fix it.
 
+IMPORTANT: Open the test file - You will see that it reads the file at $filePreffix$schemaResponseFilePath and validates if it follows the schema or not.
+So, you MUST follow the schema EXACTLY as I provide you below or the test will fail.
+
+If the test fails, you can be sure you did not follow the schema - so see the errors logs of the test and fix it.
 DO NOT change anything in this test file, it is perfect as it is - just focus on following the schema and it will naturally pass the test.
 
 The schema expected is:
@@ -102,34 +129,94 @@ ${schema.toString()}
 ----------- SCHEMA INSTRUCTIONS [END] -----------''';
   }
 
-  Future<T> handleTemporaryFilesWrapper<T>({
-    required Future<T> Function() callback,
+  ({
+    Stream<String> llmMessage,
+    Completer<Map<String, dynamic>?> structuredSchemaData,
+  })
+  handleTemporaryFilesWrapper({
     required List<PromptContent> promptsOfCurrentMessage,
     required SchemaObject? schema,
-  }) async {
-    return _lock.synchronized(() async {
-      try {
-        if (schema != null) await _setupSchemaFiles(schema);
-        await _saveNewPromptContents([
-          if (!didSendFirstMessage)
-            PromptContent.text('''----------- SYSTEM PROMPT [START] -----------
-$systemPrompt
------------ SYSTEM PROMPT [END] -----------'''),
-          if (schema != null)
-            PromptContent.text(await _generateSchemaPrompt(schema: schema)),
-          ...promptsOfCurrentMessage,
-        ]);
-        await _setTemporaryFiles();
-        final result = await callback();
-        await _cleanupTemporaryFiles();
-        if (schema != null) await _removeSchemaFiles();
-        return result;
-      } catch (_) {
-        await _cleanupTemporaryFiles();
-        if (schema != null) await _removeSchemaFiles();
-        rethrow;
-      }
-    });
+  }) {
+    final controller = StreamController<String>.broadcast();
+    final responseCompleter = Completer<Map<String, dynamic>?>();
+
+    () async {
+      await _lock.synchronized(() async {
+        try {
+          if (schema != null) await _setupSchemaFiles(schema);
+          await _saveNewPromptContents(promptsOfCurrentMessage);
+          await _setTemporaryFiles();
+          await runCodexCommand(
+            message: [
+              if (!didSendFirstMessage)
+                PromptContent.text(
+                  '''----------- SYSTEM PROMPT [START] -----------
+${options?.systemPrompt}
+----------- SYSTEM PROMPT [END] -----------''',
+                ),
+              if (schema != null)
+                PromptContent.text(await _generateSchemaPrompt(schema: schema)),
+              ...promptsOfCurrentMessage,
+            ].join('\n\n'),
+            streamSink: controller.sink,
+          );
+
+          if (schema == null) {
+            controller.close();
+            responseCompleter.complete(null);
+
+            return;
+          }
+
+          final testErrorMessage = await _isSchemaResponseValid();
+          final didSucceed = testErrorMessage == null;
+
+          if (didSucceed == false) {
+            // Let's do a recursive call to retry once more
+            await runCodexCommand(
+              message:
+                  '''A error occoured when validating the schema. The test failed.
+Please fix the schema to follow the test at $filePreffix$schemaTestFilePath
+Make sure you are writing the json in the file at $filePreffix$schemaResponseFilePath and not in other places.
+
+Remember to follow the schema EXACTLY as provided, otherwise the test will fail.
+You should modify the file 
+Currently, the test returns the following error message:
+$testErrorMessage''',
+              streamSink: controller.sink,
+            );
+
+            final stillHasErrorMessage = await _isSchemaResponseValid();
+            if (stillHasErrorMessage != null) {
+              // If it still has error, we throw
+              throw Exception(
+                'Schema validation failed again. Last error: $stillHasErrorMessage',
+              );
+            }
+          }
+
+          final fileContent = await File(schemaResponseFilePath).readAsString();
+          final json = jsonDecode(fileContent) as Map<String, dynamic>;
+          responseCompleter.complete(json);
+
+          await _cleanupTemporaryFiles();
+          await _removeSchemaFiles();
+        } catch (error, stackTrace) {
+          await _cleanupTemporaryFiles();
+          if (schema != null) await _removeSchemaFiles();
+          controller.close();
+          if (!responseCompleter.isCompleted) {
+            responseCompleter.completeError(error, stackTrace);
+          }
+          rethrow;
+        }
+      });
+    }();
+
+    return (
+      llmMessage: controller.stream,
+      structuredSchemaData: responseCompleter,
+    );
   }
 
   Future<void> _saveNewPromptContents(
@@ -175,4 +262,37 @@ $systemPrompt
       }
     }
   }
+
+  Future<TestErrorMessage?> _isSchemaResponseValid() async {
+    try {
+      final result = await Process.run('dart', ['test', schemaTestFilePath]);
+
+      if (result.exitCode == 0) {
+        print('✅ Tests in $schemaTestFilePath passed!');
+        return null; // ✅ test passed
+      } else {
+        print('❌ Tests in $schemaTestFilePath failed.');
+        // Return stderr if available, otherwise stdout (sometimes errors print to stdout)
+        final errorOutput = (result.stderr as String).trim();
+        return errorOutput.isNotEmpty
+            ? errorOutput
+            : (result.stdout as String).trim();
+      }
+    } catch (e, s) {
+      log('Error reading schema response file: $e', stackTrace: s);
+      return null;
+    }
+  }
+}
+
+typedef TestErrorMessage = String;
+
+class SchemaWorkflowResult {
+  final String llmMessage;
+  final Map<String, dynamic> structuredSchemaData;
+
+  const SchemaWorkflowResult({
+    required this.llmMessage,
+    required this.structuredSchemaData,
+  });
 }
