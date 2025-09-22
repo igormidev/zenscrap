@@ -30,18 +30,10 @@ abstract class CliChatInterface<T extends CliChatOptions> {
   }
 
   @protected
-  Future<SchemaWorkflowResult> runSchemaWorkflow({
-    required List<PromptContent> messages,
-    StreamSink<String>? streamSink,
-  });
-
-  @protected
-  Future<void> runCodexCommand({
-    required String message,
-    required StreamSink<String> streamSink,
-  });
+  Future<Process> createProcess({required String message});
 
   Directory get baseDir;
+
   Future<String> sendMessage(List<PromptContent> contents) async {
     final (
       :Stream<String> llmMessage,
@@ -143,19 +135,23 @@ abstract class CliChatInterface<T extends CliChatOptions> {
           if (schema != null) await _setupSchemaFiles(schema);
           await _saveNewPromptContents(promptsOfCurrentMessage);
           await _setTemporaryFiles();
-          await runCodexCommand(
-            message: [
-              if (!didSendFirstMessage)
-                PromptContent.text(
-                  '''----------- SYSTEM PROMPT [START] -----------
+          await _runCli(
+            await createProcess(
+              message: [
+                if (!didSendFirstMessage)
+                  PromptContent.text(
+                    '''----------- SYSTEM PROMPT [START] -----------
 ${options?.systemPrompt}
 ----------- SYSTEM PROMPT [END] -----------''',
-                ),
-              if (schema != null)
-                PromptContent.text(await _generateSchemaPrompt(schema: schema)),
-              ...promptsOfCurrentMessage,
-            ].join('\n\n'),
-            streamSink: controller.sink,
+                  ),
+                if (schema != null)
+                  PromptContent.text(
+                    await _generateSchemaPrompt(schema: schema),
+                  ),
+                ...promptsOfCurrentMessage,
+              ].join('\n\n'),
+            ),
+            controller.sink,
           );
 
           if (schema == null) {
@@ -170,9 +166,10 @@ ${options?.systemPrompt}
 
           if (didSucceed == false) {
             // Let's do a recursive call to retry once more
-            await runCodexCommand(
-              message:
-                  '''A error occoured when validating the schema. The test failed.
+            await _runCli(
+              await createProcess(
+                message:
+                    '''A error occoured when validating the schema. The test failed.
 Please fix the schema to follow the test at $filePreffix$schemaTestFilePath
 Make sure you are writing the json in the file at $filePreffix$schemaResponseFilePath and not in other places.
 
@@ -180,7 +177,8 @@ Remember to follow the schema EXACTLY as provided, otherwise the test will fail.
 You should modify the file 
 Currently, the test returns the following error message:
 $testErrorMessage''',
-              streamSink: controller.sink,
+              ),
+              controller.sink,
             );
 
             final errorMessage = await _isSchemaResponseValid();
@@ -214,6 +212,64 @@ $testErrorMessage''',
       llmMessage: controller.stream,
       structuredSchemaData: responseCompleter,
     );
+  }
+
+  Future<void> _runCli(Process process, StreamSink<String> streamSink) async {
+    final stdoutBuffer = StringBuffer();
+    final stderrBuffer = StringBuffer();
+    final stdoutDone = Completer<void>();
+    final stderrDone = Completer<void>();
+
+    final StreamSubscription<List<int>> outSub;
+    final StreamSubscription<List<int>> errSub;
+
+    // Start listening to stdout/stderr
+    outSub = process.stdout.listen(
+      (data) {
+        final chunk = utf8.decode(data, allowMalformed: true);
+        stdoutBuffer.write(chunk);
+        streamSink.add(chunk);
+      },
+      onError: (e, st) {
+        if (!stdoutDone.isCompleted) stdoutDone.completeError(e, st);
+      },
+      onDone: () {
+        if (!stdoutDone.isCompleted) stdoutDone.complete();
+      },
+      cancelOnError: true,
+    );
+
+    errSub = process.stderr.listen(
+      (data) => stderrBuffer.write(utf8.decode(data, allowMalformed: true)),
+      onError: (e, st) {
+        if (!stderrDone.isCompleted) stderrDone.completeError(e, st);
+      },
+      onDone: () {
+        if (!stderrDone.isCompleted) stderrDone.complete();
+      },
+      cancelOnError: true,
+    );
+    try {
+      // Wait for the process to exit and streams to finish.
+      final exitCode = await process.exitCode;
+      // Ensure both streams completed (ignore stream errors so we still throw on exitCode below).
+      await Future.wait([
+        stdoutDone.future.catchError((_) {}),
+        stderrDone.future.catchError((_) {}),
+      ]);
+
+      if (exitCode != 0) {
+        final errorOutput = stderrBuffer.toString().trim();
+        final output = errorOutput.isNotEmpty
+            ? errorOutput
+            : stdoutBuffer.toString().trim();
+        throw Exception('Process exited with code $exitCode: $output');
+      }
+    } finally {
+      // Dispose listeners to avoid leaks.
+      await outSub.cancel();
+      await errSub.cancel();
+    }
   }
 
   Future<String> _generateSchemaPrompt({required SchemaObject schema}) async {
@@ -349,13 +405,3 @@ final SchemaPropertyStructuredObjectWithDefinedProperties schema = ${schema.toDa
 }
 
 typedef TestErrorMessage = String;
-
-class SchemaWorkflowResult {
-  final String llmMessage;
-  final Map<String, dynamic> structuredSchemaData;
-
-  const SchemaWorkflowResult({
-    required this.llmMessage,
-    required this.structuredSchemaData,
-  });
-}

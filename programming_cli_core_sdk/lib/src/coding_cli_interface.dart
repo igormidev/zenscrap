@@ -34,6 +34,9 @@ abstract class CodingCliInterface<
 }
 
 abstract class CliChatOptions {
+  /// Max Timeout to run the cli
+  final Duration timeout = const Duration(minutes: 30);
+
   /// System prompt to set the context for Codex
   final String? systemPrompt;
 
