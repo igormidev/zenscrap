@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 void main() {
   test('Is correct schema', () async {
     final currDir = Directory.current;
-    final schemaFile = File('${currDir.path}/test_schema.json');
+    final schemaFile = File('${currDir.path}/test/test_schema.json');
     final schemaContent = await schemaFile.readAsString();
     final Map<String, dynamic> schemaJson = jsonDecode(schemaContent);
     final bool isValidSchema = schema.validateIdJsonFollowsSchemaStructure(
