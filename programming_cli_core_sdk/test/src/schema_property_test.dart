@@ -138,7 +138,11 @@ void main() {
           )
           as SchemaPropertyStructuredObjectWithDefinedProperties;
 
-  test('Should print exact Dart class declaration', () {
+  test('Should have expected to string root mapping', () {
+    print(RootSchema(properties: schema.properties).toString());
+    // expect(dartClass, expectedClassDeclaration);
+  });
+  test('Should cast to exact Dart class declaration', () {
     final dartClass = schema.toDartClassDeclaration;
     expect(dartClass, expectedClassDeclaration);
   });

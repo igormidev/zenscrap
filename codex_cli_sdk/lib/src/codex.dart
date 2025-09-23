@@ -1,105 +1,65 @@
 import 'dart:io';
+
 import 'package:path/path.dart' as path;
+import 'package:programming_cli_core_sdk/programming_cli_core_sdk.dart';
 
 import 'codex_chat.dart';
-import 'exceptions/codex_exceptions.dart';
-import 'models/chat_options.dart';
-import 'models/mcp_models.dart';
+import 'codex_chat_options.dart';
+import 'mcp_models.dart';
 
-/// Main Codex SDK class for interacting with OpenAI Codex CLI
-class Codex {
-  /// The API key for authenticating with OpenAI
-  final String apiKey;
+/// Main Codex SDK class for interacting with the OpenAI Codex CLI.
+class Codex extends CodingCliInterface<CodexChat, CodexChatOptions> {
+  Codex({required super.apiKey});
 
-  /// List of active chat sessions for cleanup
-  final List<CodexChat> _activeSessions = [];
-
-  /// Creates a new Codex SDK instance
-  Codex(this.apiKey) {
-    if (apiKey.isEmpty) {
-      throw CodexSDKException('API key cannot be empty');
-    }
-  }
-
-  /// Creates a new chat session with Codex
+  @override
   CodexChat createNewChat({CodexChatOptions? options}) {
-    final chat = CodexChat(
-      apiKey: apiKey,
-      options: options,
-    );
-    _activeSessions.add(chat);
+    final chat = CodexChat(apiKey: apiKey, options: options);
+    activeSessions.add(chat);
     return chat;
   }
 
-  /// Checks if Codex CLI is installed
+  @override
   Future<bool> isCodexCLIInstalled() async {
     try {
       final result = await Process.run(
-        _getShellCommand(),
-        _getShellArgs('codex --version'),
+        _shellCommand,
+        _shellArgs('codex --version'),
       );
-
       return result.exitCode == 0;
-    } catch (e) {
-      // If we can't run the command, assume it's not installed
+    } catch (_) {
       return false;
     }
   }
 
-  /// Installs the Codex CLI using npm
+  @override
   Future<void> installCodexCLI({bool global = true}) async {
-    // Check if npm is installed first
-    final npmInstalled = await _isNpmInstalled();
-    if (!npmInstalled) {
-      throw CodexSDKException(
+    if (!await _isNpmInstalled()) {
+      throw CliException(
         'npm is not installed. Please install Node.js and npm first.\n'
-        'Visit https://nodejs.org/ to download and install Node.js.',
+        'Visit https://nodejs.org/ to download the installer.',
       );
     }
 
     print('Installing Codex CLI...');
+    final command =
+        global ? 'npm install -g @openai/codex' : 'npm install @openai/codex';
 
-    final command = global
-        ? 'npm install -g @openai/codex'
-        : 'npm install @openai/codex';
+    final process = await Process.start(
+      _shellCommand,
+      _shellArgs(command),
+      mode: ProcessStartMode.inheritStdio,
+    );
 
-    try {
-      final process = await Process.start(
-        _getShellCommand(),
-        _getShellArgs(command),
-      );
-
-      // Stream output to console
-      process.stdout.listen((data) {
-        stdout.write(String.fromCharCodes(data));
-      });
-
-      process.stderr.listen((data) {
-        stderr.write(String.fromCharCodes(data));
-      });
-
-      final exitCode = await process.exitCode;
-
-      if (exitCode != 0) {
-        throw ProcessException(
-          'Failed to install Codex CLI',
-          exitCode: exitCode,
-        );
-      }
-
-      print('\nCodex CLI installed successfully!');
-    } catch (e) {
-      if (e is ProcessException) rethrow;
-      throw ProcessException(
-        'Failed to install Codex CLI',
-        originalError: e,
-      );
+    final exitCode = await process.exitCode;
+    if (exitCode != 0) {
+      throw CliException('Failed to install Codex CLI (exit code $exitCode).');
     }
+
+    print('\nCodex CLI installed successfully!');
   }
 
-  /// Updates the Codex CLI to the newest version if needed
+  @override
   Future<void> updateToNewestVersionIfNeeded({bool global = true}) async {
-    // First check if CLI is installed
     final isInstalled = await isCodexCLIInstalled();
     if (!isInstalled) {
       print('Codex CLI is not installed. Installing...');
@@ -107,25 +67,21 @@ class Codex {
       return;
     }
 
-    // Check if npm is installed
-    final npmInstalled = await _isNpmInstalled();
-    if (!npmInstalled) {
-      throw CodexSDKException(
+    if (!await _isNpmInstalled()) {
+      throw CliException(
         'npm is not installed. Please install Node.js and npm first.\n'
-        'Visit https://nodejs.org/ to download and install Node.js.',
+        'Visit https://nodejs.org/ to download the installer.',
       );
     }
 
     try {
-      // Get current installed version
       final currentVersionResult = await Process.run(
-        _getShellCommand(),
-        _getShellArgs('codex --version'),
+        _shellCommand,
+        _shellArgs('codex --version'),
       );
 
       String currentVersion = '';
       if (currentVersionResult.exitCode == 0) {
-        // Extract version number from output (e.g., "1.2.3" from "codex 1.2.3")
         final output = currentVersionResult.stdout.toString().trim();
         final versionMatch = RegExp(r'(\d+\.\d+\.\d+)').firstMatch(output);
         if (versionMatch != null) {
@@ -133,49 +89,35 @@ class Codex {
         }
       }
 
-      // Get latest available version from npm
       final latestVersionResult = await Process.run(
-        _getShellCommand(),
-        _getShellArgs('npm view @openai/codex version'),
+        _shellCommand,
+        _shellArgs('npm view @openai/codex version'),
       );
 
       if (latestVersionResult.exitCode != 0) {
-        print('Failed to check for updates.');
+        print('Failed to check for Codex updates.');
         return;
       }
 
       final latestVersion = latestVersionResult.stdout.toString().trim();
-
       if (currentVersion.isEmpty) {
-        print('Could not determine current version. Reinstalling...');
+        print('Could not determine current Codex version. Reinstalling...');
         await installCodexCLI(global: global);
         return;
       }
 
-      // Compare versions
       if (_isNewerVersion(currentVersion, latestVersion)) {
         print('Updating Codex CLI from v$currentVersion to v$latestVersion...');
-
-        final updateCommand = global
-            ? 'npm update -g @openai/codex'
-            : 'npm update @openai/codex';
+        final updateCommand =
+            global ? 'npm update -g @openai/codex' : 'npm update @openai/codex';
 
         final process = await Process.start(
-          _getShellCommand(),
-          _getShellArgs(updateCommand),
+          _shellCommand,
+          _shellArgs(updateCommand),
+          mode: ProcessStartMode.inheritStdio,
         );
 
-        // Stream output to console
-        process.stdout.listen((data) {
-          stdout.write(String.fromCharCodes(data));
-        });
-
-        process.stderr.listen((data) {
-          stderr.write(String.fromCharCodes(data));
-        });
-
         final exitCode = await process.exitCode;
-
         if (exitCode != 0) {
           print('Update failed. Attempting reinstall...');
           await installCodexCLI(global: global);
@@ -185,44 +127,22 @@ class Codex {
       } else {
         print('Codex CLI is up to date (v$currentVersion).');
       }
-    } catch (e) {
-      print('Error checking for updates: $e');
+    } catch (error) {
+      print('Error checking for Codex updates: $error');
       print('You can manually update with: npm update -g @openai/codex');
     }
   }
 
-  /// Helper method to compare version strings
-  bool _isNewerVersion(String current, String latest) {
-    try {
-      final currentParts = current.split('.').map(int.parse).toList();
-      final latestParts = latest.split('.').map(int.parse).toList();
-
-      for (int i = 0; i < 3; i++) {
-        final currentPart = i < currentParts.length ? currentParts[i] : 0;
-        final latestPart = i < latestParts.length ? latestParts[i] : 0;
-
-        if (latestPart > currentPart) return true;
-        if (latestPart < currentPart) return false;
-      }
-
-      return false;
-    } catch (e) {
-      // If version parsing fails, assume update is needed
-      return true;
-    }
-  }
-
-  /// Gets information about the installed SDK
+  @override
   Future<Map<String, dynamic>> getSDKInfo() async {
     final info = <String, dynamic>{};
 
-    // Check Codex CLI
-    info['codexCLI'] = await isCodexCLIInstalled();
-    if (info['codexCLI']) {
+    info['codexCLIInstalled'] = await isCodexCLIInstalled();
+    if (info['codexCLIInstalled'] == true) {
       try {
         final result = await Process.run(
-          _getShellCommand(),
-          _getShellArgs('codex --version'),
+          _shellCommand,
+          _shellArgs('codex --version'),
         );
         if (result.exitCode == 0) {
           info['codexVersion'] = result.stdout.toString().trim();
@@ -230,13 +150,12 @@ class Codex {
       } catch (_) {}
     }
 
-    // Check npm
-    info['npm'] = await _isNpmInstalled();
-    if (info['npm']) {
+    info['npmInstalled'] = await _isNpmInstalled();
+    if (info['npmInstalled'] == true) {
       try {
         final result = await Process.run(
-          _getShellCommand(),
-          _getShellArgs('npm --version'),
+          _shellCommand,
+          _shellArgs('npm --version'),
         );
         if (result.exitCode == 0) {
           info['npmVersion'] = result.stdout.toString().trim();
@@ -244,27 +163,31 @@ class Codex {
       } catch (_) {}
     }
 
-    // Check config file
-    final configFile = _getConfigFilePath();
+    final configFile = _configFilePath;
     info['configPath'] = configFile.path;
     info['configExists'] = configFile.existsSync();
 
     return info;
   }
 
-  /// Checks if MCP is installed and configured
+  /// Disposes all active chat sessions created by this SDK instance.
+  Future<void> dispose() async {
+    for (final session in activeSessions) {
+      await session.dispose();
+    }
+    activeSessions.clear();
+  }
+
+  /// Checks if MCP support is configured and returns its details.
   Future<McpInstallationInfo> isMcpInstalled() async {
     try {
-      final configFile = _getConfigFilePath();
+      final configFile = _configFilePath;
       if (!configFile.existsSync()) {
         return McpInstallationInfo.notInstalled();
       }
 
       final configContent = await configFile.readAsString();
       final servers = <McpServer>[];
-
-      // Parse TOML file to extract MCP servers
-      // This is a simplified parser - might need a proper TOML library
       final mcpSection = _parseTomlMcpServers(configContent);
       mcpSection.forEach((name, config) {
         servers.add(McpServer.fromJson(name, config));
@@ -275,61 +198,55 @@ class Codex {
         servers: servers,
         configPath: configFile.path,
       );
-    } catch (e) {
+    } catch (_) {
       return McpInstallationInfo.notInstalled();
     }
   }
 
-  /// Lists all configured MCP servers
+  /// Returns all configured MCP servers.
   Future<List<McpServer>> listMcpServers() async {
     final info = await isMcpInstalled();
     return info.servers;
   }
 
-  /// Installs a popular MCP server
-  Future<void> installPopularMcpServer(String serverName,
-      {Map<String, String>? environment}) async {
+  /// Installs a curated MCP server configuration.
+  Future<void> installPopularMcpServer(
+    String serverName, {
+    Map<String, String>? environment,
+  }) async {
     final popularServers = {
       'filesystem': {
-        'package': '@modelcontextprotocol/server-filesystem',
         'command': 'npx',
         'args': ['-y', '@modelcontextprotocol/server-filesystem'],
       },
       'github': {
-        'package': '@modelcontextprotocol/server-github',
         'command': 'npx',
         'args': ['-y', '@modelcontextprotocol/server-github'],
         'env': {'GITHUB_TOKEN': environment?['GITHUB_TOKEN'] ?? ''},
       },
       'postgres': {
-        'package': '@modelcontextprotocol/server-postgres',
         'command': 'npx',
         'args': ['-y', '@modelcontextprotocol/server-postgres'],
         'env': {'DATABASE_URL': environment?['DATABASE_URL'] ?? ''},
       },
       'git': {
-        'package': '@modelcontextprotocol/server-git',
         'command': 'npx',
         'args': ['-y', '@modelcontextprotocol/server-git'],
       },
       'puppeteer': {
-        'package': '@modelcontextprotocol/server-puppeteer',
         'command': 'npx',
         'args': ['-y', '@modelcontextprotocol/server-puppeteer'],
       },
       'sequential-thinking': {
-        'package': '@modelcontextprotocol/server-sequential-thinking',
         'command': 'npx',
         'args': ['-y', '@modelcontextprotocol/server-sequential-thinking'],
       },
       'slack': {
-        'package': '@modelcontextprotocol/server-slack',
         'command': 'npx',
         'args': ['-y', '@modelcontextprotocol/server-slack'],
         'env': {'SLACK_TOKEN': environment?['SLACK_TOKEN'] ?? ''},
       },
       'google-drive': {
-        'package': '@modelcontextprotocol/server-google-drive',
         'command': 'npx',
         'args': ['-y', '@modelcontextprotocol/server-google-drive'],
         'env': {
@@ -341,116 +258,126 @@ class Codex {
 
     final serverConfig = popularServers[serverName];
     if (serverConfig == null) {
-      throw CodexSDKException(
+      throw CliException(
         'Unknown popular server: $serverName. Available servers: ${popularServers.keys.join(', ')}',
       );
     }
 
-    // Create MCP server configuration
     final server = McpServer(
       name: serverName,
       command: serverConfig['command'] as String,
-      args: serverConfig['args'] as List<String>,
-      env: serverConfig['env'] as Map<String, String>?,
+      args: List<String>.from(serverConfig['args'] as List),
+      env: (serverConfig['env'] as Map<String, String>?)?.map(
+        (key, value) => MapEntry(key, value),
+      ),
     );
 
     await addMcpServer(serverName, customServer: server);
   }
 
-  /// Adds an MCP server to the configuration
+  /// Adds or updates an MCP server configuration.
   Future<void> addMcpServer(
     String name, {
-    String? packageName,
     McpServer? customServer,
     McpAddOptions? options,
   }) async {
-    if (packageName == null && customServer == null) {
-      throw CodexSDKException(
-        'Either packageName or customServer must be provided',
-      );
-    }
+    final configFile = _configFilePath;
+    final currentConfig = configFile.existsSync()
+        ? McpConfig.fromJson(_parseTomlFile(configFile))
+        : McpConfig();
 
-    final McpServer server;
-    if (customServer != null) {
-      server = customServer;
-    } else {
-      // Create server from package name
-      final useNpx = options?.useNpx ?? true;
-      server = McpServer(
-        name: name,
-        command: useNpx ? 'npx' : 'node',
-        args: useNpx ? ['-y', packageName!] : [packageName!],
-        env: options?.environment,
-      );
-    }
+    final server = customServer ??
+        McpServer(
+          name: name,
+          command: 'npx',
+          args: ['-y', name],
+        );
 
-    // Update config file
+    final env = options?.environment ?? {};
+    final scope = options?.scope ?? McpScope.user;
+
+    final updatedServer = server.copyWith(
+      env: env.isEmpty ? server.env : env,
+      scope: scope,
+    );
+
+    final updatedConfig = currentConfig.addServer(updatedServer);
     await _updateConfigFile((config) {
-      config['mcp_servers'] ??= {};
-      config['mcp_servers'][name] = server.toJson();
+      config['mcp_servers'] = updatedConfig.toJson()['mcp_servers'];
     });
 
-    print('Added MCP server: $name');
+    print('Configured MCP server "$name" at scope ${scope.name}.');
   }
 
-  /// Gets details about a specific MCP server
+  /// Retrieves detailed information about a specific MCP server.
   Future<McpServer?> getMcpServerDetails(String name) async {
     final servers = await listMcpServers();
     try {
-      return servers.firstWhere((s) => s.name == name);
+      return servers.firstWhere((server) => server.name == name);
     } catch (_) {
       return null;
     }
   }
 
-  /// Removes an MCP server from the configuration
+  /// Removes an MCP server from the configuration.
   Future<void> removeMcpServer(String name) async {
+    final configFile = _configFilePath;
+    if (!configFile.existsSync()) {
+      throw CliException('No Codex configuration file found to modify.');
+    }
+
     await _updateConfigFile((config) {
-      config['mcp_servers']?.remove(name);
+      final servers = (config['mcp_servers'] as Map<String, dynamic>?);
+      servers?.remove(name);
     });
 
     print('Removed MCP server: $name');
   }
 
-  /// Disposes all active chat sessions
-  Future<void> dispose() async {
-    for (final session in _activeSessions) {
-      await session.dispose();
-    }
-    _activeSessions.clear();
+  Map<String, dynamic> _parseTomlFile(File configFile) {
+    final content = configFile.readAsStringSync();
+    return {'mcp_servers': _parseTomlMcpServers(content)};
   }
 
-  // Private helper methods
+  String get _shellCommand => Platform.isWindows ? 'cmd.exe' : '/bin/sh';
 
-  String _getShellCommand() {
-    if (Platform.isWindows) {
-      return 'cmd.exe';
-    }
-    return '/bin/sh';
-  }
-
-  List<String> _getShellArgs(String command) {
-    if (Platform.isWindows) {
-      return ['/c', command];
-    }
-    return ['-c', command];
-  }
+  List<String> _shellArgs(String command) =>
+      Platform.isWindows ? ['/c', command] : ['-c', command];
 
   Future<bool> _isNpmInstalled() async {
     try {
       final result = await Process.run(
-        _getShellCommand(),
-        _getShellArgs('npm --version'),
+        _shellCommand,
+        _shellArgs('npm --version'),
       );
       return result.exitCode == 0;
-    } catch (e) {
+    } catch (_) {
       return false;
     }
   }
 
-  File _getConfigFilePath() {
-    final home = Platform.environment['HOME'] ?? Platform.environment['USERPROFILE'] ?? '';
+  File get _configFilePath {
+    final home = Platform.environment['HOME'] ??
+        Platform.environment['USERPROFILE'] ??
+        '';
     return File(path.join(home, '.codex', 'config.toml'));
+  }
+
+  bool _isNewerVersion(String current, String latest) {
+    try {
+      final currentParts = current.split('.').map(int.parse).toList();
+      final latestParts = latest.split('.').map(int.parse).toList();
+
+      for (var i = 0; i < 3; i++) {
+        final currentPart = i < currentParts.length ? currentParts[i] : 0;
+        final latestPart = i < latestParts.length ? latestParts[i] : 0;
+        if (latestPart > currentPart) return true;
+        if (latestPart < currentPart) return false;
+      }
+      return false;
+    } catch (_) {
+      return true;
+    }
   }
 
   Map<String, dynamic> _parseTomlMcpServers(String tomlContent) {
@@ -461,36 +388,29 @@ class Codex {
 
     for (final line in lines) {
       final trimmed = line.trim();
-
-      // Skip comments and empty lines
       if (trimmed.isEmpty || trimmed.startsWith('#')) continue;
 
-      // Check for [mcp_servers.name] section
-      final serverMatch = RegExp(r'^\[mcp_servers\.(.+)\]$').firstMatch(trimmed);
+      final serverMatch =
+          RegExp(r'^\[mcp_servers\.(.+)\]$').firstMatch(trimmed);
       if (serverMatch != null) {
-        // Save previous server if exists
         if (currentServer != null && currentConfig != null) {
           servers[currentServer] = currentConfig;
         }
-
         currentServer = serverMatch.group(1);
         currentConfig = {};
         continue;
       }
 
-      // Parse key-value pairs
       if (currentConfig != null && trimmed.contains('=')) {
         final parts = trimmed.split('=');
         if (parts.length >= 2) {
           final key = parts[0].trim();
           var value = parts.sublist(1).join('=').trim();
 
-          // Remove quotes if present
           if (value.startsWith('"') && value.endsWith('"')) {
             value = value.substring(1, value.length - 1);
           }
 
-          // Parse arrays
           if (value.startsWith('[') && value.endsWith(']')) {
             value = value.substring(1, value.length - 1);
             final items = value.split(',').map((s) {
@@ -508,7 +428,6 @@ class Codex {
       }
     }
 
-    // Save last server
     if (currentServer != null && currentConfig != null) {
       servers[currentServer] = currentConfig;
     }
@@ -516,35 +435,27 @@ class Codex {
     return servers;
   }
 
-  Future<void> _updateConfigFile(void Function(Map<String, dynamic>) updater) async {
-    final configFile = _getConfigFilePath();
-
-    // Create directory if it doesn't exist
+  Future<void> _updateConfigFile(
+    void Function(Map<String, dynamic>) updater,
+  ) async {
+    final configFile = _configFilePath;
     if (!configFile.parent.existsSync()) {
       configFile.parent.createSync(recursive: true);
     }
 
-    Map<String, dynamic> config = {};
-
-    // Read existing config if it exists
+    final config = <String, dynamic>{};
     if (configFile.existsSync()) {
       final content = await configFile.readAsString();
-      // Parse existing TOML - simplified approach
-      // In production, use a proper TOML library
       if (content.contains('[mcp_servers')) {
         config['mcp_servers'] = _parseTomlMcpServers(content);
       }
     }
 
-    // Update the config
     updater(config);
 
-    // Write back as TOML
     final buffer = StringBuffer();
-
-    // Write MCP servers section
-    if (config['mcp_servers'] != null) {
-      final mcpServers = config['mcp_servers'] as Map;
+    final mcpServers = config['mcp_servers'] as Map<String, dynamic>?;
+    if (mcpServers != null) {
       mcpServers.forEach((name, serverConfig) {
         buffer.writeln('[mcp_servers.$name]');
         if (serverConfig is Map) {
@@ -553,7 +464,6 @@ class Codex {
               final items = value.map((v) => '"$v"').join(', ');
               buffer.writeln('$key = [$items]');
             } else if (value is Map) {
-              // Handle environment variables
               buffer.writeln('$key = {');
               value.forEach((envKey, envValue) {
                 buffer.writeln('  $envKey = "$envValue"');

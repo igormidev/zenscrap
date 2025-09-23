@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:path/path.dart' as p;
 import 'package:meta/meta.dart';
 import 'package:programming_cli_core_sdk/src/cli_chat_options_interface.dart';
 import 'package:programming_cli_core_sdk/src/temporary_files.dart';
@@ -116,7 +117,7 @@ abstract class CliChatInterface<T extends CliChatOptions> {
   String get schemaResponseFilePath =>
       '${baseDir.path}/schema_response_id-$_chatNanoId.json';
   String get schemaTestFilePath =>
-      '${baseDir.path}/is_schema_id-${_chatNanoId}_correct_test.dart';
+      '${baseDir.path}/is_schema_correct_in_id-${_chatNanoId}_test.dart';
 
   ({
     Stream<String> llmMessage,
@@ -138,7 +139,8 @@ abstract class CliChatInterface<T extends CliChatOptions> {
           await _runCli(
             await createProcess(
               message: [
-                if (!didSendFirstMessage)
+                if (!didSendFirstMessage &&
+                    (options?.systemPrompt?.isNotEmpty ?? false))
                   PromptContent.text(
                     '''----------- SYSTEM PROMPT [START] -----------
 ${options?.systemPrompt}
@@ -170,8 +172,8 @@ ${options?.systemPrompt}
               await createProcess(
                 message:
                     '''A error occoured when validating the schema. The test failed.
-Please fix the schema to follow the test at $filePreffix$schemaTestFilePath
-Make sure you are writing the json in the file at $filePreffix$schemaResponseFilePath and not in other places.
+Please fix the schema to follow the test at $filePreffix${p.basename(schemaTestFilePath)}
+Make sure you are writing the json in the file at $filePreffix${p.basename(schemaResponseFilePath)} and not in other places.
 
 Remember to follow the schema EXACTLY as provided, otherwise the test will fail.
 You should modify the file 
@@ -276,16 +278,16 @@ $testErrorMessage''',
     return '''----------- SCHEMA INSTRUCTIONS [START] -----------
     
 I wan't the output in a json format. 
-I wan't you to write the output in the json file located at: $filePreffix$schemaResponseFilePath
+I wan't you to write the output in the json file located at: $filePreffix${p.basename(schemaResponseFilePath)}
 
 But I don't wan't the json in any random format.
 It should be in a specific schema that I will provide you below.
 You MUST follow the schema EXACTLY as I provide you.
 If you don't follow the schema, I will not be able to parse it.
 Because of that, since I need 100% of certainty, I created a dart test code that will validate if you followed the schema or not.
-The test code is located at: $filePreffix$schemaTestFilePath
+The test code is located at: $filePreffix${p.basename(schemaTestFilePath)}
 
-IMPORTANT: Open the test file - You will see that it reads the file at $filePreffix$schemaResponseFilePath and validates if it follows the schema or not.
+IMPORTANT: Open the test file - You will see that it reads the file at $filePreffix${p.basename(schemaResponseFilePath)} and validates if it follows the schema or not.
 So, you MUST follow the schema EXACTLY as I provide you below or the test will fail.
 
 If the test fails, you can be sure you did not follow the schema - so see the errors logs of the test and fix it.

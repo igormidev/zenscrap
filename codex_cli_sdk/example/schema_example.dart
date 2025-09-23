@@ -1,7 +1,8 @@
 import 'dart:io';
+
 import 'package:codex_cli_sdk/codex_cli_sdk.dart';
 
-void main() async {
+Future<void> main() async {
   final apiKey = Platform.environment['OPENAI_API_KEY'] ?? '';
 
   if (apiKey.isEmpty) {
@@ -9,51 +10,39 @@ void main() async {
     exit(1);
   }
 
-  final codexSDK = Codex(apiKey);
+  final codexSDK = Codex(apiKey: apiKey);
   final chat = codexSDK.createNewChat();
 
   try {
-    // Create a schema for extracting book information
-    final bookSchema = SchemaObject(
+    final bookSchema = SchemaProperty.structuredObject(
+      nullable: false,
       properties: {
-        'title': SchemaProperty.string(
-          description: 'The title of the book',
-          nullable: false,
-        ),
-        'author': SchemaProperty.string(
-          description: 'The author of the book',
-          nullable: false,
-        ),
-        'year': SchemaProperty.number(
-          description: 'The year the book was published',
-          nullable: true,
-        ),
-        'genre': SchemaProperty.string(
-          description: 'The genre or category of the book',
-          nullable: true,
-        ),
-        'summary': SchemaProperty.string(
-          description: 'A brief summary of the book',
-          nullable: false,
-        ),
+        'title': SchemaProperty.text(
+            nullable: false, description: 'The title of the book'),
+        'author': SchemaProperty.text(
+            nullable: false, description: 'The author of the book'),
+        'year': SchemaProperty.text(
+            nullable: true, description: 'The publication year'),
+        'genre': SchemaProperty.text(
+            nullable: true, description: 'The genre or category'),
+        'summary': SchemaProperty.text(
+            nullable: false, description: 'A brief summary'),
         'themes': SchemaProperty.array(
-          items: SchemaProperty.string(),
-          description: 'Main themes in the book',
           nullable: true,
+          description: 'Main themes in the book',
+          items: SchemaProperty.text(nullable: false),
         ),
       },
-      description: 'Information about a book',
     );
 
     print('Requesting structured book information...\n');
 
     final bookResult = await chat.sendMessageWithSchema(
       messages: [
-        CodexSdkContent.text(
-          'Give me information about the book "1984" by George Orwell',
-        ),
+        PromptContent.text(
+            'Give me information about the book "1984" by George Orwell'),
       ],
-      schema: bookSchema,
+      schema: bookSchema as SchemaObject,
     );
 
     print('Model explanation:');
@@ -75,55 +64,53 @@ void main() async {
       }
     }
 
-    // Example with nested schema
     print('\n--- Nested Schema Example ---\n');
 
-    final userSchema = SchemaObject(
+    final userSchema = SchemaProperty.structuredObject(
+      nullable: false,
       properties: {
-        'user': SchemaProperty.object(
-          properties: {
-            'name': SchemaProperty.string(nullable: false),
-            'email': SchemaProperty.string(nullable: false),
-            'age': SchemaProperty.number(nullable: true),
-          },
-          description: 'User information',
+        'user': SchemaProperty.structuredObject(
           nullable: false,
-        ),
-        'preferences': SchemaProperty.object(
+          description: 'User information',
           properties: {
-            'theme': SchemaProperty.string(
-              defaultValue: 'light',
+            'name': SchemaProperty.text(nullable: false),
+            'email': SchemaProperty.text(nullable: false),
+            'age': SchemaProperty.text(nullable: true),
+          },
+        ),
+        'preferences': SchemaProperty.structuredObject(
+          nullable: true,
+          description: 'User preferences',
+          properties: {
+            'theme': SchemaProperty.enumeration(
               enumValues: ['light', 'dark', 'auto'],
               nullable: false,
+              description: 'Preferred application theme',
             ),
             'notifications': SchemaProperty.boolean(
-              defaultValue: true,
               nullable: false,
+              description: 'Whether notifications are enabled',
             ),
-            'language': SchemaProperty.string(
-              defaultValue: 'en',
+            'language': SchemaProperty.text(
               nullable: false,
+              description: 'Preferred language',
             ),
           },
-          description: 'User preferences',
-          nullable: true,
         ),
         'tags': SchemaProperty.array(
-          items: SchemaProperty.string(),
-          description: 'User tags',
           nullable: true,
+          description: 'User tags',
+          items: SchemaProperty.text(nullable: false),
         ),
       },
-      description: 'Complete user profile',
     );
 
     final userResult = await chat.sendMessageWithSchema(
       messages: [
-        CodexSdkContent.text(
-          'Generate a sample user profile for a developer named John Doe',
-        ),
+        PromptContent.text(
+            'Generate a sample user profile for a developer named John Doe'),
       ],
-      schema: userSchema,
+      schema: userSchema as SchemaObject,
     );
 
     print('Generated User Profile:');

@@ -1,5 +1,25 @@
 # Changelog
 
+## 3.0.0
+
+### Breaking Changes
+- Migrated to the shared `programming_cli_core_sdk` foundation for chat orchestration.
+- Replaced `CodexSdkContent` with `PromptContent` from the core package.
+- Removed package-specific exceptions in favour of the shared `CliException` hierarchy.
+- Refactored `CodexChatOptions` to extend `CliChatOptions`; the `timeoutMs` field has been removed.
+- Deleted schema helper types in favour of `SchemaProperty` from the core SDK.
+- Package structure flattened under `lib/src` (no nested folders).
+
+### Added
+- `Codex` now implements `CodingCliInterface`, enabling consistent behaviour across CLI SDKs.
+- `CodexChat` extends `CliChatInterface` to inherit shared schema testing, temporary file management, and streaming utilities.
+- Re-exported the entire core SDK for convenient access to shared abstractions.
+
+### Improved
+- Simplified command construction pipeline—Codex packages now focus on describing CLI invocations only.
+- Session tracking is handled consistently, including support for schema workflows through the shared engine.
+- Documentation and examples rewritten to use the new shared primitives.
+
 ## 2.1.0
 
 ### Breaking Changes

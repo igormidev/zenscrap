@@ -1,49 +1,54 @@
-/// Represents the scope where an MCP server is configured
+/// Represents the scope where an MCP server is configured.
 enum McpScope {
-  /// Project-specific configuration
+  /// Project-specific configuration.
   project,
-  /// User-specific configuration
+
+  /// User-specific configuration.
   user,
-  /// System-wide configuration
+
+  /// System-wide configuration.
   system,
 }
 
-/// Represents the current status of an MCP server
+/// Represents the current status of an MCP server.
 enum McpServerStatus {
-  /// Server is connected and running
+  /// Server is connected and running.
   connected,
-  /// Server is configured but not connected
+
+  /// Server is configured but not connected.
   disconnected,
-  /// Server configuration has errors
+
+  /// Server configuration has errors.
   error,
-  /// Server status is unknown
+
+  /// Server status is unknown.
   unknown,
 }
 
-/// Represents an MCP server configuration
+/// Represents an MCP server configuration.
 class McpServer {
-  /// The unique name/identifier of the MCP server
+  /// The unique name/identifier of the MCP server.
   final String name;
 
-  /// The command to execute (e.g., 'npx', 'node', 'python')
+  /// The command to execute (e.g., 'npx', 'node', 'python').
   final String command;
 
-  /// Arguments to pass to the command
+  /// Arguments to pass to the command.
   final List<String> args;
 
-  /// Environment variables for the server
+  /// Environment variables for the server.
   final Map<String, String>? env;
 
-  /// The type of server (usually 'stdio')
+  /// The type of server (usually 'stdio').
   final String type;
 
-  /// The scope where this server is configured
+  /// The scope where this server is configured.
   final McpScope? scope;
 
-  /// Current status of the server
+  /// Current status of the server.
   final McpServerStatus? status;
 
-  /// Error message if status is error
+  /// Error message if status is error.
   final String? errorMessage;
 
   McpServer({
@@ -57,22 +62,21 @@ class McpServer {
     this.errorMessage,
   });
 
-  /// Creates an McpServer from JSON configuration
+  /// Creates an [McpServer] from JSON configuration.
   factory McpServer.fromJson(String name, Map<String, dynamic> json) {
     return McpServer(
       name: name,
       command: json['command'] as String,
-      args: (json['args'] as List<dynamic>?)
-              ?.map((e) => e.toString())
-              .toList() ??
-          [],
+      args:
+          (json['args'] as List<dynamic>?)?.map((e) => e.toString()).toList() ??
+              [],
       env: (json['env'] as Map<String, dynamic>?)
           ?.map((key, value) => MapEntry(key, value.toString())),
       type: json['type'] as String? ?? 'stdio',
     );
   }
 
-  /// Converts the McpServer to JSON for configuration
+  /// Converts the [McpServer] to JSON for configuration.
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{
       'command': command,
@@ -87,7 +91,7 @@ class McpServer {
     return json;
   }
 
-  /// Creates a copy with updated values
+  /// Creates a copy with updated values.
   McpServer copyWith({
     String? name,
     String? command,
@@ -117,16 +121,16 @@ class McpServer {
   }
 }
 
-/// Configuration for the entire MCP setup
+/// Configuration for the entire MCP setup.
 class McpConfig {
-  /// Map of server name to server configuration
+  /// Map of server name to server configuration.
   final Map<String, McpServer> servers;
 
   McpConfig({
     Map<String, McpServer>? servers,
   }) : servers = servers ?? {};
 
-  /// Creates McpConfig from JSON
+  /// Creates [McpConfig] from JSON.
   factory McpConfig.fromJson(Map<String, dynamic> json) {
     final mcpServers = json['mcp_servers'] as Map<String, dynamic>?;
 
@@ -144,7 +148,7 @@ class McpConfig {
     return McpConfig(servers: servers);
   }
 
-  /// Converts to JSON for configuration file
+  /// Converts to JSON for configuration file.
   Map<String, dynamic> toJson() {
     if (servers.isEmpty) {
       return {};
@@ -155,7 +159,7 @@ class McpConfig {
     };
   }
 
-  /// Creates a copy with updated servers
+  /// Creates a copy with updated servers.
   McpConfig copyWith({
     Map<String, McpServer>? servers,
   }) {
@@ -164,14 +168,14 @@ class McpConfig {
     );
   }
 
-  /// Adds a server to the configuration
+  /// Adds a server to the configuration.
   McpConfig addServer(McpServer server) {
     final newServers = Map<String, McpServer>.from(servers);
     newServers[server.name] = server;
     return copyWith(servers: newServers);
   }
 
-  /// Removes a server from the configuration
+  /// Removes a server from the configuration.
   McpConfig removeServer(String serverName) {
     final newServers = Map<String, McpServer>.from(servers);
     newServers.remove(serverName);
@@ -184,18 +188,18 @@ class McpConfig {
   }
 }
 
-/// Installation information for MCP
+/// Installation information for MCP.
 class McpInstallationInfo {
-  /// Whether MCP support is available
+  /// Whether MCP support is available.
   final bool hasMcpSupport;
 
-  /// List of configured MCP servers
+  /// List of configured MCP servers.
   final List<McpServer> servers;
 
-  /// Config file path
+  /// Config file path.
   final String? configPath;
 
-  /// Version of MCP protocol supported
+  /// Version of MCP protocol supported.
   final String? mcpVersion;
 
   const McpInstallationInfo({
@@ -205,7 +209,7 @@ class McpInstallationInfo {
     this.mcpVersion,
   });
 
-  /// Creates a default "not installed" info
+  /// Creates a default "not installed" info.
   factory McpInstallationInfo.notInstalled() {
     return const McpInstallationInfo(
       hasMcpSupport: false,
@@ -220,18 +224,18 @@ class McpInstallationInfo {
   }
 }
 
-/// Options for adding MCP servers
+/// Options for adding MCP servers.
 class McpAddOptions {
-  /// The scope to add the server to
+  /// The scope to add the server to.
   final McpScope scope;
 
-  /// Whether to use npx to run the package
+  /// Whether to use npx to run the package.
   final bool useNpx;
 
-  /// Additional environment variables
+  /// Additional environment variables.
   final Map<String, String>? environment;
 
-  /// Whether to force overwrite existing server config
+  /// Whether to force overwrite existing server config.
   final bool force;
 
   const McpAddOptions({

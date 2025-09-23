@@ -79,6 +79,10 @@ final chat = codexSDK.createNewChat(
 chat.changeModelWithEffort('gpt-5', 'medium');
 ```
 
+## Architecture Overview
+
+As of v3.0.0 this package is built on top of the shared `programming_cli_core_sdk`. The core library provides the `PromptContent`, schema utilities, and CLI orchestration that are now shared with the Claude and Gemini SDKs. `CodexChat` focuses on constructing the Codex CLI command line and delegates streaming, schema validation, and temporary file management to the core.
+
 ## Quick Start
 
 ### Basic Usage
@@ -88,7 +92,7 @@ import 'package:codex_cli_sdk/codex_cli_sdk.dart';
 
 void main() async {
   // Initialize the SDK with your API key
-  final codexSDK = Codex('YOUR_API_KEY');
+  final codexSDK = Codex(apiKey: 'YOUR_API_KEY');
 
   // Create a new chat session
   final codexChat = codexSDK.createNewChat();
@@ -96,7 +100,7 @@ void main() async {
   try {
     // Send a simple text message
     final result = await codexChat.sendMessage([
-      CodexSdkContent.text('What is the capital of France?'),
+      PromptContent.text('What is the capital of France?'),
     ]);
 
     print('Codex says: $result');
@@ -114,14 +118,14 @@ import 'dart:io';
 import 'package:codex_cli_sdk/codex_cli_sdk.dart';
 
 void main() async {
-  final codexSDK = Codex('YOUR_API_KEY');
+  final codexSDK = Codex(apiKey: 'YOUR_API_KEY');
   final codexChat = codexSDK.createNewChat();
 
   try {
     // Send a message with a file
     final result = await codexChat.sendMessage([
-      CodexSdkContent.text('Please analyze this HTML file and extract the user name'),
-      CodexSdkContent.file(File('example.html')),
+      PromptContent.text('Please analyze this HTML file and extract the user name'),
+      PromptContent.file(File('example.html')),
     ]);
 
     print('Analysis result: $result');
@@ -140,15 +144,15 @@ import 'dart:typed_data';
 import 'package:codex_cli_sdk/codex_cli_sdk.dart';
 
 void main() async {
-  final codexSDK = Codex('YOUR_API_KEY');
+  final codexSDK = Codex(apiKey: 'YOUR_API_KEY');
   final codexChat = codexSDK.createNewChat();
 
   try {
     // Example 1: Send image bytes
     final imageBytes = await File('photo.jpg').readAsBytes();
     final result = await codexChat.sendMessage([
-      CodexSdkContent.text('What is in this image?'),
-      CodexSdkContent.bytes(
+      PromptContent.text('What is in this image?'),
+      PromptContent.bytes(
         data: imageBytes,
         fileName: 'image',
         fileExtension: 'jpg',
@@ -159,8 +163,8 @@ void main() async {
     final textContent = 'Hello, this is dynamic content!';
     final textBytes = Uint8List.fromList(textContent.codeUnits);
     final result2 = await codexChat.sendMessage([
-      CodexSdkContent.text('Read this text:'),
-      CodexSdkContent.bytes(
+      PromptContent.text('Read this text:'),
+      PromptContent.bytes(
         data: textBytes,
         fileName: 'text',
         fileExtension: 'txt',
@@ -182,7 +186,7 @@ import 'dart:io';
 import 'package:codex_cli_sdk/codex_cli_sdk.dart';
 
 void main() async {
-  final codexSDK = Codex('YOUR_API_KEY');
+  final codexSDK = Codex(apiKey: 'YOUR_API_KEY');
   final codexChat = codexSDK.createNewChat();
 
   try {
@@ -207,8 +211,8 @@ void main() async {
     // Send message with schema
     final result = await codexChat.sendMessageWithSchema(
       messages: [
-        CodexSdkContent.text('Extract user information from this HTML file'),
-        CodexSdkContent.file(File('profile.html')),
+        PromptContent.text('Extract user information from this HTML file'),
+        PromptContent.file(File('profile.html')),
       ],
       schema: schema,
     );
@@ -231,13 +235,13 @@ void main() async {
 import 'package:codex_cli_sdk/codex_cli_sdk.dart';
 
 void main() async {
-  final codexSDK = Codex('YOUR_API_KEY');
+  final codexSDK = Codex(apiKey: 'YOUR_API_KEY');
   final codexChat = codexSDK.createNewChat();
 
   try {
     // Stream the response
     await for (final chunk in codexChat.streamResponse([
-      CodexSdkContent.text('Write a detailed explanation of quantum computing'),
+      PromptContent.text('Write a detailed explanation of quantum computing'),
     ])) {
       print(chunk); // Print each chunk as it arrives
     }
@@ -314,7 +318,7 @@ chat.resetConversation();
 
 ```dart
 void main() async {
-  final codexSDK = Codex('YOUR_API_KEY');
+  final codexSDK = Codex(apiKey: 'YOUR_API_KEY');
 
   // Check if Codex CLI is installed
   final isInstalled = await codexSDK.isCodexCLIInstalled();
@@ -343,7 +347,7 @@ The SDK provides a convenient method to automatically check for and install upda
 
 ```dart
 void main() async {
-  final codexSDK = Codex('YOUR_API_KEY');
+  final codexSDK = Codex(apiKey: 'YOUR_API_KEY');
 
   // Automatically check for updates and install if needed
   await codexSDK.updateToNewestVersionIfNeeded(global: true);
@@ -443,7 +447,7 @@ final chat = codexSDK.createNewChat();
 
 // Codex can now use the configured MCP tools
 final result = await chat.sendMessage([
-  CodexSdkContent.text(
+  PromptContent.text(
     'List all files in my Documents folder' // Works if filesystem MCP is installed
   ),
 ]);
@@ -506,12 +510,12 @@ The SDK provides specific exception types for different error scenarios:
 import 'package:codex_cli_sdk/codex_cli_sdk.dart';
 
 void main() async {
-  final codexSDK = Codex('YOUR_API_KEY');
+  final codexSDK = Codex(apiKey: 'YOUR_API_KEY');
   final codexChat = codexSDK.createNewChat();
 
   try {
     final result = await codexChat.sendMessage([
-      CodexSdkContent.text('Hello, Codex!'),
+      PromptContent.text('Hello, Codex!'),
     ]);
     print(result);
   } on CLINotFoundException {
@@ -523,7 +527,7 @@ void main() async {
     }
   } on JSONDecodeException catch (e) {
     print('Failed to parse response: ${e.message}');
-  } on CodexSDKException catch (e) {
+  } on CliException catch (e) {
     print('SDK error: ${e.message}');
   } finally {
     await codexChat.dispose();
@@ -563,7 +567,7 @@ await codexSDK.dispose(); // Disposes all active sessions
 
 ### Codex Class
 
-- `Codex(String apiKey)` - Creates a new SDK instance
+- `Codex(apiKey: String apiKey)` - Creates a new SDK instance
 - `createNewChat({CodexChatOptions? options})` - Creates a new chat session
 - `isCodexCLIInstalled()` - Checks if Codex CLI is installed
 - `installCodexCLI({bool global = true})` - Installs the Codex CLI
@@ -579,19 +583,19 @@ await codexSDK.dispose(); // Disposes all active sessions
 
 ### CodexChat Class
 
-- `sendMessage(List<CodexSdkContent> contents)` - Sends a message and returns the response
+- `sendMessage(List<PromptContent> contents)` - Sends a message and returns the response
 - `sendMessageWithSchema({messages, schema})` - Returns a record with the LLM summary and parsed structured data
-- `streamResponse(List<CodexSdkContent> contents)` - Streams the response
+- `streamResponse(List<PromptContent> contents)` - Streams the response
 - `streamResponseWithSchema({messages, schema})` - Streams the LLM output while resolving structured data asynchronously
 - `get sessionId` - Gets the current session ID (null until first message)
 - `resetConversation()` - Resets the conversation, starting a new session
 - `dispose()` - Disposes the chat session and cleans up resources (including temp files)
 
-### CodexSdkContent
+### PromptContent
 
-- `CodexSdkContent.text(String text)` - Creates text content
-- `CodexSdkContent.file(File file)` - Creates file content
-- `CodexSdkContent.bytes({data, fileName, fileExtension})` - Creates content from bytes (temporary file)
+- `PromptContent.text(String text)` - Creates text content
+- `PromptContent.file(File file)` - Creates file content
+- `PromptContent.bytes({data, fileName, fileExtension})` - Creates content from bytes (temporary file)
 
 ## Environment Variables
 

@@ -1,5 +1,9 @@
 # TASK:
-I wan't o replace common things in 
+I wan't to unify the cli packages, those are; @claude_code_sdk/ @codex_cli_sdk/ @gemini_cli_sdk/ 
+Since they have a lot of extremely similar structures ( if not 100% the equal structures ) I created a new package that will be the core for those cli sdk packages. It is the @programming_cli_core_sdk/ package.
+
+I wan't you to START THE REFACTOR WITH CODEX
+So you SHOULD NOT change a single line of code in @claude_code_sdk/ or  @claude_code_sdk/ because you should only refactor codex initially.
 
 # Context: 
 
@@ -32,417 +36,46 @@ All chat are really similar, they are:
 - @codex_cli_sdk/lib/src/codex_chat.dart
 
 Also, the contents model when sending a prompt is very similar as well.
-Both GeminiSdkContent, CodexSdkContent and ClaudeSdkContent have a ".file" and ".bytes".
-But it is not working as expected. Most of cli thease cli tools do not have the capacity of running outsite of its scope and can not iteract with files outside it as well. So the ai does not have the context of that file...
+But they are not 100% the same. Because of that, I have to always check when I do a modification in one of them to do the same modification in the other and that does not scale - I don't wan't to repeat myself in 3 packages.
+
+Because of that, let's unify every thing!
 
 # Fix proposal
-Because of that problem, for all 3 packages, we will do the following modification:
-We will now create temporary files and delete them by the end of the excecution.
 
-If the user uses a ".file" content, the package will see if the file exists in first place (and throw a error if it did not exist) and then read that file as a string and pass the string content to a "clone file" that will be inside the directory the cli is running at (use the getter "baseDir", save the file inside it). This will be only a temporary file. At the end of the excecution of the ai, we will delete that file that was created (garantee it will be deleted at all cost, use try catch if needed to garantee the delete function will be called at the end even if a error happeneds in the cli calling part).
+- GeminiSDK class from @gemini_cli_sdk/lib/src/gemini.dart, Codex class form @codex_cli_sdk/lib/src/codex.dart and Claude class from @claude_code_sdk/lib/src/claude.dart should be COMPLETY REFACTORED because now we will need to implement CodingCliInterface from @programming_cli_core_sdk/lib/src/coding_cli_interface.dart
 
-Also, the ".bytes" should have the same behavior (I think this logic of temporary files already happends to ".bytes", at least in some packages... Just garantee it happends in all of them).
+- GeminiChat class from @gemini_cli_sdk/lib/src/gemini_chat.dart , CodexChat from @codex_cli_sdk/lib/src/codex_chat.dart ClaudeChat from @claude_code_sdk/lib/src/claude_chat.dart should be COMPLETY REFACTORED because now we will need to implement CliChatInterface from @programming_cli_core_sdk/lib/src/cli_chat_interface.dart 
 
-Also, all of them should have a @override "String toCliString() {....}" function, like in @codex_cli_sdk/lib/src/models/codex_sdk_content.dart that you can use as reference... Don't forget to web research how is the correct string declaration for all of the 3 clis (example: files in claude start with @, maybe in the others thats not the case... So search for the similarities).
+- GeminiChatOptions from gemini_cli_sdk/lib/src/models/chat_options.dart , CodexChatOptions from codex_cli_sdk/lib/src/models/chat_options.dart and ClaudeChatOptions from
+claude_code_sdk/lib/src/models/chat_options.dart should be COMPLETY REFACTORED because now we will need to implement CliChatOptions from @programming_cli_core_sdk/lib/src/cli_chat_options_interface.dart 
 
-Also, add for the bytes class a new variable called "final String fileName;".
-When creating the temporary file, create it like this: "${fileName}_{nanoid(length: 3)}.{$fileExtension}".
-The nano id you can get with the package: "nanoid2: ^2.0.1" - this is just to garantee there will not be a conflit of files. Ps: For the clone file that you will create with ".file", also add that nano id and only save the file name with the suffic of the nano id as well.
+- GeminiSdkContent from @gemini_cli_sdk/lib/src/models/gemini_sdk_content.dart , CodexSdkContent from @codex_cli_sdk/lib/src/models/codex_sdk_content.dart and ClaudeSdkContent from @claude_code_sdk/lib/src/models/claude_sdk_content.dart should be COMPLETY DELETED and because now we will use @programming_cli_core_sdk/lib/src/prompt_content.dart
 
-Also, create string getter for filePath if needed. The temporary files will be allways on the root of where is running. To be honest, maybe a variable fileName will be better because only the name of the file is needed since the file will be allways saved in the root of where it is running
+- GeminiSDKException from @gemini_cli_sdk/lib/src/exceptions/gemini_exceptions.dart , CodexSDKException from @codex_cli_sdk/lib/src/exceptions/codex_exceptions.dart and ClaudeSDKException from @claude_code_sdk/lib/src/exceptions/claude_exceptions.dart should be COMPLETY DELETED and because now we will use CliException from @programming_cli_core_sdk/lib/src/cli_exception.dart
 
-Also, add for the bytes AND file content class a new variable called "final String? fileDescription;". Put a comentary that it is a quick resume of what that file is so in the "toCliString()" getter instead of having the "File: $filePath" we will now have the "'File path (make sure to look): ${tempFile!.absolute.path}${fileDescription != null ? '\nFile description: $fileDescription' : ''}'" - with this new variable, the user will be able to give a bref description of what that file is.
+- Shema models such as the ones in codex_cli_sdk/lib/src/models/schema_models.dart , gemini_cli_sdk/lib/src/models/schema_models.dart and claude_code_sdk/lib/src/models/schema_models.dart should be @programming_cli_core_sdk/lib/src/schema_property.dart 
 
-Also, make the GeminiSdkContent, CodexSdkContent and ClaudeSdkContent models the most close as possible - if not 100% identical. The major only thing will change is the name of the classes.
+- The files structures of each one of the 3 packages should be really close - so refactor the the files so the 3 packages have the same files. In fact, remove all folders and maake the files all displayed inside src/ without any subfolder.
+
+Since it is a big refactor, I don't wan't you to get confuse with this amout of work to do. Because of that - ONLY REFACTOR CODEX ( @codex_cli_sdk/  ) for now and do not touch in any file in @claude_code_sdk/ or @gemini_cli_sdk/ 
+
+Ps: Note that now they will not need to implement functions like sendMessage, streamResponse, sendMessageWithSchema and streamResponseWithSchema since they are already implemented in CliChatInterface - the package main structure will now all be about implementing the specific cli process of each one of them... and the overall logic will be the same for all of them. Also, garantee to set the filePreffix of programming_cli_core_sdk/lib/src/prompt_content.dart because gemini and claude code file reference starts with "@"
 
 # Final considerations
-This will fundamentally change how packages schema are used, this is a breaking change. So don't forget to update the version on yaml, the change log and the readme file. Also, fell free to web research for detailed information about specific package implementation (mainly to use the correct nomeclature to refer to a file in each cli package. Claude code uses "@" in the start, but other packages can use different things). 
+The programming_cli_core_sdk is already imported in codex_cli_sdk/pubspec.yaml, gemini_cli_sdk/pubspec.yaml and claude_code_sdk/pubspec.yaml
+
+This will fundamentally change how the cli packages work internally - they will now implement ZERO logic and will only build the cli commands - so this is a breaking change. So don't forget to update the version on yaml, the change log and the readme file. Also, fell free to web research for detailed information about specific package implementation (mainly to use the correct nomeclature to refer to a file in each cli package. Claude code uses "@" in the start, but other packages can use different things). 
+
+Avoid changing the programming_cli_core_sdk for any reason - only change it if it is really needed.
+
+
+Since it is a big refactor, I don't wan't you to get confuse with this amout of work to do. Because of that - ONLY REFACTOR CODEX ( @codex_cli_sdk/  ) for now and do not touch in any file in @claude_code_sdk/ or @gemini_cli_sdk/ 
+
+I did not created any common source of mcp. I plan to do that later. But for now, continue to use the implementation of each package
 
 Some configurations will need to be done in the @zenscrap_server/ since it uses the generation feature of @web_scrapper_generator/ - garantee that the migration is done there as well
 Btw, if you need to generate serverpod files, use the command "serverpod generate --experimental-features=all". It need to have that flag because I am using some experimental-features...
 
 YOU SHOULD check for static analysis error in each file and in @web_scrapper_generator/ , @zenscrap_flutter/ and @@zenscrap_server/ folder as well. Garantee there a are no errors in the repository as a hole after the fix.
 
-YOU SHOULD make the max possible that all benchmark tests pass. Yes, I created tests so you can test, after all the fixes, if they are working (currently none of them work for the reaons I mentioned previosly in the prompt). The tests are, for each model;
-- @web_scrapper_generator/test/end_to_end_tests_per_model/codex_web_scrapper_generator_test.dart 
-- @web_scrapper_generator/test/end_to_end_tests_per_model/claude_code_web_scrapper_test.dart 
-- @web_scrapper_generator/test/end_to_end_tests_per_model/gemini_cli_web_scrapper_test.dart 
-
-Ultra think to do this task - is is VERY COMPLEX and envolves a lot of testing to make it work - do not rush and take your time - do with calm all web researchs that you need and think for the max as possible.
-
-----
-
-
-[2025-09-20T23:02:39] OpenAI Codex v0.39.0 (research preview)
---------
-workdir: /Users/igormidev/personalprojects/zenscrap/zenscrap_server
-model: gpt-oss-120b
-provider: openai
-approval: never
-sandbox: danger-full-access
---------
-[2025-09-20T23:02:39] User instructions:
-You must produce structured JSON that matches the schema below.
-Write the JSON object directly into this file (overwrite existing contents):
-/Users/igormidev/personalprojects/zenscrap/zenscrap_server/codex_schema_aad20452-e96a-4d07-a271-153d8c0022ed.json
-
-You can run shell commands (e.g. `cat <<'EOF' > /Users/igormidev/personalprojects/zenscrap/zenscrap_server/codex_schema_aad20452-e96a-4d07-a271-153d8c0022ed.json`) or use Codex editing tools to write the file.
-Do not include the JSON in your assistant reply; only provide a concise summary of your work.
-
-JSON schema:
-```json
-{
-  "type": "object",
-  "properties": {
-    "responseType": {
-      "type": "string",
-      "description": "The type of response: \"message\", \"error\", or \"data\"",
-      "enum": [
-        "message",
-        "error",
-        "data"
-      ]
-    },
-    "message": {
-      "type": "string",
-      "description": "A message from the AI (used for responseType \"message\")"
-    },
-    "errorMessage": {
-      "type": "string",
-      "description": "An error message (used for responseType \"error\")"
-    },
-    "resumeActionMessage": {
-      "type": "string",
-      "description": "A summary of what the AI did (used for responseType \"data\")"
-    },
-    "request": {
-      "type": "object",
-      "description": "Modified WebScrapperRequest if changes were made, null if no changes needed",
-      "properties": {
-        "url": {
-          "type": "string",
-          "description": "URL pattern with {paramName} placeholders for dynamic segments"
-        },
-        "queryParam": {
-          "type": "object",
-          "description": "Query parameters with optional default values",
-          "properties": {
-            "__dynamic__": {
-              "type": "string",
-              "description": "Dynamic key-value pairs for query parameters"
-            }
-          }
-        },
-        "pathParams": {
-          "type": "array",
-          "description": "List of path parameter names",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "required": [
-        "url",
-        "queryParam",
-        "pathParams"
-      ]
-    },
-    "fetchSettings": {
-      "type": "object",
-      "description": "ScrapingBee fetch settings (used for responseType \"data\")",
-      "properties": {
-        "url": {
-          "type": "string",
-          "description": "The target URL for scraping"
-        },
-        "extract_rules": {
-          "type": "string",
-          "description": "JSON-encoded extraction rules"
-        },
-        "js_scenario": {
-          "type": "string",
-          "description": "JSON-encoded JavaScript scenario for interactions"
-        },
-        "render_js": {
-          "type": "boolean",
-          "description": "Whether to render JavaScript"
-        },
-        "wait": {
-          "type": "number",
-          "description": "Fixed delay in milliseconds"
-        },
-        "wait_for": {
-          "type": "string",
-          "description": "CSS/XPath selector to wait for"
-        },
-        "wait_browser": {
-          "type": "string",
-          "description": "Browser event to wait for"
-        },
-        "premium_proxy": {
-          "type": "boolean",
-          "description": "Whether to use premium residential proxy"
-        },
-        "country_code": {
-          "type": "string",
-          "description": "Proxy geolocation code (2-letter country code)"
-        },
-        "session_id": {
-          "type": "string",
-          "description": "Session ID for sticky sessions"
-        },
-        "custom_google": {
-          "type": "boolean",
-          "description": "Whether to use Google-specific handling"
-        }
-      },
-      "required": [
-        "url",
-        "extract_rules",
-        "render_js",
-        "premium_proxy"
-      ]
-    }
-  },
-  "required": [
-    "responseType"
-  ],
-  "description": "Structured response from the AI for web scraper generation"
-}
-```
-
-After saving, double-check the file and then respond with a short summary of what was generated.
-
-## Task: Create New Web Scraper
-
-You need to create extraction rules for a new web scraper from scratch.
-
-**Target URL**: https://www.transfermarkt.com.br/cuca/profil/trainer/4732
-
-**IMPORTANT URL HANDLING**:
-- This is your starting point for testing and development
-- The `url` field in your final ScrappingBeeFetchSettings response will be the URL you actually tested with
-- If the user asks you to "try with this other URL" or provides alternative URLs, use those for testing
-- Your final ScrappingBeeFetchSettings.url should ALWAYS be the actual URL you validated the extraction rules against
-
-**Initial Request Configuration**:
-The following JSON contains the initial WebScrapperRequest configuration that was automatically generated from the URL. You can modify these if the user requests changes (e.g., adding query parameters, changing the URL pattern).
-
-File: /var/folders/s6/tlzxwgqn2rv88j9mv2mcm5gh0000gn/T/codex_temp_5cb23eae-653e-453a-ac75-0915a8b4d1dd.json
-## Your Process:
-
-1. **Explore the Site**: Use Puppeteer MCP to open and analyze the target URL
-2. **Understand Requirements**: Based on the user's request, identify what data needs to be extracted
-3. **Create Extraction Rules**: Design CSS/XPath selectors to extract the required data
-4. **Test with ScrapingBee**: Use the test_extract_rules tool to validate your rules
-5. **Optimize for Cost**: Test with cheaper configurations to minimize credit usage
-6. **Return Results**: Provide the optimized ScrappingBeeFetchSettings
-
-## Important Notes:
-- The URL pattern and parameters in the WebScrapperRequest can be modified if needed
-- Start with premium settings for testing, then optimize
-- Always validate that the extracted data matches expectations
-- Handle dynamic content appropriately with wait parameters
-- Set custom_google=true for any Google domain
-- The final ScrappingBeeFetchSettings.url will be the URL you actually tested against
-
-The user will now describe what data they want to extract from this site.
-This is a coach page. Extract the coach name, his current club name and also the current club image url.
-[2025-09-20T23:02:49] ERROR: MCP client for `puppeteer` failed to start: request timed out
-[2025-09-20T23:02:49] stream error: unexpected status 400 Bad Request: {"detail":"Unsupported model"}; retrying 1/5 in 202ms…
-[2025-09-20T23:02:49] stream error: unexpected status 400 Bad Request: {"detail":"Unsupported model"}; retrying 2/5 in 439ms…
-[2025-09-20T23:02:50] stream error: unexpected status 400 Bad Request: {"detail":"Unsupported model"}; retrying 3/5 in 856ms…
-[2025-09-20T23:02:51] stream error: unexpected status 400 Bad Request: {"detail":"Unsupported model"}; retrying 4/5 in 1.626s…
-[2025-09-20T23:02:53] stream error: unexpected status 400 Bad Request: {"detail":"Unsupported model"}; retrying 5/5 in 3.148s…
-[2025-09-20T23:02:56] ERROR: unexpected status 400 Bad Request: {"detail":"Unsupported model"}
-[2025-09-20T23:02:56] OpenAI Codex v0.39.0 (research preview)
---------
-workdir: /Users/igormidev/personalprojects/zenscrap/zenscrap_server
-model: gpt-oss-120b
-provider: openai
-approval: never
-sandbox: danger-full-access
---------
-[2025-09-20T23:02:56] User instructions:
-You must produce structured JSON that matches the schema below.
-Write the JSON object directly into this file (overwrite existing contents):
-/Users/igormidev/personalprojects/zenscrap/zenscrap_server/codex_schema_aad20452-e96a-4d07-a271-153d8c0022ed.json
-
-You can run shell commands (e.g. `cat <<'EOF' > /Users/igormidev/personalprojects/zenscrap/zenscrap_server/codex_schema_aad20452-e96a-4d07-a271-153d8c0022ed.json`) or use Codex editing tools to write the file.
-Do not include the JSON in your assistant reply; only provide a concise summary of your work.
-
-JSON schema:
-```json
-{
-  "type": "object",
-  "properties": {
-    "responseType": {
-      "type": "string",
-      "description": "The type of response: \"message\", \"error\", or \"data\"",
-      "enum": [
-        "message",
-        "error",
-        "data"
-      ]
-    },
-    "message": {
-      "type": "string",
-      "description": "A message from the AI (used for responseType \"message\")"
-    },
-    "errorMessage": {
-      "type": "string",
-      "description": "An error message (used for responseType \"error\")"
-    },
-    "resumeActionMessage": {
-      "type": "string",
-      "description": "A summary of what the AI did (used for responseType \"data\")"
-    },
-    "request": {
-      "type": "object",
-      "description": "Modified WebScrapperRequest if changes were made, null if no changes needed",
-      "properties": {
-        "url": {
-          "type": "string",
-          "description": "URL pattern with {paramName} placeholders for dynamic segments"
-        },
-        "queryParam": {
-          "type": "object",
-          "description": "Query parameters with optional default values",
-          "properties": {
-            "__dynamic__": {
-              "type": "string",
-              "description": "Dynamic key-value pairs for query parameters"
-            }
-          }
-        },
-        "pathParams": {
-          "type": "array",
-          "description": "List of path parameter names",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "required": [
-        "url",
-        "queryParam",
-        "pathParams"
-      ]
-    },
-    "fetchSettings": {
-      "type": "object",
-      "description": "ScrapingBee fetch settings (used for responseType \"data\")",
-      "properties": {
-        "url": {
-          "type": "string",
-          "description": "The target URL for scraping"
-        },
-        "extract_rules": {
-          "type": "string",
-          "description": "JSON-encoded extraction rules"
-        },
-        "js_scenario": {
-          "type": "string",
-          "description": "JSON-encoded JavaScript scenario for interactions"
-        },
-        "render_js": {
-          "type": "boolean",
-          "description": "Whether to render JavaScript"
-        },
-        "wait": {
-          "type": "number",
-          "description": "Fixed delay in milliseconds"
-        },
-        "wait_for": {
-          "type": "string",
-          "description": "CSS/XPath selector to wait for"
-        },
-        "wait_browser": {
-          "type": "string",
-          "description": "Browser event to wait for"
-        },
-        "premium_proxy": {
-          "type": "boolean",
-          "description": "Whether to use premium residential proxy"
-        },
-        "country_code": {
-          "type": "string",
-          "description": "Proxy geolocation code (2-letter country code)"
-        },
-        "session_id": {
-          "type": "string",
-          "description": "Session ID for sticky sessions"
-        },
-        "custom_google": {
-          "type": "boolean",
-          "description": "Whether to use Google-specific handling"
-        }
-      },
-      "required": [
-        "url",
-        "extract_rules",
-        "render_js",
-        "premium_proxy"
-      ]
-    }
-  },
-  "required": [
-    "responseType"
-  ],
-  "description": "Structured response from the AI for web scraper generation"
-}
-```
-
-[Previous attempt failed schema validation.]
-Issues detected:
-- Missing required property "responseType"
-Last JSON content:
-```json
-{}
-```
-Fix these issues and overwrite the file with a corrected JSON object.
-
-After saving, double-check the file and then respond with a short summary of what was generated.
-
-## Task: Create New Web Scraper
-
-You need to create extraction rules for a new web scraper from scratch.
-
-**Target URL**: https://www.transfermarkt.com.br/cuca/profil/trainer/4732
-
-**IMPORTANT URL HANDLING**:
-- This is your starting point for testing and development
-- The `url` field in your final ScrappingBeeFetchSettings response will be the URL you actually tested with
-- If the user asks you to "try with this other URL" or provides alternative URLs, use those for testing
-- Your final ScrappingBeeFetchSettings.url should ALWAYS be the actual URL you validated the extraction rules against
-
-**Initial Request Configuration**:
-The following JSON contains the initial WebScrapperRequest configuration that was automatically generated from the URL. You can modify these if the user requests changes (e.g., adding query parameters, changing the URL pattern).
-
-File: /var/folders/s6/tlzxwgqn2rv88j9mv2mcm5gh0000gn/T/codex_temp_9bce3b00-21ab-4b44-bed0-0a8cb250656a.json
-## Your Process:
-
-1. **Explore the Site**: Use Puppeteer MCP to open and analyze the target URL
-2. **Understand Requirements**: Based on the user's request, identify what data needs to be extracted
-3. **Create Extraction Rules**: Design CSS/XPath selectors to extract the required data
-4. **Test with ScrapingBee**: Use the test_extract_rules tool to validate your rules
-5. **Optimize for Cost**: Test with cheaper configurations to minimize credit usage
-6. **Return Results**: Provide the optimized ScrappingBeeFetchSettings
-
-## Important Notes:
-- The URL pattern and parameters in the WebScrapperRequest can be modified if needed
-- Start with premium settings for testing, then optimize
-- Always validate that the extracted data matches expectations
-- Handle dynamic content appropriately with wait parameters
-- Set custom_google=true for any Google domain
-- The final ScrappingBeeFetchSettings.url will be the URL you actually tested against
-
-The user will now describe what data they want to extract from this site.
-This is a coach page. Extract the coach name, his current club name and also the current club image url.
-[2025-09-20T23:03:06] ERROR: MCP client for `puppeteer` failed to start: request timed out
-[2025-09-20T23:03:07] stream error: unexpected status 400 Bad Request: {"detail":"Unsupported model"}; retrying 1/5 in 215ms…
-[2025-09-20T23:03:07] stream error: unexpected status 400 Bad Request: {"detail":"Unsupported model"}; retrying 2/5 in 367ms…
-[2025-09-20T23:03:08] stream error: unexpected status 400 Bad Request: {"detail":"Unsupported model"}; retrying 3/5 in 808ms…
-[2025-09-20T23:03:09] stream error: unexpected status 400 Bad Request: {"detail":"Unsupported model"}; retrying 4/5 in 1.47s…
-[2025-09-20T23:03:10] stream error: unexpected status 400 Bad Request: {"detail":"Unsupported model"}; retrying 5/5 in 3.316s…
-[2025-09-20T23:03:14] ERROR: unexpected status 400 Bad Request: {"detail":"Unsupported model"}
+ultrathink to do this task - is is VERY COMPLEX and envolves a lot of testing to make it work - do not rush and take your time - do with calm all web researchs that you need and think for the max as possible.

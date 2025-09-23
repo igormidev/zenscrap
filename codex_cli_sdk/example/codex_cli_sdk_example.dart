@@ -1,8 +1,8 @@
 import 'dart:io';
+
 import 'package:codex_cli_sdk/codex_cli_sdk.dart';
 
-void main() async {
-  // Get API key from environment variable
+Future<void> main() async {
   final apiKey = Platform.environment['OPENAI_API_KEY'] ?? '';
 
   if (apiKey.isEmpty) {
@@ -11,11 +11,9 @@ void main() async {
     exit(1);
   }
 
-  // Initialize the SDK
-  final codexSDK = Codex(apiKey);
+  final codexSDK = Codex(apiKey: apiKey);
 
   try {
-    // Check if Codex CLI is installed
     print('Checking Codex CLI installation...');
     final isInstalled = await codexSDK.isCodexCLIInstalled();
 
@@ -25,7 +23,6 @@ void main() async {
 
       final input = stdin.readLineSync();
       if (input?.toLowerCase() == 'y') {
-        print('Installing Codex CLI...');
         await codexSDK.installCodexCLI();
         print('Installation complete!');
       } else {
@@ -37,58 +34,43 @@ void main() async {
       print('✓ Codex CLI is installed');
     }
 
-    // Get SDK information
     print('\nSDK Information:');
     final info = await codexSDK.getSDKInfo();
-    info.forEach((key, value) {
-      print('  $key: $value');
-    });
+    info.forEach((key, value) => print('  $key: $value'));
 
-    // Create a chat session with options
     print('\nCreating chat session...');
     final chat = codexSDK.createNewChat(
-      options: CodexChatOptions(
+      options: const CodexChatOptions(
         systemPrompt: 'You are a helpful AI assistant',
-        mode: 'suggest', // Use suggest mode for this example
-        outputJson: false,
+        mode: 'suggest',
       ),
     );
 
     try {
-      // Send a message
       print('\nSending message to Codex...');
       final response = await chat.sendMessage([
-        CodexSdkContent.text('Hello! Can you explain what Dart is in one sentence?'),
+        PromptContent.text('Explain what Dart is in one sentence.'),
       ]);
 
       print('\nCodex response:');
       print(response);
 
-      // Example with schema
       print('\n--- Schema Example ---');
-      final schema = SchemaObject(
+      final schema = SchemaProperty.structuredObject(
+        nullable: false,
         properties: {
-          'language': SchemaProperty.string(
-            description: 'The programming language name',
-            nullable: false,
-          ),
-          'paradigm': SchemaProperty.string(
-            description: 'The programming paradigm',
-            nullable: false,
-          ),
-          'creator': SchemaProperty.string(
-            description: 'Who created it',
-            nullable: true,
-          ),
+          'language': SchemaProperty.text(nullable: false),
+          'paradigm': SchemaProperty.text(nullable: false),
+          'creator': SchemaProperty.text(nullable: true),
         },
-        description: 'Information about a programming language',
       );
 
       final result = await chat.sendMessageWithSchema(
         messages: [
-          CodexSdkContent.text('Give me information about the Dart programming language'),
+          PromptContent.text(
+              'Give me information about the Dart programming language'),
         ],
-        schema: schema,
+        schema: schema as SchemaObject,
       );
 
       print('\nStructured response:');
@@ -98,12 +80,10 @@ void main() async {
       await chat.dispose();
     }
 
-    // Check MCP installation
     print('\n--- MCP Status ---');
     final mcpInfo = await codexSDK.isMcpInstalled();
     print('MCP Support: ${mcpInfo.hasMcpSupport}');
     print('Configured Servers: ${mcpInfo.servers.length}');
-
     for (final server in mcpInfo.servers) {
       print('  - ${server.name}');
     }

@@ -1,5 +1,16 @@
 import 'dart:convert';
 
+class RootSchema {
+  final Map<String, SchemaProperty> properties;
+  RootSchema({required this.properties});
+
+  Map<String, dynamic> toJson() =>
+      properties.map((key, value) => MapEntry(key, value.toJson()));
+
+  @override
+  String toString() => JsonEncoder.withIndent('  ').convert(toJson());
+}
+
 sealed class SchemaProperty {
   final String type;
   final bool nullable;

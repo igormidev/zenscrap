@@ -1,6 +1,9 @@
 import 'dart:async';
 
-import 'package:codex_cli_sdk/codex_cli_sdk.dart';
+import 'package:codex_cli_sdk/codex_cli_sdk.dart'
+    show Codex, CodexChat, CodexChatOptions;
+import 'package:programming_cli_core_sdk/programming_cli_core_sdk.dart'
+    show PromptContent, SchemaObject, SchemaProperty;
 import 'package:gemini_cli_sdk/gemini_cli_sdk.dart' as gemini_sdk;
 import 'package:web_scrapper_generator/src/prompts.dart';
 import 'package:web_scrapper_generator/src/schema_constants.dart';
@@ -27,7 +30,7 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
     );
 
     print('🚀 Initializing Codex SDK for web scraper generator...\n');
-    _codexSDK = Codex(codexApiKey);
+    _codexSDK = Codex(apiKey: codexApiKey);
 
     // Ensure Codex CLI is installed and up to date
     await _codexSDK.updateToNewestVersionIfNeeded(global: true);
@@ -60,8 +63,6 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
       options: CodexChatOptions(
         systemPrompt: _convertSystemPromptForCodex(),
         model: model.apiName,
-        // Note: Removed reasoningEffort as it may not be supported by Codex CLI
-        timeoutMs: 180000, // 3 minutes timeout
         enableMcp: true, // Enable MCP support
         sandboxMode: 'danger-full-access',
         approvalPolicy: 'never',
@@ -97,16 +98,16 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
   Future<WebScrapperChatAIResponse> sendMessage({
     required String userPrompt,
   }) async {
-    List<CodexSdkContent> messages = [];
+    List<PromptContent> messages = [];
 
     // Add initial prompts if this is the first message
-    final isFirstMessage = _chat.sessionId == null;
+    final isFirstMessage = !_chat.didSendFirstMessage;
     if (isFirstMessage) {
       messages.addAll(_convertInitialPromptsForCodex());
     }
 
     // Add the user's prompt
-    messages.add(CodexSdkContent.text(userPrompt));
+    messages.add(PromptContent.text(userPrompt));
 
     // Define the response schema for structured output
     final responseSchema = buildCodexResponseSchema();
@@ -134,16 +135,16 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
     Future<WebScrapperChatAIResponse> structuredSchemaDataCompleter,
   })
   streamMessage({required String userPrompt}) {
-    List<CodexSdkContent> messages = [];
+    List<PromptContent> messages = [];
 
     // Add initial prompts if this is the first message
-    final isFirstMessage = _chat.sessionId == null;
+    final isFirstMessage = !_chat.didSendFirstMessage;
     if (isFirstMessage) {
       messages.addAll(_convertInitialPromptsForCodex());
     }
 
     // Add the user's prompt
-    messages.add(CodexSdkContent.text(userPrompt));
+    messages.add(PromptContent.text(userPrompt));
 
     // Define the response schema for structured output
     final responseSchema = buildCodexResponseSchema();
@@ -241,18 +242,18 @@ Remember: Your goal is to create extraction rules that consistently retrieve the
   }
 
   /// Convert initial prompts from Gemini format to Codex format
-  List<CodexSdkContent> _convertInitialPromptsForCodex() {
+  List<PromptContent> _convertInitialPromptsForCodex() {
     final geminiPrompts = handleInitialPrompts(initialPayload);
-    final codexPrompts = <CodexSdkContent>[];
+    final codexPrompts = <PromptContent>[];
 
     for (final prompt in geminiPrompts) {
       // GeminiSdkContent is a sealed class, check the type directly
       if (prompt is gemini_sdk.TextContent) {
-        codexPrompts.add(CodexSdkContent.text(prompt.text));
+        codexPrompts.add(PromptContent.text(prompt.text));
       } else if (prompt is gemini_sdk.BytesContent) {
         // Codex handles bytes similarly
         codexPrompts.add(
-          CodexSdkContent.bytes(
+          PromptContent.bytes(
             data: prompt.data,
             fileName: prompt.fileName,
             fileExtension: prompt.fileExtension,
@@ -261,10 +262,12 @@ Remember: Your goal is to create extraction rules that consistently retrieve the
         );
       } else if (prompt is gemini_sdk.FileContent) {
         // Convert file content to Codex format
-        codexPrompts.add(CodexSdkContent.file(
-          prompt.file,
-          fileDescription: prompt.fileDescription,
-        ));
+        codexPrompts.add(
+          PromptContent.file(
+            prompt.file,
+            fileDescription: prompt.fileDescription,
+          ),
+        );
       }
     }
 
@@ -273,102 +276,98 @@ Remember: Your goal is to create extraction rules that consistently retrieve the
 
   /// Build the response schema for Codex
   SchemaObject buildCodexResponseSchema() {
-    return SchemaObject(
-      properties: {
-        'responseType': SchemaProperty.string(
-          description: SchemaDescriptions.responseType,
+    return SchemaProperty.structuredObject(
           nullable: false,
-          enumValues: SchemaDescriptions.responseTypeValues,
-        ),
-        'message': SchemaProperty.string(
-          description: SchemaDescriptions.message,
-          nullable: true,
-        ),
-        'errorMessage': SchemaProperty.string(
-          description: SchemaDescriptions.errorMessage,
-          nullable: true,
-        ),
-        'resumeActionMessage': SchemaProperty.string(
-          description: SchemaDescriptions.resumeActionMessage,
-          nullable: true,
-        ),
-        'request': SchemaProperty.object(
-          description: SchemaDescriptions.request,
-          nullable: true,
+          description: SchemaDescriptions.overallDescription,
           properties: {
-            'url': SchemaProperty.string(
-              description: SchemaDescriptions.requestUrl,
+            'responseType': SchemaProperty.enumeration(
+              enumValues: SchemaDescriptions.responseTypeValues,
+              description: SchemaDescriptions.responseType,
               nullable: false,
             ),
-            'queryParam': SchemaProperty.object(
-              description: SchemaDescriptions.requestQueryParam,
-              nullable: false,
+            'message': SchemaProperty.text(
+              description: SchemaDescriptions.message,
+              nullable: true,
+            ),
+            'errorMessage': SchemaProperty.text(
+              description: SchemaDescriptions.errorMessage,
+              nullable: true,
+            ),
+            'resumeActionMessage': SchemaProperty.text(
+              description: SchemaDescriptions.resumeActionMessage,
+              nullable: true,
+            ),
+            'request': SchemaProperty.structuredObject(
+              description: SchemaDescriptions.request,
+              nullable: true,
               properties: {
-                '__dynamic__': SchemaProperty.string(
-                  description: SchemaDescriptions.requestQueryParamDynamic,
+                'url': SchemaProperty.text(
+                  description: SchemaDescriptions.requestUrl,
+                  nullable: false,
+                ),
+                'queryParam': SchemaProperty.objectWithUndefinedProperties(
+                  description: SchemaDescriptions.requestQueryParam,
+                  nullable: false,
+                ),
+                'pathParams': SchemaProperty.array(
+                  description: SchemaDescriptions.requestPathParams,
+                  nullable: false,
+                  items: SchemaProperty.text(nullable: false),
+                ),
+              },
+            ),
+            'fetchSettings': SchemaProperty.structuredObject(
+              description: SchemaDescriptions.fetchSettings,
+              nullable: true,
+              properties: {
+                'url': SchemaProperty.text(
+                  description: SchemaDescriptions.fetchUrl,
+                  nullable: false,
+                ),
+                'extract_rules': SchemaProperty.text(
+                  description: SchemaDescriptions.fetchExtractRules,
+                  nullable: false,
+                ),
+                'js_scenario': SchemaProperty.text(
+                  description: SchemaDescriptions.fetchJsScenario,
+                  nullable: true,
+                ),
+                'render_js': SchemaProperty.boolean(
+                  description: SchemaDescriptions.fetchRenderJs,
+                  nullable: false,
+                ),
+                'wait': SchemaProperty.double(
+                  description: SchemaDescriptions.fetchWait,
+                  nullable: true,
+                ),
+                'wait_for': SchemaProperty.text(
+                  description: SchemaDescriptions.fetchWaitFor,
+                  nullable: true,
+                ),
+                'wait_browser': SchemaProperty.text(
+                  description: SchemaDescriptions.fetchWaitBrowser,
+                  nullable: true,
+                ),
+                'premium_proxy': SchemaProperty.boolean(
+                  description: SchemaDescriptions.fetchPremiumProxy,
+                  nullable: false,
+                ),
+                'country_code': SchemaProperty.text(
+                  description: SchemaDescriptions.fetchCountryCode,
+                  nullable: true,
+                ),
+                'session_id': SchemaProperty.text(
+                  description: SchemaDescriptions.fetchSessionId,
+                  nullable: true,
+                ),
+                'custom_google': SchemaProperty.boolean(
+                  description: SchemaDescriptions.fetchCustomGoogle,
                   nullable: true,
                 ),
               },
             ),
-            'pathParams': SchemaProperty.array(
-              description: SchemaDescriptions.requestPathParams,
-              nullable: false,
-              items: SchemaProperty.string(nullable: false),
-            ),
           },
-        ),
-        'fetchSettings': SchemaProperty.object(
-          description: SchemaDescriptions.fetchSettings,
-          nullable: true,
-          properties: {
-            'url': SchemaProperty.string(
-              description: SchemaDescriptions.fetchUrl,
-              nullable: false,
-            ),
-            'extract_rules': SchemaProperty.string(
-              description: SchemaDescriptions.fetchExtractRules,
-              nullable: false,
-            ),
-            'js_scenario': SchemaProperty.string(
-              description: SchemaDescriptions.fetchJsScenario,
-              nullable: true,
-            ),
-            'render_js': SchemaProperty.boolean(
-              description: SchemaDescriptions.fetchRenderJs,
-              nullable: false,
-            ),
-            'wait': SchemaProperty.number(
-              description: SchemaDescriptions.fetchWait,
-              nullable: true,
-            ),
-            'wait_for': SchemaProperty.string(
-              description: SchemaDescriptions.fetchWaitFor,
-              nullable: true,
-            ),
-            'wait_browser': SchemaProperty.string(
-              description: SchemaDescriptions.fetchWaitBrowser,
-              nullable: true,
-            ),
-            'premium_proxy': SchemaProperty.boolean(
-              description: SchemaDescriptions.fetchPremiumProxy,
-              nullable: false,
-            ),
-            'country_code': SchemaProperty.string(
-              description: SchemaDescriptions.fetchCountryCode,
-              nullable: true,
-            ),
-            'session_id': SchemaProperty.string(
-              description: SchemaDescriptions.fetchSessionId,
-              nullable: true,
-            ),
-            'custom_google': SchemaProperty.boolean(
-              description: SchemaDescriptions.fetchCustomGoogle,
-              nullable: true,
-            ),
-          },
-        ),
-      },
-      description: SchemaDescriptions.overallDescription,
-    );
+        )
+        as SchemaObject;
   }
 }

@@ -1,7 +1,8 @@
 import 'dart:io';
+
 import 'package:codex_cli_sdk/codex_cli_sdk.dart';
 
-void main() async {
+Future<void> main() async {
   final apiKey = Platform.environment['OPENAI_API_KEY'] ?? '';
 
   if (apiKey.isEmpty) {
@@ -9,12 +10,11 @@ void main() async {
     exit(1);
   }
 
-  final codexSDK = Codex(apiKey);
+  final codexSDK = Codex(apiKey: apiKey);
 
   try {
     print('=== MCP Server Management Example ===\n');
 
-    // Check current MCP installation status
     print('Checking MCP installation...');
     final mcpInfo = await codexSDK.isMcpInstalled();
     print('MCP Support Enabled: ${mcpInfo.hasMcpSupport}');
@@ -33,9 +33,8 @@ void main() async {
       }
     }
 
-    // List all available popular servers
     print('\n--- Available Popular MCP Servers ---');
-    final popularServers = [
+    const popularServers = [
       'filesystem',
       'github',
       'postgres',
@@ -45,14 +44,12 @@ void main() async {
       'slack',
       'google-drive',
     ];
-
     for (final server in popularServers) {
       print('  - $server');
     }
 
-    // Example: Install filesystem MCP server
     print('\n--- Installing Filesystem MCP Server ---');
-    print('Would you like to install the filesystem MCP server? (y/n)');
+    stdout.write('Install the filesystem MCP server? (y/n) ');
     final input = stdin.readLineSync();
 
     if (input?.toLowerCase() == 'y') {
@@ -64,10 +61,7 @@ void main() async {
       }
     }
 
-    // Example: Add a custom MCP server
     print('\n--- Adding Custom MCP Server ---');
-    print('Adding a custom example MCP server...');
-
     final customServer = McpServer(
       name: 'my-custom-tool',
       command: 'node',
@@ -88,20 +82,18 @@ void main() async {
       print('Failed to add custom server: $e');
     }
 
-    // Example: Add an npm package as MCP server
     print('\n--- Adding NPM Package as MCP Server ---');
-    print('Adding an example npm MCP server...');
-
     try {
       await codexSDK.addMcpServer(
         'example-npm-server',
-        packageName: '@example/mcp-server',
-        options: McpAddOptions(
+        customServer: McpServer(
+          name: 'example-npm-server',
+          command: 'npx',
+          args: ['-y', '@example/mcp-server'],
+        ),
+        options: const McpAddOptions(
           scope: McpScope.user,
           useNpx: true,
-          environment: {
-            'CONFIG_PATH': '/path/to/config.json',
-          },
         ),
       );
       print('✓ NPM MCP server added successfully!');
@@ -109,20 +101,16 @@ void main() async {
       print('Note: Example npm package may not exist: $e');
     }
 
-    // List all servers after modifications
     print('\n--- Updated MCP Server List ---');
     final updatedServers = await codexSDK.listMcpServers();
-
     if (updatedServers.isEmpty) {
       print('No MCP servers configured');
     } else {
-      print('Configured servers:');
       for (final server in updatedServers) {
         print('  - ${server.name}');
       }
     }
 
-    // Get details about a specific server
     if (updatedServers.isNotEmpty) {
       final firstServer = updatedServers.first;
       print('\n--- Server Details: ${firstServer.name} ---');
@@ -131,7 +119,6 @@ void main() async {
         print('Name: ${details.name}');
         print('Command: ${details.command}');
         print('Arguments: ${details.args.join(' ')}');
-        print('Type: ${details.type}');
         if (details.env != null && details.env!.isNotEmpty) {
           print('Environment:');
           details.env!.forEach((key, value) {
@@ -141,9 +128,8 @@ void main() async {
       }
     }
 
-    // Example: Remove a server
     print('\n--- Removing Example Server ---');
-    print('Would you like to remove the example custom server? (y/n)');
+    stdout.write('Remove the example custom server? (y/n) ');
     final removeInput = stdin.readLineSync();
 
     if (removeInput?.toLowerCase() == 'y') {
@@ -155,27 +141,20 @@ void main() async {
       }
     }
 
-    // Using MCP servers in a chat session
     print('\n--- Using MCP in Chat Session ---');
     final chat = codexSDK.createNewChat(
-      options: CodexChatOptions(
-        enableMcp: true,
-      ),
+      options: const CodexChatOptions(enableMcp: true),
     );
 
     try {
-      print('\nIf filesystem MCP is installed, you can now use file operations.');
-      print('Example message: "List all files in the current directory"');
-
-      // Only run if we have MCP servers configured
       if (mcpInfo.servers.isNotEmpty || updatedServers.isNotEmpty) {
         final response = await chat.sendMessage([
-          CodexSdkContent.text(
-            'What MCP tools are available to you right now?',
-          ),
+          PromptContent.text('What MCP tools are available to you right now?'),
         ]);
         print('\nCodex response about available MCP tools:');
         print(response);
+      } else {
+        print('No MCP servers configured, skipping chat demonstration.');
       }
     } finally {
       await chat.dispose();

@@ -16,6 +16,8 @@ dependencies:
     path: ../gemini_cli_sdk
   codex_cli_sdk:
     path: ../codex_cli_sdk
+  programming_cli_core_sdk:
+    path: ../programming_cli_core_sdk
   http: ^1.2.0
   dio: ^5.4.0
   dart_mcp: ^0.3.3
