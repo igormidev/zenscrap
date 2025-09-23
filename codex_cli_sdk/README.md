@@ -579,6 +579,7 @@ await codexSDK.dispose(); // Disposes all active sessions
 - `addMcpServer(name, {packageName, customServer, options})` - Adds an MCP server
 - `getMcpServerDetails(name)` - Gets details about a specific server
 - `removeMcpServer(name)` - Removes an MCP server
+- `exportApiKeyToEnvironment()` - Runs a shell command to export `OPENAI_API_KEY`
 - `dispose()` - Disposes all active chat sessions
 
 ### CodexChat Class
@@ -603,6 +604,24 @@ You can also set your API key as an environment variable:
 
 ```bash
 export OPENAI_API_KEY="your-api-key-here"
+```
+
+If you're automating setup, the SDK can generate this command for you:
+
+```dart
+final codexSDK = Codex(apiKey: 'YOUR_API_KEY');
+await codexSDK.exportApiKeyToEnvironment();
+// Executes `export OPENAI_API_KEY="YOUR_API_KEY"` (Unix)
+// or `setx OPENAI_API_KEY "YOUR_API_KEY"` (Windows)
+```
+
+On Unix-like systems the export only affects the spawned shell; capture the
+printed command if you need to apply it to your current session.
+
+After exporting, authenticate Codex:
+
+```bash
+codex login --api-key "$OPENAI_API_KEY"
 ```
 
 Then use it in your code:

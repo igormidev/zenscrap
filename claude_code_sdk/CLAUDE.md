@@ -1,5 +1,10 @@
 # Claude Code SDK for Dart - Developer Documentation
 
+> **Note:** Starting in v4.0.0 this package is built on top of
+> `programming_cli_core_sdk`. Use `PromptContent` for message payloads,
+> `SchemaDefinition`/`SchemaProperty` for schemas, and handle errors via
+> `CliException`.
+
 ## Project Overview
 
 This package provides a Dart SDK for interacting with Claude Code, enabling developers to integrate AI-powered coding assistance into their Dart and Flutter applications. The SDK wraps the Claude Code CLI tool and provides a clean, idiomatic Dart API.
@@ -21,9 +26,9 @@ This package provides a Dart SDK for interacting with Claude Code, enabling deve
    - Implements schema-based messaging
 
 3. **Models**
-   - `ClaudeSdkContent`: Abstract class for message content
+   - `PromptContent`: Abstract class for message content
    - `TextContent` & `FileContent`: Concrete content implementations
-   - `SchemaObject` & `SchemaProperty`: JSON schema builders
+   - `SchemaDefinition` & `SchemaProperty`: JSON schema builders
    - `({String llmMessage, Map<String, dynamic> structuredSchemaData})`: Structured response record returned by `sendMessageWithSchema()`
    - `ClaudeChatOptions`: Configuration for chat sessions
    - `McpServer` & `McpConfig`: MCP server management models
@@ -147,7 +152,7 @@ Files are passed to Claude by:
 ### Schema Implementation
 
 Schema-based messaging:
-1. Converts `SchemaObject` to JSON
+1. Converts `SchemaDefinition` to JSON
 2. Includes schema in prompt with instructions
 3. Parses structured response from JSON output
 4. Returns a record with `llmMessage` and `structuredSchemaData` once parsing succeeds
@@ -183,7 +188,7 @@ void main() {
     });
 
     test('should build correct schema JSON', () {
-      final schema = SchemaObject(
+      final schema = SchemaDefinition(
         properties: {
           'name': SchemaProperty.string(),
         },
@@ -199,7 +204,7 @@ void main() {
 
 ## Common Issues and Solutions
 
-### Issue: CLINotFoundException
+### Issue: CliException
 **Solution**: Ensure Claude Code CLI is installed:
 ```bash
 npm install -g @anthropic-ai/claude-code

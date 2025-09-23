@@ -67,81 +67,44 @@ void main() {
     });
 
     test('should serialize McpConfig to JSON', () {
-      final server1 = McpServer(
-        name: 'server1',
-        command: 'cmd1',
-        args: ['arg1'],
-      );
-
-      final server2 = McpServer(
-        name: 'server2',
-        command: 'cmd2',
-        args: ['arg2'],
-      );
-
       final config = McpConfig()
-          .addServer(server1)
-          .addServer(server2);
+          .addServer(McpServer(name: 's1', command: 'cmd1', args: []))
+          .addServer(McpServer(name: 's2', command: 'cmd2', args: []));
 
       final json = config.toJson();
-      expect(json['mcpServers'], isA<Map>());
-      expect(json['mcpServers']['server1'], isA<Map>());
-      expect(json['mcpServers']['server2'], isA<Map>());
-    });
-
-    test('should access popular MCP servers', () {
-      final servers = PopularMcpServers.availableServers;
-      expect(servers, contains('filesystem'));
-      expect(servers, contains('github'));
-      expect(servers, contains('postgres'));
-
-      final fsServer = PopularMcpServers.getServer('filesystem');
-      expect(fsServer, isNotNull);
-      expect(fsServer!.name, equals('filesystem'));
-      expect(fsServer.command, equals('npx'));
+      expect(json['mcp_servers'], isA<Map>());
+      expect((json['mcp_servers'] as Map).keys, containsAll(['s1', 's2']));
     });
 
     test('should create McpInstallationInfo', () {
-      final servers = [
-        McpServer(name: 'test1', command: 'cmd', args: []),
-        McpServer(name: 'test2', command: 'cmd', args: []),
-      ];
-
       final info = McpInstallationInfo(
-        isClaudeInstalled: true,
-        claudeVersion: '1.0.0',
-        servers: servers,
         hasMcpSupport: true,
+        servers: const [],
         configPath: '/home/.claude/.claude.json',
+        mcpVersion: '1.0.0',
       );
 
-      expect(info.isClaudeInstalled, isTrue);
-      expect(info.claudeVersion, equals('1.0.0'));
-      expect(info.servers.length, equals(2));
       expect(info.hasMcpSupport, isTrue);
+      expect(info.configPath, equals('/home/.claude/.claude.json'));
+      expect(info.mcpVersion, equals('1.0.0'));
 
-      final map = info.toMap();
-      expect(map['claude_installed'], isTrue);
-      expect(map['claude_version'], equals('1.0.0'));
-      expect(map['server_count'], equals(2));
+      final notInstalled = McpInstallationInfo.notInstalled();
+      expect(notInstalled.hasMcpSupport, isFalse);
+      expect(notInstalled.servers, isEmpty);
     });
 
     test('should handle McpAddOptions', () {
-      final options = McpAddOptions(
+      const options = McpAddOptions(
         scope: McpScope.user,
         useNpx: true,
-        npxAutoYes: true,
         environment: {'KEY': 'value'},
-        additionalArgs: ['--flag'],
-        windowsCmdWrapper: false,
+        force: true,
       );
 
       expect(options.scope, equals(McpScope.user));
       expect(options.useNpx, isTrue);
-      expect(options.npxAutoYes, isTrue);
       expect(options.environment, equals({'KEY': 'value'}));
-      expect(options.additionalArgs, equals(['--flag']));
-      expect(options.windowsCmdWrapper, isFalse);
+      expect(options.force, isTrue);
     });
   });
 }

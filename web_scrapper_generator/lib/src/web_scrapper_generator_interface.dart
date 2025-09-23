@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:gemini_cli_sdk/gemini_cli_sdk.dart' as gemini_sdk;
-import 'package:claude_code_sdk/claude_code_sdk.dart' as claude_sdk;
 import 'package:web_scrapper_generator/src/schema_constants.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_response.dart';
 import 'package:web_scrapper_generator/src/puppeteer_setup.dart'
@@ -132,107 +131,6 @@ abstract class WebScrapperGeneratorController<TModel> {
               nullable: true,
             ),
             'custom_google': gemini_sdk.SchemaProperty.boolean(
-              description: SchemaDescriptions.fetchCustomGoogle,
-              nullable: true,
-            ),
-          },
-        ),
-      },
-      description: SchemaDescriptions.overallDescription,
-    );
-  }
-
-  /// Build the response schema for Claude
-  claude_sdk.SchemaObject buildClaudeResponseSchema() {
-    return claude_sdk.SchemaObject(
-      properties: {
-        'responseType': claude_sdk.SchemaProperty.string(
-          description: SchemaDescriptions.responseType,
-          nullable: false,
-          enumValues: SchemaDescriptions.responseTypeValues,
-        ),
-        'message': claude_sdk.SchemaProperty.string(
-          description: SchemaDescriptions.message,
-          nullable: true,
-        ),
-        'errorMessage': claude_sdk.SchemaProperty.string(
-          description: SchemaDescriptions.errorMessage,
-          nullable: true,
-        ),
-        'resumeActionMessage': claude_sdk.SchemaProperty.string(
-          description: SchemaDescriptions.resumeActionMessage,
-          nullable: true,
-        ),
-        'request': claude_sdk.SchemaProperty.object(
-          description: SchemaDescriptions.request,
-          nullable: true,
-          properties: {
-            'url': claude_sdk.SchemaProperty.string(
-              description: SchemaDescriptions.requestUrl,
-              nullable: false,
-            ),
-            'queryParam': claude_sdk.SchemaProperty.object(
-              description: SchemaDescriptions.requestQueryParam,
-              nullable: false,
-              properties: {
-                '__dynamic__': claude_sdk.SchemaProperty.string(
-                  description: SchemaDescriptions.requestQueryParamDynamic,
-                  nullable: true,
-                ),
-              },
-            ),
-            'pathParams': claude_sdk.SchemaProperty.array(
-              description: SchemaDescriptions.requestPathParams,
-              nullable: false,
-              items: claude_sdk.SchemaProperty.string(nullable: false),
-            ),
-          },
-        ),
-        'fetchSettings': claude_sdk.SchemaProperty.object(
-          description: SchemaDescriptions.fetchSettings,
-          nullable: true,
-          properties: {
-            'url': claude_sdk.SchemaProperty.string(
-              description: SchemaDescriptions.fetchUrl,
-              nullable: false,
-            ),
-            'extract_rules': claude_sdk.SchemaProperty.string(
-              description: SchemaDescriptions.fetchExtractRules,
-              nullable: false,
-            ),
-            'js_scenario': claude_sdk.SchemaProperty.string(
-              description: SchemaDescriptions.fetchJsScenario,
-              nullable: true,
-            ),
-            'render_js': claude_sdk.SchemaProperty.boolean(
-              description: SchemaDescriptions.fetchRenderJs,
-              nullable: false,
-            ),
-            'wait': claude_sdk.SchemaProperty.number(
-              description: SchemaDescriptions.fetchWait,
-              nullable: true,
-            ),
-            'wait_for': claude_sdk.SchemaProperty.string(
-              description: SchemaDescriptions.fetchWaitFor,
-              nullable: true,
-            ),
-            'wait_browser': claude_sdk.SchemaProperty.string(
-              description: SchemaDescriptions.fetchWaitBrowser,
-              nullable: true,
-            ),
-            'premium_proxy': claude_sdk.SchemaProperty.boolean(
-              description: SchemaDescriptions.fetchPremiumProxy,
-              nullable: false,
-            ),
-            'country_code': claude_sdk.SchemaProperty.string(
-              description: SchemaDescriptions.fetchCountryCode,
-              nullable: true,
-            ),
-            'session_id': claude_sdk.SchemaProperty.string(
-              description: SchemaDescriptions.fetchSessionId,
-              nullable: true,
-            ),
-            'custom_google': claude_sdk.SchemaProperty.boolean(
               description: SchemaDescriptions.fetchCustomGoogle,
               nullable: true,
             ),

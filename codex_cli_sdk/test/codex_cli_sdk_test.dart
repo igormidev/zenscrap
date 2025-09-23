@@ -13,6 +13,11 @@ void main() {
       expect(chat, isA<CodexChat>());
       expect(chat.didSendFirstMessage, isFalse);
     });
+
+    test('exportApiKeyToEnvironment runs without throwing', () async {
+      final sdk = Codex(apiKey: 'secret');
+      await sdk.exportApiKeyToEnvironment();
+    });
   });
 
   group('CodexChatOptions', () {

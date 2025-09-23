@@ -1,192 +1,21 @@
+# Changelog
+
+## 4.0.0
+
+### Breaking Changes
+- Migrated the SDK onto the shared `programming_cli_core_sdk` abstractions.
+- Replaced `ClaudeSdkContent`, schema, and exception classes with the shared `PromptContent`, `SchemaDefinition`, and `CliException` types.
+- `ClaudeChat` now extends `CliChatInterface`; structured-schema flows and temporary file management are handled by the core package.
+- Restructured the library exports and file layout under `lib/src/`.
+
+### Added
+- Streaming support now routes through the shared core infrastructure while decoding Claude's JSON stream events.
+- `Claude.exportApiKeyToEnvironment()` helper to surface the API key to `ANTHROPIC_API_KEY` via shell command.
+
+### Removed
+- Custom content and exception classes in favour of the shared implementations.
+- Legacy tests that depended on the previous bespoke abstractions.
+
 ## 3.1.0
 
-### Breaking Changes
-- `ClaudeSdkContent.bytes()` now requires a `fileName` parameter for proper file identification
-- Files passed via `ClaudeSdkContent.file()` are now cloned to the working directory to ensure CLI access
-- Temporary files are automatically cleaned up in `dispose()` method
-
-### Added
-- **File Management Improvements**:
-  - Automatic file cloning to working directory for CLI accessibility
-  - Unique file naming using nanoid2 to prevent conflicts
-  - Guaranteed cleanup of temporary files in dispose()
-- **New Parameters**:
-  - `fileName` parameter (required) for `ClaudeSdkContent.bytes()`
-  - `fileDescription` parameter (optional) for both `bytes()` and `file()` methods
-- **CLI-specific formatting**: Added `toCliString()` method for proper file references
-
-### Fixed
-- CLI tools can now access files from any location by cloning them to the working directory
-- Prevents file access errors when files are outside the CLI's scope
-- Ensures consistent file handling across different operating systems
-
-## 3.0.0
-
-### Breaking
-- `sendMessageWithSchema()` now returns a record `({String llmMessage, Map<String, dynamic> structuredSchemaData})`
-- Structured responses are persisted to a temporary JSON file with validation and automatic retries
-
-### Added
-- `streamResponseWithSchema()` API for streaming Claude output while structured data is produced
-- Schema validation with detailed feedback when non-nullable fields are missing or types mismatch
-
-### Improved
-- Temporary schema files are always cleaned up even when requests fail
-- Streaming pipeline now surfaces partial `content_block_delta` updates
-
-## 2.1.0
-
-### New Features
-- **Auto-Update Functionality**: Added `updateToNewestVersionIfNeeded()` method
-  - Automatically checks for CLI updates
-  - Compares installed version with latest npm version
-  - Updates to newest version if available
-  - Also updates Python SDK if installed
-  - Falls back to reinstall if update fails
-
-### Improvements
-- Better version management for Claude Code CLI
-- Automatic handling of outdated installations
-- Improved error handling during updates
-
-## 2.0.0
-
-### Breaking Changes
-- **Default Model Changed**: Claude Sonnet 4 (`claude-sonnet-4-20250514`) is now the default model
-  - Previous default was Claude 3.5 Sonnet
-  - Sonnet 4 offers significantly better performance and capabilities
-  - To use the old default, explicitly specify `model: 'claude-3-5-sonnet-20241022'`
-
-### New Features
-- **Claude 4 Models Support**: Added support for the latest Claude 4 family
-  - Claude Sonnet 4 (`claude-sonnet-4-20250514`) - Balanced performance, now the default
-  - Claude Opus 4 (`claude-opus-4-20250514`) - Most powerful for complex tasks
-  - Claude Opus 4.1 (`claude-opus-4-1-20250805`) - Latest incremental update
-
-- **Claude 3.7 Support**: Added Claude 3.7 Sonnet
-  - `claude-3-7-sonnet-20250219` - Hybrid reasoning model with step-by-step thinking
-
-### Model Updates
-- All latest model IDs verified from official Anthropic documentation
-- Models use exact API identifiers (e.g., `claude-opus-4-1-20250805`)
-- Added comprehensive model documentation in README
-- Legacy Claude 3 models marked as deprecated but still available
-
-### Improvements
-- Better error messages when model is not found
-- Improved model validation and error handling
-- Updated documentation with model selection guide
-- Performance improvements with newer models
-
-### Migration Guide
-- If you were using the default model, your code will automatically use Claude Sonnet 4
-- For specific model requirements, update your model strings:
-  - `claude-3.5-sonnet` → `claude-3-5-sonnet-20241022`
-  - `claude-3.5-haiku` → `claude-3-5-haiku-20241022`
-- Consider upgrading to Claude 4 models for better performance
-
-## 1.3.0
-
-### New Features
-- **Smart Schema Retry Mechanism**: Automatically retries schema parsing with error context when initial parsing fails
-  - First attempt uses normal schema parsing
-  - On failure, sends detailed error feedback to Claude for correction
-  - Provides clear instructions about what went wrong (markdown blocks, mixed content, syntax errors)
-  - Includes the original error and response for context
-  - Significantly improves reliability of schema-based responses
-
-### Improvements
-- **Enhanced JSON Parsing**: Improved `_parseSchemaResponse` method with multiple strategies
-  - Automatically removes markdown code blocks (```)
-  - Tries to parse entire response as JSON first
-  - Falls back to regex extraction for mixed content
-  - Multiple regex patterns for better JSON detection
-  - Handles common formatting issues automatically
-
-- **Better Error Handling**: Enhanced `JSONDecodeException` class
-  - Now includes `rawContent` field for debugging
-  - Truncates long content to prevent token overflow
-  - Provides more detailed error messages
-  - Better toString() implementation with context
-
-### Technical Details
-- Added `_buildRetrySchemaPrompt()` method for intelligent retry prompts
-- Modified `sendMessageWithSchema()` to implement two-attempt strategy
-- Updated exception handling to support new error information
-- Maintains backward compatibility with existing code
-
-## 1.2.0
-
-### New Features
-- **Smart Schema Retry Mechanism**: Automatically retries schema parsing with error context when initial parsing fails
-  - First attempt uses normal schema parsing
-  - On failure, sends detailed error feedback to Claude for correction
-  - Provides clear instructions about what went wrong (markdown blocks, mixed content, syntax errors)
-  - Includes the original error and response for context
-  - Significantly improves reliability of schema-based responses
-
-### Improvements
-- **Enhanced JSON Parsing**: Improved `_parseSchemaResponse` method with multiple strategies
-  - Automatically removes markdown code blocks (```)
-  - Tries to parse entire response as JSON first
-  - Falls back to regex extraction for mixed content
-  - Multiple regex patterns for better JSON detection
-  - Handles common formatting issues automatically
-
-- **Better Error Handling**: Enhanced `JSONDecodeException` class
-  - Now includes `rawContent` field for debugging
-  - Truncates long content to prevent token overflow
-  - Provides more detailed error messages
-  - Better toString() implementation with context
-
-### Technical Details
-- Added `_buildRetrySchemaPrompt()` method for intelligent retry prompts
-- Modified `sendMessageWithSchema()` to implement two-attempt strategy
-- Updated exception handling to support new error information
-- Maintains backward compatibility with existing code
-
-## 1.1.0
-
-- Added comprehensive MCP (Model Context Protocol) support:
-  - New `isMcpInstalled()` method to check MCP installation and list configured servers
-  - `listMcpServers()` to get all configured MCP servers
-  - `addMcpServer()` to add custom or npm-based MCP servers
-  - `removeMcpServer()` to remove MCP servers
-  - `getMcpServerDetails()` to get details about specific servers
-  - `installPopularMcpServer()` for easy installation of popular servers
-  - `getPopularMcpServers()` to list available popular servers
-- New MCP models and types:
-  - `McpServer` - MCP server configuration model
-  - `McpConfig` - MCP configuration management
-  - `McpInstallationInfo` - Installation status information
-  - `McpScope` - Server scope enum (project/user/system)
-  - `McpServerStatus` - Server status enum
-  - `McpAddOptions` - Options for adding servers
-  - `PopularMcpServers` - Pre-configured popular servers
-- Pre-configured popular MCP servers:
-  - filesystem - File system access
-  - github - GitHub integration
-  - postgres - PostgreSQL database
-  - git - Git operations
-  - puppeteer - Web automation
-  - sequential-thinking - Problem solving
-  - slack - Slack integration
-  - google-drive - Google Drive access
-- Added MCP management example in `example/mcp_management.dart`
-- Updated SDK info to include MCP status
-- Full Windows support with cmd wrapper option
-
-## 1.0.0
-
-- Initial release of Claude Code SDK for Dart
-- Core features:
-  - Create and manage chat sessions with Claude
-  - Send text messages and file references
-  - Schema-based structured responses
-  - Real-time streaming of responses
-  - Automatic SDK installation checking
-  - Cross-platform support (Windows, macOS, Linux)
-- Comprehensive error handling with custom exceptions
-- Resource management with proper disposal
-- Full test coverage
-- Complete documentation and examples
+- Historical release notes retained for reference.

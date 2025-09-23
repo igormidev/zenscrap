@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:claude_code_sdk/claude_code_sdk.dart';
 import 'package:gemini_cli_sdk/gemini_cli_sdk.dart' as gemini_sdk;
 import 'package:web_scrapper_generator/src/prompts.dart';
+import 'package:web_scrapper_generator/src/schema_constants.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_generator_interface.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_response.dart';
 import 'package:web_scrapper_generator/src/models/ai_models.dart';
@@ -27,7 +28,7 @@ class WebScrapperClaudeImpl
     );
 
     print('🚀 Initializing Claude SDK for web scraper generator...\n');
-    _claudeSDK = Claude(claudeApiKey);
+    _claudeSDK = Claude(apiKey: claudeApiKey);
 
     // Ensure Claude Code CLI is installed and up to date
     await _claudeSDK.updateToNewestVersionIfNeeded(global: true);
@@ -60,7 +61,6 @@ class WebScrapperClaudeImpl
       options: ClaudeChatOptions(
         systemPrompt: _convertSystemPromptForClaude(),
         model: model.apiName,
-        timeoutMs: 180000, // 3 minutes timeout for Claude
         // MCP servers are configured at SDK level in initClaude
       ),
     );
@@ -80,16 +80,16 @@ class WebScrapperClaudeImpl
   Future<WebScrapperChatAIResponse> sendMessage({
     required String userPrompt,
   }) async {
-    List<ClaudeSdkContent> messages = [];
+    List<PromptContent> messages = [];
 
     // Add initial prompts if this is the first message
-    final isFirstMessage = _chat.sessionId == null;
+    final isFirstMessage = !_chat.didSendFirstMessage;
     if (isFirstMessage) {
       messages.addAll(_convertInitialPromptsForClaude());
     }
 
     // Add the user's prompt
-    messages.add(ClaudeSdkContent.text(userPrompt));
+    messages.add(PromptContent.text(userPrompt));
 
     // Define the response schema for structured output
     final responseSchema = buildClaudeResponseSchema();
@@ -117,16 +117,16 @@ class WebScrapperClaudeImpl
     Future<WebScrapperChatAIResponse> structuredSchemaDataCompleter,
   })
   streamMessage({required String userPrompt}) {
-    List<ClaudeSdkContent> messages = [];
+    List<PromptContent> messages = [];
 
     // Add initial prompts if this is the first message
-    final isFirstMessage = _chat.sessionId == null;
+    final isFirstMessage = !_chat.didSendFirstMessage;
     if (isFirstMessage) {
       messages.addAll(_convertInitialPromptsForClaude());
     }
 
     // Add the user's prompt
-    messages.add(ClaudeSdkContent.text(userPrompt));
+    messages.add(PromptContent.text(userPrompt));
 
     // Define the response schema for structured output
     final responseSchema = buildClaudeResponseSchema();
@@ -206,18 +206,18 @@ Remember: Your goal is to create extraction rules that consistently retrieve the
   }
 
   /// Convert initial prompts from Gemini format to Claude format
-  List<ClaudeSdkContent> _convertInitialPromptsForClaude() {
+  List<PromptContent> _convertInitialPromptsForClaude() {
     final geminiPrompts = handleInitialPrompts(initialPayload);
-    final claudePrompts = <ClaudeSdkContent>[];
+    final claudePrompts = <PromptContent>[];
 
     for (final prompt in geminiPrompts) {
       // GeminiSdkContent is a sealed class, check the type directly
       if (prompt is gemini_sdk.TextContent) {
-        claudePrompts.add(ClaudeSdkContent.text(prompt.text));
+        claudePrompts.add(PromptContent.text(prompt.text));
       } else if (prompt is gemini_sdk.BytesContent) {
         // Claude handles bytes similarly
         claudePrompts.add(
-          ClaudeSdkContent.bytes(
+          PromptContent.bytes(
             data: prompt.data,
             fileName: prompt.fileName,
             fileExtension: prompt.fileExtension,
@@ -226,13 +226,108 @@ Remember: Your goal is to create extraction rules that consistently retrieve the
         );
       } else if (prompt is gemini_sdk.FileContent) {
         // Convert file content to Claude format
-        claudePrompts.add(ClaudeSdkContent.file(
-          prompt.file,
-          fileDescription: prompt.fileDescription,
-        ));
+        claudePrompts.add(
+          PromptContent.file(
+            prompt.file,
+            fileDescription: prompt.fileDescription,
+          ),
+        );
       }
     }
 
     return claudePrompts;
+  }
+
+  SchemaDefinition buildClaudeResponseSchema() {
+    return SchemaDefinition(
+      properties: {
+        'responseType': SchemaProperty.enumeration(
+          enumValues: SchemaDescriptions.responseTypeValues,
+          description: SchemaDescriptions.responseType,
+          nullable: false,
+        ),
+        'message': SchemaProperty.text(
+          description: SchemaDescriptions.message,
+          nullable: true,
+        ),
+        'errorMessage': SchemaProperty.text(
+          description: SchemaDescriptions.errorMessage,
+          nullable: true,
+        ),
+        'resumeActionMessage': SchemaProperty.text(
+          description: SchemaDescriptions.resumeActionMessage,
+          nullable: true,
+        ),
+        'request': SchemaProperty.structuredObject(
+          description: SchemaDescriptions.request,
+          nullable: true,
+          properties: {
+            'url': SchemaProperty.text(
+              description: SchemaDescriptions.requestUrl,
+              nullable: false,
+            ),
+            'queryParam': SchemaProperty.objectWithUndefinedProperties(
+              description: SchemaDescriptions.requestQueryParam,
+              nullable: false,
+            ),
+            'pathParams': SchemaProperty.array(
+              description: SchemaDescriptions.requestPathParams,
+              nullable: false,
+              items: SchemaProperty.text(nullable: false),
+            ),
+          },
+        ),
+        'fetchSettings': SchemaProperty.structuredObject(
+          description: SchemaDescriptions.fetchSettings,
+          nullable: true,
+          properties: {
+            'url': SchemaProperty.text(
+              description: SchemaDescriptions.fetchUrl,
+              nullable: false,
+            ),
+            'extract_rules': SchemaProperty.text(
+              description: SchemaDescriptions.fetchExtractRules,
+              nullable: false,
+            ),
+            'js_scenario': SchemaProperty.text(
+              description: SchemaDescriptions.fetchJsScenario,
+              nullable: true,
+            ),
+            'render_js': SchemaProperty.boolean(
+              description: SchemaDescriptions.fetchRenderJs,
+              nullable: false,
+            ),
+            'wait': SchemaProperty.double(
+              description: SchemaDescriptions.fetchWait,
+              nullable: true,
+            ),
+            'wait_for': SchemaProperty.text(
+              description: SchemaDescriptions.fetchWaitFor,
+              nullable: true,
+            ),
+            'wait_browser': SchemaProperty.text(
+              description: SchemaDescriptions.fetchWaitBrowser,
+              nullable: true,
+            ),
+            'premium_proxy': SchemaProperty.boolean(
+              description: SchemaDescriptions.fetchPremiumProxy,
+              nullable: false,
+            ),
+            'country_code': SchemaProperty.text(
+              description: SchemaDescriptions.fetchCountryCode,
+              nullable: true,
+            ),
+            'session_id': SchemaProperty.text(
+              description: SchemaDescriptions.fetchSessionId,
+              nullable: true,
+            ),
+            'custom_google': SchemaProperty.boolean(
+              description: SchemaDescriptions.fetchCustomGoogle,
+              nullable: true,
+            ),
+          },
+        ),
+      },
+    );
   }
 }

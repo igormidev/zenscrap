@@ -8,6 +8,5 @@ library;
 export 'src/codex.dart';
 export 'src/codex_chat.dart';
 export 'src/codex_chat_options.dart';
-export 'src/mcp_models.dart';
 
 export 'package:programming_cli_core_sdk/programming_cli_core_sdk.dart';

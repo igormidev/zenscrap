@@ -1,814 +1,410 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:path/path.dart' as path;
+import 'package:programming_cli_core_sdk/programming_cli_core_sdk.dart';
 
 import 'claude_chat.dart';
-import 'exceptions/claude_exceptions.dart';
-import 'models/chat_options.dart';
-import 'models/mcp_models.dart';
+import 'claude_chat_options.dart';
 
-/// Main Claude SDK class for interacting with Claude Code
-class Claude {
-  /// The API key for authenticating with Claude
-  final String apiKey;
+class Claude extends CodingCliInterface<ClaudeChat, ClaudeChatOptions> {
+  Claude({required super.apiKey});
 
-  /// List of active chat sessions for cleanup
-  final List<ClaudeChat> _activeSessions = [];
-
-  /// Creates a new Claude SDK instance
-  Claude(this.apiKey) {
-    if (apiKey.isEmpty) {
-      throw ClaudeSDKException('API key cannot be empty');
-    }
-  }
-
-  /// Creates a new chat session with Claude
+  @override
   ClaudeChat createNewChat({ClaudeChatOptions? options}) {
-    final chat = ClaudeChat(
-      apiKey: apiKey,
-      options: options,
-    );
-    _activeSessions.add(chat);
+    final chat = ClaudeChat(apiKey: apiKey, options: options);
+    activeSessions.add(chat);
     return chat;
   }
 
-  /// Checks if Claude Code SDK is installed
-  Future<bool> isClaudeCodeSDKInstalled() async {
-    try {
-      // Try claude first (the actual command that works)
-      final result = await Process.run(
-        _getShellCommand(),
-        _getShellArgs('claude --version'),
-      );
-      
-      if (result.exitCode == 0) {
-        return true;
+  @override
+  Future<bool> isCodexCLIInstalled() async => isClaudeCLIInstalled();
+
+  Future<bool> isClaudeCLIInstalled() async {
+    final commands = ['claude --version', 'claude-code --version'];
+    for (final command in commands) {
+      try {
+        final result = await Process.run(
+          _shellCommand,
+          _shellArgs(command),
+        );
+        if (result.exitCode == 0) {
+          return true;
+        }
+      } catch (_) {
+        continue;
       }
-      
-      // Fallback to claude-code if claude doesn't work
-      final result2 = await Process.run(
-        _getShellCommand(),
-        _getShellArgs('claude-code --version'),
-      );
-      
-      return result2.exitCode == 0;
-    } catch (e) {
-      // If we can't run the command, assume it's not installed
-      return false;
     }
+    return false;
   }
 
-  /// Installs the Claude Code SDK using npm
-  Future<void> installClaudeCodeSDK({bool global = true}) async {
-    // Check if npm is installed first
-    final npmInstalled = await _isNpmInstalled();
-    if (!npmInstalled) {
-      throw ClaudeSDKException(
-        'npm is not installed. Please install Node.js and npm first.\n'
-        'Visit https://nodejs.org/ to download and install Node.js.',
+  @override
+  Future<void> installCodexCLI({bool global = true}) async =>
+      installClaudeCLI(global: global);
+
+  Future<void> installClaudeCLI({bool global = true}) async {
+    if (!await _isNpmInstalled()) {
+      throw CliException(
+        'npm is not installed. Install Node.js (https://nodejs.org/) to continue.',
       );
     }
 
-    print('Installing Claude Code SDK...');
-
-    final command = global
+    final installCommand = global
         ? 'npm install -g @anthropic-ai/claude-code'
         : 'npm install @anthropic-ai/claude-code';
 
-    try {
-      final process = await Process.start(
-        _getShellCommand(),
-        _getShellArgs(command),
-      );
+    final process = await Process.start(
+      _shellCommand,
+      _shellArgs(installCommand),
+      mode: ProcessStartMode.inheritStdio,
+    );
 
-      // Stream output to console
-      process.stdout.listen((data) {
-        stdout.write(String.fromCharCodes(data));
-      });
-
-      process.stderr.listen((data) {
-        stderr.write(String.fromCharCodes(data));
-      });
-
-      final exitCode = await process.exitCode;
-
-      if (exitCode != 0) {
-        throw ProcessException(
-          'Failed to install Claude Code SDK',
-          exitCode: exitCode,
-        );
-      }
-
-      print('\nClaude Code SDK installed successfully!');
-
-      // Also check if Python SDK needs to be installed
-      await _checkAndInstallPythonSDK();
-    } catch (e) {
-      throw ProcessException(
-        'Failed to install Claude Code SDK: ${e.toString()}',
-        originalError: e,
-      );
+    final exitCode = await process.exitCode;
+    if (exitCode != 0) {
+      throw CliException(
+          'Failed to install Claude Code CLI (exit code $exitCode).');
     }
   }
 
-  /// Updates the Claude Code SDK to the newest version if needed
+  @override
   Future<void> updateToNewestVersionIfNeeded({bool global = true}) async {
-    // First check if CLI is installed
-    final isInstalled = await isClaudeCodeSDKInstalled();
-    if (!isInstalled) {
-      print('Claude Code SDK is not installed. Installing...');
-      await installClaudeCodeSDK(global: global);
+    if (!await isClaudeCLIInstalled()) {
+      await installClaudeCLI(global: global);
       return;
     }
 
-    // Check if npm is installed
-    final npmInstalled = await _isNpmInstalled();
-    if (!npmInstalled) {
-      throw ClaudeSDKException(
-        'npm is not installed. Please install Node.js and npm first.\n'
-        'Visit https://nodejs.org/ to download and install Node.js.',
+    if (!await _isNpmInstalled()) {
+      throw CliException(
+        'npm is not installed. Install Node.js (https://nodejs.org/) to continue.',
       );
     }
 
     try {
-      // Get current installed version
-      final currentVersionResult = await Process.run(
-        _getShellCommand(),
-        _getShellArgs('claude --version'),
-      );
+      final current = await _resolveInstalledVersion();
+      final latest = await _resolveLatestVersion();
 
-      String currentVersion = '';
-      if (currentVersionResult.exitCode == 0) {
-        // Extract version number from output (e.g., "1.2.3" from "claude-code 1.2.3")
-        final output = currentVersionResult.stdout.toString().trim();
-        final versionMatch = RegExp(r'(\d+\.\d+\.\d+)').firstMatch(output);
-        if (versionMatch != null) {
-          currentVersion = versionMatch.group(1) ?? '';
-        }
-      }
-
-      // Get latest available version from npm
-      final latestVersionResult = await Process.run(
-        _getShellCommand(),
-        _getShellArgs('npm view @anthropic-ai/claude-code version'),
-      );
-
-      if (latestVersionResult.exitCode != 0) {
-        print('Failed to check for updates.');
-        return;
-      }
-
-      final latestVersion = latestVersionResult.stdout.toString().trim();
-
-      if (currentVersion.isEmpty) {
-        print('Could not determine current version. Reinstalling...');
-        await installClaudeCodeSDK(global: global);
-        return;
-      }
-
-      // Compare versions
-      if (_isNewerVersion(currentVersion, latestVersion)) {
-        print('Updating Claude Code SDK from v$currentVersion to v$latestVersion...');
-
-        final updateCommand = global
+      if (current == null ||
+          latest == null ||
+          _isNewerVersion(current, latest)) {
+        final command = global
             ? 'npm update -g @anthropic-ai/claude-code'
             : 'npm update @anthropic-ai/claude-code';
 
         final process = await Process.start(
-          _getShellCommand(),
-          _getShellArgs(updateCommand),
+          _shellCommand,
+          _shellArgs(command),
+          mode: ProcessStartMode.inheritStdio,
         );
 
-        // Stream output to console
-        process.stdout.listen((data) {
-          stdout.write(String.fromCharCodes(data));
-        });
-
-        process.stderr.listen((data) {
-          stderr.write(String.fromCharCodes(data));
-        });
-
         final exitCode = await process.exitCode;
-
         if (exitCode != 0) {
-          print('Update failed. Attempting reinstall...');
-          await installClaudeCodeSDK(global: global);
-        } else {
-          print('\nClaude Code SDK updated successfully to v$latestVersion!');
-
-          // Also update Python SDK if needed
-          await _updatePythonSDKIfNeeded();
+          await installClaudeCLI(global: global);
         }
-      } else {
-        print('Claude Code SDK is up to date (v$currentVersion).');
       }
-    } catch (e) {
-      print('Error checking for updates: $e');
-      print('You can manually update with: npm update -g @anthropic-ai/claude-code');
+    } catch (_) {
+      // If anything fails, fall back to reinstall.
+      await installClaudeCLI(global: global);
     }
   }
 
-  /// Helper method to compare version strings
-  bool _isNewerVersion(String current, String latest) {
-    try {
-      final currentParts = current.split('.').map(int.parse).toList();
-      final latestParts = latest.split('.').map(int.parse).toList();
-
-      for (int i = 0; i < 3; i++) {
-        final currentPart = i < currentParts.length ? currentParts[i] : 0;
-        final latestPart = i < latestParts.length ? latestParts[i] : 0;
-
-        if (latestPart > currentPart) return true;
-        if (latestPart < currentPart) return false;
-      }
-
-      return false;
-    } catch (e) {
-      // If version parsing fails, assume update is needed
-      return true;
-    }
-  }
-
-  /// Updates Python SDK if a newer version is available
-  Future<void> _updatePythonSDKIfNeeded() async {
-    try {
-      final pipInstalled = await _isPipInstalled();
-      if (!pipInstalled) {
-        return;
-      }
-
-      final pythonSdkInstalled = await _isPythonSDKInstalled();
-      if (!pythonSdkInstalled) {
-        return;
-      }
-
-      print('Checking Python SDK for updates...');
-
-      final result = await Process.run(
-        _getShellCommand(),
-        _getShellArgs('pip install --upgrade claude-code-sdk'),
-      );
-
-      if (result.exitCode == 0) {
-        print('Python SDK updated successfully.');
-      }
-    } catch (e) {
-      print('Could not update Python SDK: $e');
-    }
-  }
-
-  /// Checks and installs Python SDK if needed
-  Future<void> _checkAndInstallPythonSDK() async {
-    print('\nChecking Python SDK...');
-
-    // Check if pip is available
-    final pipInstalled = await _isPipInstalled();
-    if (!pipInstalled) {
-      print('pip is not installed. Python SDK installation skipped.');
-      print(
-          'To use all features, install Python and pip, then run: pip install claude-code-sdk');
-      return;
-    }
-
-    // Check if claude-code-sdk is already installed
-    final pythonSdkInstalled = await _isPythonSDKInstalled();
-    if (pythonSdkInstalled) {
-      print('Python SDK is already installed.');
-      return;
-    }
-
-    print('Installing Python SDK...');
-
-    try {
-      final process = await Process.start(
-        _getShellCommand(),
-        _getShellArgs('pip install claude-code-sdk'),
-      );
-
-      process.stdout.listen((data) {
-        stdout.write(String.fromCharCodes(data));
-      });
-
-      process.stderr.listen((data) {
-        stderr.write(String.fromCharCodes(data));
-      });
-
-      final exitCode = await process.exitCode;
-
-      if (exitCode != 0) {
-        print('Warning: Failed to install Python SDK.');
-        print(
-            'You can manually install it later with: pip install claude-code-sdk');
-      } else {
-        print('Python SDK installed successfully!');
-      }
-    } catch (e) {
-      print('Warning: Failed to install Python SDK: $e');
-      print(
-          'You can manually install it later with: pip install claude-code-sdk');
-    }
-  }
-
-  /// Checks if npm is installed
-  Future<bool> _isNpmInstalled() async {
-    try {
-      final result = await Process.run(
-        _getShellCommand(),
-        _getShellArgs('npm --version'),
-      );
-      return result.exitCode == 0;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  /// Checks if pip is installed
-  Future<bool> _isPipInstalled() async {
-    try {
-      final result = await Process.run(
-        _getShellCommand(),
-        _getShellArgs('pip --version'),
-      );
-      return result.exitCode == 0;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  /// Checks if Python SDK is installed
-  Future<bool> _isPythonSDKInstalled() async {
-    try {
-      final result = await Process.run(
-        _getShellCommand(),
-        _getShellArgs('pip show claude-code-sdk'),
-      );
-      return result.exitCode == 0;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  /// Gets the appropriate shell command for the platform
-  String _getShellCommand() {
-    return Platform.isWindows ? 'cmd' : 'sh';
-  }
-
-  /// Gets the appropriate shell arguments for the platform
-  List<String> _getShellArgs(String command) {
-    if (Platform.isWindows) {
-      return ['/c', command];
-    } else {
-      return ['-c', command];
-    }
-  }
-
-  /// Disposes all active chat sessions
-  Future<void> dispose() async {
-    for (final session in _activeSessions) {
-      if (!session.isDisposed) {
-        await session.dispose();
-      }
-    }
-    _activeSessions.clear();
-  }
-
-  /// Gets information about the Claude Code SDK installation
+  @override
   Future<Map<String, dynamic>> getSDKInfo() async {
     final info = <String, dynamic>{};
 
-    // Check Claude Code CLI
-    info['claude_cli_installed'] = await isClaudeCodeSDKInstalled();
+    info['claudeCLIInstalled'] = await isClaudeCLIInstalled();
+    if (info['claudeCLIInstalled'] == true) {
+      info['claudeVersion'] = await _resolveInstalledVersion();
+    }
 
-    if (info['claude_cli_installed'] == true) {
+    info['npmInstalled'] = await _isNpmInstalled();
+    if (info['npmInstalled'] == true) {
       try {
-        final versionResult = await Process.run(
-          _getShellCommand(),
-          _getShellArgs('claude --version'),
+        final result = await Process.run(
+          _shellCommand,
+          _shellArgs('npm --version'),
         );
-        if (versionResult.exitCode == 0) {
-          info['claude_cli_version'] = versionResult.stdout.toString().trim();
+        if (result.exitCode == 0) {
+          info['npmVersion'] = result.stdout.toString().trim();
         }
       } catch (_) {}
     }
 
-    // Check npm
-    info['npm_installed'] = await _isNpmInstalled();
-    if (info['npm_installed'] == true) {
-      try {
-        final npmResult = await Process.run(
-          _getShellCommand(),
-          _getShellArgs('npm --version'),
-        );
-        if (npmResult.exitCode == 0) {
-          info['npm_version'] = npmResult.stdout.toString().trim();
-        }
-      } catch (_) {}
-    }
+    final configFile = _configFilePath;
+    info['configPath'] = configFile.path;
+    info['configExists'] = configFile.existsSync();
 
-    // Check Python SDK
-    info['python_sdk_installed'] = await _isPythonSDKInstalled();
-    if (info['python_sdk_installed'] == true) {
-      try {
-        final pythonResult = await Process.run(
-          _getShellCommand(),
-          _getShellArgs('pip show claude-code-sdk'),
-        );
-        if (pythonResult.exitCode == 0) {
-          final output = pythonResult.stdout.toString();
-          final versionMatch = RegExp(r'Version: (.+)').firstMatch(output);
-          if (versionMatch != null) {
-            info['python_sdk_version'] = versionMatch.group(1)?.trim();
-          }
-        }
-      } catch (_) {}
-    }
-
-    // Check pip
-    info['pip_installed'] = await _isPipInstalled();
-
-    // Check MCP installation
-    try {
-      final mcpInfo = await isMcpInstalled();
-      info['mcp_enabled'] = mcpInfo.hasMcpSupport;
-      info['mcp_servers'] = mcpInfo.servers.length;
-      info['mcp_server_list'] = mcpInfo.servers.map((s) => s.name).toList();
-    } catch (_) {
-      info['mcp_enabled'] = false;
-      info['mcp_servers'] = 0;
-    }
+    final mcpInfo = await isMcpInstalled();
+    info['mcpEnabled'] = mcpInfo.hasMcpSupport;
+    info['mcpServerCount'] = mcpInfo.servers.length;
 
     return info;
   }
 
-  // ===== MCP (Model Context Protocol) Management Methods =====
-
-  /// Checks if MCP is installed and returns information about configured servers
   Future<McpInstallationInfo> isMcpInstalled() async {
-    // Check if Claude CLI is installed
-    final isInstalled = await isClaudeCodeSDKInstalled();
-    if (!isInstalled) {
-      return McpInstallationInfo(
-        isClaudeInstalled: false,
-        servers: [],
-        hasMcpSupport: false,
-      );
-    }
-
-    // Get Claude version
-    String? claudeVersion;
-    try {
-      final versionResult = await Process.run(
-        _getShellCommand(),
-        _getShellArgs('claude --version'),
-      );
-      if (versionResult.exitCode == 0) {
-        claudeVersion = versionResult.stdout.toString().trim();
-      }
-    } catch (_) {}
-
-    // Get list of MCP servers
+    final installed = await isClaudeCLIInstalled();
     final servers = await listMcpServers();
-
-    // Determine config path
-    final configPath = _getConfigPath();
+    final version = await _resolveInstalledVersion();
 
     return McpInstallationInfo(
-      isClaudeInstalled: true,
-      claudeVersion: claudeVersion,
+      hasMcpSupport: installed,
       servers: servers,
-      hasMcpSupport: true,
-      configPath: configPath,
+      configPath: _configFilePath.path,
+      mcpVersion: version,
     );
   }
 
-  /// Lists all configured MCP servers
   Future<List<McpServer>> listMcpServers() async {
-    try {
-      // Try using claude mcp list command
-      final result = await Process.run(
-        _getShellCommand(),
-        _getShellArgs('claude mcp list'),
-      );
-
-      if (result.exitCode == 0) {
-        // Parse the output to extract server information
-        final output = result.stdout.toString();
-        return _parseMcpListOutput(output);
-      }
-
-      // Fallback: read from config file
-      return await _readMcpServersFromConfig();
-    } catch (e) {
-      // If command fails, try reading config file directly
-      try {
-        return await _readMcpServersFromConfig();
-      } catch (_) {
-        return [];
-      }
-    }
-  }
-
-  /// Adds an MCP server to the configuration
-  Future<void> addMcpServer(
-    String name, {
-    String? packageName,
-    McpAddOptions? options,
-    McpServer? customServer,
-  }) async {
-    if (!await isClaudeCodeSDKInstalled()) {
-      throw ClaudeSDKException(
-        'Claude Code CLI is not installed. Run installClaudeCodeSDK() first.',
-      );
-    }
-
-    final opts = options ?? McpAddOptions();
-
-    // If custom server is provided, use it directly
-    if (customServer != null) {
-      await _addMcpServerViaConfig(customServer);
-      return;
-    }
-
-    // Check if it's a popular server
-    final popularServer = PopularMcpServers.getServer(name);
-    if (popularServer != null) {
-      await _addMcpServerViaConfig(popularServer.copyWith(name: name));
-      return;
-    }
-
-    // Otherwise, create a new server with the package name
-    if (packageName == null) {
-      throw ClaudeSDKException(
-        'Package name is required for non-popular MCP servers',
-      );
-    }
-
-    // Build the command and args
-    String command;
-    List<String> args;
-
-    if (opts.useNpx) {
-      if (Platform.isWindows && opts.windowsCmdWrapper) {
-        command = 'cmd';
-        args = ['/c', 'npx'];
-        if (opts.npxAutoYes) args.add('-y');
-        args.add(packageName);
-      } else {
-        command = 'npx';
-        args = [];
-        if (opts.npxAutoYes) args.add('-y');
-        args.add(packageName);
-      }
-    } else {
-      command = packageName;
-      args = [];
-    }
-
-    if (opts.additionalArgs != null) {
-      args.addAll(opts.additionalArgs!);
-    }
-
-    final server = McpServer(
-      name: name,
-      command: command,
-      args: args,
-      env: opts.environment,
-    );
-
-    await _addMcpServerViaConfig(server);
-  }
-
-  /// Removes an MCP server from the configuration
-  Future<void> removeMcpServer(String name) async {
-    if (!await isClaudeCodeSDKInstalled()) {
-      throw ClaudeSDKException(
-        'Claude Code CLI is not installed.',
-      );
-    }
-
-    // Try using CLI command first
-    try {
-      final result = await Process.run(
-        _getShellCommand(),
-        _getShellArgs('claude mcp remove $name'),
-      );
-
-      if (result.exitCode == 0) {
-        print('MCP server "$name" removed successfully');
-        return;
-      }
-    } catch (_) {}
-
-    // Fallback: modify config file directly
-    await _removeMcpServerViaConfig(name);
-  }
-
-  /// Gets details about a specific MCP server
-  Future<McpServer?> getMcpServerDetails(String name) async {
-    final servers = await listMcpServers();
-    return servers.firstWhere(
-      (s) => s.name == name,
-      orElse: () => throw ClaudeSDKException('MCP server "$name" not found'),
-    );
-  }
-
-  /// Gets a list of popular MCP servers that can be easily installed
-  List<String> getPopularMcpServers() {
-    return PopularMcpServers.availableServers;
-  }
-
-  /// Installs a popular MCP server by name
-  Future<void> installPopularMcpServer(
-    String serverName, {
-    Map<String, String>? environment,
-  }) async {
-    final server = PopularMcpServers.getServer(serverName);
-    if (server == null) {
-      throw ClaudeSDKException(
-        'Unknown popular server: $serverName. '
-        'Available servers: ${PopularMcpServers.availableServers.join(", ")}',
-      );
-    }
-
-    // Merge environment variables if provided
-    final finalServer = environment != null
-        ? server.copyWith(
-            env: {...?server.env, ...environment},
-          )
-        : server;
-
-    await addMcpServer(
-      serverName,
-      customServer: finalServer,
-    );
-
-    print('Installed popular MCP server: $serverName');
-    if (server.env != null && server.env!.isNotEmpty) {
-      final missingEnvVars = server.env!.entries
-          .where((e) => environment?[e.key] == null || environment![e.key]!.isEmpty)
-          .map((e) => e.key)
-          .toList();
-
-      if (missingEnvVars.isNotEmpty) {
-        print('\nNote: The following environment variables need to be configured:');
-        for (final envVar in missingEnvVars) {
-          print('  - $envVar');
-        }
-        print('\nEdit the configuration file at ${_getConfigPath()} to add these values.');
-      }
-    }
-  }
-
-  // ===== Private MCP Helper Methods =====
-
-  /// Gets the configuration file path
-  String _getConfigPath() {
-    final home = Platform.environment['HOME'] ?? Platform.environment['USERPROFILE'];
-    if (home == null) {
-      throw ClaudeSDKException('Could not determine home directory');
-    }
-    return path.join(home, '.claude', '.claude.json');
-  }
-
-  /// Reads MCP servers from the configuration file
-  Future<List<McpServer>> _readMcpServersFromConfig() async {
-    final configPath = _getConfigPath();
-    final configFile = File(configPath);
-
-    if (!await configFile.exists()) {
+    final file = _configFilePath;
+    if (!await file.exists()) {
       return [];
     }
 
     try {
-      final content = await configFile.readAsString();
-      final json = jsonDecode(content) as Map<String, dynamic>;
+      final content = await file.readAsString();
+      final json = _normalizeMcpConfig(jsonDecode(content));
       final config = McpConfig.fromJson(json);
       return config.serverList;
-    } catch (e) {
-      print('Error reading MCP config: $e');
+    } catch (_) {
       return [];
     }
   }
 
-  /// Adds an MCP server by modifying the config file
-  Future<void> _addMcpServerViaConfig(McpServer server) async {
-    final configPath = _getConfigPath();
-    final configFile = File(configPath);
-
-    // Ensure directory exists
-    final configDir = File(configPath).parent;
-    if (!await configDir.exists()) {
-      await configDir.create(recursive: true);
-    }
-
-    // Read existing config or create new one
-    Map<String, dynamic> configJson;
-    if (await configFile.exists()) {
-      final content = await configFile.readAsString();
-      configJson = jsonDecode(content) as Map<String, dynamic>;
-    } else {
-      configJson = {};
-    }
-
-    // Add or update the MCP server
-    configJson['mcpServers'] ??= <String, dynamic>{};
-    final mcpServers = configJson['mcpServers'] as Map<String, dynamic>;
-    mcpServers[server.name] = server.toJson();
-
-    // Write back to file
-    final encoder = JsonEncoder.withIndent('  ');
-    await configFile.writeAsString(encoder.convert(configJson));
-
-    print('MCP server "${server.name}" added successfully');
-    print('Configuration saved to: $configPath');
-  }
-
-  /// Removes an MCP server by modifying the config file
-  Future<void> _removeMcpServerViaConfig(String name) async {
-    final configPath = _getConfigPath();
-    final configFile = File(configPath);
-
-    if (!await configFile.exists()) {
-      throw ClaudeSDKException('Configuration file not found');
-    }
-
-    final content = await configFile.readAsString();
-    final configJson = jsonDecode(content) as Map<String, dynamic>;
-
-    final mcpServers = configJson['mcpServers'] as Map<String, dynamic>?;
-    if (mcpServers == null || !mcpServers.containsKey(name)) {
-      throw ClaudeSDKException('MCP server "$name" not found in configuration');
-    }
-
-    mcpServers.remove(name);
-
-    // Write back to file
-    final encoder = JsonEncoder.withIndent('  ');
-    await configFile.writeAsString(encoder.convert(configJson));
-
-    print('MCP server "$name" removed successfully');
-  }
-
-  /// Parses the output of 'claude mcp list' command
-  List<McpServer> _parseMcpListOutput(String output) {
-    final servers = <McpServer>[];
-    final lines = output.split('\n');
-
-    for (final line in lines) {
-      // Look for patterns like "• server-name: connected" or "• server-name: disconnected"
-      final match = RegExp(r'•\s+(\S+):\s+(\w+)').firstMatch(line);
-      if (match != null) {
-        final name = match.group(1)!;
-        final statusStr = match.group(2)!.toLowerCase();
-
-        McpServerStatus status;
-        switch (statusStr) {
-          case 'connected':
-            status = McpServerStatus.connected;
-            break;
-          case 'disconnected':
-            status = McpServerStatus.disconnected;
-            break;
-          case 'error':
-            status = McpServerStatus.error;
-            break;
-          default:
-            status = McpServerStatus.unknown;
-        }
-
-        servers.add(McpServer(
+  Future<void> addMcpServer(
+    String name, {
+    McpServer? customServer,
+    McpAddOptions? options,
+  }) async {
+    var server = customServer ??
+        _popularServerTemplate(name)?.copyWith(name: name) ??
+        McpServer(
           name: name,
-          command: '',  // Will be filled from config if needed
-          args: [],
-          status: status,
-        ));
+          command: options?.useNpx == false ? name : 'npx',
+          args: options?.useNpx == false ? [] : ['-y', name],
+        );
+
+    if (options?.environment != null) {
+      final mergedEnv = Map<String, String>.from(server.env ?? {});
+      mergedEnv.addAll(options!.environment!);
+      server = server.copyWith(env: mergedEnv);
+    }
+
+    final file = _configFilePath;
+    if (!await file.parent.exists()) {
+      await file.parent.create(recursive: true);
+    }
+
+    Map<String, dynamic> configJson = {};
+    if (await file.exists()) {
+      try {
+        final content = await file.readAsString();
+        configJson = jsonDecode(content) as Map<String, dynamic>;
+      } catch (_) {
+        configJson = {};
       }
     }
 
-    // If we found servers from the list, try to get their full config
-    if (servers.isNotEmpty) {
-      _enrichServersWithConfig(servers);
-    }
+    final normalized = _normalizeMcpConfig(configJson);
+    final servers = (normalized['mcp_servers'] as Map<String, dynamic>? ?? {})
+      ..[server.name] = server.toJson();
+    normalized['mcp_servers'] = servers;
 
-    return servers;
+    final encoder = JsonEncoder.withIndent('  ');
+    await file.writeAsString(encoder.convert(normalized));
   }
 
-  /// Enriches server list with configuration details
-  Future<void> _enrichServersWithConfig(List<McpServer> servers) async {
-    try {
-      final configServers = await _readMcpServersFromConfig();
-      for (var i = 0; i < servers.length; i++) {
-        final server = servers[i];
-        final configServer = configServers.firstWhere(
-          (s) => s.name == server.name,
-          orElse: () => server,
-        );
-        if (configServer != server) {
-          servers[i] = configServer.copyWith(status: server.status);
-        }
-      }
-    } catch (_) {
-      // Ignore errors, we'll use the basic info we have
+  Future<void> removeMcpServer(String name) async {
+    final file = _configFilePath;
+    if (!await file.exists()) {
+      throw CliException('Configuration file not found at ${file.path}');
     }
+
+    final content = await file.readAsString();
+    final configJson = _normalizeMcpConfig(jsonDecode(content));
+    final servers = configJson['mcp_servers'] as Map<String, dynamic>?;
+
+    if (servers == null || !servers.containsKey(name)) {
+      throw CliException('MCP server "$name" not found in configuration.');
+    }
+
+    servers.remove(name);
+    final encoder = JsonEncoder.withIndent('  ');
+    await file.writeAsString(encoder.convert(configJson));
+  }
+
+  Future<void> exportApiKeyToEnvironment() async {
+    final command = Platform.isWindows
+        ? 'setx ANTHROPIC_API_KEY "$apiKey"'
+        : 'export ANTHROPIC_API_KEY="$apiKey"';
+
+    final result = await Process.run(
+      _shellCommand,
+      _shellArgs(command),
+    );
+
+    if (result.exitCode != 0) {
+      final errorOutput = (result.stderr as String?)?.trim().isNotEmpty == true
+          ? result.stderr.toString().trim()
+          : result.stdout.toString().trim();
+      throw CliException(
+        'Failed to export ANTHROPIC_API_KEY. Exit code ${result.exitCode}.${errorOutput.isEmpty ? '' : ' Error: $errorOutput'}',
+      );
+    }
+  }
+
+  Future<void> dispose() async {
+    for (final session in activeSessions) {
+      await session.dispose();
+    }
+    activeSessions.clear();
+  }
+
+  String get _shellCommand => Platform.isWindows ? 'cmd.exe' : '/bin/sh';
+
+  List<String> _shellArgs(String command) =>
+      Platform.isWindows ? ['/c', command] : ['-c', command];
+
+  Future<bool> _isNpmInstalled() async {
+    try {
+      final result = await Process.run(
+        _shellCommand,
+        _shellArgs('npm --version'),
+      );
+      return result.exitCode == 0;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  File get _configFilePath {
+    final home = Platform.environment['HOME'] ??
+        Platform.environment['USERPROFILE'] ??
+        '';
+    return File(path.join(home, '.claude', '.claude.json'));
+  }
+
+  Future<String?> _resolveInstalledVersion() async {
+    final commands = ['claude --version', 'claude-code --version'];
+    for (final cmd in commands) {
+      try {
+        final result = await Process.run(
+          _shellCommand,
+          _shellArgs(cmd),
+        );
+        if (result.exitCode == 0) {
+          final match =
+              RegExp(r'(\d+\.\d+\.\d+)').firstMatch(result.stdout.toString());
+          if (match != null) {
+            return match.group(1);
+          }
+        }
+      } catch (_) {
+        continue;
+      }
+    }
+    return null;
+  }
+
+  Future<String?> _resolveLatestVersion() async {
+    try {
+      final result = await Process.run(
+        _shellCommand,
+        _shellArgs('npm view @anthropic-ai/claude-code version'),
+      );
+      if (result.exitCode == 0) {
+        return result.stdout.toString().trim();
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  bool _isNewerVersion(String current, String latest) {
+    try {
+      final currentParts = current.split('.').map(int.parse).toList();
+      final latestParts = latest.split('.').map(int.parse).toList();
+      for (var i = 0; i < 3; i++) {
+        final currentPart = i < currentParts.length ? currentParts[i] : 0;
+        final latestPart = i < latestParts.length ? latestParts[i] : 0;
+        if (latestPart > currentPart) return true;
+        if (latestPart < currentPart) return false;
+      }
+      return false;
+    } catch (_) {
+      return true;
+    }
+  }
+
+  Map<String, dynamic> _normalizeMcpConfig(Map<String, dynamic> json) {
+    if (json.containsKey('mcpServers') && !json.containsKey('mcp_servers')) {
+      json = Map<String, dynamic>.from(json);
+      json['mcp_servers'] = json['mcpServers'];
+      json.remove('mcpServers');
+    }
+    return json;
+  }
+
+  McpServer? _popularServerTemplate(String name) {
+    switch (name) {
+      case 'filesystem':
+        return McpServer(
+          name: 'filesystem',
+          command: 'npx',
+          args: [
+            '-y',
+            '@modelcontextprotocol/server-filesystem',
+            '~/Documents',
+            '~/Desktop'
+          ],
+        );
+      case 'github':
+        return McpServer(
+          name: 'github',
+          command: 'npx',
+          args: ['-y', '@modelcontextprotocol/server-github'],
+          env: {'GITHUB_TOKEN': ''},
+        );
+      case 'postgres':
+        return McpServer(
+          name: 'postgres',
+          command: 'npx',
+          args: ['-y', '@modelcontextprotocol/server-postgres'],
+          env: {'DATABASE_URL': ''},
+        );
+      case 'git':
+        return McpServer(
+          name: 'git',
+          command: 'npx',
+          args: ['-y', '@modelcontextprotocol/server-git'],
+        );
+      case 'puppeteer':
+        return McpServer(
+          name: 'puppeteer',
+          command: 'npx',
+          args: ['-y', '@modelcontextprotocol/server-puppeteer'],
+        );
+      case 'sequential-thinking':
+        return McpServer(
+          name: 'sequential-thinking',
+          command: 'npx',
+          args: ['-y', '@modelcontextprotocol/server-sequential-thinking'],
+        );
+      case 'slack':
+        return McpServer(
+          name: 'slack',
+          command: 'npx',
+          args: ['-y', '@modelcontextprotocol/server-slack'],
+          env: {'SLACK_TOKEN': ''},
+        );
+      case 'google-drive':
+        return McpServer(
+          name: 'google-drive',
+          command: 'npx',
+          args: ['-y', '@modelcontextprotocol/server-google-drive'],
+          env: {
+            'GOOGLE_CLIENT_ID': '',
+            'GOOGLE_CLIENT_SECRET': '',
+          },
+        );
+    }
+    return null;
   }
 }

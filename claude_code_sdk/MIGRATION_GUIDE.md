@@ -8,7 +8,7 @@ Starting from version 1.1.0, the Claude Code SDK introduces a new pattern for de
 
 ```dart
 // Old way: Using required array
-final schema = SchemaObject(
+final schema = SchemaDefinition(
   properties: {
     'userName': SchemaProperty.string(
       description: 'User name',
@@ -28,7 +28,7 @@ final schema = SchemaObject(
 
 ```dart
 // New way: Using nullable on each property
-final schema = SchemaObject(
+final schema = SchemaDefinition(
   properties: {
     'userName': SchemaProperty.string(
       description: 'User name',
@@ -85,17 +85,17 @@ For each property:
 
 ### Step 3: Remove Required Array
 
-Once all properties have their nullable status defined, remove the `required` parameter from SchemaObject:
+Once all properties have their nullable status defined, remove the `required` parameter from SchemaDefinition:
 
 ```dart
 // Before
-SchemaObject(
+SchemaDefinition(
   properties: { /* ... */ },
   required: ['userName', 'userId'],
 )
 
 // After
-SchemaObject(
+SchemaDefinition(
   properties: { /* ... */ },
   // required array removed - automatically derived from nullable properties
 )
@@ -106,7 +106,7 @@ SchemaObject(
 ### Before Migration
 
 ```dart
-final userSchema = SchemaObject(
+final userSchema = SchemaDefinition(
   properties: {
     'id': SchemaProperty.string(description: 'User ID'),
     'firstName': SchemaProperty.string(description: 'First name'),
@@ -135,7 +135,7 @@ final userSchema = SchemaObject(
 ### After Migration
 
 ```dart
-final userSchema = SchemaObject(
+final userSchema = SchemaDefinition(
   properties: {
     'id': SchemaProperty.string(
       description: 'User ID',

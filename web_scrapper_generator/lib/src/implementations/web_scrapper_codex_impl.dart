@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:codex_cli_sdk/codex_cli_sdk.dart'
     show Codex, CodexChat, CodexChatOptions;
 import 'package:programming_cli_core_sdk/programming_cli_core_sdk.dart'
-    show PromptContent, SchemaObject, SchemaProperty;
+    show PromptContent, SchemaDefinition, SchemaProperty;
 import 'package:gemini_cli_sdk/gemini_cli_sdk.dart' as gemini_sdk;
 import 'package:web_scrapper_generator/src/prompts.dart';
 import 'package:web_scrapper_generator/src/schema_constants.dart';
@@ -275,10 +275,8 @@ Remember: Your goal is to create extraction rules that consistently retrieve the
   }
 
   /// Build the response schema for Codex
-  SchemaObject buildCodexResponseSchema() {
-    return SchemaProperty.structuredObject(
-      nullable: false,
-      description: SchemaDescriptions.overallDescription,
+  SchemaDefinition buildCodexResponseSchema() {
+    return SchemaDefinition(
       properties: {
         'responseType': SchemaProperty.enumeration(
           enumValues: SchemaDescriptions.responseTypeValues,

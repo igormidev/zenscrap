@@ -76,7 +76,7 @@ import 'package:claude_code_sdk/claude_code_sdk.dart';
 
 void main() async {
   // Initialize the SDK with your API key
-  final claudeSDK = Claude('YOUR_API_KEY');
+  final claudeSDK = Claude(apiKey: 'YOUR_API_KEY');
   
   // Create a new chat session
   final claudeChat = claudeSDK.createNewChat();
@@ -84,7 +84,7 @@ void main() async {
   try {
     // Send a simple text message
     final result = await claudeChat.sendMessage([
-      ClaudeSdkContent.text('What is the capital of France?'),
+      PromptContent.text('What is the capital of France?'),
     ]);
     
     print('Claude says: $result');
@@ -102,14 +102,14 @@ import 'dart:io';
 import 'package:claude_code_sdk/claude_code_sdk.dart';
 
 void main() async {
-  final claudeSDK = Claude('YOUR_API_KEY');
+  final claudeSDK = Claude(apiKey: 'YOUR_API_KEY');
   final claudeChat = claudeSDK.createNewChat();
   
   try {
     // Send a message with a file
     final result = await claudeChat.sendMessage([
-      ClaudeSdkContent.text('Please analyze this HTML file and extract the user name'),
-      ClaudeSdkContent.file(File('example.html')),
+      PromptContent.text('Please analyze this HTML file and extract the user name'),
+      PromptContent.file(File('example.html')),
     ]);
     
     print('Analysis result: $result');
@@ -128,15 +128,15 @@ import 'dart:typed_data';
 import 'package:claude_code_sdk/claude_code_sdk.dart';
 
 void main() async {
-  final claudeSDK = Claude('YOUR_API_KEY');
+  final claudeSDK = Claude(apiKey: 'YOUR_API_KEY');
   final claudeChat = claudeSDK.createNewChat();
   
   try {
     // Example 1: Send image bytes
     final imageBytes = await File('photo.jpg').readAsBytes();
     final result = await claudeChat.sendMessage([
-      ClaudeSdkContent.text('What is in this image?'),
-      ClaudeSdkContent.bytes(
+      PromptContent.text('What is in this image?'),
+      PromptContent.bytes(
         data: imageBytes,
         fileName: 'image',
         fileExtension: 'jpg',
@@ -147,8 +147,8 @@ void main() async {
     final textContent = 'Hello, this is dynamic content!';
     final textBytes = Uint8List.fromList(textContent.codeUnits);
     final result2 = await claudeChat.sendMessage([
-      ClaudeSdkContent.text('Read this text:'),
-      ClaudeSdkContent.bytes(
+      PromptContent.text('Read this text:'),
+      PromptContent.bytes(
         data: textBytes,
         fileName: 'text',
         fileExtension: 'txt',
@@ -172,12 +172,12 @@ import 'dart:io';
 import 'package:claude_code_sdk/claude_code_sdk.dart';
 
 void main() async {
-  final claudeSDK = Claude('YOUR_API_KEY');
+  final claudeSDK = Claude(apiKey: 'YOUR_API_KEY');
   final claudeChat = claudeSDK.createNewChat();
   
   try {
     // Define a schema with nullable properties
-    final schema = SchemaObject(
+    final schema = SchemaDefinition(
       properties: {
         'userName': SchemaProperty.string(
           description: 'The name of the user found in the HTML',
@@ -198,8 +198,8 @@ void main() async {
     // Send message with schema
     final result = await claudeChat.sendMessageWithSchema(
       messages: [
-        ClaudeSdkContent.text('Extract user information from this HTML file'),
-        ClaudeSdkContent.file(File('profile.html')),
+        PromptContent.text('Extract user information from this HTML file'),
+        PromptContent.file(File('profile.html')),
       ],
       schema: schema,
     );
@@ -222,7 +222,7 @@ void main() async {
 import 'package:claude_code_sdk/claude_code_sdk.dart';
 
 void main() async {
-  final claudeSDK = Claude('YOUR_API_KEY');
+  final claudeSDK = Claude(apiKey: 'YOUR_API_KEY');
   final claudeChat = claudeSDK.createNewChat(
     options: ClaudeChatOptions(
       streamJson: true,
@@ -232,7 +232,7 @@ void main() async {
   try {
     // Stream the response
     await for (final chunk in claudeChat.streamResponse([
-      ClaudeSdkContent.text('Write a detailed explanation of quantum computing'),
+      PromptContent.text('Write a detailed explanation of quantum computing'),
     ])) {
       print(chunk); // Print each chunk as it arrives
     }
@@ -265,7 +265,7 @@ final claudeChat = claudeSDK.createNewChat(
 
 ```dart
 void main() async {
-  final claudeSDK = Claude('YOUR_API_KEY');
+  final claudeSDK = Claude(apiKey: 'YOUR_API_KEY');
   
   // Check if Claude Code SDK is installed
   final isInstalled = await claudeSDK.isClaudeCodeSDKInstalled();
@@ -294,7 +294,7 @@ The SDK provides a convenient method to automatically check for and install upda
 
 ```dart
 void main() async {
-  final claudeSDK = Claude('YOUR_API_KEY');
+  final claudeSDK = Claude(apiKey: 'YOUR_API_KEY');
 
   // Automatically check for updates and install if needed
   await claudeSDK.updateToNewestVersionIfNeeded(global: true);
@@ -395,7 +395,7 @@ final chat = claudeSDK.createNewChat();
 
 // Claude can now use the configured MCP tools
 final result = await chat.sendMessage([
-  ClaudeSdkContent.text(
+  PromptContent.text(
     'List all files in my Documents folder' // Works if filesystem MCP is installed
   ),
 ]);
@@ -406,7 +406,7 @@ final result = await chat.sendMessage([
 The SDK provides convenient factory methods for building schemas with nullable control:
 
 ```dart
-final schema = SchemaObject(
+final schema = SchemaDefinition(
   properties: {
     'name': SchemaProperty.string(
       description: 'User name',
@@ -450,7 +450,7 @@ final schema = SchemaObject(
 - `nullable: false` - The property is required and must be present in the response
 - `nullable: true` (default) - The property is optional and may be omitted or null
 - Properties with `nullable: false` are automatically added to the JSON schema's `required` array
-- You can still use the legacy `required` parameter on SchemaObject for backward compatibility
+- You can still use the legacy `required` parameter on SchemaDefinition for backward compatibility
 
 ## Error Handling
 
@@ -460,22 +460,22 @@ The SDK provides specific exception types for different error scenarios:
 import 'package:claude_code_sdk/claude_code_sdk.dart';
 
 void main() async {
-  final claudeSDK = Claude('YOUR_API_KEY');
+  final claudeSDK = Claude(apiKey: 'YOUR_API_KEY');
   final claudeChat = claudeSDK.createNewChat();
   
   try {
     final result = await claudeChat.sendMessage([
-      ClaudeSdkContent.text('Hello, Claude!'),
+      PromptContent.text('Hello, Claude!'),
     ]);
     print(result);
-  } on CLINotFoundException {
+  } on CliException {
     print('Claude Code CLI is not installed. Please install it first.');
   } on ProcessException catch (e) {
     print('Process error: ${e.message}');
     if (e.exitCode != null) {
       print('Exit code: ${e.exitCode}');
     }
-  } on JSONDecodeException catch (e) {
+  } on CliException catch (e) {
     print('Failed to parse response: ${e.message}');
   } on ClaudeSDKException catch (e) {
     print('SDK error: ${e.message}');
@@ -527,17 +527,17 @@ await claudeSDK.dispose(); // Disposes all active sessions
 
 ### ClaudeChat Class
 
-- `sendMessage(List<ClaudeSdkContent> contents)` - Sends a message and returns the response
+- `sendMessage(List<PromptContent> contents)` - Sends a message and returns the response
 - `sendMessageWithSchema({messages, schema})` - Returns a record with the LLM summary and parsed structured data
 - `get sessionId` - Gets the current session ID (null until first message)
 - `resetConversation()` - Resets the conversation, starting a new session
 - `dispose()` - Disposes the chat session and cleans up resources (including temp files)
 
-### ClaudeSdkContent
+### PromptContent
 
-- `ClaudeSdkContent.text(String text)` - Creates text content
-- `ClaudeSdkContent.file(File file)` - Creates file content
-- `ClaudeSdkContent.bytes({data, fileName, fileExtension})` - Creates content from bytes (temporary file)
+- `PromptContent.text(String text)` - Creates text content
+- `PromptContent.file(File file)` - Creates file content
+- `PromptContent.bytes({data, fileName, fileExtension})` - Creates content from bytes (temporary file)
 
 ## Environment Variables
 
@@ -558,7 +558,7 @@ final claudeSDK = Claude(apiKey);
 
 ### Claude Code CLI not found
 
-If you get a `CLINotFoundException`, make sure Claude Code is installed:
+If you get a `CliException`, make sure Claude Code is installed:
 
 ```bash
 npm install -g @anthropic-ai/claude-code

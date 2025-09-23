@@ -5,7 +5,6 @@ import 'package:programming_cli_core_sdk/programming_cli_core_sdk.dart';
 
 import 'codex_chat.dart';
 import 'codex_chat_options.dart';
-import 'mcp_models.dart';
 
 /// Main Codex SDK class for interacting with the OpenAI Codex CLI.
 class Codex extends CodingCliInterface<CodexChat, CodexChatOptions> {
@@ -168,6 +167,35 @@ class Codex extends CodingCliInterface<CodexChat, CodexChatOptions> {
     info['configExists'] = configFile.existsSync();
 
     return info;
+  }
+
+  /// Runs a shell command that exports the current API key to
+  /// `OPENAI_API_KEY` for the active shell session.
+  ///
+  /// On Unix-like systems this executes `export OPENAI_API_KEY="..."`.
+  /// On Windows it uses `setx OPENAI_API_KEY "..."`.
+  ///
+  /// Note: when invoked from a child process this will not mutate the parent
+  /// shell's environment. It is mainly intended for scripted setups where the
+  /// command output is piped into the user's shell.
+  Future<void> exportApiKeyToEnvironment() async {
+    final command = Platform.isWindows
+        ? 'setx OPENAI_API_KEY "$apiKey"'
+        : 'export OPENAI_API_KEY="$apiKey"';
+
+    final result = await Process.run(
+      _shellCommand,
+      _shellArgs(command),
+    );
+
+    if (result.exitCode != 0) {
+      final errorOutput = (result.stderr as String?)?.trim().isNotEmpty == true
+          ? result.stderr.toString().trim()
+          : result.stdout.toString().trim();
+      throw CliException(
+        'Failed to export OPENAI_API_KEY. Exit code ${result.exitCode}.${errorOutput.isEmpty ? '' : ' Error: $errorOutput'}',
+      );
+    }
   }
 
   /// Disposes all active chat sessions created by this SDK instance.
