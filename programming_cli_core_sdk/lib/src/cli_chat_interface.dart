@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:meta/meta.dart';
-import 'package:programming_cli_core_sdk/src/coding_cli_interface.dart';
+import 'package:programming_cli_core_sdk/src/cli_chat_options_interface.dart';
 import 'package:programming_cli_core_sdk/src/temporary_files.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:nanoid2/nanoid2.dart';
