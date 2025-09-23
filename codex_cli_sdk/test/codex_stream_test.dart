@@ -17,8 +17,7 @@ void main() {
         ),
       );
 
-      final schema = SchemaProperty.structuredObject(
-        nullable: false,
+      final schema = SchemaDefinition(
         properties: {
           'presidents': SchemaProperty.array(
             nullable: false,
@@ -42,7 +41,7 @@ void main() {
             'with their name and term start year.',
           ),
         ],
-        schema: schema as SchemaObject,
+        schema: schema,
       );
 
       await for (final chunk in result.llmMessage) {

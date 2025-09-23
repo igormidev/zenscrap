@@ -83,7 +83,7 @@ class CodexChat extends CliChatInterface<CodexChatOptions> {
   Future<({String llmMessage, Map<String, dynamic> structuredSchemaData})>
       sendMessageWithSchema({
     required List<PromptContent> messages,
-    required SchemaObject schema,
+    required SchemaDefinition schema,
   }) async {
     final result =
         await super.sendMessageWithSchema(messages: messages, schema: schema);
@@ -103,7 +103,7 @@ class CodexChat extends CliChatInterface<CodexChatOptions> {
     Completer<Map<String, dynamic>> structuredSchemaData,
   }) streamResponseWithSchema({
     required List<PromptContent> messages,
-    required SchemaObject schema,
+    required SchemaDefinition schema,
   }) {
     final base =
         super.streamResponseWithSchema(messages: messages, schema: schema);

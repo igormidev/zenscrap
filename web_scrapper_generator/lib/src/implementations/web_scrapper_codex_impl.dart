@@ -277,97 +277,96 @@ Remember: Your goal is to create extraction rules that consistently retrieve the
   /// Build the response schema for Codex
   SchemaObject buildCodexResponseSchema() {
     return SchemaProperty.structuredObject(
+      nullable: false,
+      description: SchemaDescriptions.overallDescription,
+      properties: {
+        'responseType': SchemaProperty.enumeration(
+          enumValues: SchemaDescriptions.responseTypeValues,
+          description: SchemaDescriptions.responseType,
           nullable: false,
-          description: SchemaDescriptions.overallDescription,
+        ),
+        'message': SchemaProperty.text(
+          description: SchemaDescriptions.message,
+          nullable: true,
+        ),
+        'errorMessage': SchemaProperty.text(
+          description: SchemaDescriptions.errorMessage,
+          nullable: true,
+        ),
+        'resumeActionMessage': SchemaProperty.text(
+          description: SchemaDescriptions.resumeActionMessage,
+          nullable: true,
+        ),
+        'request': SchemaProperty.structuredObject(
+          description: SchemaDescriptions.request,
+          nullable: true,
           properties: {
-            'responseType': SchemaProperty.enumeration(
-              enumValues: SchemaDescriptions.responseTypeValues,
-              description: SchemaDescriptions.responseType,
+            'url': SchemaProperty.text(
+              description: SchemaDescriptions.requestUrl,
               nullable: false,
             ),
-            'message': SchemaProperty.text(
-              description: SchemaDescriptions.message,
-              nullable: true,
+            'queryParam': SchemaProperty.objectWithUndefinedProperties(
+              description: SchemaDescriptions.requestQueryParam,
+              nullable: false,
             ),
-            'errorMessage': SchemaProperty.text(
-              description: SchemaDescriptions.errorMessage,
-              nullable: true,
-            ),
-            'resumeActionMessage': SchemaProperty.text(
-              description: SchemaDescriptions.resumeActionMessage,
-              nullable: true,
-            ),
-            'request': SchemaProperty.structuredObject(
-              description: SchemaDescriptions.request,
-              nullable: true,
-              properties: {
-                'url': SchemaProperty.text(
-                  description: SchemaDescriptions.requestUrl,
-                  nullable: false,
-                ),
-                'queryParam': SchemaProperty.objectWithUndefinedProperties(
-                  description: SchemaDescriptions.requestQueryParam,
-                  nullable: false,
-                ),
-                'pathParams': SchemaProperty.array(
-                  description: SchemaDescriptions.requestPathParams,
-                  nullable: false,
-                  items: SchemaProperty.text(nullable: false),
-                ),
-              },
-            ),
-            'fetchSettings': SchemaProperty.structuredObject(
-              description: SchemaDescriptions.fetchSettings,
-              nullable: true,
-              properties: {
-                'url': SchemaProperty.text(
-                  description: SchemaDescriptions.fetchUrl,
-                  nullable: false,
-                ),
-                'extract_rules': SchemaProperty.text(
-                  description: SchemaDescriptions.fetchExtractRules,
-                  nullable: false,
-                ),
-                'js_scenario': SchemaProperty.text(
-                  description: SchemaDescriptions.fetchJsScenario,
-                  nullable: true,
-                ),
-                'render_js': SchemaProperty.boolean(
-                  description: SchemaDescriptions.fetchRenderJs,
-                  nullable: false,
-                ),
-                'wait': SchemaProperty.double(
-                  description: SchemaDescriptions.fetchWait,
-                  nullable: true,
-                ),
-                'wait_for': SchemaProperty.text(
-                  description: SchemaDescriptions.fetchWaitFor,
-                  nullable: true,
-                ),
-                'wait_browser': SchemaProperty.text(
-                  description: SchemaDescriptions.fetchWaitBrowser,
-                  nullable: true,
-                ),
-                'premium_proxy': SchemaProperty.boolean(
-                  description: SchemaDescriptions.fetchPremiumProxy,
-                  nullable: false,
-                ),
-                'country_code': SchemaProperty.text(
-                  description: SchemaDescriptions.fetchCountryCode,
-                  nullable: true,
-                ),
-                'session_id': SchemaProperty.text(
-                  description: SchemaDescriptions.fetchSessionId,
-                  nullable: true,
-                ),
-                'custom_google': SchemaProperty.boolean(
-                  description: SchemaDescriptions.fetchCustomGoogle,
-                  nullable: true,
-                ),
-              },
+            'pathParams': SchemaProperty.array(
+              description: SchemaDescriptions.requestPathParams,
+              nullable: false,
+              items: SchemaProperty.text(nullable: false),
             ),
           },
-        )
-        as SchemaObject;
+        ),
+        'fetchSettings': SchemaProperty.structuredObject(
+          description: SchemaDescriptions.fetchSettings,
+          nullable: true,
+          properties: {
+            'url': SchemaProperty.text(
+              description: SchemaDescriptions.fetchUrl,
+              nullable: false,
+            ),
+            'extract_rules': SchemaProperty.text(
+              description: SchemaDescriptions.fetchExtractRules,
+              nullable: false,
+            ),
+            'js_scenario': SchemaProperty.text(
+              description: SchemaDescriptions.fetchJsScenario,
+              nullable: true,
+            ),
+            'render_js': SchemaProperty.boolean(
+              description: SchemaDescriptions.fetchRenderJs,
+              nullable: false,
+            ),
+            'wait': SchemaProperty.double(
+              description: SchemaDescriptions.fetchWait,
+              nullable: true,
+            ),
+            'wait_for': SchemaProperty.text(
+              description: SchemaDescriptions.fetchWaitFor,
+              nullable: true,
+            ),
+            'wait_browser': SchemaProperty.text(
+              description: SchemaDescriptions.fetchWaitBrowser,
+              nullable: true,
+            ),
+            'premium_proxy': SchemaProperty.boolean(
+              description: SchemaDescriptions.fetchPremiumProxy,
+              nullable: false,
+            ),
+            'country_code': SchemaProperty.text(
+              description: SchemaDescriptions.fetchCountryCode,
+              nullable: true,
+            ),
+            'session_id': SchemaProperty.text(
+              description: SchemaDescriptions.fetchSessionId,
+              nullable: true,
+            ),
+            'custom_google': SchemaProperty.boolean(
+              description: SchemaDescriptions.fetchCustomGoogle,
+              nullable: true,
+            ),
+          },
+        ),
+      },
+    );
   }
 }

@@ -11,8 +11,6 @@ import 'package:nanoid2/nanoid2.dart';
 import 'package:programming_cli_core_sdk/src/prompt_content.dart';
 import 'package:programming_cli_core_sdk/src/schema_property.dart';
 
-typedef SchemaObject = SchemaPropertyStructuredObjectWithDefinedProperties;
-
 abstract class CliChatInterface<T extends CliChatOptions> {
   CliChatInterface({required this.options});
   T? options;
@@ -62,7 +60,7 @@ abstract class CliChatInterface<T extends CliChatOptions> {
   Future<({String llmMessage, Map<String, dynamic> structuredSchemaData})>
   sendMessageWithSchema({
     required List<PromptContent> messages,
-    required SchemaObject schema,
+    required SchemaDefinition schema,
   }) async {
     final (
       :Stream<String> llmMessage,
@@ -86,7 +84,7 @@ abstract class CliChatInterface<T extends CliChatOptions> {
   })
   streamResponseWithSchema({
     required List<PromptContent> messages,
-    required SchemaObject schema,
+    required SchemaDefinition schema,
   }) {
     final (
       :Stream<String> llmMessage,
@@ -125,7 +123,7 @@ abstract class CliChatInterface<T extends CliChatOptions> {
   })
   _handleTemporaryFilesWrapper({
     required List<PromptContent> promptsOfCurrentMessage,
-    required SchemaObject? schema,
+    required SchemaDefinition? schema,
   }) {
     final controller = StreamController<String>.broadcast();
     final responseCompleter = Completer<Map<String, dynamic>?>();
@@ -274,7 +272,9 @@ $testErrorMessage''',
     }
   }
 
-  Future<String> _generateSchemaPrompt({required SchemaObject schema}) async {
+  Future<String> _generateSchemaPrompt({
+    required SchemaDefinition schema,
+  }) async {
     return '''----------- SCHEMA INSTRUCTIONS [START] -----------
     
 I wan't the output in a json format. 
@@ -301,7 +301,7 @@ ${schema.toString()}
 ----------- SCHEMA INSTRUCTIONS [END] -----------''';
   }
 
-  Future<void> _setupSchemaFiles(SchemaObject schema) async {
+  Future<void> _setupSchemaFiles(SchemaDefinition schema) async {
     // First, lets create the json file where the AI will write the response in the json schema format
     final schemaFile = await File(schemaResponseFilePath).create();
     await schemaFile.writeAsString('{}');
@@ -326,7 +326,7 @@ void main() {
   });
 }
 
-final SchemaPropertyStructuredObjectWithDefinedProperties schema = ${schema.toDartClassDeclaration} as SchemaPropertyStructuredObjectWithDefinedProperties;''';
+final SchemaPropertyStructuredObjectWithDefinedProperties schema = ${schema.toSchemaProperty().toDartClassDeclaration} as SchemaPropertyStructuredObjectWithDefinedProperties;''';
 
     await schemaTestFolder.writeAsString(testContent);
   }

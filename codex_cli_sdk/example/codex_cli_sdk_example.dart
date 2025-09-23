@@ -56,8 +56,7 @@ Future<void> main() async {
       print(response);
 
       print('\n--- Schema Example ---');
-      final schema = SchemaProperty.structuredObject(
-        nullable: false,
+      final SchemaDefinition schema = SchemaDefinition(
         properties: {
           'language': SchemaProperty.text(nullable: false),
           'paradigm': SchemaProperty.text(nullable: false),
@@ -70,7 +69,7 @@ Future<void> main() async {
           PromptContent.text(
               'Give me information about the Dart programming language'),
         ],
-        schema: schema as SchemaObject,
+        schema: schema,
       );
 
       print('\nStructured response:');

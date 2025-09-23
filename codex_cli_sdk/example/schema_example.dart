@@ -14,8 +14,7 @@ Future<void> main() async {
   final chat = codexSDK.createNewChat();
 
   try {
-    final bookSchema = SchemaProperty.structuredObject(
-      nullable: false,
+    final bookSchema = SchemaDefinition(
       properties: {
         'title': SchemaProperty.text(
             nullable: false, description: 'The title of the book'),
@@ -42,7 +41,7 @@ Future<void> main() async {
         PromptContent.text(
             'Give me information about the book "1984" by George Orwell'),
       ],
-      schema: bookSchema as SchemaObject,
+      schema: bookSchema,
     );
 
     print('Model explanation:');
@@ -66,8 +65,7 @@ Future<void> main() async {
 
     print('\n--- Nested Schema Example ---\n');
 
-    final userSchema = SchemaProperty.structuredObject(
-      nullable: false,
+    final userSchema = SchemaDefinition(
       properties: {
         'user': SchemaProperty.structuredObject(
           nullable: false,
@@ -110,7 +108,7 @@ Future<void> main() async {
         PromptContent.text(
             'Generate a sample user profile for a developer named John Doe'),
       ],
-      schema: userSchema as SchemaObject,
+      schema: userSchema,
     );
 
     print('Generated User Profile:');
