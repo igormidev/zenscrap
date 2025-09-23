@@ -2,50 +2,40 @@ import 'dart:io';
 
 import 'package:gemini_cli_sdk/gemini_cli_sdk.dart';
 
-void main() async {
-  // Get API key from environment or use a test key
+Future<void> main() async {
   final apiKey = Platform.environment['GEMINI_API_KEY'] ?? 'YOUR_API_KEY';
-
   if (apiKey == 'YOUR_API_KEY') {
-    print('Please set your GEMINI_API_KEY environment variable');
-    print(
-        'You can get your API key from: https://makersuite.google.com/app/apikey');
+    stderr.writeln('Set GEMINI_API_KEY before running this example.');
     return;
   }
 
-  // Initialize the SDK with your API key
-  final geminiSDK = GeminiSDK(apiKey);
-
-  // Create a new chat session
-  final geminiChat = geminiSDK.createNewChat();
+  final gemini = Gemini(apiKey: apiKey);
+  final chat = gemini.createNewChat(
+    options: const GeminiChatOptions(model: 'gemini-2.5-flash'),
+  );
 
   try {
-    print('Sending message to Gemini...\n');
-
-    // Send a simple text message
-    final result = await geminiChat.sendMessage([
-      GeminiSdkContent.text(
-          'What are the main differences between Dart and JavaScript? Please provide a brief comparison.'),
+    final response = await chat.sendMessage([
+      PromptContent.text(
+        'What are the main differences between Dart and JavaScript? Provide a concise comparison.',
+      ),
     ]);
 
-    print('Gemini response:');
-    print(result);
+    stdout
+      ..writeln('Gemini response:')
+      ..writeln(response)
+      ..writeln('\n---\nFollow-up question...');
 
-    // Continue the conversation
-    print('\n---\nAsking follow-up question...\n');
-
-    final followUp = await geminiChat.sendMessage([
-      GeminiSdkContent.text(
-          'Which one would you recommend for building mobile apps and why?'),
+    final followUp = await chat.sendMessage([
+      PromptContent.text(
+          'Which language would you recommend for mobile apps and why?'),
     ]);
 
-    print('Gemini response:');
-    print(followUp);
-  } catch (e) {
-    print('Error: $e');
+    stdout
+      ..writeln('Gemini response:')
+      ..writeln(followUp);
   } finally {
-    // Always dispose of the chat when done
-    await geminiChat.dispose();
-    print('\nChat session disposed.');
+    await chat.dispose();
+    await gemini.dispose();
   }
 }

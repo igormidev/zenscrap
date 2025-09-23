@@ -470,21 +470,25 @@ class ScrapingBeeMcpServerSetup {
   /// Resolves the package root directory for web_scrapper_generator
   static Future<String> _resolvePackageRoot() async {
     // Try to resolve the package URI to find the actual package location
-    final packageUri = Uri.parse('package:web_scrapper_generator/web_scrapper_generator.dart');
+    final packageUri = Uri.parse(
+      'package:web_scrapper_generator/web_scrapper_generator.dart',
+    );
     final resolvedUri = await Isolate.resolvePackageUri(packageUri);
-    
+
     if (resolvedUri != null) {
       // Get the directory path from the resolved URI
       // The URI points to lib/web_scrapper_generator.dart, so we need to go up to the package root
       final libPath = resolvedUri.toFilePath();
-      final packageRoot = path.dirname(path.dirname(libPath)); // Go up from lib/file.dart to package root
+      final packageRoot = path.dirname(
+        path.dirname(libPath),
+      ); // Go up from lib/file.dart to package root
       return packageRoot;
     }
-    
+
     // Fallback to current directory if resolution fails
     return Directory.current.path;
   }
-  
+
   /// Compiles the MCP server executable if needed
   static Future<void> _compileServerIfNeeded() async {
     final packagePath = await _resolvePackageRoot();

@@ -1,537 +1,515 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:path/path.dart' as path;
+import 'package:programming_cli_core_sdk/programming_cli_core_sdk.dart';
 
 import 'gemini_chat.dart';
-import 'exceptions/gemini_exceptions.dart';
-import 'models/chat_options.dart';
-import 'models/mcp_models.dart';
+import 'gemini_chat_options.dart';
 
-/// Main Gemini SDK class for interacting with Gemini CLI
-class GeminiSDK {
-  /// The API key for authenticating with Gemini
-  final String apiKey;
+class Gemini extends CodingCliInterface<GeminiChat, GeminiChatOptions> {
+  Gemini({required super.apiKey});
 
-  /// List of active chat sessions for cleanup
-  final List<GeminiChat> _activeSessions = [];
-
-  /// Creates a new Gemini SDK instance
-  GeminiSDK(this.apiKey) {
-    if (apiKey.isEmpty) {
-      throw GeminiSDKException('API key cannot be empty');
-    }
-  }
-
-  /// Creates a new chat session with Gemini
+  @override
   GeminiChat createNewChat({GeminiChatOptions? options}) {
-    final chat = GeminiChat(
-      apiKey: apiKey,
-      options: options,
-    );
-    _activeSessions.add(chat);
+    final chat = GeminiChat(apiKey: apiKey, options: options);
+    activeSessions.add(chat);
     return chat;
   }
 
-  /// Checks if Gemini CLI is installed
+  @override
+  Future<bool> isCodexCLIInstalled() async => isGeminiCLIInstalled();
+
   Future<bool> isGeminiCLIInstalled() async {
     try {
       final result = await Process.run(
-        _getShellCommand(),
-        _getShellArgs('gemini --version'),
+        _shellCommand,
+        _shellArgs('gemini --version'),
       );
-
       return result.exitCode == 0;
-    } catch (e) {
-      // If we can't run the command, assume it's not installed
+    } catch (_) {
       return false;
     }
   }
 
-  /// Installs the Gemini CLI using npm
+  @override
+  Future<void> installCodexCLI({bool global = true}) async =>
+      installGeminiCLI(global: global);
+
   Future<void> installGeminiCLI({bool global = true}) async {
-    // Check if npm is installed first
-    final npmInstalled = await _isNpmInstalled();
-    if (!npmInstalled) {
-      throw GeminiSDKException(
-        'npm is not installed. Please install Node.js and npm first.\n'
-        'Visit https://nodejs.org/ to download and install Node.js.',
+    if (!await _isNpmInstalled()) {
+      throw CliException(
+        'npm is not installed. Please install Node.js (https://nodejs.org/) first.',
       );
     }
-
-    print('Installing Gemini CLI...');
 
     final command = global
         ? 'npm install -g @google/gemini-cli'
         : 'npm install @google/gemini-cli';
 
-    try {
-      final process = await Process.start(
-        _getShellCommand(),
-        _getShellArgs(command),
-      );
+    final process = await Process.start(
+      _shellCommand,
+      _shellArgs(command),
+      mode: ProcessStartMode.inheritStdio,
+    );
 
-      // Stream output to console
-      process.stdout.listen((data) {
-        stdout.write(String.fromCharCodes(data));
-      });
-
-      process.stderr.listen((data) {
-        stderr.write(String.fromCharCodes(data));
-      });
-
-      final exitCode = await process.exitCode;
-
-      if (exitCode != 0) {
-        throw ProcessException(
-          'Failed to install Gemini CLI',
-          exitCode: exitCode,
-        );
-      }
-
-      print('\nGemini CLI installed successfully!');
-    } catch (e) {
-      throw ProcessException(
-        'Failed to install Gemini CLI: ${e.toString()}',
-        originalError: e,
-      );
+    final exitCode = await process.exitCode;
+    if (exitCode != 0) {
+      throw CliException('Failed to install Gemini CLI (exit code $exitCode).');
     }
   }
 
-  /// Updates the Gemini CLI to the newest version if needed
+  @override
   Future<void> updateToNewestVersionIfNeeded({bool global = true}) async {
-    // First check if CLI is installed
-    final isInstalled = await isGeminiCLIInstalled();
-    if (!isInstalled) {
-      print('Gemini CLI is not installed. Installing...');
+    if (!await isGeminiCLIInstalled()) {
       await installGeminiCLI(global: global);
       return;
     }
 
-    // Check if npm is installed
-    final npmInstalled = await _isNpmInstalled();
-    if (!npmInstalled) {
-      throw GeminiSDKException(
-        'npm is not installed. Please install Node.js and npm first.\n'
-        'Visit https://nodejs.org/ to download and install Node.js.',
+    if (!await _isNpmInstalled()) {
+      throw CliException(
+        'npm is not installed. Please install Node.js (https://nodejs.org/) first.',
       );
     }
 
     try {
-      // Get current installed version
       final currentVersionResult = await Process.run(
-        _getShellCommand(),
-        _getShellArgs('gemini --version'),
+        _shellCommand,
+        _shellArgs('gemini --version'),
       );
 
       String currentVersion = '';
       if (currentVersionResult.exitCode == 0) {
-        // Extract version number from output (e.g., "1.2.3" from "gemini 1.2.3")
-        final output = currentVersionResult.stdout.toString().trim();
-        final versionMatch = RegExp(r'(\d+\.\d+\.\d+)').firstMatch(output);
+        final versionMatch = RegExp(r'(\d+\.\d+\.\d+)')
+            .firstMatch(currentVersionResult.stdout.toString());
         if (versionMatch != null) {
           currentVersion = versionMatch.group(1) ?? '';
         }
       }
 
-      // Get latest available version from npm
       final latestVersionResult = await Process.run(
-        _getShellCommand(),
-        _getShellArgs('npm view @google/gemini-cli version'),
+        _shellCommand,
+        _shellArgs('npm view @google/gemini-cli version'),
       );
 
       if (latestVersionResult.exitCode != 0) {
-        print('Failed to check for updates.');
         return;
       }
 
       final latestVersion = latestVersionResult.stdout.toString().trim();
-
       if (currentVersion.isEmpty) {
-        print('Could not determine current version. Reinstalling...');
         await installGeminiCLI(global: global);
         return;
       }
 
-      // Compare versions
       if (_isNewerVersion(currentVersion, latestVersion)) {
-        print('Updating Gemini CLI from v$currentVersion to v$latestVersion...');
-
-        final updateCommand = global
+        final command = global
             ? 'npm update -g @google/gemini-cli'
             : 'npm update @google/gemini-cli';
 
         final process = await Process.start(
-          _getShellCommand(),
-          _getShellArgs(updateCommand),
+          _shellCommand,
+          _shellArgs(command),
+          mode: ProcessStartMode.inheritStdio,
         );
 
-        // Stream output to console
-        process.stdout.listen((data) {
-          stdout.write(String.fromCharCodes(data));
-        });
-
-        process.stderr.listen((data) {
-          stderr.write(String.fromCharCodes(data));
-        });
-
         final exitCode = await process.exitCode;
-
         if (exitCode != 0) {
-          print('Update failed. Attempting reinstall...');
           await installGeminiCLI(global: global);
-        } else {
-          print('\nGemini CLI updated successfully to v$latestVersion!');
         }
-      } else {
-        print('Gemini CLI is up to date (v$currentVersion).');
       }
-    } catch (e) {
-      print('Error checking for updates: $e');
-      print('You can manually update with: npm update -g @google/gemini-cli');
+    } catch (_) {
+      await installGeminiCLI(global: global);
     }
   }
 
-  /// Helper method to compare version strings
-  bool _isNewerVersion(String current, String latest) {
-    try {
-      final currentParts = current.split('.').map(int.parse).toList();
-      final latestParts = latest.split('.').map(int.parse).toList();
-
-      for (int i = 0; i < 3; i++) {
-        final currentPart = i < currentParts.length ? currentParts[i] : 0;
-        final latestPart = i < latestParts.length ? latestParts[i] : 0;
-
-        if (latestPart > currentPart) return true;
-        if (latestPart < currentPart) return false;
-      }
-
-      return false;
-    } catch (e) {
-      // If version parsing fails, assume update is needed
-      return true;
-    }
-  }
-
-  /// Gets information about installed Gemini CLI
+  @override
   Future<Map<String, dynamic>> getSDKInfo() async {
     final info = <String, dynamic>{};
 
-    // Check if Gemini CLI is installed
-    info['geminiCLI'] = await isGeminiCLIInstalled();
-
-    if (info['geminiCLI']) {
+    info['geminiCLIInstalled'] = await isGeminiCLIInstalled();
+    if (info['geminiCLIInstalled'] == true) {
       try {
-        // Get version
-        final versionResult = await Process.run(
-          _getShellCommand(),
-          _getShellArgs('gemini --version'),
+        final result = await Process.run(
+          _shellCommand,
+          _shellArgs('gemini --version'),
         );
-
-        if (versionResult.exitCode == 0) {
-          info['version'] = versionResult.stdout.toString().trim();
+        if (result.exitCode == 0) {
+          info['geminiVersion'] = result.stdout.toString().trim();
         }
-      } catch (e) {
-        info['version'] = 'unknown';
-      }
+      } catch (_) {}
     }
 
-    // Check MCP status
+    info['npmInstalled'] = await _isNpmInstalled();
+    if (info['npmInstalled'] == true) {
+      try {
+        final result = await Process.run(
+          _shellCommand,
+          _shellArgs('npm --version'),
+        );
+        if (result.exitCode == 0) {
+          info['npmVersion'] = result.stdout.toString().trim();
+        }
+      } catch (_) {}
+    }
+
+    final userConfig = _configFile(scope: McpScope.user);
+    info['configPath'] = userConfig.path;
+    info['configExists'] = userConfig.existsSync();
+
     final mcpInfo = await isMcpInstalled();
-    info['mcp'] = {
-      'enabled': mcpInfo.hasMcpSupport,
-      'servers': mcpInfo.servers.length,
-      'configPath': mcpInfo.configPath,
-    };
+    info['mcpEnabled'] = mcpInfo.hasMcpSupport;
+    info['mcpServers'] = mcpInfo.servers.length;
 
     return info;
   }
 
-  /// Checks if MCP is installed and configured
+  Future<void> exportApiKeyToEnvironment() async {
+    final command = Platform.isWindows
+        ? 'setx GEMINI_API_KEY "$apiKey"'
+        : 'export GEMINI_API_KEY="$apiKey"';
+
+    final result = await Process.run(
+      _shellCommand,
+      _shellArgs(command),
+    );
+
+    if (result.exitCode != 0) {
+      final errorOutput = (result.stderr as String?)?.trim().isNotEmpty == true
+          ? result.stderr.toString().trim()
+          : result.stdout.toString().trim();
+      throw CliException(
+        'Failed to export GEMINI_API_KEY. Exit code ${result.exitCode}.${errorOutput.isEmpty ? '' : ' Error: $errorOutput'}',
+      );
+    }
+  }
+
+  Future<void> dispose() async {
+    for (final session in activeSessions) {
+      await session.dispose();
+    }
+    activeSessions.clear();
+  }
+
   Future<McpInstallationInfo> isMcpInstalled() async {
+    final file = _configFile(scope: McpScope.user);
+    if (!await file.exists()) {
+      return McpInstallationInfo.notInstalled();
+    }
+
     try {
-      final homeDir =
-          Platform.environment['HOME'] ?? Platform.environment['USERPROFILE'];
-      if (homeDir == null) {
-        return const McpInstallationInfo(
-          hasMcpSupport: false,
-          servers: [],
-        );
-      }
-
-      final configPath = path.join(homeDir, '.gemini', 'settings.json');
-      final configFile = File(configPath);
-
-      if (!await configFile.exists()) {
-        return McpInstallationInfo(
-          hasMcpSupport: false,
-          servers: [],
-          configPath: configPath,
-        );
-      }
-
-      final configContent = await configFile.readAsString();
-      final config = jsonDecode(configContent) as Map<String, dynamic>;
-
-      final servers = <McpServerStatus>[];
-
-      if (config['mcpServers'] != null) {
-        final mcpServers = config['mcpServers'] as Map<String, dynamic>;
-        for (final entry in mcpServers.entries) {
-          servers.add(McpServerStatus(
-            name: entry.key,
-            status: 'configured',
-          ));
-        }
-      }
-
+      final json = await _readConfigJson(file);
+      final normalized = _normalizeConfig(json);
+      final config = McpConfig.fromJson(normalized);
       return McpInstallationInfo(
-        hasMcpSupport: servers.isNotEmpty,
-        servers: servers,
-        configPath: configPath,
+        hasMcpSupport: config.servers.isNotEmpty,
+        servers: config.serverList,
+        configPath: file.path,
       );
-    } catch (e) {
-      return const McpInstallationInfo(
-        hasMcpSupport: false,
-        servers: [],
-      );
+    } catch (_) {
+      return McpInstallationInfo.notInstalled();
     }
   }
 
-  /// Installs a popular MCP server
-  Future<void> installPopularMcpServer(
-    String serverName, {
-    Map<String, String>? environment,
-  }) async {
-    final serverConfig = PopularMcpServers.getServer(serverName);
-    if (serverConfig == null) {
-      throw GeminiSDKException(
-        'Unknown popular server: $serverName\n'
-        'Available servers: ${PopularMcpServers.list().join(', ')}',
-      );
-    }
-
-    // Check required environment variables
-    if (serverConfig['requiredEnv'] != null) {
-      final requiredEnv = serverConfig['requiredEnv'] as List<dynamic>;
-      final missingEnv = <String>[];
-
-      for (final envVar in requiredEnv) {
-        if (environment?[envVar] == null &&
-            Platform.environment[envVar] == null) {
-          missingEnv.add(envVar as String);
-        }
-      }
-
-      if (missingEnv.isNotEmpty) {
-        throw GeminiSDKException(
-          'Missing required environment variables for $serverName: ${missingEnv.join(', ')}\n'
-          'Please provide them in the environment parameter.',
-        );
-      }
-    }
-
-    // Create MCP server configuration
-    final server = McpServer(
-      name: serverName,
-      command: serverConfig['command'] as String,
-      args: List<String>.from(serverConfig['args'] as List),
-      env: environment,
-    );
-
-    await addMcpServer(serverName, customServer: server);
-
-    print('Successfully installed $serverName MCP server');
-  }
-
-  /// Adds an MCP server to the configuration
-  Future<void> addMcpServer(
-    String name, {
-    String? packageName,
-    McpServer? customServer,
-    McpAddOptions? options,
-  }) async {
-    if (packageName == null && customServer == null) {
-      throw GeminiSDKException(
-        'Either packageName or customServer must be provided',
-      );
-    }
-
-    final opts = options ?? const McpAddOptions();
-
-    // Determine config path based on scope
-    final homeDir =
-        Platform.environment['HOME'] ?? Platform.environment['USERPROFILE'];
-    if (homeDir == null) {
-      throw GeminiSDKException('Could not determine home directory');
-    }
-
-    final configPath = opts.scope == McpScope.user
-        ? path.join(homeDir, '.gemini', 'settings.json')
-        : path.join(Directory.current.path, '.gemini', 'settings.json');
-
-    // Create directory if it doesn't exist
-    final configDir = Directory(path.dirname(configPath));
-    if (!await configDir.exists()) {
-      await configDir.create(recursive: true);
-    }
-
-    // Load existing config or create new one
-    Map<String, dynamic> config = {};
-    final configFile = File(configPath);
-
-    if (await configFile.exists()) {
-      final content = await configFile.readAsString();
-      config = jsonDecode(content) as Map<String, dynamic>;
-    }
-
-    // Ensure mcpServers exists
-    config['mcpServers'] ??= <String, dynamic>{};
-    final mcpServers = config['mcpServers'] as Map<String, dynamic>;
-
-    // Add the server
-    if (customServer != null) {
-      mcpServers[name] = customServer.toJson();
-    } else if (packageName != null) {
-      // Create server from npm package
-      final server = McpServer(
-        name: name,
-        command: opts.useNpx ? 'npx' : 'node',
-        args: opts.useNpx ? ['-y', packageName] : [packageName],
-        env: opts.environment,
-      );
-      mcpServers[name] = server.toJson();
-    }
-
-    // Save the updated config
-    await configFile.writeAsString(
-      const JsonEncoder.withIndent('  ').convert(config),
-    );
-
-    print('Added MCP server "$name" to ${opts.scope.name} configuration');
-  }
-
-  /// Lists all configured MCP servers
-  Future<List<McpServer>> listMcpServers() async {
-    final mcpInfo = await isMcpInstalled();
-
-    if (!mcpInfo.hasMcpSupport || mcpInfo.configPath == null) {
+  Future<List<McpServer>> listMcpServers(
+      {McpScope scope = McpScope.user}) async {
+    final file = _configFile(scope: scope);
+    if (!await file.exists()) {
       return [];
     }
 
     try {
-      final configFile = File(mcpInfo.configPath!);
-      final configContent = await configFile.readAsString();
-      final config = jsonDecode(configContent) as Map<String, dynamic>;
-
-      if (config['mcpServers'] == null) {
-        return [];
-      }
-
-      final mcpServers = config['mcpServers'] as Map<String, dynamic>;
-      final servers = <McpServer>[];
-
-      for (final entry in mcpServers.entries) {
-        servers.add(McpServer.fromJson({
-          'name': entry.key,
-          ...entry.value as Map<String, dynamic>,
-        }));
-      }
-
-      return servers;
-    } catch (e) {
-      throw GeminiSDKException('Failed to list MCP servers: $e');
+      final json = await _readConfigJson(file);
+      final normalized = _normalizeConfig(json);
+      final config = McpConfig.fromJson(normalized);
+      return config.serverList;
+    } catch (_) {
+      return [];
     }
   }
 
-  /// Gets details about a specific MCP server
+  Future<void> installPopularMcpServer(
+    String serverName, {
+    Map<String, String>? environment,
+    McpScope scope = McpScope.user,
+  }) async {
+    final template = _popularServers[serverName];
+    if (template == null) {
+      throw CliException(
+        'Unknown popular server: $serverName. Available servers: ${_popularServers.keys.join(', ')}',
+      );
+    }
+
+    final env = <String, String>{};
+    env.addAll(template.env ?? {});
+    if (environment != null) {
+      env.addAll(environment);
+    }
+
+    final server = McpServer(
+      name: serverName,
+      command: template.command,
+      args: template.args,
+      env: env.isEmpty ? null : env,
+    );
+
+    await addMcpServer(
+      serverName,
+      customServer: server,
+      options: McpAddOptions(scope: scope),
+    );
+  }
+
+  Future<void> addMcpServer(
+    String name, {
+    McpServer? customServer,
+    McpAddOptions? options,
+  }) async {
+    final opts = options ?? const McpAddOptions();
+    final scope = opts.scope;
+    if (scope == McpScope.system) {
+      throw CliException(
+          'Gemini CLI does not support system scope configurations.');
+    }
+
+    final file = _configFile(scope: scope);
+    final originalJson = await _readConfigJson(file);
+    final normalized = _normalizeConfig(originalJson);
+    var config = McpConfig.fromJson(normalized);
+
+    var server = customServer ?? _createDefaultServer(name, opts.useNpx);
+    if (opts.environment != null && opts.environment!.isNotEmpty) {
+      final mergedEnv = Map<String, String>.from(server.env ?? {});
+      mergedEnv.addAll(opts.environment!);
+      server = server.copyWith(env: mergedEnv);
+    }
+
+    config = config.addServer(server.copyWith(scope: scope));
+
+    final updatedJson = _denormalizeConfig(config, originalJson);
+    await _writeConfigJson(file, updatedJson);
+  }
+
   Future<McpServer?> getMcpServerDetails(String name) async {
     final servers = await listMcpServers();
-
     try {
-      return servers.firstWhere((s) => s.name == name);
-    } catch (e) {
+      return servers.firstWhere((server) => server.name == name);
+    } catch (_) {
       return null;
     }
   }
 
-  /// Removes an MCP server from the configuration
-  Future<void> removeMcpServer(String name) async {
-    final homeDir =
-        Platform.environment['HOME'] ?? Platform.environment['USERPROFILE'];
-    if (homeDir == null) {
-      throw GeminiSDKException('Could not determine home directory');
+  Future<void> removeMcpServer(String name,
+      {bool removeFromProject = true}) async {
+    final scopes = <McpScope>[McpScope.user];
+    if (removeFromProject) {
+      scopes.add(McpScope.project);
     }
 
-    // Try both user and project scope
-    final userConfigPath = path.join(homeDir, '.gemini', 'settings.json');
-    final projectConfigPath =
-        path.join(Directory.current.path, '.gemini', 'settings.json');
-
-    bool removed = false;
-
-    for (final configPath in [userConfigPath, projectConfigPath]) {
-      final configFile = File(configPath);
-
-      if (await configFile.exists()) {
-        final content = await configFile.readAsString();
-        final config = jsonDecode(content) as Map<String, dynamic>;
-
-        if (config['mcpServers'] != null) {
-          final mcpServers = config['mcpServers'] as Map<String, dynamic>;
-
-          if (mcpServers.containsKey(name)) {
-            mcpServers.remove(name);
-
-            await configFile.writeAsString(
-              const JsonEncoder.withIndent('  ').convert(config),
-            );
-
-            removed = true;
-            print('Removed MCP server "$name" from configuration');
-          }
-        }
+    var removed = false;
+    for (final scope in scopes) {
+      final file = _configFile(scope: scope);
+      if (!await file.exists()) {
+        continue;
       }
+
+      final originalJson = await _readConfigJson(file);
+      final normalized = _normalizeConfig(originalJson);
+      final config = McpConfig.fromJson(normalized);
+      if (config.getServer(name) == null) {
+        continue;
+      }
+
+      final updatedConfig = config.removeServer(name);
+      final updatedJson = _denormalizeConfig(updatedConfig, originalJson);
+      await _writeConfigJson(file, updatedJson);
+      removed = true;
     }
 
     if (!removed) {
-      throw GeminiSDKException('MCP server "$name" not found in configuration');
+      throw CliException('MCP server "$name" not found in configuration.');
     }
   }
 
-  /// Checks if npm is installed
+  String get _shellCommand => Platform.isWindows ? 'cmd.exe' : '/bin/sh';
+
+  List<String> _shellArgs(String command) =>
+      Platform.isWindows ? ['/c', command] : ['-c', command];
+
   Future<bool> _isNpmInstalled() async {
     try {
       final result = await Process.run(
-        _getShellCommand(),
-        _getShellArgs('npm --version'),
+        _shellCommand,
+        _shellArgs('npm --version'),
       );
       return result.exitCode == 0;
-    } catch (e) {
+    } catch (_) {
       return false;
     }
   }
 
-  /// Gets the appropriate shell command for the platform
-  String _getShellCommand() {
-    if (Platform.isWindows) {
-      return 'cmd.exe';
+  bool _isNewerVersion(String current, String latest) {
+    try {
+      final currentParts = current.split('.').map(int.parse).toList();
+      final latestParts = latest.split('.').map(int.parse).toList();
+      for (var i = 0; i < 3; i++) {
+        final currentPart = i < currentParts.length ? currentParts[i] : 0;
+        final latestPart = i < latestParts.length ? latestParts[i] : 0;
+        if (latestPart > currentPart) return true;
+        if (latestPart < currentPart) return false;
+      }
+      return false;
+    } catch (_) {
+      return true;
     }
-    return 'sh';
   }
 
-  /// Gets the appropriate shell arguments for the platform
-  List<String> _getShellArgs(String command) {
-    if (Platform.isWindows) {
-      return ['/c', command];
+  File _configFile({required McpScope scope}) {
+    final fileName = path.join('.gemini', 'settings.json');
+    switch (scope) {
+      case McpScope.user:
+        final home = _resolveHomeDirectory();
+        return File(path.join(home, fileName));
+      case McpScope.project:
+        return File(path.join(Directory.current.path, fileName));
+      case McpScope.system:
+        throw CliException('System scope is not supported for Gemini CLI.');
     }
-    return ['-c', command];
   }
 
-  /// Disposes all active chat sessions
-  Future<void> dispose() async {
-    for (final session in _activeSessions) {
-      await session.dispose();
+  String _resolveHomeDirectory() {
+    final home = Platform.environment['HOME'] ??
+        Platform.environment['USERPROFILE'] ??
+        Platform.environment['HOMEPATH'];
+    if (home == null || home.isEmpty) {
+      throw CliException(
+          'Could not determine home directory for MCP configuration.');
     }
-    _activeSessions.clear();
+    return home;
   }
+
+  Future<Map<String, dynamic>> _readConfigJson(File file) async {
+    if (!await file.exists()) {
+      return {};
+    }
+
+    try {
+      final content = await file.readAsString();
+      if (content.trim().isEmpty) {
+        return {};
+      }
+      final decoded = jsonDecode(content);
+      if (decoded is Map<String, dynamic>) {
+        return decoded;
+      }
+      return {};
+    } catch (_) {
+      return {};
+    }
+  }
+
+  Future<void> _writeConfigJson(File file, Map<String, dynamic> json) async {
+    if (!await file.parent.exists()) {
+      await file.parent.create(recursive: true);
+    }
+
+    final encoder = const JsonEncoder.withIndent('  ');
+    await file.writeAsString('${encoder.convert(json)}\n');
+  }
+
+  Map<String, dynamic> _normalizeConfig(Map<String, dynamic> json) {
+    if (json.containsKey('mcp_servers')) {
+      return json;
+    }
+    if (json.containsKey('mcpServers')) {
+      final value = json['mcpServers'];
+      if (value is Map<String, dynamic>) {
+        return {
+          ...json,
+          'mcp_servers': value,
+        };
+      }
+    }
+    return json;
+  }
+
+  Map<String, dynamic> _denormalizeConfig(
+    McpConfig config,
+    Map<String, dynamic> original,
+  ) {
+    final updated = Map<String, dynamic>.from(original)
+      ..remove('mcpServers')
+      ..remove('mcp_servers');
+
+    final servers = config.toJson()['mcp_servers'] as Map<String, dynamic>?;
+    if (servers != null && servers.isNotEmpty) {
+      updated['mcpServers'] = servers;
+    }
+
+    return updated;
+  }
+
+  McpServer _createDefaultServer(String name, bool useNpx) {
+    return McpServer(
+      name: name,
+      command: useNpx ? 'npx' : name,
+      args: useNpx ? ['-y', name] : [],
+    );
+  }
+
+  static const Map<String, _PopularServer> _popularServers = {
+    'filesystem': _PopularServer(
+      command: 'npx',
+      args: ['-y', '@modelcontextprotocol/server-filesystem'],
+    ),
+    'github': _PopularServer(
+      command: 'npx',
+      args: ['-y', '@modelcontextprotocol/server-github'],
+      env: {'GITHUB_TOKEN': ''},
+    ),
+    'postgres': _PopularServer(
+      command: 'npx',
+      args: ['-y', '@modelcontextprotocol/server-postgres'],
+      env: {'DATABASE_URL': ''},
+    ),
+    'git': _PopularServer(
+      command: 'npx',
+      args: ['-y', '@modelcontextprotocol/server-git'],
+    ),
+    'puppeteer': _PopularServer(
+      command: 'npx',
+      args: ['-y', '@modelcontextprotocol/server-puppeteer'],
+    ),
+    'sequential-thinking': _PopularServer(
+      command: 'npx',
+      args: ['-y', '@modelcontextprotocol/server-sequential-thinking'],
+    ),
+    'slack': _PopularServer(
+      command: 'npx',
+      args: ['-y', '@modelcontextprotocol/server-slack'],
+      env: {'SLACK_TOKEN': ''},
+    ),
+    'google-drive': _PopularServer(
+      command: 'npx',
+      args: ['-y', '@modelcontextprotocol/server-google-drive'],
+      env: {
+        'GOOGLE_CLIENT_ID': '',
+        'GOOGLE_CLIENT_SECRET': '',
+      },
+    ),
+  };
 }
+
+class _PopularServer {
+  const _PopularServer({
+    required this.command,
+    required this.args,
+    this.env,
+  });
+
+  final String command;
+  final List<String> args;
+  final Map<String, String>? env;
+}
+
+typedef GeminiSDK = Gemini;

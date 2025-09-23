@@ -26,7 +26,7 @@ class WebScrapperGeminiImpl
     );
 
     print('🚀 Initializing Gemini SDK for web scraper generator...\n');
-    _geminiSDK = GeminiSDK(geminiApiKey);
+    _geminiSDK = GeminiSDK(apiKey: geminiApiKey);
 
     // Ensure Gemini CLI is installed and up to date
     await _geminiSDK.updateToNewestVersionIfNeeded(global: true);
@@ -75,7 +75,7 @@ class WebScrapperGeminiImpl
   Future<WebScrapperChatAIResponse> sendMessage({
     required String userPrompt,
   }) async {
-    List<GeminiSdkContent> messages = [];
+    List<PromptContent> messages = [];
 
     // Add initial prompts if this is the first message
     final isFirstMessage = _chat.isFirstMessage;
@@ -84,7 +84,7 @@ class WebScrapperGeminiImpl
     }
 
     // Add the user's prompt
-    messages.add(GeminiSdkContent.text(userPrompt));
+    messages.add(PromptContent.text(userPrompt));
 
     // Define the response schema for structured output
     final responseSchema = buildGeminiResponseSchema();
@@ -112,7 +112,7 @@ class WebScrapperGeminiImpl
     Future<WebScrapperChatAIResponse> structuredSchemaDataCompleter,
   })
   streamMessage({required String userPrompt}) {
-    List<GeminiSdkContent> messages = [];
+    List<PromptContent> messages = [];
 
     // Add initial prompts if this is the first message
     final isFirstMessage = _chat.isFirstMessage;
@@ -121,7 +121,7 @@ class WebScrapperGeminiImpl
     }
 
     // Add the user's prompt
-    messages.add(GeminiSdkContent.text(userPrompt));
+    messages.add(PromptContent.text(userPrompt));
 
     // Define the response schema for structured output
     final responseSchema = buildGeminiResponseSchema();

@@ -30,7 +30,7 @@ import 'package:gemini_cli_sdk/gemini_cli_sdk.dart';
 
 void main() async {
   // Initialize Gemini SDK
-  final geminiSDK = GeminiSDK('YOUR_API_KEY');
+  final geminiSDK = GeminiSDK(apiKey: 'YOUR_API_KEY');
   
   // Run the setup
   await PuppeteerSetup.instance.setupIfNeeded(geminiSDK);
@@ -63,7 +63,7 @@ final chat = geminiSDK.createNewChat();
 
 // Ask Gemini to scrape a website
 final result = await chat.sendMessage([
-  GeminiSdkContent.text('''
+  PromptContent.text('''
     Using Puppeteer, navigate to https://example.com and:
     1. Get the page title
     2. Extract all h1 headings
@@ -199,7 +199,7 @@ import 'package:gemini_cli_sdk/gemini_cli_sdk.dart';
 
 void main() async {
   // Setup
-  final geminiSDK = GeminiSDK(Platform.environment['GEMINI_API_KEY']!);
+  final geminiSDK = GeminiSDK(apiKey: Platform.environment['GEMINI_API_KEY']!);
   await PuppeteerSetup.instance.setupIfNeeded(geminiSDK);
   
   // Create chat session
@@ -208,7 +208,7 @@ void main() async {
   try {
     // Complex scraping task
     final result = await chat.sendMessage([
-      GeminiSdkContent.text('''
+      PromptContent.text('''
         Using Puppeteer, go to https://news.ycombinator.com and:
         1. Extract the top 5 story titles
         2. Get their vote counts
@@ -304,7 +304,7 @@ Once configured, Gemini can use Puppeteer with the proxy:
 final chat = geminiSDK.createNewChat();
 
 final result = await chat.sendMessage([
-  GeminiSdkContent.text('''
+  PromptContent.text('''
     Using Puppeteer with proxy, scrape https://example.com and:
     1. Extract the main content
     2. Get all links

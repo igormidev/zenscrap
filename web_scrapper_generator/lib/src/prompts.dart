@@ -231,7 +231,7 @@ Must include:
 
 Remember: Your goal is to create reliable, cost-effective extraction rules that consistently retrieve the data users need.''';
 
-List<GeminiSdkContent> handleInitialPrompts(InitialPayloadData payload) {
+List<PromptContent> handleInitialPrompts(InitialPayloadData payload) {
   return switch (payload) {
     InitialPayloadDataCreatingFromZero() => creatingFromZeroInitialPrompt(
       payload: payload,
@@ -241,7 +241,7 @@ List<GeminiSdkContent> handleInitialPrompts(InitialPayloadData payload) {
   };
 }
 
-List<GeminiSdkContent> creatingFromZeroInitialPrompt({
+List<PromptContent> creatingFromZeroInitialPrompt({
   required InitialPayloadDataCreatingFromZero payload,
 }) {
   final String targetUrl = payload.targetExampleUrl;
@@ -251,7 +251,7 @@ List<GeminiSdkContent> creatingFromZeroInitialPrompt({
   final inputBytes = Uint8List.fromList(e.convert(requestJson).codeUnits);
 
   return [
-    GeminiSdkContent.text('''## Task: Create New Web Scraper
+    PromptContent.text('''## Task: Create New Web Scraper
 
 You need to create extraction rules for a new web scraper from scratch.
 
@@ -266,12 +266,12 @@ You need to create extraction rules for a new web scraper from scratch.
 **Initial Request Configuration**:
 The following JSON contains the initial WebScrapperRequest configuration that was automatically generated from the URL. You can modify these if the user requests changes (e.g., adding query parameters, changing the URL pattern).
 '''),
-    GeminiSdkContent.bytes(
+    PromptContent.bytes(
       data: inputBytes,
       fileName: 'request_config',
       fileExtension: 'json',
     ),
-    GeminiSdkContent.text('''
+    PromptContent.text('''
 ## Your Process:
 
 1. **Explore the Site**: Use Puppeteer MCP to open and analyze the target URL
@@ -294,7 +294,7 @@ User prompt:'''),
   ];
 }
 
-List<GeminiSdkContent> editingExistingWebScrapperInitialPrompt({
+List<PromptContent> editingExistingWebScrapperInitialPrompt({
   required InitialPayloadDataEditingExistingWebScrapper payload,
 }) {
   final WebScrapperRequest currentRequest = payload.currentRequest;
@@ -311,7 +311,7 @@ List<GeminiSdkContent> editingExistingWebScrapperInitialPrompt({
   final inputBytes = Uint8List.fromList(e.convert(inputJson).codeUnits);
 
   return [
-    GeminiSdkContent.text('''## Task: Edit Existing Web Scraper
+    PromptContent.text('''## Task: Edit Existing Web Scraper
 
 You are editing an existing, working web scraper. The current configuration successfully extracts data, but the user wants to make modifications.
 
@@ -328,12 +328,12 @@ The following JSON contains:
 1. **currentRequest**: The current WebScrapperRequest (URL pattern, query params, path params)
 2. **currentFetchSettings**: The current ScrapingBee settings that are successfully extracting data
 '''),
-    GeminiSdkContent.bytes(
+    PromptContent.bytes(
       data: inputBytes,
       fileName: 'current_config',
       fileExtension: 'json',
     ),
-    GeminiSdkContent.text('''
+    PromptContent.text('''
 ## Your Process:
 
 1. **Understand Current Setup**: The existing rules are working correctly

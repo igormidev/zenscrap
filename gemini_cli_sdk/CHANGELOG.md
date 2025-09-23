@@ -1,3 +1,21 @@
+## 3.0.0
+
+### Breaking Changes
+- Rebuilt the SDK on top of `programming_cli_core_sdk`, aligning the Gemini, Codex, and Claude packages.
+- Replaced `GeminiSdkContent` with the shared `PromptContent` abstractions for text and file prompts.
+- Removed package-specific exceptions in favour of the shared `CliException` hierarchy.
+- Simplified the public API to mirror other CLI SDKs; previous MCP helper models have been replaced with shared types.
+
+### Added
+- New `Gemini`/`GeminiSDK` class implementing `CodingCliInterface` with consistent session management.
+- Dedicated `GeminiChatOptions` that map directly to Gemini CLI flags and shared schema tooling.
+- Enhanced MCP management using the shared `McpConfig`, including popular server templates and scope-aware helpers.
+
+### Improved
+- Streaming now normalises Gemini CLI output and strips metadata automatically.
+- Environment handling ensures `GEMINI_API_KEY` is injected for every process and can export to the shell on demand.
+- Package layout now mirrors the other CLI SDKs with a flat `lib/src` structure.
+
 ## 2.1.0
 
 ### Breaking Changes

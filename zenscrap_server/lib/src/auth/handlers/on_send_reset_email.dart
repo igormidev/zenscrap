@@ -8,10 +8,10 @@ Future<bool> onSendResetEmail(
   UserInfo userInfo,
   String validationCode,
 ) async {
-  print('Validation code: $validationCode');
+  session.log('Validation code: $validationCode');
   final email = userInfo.email;
   if (email == null) {
-    print('Email not found for ${userInfo.id}');
+    session.log('Email not found for ${userInfo.id}');
     return false;
   }
   final htmlText = getHTMLEmailTemplate(

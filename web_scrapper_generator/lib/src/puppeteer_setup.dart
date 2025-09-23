@@ -10,7 +10,7 @@ class PuppeteerSetup {
   static PuppeteerSetup get instance => _instance ??= PuppeteerSetup._();
 
   /// Ensures Puppeteer and its MCP integration are properly installed and configured
-  /// 
+  ///
   /// Note: Proxy configuration is now handled dynamically by the AI through launchOptions
   /// when calling puppeteer_navigate, not during setup.
   Future<void> setupIfNeeded(
@@ -59,7 +59,9 @@ class PuppeteerSetup {
       // The proxyConfig parameter is kept for backward compatibility but not used
       if (proxyConfig != null) {
         print('ℹ️ Proxy configuration is now handled dynamically by the AI\n');
-        print('   The AI will pass proxy settings through launchOptions when needed.\n');
+        print(
+          '   The AI will pass proxy settings through launchOptions when needed.\n',
+        );
       }
 
       // Step 4: Verify the setup
@@ -113,9 +115,7 @@ class PuppeteerSetup {
       );
 
       if (result.exitCode != 0) {
-        throw Exception(
-          'Failed to install puppeteer:\n${result.stderr}',
-        );
+        throw Exception('Failed to install puppeteer:\n${result.stderr}');
       }
 
       // Also install the MCP server-puppeteer globally if not already installed
@@ -152,9 +152,11 @@ class PuppeteerSetup {
       }
 
       // Check if puppeteer server is in the list
-      return mcpInfo.servers.any((server) =>
-          server.name.toLowerCase().contains('puppeteer') ||
-          server.name.contains('mcp-puppeteer'));
+      return mcpInfo.servers.any(
+        (server) =>
+            server.name.toLowerCase().contains('puppeteer') ||
+            server.name.contains('mcp-puppeteer'),
+      );
     } catch (e) {
       return false;
     }
@@ -163,48 +165,32 @@ class PuppeteerSetup {
   /// Configures the MCP puppeteer server
   Future<void> _configureMcpPuppeteer(GeminiSDK geminiSDK) async {
     try {
-      // Check if the popular server is available
-      if (PopularMcpServers.isPopular('puppeteer')) {
-        // Use the popular server configuration
-        await geminiSDK.installPopularMcpServer('puppeteer');
-      } else {
-        // Configure custom MCP server for puppeteer
-        final puppeteerServer = McpServer(
-          name: 'puppeteer',
-          command: 'npx',
-          args: ['-y', '@modelcontextprotocol/server-puppeteer'],
-          env: {'NODE_PATH': path.join(Directory.current.path, 'node_modules')},
-        );
+      await geminiSDK.installPopularMcpServer('puppeteer');
+    } catch (e) {
+      final puppeteerServer = McpServer(
+        name: 'puppeteer',
+        command: 'npx',
+        args: ['-y', '@modelcontextprotocol/server-puppeteer'],
+        env: {'NODE_PATH': path.join(Directory.current.path, 'node_modules')},
+      );
 
+      try {
         await geminiSDK.addMcpServer(
           'puppeteer',
           customServer: puppeteerServer,
         );
-      }
-    } catch (e) {
-      // If adding to user config fails, try project scope
-      try {
+      } catch (_) {
         await geminiSDK.addMcpServer(
           'puppeteer',
-          packageName: '@modelcontextprotocol/server-puppeteer',
-          options: McpAddOptions(
-            scope: McpScope.project,
-            useNpx: true,
-            environment: {
-              'NODE_PATH': path.join(Directory.current.path, 'node_modules'),
-            },
-          ),
+          customServer: puppeteerServer,
+          options: const McpAddOptions(scope: McpScope.project, useNpx: true),
         );
-      } catch (e2) {
-        throw Exception('Failed to configure MCP Puppeteer server: $e2');
       }
     }
   }
 
   /// Verifies that the Puppeteer setup is working
-  Future<void> _verifySetup(
-    GeminiSDK geminiSDK,
-  ) async {
+  Future<void> _verifySetup(GeminiSDK geminiSDK) async {
     print('🔍 Verifying Puppeteer setup...');
 
     // Verify Puppeteer installation by creating a simple test script
@@ -282,10 +268,8 @@ const puppeteer = require('puppeteer');
   /// Cleans up any temporary files or resources
   Future<void> cleanup() async {
     // Cleanup any temporary files if needed
-    final filesToClean = [
-      '_puppeteer_test.js',
-    ];
-    
+    final filesToClean = ['_puppeteer_test.js'];
+
     for (final fileName in filesToClean) {
       final file = File(path.join(Directory.current.path, fileName));
       if (await file.exists()) {
@@ -332,28 +316,28 @@ const puppeteer = require('puppeteer');
 class ScrappingBeeProxyConfig {
   /// Your ScrapingBee API key
   final String apiKey;
-  
+
   /// Proxy server host (default: proxy.scrapingbee.com)
   final String proxyHost;
-  
+
   /// Proxy port (default: 8886 for HTTP, 8887 for HTTPS)
   final int proxyPort;
-  
+
   /// Protocol to use (http, https, or socks5)
   final ProxyProtocol protocol;
-  
+
   /// Custom parameters to pass to ScrapingBee
   final Map<String, String> parameters;
-  
+
   /// Use stealth proxy for better success rates (rotating IPs)
   final bool stealthProxy;
-  
+
   /// Enable JavaScript rendering
   final bool renderJs;
-  
+
   /// Use premium residential proxies
   final bool premiumProxy;
-  
+
   /// Country code for geo-targeting (e.g., 'us', 'de', 'br')
   final String? countryCode;
 
@@ -378,32 +362,30 @@ class ScrappingBeeProxyConfig {
     final scheme = protocol == ProxyProtocol.socks5 ? 'socks5' : protocol.name;
     return '$scheme://$auth@$proxyHost:$proxyPort';
   }
-  
+
   /// Builds the parameter string for authentication
   String _buildParameters({String? countryCode}) {
     final params = <String, String>{};
-    
+
     // Always set these for proxy mode
     params['render_js'] = renderJs ? 'True' : 'False';
     params['premium_proxy'] = premiumProxy ? 'True' : 'False';
-    
+
     if (stealthProxy) {
       params['stealth_proxy'] = 'True';
     }
-    
+
     // Use provided country code or fall back to configured one
     final country = countryCode ?? this.countryCode;
     if (country != null) {
       params['country_code'] = country;
     }
-    
+
     // Add any custom parameters
     params.addAll(parameters);
-    
+
     // Format as key1=value1&key2=value2
-    return params.entries
-        .map((e) => '${e.key}=${e.value}')
-        .join('&');
+    return params.entries.map((e) => '${e.key}=${e.value}').join('&');
   }
 
   ScrappingBeeProxyConfig copyWith({
@@ -432,8 +414,4 @@ class ScrappingBeeProxyConfig {
 }
 
 /// Proxy protocol types supported by ScrapingBee
-enum ProxyProtocol {
-  http,
-  https,
-  socks5,
-}
+enum ProxyProtocol { http, https, socks5 }

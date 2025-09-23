@@ -1,40 +1,30 @@
 import 'dart:io';
+
 import 'package:gemini_cli_sdk/gemini_cli_sdk.dart';
 
-void main() async {
-  // Get API key from environment
+Future<void> main() async {
   final apiKey = Platform.environment['GEMINI_API_KEY'] ?? 'YOUR_API_KEY';
-  
   if (apiKey == 'YOUR_API_KEY') {
-    print('Please set your GEMINI_API_KEY environment variable');
+    stderr.writeln('Set GEMINI_API_KEY before running this example.');
     return;
   }
 
-  final geminiSDK = GeminiSDK(apiKey);
-  final geminiChat = geminiSDK.createNewChat();
-  
+  final gemini = Gemini(apiKey: apiKey);
+  final chat = gemini.createNewChat(
+    options: const GeminiChatOptions(model: 'gemini-2.5-flash'),
+  );
+
   try {
-    print('Requesting a streamed response from Gemini...');
-    print('(This will print the response as it arrives)\n');
-    print('=' * 50);
-    
-    // Stream the response
-    await for (final chunk in geminiChat.streamResponse([
-      GeminiSdkContent.text('''
-Write a short story about a robot learning to paint. 
-Make it creative and engaging, about 3-4 paragraphs long.
-'''),
-    ])) {
-      // Print each chunk as it arrives without newline
+    final stream = chat.streamResponse([
+      PromptContent.text(
+          'Explain the Gemini CLI in three concise bullet points.'),
+    ]);
+
+    await for (final chunk in stream) {
       stdout.write(chunk);
     }
-    
-    print('\n${'=' * 50}');
-    print('\nStreaming complete!');
-    
-  } catch (e) {
-    print('Error: $e');
   } finally {
-    await geminiChat.dispose();
+    await chat.dispose();
+    await gemini.dispose();
   }
 }

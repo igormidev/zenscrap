@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:claude_code_sdk/claude_code_sdk.dart';
-import 'package:gemini_cli_sdk/gemini_cli_sdk.dart' as gemini_sdk;
 import 'package:web_scrapper_generator/src/prompts.dart';
 import 'package:web_scrapper_generator/src/schema_constants.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_generator_interface.dart';
@@ -207,35 +206,7 @@ Remember: Your goal is to create extraction rules that consistently retrieve the
 
   /// Convert initial prompts from Gemini format to Claude format
   List<PromptContent> _convertInitialPromptsForClaude() {
-    final geminiPrompts = handleInitialPrompts(initialPayload);
-    final claudePrompts = <PromptContent>[];
-
-    for (final prompt in geminiPrompts) {
-      // GeminiSdkContent is a sealed class, check the type directly
-      if (prompt is gemini_sdk.TextContent) {
-        claudePrompts.add(PromptContent.text(prompt.text));
-      } else if (prompt is gemini_sdk.BytesContent) {
-        // Claude handles bytes similarly
-        claudePrompts.add(
-          PromptContent.bytes(
-            data: prompt.data,
-            fileName: prompt.fileName,
-            fileExtension: prompt.fileExtension,
-            fileDescription: prompt.fileDescription,
-          ),
-        );
-      } else if (prompt is gemini_sdk.FileContent) {
-        // Convert file content to Claude format
-        claudePrompts.add(
-          PromptContent.file(
-            prompt.file,
-            fileDescription: prompt.fileDescription,
-          ),
-        );
-      }
-    }
-
-    return claudePrompts;
+    return List<PromptContent>.from(handleInitialPrompts(initialPayload));
   }
 
   SchemaDefinition buildClaudeResponseSchema() {

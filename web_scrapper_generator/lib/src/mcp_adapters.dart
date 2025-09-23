@@ -9,7 +9,8 @@ import 'puppeteer_setup.dart';
 abstract class McpAdapter {
   Future<bool> isMcpInstalled();
   Future<bool> hasServer(String serverName);
-  Future<void> addMcpServer(String name, {
+  Future<void> addMcpServer(
+    String name, {
     required String command,
     required List<String> args,
     Map<String, String>? env,
@@ -35,7 +36,8 @@ class GeminiMcpAdapter implements McpAdapter {
   }
 
   @override
-  Future<void> addMcpServer(String name, {
+  Future<void> addMcpServer(
+    String name, {
     required String command,
     required List<String> args,
     Map<String, String>? env,
@@ -69,7 +71,8 @@ class ClaudeMcpAdapter implements McpAdapter {
   }
 
   @override
-  Future<void> addMcpServer(String name, {
+  Future<void> addMcpServer(
+    String name, {
     required String command,
     required List<String> args,
     Map<String, String>? env,
@@ -103,7 +106,8 @@ class CodexMcpAdapter implements McpAdapter {
   }
 
   @override
-  Future<void> addMcpServer(String name, {
+  Future<void> addMcpServer(
+    String name, {
     required String command,
     required List<String> args,
     Map<String, String>? env,
@@ -122,7 +126,8 @@ class CodexMcpAdapter implements McpAdapter {
 class UnifiedPuppeteerSetup {
   static UnifiedPuppeteerSetup? _instance;
   UnifiedPuppeteerSetup._();
-  static UnifiedPuppeteerSetup get instance => _instance ??= UnifiedPuppeteerSetup._();
+  static UnifiedPuppeteerSetup get instance =>
+      _instance ??= UnifiedPuppeteerSetup._();
 
   /// Sets up Puppeteer MCP for any SDK using the adapter pattern
   Future<void> setupWithAdapter(
@@ -169,7 +174,9 @@ class UnifiedPuppeteerSetup {
 
       if (proxyConfig != null) {
         print('ℹ️ Proxy configuration is now handled dynamically by the AI\n');
-        print('   The AI will pass proxy settings through launchOptions when needed.\n');
+        print(
+          '   The AI will pass proxy settings through launchOptions when needed.\n',
+        );
       }
 
       print('🎉 Puppeteer setup complete! Ready for web scraping.\n');
@@ -275,11 +282,7 @@ class UnifiedPuppeteerSetup {
       ];
     }
 
-    await adapter.addMcpServer(
-      'puppeteer',
-      command: command,
-      args: args,
-    );
+    await adapter.addMcpServer('puppeteer', command: command, args: args);
   }
 }
 
@@ -287,7 +290,8 @@ class UnifiedPuppeteerSetup {
 class UnifiedScrapingBeeSetup {
   static UnifiedScrapingBeeSetup? _instance;
   UnifiedScrapingBeeSetup._();
-  static UnifiedScrapingBeeSetup get instance => _instance ??= UnifiedScrapingBeeSetup._();
+  static UnifiedScrapingBeeSetup get instance =>
+      _instance ??= UnifiedScrapingBeeSetup._();
 
   /// Sets up ScrapingBee MCP for any SDK using the adapter pattern
   Future<void> setupWithAdapter(McpAdapter adapter) async {
@@ -341,22 +345,13 @@ class UnifiedScrapingBeeSetup {
     }
 
     // Compile the Dart script to an executable
-    final result = await Process.run(
-      'dart',
-      [
-        'compile',
-        'exe',
-        path.join(
-          projectRoot,
-          'lib',
-          'src',
-          'scraping_bee_mcp.dart',
-        ),
-        '-o',
-        serverExePath,
-      ],
-      workingDirectory: projectRoot,
-    );
+    final result = await Process.run('dart', [
+      'compile',
+      'exe',
+      path.join(projectRoot, 'lib', 'src', 'scraping_bee_mcp.dart'),
+      '-o',
+      serverExePath,
+    ], workingDirectory: projectRoot);
 
     if (result.exitCode != 0) {
       throw Exception(

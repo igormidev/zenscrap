@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:gemini_cli_sdk/gemini_cli_sdk.dart' as gemini_sdk;
+import 'package:programming_cli_core_sdk/programming_cli_core_sdk.dart';
 import 'package:web_scrapper_generator/src/schema_constants.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_response.dart';
 import 'package:web_scrapper_generator/src/puppeteer_setup.dart'
@@ -41,103 +41,102 @@ abstract class WebScrapperGeneratorController<TModel> {
   Future<void> dispose();
 
   /// Build the response schema that all implementations must use
-  gemini_sdk.SchemaObject buildGeminiResponseSchema() {
-    return gemini_sdk.SchemaObject(
+  SchemaDefinition buildGeminiResponseSchema() {
+    return SchemaDefinition(
       properties: {
-        'responseType': gemini_sdk.SchemaProperty.string(
-          description: SchemaDescriptions.responseType,
-          nullable: false,
+        'responseType': SchemaProperty.enumeration(
           enumValues: SchemaDescriptions.responseTypeValues,
+          nullable: false,
+          description: SchemaDescriptions.responseType,
         ),
-        'message': gemini_sdk.SchemaProperty.string(
+        'message': SchemaProperty.text(
+          nullable: true,
           description: SchemaDescriptions.message,
-          nullable: true,
         ),
-        'errorMessage': gemini_sdk.SchemaProperty.string(
+        'errorMessage': SchemaProperty.text(
+          nullable: true,
           description: SchemaDescriptions.errorMessage,
-          nullable: true,
         ),
-        'resumeActionMessage': gemini_sdk.SchemaProperty.string(
+        'resumeActionMessage': SchemaProperty.text(
+          nullable: true,
           description: SchemaDescriptions.resumeActionMessage,
-          nullable: true,
         ),
-        'request': gemini_sdk.SchemaProperty.object(
-          description: SchemaDescriptions.request,
+        'request': SchemaProperty.structuredObject(
           nullable: true,
+          description: SchemaDescriptions.request,
           properties: {
-            'url': gemini_sdk.SchemaProperty.string(
+            'url': SchemaProperty.text(
+              nullable: false,
               description: SchemaDescriptions.requestUrl,
-              nullable: false,
             ),
-            'queryParam': gemini_sdk.SchemaProperty.object(
-              description: SchemaDescriptions.requestQueryParam,
+            'queryParam': SchemaProperty.structuredObject(
               nullable: false,
+              description: SchemaDescriptions.requestQueryParam,
               properties: {
-                '__dynamic__': gemini_sdk.SchemaProperty.string(
-                  description: SchemaDescriptions.requestQueryParamDynamic,
+                '__dynamic__': SchemaProperty.text(
                   nullable: true,
+                  description: SchemaDescriptions.requestQueryParamDynamic,
                 ),
               },
             ),
-            'pathParams': gemini_sdk.SchemaProperty.array(
-              description: SchemaDescriptions.requestPathParams,
+            'pathParams': SchemaProperty.array(
+              items: SchemaProperty.text(nullable: false),
               nullable: false,
-              items: gemini_sdk.SchemaProperty.string(nullable: false),
+              description: SchemaDescriptions.requestPathParams,
             ),
           },
         ),
-        'fetchSettings': gemini_sdk.SchemaProperty.object(
-          description: SchemaDescriptions.fetchSettings,
+        'fetchSettings': SchemaProperty.structuredObject(
           nullable: true,
+          description: SchemaDescriptions.fetchSettings,
           properties: {
-            'url': gemini_sdk.SchemaProperty.string(
+            'url': SchemaProperty.text(
+              nullable: false,
               description: SchemaDescriptions.fetchUrl,
-              nullable: false,
             ),
-            'extract_rules': gemini_sdk.SchemaProperty.string(
+            'extract_rules': SchemaProperty.text(
+              nullable: false,
               description: SchemaDescriptions.fetchExtractRules,
-              nullable: false,
             ),
-            'js_scenario': gemini_sdk.SchemaProperty.string(
+            'js_scenario': SchemaProperty.text(
+              nullable: true,
               description: SchemaDescriptions.fetchJsScenario,
-              nullable: true,
             ),
-            'render_js': gemini_sdk.SchemaProperty.boolean(
+            'render_js': SchemaProperty.boolean(
+              nullable: false,
               description: SchemaDescriptions.fetchRenderJs,
-              nullable: false,
             ),
-            'wait': gemini_sdk.SchemaProperty.number(
+            'wait': SchemaProperty.double(
+              nullable: true,
               description: SchemaDescriptions.fetchWait,
-              nullable: true,
             ),
-            'wait_for': gemini_sdk.SchemaProperty.string(
+            'wait_for': SchemaProperty.text(
+              nullable: true,
               description: SchemaDescriptions.fetchWaitFor,
-              nullable: true,
             ),
-            'wait_browser': gemini_sdk.SchemaProperty.string(
+            'wait_browser': SchemaProperty.text(
+              nullable: true,
               description: SchemaDescriptions.fetchWaitBrowser,
-              nullable: true,
             ),
-            'premium_proxy': gemini_sdk.SchemaProperty.boolean(
-              description: SchemaDescriptions.fetchPremiumProxy,
+            'premium_proxy': SchemaProperty.boolean(
               nullable: false,
+              description: SchemaDescriptions.fetchPremiumProxy,
             ),
-            'country_code': gemini_sdk.SchemaProperty.string(
+            'country_code': SchemaProperty.text(
+              nullable: true,
               description: SchemaDescriptions.fetchCountryCode,
-              nullable: true,
             ),
-            'session_id': gemini_sdk.SchemaProperty.string(
+            'session_id': SchemaProperty.text(
+              nullable: true,
               description: SchemaDescriptions.fetchSessionId,
-              nullable: true,
             ),
-            'custom_google': gemini_sdk.SchemaProperty.boolean(
-              description: SchemaDescriptions.fetchCustomGoogle,
+            'custom_google': SchemaProperty.boolean(
               nullable: true,
+              description: SchemaDescriptions.fetchCustomGoogle,
             ),
           },
         ),
       },
-      description: SchemaDescriptions.overallDescription,
     );
   }
 
