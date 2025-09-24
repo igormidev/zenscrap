@@ -6,6 +6,103 @@ import 'package:web_scrapper_generator/src/web_scrapper_response.dart';
 import 'package:web_scrapper_generator/src/puppeteer_setup.dart'
     show ScrappingBeeProxyConfig;
 
+final SchemaDefinition webScrapperResponseSchema = SchemaDefinition(
+  properties: {
+    'responseType': SchemaProperty.enumeration(
+      enumValues: SchemaDescriptions.responseTypeValues,
+      nullable: false,
+      description: SchemaDescriptions.responseType,
+    ),
+    'message': SchemaProperty.text(
+      nullable: true,
+      description: SchemaDescriptions.message,
+    ),
+    'errorMessage': SchemaProperty.text(
+      nullable: true,
+      description: SchemaDescriptions.errorMessage,
+    ),
+    'resumeActionMessage': SchemaProperty.text(
+      nullable: true,
+      description: SchemaDescriptions.resumeActionMessage,
+    ),
+    'request': SchemaProperty.structuredObject(
+      nullable: true,
+      description: SchemaDescriptions.request,
+      properties: {
+        'url': SchemaProperty.text(
+          nullable: false,
+          description: SchemaDescriptions.requestUrl,
+        ),
+        'queryParam': SchemaProperty.structuredObject(
+          nullable: false,
+          description: SchemaDescriptions.requestQueryParam,
+          properties: {
+            '__dynamic__': SchemaProperty.text(
+              nullable: true,
+              description: SchemaDescriptions.requestQueryParamDynamic,
+            ),
+          },
+        ),
+        'pathParams': SchemaProperty.array(
+          items: SchemaProperty.text(nullable: false),
+          nullable: false,
+          description: SchemaDescriptions.requestPathParams,
+        ),
+      },
+    ),
+    'fetchSettings': SchemaProperty.structuredObject(
+      nullable: true,
+      description: SchemaDescriptions.fetchSettings,
+      properties: {
+        'url': SchemaProperty.text(
+          nullable: false,
+          description: SchemaDescriptions.fetchUrl,
+        ),
+        'extract_rules': SchemaProperty.text(
+          nullable: false,
+          description: SchemaDescriptions.fetchExtractRules,
+        ),
+        'js_scenario': SchemaProperty.text(
+          nullable: true,
+          description: SchemaDescriptions.fetchJsScenario,
+        ),
+        'render_js': SchemaProperty.boolean(
+          nullable: false,
+          description: SchemaDescriptions.fetchRenderJs,
+        ),
+        'wait': SchemaProperty.double(
+          nullable: true,
+          description: SchemaDescriptions.fetchWait,
+        ),
+        'wait_for': SchemaProperty.text(
+          nullable: true,
+          description: SchemaDescriptions.fetchWaitFor,
+        ),
+        'wait_browser': SchemaProperty.text(
+          nullable: true,
+          description: SchemaDescriptions.fetchWaitBrowser,
+        ),
+        'premium_proxy': SchemaProperty.boolean(
+          nullable: false,
+          description: SchemaDescriptions.fetchPremiumProxy,
+        ),
+        'country_code': SchemaProperty.text(
+          nullable: true,
+          description: SchemaDescriptions.fetchCountryCode,
+        ),
+        'session_id': SchemaProperty.text(
+          nullable: true,
+          description: SchemaDescriptions.fetchSessionId,
+        ),
+        'custom_google': SchemaProperty.boolean(
+          nullable: true,
+          description: SchemaDescriptions.fetchCustomGoogle,
+        ),
+      },
+    ),
+  },
+);
+
 /// Abstract interface for web scrapper generator controllers
 abstract class WebScrapperGeneratorController<TModel> {
   /// The initial payload data for the conversation
@@ -39,106 +136,6 @@ abstract class WebScrapperGeneratorController<TModel> {
 
   /// Dispose of resources
   Future<void> dispose();
-
-  /// Build the response schema that all implementations must use
-  SchemaDefinition buildGeminiResponseSchema() {
-    return SchemaDefinition(
-      properties: {
-        'responseType': SchemaProperty.enumeration(
-          enumValues: SchemaDescriptions.responseTypeValues,
-          nullable: false,
-          description: SchemaDescriptions.responseType,
-        ),
-        'message': SchemaProperty.text(
-          nullable: true,
-          description: SchemaDescriptions.message,
-        ),
-        'errorMessage': SchemaProperty.text(
-          nullable: true,
-          description: SchemaDescriptions.errorMessage,
-        ),
-        'resumeActionMessage': SchemaProperty.text(
-          nullable: true,
-          description: SchemaDescriptions.resumeActionMessage,
-        ),
-        'request': SchemaProperty.structuredObject(
-          nullable: true,
-          description: SchemaDescriptions.request,
-          properties: {
-            'url': SchemaProperty.text(
-              nullable: false,
-              description: SchemaDescriptions.requestUrl,
-            ),
-            'queryParam': SchemaProperty.structuredObject(
-              nullable: false,
-              description: SchemaDescriptions.requestQueryParam,
-              properties: {
-                '__dynamic__': SchemaProperty.text(
-                  nullable: true,
-                  description: SchemaDescriptions.requestQueryParamDynamic,
-                ),
-              },
-            ),
-            'pathParams': SchemaProperty.array(
-              items: SchemaProperty.text(nullable: false),
-              nullable: false,
-              description: SchemaDescriptions.requestPathParams,
-            ),
-          },
-        ),
-        'fetchSettings': SchemaProperty.structuredObject(
-          nullable: true,
-          description: SchemaDescriptions.fetchSettings,
-          properties: {
-            'url': SchemaProperty.text(
-              nullable: false,
-              description: SchemaDescriptions.fetchUrl,
-            ),
-            'extract_rules': SchemaProperty.text(
-              nullable: false,
-              description: SchemaDescriptions.fetchExtractRules,
-            ),
-            'js_scenario': SchemaProperty.text(
-              nullable: true,
-              description: SchemaDescriptions.fetchJsScenario,
-            ),
-            'render_js': SchemaProperty.boolean(
-              nullable: false,
-              description: SchemaDescriptions.fetchRenderJs,
-            ),
-            'wait': SchemaProperty.double(
-              nullable: true,
-              description: SchemaDescriptions.fetchWait,
-            ),
-            'wait_for': SchemaProperty.text(
-              nullable: true,
-              description: SchemaDescriptions.fetchWaitFor,
-            ),
-            'wait_browser': SchemaProperty.text(
-              nullable: true,
-              description: SchemaDescriptions.fetchWaitBrowser,
-            ),
-            'premium_proxy': SchemaProperty.boolean(
-              nullable: false,
-              description: SchemaDescriptions.fetchPremiumProxy,
-            ),
-            'country_code': SchemaProperty.text(
-              nullable: true,
-              description: SchemaDescriptions.fetchCountryCode,
-            ),
-            'session_id': SchemaProperty.text(
-              nullable: true,
-              description: SchemaDescriptions.fetchSessionId,
-            ),
-            'custom_google': SchemaProperty.boolean(
-              nullable: true,
-              description: SchemaDescriptions.fetchCustomGoogle,
-            ),
-          },
-        ),
-      },
-    );
-  }
 
   /// Parse the structured response from the AI
   WebScrapperChatAIResponse parseStructuredResponse(Map<String, dynamic> data) {

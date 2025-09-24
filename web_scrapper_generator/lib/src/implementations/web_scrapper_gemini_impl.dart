@@ -87,7 +87,7 @@ class WebScrapperGeminiImpl
     messages.add(PromptContent.text(userPrompt));
 
     // Define the response schema for structured output
-    final responseSchema = buildGeminiResponseSchema();
+    final responseSchema = webScrapperResponseSchema;
 
     try {
       // Send message with schema for structured response
@@ -124,7 +124,7 @@ class WebScrapperGeminiImpl
     messages.add(PromptContent.text(userPrompt));
 
     // Define the response schema for structured output
-    final responseSchema = buildGeminiResponseSchema();
+    final responseSchema = webScrapperResponseSchema;
 
     try {
       // Send message with schema for structured response

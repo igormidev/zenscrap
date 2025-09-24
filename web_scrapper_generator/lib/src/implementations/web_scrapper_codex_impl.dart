@@ -3,9 +3,8 @@ import 'dart:async';
 import 'package:codex_cli_sdk/codex_cli_sdk.dart'
     show Codex, CodexChat, CodexChatOptions;
 import 'package:programming_cli_core_sdk/programming_cli_core_sdk.dart'
-    show PromptContent, SchemaDefinition, SchemaProperty;
+    show PromptContent;
 import 'package:web_scrapper_generator/src/prompts.dart';
-import 'package:web_scrapper_generator/src/schema_constants.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_generator_interface.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_response.dart';
 import 'package:web_scrapper_generator/src/models/ai_models.dart';
@@ -21,6 +20,7 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
     required String codexApiKey,
     required String scrappingBeeApiKey,
     required ScrappingBeeProxyConfig proxyConfig,
+    bool skipCliSetup = false,
   }) async {
     // Initialize shared resources first
     await WebScrapperGeneratorController.initShared(
@@ -30,6 +30,10 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
 
     print('🚀 Initializing Codex SDK for web scraper generator...\n');
     _codexSDK = Codex(apiKey: codexApiKey);
+
+    if (skipCliSetup) {
+      return;
+    }
 
     // Ensure Codex CLI is installed and up to date
     await _codexSDK.updateToNewestVersionIfNeeded(global: true);
@@ -57,18 +61,47 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
   static WebScrapperCodexImpl startChat({
     required InitialPayloadData initialPayload,
     CodexModel model = CodexModel.gptOss120b,
+    CodexChatOptions? options,
   }) {
-    final chat = _codexSDK.createNewChat(
-      options: CodexChatOptions(
-        systemPrompt: _convertSystemPromptForCodex(),
-        model: model.apiName,
-        enableMcp: true, // Enable MCP support
-        sandboxMode: 'danger-full-access',
-        approvalPolicy: 'never',
-        // Note: Removed mode as Codex exec doesn't support --auto-edit
-        outputJson: false, // We'll use schema for structured output
-      ),
+    final defaultOptions = CodexChatOptions(
+      systemPrompt: _convertSystemPromptForCodex(),
+      model: model.apiName,
+      enableMcp: true, // Enable MCP support
+      sandboxMode: 'danger-full-access',
+      approvalPolicy: 'never',
+      // Note: Removed mode as Codex exec doesn't support --auto-edit
+      outputJson: false, // We'll use schema for structured output
     );
+
+    final overrides = options;
+    final mergedOptions = CodexChatOptions(
+      maxTurns: overrides?.maxTurns ?? defaultOptions.maxTurns,
+      mode: overrides?.mode ?? defaultOptions.mode,
+      profile: overrides?.profile ?? defaultOptions.profile,
+      resumeSessionId:
+          overrides?.resumeSessionId ?? defaultOptions.resumeSessionId,
+      environment: overrides?.environment ?? defaultOptions.environment,
+      outputJson: overrides?.outputJson ?? defaultOptions.outputJson,
+      quiet: overrides?.quiet ?? defaultOptions.quiet,
+      continueLastSession:
+          overrides?.continueLastSession ?? defaultOptions.continueLastSession,
+      enableMcp: overrides?.enableMcp ?? defaultOptions.enableMcp,
+      sandboxMode: overrides?.sandboxMode ?? defaultOptions.sandboxMode,
+      approvalPolicy:
+          overrides?.approvalPolicy ?? defaultOptions.approvalPolicy,
+      allowedDirectories:
+          overrides?.allowedDirectories ?? defaultOptions.allowedDirectories,
+      configPath: overrides?.configPath ?? defaultOptions.configPath,
+      additionalArgs:
+          overrides?.additionalArgs ?? defaultOptions.additionalArgs,
+      reasoningEffort:
+          overrides?.reasoningEffort ?? defaultOptions.reasoningEffort,
+      systemPrompt: overrides?.systemPrompt ?? defaultOptions.systemPrompt,
+      model: overrides?.model ?? defaultOptions.model,
+      cwd: overrides?.cwd ?? defaultOptions.cwd,
+    );
+
+    final chat = _codexSDK.createNewChat(options: mergedOptions);
 
     return WebScrapperCodexImpl._(initialPayload, chat);
   }
@@ -109,7 +142,7 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
     messages.add(PromptContent.text(userPrompt));
 
     // Define the response schema for structured output
-    final responseSchema = buildCodexResponseSchema();
+    final responseSchema = webScrapperResponseSchema;
 
     try {
       // Send message with schema for structured response
@@ -146,7 +179,7 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
     messages.add(PromptContent.text(userPrompt));
 
     // Define the response schema for structured output
-    final responseSchema = buildCodexResponseSchema();
+    final responseSchema = webScrapperResponseSchema;
 
     try {
       // Send message with schema for structured response
@@ -246,96 +279,4 @@ Remember: Your goal is to create extraction rules that consistently retrieve the
   }
 
   /// Build the response schema for Codex
-  SchemaDefinition buildCodexResponseSchema() {
-    return SchemaDefinition(
-      properties: {
-        'responseType': SchemaProperty.enumeration(
-          enumValues: SchemaDescriptions.responseTypeValues,
-          description: SchemaDescriptions.responseType,
-          nullable: false,
-        ),
-        'message': SchemaProperty.text(
-          description: SchemaDescriptions.message,
-          nullable: true,
-        ),
-        'errorMessage': SchemaProperty.text(
-          description: SchemaDescriptions.errorMessage,
-          nullable: true,
-        ),
-        'resumeActionMessage': SchemaProperty.text(
-          description: SchemaDescriptions.resumeActionMessage,
-          nullable: true,
-        ),
-        'request': SchemaProperty.structuredObject(
-          description: SchemaDescriptions.request,
-          nullable: true,
-          properties: {
-            'url': SchemaProperty.text(
-              description: SchemaDescriptions.requestUrl,
-              nullable: false,
-            ),
-            'queryParam': SchemaProperty.objectWithUndefinedProperties(
-              description: SchemaDescriptions.requestQueryParam,
-              nullable: false,
-            ),
-            'pathParams': SchemaProperty.array(
-              description: SchemaDescriptions.requestPathParams,
-              nullable: false,
-              items: SchemaProperty.text(nullable: false),
-            ),
-          },
-        ),
-        'fetchSettings': SchemaProperty.structuredObject(
-          description: SchemaDescriptions.fetchSettings,
-          nullable: true,
-          properties: {
-            'url': SchemaProperty.text(
-              description: SchemaDescriptions.fetchUrl,
-              nullable: false,
-            ),
-            'extract_rules': SchemaProperty.text(
-              description: SchemaDescriptions.fetchExtractRules,
-              nullable: false,
-            ),
-            'js_scenario': SchemaProperty.text(
-              description: SchemaDescriptions.fetchJsScenario,
-              nullable: true,
-            ),
-            'render_js': SchemaProperty.boolean(
-              description: SchemaDescriptions.fetchRenderJs,
-              nullable: false,
-            ),
-            'wait': SchemaProperty.double(
-              description: SchemaDescriptions.fetchWait,
-              nullable: true,
-            ),
-            'wait_for': SchemaProperty.text(
-              description: SchemaDescriptions.fetchWaitFor,
-              nullable: true,
-            ),
-            'wait_browser': SchemaProperty.text(
-              description: SchemaDescriptions.fetchWaitBrowser,
-              nullable: true,
-            ),
-            'premium_proxy': SchemaProperty.boolean(
-              description: SchemaDescriptions.fetchPremiumProxy,
-              nullable: false,
-            ),
-            'country_code': SchemaProperty.text(
-              description: SchemaDescriptions.fetchCountryCode,
-              nullable: true,
-            ),
-            'session_id': SchemaProperty.text(
-              description: SchemaDescriptions.fetchSessionId,
-              nullable: true,
-            ),
-            'custom_google': SchemaProperty.boolean(
-              description: SchemaDescriptions.fetchCustomGoogle,
-              nullable: true,
-            ),
-          },
-        ),
-      },
-    );
-  }
 }
