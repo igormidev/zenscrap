@@ -1,8 +1,0 @@
-{
-  "url": "https://www.transfermarkt.com.br/{trainerSlug}/profil/trainer/{trainerId}",
-  "queryParam": {},
-  "pathParams": [
-    "trainerSlug",
-    "trainerId"
-  ]
-}

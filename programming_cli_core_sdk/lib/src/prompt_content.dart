@@ -69,7 +69,8 @@ class FileContent extends PromptContent {
   /// Optional description of what this file contains
   final String? fileDescription;
 
-  String inChatFilePath(String nanoId) => '${fileName}_$nanoId.$fileExtension';
+  String inChatFilePath(String nanoId) =>
+      '${fileName}_id-$nanoId.$fileExtension';
 
   FileContent(this.file, {this.fileDescription});
 
@@ -91,7 +92,8 @@ class BytesContent extends PromptContent {
   /// Optional description of what this file contains
   final String? fileDescription;
 
-  String inChatFilePath(String nanoId) => '${fileName}_$nanoId.$fileExtension';
+  String inChatFilePath(String nanoId) =>
+      '${fileName}_id-$nanoId.$fileExtension';
 
   BytesContent({
     required this.data,

@@ -140,9 +140,9 @@ abstract class CliChatInterface<T extends CliChatOptions> {
                 if (!didSendFirstMessage &&
                     (options?.systemPrompt?.isNotEmpty ?? false))
                   PromptContent.text(
-                    '''----------- SYSTEM PROMPT [START] -----------
+                    '''[----------- SYSTEM PROMPT [START] -----------]
 ${options?.systemPrompt}
------------ SYSTEM PROMPT [END] -----------''',
+                [----------- SYSTEM PROMPT [END] -----------]''',
                   ),
                 if (schema != null)
                   PromptContent.text(
@@ -275,19 +275,20 @@ $testErrorMessage''',
   Future<String> _generateSchemaPrompt({
     required SchemaDefinition schema,
   }) async {
-    return '''----------- SCHEMA INSTRUCTIONS [START] -----------
+    return '''[----------- SCHEMA INSTRUCTIONS [START] -----------]
     
 I wan't the output in a json format. 
-I wan't you to write the output in the json file located at: $filePreffix${p.basename(schemaResponseFilePath)}
+I wan't you to write the output in the json file located at: " $filePreffix${p.basename(schemaResponseFilePath)} "
+I will use that file to read the json you wrote.
 
 But I don't wan't the json in any random format.
 It should be in a specific schema that I will provide you below.
 You MUST follow the schema EXACTLY as I provide you.
 If you don't follow the schema, I will not be able to parse it.
 Because of that, since I need 100% of certainty, I created a dart test code that will validate if you followed the schema or not.
-The test code is located at: $filePreffix${p.basename(schemaTestFilePath)}
+The test code is located at the test file in: " $filePreffix${p.basename(schemaTestFilePath)} "
 
-IMPORTANT: Open the test file - You will see that it reads the file at $filePreffix${p.basename(schemaResponseFilePath)} and validates if it follows the schema or not.
+IMPORTANT: Open the test file - You will see that the test file will read the file at " $filePreffix${p.basename(schemaResponseFilePath)} " and validates if it follows the schema or not.
 So, you MUST follow the schema EXACTLY as I provide you below or the test will fail.
 
 If the test fails, you can be sure you did not follow the schema - so see the errors logs of the test and fix it.
@@ -298,7 +299,7 @@ The schema expected is:
 ${schema.toString()}
 ```
 
------------ SCHEMA INSTRUCTIONS [END] -----------''';
+[----------- SCHEMA INSTRUCTIONS [END] -----------]''';
   }
 
   Future<void> _setupSchemaFiles(SchemaDefinition schema) async {
