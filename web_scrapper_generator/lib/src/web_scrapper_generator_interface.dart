@@ -33,15 +33,9 @@ final SchemaDefinition webScrapperResponseSchema = SchemaDefinition(
           nullable: false,
           description: SchemaDescriptions.requestUrl,
         ),
-        'queryParam': SchemaProperty.structuredObject(
+        'queryParam': SchemaProperty.objectWithUndefinedProperties(
           nullable: false,
           description: SchemaDescriptions.requestQueryParam,
-          properties: {
-            '__dynamic__': SchemaProperty.text(
-              nullable: true,
-              description: SchemaDescriptions.requestQueryParamDynamic,
-            ),
-          },
         ),
         'pathParams': SchemaProperty.array(
           items: SchemaProperty.text(nullable: false),
