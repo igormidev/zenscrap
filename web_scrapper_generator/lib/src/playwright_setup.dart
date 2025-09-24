@@ -4,20 +4,20 @@ import 'dart:io';
 import 'package:gemini_cli_sdk/gemini_cli_sdk.dart';
 import 'package:path/path.dart' as path;
 
-class PuppeteerSetup {
-  static PuppeteerSetup? _instance;
-  PuppeteerSetup._();
-  static PuppeteerSetup get instance => _instance ??= PuppeteerSetup._();
+class PlaywrightSetup {
+  static PlaywrightSetup? _instance;
+  PlaywrightSetup._();
+  static PlaywrightSetup get instance => _instance ??= PlaywrightSetup._();
 
-  /// Ensures Puppeteer and its MCP integration are properly installed and configured
+  /// Ensures Playwright and its MCP integration are properly installed and configured
   ///
   /// Note: Proxy configuration is now handled dynamically by the AI through launchOptions
-  /// when calling puppeteer_navigate, not during setup.
+  /// when calling playwright tools, not during setup.
   Future<void> setupIfNeeded(
     GeminiSDK geminiSDK, {
     ScrappingBeeProxyConfig? proxyConfig,
   }) async {
-    print('🚀 Setting up Puppeteer for web scraping...\n');
+    print('🚀 Setting up Playwright for web scraping...\n');
 
     try {
       // Step 1: Check if npm is installed
@@ -31,28 +31,28 @@ class PuppeteerSetup {
       }
       print('✅ npm is installed\n');
 
-      // Step 2: Check and install puppeteer locally
-      print('🌐 Checking Puppeteer installation...');
-      final puppeteerInstalled = await _isPuppeteerInstalled();
+      // Step 2: Check and install playwright locally
+      print('🌐 Checking Playwright installation...');
+      final playwrightInstalled = await _isPlaywrightInstalled();
 
-      if (!puppeteerInstalled) {
-        print('📥 Puppeteer not found. Installing locally...');
-        await _installPuppeteer();
-        print('✅ Puppeteer installed successfully\n');
+      if (!playwrightInstalled) {
+        print('📥 Playwright not found. Installing locally...');
+        await _installPlaywright();
+        print('✅ Playwright installed successfully\n');
       } else {
-        print('✅ Puppeteer is already installed\n');
+        print('✅ Playwright is already installed\n');
       }
 
-      // Step 3: Check MCP puppeteer server configuration
-      print('🔌 Checking MCP Puppeteer server configuration...');
-      final mcpConfigured = await _isMcpPuppeteerConfigured(geminiSDK);
+      // Step 3: Check MCP playwright server configuration
+      print('🔌 Checking MCP Playwright server configuration...');
+      final mcpConfigured = await _isMcpPlaywrightConfigured(geminiSDK);
 
       if (!mcpConfigured) {
-        print('⚙️ Configuring MCP Puppeteer server...');
-        await _configureMcpPuppeteer(geminiSDK);
-        print('✅ MCP Puppeteer server configured successfully\n');
+        print('⚙️ Configuring MCP Playwright server...');
+        await _configureMcpPlaywright(geminiSDK);
+        print('✅ MCP Playwright server configured successfully\n');
       } else {
-        print('✅ MCP Puppeteer server is already configured\n');
+        print('✅ MCP Playwright server is already configured\n');
       }
 
       // Note: Proxy configuration is now handled dynamically by the AI
@@ -67,7 +67,7 @@ class PuppeteerSetup {
       // Step 4: Verify the setup
       await _verifySetup(geminiSDK);
 
-      print('🎉 Puppeteer setup complete! Ready for web scraping.\n');
+      print('🎉 Playwright setup complete! Ready for web scraping.\n');
     } catch (e) {
       print('❌ Setup failed: $e');
       rethrow;
@@ -87,121 +87,128 @@ class PuppeteerSetup {
     }
   }
 
-  /// Checks if puppeteer is installed locally
-  Future<bool> _isPuppeteerInstalled() async {
+  /// Checks if playwright is installed locally
+  Future<bool> _isPlaywrightInstalled() async {
     try {
-      // Check if node_modules/puppeteer exists
-      final puppeteerPath = path.join(
+      // Check if node_modules/playwright exists
+      final playwrightPath = path.join(
         Directory.current.path,
         'node_modules',
-        'puppeteer',
+        'playwright',
       );
-      return Directory(puppeteerPath).existsSync();
+      return Directory(playwrightPath).existsSync();
     } catch (e) {
       return false;
     }
   }
 
-  /// Installs puppeteer locally
-  Future<void> _installPuppeteer() async {
+  /// Installs playwright locally
+  Future<void> _installPlaywright() async {
     try {
-      print('  Installing puppeteer...');
+      print('  Installing playwright...');
       final result = await Process.run(
         Platform.isWindows ? 'cmd.exe' : 'sh',
         Platform.isWindows
-            ? ['/c', 'npm install puppeteer']
-            : ['-c', 'npm install puppeteer'],
+            ? ['/c', 'npm install playwright']
+            : ['-c', 'npm install playwright'],
         workingDirectory: Directory.current.path,
       );
 
       if (result.exitCode != 0) {
-        throw Exception('Failed to install puppeteer:\n${result.stderr}');
+        throw Exception('Failed to install playwright:\n${result.stderr}');
       }
 
-      // Also install the MCP server-puppeteer globally if not already installed
-      print('  Installing @modelcontextprotocol/server-puppeteer...');
-      final mcpResult = await Process.run(
+      // Install the browsers
+      print('  Installing Playwright browsers...');
+      final browsersResult = await Process.run(
         Platform.isWindows ? 'cmd.exe' : 'sh',
         Platform.isWindows
-            ? ['/c', 'npm install -g @modelcontextprotocol/server-puppeteer']
-            : ['-c', 'npm install -g @modelcontextprotocol/server-puppeteer'],
+            ? ['/c', 'npx playwright install']
+            : ['-c', 'npx playwright install'],
+        workingDirectory: Directory.current.path,
       );
 
-      if (mcpResult.exitCode != 0) {
-        // Try local installation if global fails
-        print('  Global installation failed, trying local installation...');
-        await Process.run(
-          Platform.isWindows ? 'cmd.exe' : 'sh',
-          Platform.isWindows
-              ? ['/c', 'npm install @modelcontextprotocol/server-puppeteer']
-              : ['-c', 'npm install @modelcontextprotocol/server-puppeteer'],
-          workingDirectory: Directory.current.path,
-        );
+      if (browsersResult.exitCode != 0) {
+        print('  Warning: Browser installation had issues: ${browsersResult.stderr}');
       }
     } catch (e) {
-      throw Exception('Failed to install puppeteer: $e');
+      throw Exception('Failed to install playwright: $e');
     }
   }
 
-  /// Checks if MCP puppeteer server is configured
-  Future<bool> _isMcpPuppeteerConfigured(GeminiSDK geminiSDK) async {
+  /// Checks if MCP playwright server is configured
+  Future<bool> _isMcpPlaywrightConfigured(GeminiSDK geminiSDK) async {
     try {
       final mcpInfo = await geminiSDK.isMcpInstalled();
       if (!mcpInfo.hasMcpSupport) {
         return false;
       }
 
-      // Check if puppeteer server is in the list
+      // Check if playwright server is in the list
       return mcpInfo.servers.any(
         (server) =>
-            server.name.toLowerCase().contains('puppeteer') ||
-            server.name.contains('mcp-puppeteer'),
+            server.name.toLowerCase().contains('playwright') ||
+            server.name.contains('mcp-playwright'),
       );
     } catch (e) {
       return false;
     }
   }
 
-  /// Configures the MCP puppeteer server
-  Future<void> _configureMcpPuppeteer(GeminiSDK geminiSDK) async {
+  /// Configures the MCP playwright server
+  Future<void> _configureMcpPlaywright(GeminiSDK geminiSDK) async {
     try {
-      await geminiSDK.installPopularMcpServer('puppeteer');
-    } catch (e) {
-      final puppeteerServer = McpServer(
-        name: 'puppeteer',
+      // First try the official Microsoft Playwright MCP
+      final playwrightServer = McpServer(
+        name: 'playwright',
         command: 'npx',
-        args: ['-y', '@modelcontextprotocol/server-puppeteer'],
+        args: ['@playwright/mcp@latest', '--headless'],
         env: {'NODE_PATH': path.join(Directory.current.path, 'node_modules')},
       );
 
       try {
         await geminiSDK.addMcpServer(
-          'puppeteer',
-          customServer: puppeteerServer,
+          'playwright',
+          customServer: playwrightServer,
         );
       } catch (_) {
         await geminiSDK.addMcpServer(
-          'puppeteer',
-          customServer: puppeteerServer,
+          'playwright',
+          customServer: playwrightServer,
           options: const McpAddOptions(scope: McpScope.project, useNpx: true),
         );
       }
+    } catch (e) {
+      // If official fails, try alternative
+      print('  Official Playwright MCP failed, trying alternative...');
+      final altServer = McpServer(
+        name: 'playwright',
+        command: 'npx',
+        args: ['@executeautomation/playwright-mcp-server'],
+        env: {'NODE_PATH': path.join(Directory.current.path, 'node_modules')},
+      );
+
+      await geminiSDK.addMcpServer(
+        'playwright',
+        customServer: altServer,
+        options: const McpAddOptions(scope: McpScope.project, useNpx: true),
+      );
     }
   }
 
-  /// Verifies that the Puppeteer setup is working
+  /// Verifies that the Playwright setup is working
   Future<void> _verifySetup(GeminiSDK geminiSDK) async {
-    print('🔍 Verifying Puppeteer setup...');
+    print('🔍 Verifying Playwright setup...');
 
-    // Verify Puppeteer installation by creating a simple test script
+    // Verify Playwright installation by creating a simple test script
     try {
       final testScript = '''
-const puppeteer = require('puppeteer');
+const { chromium } = require('playwright');
 (async () => {
   try {
-    const browser = await puppeteer.launch({ headless: 'new' });
+    const browser = await chromium.launch({ headless: true });
     const page = await browser.newPage();
-    await page.goto('https://example.com', { waitUntil: 'networkidle2' });
+    await page.goto('https://example.com', { waitUntil: 'networkidle' });
     const title = await page.title();
     console.log('SUCCESS: Page title is: ' + title);
     await browser.close();
@@ -215,7 +222,7 @@ const puppeteer = require('puppeteer');
 
       // Create temporary test file
       final testFile = File(
-        path.join(Directory.current.path, '_puppeteer_test.js'),
+        path.join(Directory.current.path, '_playwright_test.js'),
       );
       await testFile.writeAsString(testScript);
 
@@ -228,15 +235,15 @@ const puppeteer = require('puppeteer');
         );
 
         if (result.exitCode != 0) {
-          throw Exception('Puppeteer test failed: ${result.stderr}');
+          throw Exception('Playwright test failed: ${result.stderr}');
         }
 
         final output = result.stdout.toString();
         if (!output.contains('SUCCESS')) {
-          throw Exception('Puppeteer test did not complete successfully');
+          throw Exception('Playwright test did not complete successfully');
         }
 
-        print('✅ Puppeteer is working correctly');
+        print('✅ Playwright is working correctly');
       } finally {
         // Clean up test file
         if (await testFile.exists()) {
@@ -244,7 +251,7 @@ const puppeteer = require('puppeteer');
         }
       }
     } catch (e) {
-      print('⚠️ Warning: Could not verify Puppeteer functionality: $e');
+      print('⚠️ Warning: Could not verify Playwright functionality: $e');
       print(
         '   The setup may still work, but manual verification is recommended.',
       );
@@ -253,13 +260,13 @@ const puppeteer = require('puppeteer');
     // Verify MCP configuration
     final mcpInfo = await geminiSDK.isMcpInstalled();
     if (mcpInfo.hasMcpSupport) {
-      final puppeteerServer = mcpInfo.servers
-          .where((s) => s.name.contains('puppeteer'))
+      final playwrightServer = mcpInfo.servers
+          .where((s) => s.name.contains('playwright'))
           .toList();
 
-      if (puppeteerServer.isNotEmpty) {
+      if (playwrightServer.isNotEmpty) {
         print(
-          '✅ MCP Puppeteer server is registered: ${puppeteerServer.first.name}',
+          '✅ MCP Playwright server is registered: ${playwrightServer.first.name}',
         );
       }
     }
@@ -268,7 +275,7 @@ const puppeteer = require('puppeteer');
   /// Cleans up any temporary files or resources
   Future<void> cleanup() async {
     // Cleanup any temporary files if needed
-    final filesToClean = ['_puppeteer_test.js'];
+    final filesToClean = ['_playwright_test.js'];
 
     for (final fileName in filesToClean) {
       final file = File(path.join(Directory.current.path, fileName));
@@ -278,15 +285,15 @@ const puppeteer = require('puppeteer');
     }
   }
 
-  /// Gets information about the current Puppeteer setup
+  /// Gets information about the current Playwright setup
   Future<Map<String, dynamic>> getSetupInfo() async {
     final info = <String, dynamic>{};
 
     info['npm_installed'] = await _isNpmInstalled();
-    info['puppeteer_installed'] = await _isPuppeteerInstalled();
+    info['playwright_installed'] = await _isPlaywrightInstalled();
 
-    // Check puppeteer version if installed
-    if (info['puppeteer_installed']) {
+    // Check playwright version if installed
+    if (info['playwright_installed']) {
       try {
         final packageJsonFile = File(
           path.join(Directory.current.path, 'package.json'),
@@ -295,10 +302,10 @@ const puppeteer = require('puppeteer');
           final content = await packageJsonFile.readAsString();
           // Extract version from package.json
           final versionMatch = RegExp(
-            r'"puppeteer":\s*"([^"]+)"',
+            r'"playwright":\s*"([^"]+)"',
           ).firstMatch(content);
           if (versionMatch != null) {
-            info['puppeteer_version'] = versionMatch.group(1);
+            info['playwright_version'] = versionMatch.group(1);
           }
         }
       } catch (e) {
@@ -312,7 +319,7 @@ const puppeteer = require('puppeteer');
 
 /// Configuration for ScrapingBee proxy service
 /// Note: This is now primarily used for the ScrapingBee MCP server.
-/// For Puppeteer, proxy settings are passed dynamically through launchOptions.
+/// For Playwright, proxy settings are passed dynamically through launchOptions.
 class ScrappingBeeProxyConfig {
   /// Your ScrapingBee API key
   final String apiKey;

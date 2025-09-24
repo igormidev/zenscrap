@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:programming_cli_core_sdk/programming_cli_core_sdk.dart';
 import 'package:web_scrapper_generator/src/schema_constants.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_response.dart';
-import 'package:web_scrapper_generator/src/puppeteer_setup.dart'
+import 'package:web_scrapper_generator/src/playwright_setup.dart'
     show ScrappingBeeProxyConfig;
 
 final SchemaDefinition webScrapperResponseSchema = SchemaDefinition(

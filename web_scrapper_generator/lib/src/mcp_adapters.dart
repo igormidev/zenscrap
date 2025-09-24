@@ -3,7 +3,7 @@ import 'package:path/path.dart' as path;
 import 'package:gemini_cli_sdk/gemini_cli_sdk.dart' as gemini;
 import 'package:claude_code_sdk/claude_code_sdk.dart' as claude;
 import 'package:codex_cli_sdk/codex_cli_sdk.dart' as codex;
-import 'puppeteer_setup.dart';
+import 'playwright_setup.dart';
 
 /// Abstract adapter for MCP setup across different SDKs
 abstract class McpAdapter {
@@ -122,19 +122,19 @@ class CodexMcpAdapter implements McpAdapter {
   }
 }
 
-/// Unified Puppeteer setup that works with any SDK via adapter
-class UnifiedPuppeteerSetup {
-  static UnifiedPuppeteerSetup? _instance;
-  UnifiedPuppeteerSetup._();
-  static UnifiedPuppeteerSetup get instance =>
-      _instance ??= UnifiedPuppeteerSetup._();
+/// Unified Playwright setup that works with any SDK via adapter
+class UnifiedPlaywrightSetup {
+  static UnifiedPlaywrightSetup? _instance;
+  UnifiedPlaywrightSetup._();
+  static UnifiedPlaywrightSetup get instance =>
+      _instance ??= UnifiedPlaywrightSetup._();
 
-  /// Sets up Puppeteer MCP for any SDK using the adapter pattern
+  /// Sets up Playwright MCP for any SDK using the adapter pattern
   Future<void> setupWithAdapter(
     McpAdapter adapter, {
     ScrappingBeeProxyConfig? proxyConfig,
   }) async {
-    print('🚀 Setting up Puppeteer for web scraping...\n');
+    print('🚀 Setting up Playwright for web scraping...\n');
 
     try {
       // Step 1: Check if npm is installed
@@ -148,28 +148,28 @@ class UnifiedPuppeteerSetup {
       }
       print('✅ npm is installed\n');
 
-      // Step 2: Check and install puppeteer locally
-      print('🌐 Checking Puppeteer installation...');
-      final puppeteerInstalled = await _isPuppeteerInstalled();
+      // Step 2: Check and install playwright locally
+      print('🌐 Checking Playwright installation...');
+      final playwrightInstalled = await _isPlaywrightInstalled();
 
-      if (!puppeteerInstalled) {
-        print('📥 Puppeteer not found. Installing locally...');
-        await _installPuppeteer();
-        print('✅ Puppeteer installed successfully\n');
+      if (!playwrightInstalled) {
+        print('📥 Playwright not found. Installing locally...');
+        await _installPlaywright();
+        print('✅ Playwright installed successfully\n');
       } else {
-        print('✅ Puppeteer is already installed\n');
+        print('✅ Playwright is already installed\n');
       }
 
-      // Step 3: Check MCP puppeteer server configuration
-      print('🔌 Checking MCP Puppeteer server configuration...');
-      final hasServer = await adapter.hasServer('puppeteer');
+      // Step 3: Check MCP playwright server configuration
+      print('🔌 Checking MCP Playwright server configuration...');
+      final hasServer = await adapter.hasServer('playwright');
 
       if (!hasServer) {
-        print('⚙️ Configuring MCP Puppeteer server...');
-        await _configureMcpPuppeteer(adapter);
-        print('✅ MCP Puppeteer server configured successfully\n');
+        print('⚙️ Configuring MCP Playwright server...');
+        await _configureMcpPlaywright(adapter);
+        print('✅ MCP Playwright server configured successfully\n');
       } else {
-        print('✅ MCP Puppeteer server is already configured\n');
+        print('✅ MCP Playwright server is already configured\n');
       }
 
       if (proxyConfig != null) {
@@ -179,7 +179,7 @@ class UnifiedPuppeteerSetup {
         );
       }
 
-      print('🎉 Puppeteer setup complete! Ready for web scraping.\n');
+      print('🎉 Playwright setup complete! Ready for web scraping.\n');
     } catch (e) {
       print('❌ Setup failed: $e');
       rethrow;
@@ -198,91 +198,59 @@ class UnifiedPuppeteerSetup {
     }
   }
 
-  Future<bool> _isPuppeteerInstalled() async {
+  Future<bool> _isPlaywrightInstalled() async {
     try {
-      final puppeteerPath = path.join(
+      final playwrightPath = path.join(
         Directory.current.path,
         'node_modules',
-        'puppeteer',
+        'playwright',
       );
-      return Directory(puppeteerPath).existsSync();
+      return Directory(playwrightPath).existsSync();
     } catch (e) {
       return false;
     }
   }
 
-  Future<void> _installPuppeteer() async {
+  Future<void> _installPlaywright() async {
     try {
-      print('  Installing puppeteer...');
+      print('  Installing playwright...');
       final result = await Process.run(
         Platform.isWindows ? 'cmd.exe' : 'sh',
         Platform.isWindows
-            ? ['/c', 'npm install puppeteer']
-            : ['-c', 'npm install puppeteer'],
+            ? ['/c', 'npm install playwright']
+            : ['-c', 'npm install playwright'],
         workingDirectory: Directory.current.path,
       );
 
       if (result.exitCode != 0) {
-        throw Exception('Failed to install puppeteer:\n${result.stderr}');
+        throw Exception('Failed to install playwright:\n${result.stderr}');
       }
 
-      // Also install the MCP server-puppeteer globally if not already installed
-      print('  Installing @modelcontextprotocol/server-puppeteer...');
-      final mcpResult = await Process.run(
+      // Install the browsers
+      print('  Installing Playwright browsers...');
+      final browsersResult = await Process.run(
         Platform.isWindows ? 'cmd.exe' : 'sh',
         Platform.isWindows
-            ? ['/c', 'npm install -g @modelcontextprotocol/server-puppeteer']
-            : ['-c', 'npm install -g @modelcontextprotocol/server-puppeteer'],
+            ? ['/c', 'npx playwright install']
+            : ['-c', 'npx playwright install'],
+        workingDirectory: Directory.current.path,
       );
 
-      if (mcpResult.exitCode != 0) {
-        // Try local installation if global fails
-        print('  Global installation failed, trying local installation...');
-        await Process.run(
-          Platform.isWindows ? 'cmd.exe' : 'sh',
-          Platform.isWindows
-              ? ['/c', 'npm install @modelcontextprotocol/server-puppeteer']
-              : ['-c', 'npm install @modelcontextprotocol/server-puppeteer'],
-          workingDirectory: Directory.current.path,
-        );
+      if (browsersResult.exitCode != 0) {
+        print('  Warning: Browser installation had issues: ${browsersResult.stderr}');
       }
     } catch (e) {
-      throw Exception('Failed to install puppeteer: $e');
+      throw Exception('Failed to install playwright: $e');
     }
   }
 
-  Future<void> _configureMcpPuppeteer(McpAdapter adapter) async {
-    // Check if we have global installation
-    final globalCheck = await Process.run(
-      Platform.isWindows ? 'cmd.exe' : 'sh',
-      Platform.isWindows
-          ? ['/c', 'where @modelcontextprotocol/server-puppeteer']
-          : ['-c', 'which @modelcontextprotocol/server-puppeteer'],
+  Future<void> _configureMcpPlaywright(McpAdapter adapter) async {
+    // Use the official Microsoft Playwright MCP
+    await adapter.addMcpServer(
+      'playwright',
+      command: 'npx',
+      args: ['@playwright/mcp@latest', '--headless'],
     );
-
-    String command;
-    List<String> args;
-
-    if (globalCheck.exitCode == 0) {
-      // Use global installation
-      command = 'npx';
-      args = ['-y', '@modelcontextprotocol/server-puppeteer'];
-    } else {
-      // Use local installation
-      command = 'node';
-      args = [
-        path.join(
-          Directory.current.path,
-          'node_modules',
-          '@modelcontextprotocol',
-          'server-puppeteer',
-          'dist',
-          'index.js',
-        ),
-      ];
-    }
-
-    await adapter.addMcpServer('puppeteer', command: command, args: args);
   }
 }
 

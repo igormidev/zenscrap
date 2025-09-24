@@ -8,7 +8,7 @@ import 'package:web_scrapper_generator/src/prompts.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_generator_interface.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_response.dart';
 import 'package:web_scrapper_generator/src/models/ai_models.dart';
-import '../puppeteer_setup.dart';
+import '../playwright_setup.dart';
 import '../mcp_adapters.dart';
 
 /// Codex CLI SDK implementation of the web scrapper generator
@@ -41,8 +41,8 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
     // Create adapter for MCP setup
     final adapter = CodexMcpAdapter(_codexSDK);
 
-    // Setup Puppeteer MCP integration using the unified setup
-    await UnifiedPuppeteerSetup.instance.setupWithAdapter(
+    // Setup Playwright MCP integration using the unified setup
+    await UnifiedPlaywrightSetup.instance.setupWithAdapter(
       adapter,
       proxyConfig: proxyConfig,
     );
@@ -230,14 +230,14 @@ You are helping to create web scraping configurations using ScrapingBee API. You
 ## Available MCP Tools
 You have access to two powerful MCP servers:
 
-### 1. Puppeteer MCP Server
-Use the puppeteer tools to navigate and interact with web pages:
-- puppeteer_navigate: Navigate to URLs and interact with pages
-- puppeteer_screenshot: Take screenshots of pages
-- puppeteer_click: Click on elements
-- puppeteer_fill: Fill in form fields
-- puppeteer_select: Select dropdown options
-- puppeteer_evaluate: Execute JavaScript in the page context
+### 1. Playwright MCP Server
+Use the playwright tools to navigate and interact with web pages:
+- playwright_navigate: Navigate to URLs and interact with pages
+- playwright_screenshot: Take screenshots of pages
+- playwright_click: Click on elements
+- playwright_fill: Fill in form fields
+- playwright_select: Select dropdown options
+- playwright_evaluate: Execute JavaScript in the page context
 
 ### 2. ScrapingBee MCP Server
 Use the test_extract_rules tool to validate your extraction rules:

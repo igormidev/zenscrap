@@ -6,7 +6,7 @@ import 'package:web_scrapper_generator/src/web_scrapper_generator_interface.dart
 import 'package:web_scrapper_generator/src/web_scrapper_response.dart';
 import 'package:web_scrapper_generator/src/models/ai_models.dart';
 import 'package:web_scrapper_generator/src/scraping_bee_mcp.dart';
-import '../puppeteer_setup.dart';
+import '../playwright_setup.dart';
 
 /// Gemini implementation of the web scrapper generator
 class WebScrapperGeminiImpl
@@ -31,8 +31,8 @@ class WebScrapperGeminiImpl
     // Ensure Gemini CLI is installed and up to date
     await _geminiSDK.updateToNewestVersionIfNeeded(global: true);
 
-    // Setup Puppeteer and its MCP integration
-    await PuppeteerSetup.instance.setupIfNeeded(
+    // Setup Playwright and its MCP integration
+    await PlaywrightSetup.instance.setupIfNeeded(
       _geminiSDK,
       proxyConfig: proxyConfig,
     );
@@ -56,7 +56,7 @@ class WebScrapperGeminiImpl
       options: GeminiChatOptions(
         systemPrompt: systemPrompt,
         model: model.apiName,
-        allowedMcpServerNames: ['puppeteer', 'scraping-bee-mcp'],
+        allowedMcpServerNames: ['playwright', 'scraping-bee-mcp'],
         allowedTools: ['*'], // Allow all tools from the allowed MCP servers
         approvalMode: 'yolo', // Automatically approve all tool usage
       ),

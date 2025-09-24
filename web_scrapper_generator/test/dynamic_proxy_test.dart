@@ -95,18 +95,18 @@ void main() {
       });
     });
 
-    test('Puppeteer launchOptions format example', () {
-      // This demonstrates how the AI should format launchOptions for Puppeteer
+    test('Playwright launchOptions format example', () {
+      // This demonstrates how the AI should format launchOptions for Playwright
       final proxyUrl = proxyConfig.buildProxyUrl(dynamicCountryCode: 'de');
-      
+
       final launchOptions = {
         'args': ['--proxy-server=$proxyUrl'],
       };
 
       expect(launchOptions['args']![0], contains('proxy-server='));
       expect(launchOptions['args']![0], contains('country_code=de'));
-      
-      print('Puppeteer launchOptions example:');
+
+      print('Playwright launchOptions example:');
       print('''
 {
   "url": "https://example.com",

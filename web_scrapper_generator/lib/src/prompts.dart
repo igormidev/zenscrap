@@ -12,7 +12,7 @@ const String systemPrompt =
 
 You have access to two powerful MCP (Model Context Protocol) servers:
 
-### 1. Puppeteer MCP
+### 1. Playwright MCP
 Use this to:
 - Open and interact with web pages in a real browser environment
 - View the rendered HTML after JavaScript execution
@@ -89,9 +89,9 @@ ScrapingBee supports proxies from 195+ countries using ISO 3166-1 alpha-2 codes:
    - /pt-BR/, /brazil/ → Use 'br'
    - /es-MX/, /mexico/ → Use 'mx'
 
-### Dynamic Proxy Configuration for Puppeteer
+### Dynamic Proxy Configuration for Playwright
 
-When using Puppeteer MCP, you can dynamically set the proxy country by passing launchOptions:
+When using Playwright MCP, you can dynamically set the proxy country by passing launchOptions:
 
 ```json
 {
@@ -146,7 +146,7 @@ ScrapingBee charges different credit amounts based on parameters:
 ## Workflow Process
 
 1. **Exploration Phase**:
-   - Use Puppeteer MCP to explore the target site
+   - Use Playwright MCP to explore the target site
    - Understand the page structure and dynamic behavior
    - Identify what data needs to be extracted
    - Test interaction flows if needed
@@ -274,7 +274,7 @@ The following JSON contains the initial WebScrapperRequest configuration that wa
     PromptContent.text('''
 ## Your Process:
 
-1. **Explore the Site**: Use Puppeteer MCP to open and analyze the target URL
+1. **Explore the Site**: Use Playwright MCP to open and analyze the target URL
 2. **Understand Requirements**: Based on the user's request, identify what data needs to be extracted
 3. **Create Extraction Rules**: Design CSS/XPath selectors to extract the required data
 4. **Test with ScrapingBee**: Use the test_extract_rules tool to validate your rules
@@ -338,7 +338,7 @@ The following JSON contains:
 
 1. **Understand Current Setup**: The existing rules are working correctly
 2. **Identify Required Changes**: Based on the user's request, determine what needs modification
-3. **Test Modifications**: Use Puppeteer and ScrapingBee MCPs to test changes
+3. **Test Modifications**: Use Playwright and ScrapingBee MCPs to test changes
 4. **Preserve What Works**: Don't break existing functionality unless explicitly requested
 5. **Optimize if Possible**: If making changes, also check if settings can be optimized
 6. **Return Updated Configuration**: Provide the modified settings

@@ -3,7 +3,7 @@ import 'package:web_scrapper_generator/src/implementations/web_scrapper_codex_im
 import 'package:web_scrapper_generator/src/models/ai_models.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_generator_interface.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_response.dart';
-import 'package:web_scrapper_generator/src/puppeteer_setup.dart';
+import 'package:web_scrapper_generator/src/playwright_setup.dart';
 
 void main() async {
   // Get API keys from environment

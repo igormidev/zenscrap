@@ -11,14 +11,14 @@ Currently, I attach the html and a screenshot of the site and example of past re
 I think a much better way to do this is:
 Use a agentic cli tool! For that, I created the gemini_cli_sdk.
 My ideia is: I plugged in two very important mcp's;
-- the puppeteer mcp, at @web_scrapper_generator/lib/src/puppeteer_setup.dart
+- the playwright mcp, at @web_scrapper_generator/lib/src/playwright_setup.dart
 - the scrapping bee mcp, at @web_scrapper_generator/lib/src/scraping_bee_mcp.dart
 This way the cli tool can open the site by it self and see the html in any time and all javascript functions - so the AI will be able to think in flows that require tapping a field, changing a filter checkbox and waiting for the result to then call the scrapping bee with the extract rules and also the js_scenario of fields that need to be fullfilled. So I won't need to call the scrapping be api mannualy, the gemini_cli can call it how many time he wants until the task is done. This is great because I will not need to do any mannual validation...
 
 Both mcp's are done. Now, I have to create the logic of the user "talking with ai". Mainly, your task is to implement "WebScrapperGeneratorController.sendMessage" in  @web_scrapper_generator/lib/src/web_scrapper_generator.dart  and ultra think for a long time to greate good prompts in @web_scrapper_generator/lib/src/prompts.dart
 
 # System Prompt
-Let's start with the system prompts. I writted just a initial version of "systemPrompt", but it should be much more bigger with all the logic that I explained above that it should use both mcp servers. The puppeteer to plan the extract_rules/js_scenario and the scrapping bee mcp to test of the created rules are correct.
+Let's start with the system prompts. I writted just a initial version of "systemPrompt", but it should be much more bigger with all the logic that I explained above that it should use both mcp servers. The playwright to plan the extract_rules/js_scenario and the scrapping bee mcp to test of the created rules are correct.
 
 Also, it should explain about all the possible schemas of the scrappable mcps (use web research to seek documentation and give a better description if needed):
 - url (string): the target page URL to scrape
@@ -52,7 +52,7 @@ Ps: Don't forget to mention that if the target url is a google domain url, then 
 
 Ps: You should tell ai to use the web search tool to find more info about that site so it can discover more things if needed.
 
-Also, remember to tell ai that if a info the user is talking about is not apearing in the puppeteer html in a first moment, it can wait add a wait delay to scrapping bee so the page waits... It can also use wait_for or wait_browser if any of those are needed.
+Also, remember to tell ai that if a info the user is talking about is not apearing in the playwright html in a first moment, it can wait add a wait delay to scrapping bee so the page waits... It can also use wait_for or wait_browser if any of those are needed.
 
 Note: This is very similar to systemprompt in @zenscrap_server/lib/src/endpoints/public/chat_controller/chat_controller_gemini_api_impl.dart - so you can use it as reference (but do not copy letter by letter - its just a reference).
 

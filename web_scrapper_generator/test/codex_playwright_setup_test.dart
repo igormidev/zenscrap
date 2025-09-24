@@ -3,7 +3,7 @@ import 'package:web_scrapper_generator/web_scrapper_generator.dart';
 
 void main() {
   test(
-    'Web scrapper generator test codex puppeteer setup',
+    'Web scrapper generator test codex playwright setup',
     () async {
       // Get API key from environment or use a test key
       final codexApiKey =
@@ -53,7 +53,7 @@ void main() {
       print('Streaming message to Codex...\n');
       final result = await codexChat.sendMessage(
         userPrompt:
-            'Quick question - before you write ANY CODE; answer me: do you have access to puppeteer in your environment? Are you able to use it? Please confirm that you can use puppeteer to interact with web pages.',
+            'Quick question - before you write ANY CODE; answer me: do you have access to playwright in your environment? Are you able to use it? Please confirm that you can use playwright to interact with web pages.',
       );
 
       int messageCount = 0;

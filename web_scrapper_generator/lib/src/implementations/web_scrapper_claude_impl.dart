@@ -5,7 +5,7 @@ import 'package:web_scrapper_generator/src/prompts.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_generator_interface.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_response.dart';
 import 'package:web_scrapper_generator/src/models/ai_models.dart';
-import '../puppeteer_setup.dart';
+import '../playwright_setup.dart';
 import '../mcp_adapters.dart';
 
 /// Claude Code SDK implementation of the web scrapper generator
@@ -34,8 +34,8 @@ class WebScrapperClaudeImpl
     // Create adapter for MCP setup
     final adapter = ClaudeMcpAdapter(_claudeSDK);
 
-    // Setup Puppeteer MCP integration using the unified setup
-    await UnifiedPuppeteerSetup.instance.setupWithAdapter(
+    // Setup Playwright MCP integration using the unified setup
+    await UnifiedPlaywrightSetup.instance.setupWithAdapter(
       adapter,
       proxyConfig: proxyConfig,
     );
