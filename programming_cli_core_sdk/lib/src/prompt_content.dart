@@ -1,16 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:nanoid2/nanoid2.dart';
 import 'package:path/path.dart' as p;
 
 /// In some cli's, like claude code, files are prefixed with @ - so we can change it here
 String filePreffix = '';
 
 abstract class PromptContent {
-  PromptContent() : contentNanoId = nanoid(length: 6);
-
-  final String contentNanoId;
+  const PromptContent();
 
   /// Creates a text content
   factory PromptContent.text(String text) = TextContent;
@@ -72,7 +69,7 @@ class FileContent extends PromptContent {
   /// Optional description of what this file contains
   final String? fileDescription;
 
-  String get inChatFilePath => '${fileName}_$contentNanoId.$fileExtension';
+  String inChatFilePath(String nanoId) => '${fileName}_$nanoId.$fileExtension';
 
   FileContent(this.file, {this.fileDescription});
 
@@ -94,7 +91,7 @@ class BytesContent extends PromptContent {
   /// Optional description of what this file contains
   final String? fileDescription;
 
-  String get inChatFilePath => '${fileName}_$contentNanoId.$fileExtension';
+  String inChatFilePath(String nanoId) => '${fileName}_$nanoId.$fileExtension';
 
   BytesContent({
     required this.data,
