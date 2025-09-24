@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:test/test.dart';
 import 'package:web_scrapper_generator/web_scrapper_generator.dart';
 
@@ -50,22 +52,45 @@ void main() {
         model: CodexModel.gpt5,
       );
 
-      print('Sending message to Codex...\n');
-      final WebScrapperChatAIResponse result = await codexChat.sendMessage(
+      print('Streaming message to Codex...\n');
+      final (
+        :llmMessage,
+        :structuredSchemaDataCompleter,
+      ) = codexChat.streamMessage(
         userPrompt:
             'This is a player page. Extract the player name, his current club name and also the current club image url',
       );
-      print('Response:\n');
+
+      int messageCount = 0;
+
+      // Listen to the stream of LLM messages
+      print('LLM Stream messages:');
+      await for (final String message in llmMessage) {
+        messageCount++;
+        stdout.write(message);
+        // print('Stream message #$messageCount: $message');
+        // print('---'); // Separator between messages
+      }
+
+      print('\nTotal stream messages received: $messageCount');
+      print('Waiting for final structured response...\n');
+
+      // Wait for the final structured response
+      final WebScrapperChatAIResponse result =
+          await structuredSchemaDataCompleter;
+
+      print('Final structured response:');
       print(switch (result) {
-        WebScrapperChatAIResponseJustMessage(:final String message) => message,
+        WebScrapperChatAIResponseJustMessage(:final String message) =>
+          'JustMessage: $message',
         WebScrapperChatAIResponseErrorMessage(:final String errorDescription) =>
-          errorDescription,
+          'ErrorMessage: $errorDescription',
         WebScrapperChatAIResponseWithDataResponse(
           :final String resumeActionMessage,
           :final WebScrapperRequest? request,
           :final ScrappingBeeFetchSettings fetchSettings,
         ) =>
-          '''$resumeActionMessage
+          '''WithDataResponse: $resumeActionMessage
 
 Request used:
 $request
@@ -85,6 +110,8 @@ Fetch settings used:
   'custom_google': ${fetchSettings.custom_google},
 }''',
       });
+
+      print('\nFinal response type: ${result.runtimeType}');
 
       expect(result, isA<WebScrapperChatAIResponseWithDataResponse>());
 
