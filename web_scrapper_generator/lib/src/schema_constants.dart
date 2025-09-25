@@ -33,11 +33,13 @@ class SchemaDescriptions {
       'JSON-encoded JavaScript scenario for interactions';
   static const String fetchRenderJs = 'Whether to render JavaScript';
   static const String fetchWait =
-      'Fixed delay in milliseconds (int with max value as 35000)';
+      'Fixed delay in milliseconds (int with max value as 35000), but try to avoid if possible so the request is faster - if really needed try to start with low values like 3000 or 5000';
   static const String fetchWaitFor = 'CSS/XPath selector to wait for';
   static const String fetchWaitBrowser = 'Browser event to wait for';
   static const String fetchPremiumProxy =
       'Whether to use premium residential proxy';
+  static const String fetchStealthProxy =
+      'Whether to use stealth proxy for hardest-to-scrape sites (most expensive)';
   static const String fetchCountryCode =
       'Proxy geolocation code (2-letter country code)';
   static const String fetchSessionId = 'Session ID for sticky sessions';

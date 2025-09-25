@@ -33,6 +33,7 @@ Use this to test your extraction rules with the actual ScrapingBee API.
 - **wait_for** (string, optional): CSS/XPath selector to wait for before extraction
 - **wait_browser** (string, optional): Browser event to wait for (domcontentloaded, load, networkidle0, networkidle2)
 - **premium_proxy** (boolean, default: false): Use residential proxies for anti-scraping protected sites
+- **stealth_proxy** (boolean, default: false): Use stealth proxy for the hardest-to-scrape sites (most expensive option, 15-75 credits)
 - **country_code** (string, optional): Proxy geolocation (2-letter code like us, de, br)
 - **session_id** (integer, optional): Maintain same IP across requests (sticky session)
 - **custom_google** (boolean, optional): MUST be true for Google domains (google.com, news.google.com, etc.)
@@ -103,8 +104,11 @@ When using Playwright MCP, you can dynamically set the proxy country by passing 
 ```
 
 **IMPORTANT PROXY SETTINGS**:
-- ALWAYS use `premium_proxy=True` for proxy mode
-- ALWAYS use `stealth_proxy=True` for better success rates
+- Use proxy settings based on site difficulty:
+  - For normal sites: No proxy needed (cheapest)
+  - For moderate difficulty: Use `premium_proxy=True` (25 credits with JS)
+  - For hardest sites only: Use `stealth_proxy=True` (75 credits, most expensive)
+  - NEVER use both stealth_proxy and premium_proxy together (stealth_proxy supersedes premium_proxy)
 - ALWAYS use `render_js=True` for JavaScript-heavy sites
 - Country code is DYNAMIC based on your analysis
 
@@ -130,16 +134,21 @@ ScrapingBee charges different credit amounts based on parameters:
 **Credit Costs:**
 - Basic request (render_js=false): 1 credit
 - JavaScript rendering (render_js=true): 5 credits
-- Premium proxy without JS: 10 credits  
+- Premium proxy without JS: 10 credits
 - Premium proxy with JS: 25 credits
+- Stealth proxy: 15-75 credits (varies by configuration, most expensive)
 - Google domains (custom_google=true): 20 credits flat
 
 **Your Testing Workflow:**
-1. **Initial Testing Phase**: Use premium settings (premium_proxy=true, render_js=true) to ensure rules work
+1. **Initial Testing Phase**:
+   - Start with moderate settings (premium_proxy=true, render_js=true) for unknown sites
+   - Only escalate to stealth_proxy=true if premium_proxy fails consistently (e.g., returns captchas or blocks)
+   - Remember: stealth_proxy is for the HARDEST sites only (like heavily protected e-commerce or social media)
 2. **Optimization Phase**: After finding working rules, systematically test cheaper configurations:
-   - First, try removing premium_proxy (test 2-3 times to ensure consistency)
-   - If that works, try render_js=false (test 2-3 times)
-   - Only keep premium settings if absolutely necessary
+   - If using stealth_proxy, try downgrading to premium_proxy (test 2-3 times)
+   - Then try removing premium_proxy entirely (test 2-3 times)
+   - Finally, try render_js=false if possible (test 2-3 times)
+   - Only keep expensive settings if absolutely necessary
 
 **IMPORTANT**: For Google domains, ALWAYS set custom_google=true without testing alternatives.
 
@@ -157,17 +166,23 @@ ScrapingBee charges different credit amounts based on parameters:
    - Consider wait strategies for dynamic content
 
 3. **Testing Phase**:
-   - Test rules with ScrapingBee MCP using premium settings
+   - Test rules with ScrapingBee MCP using appropriate settings:
+     * Start with premium_proxy=true for protected sites
+     * Only use stealth_proxy=true if premium fails (captchas, blocks, etc.)
    - Verify extracted data matches user expectations
    - Iterate if needed
 
 4. **Optimization Phase**:
-   - Test with cheaper configurations
-   - Find the minimum required settings
-   - Ensure consistent results
+   - Test with cheaper configurations in this order:
+     * If using stealth_proxy, try premium_proxy instead
+     * If using premium_proxy, try without it
+     * If using render_js, try without it (for static sites)
+   - Find the minimum required settings for reliable extraction
+   - Ensure consistent results (test multiple times)
 
 5. **Response Phase**:
    - Return optimized settings via WebScrapperChatAIResponse
+   - Include stealth_proxy only if absolutely necessary for the hardest sites
 
 ## WebScrapperRequest Editing
 
@@ -225,9 +240,13 @@ Must include:
 1. Use web search to research unfamiliar sites or technologies
 2. If content doesn't appear immediately, use wait parameters appropriately and other ScrapingBee mcp parameters
 3. Always validate that extracted data matches user expectations
-4. Be thorough in testing but mindful of credit costs
+4. Be thorough in testing but mindful of credit costs:
+   - Avoid stealth_proxy unless absolutely necessary
+   - Test with cheaper options first before escalating
 5. Explain your process and findings clearly
-6. Handle edge cases like captchas, rate limiting, or access restrictions gracefully
+6. Handle edge cases like captchas, rate limiting, or access restrictions:
+   - Try premium_proxy first for moderate protection
+   - Only use stealth_proxy for sites that block premium_proxy
 
 Remember: Your goal is to create reliable, cost-effective extraction rules that consistently retrieve the data users need.''';
 
@@ -279,7 +298,7 @@ The following JSON contains the initial WebScrapperRequest configuration that wa
 3. **Create Extraction Rules**: Design CSS/XPath selectors to extract the required data
 4. **Test with ScrapingBee**: Use the test_extract_rules tool to validate your rules
 5. **Optimize for Cost**: Test with cheaper configurations to minimize credit usage
-6. **Return Results**: Provide the optimized ScrappingBeeFetchSettings
+6. **Return Results**: Provide the optimized ScrappingBeeFetchSettings with the minimum necessary proxy level (none > premium > stealth)
 
 ## Important Notes:
 - The URL pattern and parameters in the WebScrapperRequest can be modified if needed

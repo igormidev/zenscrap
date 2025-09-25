@@ -77,6 +77,8 @@ class ScrappingBeeFetchSettings {
   final String? wait_browser;
   // will use residencial proxy, for more scrapper-resident sites
   final bool premium_proxy;
+  // use stealth proxy for the hardest to scrape websites (most expensive option)
+  final bool stealth_proxy;
   // proxy geolocation (e.g., us, de, br)
   final String? country_code;
   // keep the same IP across multiple requests (sticky sessions).
@@ -90,6 +92,7 @@ class ScrappingBeeFetchSettings {
     this.js_scenario,
     required this.render_js,
     required this.premium_proxy,
+    required this.stealth_proxy,
     this.wait,
     this.wait_for,
     this.wait_browser,
@@ -108,6 +111,7 @@ class ScrappingBeeFetchSettings {
       'wait_for': wait_for,
       'wait_browser': wait_browser,
       'premium_proxy': premium_proxy,
+      'stealth_proxy': stealth_proxy,
       'country_code': country_code,
       'session_id': session_id,
       'custom_google': custom_google,
@@ -116,6 +120,6 @@ class ScrappingBeeFetchSettings {
 
   @override
   String toString() {
-    return 'ScrappingBeeFetchSettings(url: $url, extract_rules: $extract_rules, js_scenario: $js_scenario, render_js: $render_js, wait: $wait, wait_for: $wait_for, wait_browser: $wait_browser, premium_proxy: $premium_proxy, country_code: $country_code, session_id: $session_id, custom_google: $custom_google)';
+    return 'ScrappingBeeFetchSettings(url: $url, extract_rules: $extract_rules, js_scenario: $js_scenario, render_js: $render_js, wait: $wait, wait_for: $wait_for, wait_browser: $wait_browser, premium_proxy: $premium_proxy, stealth_proxy: $stealth_proxy, country_code: $country_code, session_id: $session_id, custom_google: $custom_google)';
   }
 }

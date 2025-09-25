@@ -80,6 +80,10 @@ final SchemaDefinition webScrapperResponseSchema = SchemaDefinition(
           nullable: false,
           description: SchemaDescriptions.fetchPremiumProxy,
         ),
+        'stealth_proxy': SchemaProperty.boolean(
+          nullable: false,
+          description: SchemaDescriptions.fetchStealthProxy,
+        ),
         'country_code': SchemaProperty.text(
           nullable: true,
           description: SchemaDescriptions.fetchCountryCode,
@@ -195,6 +199,7 @@ abstract class WebScrapperGeneratorController<TModel> {
           js_scenario: scrappingBeeFetchSettingsData['js_scenario'] as String?,
           render_js: scrappingBeeFetchSettingsData['render_js'] as bool,
           premium_proxy: scrappingBeeFetchSettingsData['premium_proxy'] as bool,
+          stealth_proxy: scrappingBeeFetchSettingsData['stealth_proxy'] as bool,
           wait: scrappingBeeFetchSettingsData['wait'] as int?,
           wait_for: scrappingBeeFetchSettingsData['wait_for'] as String?,
           wait_browser:

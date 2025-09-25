@@ -110,6 +110,7 @@ Fetch settings used:
   'wait_for': ${fetchSettings.wait_for},
   'wait_browser': ${fetchSettings.wait_browser},
   'premium_proxy': ${fetchSettings.premium_proxy},
+  'stealth_proxy': ${fetchSettings.stealth_proxy},
   'country_code': ${fetchSettings.country_code},
   'session_id': ${fetchSettings.session_id},
   'custom_google': ${fetchSettings.custom_google},

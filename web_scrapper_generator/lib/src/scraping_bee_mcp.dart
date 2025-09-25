@@ -84,6 +84,9 @@ base class ScrapingBeeMcpServer extends MCPServer with ToolsSupport {
             'premium_proxy': Schema.bool(
               description: 'Use residential proxy for scraper-resistant sites',
             ),
+            'stealth_proxy': Schema.bool(
+              description: 'Use stealth proxy for the hardest-to-scrape sites (most expensive option)',
+            ),
             'country_code': Schema.string(
               description: 'Proxy geolocation (e.g., us, de, br)',
               pattern: r'^[a-z]{2}$',
@@ -201,6 +204,10 @@ base class ScrapingBeeMcpServer extends MCPServer with ToolsSupport {
 
       if (args.containsKey('premium_proxy') && args['premium_proxy'] == true) {
         queryParams['premium_proxy'] = 'true';
+      }
+
+      if (args.containsKey('stealth_proxy') && args['stealth_proxy'] == true) {
+        queryParams['stealth_proxy'] = 'true';
       }
 
       if (args.containsKey('country_code') && args['country_code'] != null) {
