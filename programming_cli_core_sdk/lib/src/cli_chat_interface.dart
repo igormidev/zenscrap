@@ -170,14 +170,23 @@ ${options?.systemPrompt}
             await _runCli(
               await createProcess(
                 message:
-                    '''A error occoured when validating the schema. The test failed.
-Please fix the schema to follow the test at $filePreffix${p.basename(schemaTestFilePath)}
-Make sure you are writing the json in the file at $filePreffix${p.basename(schemaResponseFilePath)} and not in other places.
+                    '''❌ SCHEMA VALIDATION FAILED
 
-Remember to follow the schema EXACTLY as provided, otherwise the test will fail.
-You should modify the file 
-Currently, the test returns the following error message:
-$testErrorMessage''',
+The test failed to validate your JSON output.
+
+CRITICAL REMINDERS:
+1. You MUST write the JSON to the file: $filePreffix${p.basename(schemaResponseFilePath)}
+2. DO NOT output JSON as text - ONLY write it to the file
+3. The file MUST contain valid JSON that matches the schema
+
+Test file location: $filePreffix${p.basename(schemaTestFilePath)}
+JSON output file: $filePreffix${p.basename(schemaResponseFilePath)}
+
+ERROR DETAILS:
+$testErrorMessage
+
+ACTION REQUIRED:
+Write valid JSON to the file $filePreffix${p.basename(schemaResponseFilePath)} that matches the schema exactly.''',
               ),
               controller.sink,
             );
@@ -191,7 +200,14 @@ $testErrorMessage''',
             }
           }
 
-          final fileContent = await File(schemaResponseFilePath).readAsString();
+          final schemaFile = File(schemaResponseFilePath);
+          if (!await schemaFile.exists()) {
+            throw Exception('Schema JSON file was not created at $schemaResponseFilePath');
+          }
+          final fileContent = await schemaFile.readAsString();
+          if (fileContent.trim().isEmpty) {
+            throw Exception('Schema JSON file is empty at $schemaResponseFilePath');
+          }
           final json = jsonDecode(fileContent) as Map<String, dynamic>;
           await _cleanupTemporaryFiles();
           await _removeSchemaFiles();
@@ -276,37 +292,50 @@ $testErrorMessage''',
   Future<String> _generateSchemaPrompt({
     required SchemaDefinition schema,
   }) async {
-    return '''[----------- SCHEMA INSTRUCTIONS [START] -----------]
-    
-I wan't the output in a json format. 
-I wan't you to write the output in the json file located at: " $filePreffix${p.basename(schemaResponseFilePath)} "
-I will use that file to read the json you wrote.
+    return '''[----------- CRITICAL SCHEMA OUTPUT INSTRUCTIONS [START] -----------]
 
-But I don't wan't the json in any random format.
-It should be in a specific schema that I will provide you below.
-You MUST follow the schema EXACTLY as I provide you.
-If you don't follow the schema, I will not be able to parse it.
-Because of that, since I need 100% of certainty, I created a dart test code that will validate if you followed the schema or not.
-The test code is located at the test file in: " $filePreffix${p.basename(schemaTestFilePath)} "
+⚠️ CRITICAL: This is a FILE OPERATION task, NOT a text response task!
 
-IMPORTANT: Open the test file - You will see that the test file will read the file at " $filePreffix${p.basename(schemaResponseFilePath)} " and validates if it follows the schema or not.
-So, you MUST follow the schema EXACTLY as I provide you below or the test will fail.
+YOU MUST DO THE FOLLOWING:
+1. Generate a JSON response that follows the schema below EXACTLY
+2. Write that JSON to the file: " $filePreffix${p.basename(schemaResponseFilePath)} "
+3. DO NOT output the JSON as text in your response - ONLY write it to the file
 
-If the test fails, you can be sure you did not follow the schema - so see the errors logs of the test and fix it.
-DO NOT change anything in this test file, it is perfect as it is - just focus on following the schema and it will naturally pass the test.
+IMPORTANT FILE WRITING RULES:
+- You MUST write the JSON content to the file using file writing tools
+- The file is currently empty and WILL FAIL the test if left empty
+- Do NOT return the JSON in your text response - ONLY write it to the file
+- The test will read the file to validate your JSON, not your text output
 
-The schema expected is:
+VALIDATION PROCESS:
+- A test file has been created at: " $filePreffix${p.basename(schemaTestFilePath)} "
+- This test will:
+  1. Check if the file exists (fails if missing)
+  2. Check if the file has content (fails if empty)
+  3. Parse the JSON from the file
+  4. Validate it matches the schema exactly
+- If any validation fails, you'll get a detailed error message
+
+SCHEMA TO FOLLOW:
 ```json
 ${schema.toString()}
 ```
 
-[----------- SCHEMA INSTRUCTIONS [END] -----------]''';
+REMEMBER:
+✅ DO: Write JSON to the file " $filePreffix${p.basename(schemaResponseFilePath)} "
+❌ DON'T: Output JSON as text in your response
+❌ DON'T: Leave the file empty
+❌ DON'T: Modify the test file
+
+Your ONLY task is to write valid JSON to the file that matches the schema above.
+
+[----------- CRITICAL SCHEMA OUTPUT INSTRUCTIONS [END] -----------]''';
   }
 
   Future<void> _setupSchemaFiles(SchemaDefinition schema) async {
     // First, lets create the json file where the AI will write the response in the json schema format
-    final schemaFile = await File(schemaResponseFilePath).create();
-    await schemaFile.writeAsString('{}');
+    await File(schemaResponseFilePath).create();
+    // Don't write empty JSON - let the AI populate it
     // Now, create the schema instructions file
     final schemaTestFolder = await File(schemaTestFilePath).create();
 
@@ -320,13 +349,21 @@ import 'package:test/test.dart';
 void main() {
   test('Is correct schema', () async {
     final schemaFile = File('$schemaResponseFilePath');
+    if (!await schemaFile.exists()) {
+      throw Exception('Schema file does not exist at $schemaResponseFilePath - AI did not write any JSON output to the file');
+    }
     final schemaContent = await schemaFile.readAsString();
+    if (schemaContent.trim().isEmpty) {
+      throw Exception('Schema file is empty at $schemaResponseFilePath - AI did not write any JSON output to the file');
+    }
     final Map<String, dynamic> schemaJson = jsonDecode(schemaContent);
-    final bool isValidSchema = schema.validateIdJsonFollowsSchemaStructure(
+    final String? validationError = schema.validateIdJsonFollowsSchemaStructure(
       schemaJson,
     );
-    expect(isValidSchema, true);
-  });
+    if (validationError != null) {
+      throw Exception('Schema validation failed: \$validationError');
+    }
+  }, timeout: Timeout(Duration(minutes: 2)));
 }
 
 final SchemaPropertyStructuredObjectWithDefinedProperties schema = ${schema.toSchemaProperty().toDartClassDeclaration} as SchemaPropertyStructuredObjectWithDefinedProperties;
@@ -395,7 +432,24 @@ $schemaClassDeclaration
 
   Future<TestErrorMessage?> _isSchemaResponseValid() async {
     try {
-      final result = await Process.run('dart', ['test', schemaTestFilePath]);
+      // First check if the file even exists
+      final schemaFile = File(schemaResponseFilePath);
+      if (!await schemaFile.exists()) {
+        return 'Schema file does not exist at ${p.basename(schemaResponseFilePath)} - You must write JSON to this file';
+      }
+
+      // Check if file has content
+      final content = await schemaFile.readAsString();
+      if (content.trim().isEmpty) {
+        return 'Schema file is empty at ${p.basename(schemaResponseFilePath)} - You must write JSON content to this file';
+      }
+
+      // Now run the actual test
+      final result = await Process.run('dart', [
+        'test',
+        '--chain-stack-traces',
+        schemaTestFilePath,
+      ]);
 
       if (result.exitCode == 0) {
         print('✅ Tests in $schemaTestFilePath passed!');
@@ -410,7 +464,7 @@ $schemaClassDeclaration
       }
     } catch (e, s) {
       log('Error reading schema response file: $e', stackTrace: s);
-      return null;
+      return 'Error validating schema: $e';
     }
   }
 }
@@ -540,43 +594,69 @@ class SchemaPropertyStructuredObjectWithDefinedProperties
   // Will see if a given JSON object follows this schema structure
   // If a field is required (not nullable) it must be present
   // If a field is nullable it can be absent or null, but if it is present it must follow the schema
-  bool validateIdJsonFollowsSchemaStructure(Map<String, dynamic> model) {
-    return _validateValueForSchema(this, model);
+  // Returns null if valid, error message if invalid
+  String? validateIdJsonFollowsSchemaStructure(Map<String, dynamic> model) {
+    return _validateValueForSchema(this, model, 'root');
   }
 
-  static bool _validateValueForSchema(SchemaProperty schema, dynamic value) {
+  static String? _validateValueForSchema(SchemaProperty schema, dynamic value, String path) {
     if (value == null) {
-      return schema.nullable;
+      if (!schema.nullable) {
+        return 'Expected non-null value at $path but got null (field is not nullable)';
+      }
+      return null;
     }
 
     switch (schema) {
       case SchemaPropertyString():
-        return value is String;
+        if (value is! String) {
+          return 'Expected String at $path but got ${value.runtimeType}';
+        }
+        return null;
       case SchemaPropertyInteger():
-        return value is int;
+        if (value is! int) {
+          return 'Expected int at $path but got ${value.runtimeType}';
+        }
+        return null;
       case SchemaPropertyDouble():
-        return value is num;
+        if (value is! num) {
+          return 'Expected num (double) at $path but got ${value.runtimeType}';
+        }
+        return null;
       case SchemaPropertyBoolean():
-        return value is bool;
+        if (value is! bool) {
+          return 'Expected bool at $path but got ${value.runtimeType}';
+        }
+        return null;
       case SchemaPropertyEnum(:final enumValues):
-        return value is String && enumValues.contains(value);
+        if (value is! String) {
+          return 'Expected String (enum) at $path but got ${value.runtimeType}';
+        }
+        if (!enumValues.contains(value)) {
+          return 'Invalid enum value at $path: "$value" is not one of [${enumValues.join(', ')}]';
+        }
+        return null;
       case SchemaPropertyArray(:final items):
         if (value is! List) {
-          return false;
+          return 'Expected List at $path but got ${value.runtimeType}';
         }
-        for (final element in value) {
-          if (!_validateValueForSchema(items, element)) {
-            return false;
+        for (var i = 0; i < value.length; i++) {
+          final error = _validateValueForSchema(items, value[i], '$path[$i]');
+          if (error != null) {
+            return error;
           }
         }
-        return true;
+        return null;
       case SchemaPropertyObjectWithUndefinedProperties():
-        return value is Map<String, dynamic>;
+        if (value is! Map<String, dynamic>) {
+          return 'Expected Map<String, dynamic> at $path but got ${value.runtimeType}';
+        }
+        return null;
       case SchemaPropertyStructuredObjectWithDefinedProperties(
         :final properties,
       ):
         if (value is! Map<String, dynamic>) {
-          return false;
+          return 'Expected Map<String, dynamic> at $path but got ${value.runtimeType}';
         }
 
         for (final entry in properties.entries) {
@@ -586,17 +666,18 @@ class SchemaPropertyStructuredObjectWithDefinedProperties
 
           if (!hasKey) {
             if (!propertySchema.nullable) {
-              return false;
+              return 'Missing required field "$key" at $path (field is not nullable)';
             }
             continue;
           }
 
           final propertyValue = value[key];
-          if (!_validateValueForSchema(propertySchema, propertyValue)) {
-            return false;
+          final error = _validateValueForSchema(propertySchema, propertyValue, '$path.$key');
+          if (error != null) {
+            return error;
           }
         }
-        return true;
+        return null;
     }
   }
 

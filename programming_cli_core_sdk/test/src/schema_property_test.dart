@@ -193,13 +193,13 @@ void main() {
 
     test('accepts a fully valid payload', () {
       final model = buildValidModel();
-      expect(schema.validateIdJsonFollowsSchemaStructure(model), isTrue);
+      expect(schema.validateIdJsonFollowsSchemaStructure(model), isNull);
     });
 
     test('rejects payload missing required top-level field', () {
       final model = buildValidModel();
       model.remove('name');
-      expect(schema.validateIdJsonFollowsSchemaStructure(model), isFalse);
+      expect(schema.validateIdJsonFollowsSchemaStructure(model), isNotNull);
     });
 
     test('accepts when nullable object is null or absent', () {
@@ -207,21 +207,23 @@ void main() {
       modelWithNull['optionalPayload'] = null;
       expect(
         schema.validateIdJsonFollowsSchemaStructure(modelWithNull),
-        isTrue,
+        isNull,
       );
 
       final modelWithoutKey = buildValidModel();
       modelWithoutKey.remove('optionalPayload');
       expect(
         schema.validateIdJsonFollowsSchemaStructure(modelWithoutKey),
-        isTrue,
+        isNull,
       );
     });
 
     test('rejects incorrect primitive types deep in the tree', () {
       final model = buildValidModel();
       (model['metadata'] as Map<String, dynamic>)['owner'] = 1234;
-      expect(schema.validateIdJsonFollowsSchemaStructure(model), isFalse);
+      final error = schema.validateIdJsonFollowsSchemaStructure(model);
+      expect(error, isNotNull);
+      expect(error, contains('Expected String at root.metadata.owner'));
     });
 
     test('rejects invalid array element structures', () {
@@ -234,14 +236,16 @@ void main() {
       final List<dynamic> history = metrics['history'] as List<dynamic>;
       (history.first as Map<String, dynamic>)['success'] = 'yes';
 
-      expect(schema.validateIdJsonFollowsSchemaStructure(model), isFalse);
+      final error = schema.validateIdJsonFollowsSchemaStructure(model);
+      expect(error, isNotNull);
+      expect(error, contains('Expected bool at root.sessions[0].metrics.history[0].success'));
     });
 
     test('allows unspecified additional keys while matching known schema', () {
       final model = buildValidModel();
       (model['metadata'] as Map<String, dynamic>)['extraData'] = {'foo': 'bar'};
       model['unexpectedRootKey'] = 'ignored';
-      expect(schema.validateIdJsonFollowsSchemaStructure(model), isTrue);
+      expect(schema.validateIdJsonFollowsSchemaStructure(model), isNull);
     });
 
     test('accepts nullable fields when omitted from nested structures', () {
@@ -253,7 +257,7 @@ void main() {
           metadata['preferences'] as Map<String, dynamic>;
       preferences.remove('theme');
 
-      expect(schema.validateIdJsonFollowsSchemaStructure(model), isTrue);
+      expect(schema.validateIdJsonFollowsSchemaStructure(model), isNull);
     });
 
     test('rejects missing required properties in nested objects', () {
@@ -267,7 +271,9 @@ void main() {
         // Missing required "success" field
       });
 
-      expect(schema.validateIdJsonFollowsSchemaStructure(model), isFalse);
+      final error = schema.validateIdJsonFollowsSchemaStructure(model);
+      expect(error, isNotNull);
+      expect(error, contains('Missing required field "success"'));
     });
   });
 }

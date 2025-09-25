@@ -140,43 +140,69 @@ class SchemaPropertyStructuredObjectWithDefinedProperties
   // Will see if a given JSON object follows this schema structure
   // If a field is required (not nullable) it must be present
   // If a field is nullable it can be absent or null, but if it is present it must follow the schema
-  bool validateIdJsonFollowsSchemaStructure(Map<String, dynamic> model) {
-    return _validateValueForSchema(this, model);
+  // Returns null if valid, error message if invalid
+  String? validateIdJsonFollowsSchemaStructure(Map<String, dynamic> model) {
+    return _validateValueForSchema(this, model, 'root');
   }
 
-  static bool _validateValueForSchema(SchemaProperty schema, dynamic value) {
+  static String? _validateValueForSchema(SchemaProperty schema, dynamic value, String path) {
     if (value == null) {
-      return schema.nullable;
+      if (!schema.nullable) {
+        return 'Expected non-null value at $path but got null (field is not nullable)';
+      }
+      return null;
     }
 
     switch (schema) {
       case SchemaPropertyString():
-        return value is String;
+        if (value is! String) {
+          return 'Expected String at $path but got ${value.runtimeType}';
+        }
+        return null;
       case SchemaPropertyInteger():
-        return value is int;
+        if (value is! int) {
+          return 'Expected int at $path but got ${value.runtimeType}';
+        }
+        return null;
       case SchemaPropertyDouble():
-        return value is num;
+        if (value is! num) {
+          return 'Expected num (double) at $path but got ${value.runtimeType}';
+        }
+        return null;
       case SchemaPropertyBoolean():
-        return value is bool;
+        if (value is! bool) {
+          return 'Expected bool at $path but got ${value.runtimeType}';
+        }
+        return null;
       case SchemaPropertyEnum(:final enumValues):
-        return value is String && enumValues.contains(value);
+        if (value is! String) {
+          return 'Expected String (enum) at $path but got ${value.runtimeType}';
+        }
+        if (!enumValues.contains(value)) {
+          return 'Invalid enum value at $path: "$value" is not one of [${enumValues.join(', ')}]';
+        }
+        return null;
       case SchemaPropertyArray(:final items):
         if (value is! List) {
-          return false;
+          return 'Expected List at $path but got ${value.runtimeType}';
         }
-        for (final element in value) {
-          if (!_validateValueForSchema(items, element)) {
-            return false;
+        for (var i = 0; i < value.length; i++) {
+          final error = _validateValueForSchema(items, value[i], '$path[$i]');
+          if (error != null) {
+            return error;
           }
         }
-        return true;
+        return null;
       case SchemaPropertyObjectWithUndefinedProperties():
-        return value is Map<String, dynamic>;
+        if (value is! Map<String, dynamic>) {
+          return 'Expected Map<String, dynamic> at $path but got ${value.runtimeType}';
+        }
+        return null;
       case SchemaPropertyStructuredObjectWithDefinedProperties(
         :final properties,
       ):
         if (value is! Map<String, dynamic>) {
-          return false;
+          return 'Expected Map<String, dynamic> at $path but got ${value.runtimeType}';
         }
 
         for (final entry in properties.entries) {
@@ -186,17 +212,18 @@ class SchemaPropertyStructuredObjectWithDefinedProperties
 
           if (!hasKey) {
             if (!propertySchema.nullable) {
-              return false;
+              return 'Missing required field "$key" at $path (field is not nullable)';
             }
             continue;
           }
 
           final propertyValue = value[key];
-          if (!_validateValueForSchema(propertySchema, propertyValue)) {
-            return false;
+          final error = _validateValueForSchema(propertySchema, propertyValue, '$path.$key');
+          if (error != null) {
+            return error;
           }
         }
-        return true;
+        return null;
     }
   }
 

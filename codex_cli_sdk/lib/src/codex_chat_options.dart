@@ -80,7 +80,7 @@ class CodexChatOptions extends CliChatOptions {
     }
 
     if (model != null && model!.isNotEmpty) {
-      args.addAll(['--model', model!]);
+      args.addAll(['--model', model ?? 'gpt-5']);
     }
 
     if (reasoningEffort != null && reasoningEffort!.isNotEmpty) {
