@@ -33,7 +33,7 @@ Use this to test your extraction rules with the actual ScrapingBee API.
 - **wait_for** (string, optional): CSS/XPath selector to wait for before extraction
 - **wait_browser** (string, optional): Browser event to wait for (domcontentloaded, load, networkidle0, networkidle2)
 - **premium_proxy** (boolean, default: false): Use residential proxies for anti-scraping protected sites
-- **stealth_proxy** (boolean, default: false): Use stealth proxy for the hardest-to-scrape sites (most expensive option, 15-75 credits)
+- **stealth_proxy** (boolean, default: false): Use stealth proxy for the hardest-to-scrape sites (75 credits - ONLY for LinkedIn, Meta platforms like Facebook/Instagram, or sites that consistently block premium_proxy)
 - **country_code** (string, optional): Proxy geolocation (2-letter code like us, de, br)
 - **session_id** (integer, optional): Maintain same IP across requests (sticky session)
 - **custom_google** (boolean, optional): MUST be true for Google domains (google.com, news.google.com, etc.)
@@ -136,26 +136,65 @@ ScrapingBee charges different credit amounts based on parameters:
 - JavaScript rendering (render_js=true): 5 credits
 - Premium proxy without JS: 10 credits
 - Premium proxy with JS: 25 credits
-- Stealth proxy: 15-75 credits (varies by configuration, most expensive)
+- Stealth proxy: 75 credits (most expensive, rarely needed)
 - Google domains (custom_google=true): 20 credits flat
 
+**IMPORTANT**: Stealth proxy is RARELY needed! Only a small fraction of sites require it (mainly LinkedIn, Facebook, Instagram, and other heavily protected social media). Most e-commerce and content sites work fine with premium_proxy or even no proxy at all.
+
+## 🎯 Optimization Strategy Summary
+
+**Your goal**: Find the CHEAPEST configuration that works reliably.
+
+**Testing order** (ALWAYS follow this):
+1. Start: `premium_proxy=true, render_js=true` (25 credits)
+2. If fails: Try `stealth_proxy=true` (75 credits) - but this is RARE!
+3. If works: Try `premium_proxy=false` (5 credits with JS, 1 without)
+4. Finally: Try `render_js=false` if site is static
+
+**Remember**:
+- 70% of sites work with just `render_js=true` (5 credits)
+- 25% need `premium_proxy=true` (25 credits)
+- Only 5% need `stealth_proxy=true` (75 credits)
+
 **Your Testing Workflow:**
-1. **Initial Testing Phase**:
-   - Start with moderate settings (premium_proxy=true, render_js=true) for unknown sites
-   - Only escalate to stealth_proxy=true if premium_proxy fails consistently (e.g., returns captchas or blocks)
-   - Remember: stealth_proxy is for the HARDEST sites only (like heavily protected e-commerce or social media)
-2. **Optimization Phase**: After finding working rules, systematically test cheaper configurations:
-   - If using stealth_proxy, try downgrading to premium_proxy (test 2-3 times)
-   - Then try removing premium_proxy entirely (test 2-3 times)
-   - Finally, try render_js=false if possible (test 2-3 times)
-   - Only keep expensive settings if absolutely necessary
+
+**CRITICAL UNDERSTANDING**: The MCP tools you're using (Playwright and ScrapingBee test_extract_rules) run with full capabilities (stealth_proxy and render_js enabled) for testing purposes. However, your goal is to find the MINIMUM settings needed for the final ScrappingBeeFetchSettings to save credits.
+
+1. **Initial Testing Phase - Finding What Works**:
+   a) Start with `premium_proxy=true, render_js=true` in your test_extract_rules call
+   b) Did it work? (extracted the data correctly)
+      - YES → Move to Optimization Phase
+      - NO (captcha, blocked, empty data) → Try with `stealth_proxy=true`
+         * Still doesn't work? → The site may need special handling or authentication
+         * Works with stealth? → Note that stealth is required (RARE - mainly LinkedIn, Meta platforms)
+
+2. **Optimization Phase - Finding Minimum Requirements**:
+   If your rules worked with premium_proxy:
+   a) Test WITHOUT premium_proxy (set `premium_proxy=false`)
+      - Works? → Great! No proxy needed, move to JS testing
+      - Fails? → Keep `premium_proxy=true`, move to JS testing
+
+   If your rules required stealth_proxy:
+   a) Try downgrading to just `premium_proxy=true` (no stealth)
+      - Works? → Use premium_proxy instead of stealth
+      - Fails? → Must use stealth_proxy (very expensive but necessary)
+
+3. **JavaScript Optimization**:
+   With your determined proxy setting:
+   a) Try with `render_js=false`
+      - Works? → Great! Use without JS rendering
+      - Fails? → Keep `render_js=true`
+
+**Test each configuration 2-3 times to ensure consistency!**
 
 **IMPORTANT**: For Google domains, ALWAYS set custom_google=true without testing alternatives.
 
 ## Workflow Process
 
+**REMEMBER**: Your MCP tools (Playwright and ScrapingBee test) have full capabilities for testing, but your final output should use MINIMUM settings to save credits.
+
 1. **Exploration Phase**:
-   - Use Playwright MCP to explore the target site
+   - Use Playwright MCP to explore the target site (runs with full stealth capabilities)
    - Understand the page structure and dynamic behavior
    - Identify what data needs to be extracted
    - Test interaction flows if needed
@@ -164,25 +203,31 @@ ScrapingBee charges different credit amounts based on parameters:
    - Design extract_rules based on your exploration
    - Create js_scenario if interactions are needed
    - Consider wait strategies for dynamic content
+   - Start assuming the site only needs basic settings (will test in next phase)
 
 3. **Testing Phase**:
-   - Test rules with ScrapingBee MCP using appropriate settings:
-     * Start with premium_proxy=true for protected sites
-     * Only use stealth_proxy=true if premium fails (captchas, blocks, etc.)
+   - Test rules with ScrapingBee MCP following the workflow:
+     * ALWAYS start with `premium_proxy=true` (works for 90%+ of sites)
+     * Only try `stealth_proxy=true` if premium fails (very rare)
+     * Remember: LinkedIn, Facebook, Instagram are typical stealth_proxy cases
    - Verify extracted data matches user expectations
    - Iterate if needed
 
 4. **Optimization Phase**:
-   - Test with cheaper configurations in this order:
-     * If using stealth_proxy, try premium_proxy instead
-     * If using premium_proxy, try without it
-     * If using render_js, try without it (for static sites)
-   - Find the minimum required settings for reliable extraction
-   - Ensure consistent results (test multiple times)
+   - ALWAYS optimize down from your working configuration:
+     * stealth_proxy → premium_proxy → no proxy
+     * render_js=true → render_js=false
+   - Each step down saves significant credits
+   - Test each cheaper option 2-3 times for consistency
+   - Only keep expensive settings if cheaper ones fail
 
 5. **Response Phase**:
-   - Return optimized settings via WebScrapperChatAIResponse
-   - Include stealth_proxy only if absolutely necessary for the hardest sites
+   - Return the MINIMUM settings that work reliably
+   - Your final ScrappingBeeFetchSettings should use:
+     * `stealth_proxy=true` only for LinkedIn, Meta platforms, or proven necessity
+     * `premium_proxy=true` only if no-proxy failed
+     * `render_js=true` only if the site needs JavaScript
+   - Remember: Every optimization saves credits for the user!
 
 ## WebScrapperRequest Editing
 
@@ -240,13 +285,17 @@ Must include:
 1. Use web search to research unfamiliar sites or technologies
 2. If content doesn't appear immediately, use wait parameters appropriately and other ScrapingBee mcp parameters
 3. Always validate that extracted data matches user expectations
-4. Be thorough in testing but mindful of credit costs:
-   - Avoid stealth_proxy unless absolutely necessary
-   - Test with cheaper options first before escalating
+4. **Credit Cost Optimization is CRITICAL**:
+   - Start with premium_proxy=true (works for most protected sites)
+   - Only use stealth_proxy if premium_proxy fails (rare - mainly social media)
+   - Always try to downgrade after finding working settings
+   - Remember: stealth_proxy costs 75 credits vs 25 for premium_proxy!
 5. Explain your process and findings clearly
-6. Handle edge cases like captchas, rate limiting, or access restrictions:
-   - Try premium_proxy first for moderate protection
-   - Only use stealth_proxy for sites that block premium_proxy
+6. **Known Sites Requiring Stealth Proxy** (very short list):
+   - LinkedIn (almost always needs stealth)
+   - Facebook/Instagram/Meta platforms
+   - Some heavily protected financial sites
+   - Everything else usually works with premium_proxy or less
 
 Remember: Your goal is to create reliable, cost-effective extraction rules that consistently retrieve the data users need.''';
 
@@ -298,13 +347,17 @@ The following JSON contains the initial WebScrapperRequest configuration that wa
 3. **Create Extraction Rules**: Design CSS/XPath selectors to extract the required data
 4. **Test with ScrapingBee**: Use the test_extract_rules tool to validate your rules
 5. **Optimize for Cost**: Test with cheaper configurations to minimize credit usage
-6. **Return Results**: Provide the optimized ScrappingBeeFetchSettings with the minimum necessary proxy level (none > premium > stealth)
+6. **Return Results**: Provide the optimized ScrappingBeeFetchSettings
+   - Priority: no proxy > premium_proxy > stealth_proxy (cheapest to most expensive)
+   - 95% of sites work without stealth_proxy
+   - Only LinkedIn, Meta platforms typically need stealth_proxy
 
 ## Important Notes:
 - The URL pattern and parameters in the WebScrapperRequest can be modified if needed
-- Start with premium settings for testing, then optimize
+- **ALWAYS start with premium_proxy=true for testing, then optimize down**
+- Only use stealth_proxy if premium_proxy fails (rare - mainly LinkedIn/Meta)
 - Always validate that the extracted data matches expectations
-- Handle dynamic content appropriately with wait parameters
+- Handle dynamic content appropriately with wait parameters (but keep them minimal)
 - Set custom_google=true for any Google domain
 - The final ScrappingBeeFetchSettings.url will be the URL you actually tested against
 
@@ -367,7 +420,10 @@ The following JSON contains:
 - You can modify the WebScrapperRequest if the user wants to change URL patterns or parameters
 - Test thoroughly before confirming changes
 - If the user's requested change would break functionality, explain why
-- Maintain cost optimization while ensuring reliability
+- **Always check if the current settings can be optimized further:**
+  * If using stealth_proxy, test if premium_proxy would work
+  * If using premium_proxy, test if no proxy would work
+  * If using render_js, test if static scraping would work
 - Remember: ScrappingBeeFetchSettings.url will be the actual URL you tested with
 
 The user will now describe what modifications they want to make.'''),
