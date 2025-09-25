@@ -66,7 +66,7 @@ final SchemaPropertyStructuredObjectWithDefinedProperties schema =
                   'Modified WebScrapperRequest if changes were made, null if no changes needed',
               nullable: true,
             ),
-            'fetchSettings': SchemaProperty.structuredObject(
+            'scrappingBeeFetchSettings': SchemaProperty.structuredObject(
               properties: {
                 'url': SchemaProperty.text(
                   description: 'The target URL for scraping',

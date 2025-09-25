@@ -65,14 +65,19 @@ void main() {
 
       // Listen to the stream of LLM messages
       print('LLM Stream messages:');
+      final StringBuffer messages = StringBuffer();
       await for (final String message in llmMessage) {
         messageCount++;
         stdout.write(message);
+        messages.write(message);
         // print('Stream message #$messageCount: $message');
         // print('---'); // Separator between messages
       }
 
       print('\nTotal stream messages received: $messageCount');
+      print(
+        '\n[---------------- MESSAGE START ----------------]\n${messages.toString()}\n\n[---------------- MESSAGE END ----------------]',
+      );
       print('Waiting for final structured response...\n');
 
       // Wait for the final structured response

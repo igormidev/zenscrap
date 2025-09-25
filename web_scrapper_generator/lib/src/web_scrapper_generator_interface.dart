@@ -44,7 +44,7 @@ final SchemaDefinition webScrapperResponseSchema = SchemaDefinition(
         ),
       },
     ),
-    'fetchSettings': SchemaProperty.structuredObject(
+    'scrappingBeeFetchSettings': SchemaProperty.structuredObject(
       nullable: true,
       description: SchemaDescriptions.fetchSettings,
       properties: {
@@ -162,10 +162,11 @@ abstract class WebScrapperGeneratorController<TModel> {
 
       case 'data':
         final resumeActionMessage = data['resumeActionMessage'] as String?;
-        final fetchSettingsData =
-            data['fetchSettings'] as Map<String, dynamic>?;
+        final scrappingBeeFetchSettingsData =
+            data['scrappingBeeFetchSettings'] as Map<String, dynamic>?;
 
-        if (resumeActionMessage == null || fetchSettingsData == null) {
+        if (resumeActionMessage == null ||
+            scrappingBeeFetchSettingsData == null) {
           return const WebScrapperChatAIResponseErrorMessage(
             'Invalid response: data type but missing required fields',
           );
@@ -188,17 +189,21 @@ abstract class WebScrapperGeneratorController<TModel> {
 
         // Parse the fetch settings
         final fetchSettings = ScrappingBeeFetchSettings(
-          url: fetchSettingsData['url'] as String,
-          extract_rules: fetchSettingsData['extract_rules'] as String,
-          js_scenario: fetchSettingsData['js_scenario'] as String?,
-          render_js: fetchSettingsData['render_js'] as bool,
-          premium_proxy: fetchSettingsData['premium_proxy'] as bool,
-          wait: fetchSettingsData['wait'] as int?,
-          wait_for: fetchSettingsData['wait_for'] as String?,
-          wait_browser: fetchSettingsData['wait_browser'] as String?,
-          country_code: fetchSettingsData['country_code'] as String?,
-          session_id: fetchSettingsData['session_id'] as String?,
-          custom_google: fetchSettingsData['custom_google'] as bool?,
+          url: scrappingBeeFetchSettingsData['url'] as String,
+          extract_rules:
+              scrappingBeeFetchSettingsData['extract_rules'] as String,
+          js_scenario: scrappingBeeFetchSettingsData['js_scenario'] as String?,
+          render_js: scrappingBeeFetchSettingsData['render_js'] as bool,
+          premium_proxy: scrappingBeeFetchSettingsData['premium_proxy'] as bool,
+          wait: scrappingBeeFetchSettingsData['wait'] as int?,
+          wait_for: scrappingBeeFetchSettingsData['wait_for'] as String?,
+          wait_browser:
+              scrappingBeeFetchSettingsData['wait_browser'] as String?,
+          country_code:
+              scrappingBeeFetchSettingsData['country_code'] as String?,
+          session_id: scrappingBeeFetchSettingsData['session_id'] as String?,
+          custom_google:
+              scrappingBeeFetchSettingsData['custom_google'] as bool?,
         );
 
         return WebScrapperChatAIResponseWithDataResponse(

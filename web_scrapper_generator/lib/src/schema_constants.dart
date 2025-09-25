@@ -32,7 +32,8 @@ class SchemaDescriptions {
   static const String fetchJsScenario =
       'JSON-encoded JavaScript scenario for interactions';
   static const String fetchRenderJs = 'Whether to render JavaScript';
-  static const String fetchWait = 'Fixed delay in milliseconds';
+  static const String fetchWait =
+      'Fixed delay in milliseconds (int with max value as 35000)';
   static const String fetchWaitFor = 'CSS/XPath selector to wait for';
   static const String fetchWaitBrowser = 'Browser event to wait for';
   static const String fetchPremiumProxy =

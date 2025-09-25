@@ -3,6 +3,6 @@
   "version": "1.0.0",
   "description": "Web scrapper generator with Playwright support",
   "dependencies": {
-    "playwright": "^1.49.0"
+    "playwright": "^1.55.1"
   }
 }
