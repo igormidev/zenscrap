@@ -39,13 +39,15 @@ void main() async {
       },
       pathParams: ['productId'],
     ),
-    targetExampleUrl: 'https://example.com/products/123?sort=price&filter=electronics',
+    targetExampleUrl:
+        'https://example.com/products/123?sort=price&filter=electronics',
   );
 
   // Start a chat session with Codex
   final codexChat = WebScrapperCodexImpl.startChat(
     initialPayload: initialPayload,
-    model: CodexModel.gptOss120b, // Use GPT-OSS-120B with high reasoning by default
+    model: CodexModel
+        .gpt5Codex, // Use GPT-5 Codex with powerful reasoning by default
   );
 
   try {
@@ -75,7 +77,11 @@ void main() async {
         print('❌ Error: $errorDescription\n');
         break;
 
-      case WebScrapperChatAIResponseWithDataResponse(:final resumeActionMessage, :final fetchSettings, :final request):
+      case WebScrapperChatAIResponseWithDataResponse(
+        :final resumeActionMessage,
+        :final fetchSettings,
+        :final request,
+      ):
         print('✅ Success! Codex created extraction rules.\n');
         print('📋 Summary: $resumeActionMessage\n');
 
@@ -116,7 +122,9 @@ void main() async {
         print('📝 GPT-5 says: $message\n');
         break;
 
-      case WebScrapperChatAIResponseWithDataResponse(:final resumeActionMessage):
+      case WebScrapperChatAIResponseWithDataResponse(
+        :final resumeActionMessage,
+      ):
         print('✅ GPT-5 updated the configuration: $resumeActionMessage\n');
         break;
 
@@ -124,7 +132,6 @@ void main() async {
         print('❌ Error: $errorDescription\n');
         break;
     }
-
   } catch (e) {
     print('💥 Unexpected error: $e');
   } finally {

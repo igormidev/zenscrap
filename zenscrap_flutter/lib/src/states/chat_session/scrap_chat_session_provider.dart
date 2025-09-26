@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/serverpod_to_result.dart';
@@ -79,6 +80,8 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
             onDone: () {
               _aiCurrentThinkingSubscription?.cancel();
               state.mapOrNull(standard: (value) {
+                Clipboard.setData(ClipboardData(
+                    text: value.llmThinkingStream?.join('\n') ?? ''));
                 state = value.copyWith(llmThinkingStream: null);
               });
             },

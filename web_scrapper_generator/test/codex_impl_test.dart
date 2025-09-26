@@ -9,12 +9,15 @@ void main() {
     test('should have correct model options', () {
       expect(CodexModel.values.length, equals(2));
       expect(CodexModel.gpt5.apiName, equals('gpt-5'));
-      expect(CodexModel.gptOss120b.apiName, equals('gpt-oss-120b'));
+      expect(CodexModel.gpt5Codex.apiName, equals('gpt-5-codex'));
     });
 
     test('should have correct display names', () {
       expect(CodexModel.gpt5.displayName, equals('GPT-5 (Fast Reasoning)'));
-      expect(CodexModel.gptOss120b.displayName, equals('GPT-OSS-120B (High Reasoning)'));
+      expect(
+        CodexModel.gpt5Codex.displayName,
+        equals('GPT-5 Codex (Powerful Reasoning)'),
+      );
     });
 
     test('should build correct schema', () {

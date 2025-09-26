@@ -175,9 +175,10 @@ mixin ChatControllerHandlerMixin {
                 session, scrappingBeeExtractLogic,
                 transaction: transaction);
           });
+        } else {
+          await Future.delayed(const Duration(milliseconds: 800));
         }
 
-        await Future.delayed(const Duration(milliseconds: 800));
         chatSeason.add(NewExtractRuleResponse(
             role: PromptRole.system,
             messageText: 'New rules were tested and did not present any errors',

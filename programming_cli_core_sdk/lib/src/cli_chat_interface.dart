@@ -114,9 +114,9 @@ abstract class CliChatInterface<T extends CliChatOptions> {
   }
 
   String get schemaResponseFilePath =>
-      '${baseDir.path}/schema_response_id-$_chatNanoId.json';
+      '${baseDir.path}/ai_generated_files/schema_response_id-$_chatNanoId.json';
   String get schemaTestFilePath =>
-      '${baseDir.path}/is_schema_correct_in_id-${_chatNanoId}_test.dart';
+      '${baseDir.path}/ai_generated_files/is_schema_correct_in_id-${_chatNanoId}_test.dart';
 
   ({
     Stream<String> llmMessage,
@@ -348,10 +348,12 @@ Your task is to:
 
   Future<void> _setupSchemaFiles(SchemaDefinition schema) async {
     // First, lets create the json file where the AI will write the response in the json schema format
-    await File(schemaResponseFilePath).create();
+    await File(schemaResponseFilePath).create(recursive: true);
     // Don't write empty JSON - let the AI populate it
     // Now, create the schema instructions file
-    final schemaTestFolder = await File(schemaTestFilePath).create();
+    final schemaTestFolder = await File(
+      schemaTestFilePath,
+    ).create(recursive: true);
 
     final String testContent =
         '''// ignore_for_file: file_names
@@ -424,9 +426,11 @@ $schemaClassDeclaration
 
   Future<void> _setTemporaryFiles() async {
     for (final tempFile in _temporaryFiles) {
-      final file = File('${baseDir.path}/${tempFile.fileName}');
+      final file = File(
+        '${baseDir.path}/ai_generated_files/${tempFile.fileName}',
+      );
       if (!await file.exists()) {
-        final createdFile = await file.create();
+        final createdFile = await file.create(recursive: true);
         await createdFile.writeAsBytes(tempFile.fileContent);
       } else {
         await file.writeAsBytes(tempFile.fileContent);
@@ -437,7 +441,7 @@ $schemaClassDeclaration
   Future<void> _cleanupTemporaryFiles() async {
     for (final tempFile in _temporaryFiles) {
       try {
-        final path = '${baseDir.path}/${tempFile.fileName}';
+        final path = '${baseDir.path}/ai_generated_files/${tempFile.fileName}';
         final file = File(path);
         print('[${await file.exists()}] $path');
         if (await file.exists()) {

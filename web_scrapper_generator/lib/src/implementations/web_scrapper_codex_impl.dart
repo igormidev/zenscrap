@@ -60,7 +60,7 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
   /// Factory method to create a new chat instance
   static WebScrapperCodexImpl startChat({
     required InitialPayloadData initialPayload,
-    CodexModel model = CodexModel.gptOss120b,
+    CodexModel model = CodexModel.gpt5Codex,
     CodexChatOptions? options,
   }) {
     final defaultOptions = CodexChatOptions(
@@ -69,6 +69,7 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
       enableMcp: true, // Enable MCP support
       sandboxMode: 'danger-full-access',
       approvalPolicy: 'never',
+      reasoningEffort: 'medium',
       // Note: Removed mode as Codex exec doesn't support --auto-edit
       outputJson: false, // We'll use schema for structured output
     );

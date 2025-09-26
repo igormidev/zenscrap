@@ -16,7 +16,7 @@ class ChatControllerCodexSdkImpl extends IChatController
   factory ChatControllerCodexSdkImpl.startChat({
     required ReferenceTestData referenceTestData,
     required ScrappableRequest scrapperRequest,
-    CodexModel model = CodexModel.gptOss120b,
+    CodexModel model = CodexModel.gpt5Codex,
   }) {
     final webScrapperRequest = WebScrapperRequest(
       url: scrapperRequest.url,
@@ -28,7 +28,6 @@ class ChatControllerCodexSdkImpl extends IChatController
         targetExampleUrl: referenceTestData.referenceLinkUsed,
         webScrapperRequest: webScrapperRequest,
       ),
-      model: model,
     );
 
     return ChatControllerCodexSdkImpl._(controller: controller);
@@ -39,8 +38,8 @@ class ChatControllerCodexSdkImpl extends IChatController
     // Map the normal/powerful models to appropriate Codex models with high reasoning effort
     switch (aiModel) {
       case AiModel.normal:
-        // GPT-OSS-120B with high reasoning effort for balanced performance
-        await controller.changeModelWithEffort(CodexModel.gptOss120b, 'high');
+        // GPT-5 Codex with high reasoning effort for balanced performance
+        await controller.changeModelWithEffort(CodexModel.gpt5Codex, 'high');
         break;
       case AiModel.powerful:
         // GPT-5 with high reasoning effort for maximum capability
