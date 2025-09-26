@@ -12,6 +12,7 @@ import 'package:zenscrap_flutter/src/states/chat_session/chat_scroll_controller_
 import 'package:zenscrap_flutter/src/states/chat_session/is_chat_loading_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_messages_provider.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
+import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/llm_thinking_bubble.dart';
 
 class ScrappableChatMessageStreamSection extends ConsumerStatefulWidget {
   final List<String>? llmThinkingStream;
@@ -115,18 +116,11 @@ class _ScrappableChatMessageStreamSectionState
             if (isLastIndex &&
                 widget.llmThinkingStream != null &&
                 widget.llmThinkingStream!.isNotEmpty) {
-              Clipboard.setData(
-                  ClipboardData(text: widget.llmThinkingStream!.join()));
-              return Text(
-                widget.llmThinkingStream!.join(),
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      height: 1.4,
-                      fontSize: 14,
-                      color: Theme.of(context)
-                          .colorScheme
-                          .outline
-                          .withValues(alpha: 0.9),
-                    ),
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: LLMThinkingBubble(
+                  thinkingStream: widget.llmThinkingStream!,
+                ),
               );
             }
 
@@ -294,7 +288,9 @@ class _ChatMessageBubble extends StatelessWidget {
           ],
           Flexible(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: isUserMessage
+                  ? CrossAxisAlignment.end
+                  : CrossAxisAlignment.start,
               children: [
                 Align(
                   alignment: isUserMessage

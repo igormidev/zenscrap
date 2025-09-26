@@ -300,10 +300,12 @@ Write valid JSON to the file $filePreffix${p.basename(schemaResponseFilePath)} t
 
 ⚠️ CRITICAL: This is a FILE OPERATION task, NOT a text response task!
 
-YOU MUST DO THE FOLLOWING:
+YOU MUST DO THE FOLLOWING IN THIS EXACT ORDER:
 1. Generate a JSON response that follows the schema below EXACTLY
 2. Write that JSON to the file: " $filePreffix${p.basename(schemaResponseFilePath)} "
 3. DO NOT output the JSON as text in your response - ONLY write it to the file
+4. After writing the JSON file, IMMEDIATELY run this test command to validate your output:
+   dart test --chain-stack-traces ${p.basename(schemaTestFilePath)}
 
 IMPORTANT FILE WRITING RULES:
 - You MUST write the JSON content to the file using file writing tools
@@ -313,12 +315,14 @@ IMPORTANT FILE WRITING RULES:
 
 VALIDATION PROCESS:
 - A test file has been created at: " $filePreffix${p.basename(schemaTestFilePath)} "
+- You MUST run the test yourself using: dart test --chain-stack-traces ${p.basename(schemaTestFilePath)}
 - This test will:
   1. Check if the file exists (fails if missing)
   2. Check if the file has content (fails if empty)
   3. Parse the JSON from the file
   4. Validate it matches the schema exactly
-- If any validation fails, you'll get a detailed error message
+- If the test fails, fix the JSON and run the test again until it passes
+- The test MUST pass before you finish your response
 
 SCHEMA TO FOLLOW:
 ```json
@@ -327,11 +331,17 @@ ${schema.toString()}
 
 REMEMBER:
 ✅ DO: Write JSON to the file " $filePreffix${p.basename(schemaResponseFilePath)} "
+✅ DO: Run the test command: dart test --chain-stack-traces ${p.basename(schemaTestFilePath)}
+✅ DO: Ensure the test passes before completing your response
 ❌ DON'T: Output JSON as text in your response
 ❌ DON'T: Leave the file empty
 ❌ DON'T: Modify the test file
+❌ DON'T: Complete your response without running and passing the test
 
-Your ONLY task is to write valid JSON to the file that matches the schema above.
+Your task is to:
+1. Write valid JSON to the file that matches the schema
+2. Run the test to validate your output
+3. Ensure the test passes
 
 [----------- CRITICAL SCHEMA OUTPUT INSTRUCTIONS [END] -----------]''';
   }
@@ -354,11 +364,11 @@ void main() {
   test('Is correct schema', () async {
     final schemaFile = File('$schemaResponseFilePath');
     if (!await schemaFile.exists()) {
-      throw Exception('Schema file does not exist at $schemaResponseFilePath - AI did not write any JSON output to the file');
+      throw Exception('Schema file does not exist at " $schemaResponseFilePath " - AI did not write any JSON output to the file');
     }
     final schemaContent = await schemaFile.readAsString();
     if (schemaContent.trim().isEmpty) {
-      throw Exception('Schema file is empty at $schemaResponseFilePath - AI did not write any JSON output to the file');
+      throw Exception('Schema file is empty at " $schemaResponseFilePath " - AI did not write any JSON output to the file');
     }
     final Map<String, dynamic> schemaJson = jsonDecode(schemaContent);
     final String? validationError = schema.validateIdJsonFollowsSchemaStructure(
@@ -444,13 +454,13 @@ $schemaClassDeclaration
       // First check if the file even exists
       final schemaFile = File(schemaResponseFilePath);
       if (!await schemaFile.exists()) {
-        return 'Schema file does not exist at ${p.basename(schemaResponseFilePath)} - You must write JSON to this file';
+        return 'Schema file does not exist at " ${p.basename(schemaResponseFilePath)} " - You must write JSON to this file';
       }
 
       // Check if file has content
       final content = await schemaFile.readAsString();
       if (content.trim().isEmpty) {
-        return 'Schema file is empty at ${p.basename(schemaResponseFilePath)} - You must write JSON content to this file';
+        return 'Schema file is empty at " ${p.basename(schemaResponseFilePath)} " - You must write JSON content to this file';
       }
 
       // Now run the actual test

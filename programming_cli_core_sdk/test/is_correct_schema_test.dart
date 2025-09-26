@@ -9,13 +9,13 @@ void main() {
     final schemaFile = File(schemaResponseFilePath);
     if (!await schemaFile.exists()) {
       throw Exception(
-        'Schema file does not exist at $schemaResponseFilePath - AI did not write any JSON output to the file',
+        'Schema file does not exist at " $schemaResponseFilePath " - AI did not write any JSON output to the file',
       );
     }
     final schemaContent = await schemaFile.readAsString();
     if (schemaContent.trim().isEmpty) {
       throw Exception(
-        'Schema file is empty at $schemaResponseFilePath - AI did not write any JSON output to the file',
+        'Schema file is empty at " $schemaResponseFilePath " - AI did not write any JSON output to the file',
       );
     }
     final Map<String, dynamic> schemaJson = jsonDecode(schemaContent);
