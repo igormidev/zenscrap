@@ -143,7 +143,7 @@ abstract class CliChatInterface<T extends CliChatOptions> {
                   PromptContent.text(
                     '''[----------- SYSTEM PROMPT [START] -----------]
 ${options?.systemPrompt}
-                [----------- SYSTEM PROMPT [END] -----------]''',
+[----------- SYSTEM PROMPT [END] -----------]''',
                   ),
                 if (schema != null)
                   PromptContent.text(
@@ -202,11 +202,15 @@ Write valid JSON to the file $filePreffix${p.basename(schemaResponseFilePath)} t
 
           final schemaFile = File(schemaResponseFilePath);
           if (!await schemaFile.exists()) {
-            throw Exception('Schema JSON file was not created at $schemaResponseFilePath');
+            throw Exception(
+              'Schema JSON file was not created at $schemaResponseFilePath',
+            );
           }
           final fileContent = await schemaFile.readAsString();
           if (fileContent.trim().isEmpty) {
-            throw Exception('Schema JSON file is empty at $schemaResponseFilePath');
+            throw Exception(
+              'Schema JSON file is empty at $schemaResponseFilePath',
+            );
           }
           final json = jsonDecode(fileContent) as Map<String, dynamic>;
           await _cleanupTemporaryFiles();
@@ -376,6 +380,9 @@ $schemaClassDeclaration
 
   Future<void> _removeSchemaFiles() async {
     try {
+      print(
+        '[$_chatNanoId] _removeSchemaFiles - $schemaResponseFilePath - $schemaTestFilePath',
+      );
       await File(schemaResponseFilePath).delete();
       await File(schemaTestFilePath).delete();
     } catch (_) {
@@ -420,7 +427,9 @@ $schemaClassDeclaration
   Future<void> _cleanupTemporaryFiles() async {
     for (final tempFile in _temporaryFiles) {
       try {
-        final file = File('${baseDir.path}/${tempFile.fileName}');
+        final path = '${baseDir.path}/${tempFile.fileName}';
+        final file = File(path);
+        print('[${await file.exists()}] $path');
         if (await file.exists()) {
           await file.delete();
         }
@@ -449,7 +458,7 @@ $schemaClassDeclaration
         'test',
         '--chain-stack-traces',
         schemaTestFilePath,
-      ]);
+      ], workingDirectory: baseDir.path);
 
       if (result.exitCode == 0) {
         print('✅ Tests in $schemaTestFilePath passed!');

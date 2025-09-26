@@ -132,7 +132,6 @@ class ScrappableChatSession extends Endpoint {
   }) {
     session.log('Listening to session $sessionUuid');
     session.addWillCloseListener((session) async {
-      session.log('Disposing session $sessionUuid');
       await _disposeSession(sessionId: sessionUuid);
     });
     final subject = _scrapRedraftSessions[sessionUuid];
