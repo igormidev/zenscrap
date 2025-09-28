@@ -4,7 +4,6 @@ import 'dart:typed_data';
 import 'package:serverpod/serverpod.dart';
 import 'package:web_scrapper_generator/web_scrapper_generator.dart';
 import 'package:zenscrap_server/server.dart';
-import 'package:zenscrap_server/src/core/scraping_bee.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 typedef RetryText = String;
@@ -125,7 +124,7 @@ mixin ChatControllerHandlerMixin {
 
     // Needs to validate if the rules are working...
     final ExtractFullDataByRule extractResult =
-        await scrappingBee.fetchHtmlAndScreenshot(
+        await scrappingBee.fetchHtmlAndScreenshotWithLogic(
       targetUrl: referenceTestData.referenceLinkUsed,
       scrappingBeeExtractLogic: scrappingBeeExtractLogic,
     );
@@ -281,6 +280,7 @@ extension WebScrapperChatAIResponseMapExt on WebScrapperChatAIResponse {
                     waitFor: fetchSettings.wait_for,
                     waitBrowser: fetchSettings.wait_browser,
                     premiumProxy: fetchSettings.premium_proxy,
+                    stealthProxy: fetchSettings.stealth_proxy,
                     countryCode: fetchSettings.country_code,
                     sessionId: fetchSettings.session_id,
                     customGoogle: fetchSettings.custom_google,
@@ -293,6 +293,7 @@ extension WebScrapperChatAIResponseMapExt on WebScrapperChatAIResponse {
                     waitFor: fetchSettings.wait_for,
                     waitBrowser: fetchSettings.wait_browser,
                     premiumProxy: fetchSettings.premium_proxy,
+                    stealthProxy: fetchSettings.stealth_proxy,
                     countryCode: fetchSettings.country_code,
                     sessionId: fetchSettings.session_id,
                     customGoogle: fetchSettings.custom_google,

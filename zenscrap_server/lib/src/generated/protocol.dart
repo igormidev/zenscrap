@@ -1084,6 +1084,12 @@ class Protocol extends _i1.SerializationManagerServer {
           dartType: 'bool',
         ),
         _i2.ColumnDefinition(
+          name: 'stealthProxy',
+          columnType: _i2.ColumnType.boolean,
+          isNullable: false,
+          dartType: 'bool',
+        ),
+        _i2.ColumnDefinition(
           name: 'countryCode',
           columnType: _i2.ColumnType.text,
           isNullable: true,

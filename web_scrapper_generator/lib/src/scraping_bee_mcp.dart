@@ -5,28 +5,15 @@ import 'dart:isolate';
 
 import 'package:dart_mcp/server.dart';
 import 'package:dart_mcp/stdio.dart';
-import 'package:dio/dio.dart';
 import 'package:gemini_cli_sdk/gemini_cli_sdk.dart' hide TextContent;
 import 'package:path/path.dart' as path;
+import 'scraping_bee_api_mixin.dart';
 
 /// ScrapingBee MCP Server implementation
 /// Provides MCP tools for testing web scraping extract rules
-base class ScrapingBeeMcpServer extends MCPServer with ToolsSupport {
-  static const String _apiKey =
-      '37N8150Q1JBVN85NS4RUOUIUYZ2AEUFX69QBM0X74VD13M9TLNRVOFWS7HZMKRG1X4SOH4BKJT5EUN6K';
-  static const String _baseUrl = 'https://app.scrapingbee.com/api/v1/';
-
-  final Dio _dio;
-
+base class ScrapingBeeMcpServer extends MCPServer with ToolsSupport, ScrapingBeeApiMixin {
   ScrapingBeeMcpServer.fromStdio()
-    : _dio = Dio(
-        BaseOptions(
-          baseUrl: _baseUrl,
-          connectTimeout: const Duration(seconds: 30),
-          receiveTimeout: const Duration(seconds: 60),
-        ),
-      ),
-      super.fromStreamChannel(
+    : super.fromStreamChannel(
         stdioChannel(input: stdin, output: stdout),
         implementation: Implementation(
           name: 'scraping-bee-mcp',
@@ -39,6 +26,9 @@ base class ScrapingBeeMcpServer extends MCPServer with ToolsSupport {
 
   @override
   FutureOr<InitializeResult> initialize(InitializeRequest request) async {
+    // Set the API key for ScrapingBee
+    ScrapingBeeApiMixin.setApiKey(
+        '37N8150Q1JBVN85NS4RUOUIUYZ2AEUFX69QBM0X74VD13M9TLNRVOFWS7HZMKRG1X4SOH4BKJT5EUN6K');
     // Register the test_extract_rules tool
     registerTool(
       Tool(
@@ -135,21 +125,12 @@ base class ScrapingBeeMcpServer extends MCPServer with ToolsSupport {
         );
       }
 
-      // Build query parameters
-      final Map<String, dynamic> queryParams = {
-        'api_key': _apiKey,
-        'url': url,
-        'extract_rules': extractRules,
-        'json_response': 'true',
-      };
-
-      // Add optional parameters
+      // Validate js_scenario if provided
+      String? jsScenario;
       if (args.containsKey('js_scenario') && args['js_scenario'] != null) {
-        final jsScenario = args['js_scenario'] as String;
-        // Validate js_scenario is valid JSON
+        jsScenario = args['js_scenario'] as String;
         try {
           jsonDecode(jsScenario);
-          queryParams['js_scenario'] = jsScenario;
         } catch (e) {
           return CallToolResult(
             content: [
@@ -167,16 +148,12 @@ base class ScrapingBeeMcpServer extends MCPServer with ToolsSupport {
         }
       }
 
-      if (args.containsKey('render_js')) {
-        queryParams['render_js'] = (args['render_js'] as bool? ?? true)
-            ? 'true'
-            : 'false';
-      } else {
-        queryParams['render_js'] = 'true'; // Default to true
-      }
+      // Extract optional parameters with validation
+      final bool renderJs = args['render_js'] as bool? ?? true;
 
+      int? wait;
       if (args.containsKey('wait') && args['wait'] != null) {
-        final wait = args['wait'] as int;
+        wait = args['wait'] as int;
         if (wait < 0 || wait > 35000) {
           return CallToolResult(
             content: [
@@ -191,27 +168,16 @@ base class ScrapingBeeMcpServer extends MCPServer with ToolsSupport {
             isError: true,
           );
         }
-        queryParams['wait'] = wait.toString();
       }
 
-      if (args.containsKey('wait_for') && args['wait_for'] != null) {
-        queryParams['wait_for'] = args['wait_for'] as String;
-      }
+      final String? waitFor = args['wait_for'] as String?;
+      final String? waitBrowser = args['wait_browser'] as String?;
+      final bool premiumProxy = args['premium_proxy'] as bool? ?? false;
+      final bool stealthProxy = args['stealth_proxy'] as bool? ?? false;
 
-      if (args.containsKey('wait_browser') && args['wait_browser'] != null) {
-        queryParams['wait_browser'] = args['wait_browser'] as String;
-      }
-
-      if (args.containsKey('premium_proxy') && args['premium_proxy'] == true) {
-        queryParams['premium_proxy'] = 'true';
-      }
-
-      if (args.containsKey('stealth_proxy') && args['stealth_proxy'] == true) {
-        queryParams['stealth_proxy'] = 'true';
-      }
-
+      String? countryCode;
       if (args.containsKey('country_code') && args['country_code'] != null) {
-        final countryCode = args['country_code'] as String;
+        countryCode = args['country_code'] as String;
         if (!RegExp(r'^[a-z]{2}$').hasMatch(countryCode)) {
           return CallToolResult(
             content: [
@@ -227,145 +193,54 @@ base class ScrapingBeeMcpServer extends MCPServer with ToolsSupport {
             isError: true,
           );
         }
-        queryParams['country_code'] = countryCode;
       }
 
-      if (args.containsKey('session_id') && args['session_id'] != null) {
-        queryParams['session_id'] = (args['session_id'] as int).toString();
-      }
+      final String? sessionId = args['session_id']?.toString();
+      final bool? customGoogle = args['custom_google'] as bool?;
 
-      // Check if URL is a Google domain and set custom_google
-      final bool isGoogleDomain = _isGoogleDomain(url);
-      if (isGoogleDomain ||
-          (args.containsKey('custom_google') &&
-              args['custom_google'] == true)) {
-        queryParams['custom_google'] = 'true';
-      }
-
-      // Make the request to ScrapingBee
-      final response = await _dio.getUri<dynamic>(
-        Uri.https('app.scrapingbee.com', '/api/v1/', queryParams),
-        options: Options(
-          responseType: ResponseType.json,
-          validateStatus: (status) => status != null && status < 600,
-        ),
+      // Use the mixin method to extract data
+      final result = await extractByRules(
+        targetUrl: url,
+        extract_rules: extractRules,
+        js_scenario: jsScenario,
+        render_js: renderJs,
+        wait: wait,
+        wait_for: waitFor,
+        wait_browser: waitBrowser,
+        premium_proxy: premiumProxy,
+        stealth_proxy: stealthProxy,
+        country_code: countryCode,
+        session_id: sessionId,
+        custom_google: customGoogle,
       );
 
-      // Handle the response
-      if (response.statusCode == 200) {
-        // Success - extract the data
-        Map<String, dynamic> responseData;
-
-        if (response.data is String) {
-          try {
-            responseData =
-                jsonDecode(response.data as String) as Map<String, dynamic>;
-          } catch (e) {
-            // If it's not JSON, treat it as raw HTML response
-            return CallToolResult(
-              content: [
-                TextContent(
-                  text: jsonEncode({
-                    'success': true,
-                    'data': response.data,
-                    'message': 'Raw HTML response (no extraction performed)',
-                  }),
-                ),
-              ],
-            );
-          }
-        } else {
-          responseData = response.data as Map<String, dynamic>;
-        }
-
-        // Extract the body which contains the extracted data
-        final extractedData = responseData['body'] ?? {};
-
-        return CallToolResult(
+      // Handle the result using the when method
+      return result.when(
+        withData: (data) => CallToolResult(
           content: [
             TextContent(
               text: jsonEncode({
                 'success': true,
-                'data': extractedData,
+                'data': data,
                 'message': 'Data extracted successfully',
                 'url': url,
                 'rules_applied': jsonDecode(extractRules),
               }),
             ),
           ],
-        );
-      } else {
-        // Error response
-        Map<String, dynamic>? errorData;
-        String errorMessage = 'Unknown error';
-
-        try {
-          if (response.data is String) {
-            errorData =
-                jsonDecode(response.data as String) as Map<String, dynamic>;
-          } else {
-            errorData = response.data as Map<String, dynamic>;
-          }
-          errorMessage = errorData['message'] ?? 'ScrapingBee API error';
-        } catch (e) {
-          errorMessage =
-              'ScrapingBee API error (Status: ${response.statusCode})';
-        }
-
-        return CallToolResult(
+        ),
+        error: (errorMessage) => CallToolResult(
           content: [
             TextContent(
               text: jsonEncode({
                 'success': false,
                 'error': errorMessage,
-                'status_code': response.statusCode,
                 'message': 'Failed to extract data from the target URL',
-                'details': errorData,
               }),
             ),
           ],
           isError: true,
-        );
-      }
-    } on DioException catch (e) {
-      // Network or Dio-specific errors
-      String errorMessage = 'Network error';
-      Map<String, dynamic>? errorDetails;
-
-      if (e.response != null) {
-        try {
-          if (e.response!.data is String) {
-            errorDetails =
-                jsonDecode(e.response!.data as String) as Map<String, dynamic>;
-          } else {
-            errorDetails = e.response!.data as Map<String, dynamic>;
-          }
-          errorMessage = errorDetails['message'] ?? 'ScrapingBee API error';
-        } catch (_) {
-          errorMessage =
-              'ScrapingBee API error (Status: ${e.response!.statusCode})';
-        }
-      } else if (e.type == DioExceptionType.connectionTimeout) {
-        errorMessage =
-            'Connection timeout - the target site may be slow or unresponsive';
-      } else if (e.type == DioExceptionType.receiveTimeout) {
-        errorMessage = 'Response timeout - the extraction took too long';
-      } else {
-        errorMessage = e.message ?? 'Network error occurred';
-      }
-
-      return CallToolResult(
-        content: [
-          TextContent(
-            text: jsonEncode({
-              'success': false,
-              'error': errorMessage,
-              'message': 'Failed to connect to ScrapingBee API',
-              'details': errorDetails,
-            }),
-          ),
-        ],
-        isError: true,
+        ),
       );
     } catch (e) {
       // Any other unexpected errors
@@ -382,23 +257,6 @@ base class ScrapingBeeMcpServer extends MCPServer with ToolsSupport {
         ],
         isError: true,
       );
-    }
-  }
-
-  /// Check if a URL belongs to a Google domain
-  bool _isGoogleDomain(String url) {
-    try {
-      final uri = Uri.parse(url);
-      final host = uri.host.toLowerCase();
-      return host.contains('google.') ||
-          host.contains('googleapis.') ||
-          host.contains('googlevideo.') ||
-          host.contains('googleusercontent.') ||
-          host.contains('gstatic.') ||
-          host.contains('youtube.') ||
-          host.contains('ytimg.');
-    } catch (e) {
-      return false;
     }
   }
 }

@@ -133,6 +133,8 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
                     sourceScrappable.scrappingBeeExtractRules!.waitBrowser,
                 premiumProxy:
                     sourceScrappable.scrappingBeeExtractRules!.premiumProxy,
+                stealthProxy:
+                    sourceScrappable.scrappingBeeExtractRules!.stealthProxy,
                 countryCode:
                     sourceScrappable.scrappingBeeExtractRules!.countryCode,
                 sessionId: sourceScrappable.scrappingBeeExtractRules!.sessionId,

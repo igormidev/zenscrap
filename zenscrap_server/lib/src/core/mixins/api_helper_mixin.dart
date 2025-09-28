@@ -358,7 +358,7 @@ mixin ApiHelperMixin {
       final ScrappingBeeExtractLogic extractRules =
           await _getExtractRules(session, scrappable, apiKey);
 
-      final ExtractDataByRule result = await scrappingBee.extractByRules(
+      final ExtractDataByRule result = await scrappingBee.extractByRulesWithLogic(
         targetUrl: targetUrl,
         scrappingBeeExtractLogic: extractRules,
       );
