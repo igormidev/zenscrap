@@ -69,15 +69,9 @@ class ExtractFullDataByRule {
 /// Unified mixin for ScrapingBee API interactions
 /// This is the single source of truth for all ScrapingBee API calls
 mixin ScrapingBeeApiMixin {
-  static final String _apiKey =
+  static const String _apiKey =
       '37N8150Q1JBVN85NS4RUOUIUYZ2AEUFX69QBM0X74VD13M9TLNRVOFWS7HZMKRG1X4SOH4BKJT5EUN6K';
   static const String _baseUrl = 'https://app.scrapingbee.com/api/v1/';
-
-  // /// Set the API key for all ScrapingBee operations
-  // static void setApiKey(String apiKey) => _apiKey = apiKey;
-
-  // /// Get the current API key (for MCP server that has its own key)
-  // static String get apiKey => _apiKey;
 
   /// Dio client for making requests
   Dio get dio => Dio(
@@ -214,7 +208,6 @@ mixin ScrapingBeeApiMixin {
     );
 
     try {
-      print(Uri.https('app.scrapingbee.com', '/api/v1/', queryParams));
       final response = await dio.getUri<dynamic>(
         Uri.https('app.scrapingbee.com', '/api/v1/', queryParams),
         options: Options(
@@ -362,27 +355,41 @@ mixin ScrapingBeeApiMixin {
       );
 
       if (response.statusCode == 200) {
-        final body = (response.data?['body'] as String?) ?? '';
-        final b64 = (response.data?['screenshot'] as String?) ?? '';
+        // Handle the 'body' field which can be either:
+        // - A Map<String, dynamic> when extract_rules returns JSON data
+        // - A String when it's raw HTML
+        final bodyData = response.data?['body'];
+        final String htmlContent = (response.data?['html'] as String?) ?? '';
+        final String b64Screenshot =
+            (response.data?['screenshot'] as String?) ?? '';
 
-        // The 'body' field contains the extracted data when extract_rules are provided
-        // Parse it as JSON to get the extracted data
         Map<String, dynamic> extractedData = {};
-        try {
-          if (body.isNotEmpty) {
-            extractedData = jsonDecode(body) as Map<String, dynamic>;
+
+        if (bodyData != null) {
+          if (bodyData is Map<String, dynamic>) {
+            // Body is already parsed JSON (extracted data)
+            extractedData = bodyData;
+          } else if (bodyData is String) {
+            // Body is a string, try to parse it as JSON
+            try {
+              extractedData = jsonDecode(bodyData) as Map<String, dynamic>;
+            } catch (e) {
+              // If it's not JSON, treat it as raw HTML
+              extractedData = {'raw_html': bodyData};
+            }
           }
-        } catch (e) {
-          // If body is not JSON, it might be raw HTML
-          extractedData = {'raw_html': body};
+        }
+
+        // For the HTML content, prioritize the 'html' field, fall back to bodyData if it's a string
+        String finalHtml = htmlContent;
+        if (finalHtml.isEmpty && bodyData is String) {
+          finalHtml = bodyData;
         }
 
         return ExtractFullDataByRule.withData(
           result: extractedData,
-          html:
-              response.data?['html'] ??
-              body, // Use 'html' field if available, otherwise use body
-          screenshot: base64Decode(b64),
+          html: finalHtml,
+          screenshot: base64Decode(b64Screenshot),
         );
       } else {
         // Error response
