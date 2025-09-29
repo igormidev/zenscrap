@@ -57,7 +57,6 @@ void run(List<String> args) async {
   ));
 
   final String? scrapingBeeApiKey = pod.getPassword('scrapingBeeApiKey');
-  ScrapingBee.initialize(scrapingBeeApiKey ?? '');
   final String? openAiApiKey = pod.getPassword('openAiApiKey');
   openAiClient = OpenAIClient(apiKey: openAiApiKey);
 

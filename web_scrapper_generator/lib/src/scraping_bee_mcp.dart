@@ -11,7 +11,8 @@ import 'scraping_bee_api_mixin.dart';
 
 /// ScrapingBee MCP Server implementation
 /// Provides MCP tools for testing web scraping extract rules
-base class ScrapingBeeMcpServer extends MCPServer with ToolsSupport, ScrapingBeeApiMixin {
+base class ScrapingBeeMcpServer extends MCPServer
+    with ToolsSupport, ScrapingBeeApiMixin {
   ScrapingBeeMcpServer.fromStdio()
     : super.fromStreamChannel(
         stdioChannel(input: stdin, output: stdout),
@@ -26,9 +27,6 @@ base class ScrapingBeeMcpServer extends MCPServer with ToolsSupport, ScrapingBee
 
   @override
   FutureOr<InitializeResult> initialize(InitializeRequest request) async {
-    // Set the API key for ScrapingBee
-    ScrapingBeeApiMixin.setApiKey(
-        '37N8150Q1JBVN85NS4RUOUIUYZ2AEUFX69QBM0X74VD13M9TLNRVOFWS7HZMKRG1X4SOH4BKJT5EUN6K');
     // Register the test_extract_rules tool
     registerTool(
       Tool(
@@ -75,7 +73,8 @@ base class ScrapingBeeMcpServer extends MCPServer with ToolsSupport, ScrapingBee
               description: 'Use residential proxy for scraper-resistant sites',
             ),
             'stealth_proxy': Schema.bool(
-              description: 'Use stealth proxy for the hardest-to-scrape sites (most expensive option)',
+              description:
+                  'Use stealth proxy for the hardest-to-scrape sites (most expensive option)',
             ),
             'country_code': Schema.string(
               description: 'Proxy geolocation (e.g., us, de, br)',

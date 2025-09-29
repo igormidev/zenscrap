@@ -89,7 +89,7 @@ Future<ExtractFullDataByRule> fetchHtmlAndScreenshot({
 
 Then, after creating that mixin - use it in ScrapingBeeMcpServer and export it in @web_scrapper_generator/lib/web_scrapper_generator.dart so you can use it in as mixin for the class ScrapingBee in @zenscrap_server/lib/src/core/scraping_bee as well (refactor fetchHtmlAndScreenshot and extractByRules) - this way we will ensure that there is only 1 source of truth to fetch scrapping bee.
 
-This way, the problem might disapear... Also, IF YOU THINK IS NEEDED, modify the prompts in @web_scrapper_generator/lib/src/prompts.dart to tell ai that it SHOULD NOT END AND RETURN WITHOUT TESTING ITS GENERATED SCHEMA OF EXTRACT RULES IN THE MCP - ask it to use thame.
+This way, the problem might disapear... Also, IF YOU THINK IS NEEDED, Modify the prompts in @web_scrapper_generator/lib/src/prompts.dart to tell ai that it SHOULD NOT END AND RETURN WITHOUT TESTING ITS GENERATED SCHEMA OF EXTRACT RULES IN THE MCP - ask it to use thame.
 
 # Final considerations
 Deeply understand how the chat systems works in @programming_cli_core_sdk/lib/src/cli_chat_options_interface.dart before writing any code.

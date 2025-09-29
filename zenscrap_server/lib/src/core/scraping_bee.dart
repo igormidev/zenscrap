@@ -12,11 +12,6 @@ export 'package:web_scrapper_generator/web_scrapper_generator.dart'
 final scrapingBee = ScrapingBee();
 
 class ScrapingBee with ScrapingBeeApiMixin {
-  /// Initialize the ScrapingBee API with an API key
-  static void initialize(String apiKey) {
-    ScrapingBeeApiMixin.setApiKey(apiKey);
-  }
-
   Future<ExtractFullDataByRule> fetchHtmlAndScreenshotWithLogic({
     required String targetUrl,
     required ScrappingBeeExtractLogic scrappingBeeExtractLogic,
