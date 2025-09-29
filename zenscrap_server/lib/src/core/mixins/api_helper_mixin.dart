@@ -1,6 +1,7 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/server.dart';
 import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';
+import 'package:zenscrap_server/src/core/extension/scrapping_bee_extract_logic_extension.dart';
 import 'package:zenscrap_server/src/core/scraping_bee.dart';
 import 'package:zenscrap_server/src/endpoints/public/scrappable_chat_session.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
@@ -17,8 +18,8 @@ mixin ApiHelperMixin {
 
   static void resetNanoId(NanoId nanoId) {
     _currentConcurrencyRequests.remove(nanoId);
-    _currentCreditUsage.remove(nanoId);
     _currentAccountPlanTierCache.remove(nanoId);
+    _currentCreditUsage.remove(nanoId);
     _remainingSubscriptionCredits.remove(nanoId);
     _remainingPurchasedCredits.remove(nanoId);
     _apiKeysAttachedToNanoId.remove(nanoId);
@@ -129,6 +130,7 @@ mixin ApiHelperMixin {
   Future<void> discountApiTokens(
     Session session, {
     required NanoId? nanoId,
+    required int creditCost,
   }) async {
     if (nanoId == null) return;
     final subscriptionCredits = _remainingSubscriptionCredits[nanoId];
@@ -152,19 +154,35 @@ mixin ApiHelperMixin {
           accountApiUsage.creditUsage!.purchasedCredits;
       _remainingSubscriptionCredits[nanoId] =
           accountApiUsage.creditUsage!.subscriptionCredits;
-      return discountApiTokens(session, nanoId: nanoId);
+      return discountApiTokens(session, nanoId: nanoId, creditCost: creditCost);
+    }
+
+    // Check if we have enough credits in total
+    final totalCredits = subscriptionCredits + purchasedCredits;
+    if (totalCredits < creditCost) {
+      throw _insufficientCredits;
     }
 
     // First, try to deduct from subscription credits
-    if (subscriptionCredits > 0) {
+    if (subscriptionCredits >= creditCost) {
       _remainingSubscriptionCredits[nanoId] =
-          (_remainingSubscriptionCredits[nanoId] ?? subscriptionCredits) - 1;
+          (_remainingSubscriptionCredits[nanoId] ?? subscriptionCredits) - creditCost;
       return;
     }
 
-    if (purchasedCredits > 0) {
+    // If subscription credits are not enough, use them all and deduct the rest from purchased credits
+    if (subscriptionCredits > 0) {
+      final remainingCost = creditCost - subscriptionCredits;
+      _remainingSubscriptionCredits[nanoId] = 0;
       _remainingPurchasedCredits[nanoId] =
-          (_remainingPurchasedCredits[nanoId] ?? purchasedCredits) - 1;
+          (_remainingPurchasedCredits[nanoId] ?? purchasedCredits) - remainingCost;
+      return;
+    }
+
+    // No subscription credits, deduct all from purchased credits
+    if (purchasedCredits >= creditCost) {
+      _remainingPurchasedCredits[nanoId] =
+          (_remainingPurchasedCredits[nanoId] ?? purchasedCredits) - creditCost;
       return;
     }
 
@@ -348,17 +366,24 @@ mixin ApiHelperMixin {
   }) async {
     return wrapAnalytics(session, apiKey,
         (setScrappableCallback, nanoId) async {
-      await discountApiTokens(session, nanoId: nanoId);
-
       final (Scrappable scrappable, ScrappableRequest targetRequest) =
           await getScrappableById(session, scrappableId, nanoId);
       setScrappableCallback(scrappable);
       throwErrorIfIsATestRequestAndTestTimeExpired(apiKey, scrappable);
-      final String targetUrl = composeUrl(payload, targetRequest);
+
       final ScrappingBeeExtractLogic extractRules =
           await _getExtractRules(session, scrappable, apiKey);
 
-      final ExtractDataByRule result = await scrappingBee.extractByRulesWithLogic(
+      // Calculate the actual credit cost for this extraction
+      final creditCost = extractRules.totalCreditCost;
+
+      // Discount the actual cost from the account
+      await discountApiTokens(session, nanoId: nanoId, creditCost: creditCost);
+
+      final String targetUrl = composeUrl(payload, targetRequest);
+
+      final ExtractDataByRule result =
+          await scrappingBee.extractByRulesWithLogic(
         targetUrl: targetUrl,
         scrappingBeeExtractLogic: extractRules,
       );

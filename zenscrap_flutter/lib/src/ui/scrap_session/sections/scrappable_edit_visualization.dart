@@ -4,6 +4,7 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/mixins/edit_scrappable.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/edit_scrappable_dialog.dart';
+import 'package:zenscrap_flutter/src/design_system/widgets/scrapping_bee_cost_table.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 
 class ScrappableEditVisualization extends ConsumerStatefulWidget {
@@ -22,36 +23,66 @@ class _ScrappableEditVisualizationState
     extends ConsumerState<ScrappableEditVisualization> with EditScrappable {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: context.c.surfaceContainerLowest,
-        border: BoxBorder.all(
-          color: context.c.outline.withAlpha(60),
-          // width: 3,
-        ),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: ScrappableEditForm(
-        scrappable: widget.scrappable,
-        shouldPopOnEnd: false,
-        onSave: (name, description, category, willHideFromMarketplace) async {
-          return onEditScrappable(
-            widget.scrappable,
-            name,
-            description,
-            category,
-            willHideFromMarketplace,
-            () {
-              // Update the scrappable in the state provider
-              ref.read(scrapChatProvider.notifier).updateScrappableDetails(
-                    name: name,
-                    description: description,
-                    category: category,
-                  );
+    final extractLogic = widget.scrappable.scrappingBeeExtractRules;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Scrappable Edit Form
+        Container(
+          decoration: BoxDecoration(
+            color: context.c.surfaceContainerLowest,
+            border: Border.all(
+              color: context.c.outline.withAlpha(60),
+            ),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: ScrappableEditForm(
+            scrappable: widget.scrappable,
+            shouldPopOnEnd: false,
+            onSave: (name, description, category, willHideFromMarketplace) async {
+              return onEditScrappable(
+                widget.scrappable,
+                name,
+                description,
+                category,
+                willHideFromMarketplace,
+                () {
+                  // Update the scrappable in the state provider
+                  ref.read(scrapChatProvider.notifier).updateScrappableDetails(
+                        name: name,
+                        description: description,
+                        category: category,
+                      );
+                },
+              );
             },
-          );
-        },
-      ),
+          ),
+        ),
+
+        // Cost Table - only show if extract rules exist
+        if (extractLogic != null) ...[
+          const SizedBox(height: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 4, bottom: 8),
+                child: Text(
+                  'ScrapingBee API Configuration & Costs',
+                  style: context.t.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: context.c.onSurface,
+                  ),
+                ),
+              ),
+              ScrappingBeeCostTable(
+                extractLogic: extractLogic,
+              ),
+            ],
+          ),
+        ],
+      ],
     );
   }
 }
