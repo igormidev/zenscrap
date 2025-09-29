@@ -176,10 +176,7 @@ class _LLMThinkingBubbleState extends State<LLMThinkingBubble> {
                                     colorScheme.onSurfaceVariant.withAlpha(204),
                               ),
                             )
-                                .animate(
-                                  key: ValueKey(
-                                      '${displayText.length}_$_isExpanded'),
-                                )
+                                .animate()
                                 .fadeIn(
                                   duration: 400.ms,
                                   curve: Curves.easeOut,

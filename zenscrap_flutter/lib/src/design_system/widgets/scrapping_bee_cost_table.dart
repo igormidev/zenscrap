@@ -129,7 +129,6 @@ class _TableHeader extends StatelessWidget {
             ),
           ),
           Expanded(
-            flex: 2,
             child: Text(
               'Credits',
               style: context.t.titleSmall?.copyWith(
@@ -165,11 +164,11 @@ class _TableRow extends StatelessWidget {
     final displayCost = isNull ? '-' : cost.toString();
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: context.c.outline.withAlpha(20),
+            color: context.c.outlineVariant,
             width: 0.5,
           ),
         ),
@@ -199,15 +198,14 @@ class _TableRow extends StatelessWidget {
             ),
           ),
           Expanded(
-            flex: 2,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
                 color: isNull
                     ? Colors.transparent
                     : cost > 0
-                        ? context.c.errorContainer.withAlpha(30)
-                        : context.c.primaryContainer.withAlpha(30),
+                        ? context.c.errorContainer.withAlpha(80)
+                        : context.c.primaryContainer.withAlpha(80),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
@@ -242,7 +240,7 @@ class _TotalRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: context.c.primaryContainer.withAlpha(20),
         borderRadius: const BorderRadius.only(

@@ -11,6 +11,7 @@ import 'package:zenscrap_flutter/src/core/mixins/edit_scrappable.dart';
 import 'package:zenscrap_flutter/src/design_system/default_error_snackbar.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
+import 'package:zenscrap_flutter/src/design_system/widgets/scrapping_bee_cost_table.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
@@ -447,243 +448,271 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      shrinkWrap: widget.shouldPopOnEnd ? true : false,
+    final actionButton = FilledButton.icon(
+      onPressed: _hasChanges && !_isLoading ? _handleSave : null,
+      style: FilledButton.styleFrom(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        backgroundColor: context.c.primary,
+        disabledBackgroundColor: context.c.surfaceContainerHighest,
+      ),
+      icon: _isLoading
+          ? SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  context.c.onSurfaceVariant,
+                ),
+              ),
+            )
+          : Icon(
+              Icons.save_rounded,
+              color: _hasChanges
+                  ? context.c.onPrimary
+                  : context.c.onSurfaceVariant,
+            ),
+      label: Text(
+        _isLoading ? 'Saving...' : 'Save Changes',
+        style: context.t.labelLarge?.copyWith(
+          color: _hasChanges ? context.c.onPrimary : context.c.onSurfaceVariant,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.1, end: 0);
+    return Stack(
       children: [
-        // Content
-        Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Name Field
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        ListView(
+          shrinkWrap: widget.shouldPopOnEnd ? true : false,
+          children: [
+            // Content
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    'Name',
-                    style: context.t.labelLarge?.copyWith(
-                      color: context.c.onSurface,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  TextFormField(
-                    controller: _nameController,
-                    enabled: !_isLoading,
-                    maxLines: 1,
-                    maxLength: 50,
-                    buildCounter: (context,
-                        {required currentLength,
-                        required isFocused,
-                        maxLength}) {
-                      return Text(
-                        '$currentLength/$maxLength',
-                        style: context.t.labelSmall?.copyWith(
-                          color: currentLength > maxLength!
-                              ? context.c.error
-                              : context.c.onSurfaceVariant.withAlpha(150),
-                        ),
-                      );
-                    },
-                    decoration: InputDecoration(
-                      hintText: 'Enter scrappable name',
-                      filled: true,
-                      fillColor:
-                          context.c.surfaceContainerHighest.withAlpha(100),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: context.c.outline.withAlpha(50),
+                  // Name Field
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Name',
+                        style: context.t.labelLarge?.copyWith(
+                          color: context.c.onSurface,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: context.c.primary,
-                          width: 2,
-                        ),
-                      ),
-                      prefixIcon: Icon(
-                        Icons.label_outline_rounded,
-                        color: context.c.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
-                ],
-              ).animate().fadeIn(delay: 100.ms).slideX(begin: -0.1, end: 0),
-
-              // Category Field
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Category',
-                    style: context.t.labelLarge?.copyWith(
-                      color: context.c.onSurface,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  InkWell(
-                    onTap: _isLoading
-                        ? null
-                        : () => _showCategorySelectionDialog(),
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: context.c.surfaceContainerHighest.withAlpha(100),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: context.c.outline.withAlpha(50),
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            _selectedCategory?.icon ?? _initialCategory.icon,
-                            color: context.c.onSurfaceVariant,
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: _nameController,
+                        enabled: !_isLoading,
+                        maxLines: 1,
+                        maxLength: 50,
+                        buildCounter: (context,
+                            {required currentLength,
+                            required isFocused,
+                            maxLength}) {
+                          return Text(
+                            '$currentLength/$maxLength',
+                            style: context.t.labelSmall?.copyWith(
+                              color: currentLength > maxLength!
+                                  ? context.c.error
+                                  : context.c.onSurfaceVariant.withAlpha(150),
+                            ),
+                          );
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Enter scrappable name',
+                          filled: true,
+                          fillColor:
+                              context.c.surfaceContainerHighest.withAlpha(100),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              _selectedCategory!.displayName,
-                              style: context.t.bodyLarge?.copyWith(
-                                color: context.c.onSurface,
-                              ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: context.c.outline.withAlpha(50),
                             ),
                           ),
-                          Icon(
-                            Icons.arrow_drop_down_rounded,
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: context.c.primary,
+                              width: 2,
+                            ),
+                          ),
+                          prefixIcon: Icon(
+                            Icons.label_outline_rounded,
                             color: context.c.onSurfaceVariant,
                           ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
-                ],
-              ).animate().fadeIn(delay: 150.ms).slideX(begin: -0.1, end: 0),
+                    ],
+                  ).animate().fadeIn(delay: 100.ms).slideX(begin: -0.1, end: 0),
 
-              const SizedBox(height: 20),
-
-              // Description Field
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Description',
-                    style: context.t.labelLarge?.copyWith(
-                      color: context.c.onSurface,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  TextFormField(
-                    controller: _descriptionController,
-                    enabled: !_isLoading,
-                    maxLines: 4,
-                    maxLength: 220,
-                    buildCounter: (context,
-                        {required currentLength,
-                        required isFocused,
-                        maxLength}) {
-                      return Text(
-                        '$currentLength/$maxLength',
-                        style: context.t.labelSmall?.copyWith(
-                          color: currentLength > maxLength!
-                              ? context.c.error
-                              : context.c.onSurfaceVariant.withAlpha(150),
+                  // Category Field
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Category',
+                        style: context.t.labelLarge?.copyWith(
+                          color: context.c.onSurface,
+                          fontWeight: FontWeight.w500,
                         ),
-                      );
-                    },
-                    decoration: InputDecoration(
-                      hintText: 'Enter scrappable description',
-                      filled: true,
-                      fillColor:
-                          context.c.surfaceContainerHighest.withAlpha(100),
-                      border: OutlineInputBorder(
+                      ),
+                      const SizedBox(height: 8),
+                      InkWell(
+                        onTap: _isLoading
+                            ? null
+                            : () => _showCategorySelectionDialog(),
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: context.c.outline.withAlpha(50),
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: context.c.primary,
-                          width: 2,
-                        ),
-                      ),
-                      prefixIcon: Padding(
-                        padding: const EdgeInsets.only(bottom: 60),
-                        child: Icon(
-                          Icons.description_outlined,
-                          color: context.c.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ).animate().fadeIn(delay: 200.ms).slideX(begin: -0.1, end: 0),
-
-              ...widget.children.map(
-                (child) => child
-                    .animate()
-                    .fadeIn(delay: 200.ms)
-                    .slideX(begin: -0.1, end: 0),
-              ),
-              SizedBox(height: 16),
-              // Action Buttons
-              FilledButton.icon(
-                onPressed: _hasChanges && !_isLoading ? _handleSave : null,
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  backgroundColor: context.c.primary,
-                  disabledBackgroundColor: context.c.surfaceContainerHighest,
-                ),
-                icon: _isLoading
-                    ? SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            context.c.onSurfaceVariant,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
+                          decoration: BoxDecoration(
+                            color: context.c.surfaceContainerHighest
+                                .withAlpha(100),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: context.c.outline.withAlpha(50),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                _selectedCategory?.icon ??
+                                    _initialCategory.icon,
+                                color: context.c.onSurfaceVariant,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  _selectedCategory!.displayName,
+                                  style: context.t.bodyLarge?.copyWith(
+                                    color: context.c.onSurface,
+                                  ),
+                                ),
+                              ),
+                              Icon(
+                                Icons.arrow_drop_down_rounded,
+                                color: context.c.onSurfaceVariant,
+                              ),
+                            ],
                           ),
                         ),
-                      )
-                    : Icon(
-                        Icons.save_rounded,
-                        color: _hasChanges
-                            ? context.c.onPrimary
-                            : context.c.onSurfaceVariant,
                       ),
-                label: Text(
-                  _isLoading ? 'Saving...' : 'Save Changes',
-                  style: context.t.labelLarge?.copyWith(
-                    color: _hasChanges
-                        ? context.c.onPrimary
-                        : context.c.onSurfaceVariant,
-                    fontWeight: FontWeight.w600,
+                    ],
+                  ).animate().fadeIn(delay: 150.ms).slideX(begin: -0.1, end: 0),
+
+                  const SizedBox(height: 20),
+
+                  // Description Field
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Description',
+                        style: context.t.labelLarge?.copyWith(
+                          color: context.c.onSurface,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: _descriptionController,
+                        enabled: !_isLoading,
+                        maxLines: 4,
+                        maxLength: 220,
+                        buildCounter: (context,
+                            {required currentLength,
+                            required isFocused,
+                            maxLength}) {
+                          return Text(
+                            '$currentLength/$maxLength',
+                            style: context.t.labelSmall?.copyWith(
+                              color: currentLength > maxLength!
+                                  ? context.c.error
+                                  : context.c.onSurfaceVariant.withAlpha(150),
+                            ),
+                          );
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Enter scrappable description',
+                          filled: true,
+                          fillColor:
+                              context.c.surfaceContainerHighest.withAlpha(100),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: context.c.outline.withAlpha(50),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: context.c.primary,
+                              width: 2,
+                            ),
+                          ),
+                          prefixIcon: Padding(
+                            padding: const EdgeInsets.only(bottom: 60),
+                            child: Icon(
+                              Icons.description_outlined,
+                              color: context.c.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ).animate().fadeIn(delay: 200.ms).slideX(begin: -0.1, end: 0),
+
+                  ...widget.children.map(
+                    (child) => child
+                        .animate()
+                        .fadeIn(delay: 200.ms)
+                        .slideX(begin: -0.1, end: 0),
                   ),
-                ),
-              ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.1, end: 0),
-            ],
+                  if (widget.scrappable.scrappingBeeExtractRules != null) ...[
+                    Text(
+                      'API Configuration & Costs',
+                      style: context.t.labelLarge?.copyWith(
+                        color: context.c.onSurface,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    ScrappingBeeCostTable(
+                      extractLogic: widget.scrappable.scrappingBeeExtractRules!,
+                    )
+                        .animate()
+                        .fadeIn(delay: 200.ms)
+                        .slideX(begin: -0.1, end: 0),
+                    // Action Buttons
+                    if (widget.shouldPopOnEnd) actionButton,
+                  ],
+                ],
+              ),
+            ),
+            if (!widget.shouldPopOnEnd) SizedBox(height: 60),
+          ],
+        ),
+        if (!widget.shouldPopOnEnd)
+          Positioned(
+            bottom: 20,
+            left: 24,
+            right: 24,
+            child: actionButton,
           ),
-        )
       ],
     );
   }
