@@ -261,10 +261,6 @@ class Codex extends CodingCliInterface<CodexChat, CodexChatOptions> {
         'command': 'npx',
         'args': ['-y', '@modelcontextprotocol/server-git'],
       },
-      'puppeteer': {
-        'command': 'npx',
-        'args': ['-y', '@modelcontextprotocol/server-puppeteer'],
-      },
       'sequential-thinking': {
         'command': 'npx',
         'args': ['-y', '@modelcontextprotocol/server-sequential-thinking'],

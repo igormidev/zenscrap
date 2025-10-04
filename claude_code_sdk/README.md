@@ -339,7 +339,6 @@ await claudeSDK.installPopularMcpServer('github',
 // - github: GitHub integration
 // - postgres: PostgreSQL database
 // - git: Git operations
-// - puppeteer: Web automation
 // - sequential-thinking: Problem solving
 // - slack: Slack integration
 // - google-drive: Google Drive access

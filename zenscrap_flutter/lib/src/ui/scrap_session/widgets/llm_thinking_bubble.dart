@@ -34,7 +34,8 @@ class _LLMThinkingBubbleState extends State<LLMThinkingBubble> {
     String cleaned = text.replaceAll(ansiPattern, '');
 
     // Remove other common control characters except newlines and tabs
-    cleaned = cleaned.replaceAll(RegExp(r'[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]'), '');
+    cleaned =
+        cleaned.replaceAll(RegExp(r'[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]'), '');
 
     return cleaned;
   }
@@ -95,13 +96,16 @@ class _LLMThinkingBubbleState extends State<LLMThinkingBubble> {
               Flexible(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(24),
-                  child: SelectableText(
-                    fullText,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontFamily: 'monospace',
-                          height: 1.6,
-                          fontSize: 12,
-                        ),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: SelectableText(
+                      fullText,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontFamily: 'monospace',
+                            height: 1.6,
+                            fontSize: 12,
+                          ),
+                    ),
                   ),
                 ),
               ),
@@ -125,19 +129,20 @@ class _LLMThinkingBubbleState extends State<LLMThinkingBubble> {
     final colorScheme = theme.colorScheme;
     final fullText = _cleanText(widget.thinkingStream.join());
 
-    // Get last 15 lines
-    final lines = fullText.split('\n');
-    final last15Lines = lines.length > 15
-        ? lines.sublist(lines.length - 15)
-        : lines;
-    final displayText = last15Lines.join('\n');
+    // Split by newline and get EXACTLY the last 15 lines
+    final allLines = fullText.split('\n');
+    final linesToShow = allLines.length > 15
+        ? allLines.sublist(allLines.length - 15)
+        : allLines;
+    final displayText = linesToShow.join('\n');
 
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: GestureDetector(
-        onTap: () => _showFullThinkingDialog(context, fullText),
-        child: MouseRegion(
-          cursor: SystemMouseCursors.click,
+    return GestureDetector(
+      onTap: () => _showFullThinkingDialog(context, fullText),
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: Container(
+          width: MediaQuery.of(context).size.width * 0.85,
+          padding: const EdgeInsets.all(12),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -184,48 +189,44 @@ class _LLMThinkingBubbleState extends State<LLMThinkingBubble> {
                 ],
               ),
               const SizedBox(height: 12),
-              // Raw text with fade effect at bottom (no scroll, just display)
-              ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * 0.85,
-                ),
-                child: ShaderMask(
-                  shaderCallback: (Rect bounds) {
-                    return LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: const [
-                        Colors.black,
-                        Colors.black,
-                        Colors.transparent,
-                      ],
-                      stops: const [0.0, 0.85, 1.0],
-                    ).createShader(bounds);
-                  },
-                  blendMode: BlendMode.dstIn,
-                  child: Text(
-                    displayText,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      fontFamily: 'monospace',
-                      height: 1.6,
-                      fontSize: 11,
-                      color: colorScheme.onSurfaceVariant.withAlpha(179),
+              // Display last 15 lines with NO scroll - just plain text with fade
+              ShaderMask(
+                shaderCallback: (Rect bounds) {
+                  return LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: const [
+                      Colors.black,
+                      Colors.black,
+                      Colors.transparent,
+                    ],
+                    stops: const [0.0, 0.85, 1.0],
+                  ).createShader(bounds);
+                },
+                blendMode: BlendMode.dstIn,
+                child: Text(
+                  displayText,
+                  overflow: TextOverflow.visible,
+                  softWrap: true,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontFamily: 'monospace',
+                    height: 1.6,
+                    fontSize: 11,
+                    color: colorScheme.onSurfaceVariant.withAlpha(179),
+                  ),
+                )
+                    .animate()
+                    .fadeIn(
+                      duration: 300.ms,
+                      curve: Curves.easeOut,
+                    )
+                    .slideY(
+                      begin: 0.05,
+                      end: 0,
+                      duration: 300.ms,
+                      curve: Curves.easeOut,
                     ),
-                  )
-                      .animate()
-                      .fadeIn(
-                        duration: 300.ms,
-                        curve: Curves.easeOut,
-                      )
-                      .slideY(
-                        begin: 0.05,
-                        end: 0,
-                        duration: 300.ms,
-                        curve: Curves.easeOut,
-                      ),
-                ),
               ),
-              const SizedBox(height: 8),
             ],
           ),
         ),

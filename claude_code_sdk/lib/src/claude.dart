@@ -375,12 +375,6 @@ class Claude extends CodingCliInterface<ClaudeChat, ClaudeChatOptions> {
           command: 'npx',
           args: ['-y', '@modelcontextprotocol/server-git'],
         );
-      case 'puppeteer':
-        return McpServer(
-          name: 'puppeteer',
-          command: 'npx',
-          args: ['-y', '@modelcontextprotocol/server-puppeteer'],
-        );
       case 'sequential-thinking':
         return McpServer(
           name: 'sequential-thinking',

@@ -56,7 +56,7 @@ Future<void> main() async {
     options: const GeminiChatOptions(
       model: 'gemini-2.5-flash',
       allowedTools: ['*'],
-      allowedMcpServerNames: ['puppeteer'],
+      allowedMcpServerNames: ['playwright'],
     ),
   );
 

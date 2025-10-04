@@ -9,9 +9,8 @@ import 'gemini_chat_options.dart';
 class GeminiChat extends CliChatInterface<GeminiChatOptions> {
   GeminiChat({
     required this.apiKey,
-    GeminiChatOptions? options,
-  })  : _sessionId = options?.resumeSessionId,
-        super(options: options);
+    super.options,
+  })  : _sessionId = options?.resumeSessionId;
 
   final String apiKey;
   bool _didSendFirstMessage = false;

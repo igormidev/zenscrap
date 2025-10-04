@@ -39,7 +39,6 @@ Future<void> main() async {
       'github',
       'postgres',
       'git',
-      'puppeteer',
       'sequential-thinking',
       'slack',
       'google-drive',

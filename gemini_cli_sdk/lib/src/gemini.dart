@@ -476,10 +476,6 @@ class Gemini extends CodingCliInterface<GeminiChat, GeminiChatOptions> {
       command: 'npx',
       args: ['-y', '@modelcontextprotocol/server-git'],
     ),
-    'puppeteer': _PopularServer(
-      command: 'npx',
-      args: ['-y', '@modelcontextprotocol/server-puppeteer'],
-    ),
     'sequential-thinking': _PopularServer(
       command: 'npx',
       args: ['-y', '@modelcontextprotocol/server-sequential-thinking'],
