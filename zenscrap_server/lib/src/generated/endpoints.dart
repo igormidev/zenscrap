@@ -433,14 +433,29 @@ class Endpoints extends _i1.EndpointDispatch {
       methodConnectors: {
         'call': _i1.MethodConnector(
           name: 'call',
-          params: {},
+          params: {
+            'page': _i1.ParameterDescription(
+              name: 'page',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'searchQuery': _i1.ParameterDescription(
+              name: 'searchQuery',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
+          },
           call: (
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
               (endpoints['privateUserScrappables']
                       as _i7.PrivateUserScrappablesEndpoint)
-                  .call(session),
+                  .call(
+            session,
+            page: params['page'],
+            searchQuery: params['searchQuery'],
+          ),
         ),
         'getScrappableById': _i1.MethodConnector(
           name: 'getScrappableById',

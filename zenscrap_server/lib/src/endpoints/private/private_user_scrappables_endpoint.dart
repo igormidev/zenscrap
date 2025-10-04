@@ -5,7 +5,11 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
   @override
   bool get requireLogin => true;
 
-  Future<List<Scrappable>> call(Session session) async {
+  Future<UserPaginatedScrappableResponse> call(
+    Session session, {
+    int page = 1,
+    String? searchQuery,
+  }) async {
     final userId = (await session.authenticated)?.userId;
     if (userId == null) {
       throw ZenScrapException(
@@ -14,17 +18,11 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
       );
     }
 
-    final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(session,
-        where: (p0) => p0.userInfoId.equals(userId),
-        include: AccountInfo.include(
-          scrappables: Scrappable.includeList(
-            include: Scrappable.include(
-              targetRequest: ScrappableRequest.include(),
-              scrappingBeeExtractRules: ScrappingBeeExtractLogic.include(),
-              referenceTestData: ReferenceTestData.include(),
-            ),
-          ),
-        ));
+    // Get account info to verify user and get accountId
+    final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
+      session,
+      where: (p0) => p0.userInfoId.equals(userId),
+    );
     if (accountInfo == null) {
       throw ZenScrapException(
         title: 'Account Not Found',
@@ -32,9 +30,62 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
       );
     }
 
-    // Filter out deleted scrappables
-    final scrappables = accountInfo.scrappables ?? <Scrappable>[];
-    return scrappables.where((s) => s.isDeleted != true).toList();
+    const int pageSize = 12;
+
+    // Ensure page is at least 1
+    page = page < 1 ? 1 : page;
+
+    // Build where clause - filter by account and exclude deleted
+    Expression baseWhere(ScrappableTable t) =>
+        t.accountId.equals(accountInfo.id) & t.isDeleted.equals(false);
+
+    // Add search filter if query is provided
+    Expression whereClause(ScrappableTable t) => searchQuery != null && searchQuery.isNotEmpty
+        ? baseWhere(t) &
+            (t.name.ilike('%$searchQuery%') |
+                t.description.ilike('%$searchQuery%'))
+        : baseWhere(t);
+
+    // Get total count for pagination
+    final totalCount = await Scrappable.db.count(
+      session,
+      where: whereClause,
+    );
+
+    // Calculate pagination metadata
+    final totalPages = (totalCount / pageSize).ceil();
+    final hasNextPage = page < totalPages;
+    final hasPreviousPage = page > 1;
+
+    // Calculate offset
+    final offset = (page - 1) * pageSize;
+
+    // Fetch paginated data
+    final scrappables = await Scrappable.db.find(
+      session,
+      where: whereClause,
+      orderBy: (t) => t.id,
+      orderDescending: true,
+      limit: pageSize,
+      offset: offset,
+      include: Scrappable.include(
+        targetRequest: ScrappableRequest.include(),
+        scrappingBeeExtractRules: ScrappingBeeExtractLogic.include(),
+        referenceTestData: ReferenceTestData.include(),
+      ),
+    );
+
+    return UserPaginatedScrappableResponse(
+      data: scrappables,
+      pagination: PaginationMetadata(
+        currentPage: page,
+        pageSize: pageSize,
+        totalCount: totalCount,
+        totalPages: totalPages,
+        hasNextPage: hasNextPage,
+        hasPreviousPage: hasPreviousPage,
+      ),
+    );
   }
 
   Future<Scrappable> getScrappableById(

@@ -158,7 +158,9 @@ extension UserScrappablesStatePatterns on UserScrappablesState {
     TResult Function()? initial,
     TResult Function()? loading,
     TResult Function(ZenScrapException error)? withError,
-    TResult Function(List<Scrappable> scrappables)? withData,
+    TResult Function(
+            UserPaginatedScrappableResponse response, String searchQuery)?
+        withData,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -170,7 +172,7 @@ extension UserScrappablesStatePatterns on UserScrappablesState {
       case _UserScrappablesListageWithError() when withError != null:
         return withError(_that.error);
       case _UserScrappablesListageWithData() when withData != null:
-        return withData(_that.scrappables);
+        return withData(_that.response, _that.searchQuery);
       case _:
         return orElse();
     }
@@ -194,7 +196,9 @@ extension UserScrappablesStatePatterns on UserScrappablesState {
     required TResult Function() initial,
     required TResult Function() loading,
     required TResult Function(ZenScrapException error) withError,
-    required TResult Function(List<Scrappable> scrappables) withData,
+    required TResult Function(
+            UserPaginatedScrappableResponse response, String searchQuery)
+        withData,
   }) {
     final _that = this;
     switch (_that) {
@@ -205,7 +209,7 @@ extension UserScrappablesStatePatterns on UserScrappablesState {
       case _UserScrappablesListageWithError():
         return withError(_that.error);
       case _UserScrappablesListageWithData():
-        return withData(_that.scrappables);
+        return withData(_that.response, _that.searchQuery);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -228,7 +232,9 @@ extension UserScrappablesStatePatterns on UserScrappablesState {
     TResult? Function()? initial,
     TResult? Function()? loading,
     TResult? Function(ZenScrapException error)? withError,
-    TResult? Function(List<Scrappable> scrappables)? withData,
+    TResult? Function(
+            UserPaginatedScrappableResponse response, String searchQuery)?
+        withData,
   }) {
     final _that = this;
     switch (_that) {
@@ -239,7 +245,7 @@ extension UserScrappablesStatePatterns on UserScrappablesState {
       case _UserScrappablesListageWithError() when withError != null:
         return withError(_that.error);
       case _UserScrappablesListageWithData() when withData != null:
-        return withData(_that.scrappables);
+        return withData(_that.response, _that.searchQuery);
       case _:
         return null;
     }
@@ -357,15 +363,11 @@ class __$UserScrappablesListageWithErrorCopyWithImpl<$Res>
 /// @nodoc
 
 class _UserScrappablesListageWithData implements UserScrappablesState {
-  _UserScrappablesListageWithData({required final List<Scrappable> scrappables})
-      : _scrappables = scrappables;
+  _UserScrappablesListageWithData(
+      {required this.response, required this.searchQuery});
 
-  final List<Scrappable> _scrappables;
-  List<Scrappable> get scrappables {
-    if (_scrappables is EqualUnmodifiableListView) return _scrappables;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_scrappables);
-  }
+  final UserPaginatedScrappableResponse response;
+  final String searchQuery;
 
   /// Create a copy of UserScrappablesState
   /// with the given fields replaced by the non-null parameter values.
@@ -380,17 +382,18 @@ class _UserScrappablesListageWithData implements UserScrappablesState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _UserScrappablesListageWithData &&
-            const DeepCollectionEquality()
-                .equals(other._scrappables, _scrappables));
+            (identical(other.response, response) ||
+                other.response == response) &&
+            (identical(other.searchQuery, searchQuery) ||
+                other.searchQuery == searchQuery));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType, const DeepCollectionEquality().hash(_scrappables));
+  int get hashCode => Object.hash(runtimeType, response, searchQuery);
 
   @override
   String toString() {
-    return 'UserScrappablesState.withData(scrappables: $scrappables)';
+    return 'UserScrappablesState.withData(response: $response, searchQuery: $searchQuery)';
   }
 }
 
@@ -402,7 +405,7 @@ abstract mixin class _$UserScrappablesListageWithDataCopyWith<$Res>
           $Res Function(_UserScrappablesListageWithData) _then) =
       __$UserScrappablesListageWithDataCopyWithImpl;
   @useResult
-  $Res call({List<Scrappable> scrappables});
+  $Res call({UserPaginatedScrappableResponse response, String searchQuery});
 }
 
 /// @nodoc
@@ -417,13 +420,18 @@ class __$UserScrappablesListageWithDataCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? scrappables = null,
+    Object? response = null,
+    Object? searchQuery = null,
   }) {
     return _then(_UserScrappablesListageWithData(
-      scrappables: null == scrappables
-          ? _self._scrappables
-          : scrappables // ignore: cast_nullable_to_non_nullable
-              as List<Scrappable>,
+      response: null == response
+          ? _self.response
+          : response // ignore: cast_nullable_to_non_nullable
+              as UserPaginatedScrappableResponse,
+      searchQuery: null == searchQuery
+          ? _self.searchQuery
+          : searchQuery // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
