@@ -69,6 +69,8 @@ class ScrappableCardIndicator extends StatelessWidget {
                       await showDialog<bool>(
                         context: context,
                         builder: (dialogContext) => EditScrappableDialog(
+                          willDisplayHideFromMarketplaceToggle:
+                              !isNew, // Only show toggle if it's not new
                           scrappable: scrappable,
                           willHaveOrOptions: isNew == false,
                         ),

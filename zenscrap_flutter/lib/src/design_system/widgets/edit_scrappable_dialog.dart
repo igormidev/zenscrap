@@ -20,11 +20,13 @@ import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables.dart';
 import 'package:zenscrap_flutter/src/ui/marketplace/dialogs/upgrade_plan_dialog.dart';
 
 class EditScrappableDialog extends ConsumerStatefulWidget {
+  final bool willDisplayHideFromMarketplaceToggle;
   final bool willHaveOrOptions;
   final Scrappable scrappable;
 
   const EditScrappableDialog({
     super.key,
+    this.willDisplayHideFromMarketplaceToggle = false,
     required this.scrappable,
     required this.willHaveOrOptions,
   });
@@ -225,21 +227,25 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
                 },
                 onHasChangesUpdated: (hasChanges) =>
                     _hasChangesVN.value = hasChanges,
-                children: [
-                  Builder(
-                    builder: (context) {
-                      // Get the form state to access the setWillHideFromMarketplace method
-                      final formState = context
-                          .findAncestorStateOfType<_ScrappableEditFormState>();
-                      if (formState == null) return const SizedBox.shrink();
+                children: widget.willDisplayHideFromMarketplaceToggle
+                    ? [
+                        Builder(
+                          builder: (context) {
+                            // Get the form state to access the setWillHideFromMarketplace method
+                            final formState = context.findAncestorStateOfType<
+                                _ScrappableEditFormState>();
+                            if (formState == null)
+                              return const SizedBox.shrink();
 
-                      return HideFromMarketplaceToggle(
-                        initialValue: widget.scrappable.willHideFromMarketplace,
-                        onChanged: formState.setWillHideFromMarketplace,
-                      );
-                    },
-                  ),
-                ],
+                            return HideFromMarketplaceToggle(
+                              initialValue:
+                                  widget.scrappable.willHideFromMarketplace,
+                              onChanged: formState.setWillHideFromMarketplace,
+                            );
+                          },
+                        ),
+                      ]
+                    : const [],
               ),
             ),
             if (widget.willHaveOrOptions) ...[

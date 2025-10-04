@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/animated_thinking_dots.dart';
+import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/llm_thinking_dialog.dart';
 
 class LLMThinkingBubble extends StatefulWidget {
   final List<String> thinkingStream;
@@ -15,17 +16,6 @@ class LLMThinkingBubble extends StatefulWidget {
 }
 
 class _LLMThinkingBubbleState extends State<LLMThinkingBubble> {
-  bool _isDialogOpen = false;
-
-  @override
-  void dispose() {
-    // Auto-close dialog when thinking ends (widget is disposed)
-    if (_isDialogOpen && mounted) {
-      Navigator.of(context, rootNavigator: true).pop();
-    }
-    super.dispose();
-  }
-
   /// Removes ANSI escape codes and other control characters
   String _cleanText(String text) {
     // Remove ANSI escape codes (color codes, cursor movements, etc.)
@@ -40,87 +30,11 @@ class _LLMThinkingBubbleState extends State<LLMThinkingBubble> {
     return cleaned;
   }
 
-  void _showFullThinkingDialog(BuildContext context, String fullText) {
-    _isDialogOpen = true;
-
+  void _showFullThinkingDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (dialogContext) => Dialog(
-        child: Container(
-          constraints: BoxConstraints(
-            maxWidth: 700,
-            maxHeight: MediaQuery.of(context).size.height * 0.8,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Dialog header
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(28),
-                    topRight: Radius.circular(28),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.psychology,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Full Thinking Process',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onPrimaryContainer,
-                          ),
-                    ),
-                    const Spacer(),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () {
-                        _isDialogOpen = false;
-                        Navigator.of(dialogContext).pop();
-                      },
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
-                    ),
-                  ],
-                ),
-              ),
-              // Scrollable content
-              Flexible(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(24),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: SelectableText(
-                      fullText,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontFamily: 'monospace',
-                            height: 1.6,
-                            fontSize: 12,
-                          ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    ).then((_) {
-      // Dialog closed
-      if (mounted) {
-        setState(() {
-          _isDialogOpen = false;
-        });
-      }
-    });
+      builder: (dialogContext) => const LLMThinkingDialog(),
+    );
   }
 
   @override
@@ -135,7 +49,7 @@ class _LLMThinkingBubbleState extends State<LLMThinkingBubble> {
     final displayText = linesToShow.join('\n');
 
     return GestureDetector(
-      onTap: () => _showFullThinkingDialog(context, fullText),
+      onTap: () => _showFullThinkingDialog(context),
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
         child: Container(
