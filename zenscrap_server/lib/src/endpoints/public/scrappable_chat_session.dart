@@ -100,6 +100,7 @@ class ScrappableChatSession extends Endpoint {
     _scrappableOpenedSessionsIds[scrappable.id!] = sessionUuid;
     _scrapRedraftSessions[sessionUuid] = ReplaySubject<ChatResponse>();
     _chatSessions[sessionUuid] = ChatControllerCodexSdkImpl.startChat(
+      scrappableId: scrappable.id!,
       scrapperRequest: scrapperRequest,
       referenceTestData: referenceTestData,
     );

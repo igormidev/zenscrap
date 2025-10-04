@@ -11,9 +11,11 @@ class ChatControllerGeminiSdkImpl extends IChatController
   @override
   String get providerName => 'Gemini';
 
-  const ChatControllerGeminiSdkImpl._({required this.controller});
+  const ChatControllerGeminiSdkImpl._(
+      {required this.controller, required super.scrappableId});
 
   factory ChatControllerGeminiSdkImpl.startChat({
+    required int scrappableId,
     required ReferenceTestData referenceTestData,
     required ScrappableRequest scrapperRequest,
   }) {
@@ -30,11 +32,11 @@ class ChatControllerGeminiSdkImpl extends IChatController
       model: GeminiModel.gemini25Flash,
     );
 
-    return ChatControllerGeminiSdkImpl._(controller: controller);
+    return ChatControllerGeminiSdkImpl._(
+        controller: controller, scrappableId: scrappableId);
   }
 
   // The sendMessage method is now provided by ChatControllerHandlerMixin
-
 
   @override
   Future<void> changeModel(AiModel aiModel) {

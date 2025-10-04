@@ -10,6 +10,8 @@ typedef RetryText = String;
 
 /// Mixin that provides shared functionality for chat controller implementations
 mixin ChatControllerHandlerMixin {
+  int get scrappableId;
+
   /// Abstract getter for the controller - must be implemented by classes using this mixin
   WebScrapperGeneratorController get controller;
 
@@ -62,7 +64,7 @@ mixin ChatControllerHandlerMixin {
           response: await structuredSchemaDataCompleter,
           referenceTestData: referenceTestData,
           scrapperRequest: scrapperRequest,
-          currentScrappingBeeExtractLogic: scrappingBeeExtractLogic,
+          scrappingBeeLogic: scrappingBeeExtractLogic,
           chatSeason: chatSeason,
           attemptNumber: attempt,
           thinkingSentences: thinkingSentences,
@@ -98,18 +100,18 @@ mixin ChatControllerHandlerMixin {
     required ReferenceTestData referenceTestData,
     required ScrappableRequest scrapperRequest,
     required int attemptNumber,
-    required ScrappingBeeExtractLogic? currentScrappingBeeExtractLogic,
+    required ScrappingBeeExtractLogic? scrappingBeeLogic,
     required StreamController<ChatResponse> chatSeason,
     required List<String> thinkingSentences,
   }) async {
     final resp = response.toChatResponse(
       referenceTestData: referenceTestData,
       scrapperRequest: scrapperRequest,
-      scrappingBeeExtractLogic: currentScrappingBeeExtractLogic,
+      scrappingBeeExtractLogic: scrappingBeeLogic,
       thinkingSentences: thinkingSentences,
     );
     chatSeason.add(resp.$1);
-    final scrappingBeeExtractLogic = resp.$2;
+    final ScrappingBeeExtractLogic? scrappingBeeExtractLogic = resp.$2;
     if (scrappingBeeExtractLogic == null) {
       // No new extract logic to test, so no verification/retry needed
       return null;
@@ -153,9 +155,12 @@ mixin ChatControllerHandlerMixin {
           byteData: byteTestData,
         );
 
+        ScrappingBeeExtractLogic newScrappingBeeLogic =
+            scrappingBeeExtractLogic;
+
         final isNew = referenceTestData.byteDataId == null ||
             referenceTestData.byteData == null ||
-            scrappingBeeExtractLogic.id == null;
+            newScrappingBeeLogic.id == null;
 
         if (isNew) {
           await session.db.transaction((transaction) async {
@@ -170,8 +175,15 @@ mixin ChatControllerHandlerMixin {
                 transaction: transaction);
             await ReferenceTestData.db.updateRow(session, newReferenceTestData,
                 transaction: transaction);
-            await ScrappingBeeExtractLogic.db.insertRow(
-                session, scrappingBeeExtractLogic,
+            final scrappable = await Scrappable.db
+                .findById(session, scrappableId, transaction: transaction);
+
+            newScrappingBeeLogic = await ScrappingBeeExtractLogic.db.insertRow(
+                session, newScrappingBeeLogic,
+                transaction: transaction);
+
+            await Scrappable.db.attachRow.scrappingBeeExtractRules(
+                session, scrappable!, newScrappingBeeLogic,
                 transaction: transaction);
           });
         } else {
@@ -183,7 +195,7 @@ mixin ChatControllerHandlerMixin {
             messageText: 'New rules were tested and did not present any errors',
             scrapperRequest: scrapperRequest,
             referenceTestData: newReferenceTestData,
-            scrappingBeeExtractLogic: scrappingBeeExtractLogic));
+            scrappingBeeExtractLogic: newScrappingBeeLogic));
         return null;
       },
       error: (String errorMessage) {

@@ -165,12 +165,14 @@ class PrivateAccountEndpoint extends Endpoint with DeployEndpointMixin {
     await deployReferenceTestData(
       session: session,
       transaction: transaction,
-      testData: scrappable.referenceTestData!.copyWith(
-        id: existingScrappable.referenceTestData!.id,
-      ),
-      scrappingBeeExtractLogic: scrappable.scrappingBeeExtractRules!.copyWith(
-        id: existingScrappable.scrappingBeeExtractRules!.id,
-      ),
+      testData: scrappable.referenceTestData!,
+      scrappingBeeExtractLogic: scrappable.scrappingBeeExtractRules!,
+      // testData: scrappable.referenceTestData!.copyWith(
+      //   id: existingScrappable.referenceTestData!.id,
+      // ),
+      // scrappingBeeExtractLogic: scrappable.scrappingBeeExtractRules!.copyWith(
+      //   id: existingScrappable.scrappingBeeExtractRules!.id,
+      // ),
       scrappableRequest: scrappable.targetRequest!,
     );
   }

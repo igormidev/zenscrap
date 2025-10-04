@@ -4,7 +4,8 @@ import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 abstract class IChatController {
-  const IChatController();
+  final int scrappableId;
+  const IChatController({required this.scrappableId});
 
   Future<void> changeModel(AiModel aiModel);
 

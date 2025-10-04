@@ -1,0 +1,21 @@
+{
+  "responseType": "data",
+  "message": null,
+  "errorMessage": null,
+  "resumeActionMessage": "Validated selectors for coach name, current club, and club badge image on Transfermarkt without JS rendering or premium proxy.",
+  "request": null,
+  "scrappingBeeFetchSettings": {
+    "url": "https://www.transfermarkt.com.br/cuca/profil/trainer/4732",
+    "extract_rules": "{\"coach\":{\"selector\":\"h1.data-header__headline-wrapper strong\",\"type\":\"item\"},\"current_club\":{\"selector\":\".data-header__club-info .data-header__club a\",\"type\":\"item\"},\"current_club_image\":{\"selector\":\".data-header__box--big img\",\"type\":\"item\",\"output\":\"@src\"}}",
+    "js_scenario": null,
+    "render_js": false,
+    "wait": null,
+    "wait_for": null,
+    "wait_browser": null,
+    "premium_proxy": false,
+    "stealth_proxy": false,
+    "country_code": null,
+    "session_id": null,
+    "custom_google": null
+  }
+}

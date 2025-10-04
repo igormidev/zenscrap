@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
 
+const String kZenscrapHtmlCaptureField = '__zenscrap_full_html__';
+
 /// Response model for data extraction (without screenshot)
 class ExtractDataByRule {
   final Map<String, dynamic>? result;
@@ -113,13 +115,14 @@ mixin ScrapingBeeApiMixin {
     required String? country_code,
     required String? session_id,
     required bool? custom_google,
+    bool jsonResponse = true,
     bool includeScreenshot = false,
   }) {
     final Map<String, String> queryParams = {
       'api_key': _apiKey,
       'url': targetUrl,
       'extract_rules': extract_rules,
-      'json_response': 'true',
+      'json_response': jsonResponse ? 'true' : 'false',
       'render_js': render_js ? 'true' : 'false',
     };
 
@@ -382,6 +385,14 @@ mixin ScrapingBeeApiMixin {
 
         // For the HTML content, prioritize the 'html' field, fall back to bodyData if it's a string
         String finalHtml = htmlContent;
+        if (finalHtml.isEmpty &&
+            extractedData.containsKey(kZenscrapHtmlCaptureField)) {
+          final capturedHtml = extractedData.remove(kZenscrapHtmlCaptureField);
+          if (capturedHtml is String && capturedHtml.isNotEmpty) {
+            finalHtml = capturedHtml;
+          }
+        }
+
         if (finalHtml.isEmpty && bodyData is String) {
           finalHtml = bodyData;
         }

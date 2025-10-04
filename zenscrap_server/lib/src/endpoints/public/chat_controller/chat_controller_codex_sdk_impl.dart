@@ -11,9 +11,11 @@ class ChatControllerCodexSdkImpl extends IChatController
   @override
   String get providerName => 'Codex';
 
-  const ChatControllerCodexSdkImpl._({required this.controller});
+  const ChatControllerCodexSdkImpl._(
+      {required this.controller, required super.scrappableId});
 
   factory ChatControllerCodexSdkImpl.startChat({
+    required int scrappableId,
     required ReferenceTestData referenceTestData,
     required ScrappableRequest scrapperRequest,
     CodexModel model = CodexModel.gpt5Codex,
@@ -30,7 +32,8 @@ class ChatControllerCodexSdkImpl extends IChatController
       ),
     );
 
-    return ChatControllerCodexSdkImpl._(controller: controller);
+    return ChatControllerCodexSdkImpl._(
+        controller: controller, scrappableId: scrappableId);
   }
 
   @override

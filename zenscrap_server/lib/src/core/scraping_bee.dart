@@ -1,7 +1,13 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'dart:convert';
+
 import 'package:web_scrapper_generator/web_scrapper_generator.dart'
-    show ScrapingBeeApiMixin, ExtractDataByRule, ExtractFullDataByRule;
+    show
+        ScrapingBeeApiMixin,
+        ExtractDataByRule,
+        ExtractFullDataByRule,
+        kZenscrapHtmlCaptureField;
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 // Re-export the result types from the mixin
@@ -16,10 +22,13 @@ class ScrapingBee with ScrapingBeeApiMixin {
     required String targetUrl,
     required ScrappingBeeExtractLogic scrappingBeeExtractLogic,
   }) async {
+    final String extractRulesWithHtml =
+        _withHtmlCapture(scrappingBeeExtractLogic.extractRules);
+
     // Use the mixin's method with individual parameters
     return await fetchHtmlAndScreenshot(
       targetUrl: targetUrl,
-      extract_rules: scrappingBeeExtractLogic.extractRules,
+      extract_rules: extractRulesWithHtml,
       js_scenario: scrappingBeeExtractLogic.jsScenario,
       render_js: scrappingBeeExtractLogic.renderJs,
       wait: scrappingBeeExtractLogic.wait,
@@ -52,5 +61,24 @@ class ScrapingBee with ScrapingBeeApiMixin {
       session_id: scrappingBeeExtractLogic.sessionId,
       custom_google: scrappingBeeExtractLogic.customGoogle,
     );
+  }
+
+  String _withHtmlCapture(String extractRules) {
+    try {
+      final decoded = jsonDecode(extractRules);
+      if (decoded is Map<String, dynamic>) {
+        if (!decoded.containsKey(kZenscrapHtmlCaptureField)) {
+          decoded[kZenscrapHtmlCaptureField] = {
+            'selector': 'html',
+            'output': 'html',
+          };
+          return jsonEncode(decoded);
+        }
+      }
+    } catch (_) {
+      // If the extract rules aren't a JSON map we can't augment them.
+    }
+
+    return extractRules;
   }
 }

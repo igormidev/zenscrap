@@ -129,11 +129,9 @@ class _LLMThinkingBubbleState extends State<LLMThinkingBubble> {
     final colorScheme = theme.colorScheme;
     final fullText = _cleanText(widget.thinkingStream.join());
 
-    // Split by newline and get EXACTLY the last 15 lines
+    // Split by newline and get EXACTLY the last 10 lines
     final allLines = fullText.split('\n');
-    final linesToShow = allLines.length > 15
-        ? allLines.sublist(allLines.length - 15)
-        : allLines;
+    final linesToShow = allLines.sublist(allLines.length - 10);
     final displayText = linesToShow.join('\n');
 
     return GestureDetector(
