@@ -148,19 +148,6 @@ class MyApp extends ConsumerStatefulWidget {
 }
 
 class _MyAppState extends ConsumerState<MyApp> {
-  void _setLoggoutIfNeeded() {
-    final user = ref.read(sessionManagerProvider).signedInUser;
-    if (user == null) {
-      ref.read(sessionProvider).maybeMap(
-            notSignedIn: (_) {},
-            orElse: () {
-              ref.read(sessionProvider.notifier).state =
-                  SessionState.notSignedIn();
-            },
-          );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     ref.listen(sessionProvider, (previous, next) {
@@ -176,9 +163,6 @@ class _MyAppState extends ConsumerState<MyApp> {
           },
         );
       });
-    });
-    ref.listen(sessionManagerProvider, (previous, next) {
-      _setLoggoutIfNeeded();
     });
     final router = ref.watch(routerProvider);
 

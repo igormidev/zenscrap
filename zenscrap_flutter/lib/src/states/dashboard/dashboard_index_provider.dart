@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/dashboard/possible_navigations_provider.dart';
+import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
+import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
 
 final currentTabIndexProvider =
@@ -60,6 +62,7 @@ Future<void> logOut(BuildContext context, WidgetRef ref) async {
   if (result == OkCancelResult.ok) {
     ref.globalLoadingSetter(() async {
       await ref.read(sessionManagerProvider).signOutDevice();
+      ref.read(sessionProvider.notifier).state = SessionState.notSignedIn();
     });
   }
 }
@@ -75,6 +78,7 @@ Future<void> rawLogOut(BuildContext context, Ref ref) async {
   if (result == OkCancelResult.ok) {
     ref.globalLoadingSetter(() async {
       await ref.read(sessionManagerProvider).signOutDevice();
+      ref.read(sessionProvider.notifier).state = SessionState.notSignedIn();
     });
   }
 }
