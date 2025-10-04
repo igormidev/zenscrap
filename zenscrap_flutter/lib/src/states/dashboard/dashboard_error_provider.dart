@@ -8,7 +8,7 @@ import 'package:zenscrap_flutter/src/states/analytics/analytics_state.dart';
 import 'package:zenscrap_flutter/src/states/dashboard/dashboard_index_provider.dart';
 import 'package:zenscrap_flutter/src/states/marketplace/marketplace_provider.dart';
 import 'package:zenscrap_flutter/src/states/marketplace/marketplace_state.dart';
-import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables.dart';
+import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables_provider.dart';
 import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables_state.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
 
