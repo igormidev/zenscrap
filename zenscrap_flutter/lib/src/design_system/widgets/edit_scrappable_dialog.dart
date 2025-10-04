@@ -675,7 +675,6 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
                       ),
                     ],
                   ).animate().fadeIn(delay: 200.ms).slideX(begin: -0.1, end: 0),
-
                   ...widget.children.map(
                     (child) => child
                         .animate()

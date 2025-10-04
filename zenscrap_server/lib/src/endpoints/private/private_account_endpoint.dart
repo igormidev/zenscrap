@@ -146,6 +146,10 @@ class PrivateAccountEndpoint extends Endpoint with DeployEndpointMixin {
     final Scrappable? existingScrappable = await Scrappable.db.findById(
       session,
       scrappable.id!,
+      include: Scrappable.include(
+        scrappingBeeExtractRules: ScrappingBeeExtractLogic.include(),
+        referenceTestData: ReferenceTestData.include(),
+      ),
     );
     if (existingScrappable == null ||
         existingScrappable.accountId != null ||
@@ -161,8 +165,12 @@ class PrivateAccountEndpoint extends Endpoint with DeployEndpointMixin {
     await deployReferenceTestData(
       session: session,
       transaction: transaction,
-      testData: scrappable.referenceTestData!,
-      scrappingBeeExtractLogic: scrappable.scrappingBeeExtractRules!,
+      testData: scrappable.referenceTestData!.copyWith(
+        id: existingScrappable.referenceTestData!.id,
+      ),
+      scrappingBeeExtractLogic: scrappable.scrappingBeeExtractRules!.copyWith(
+        id: existingScrappable.scrappingBeeExtractRules!.id,
+      ),
       scrappableRequest: scrappable.targetRequest!,
     );
   }

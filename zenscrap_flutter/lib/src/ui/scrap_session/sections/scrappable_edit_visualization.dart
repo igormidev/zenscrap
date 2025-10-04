@@ -4,7 +4,6 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/mixins/edit_scrappable.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/edit_scrappable_dialog.dart';
-import 'package:zenscrap_flutter/src/design_system/widgets/scrapping_bee_cost_table.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 
 class ScrappableEditVisualization extends ConsumerStatefulWidget {
@@ -23,8 +22,6 @@ class _ScrappableEditVisualizationState
     extends ConsumerState<ScrappableEditVisualization> with EditScrappable {
   @override
   Widget build(BuildContext context) {
-    final extractLogic = widget.scrappable.scrappingBeeExtractRules;
-
     return Container(
       decoration: BoxDecoration(
         color: context.c.surfaceContainerLowest,

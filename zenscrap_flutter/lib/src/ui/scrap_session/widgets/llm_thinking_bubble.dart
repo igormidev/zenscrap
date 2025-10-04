@@ -15,266 +15,220 @@ class LLMThinkingBubble extends StatefulWidget {
 }
 
 class _LLMThinkingBubbleState extends State<LLMThinkingBubble> {
-  bool _isExpanded = false;
-  final ScrollController _scrollController = ScrollController();
-
-  static const int _compactCharLimit = 200;
+  bool _isDialogOpen = false;
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    // Auto-close dialog when thinking ends (widget is disposed)
+    if (_isDialogOpen && mounted) {
+      Navigator.of(context, rootNavigator: true).pop();
+    }
     super.dispose();
   }
 
-  String _getDisplayText(String fullText) {
-    if (_isExpanded) {
-      // Show all text when expanded (with ability to scroll)
-      return fullText;
-    } else {
-      // Show last 200 characters when compact
-      if (fullText.length <= _compactCharLimit) {
-        return fullText;
+  /// Removes ANSI escape codes and other control characters
+  String _cleanText(String text) {
+    // Remove ANSI escape codes (color codes, cursor movements, etc.)
+    // Pattern matches ESC[ followed by any characters up to a letter
+    final ansiPattern = RegExp(r'\x1B\[[0-9;]*[a-zA-Z]');
+    String cleaned = text.replaceAll(ansiPattern, '');
+
+    // Remove other common control characters except newlines and tabs
+    cleaned = cleaned.replaceAll(RegExp(r'[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]'), '');
+
+    return cleaned;
+  }
+
+  void _showFullThinkingDialog(BuildContext context, String fullText) {
+    _isDialogOpen = true;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => Dialog(
+        child: Container(
+          constraints: BoxConstraints(
+            maxWidth: 700,
+            maxHeight: MediaQuery.of(context).size.height * 0.8,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Dialog header
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(28),
+                    topRight: Radius.circular(28),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.psychology,
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Full Thinking Process',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onPrimaryContainer,
+                          ),
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () {
+                        _isDialogOpen = false;
+                        Navigator.of(dialogContext).pop();
+                      },
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    ),
+                  ],
+                ),
+              ),
+              // Scrollable content
+              Flexible(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
+                  child: SelectableText(
+                    fullText,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontFamily: 'monospace',
+                          height: 1.6,
+                          fontSize: 12,
+                        ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ).then((_) {
+      // Dialog closed
+      if (mounted) {
+        setState(() {
+          _isDialogOpen = false;
+        });
       }
-
-      final startIndex = fullText.length - _compactCharLimit;
-      String compactText = fullText.substring(startIndex);
-
-      // Clean up the start to begin at a word boundary if possible
-      final firstSpace = compactText.indexOf(' ');
-      if (firstSpace > 0 && firstSpace < 20) {
-        compactText = '...${compactText.substring(firstSpace + 1)}';
-      } else {
-        compactText = '...$compactText';
-      }
-
-      return compactText;
-    }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final fullText = widget.thinkingStream.join();
-    final displayText = _getDisplayText(fullText);
+    final fullText = _cleanText(widget.thinkingStream.join());
+
+    // Get last 15 lines
+    final lines = fullText.split('\n');
+    final last15Lines = lines.length > 15
+        ? lines.sublist(lines.length - 15)
+        : lines;
+    final displayText = last15Lines.join('\n');
 
     return Align(
       alignment: Alignment.centerLeft,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Avatar
-          Container(
-            width: 32,
-            height: 32,
-            margin: const EdgeInsets.only(top: 20),
-            decoration: BoxDecoration(
-              color: colorScheme.secondaryContainer,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withAlpha(26),
-                  blurRadius: 2,
-                  offset: const Offset(0, 1),
-                ),
-              ],
-            ),
-            child: Icon(
-              Icons.psychology,
-              size: 18,
-              color: colorScheme.onSecondaryContainer,
-            ),
-          ),
-          const SizedBox(width: 8),
-          // Message bubble
-          Flexible(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Username with icon
-                Row(
-                  children: [
-                    Icon(
-                      Icons.lightbulb_outlined,
+      child: GestureDetector(
+        onTap: () => _showFullThinkingDialog(context, fullText),
+        child: MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header with icon and label
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 24,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: colorScheme.primary.withAlpha(26),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.psychology,
                       size: 14,
                       color: colorScheme.primary,
                     ),
-                    const SizedBox(width: 4),
-                    Text(
-                      'AI (Thinking)',
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'monospace',
-                        color: colorScheme.primary,
-                      ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'AI (Thinking)',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.primary,
                     ),
-                  ],
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    '• Tap to view full',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant.withAlpha(153),
+                      fontSize: 10,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  AnimatedThinkingDots(
+                    color: colorScheme.primary,
+                    size: 4,
+                    spacing: 1.5,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              // Raw text with fade effect at bottom (no scroll, just display)
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width * 0.85,
                 ),
-                const SizedBox(height: 4),
-                // Thinking bubble
-                Container(
-                  constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * 0.75,
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 14),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        colorScheme.surfaceContainerHighest,
-                        colorScheme.surfaceContainerHigh,
+                child: ShaderMask(
+                  shaderCallback: (Rect bounds) {
+                    return LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: const [
+                        Colors.black,
+                        Colors.black,
+                        Colors.transparent,
                       ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+                      stops: const [0.0, 0.85, 1.0],
+                    ).createShader(bounds);
+                  },
+                  blendMode: BlendMode.dstIn,
+                  child: Text(
+                    displayText,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontFamily: 'monospace',
+                      height: 1.6,
+                      fontSize: 11,
+                      color: colorScheme.onSurfaceVariant.withAlpha(179),
                     ),
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(4),
-                      topRight: Radius.circular(22),
-                      bottomLeft: Radius.circular(22),
-                      bottomRight: Radius.circular(22),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: colorScheme.shadow.withAlpha(20),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
+                  )
+                      .animate()
+                      .fadeIn(
+                        duration: 300.ms,
+                        curve: Curves.easeOut,
+                      )
+                      .slideY(
+                        begin: 0.05,
+                        end: 0,
+                        duration: 300.ms,
+                        curve: Curves.easeOut,
                       ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Thinking text content with animation
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        constraints: BoxConstraints(
-                          maxHeight: _isExpanded ? 300 : 80,
-                        ),
-                        child: ScrollConfiguration(
-                          behavior: const ScrollBehavior().copyWith(
-                            overscroll: false,
-                            scrollbars: _isExpanded,
-                          ),
-                          child: SingleChildScrollView(
-                            controller: _scrollController,
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 12,
-                            ),
-                            physics: _isExpanded
-                                ? const AlwaysScrollableScrollPhysics()
-                                : const NeverScrollableScrollPhysics(),
-                            child: SelectableText(
-                              displayText,
-                              key: ValueKey(
-                                  '${displayText.length}_$_isExpanded'),
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                fontFamily: 'monospace',
-                                height: 1.5,
-                                fontSize: 12,
-                                color:
-                                    colorScheme.onSurfaceVariant.withAlpha(204),
-                              ),
-                            )
-                                .animate()
-                                .fadeIn(
-                                  duration: 400.ms,
-                                  curve: Curves.easeOut,
-                                )
-                                .slideX(
-                                  begin: -0.02,
-                                  end: 0,
-                                  duration: 400.ms,
-                                  curve: Curves.easeOut,
-                                ),
-                          ),
-                        ),
-                      ),
-                      // Bottom bar with expand button and thinking indicator
-                      if (fullText.length > _compactCharLimit) ...[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            // Expand/Collapse button
-                            InkWell(
-                              onTap: () {
-                                setState(() {
-                                  _isExpanded = !_isExpanded;
-                                  if (_isExpanded) {
-                                    _scrollController.jumpTo(
-                                      _scrollController
-                                          .position.maxScrollExtent,
-                                    );
-                                  }
-                                });
-                              },
-                              borderRadius: BorderRadius.circular(12),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: colorScheme.primary.withAlpha(26),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      _isExpanded ? 'Show less' : 'Show more',
-                                      style:
-                                          theme.textTheme.labelSmall?.copyWith(
-                                        color: colorScheme.primary,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Icon(
-                                      _isExpanded
-                                          ? Icons.keyboard_arrow_up
-                                          : Icons.keyboard_arrow_down,
-                                      size: 14,
-                                      color: colorScheme.primary,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            // Animated thinking dots with tooltip
-                            Tooltip(
-                              message: 'AI is thinking...',
-                              child: AnimatedThinkingDots(
-                                color: colorScheme.primary,
-                                size: 5,
-                                spacing: 1.5,
-                              ),
-                            ),
-                          ],
-                        ).animate().fadeIn(duration: 300.ms),
-                      ] else ...[
-                        // Show thinking indicator even for short messages
-                        const SizedBox(height: 8),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: Tooltip(
-                            message: 'AI is thinking...',
-                            child: AnimatedThinkingDots(
-                              color: colorScheme.primary,
-                              size: 5,
-                              spacing: 1.5,
-                            ),
-                          ),
-                        ),
-                      ],
-                      SizedBox(height: 16),
-                    ],
-                  ),
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 8),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
