@@ -125,7 +125,7 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 500),
+        constraints: const BoxConstraints(maxWidth: 500, maxHeight: 650),
         decoration: BoxDecoration(
           color: context.c.surface,
           borderRadius: BorderRadius.circular(28),
@@ -196,49 +196,51 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
               ),
             ).animate().fadeIn(duration: 200.ms).slideY(begin: -0.1, end: 0),
 
-            ScrappableEditForm(
-              key: ValueKey('edit_form_${widget.scrappable.id}'),
-              scrappable: widget.scrappable,
-              onSave:
-                  (name, description, category, willHideFromMarketplace) async {
-                return onEditScrappable(
-                  widget.scrappable,
-                  name,
-                  description,
-                  category,
-                  willHideFromMarketplace,
-                  () {
-                    unawaited(
-                        ref.read(userScrappables.notifier).getScrappables());
-                    // Update the scrappable in the state provider
-                    ref
-                        .read(scrapChatProvider.notifier)
-                        .updateScrappableDetails(
-                          name: name,
-                          description: description,
-                          category: category,
-                        );
-                  },
-                );
-              },
-              shouldPopOnEnd: true,
-              onHasChangesUpdated: (hasChanges) =>
-                  _hasChangesVN.value = hasChanges,
-              children: [
-                Builder(
-                  builder: (context) {
-                    // Get the form state to access the setWillHideFromMarketplace method
-                    final formState = context
-                        .findAncestorStateOfType<_ScrappableEditFormState>();
-                    if (formState == null) return const SizedBox.shrink();
+            Flexible(
+              child: ScrappableEditForm(
+                shouldPopOnEnd: true,
+                key: ValueKey('edit_form_${widget.scrappable.id}'),
+                scrappable: widget.scrappable,
+                onSave: (name, description, category,
+                    willHideFromMarketplace) async {
+                  return onEditScrappable(
+                    widget.scrappable,
+                    name,
+                    description,
+                    category,
+                    willHideFromMarketplace,
+                    () {
+                      unawaited(
+                          ref.read(userScrappables.notifier).getScrappables());
+                      // Update the scrappable in the state provider
+                      ref
+                          .read(scrapChatProvider.notifier)
+                          .updateScrappableDetails(
+                            name: name,
+                            description: description,
+                            category: category,
+                          );
+                    },
+                  );
+                },
+                onHasChangesUpdated: (hasChanges) =>
+                    _hasChangesVN.value = hasChanges,
+                children: [
+                  Builder(
+                    builder: (context) {
+                      // Get the form state to access the setWillHideFromMarketplace method
+                      final formState = context
+                          .findAncestorStateOfType<_ScrappableEditFormState>();
+                      if (formState == null) return const SizedBox.shrink();
 
-                    return HideFromMarketplaceToggle(
-                      initialValue: widget.scrappable.willHideFromMarketplace,
-                      onChanged: formState.setWillHideFromMarketplace,
-                    );
-                  },
-                ),
-              ],
+                      return HideFromMarketplaceToggle(
+                        initialValue: widget.scrappable.willHideFromMarketplace,
+                        onChanged: formState.setWillHideFromMarketplace,
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
             if (widget.willHaveOrOptions) ...[
               Transform.translate(
@@ -682,6 +684,7 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
                         .slideX(begin: -0.1, end: 0),
                   ),
                   if (widget.scrappable.scrappingBeeExtractRules != null) ...[
+                    if (widget.children.isNotEmpty) SizedBox(height: 12),
                     Text(
                       'API Configuration & Costs',
                       style: context.t.labelLarge?.copyWith(
@@ -696,22 +699,19 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
                         .animate()
                         .fadeIn(delay: 200.ms)
                         .slideX(begin: -0.1, end: 0),
-                    // Action Buttons
-                    if (widget.shouldPopOnEnd) actionButton,
                   ],
                 ],
               ),
             ),
-            if (!widget.shouldPopOnEnd) SizedBox(height: 60),
+            SizedBox(height: 60),
           ],
         ),
-        if (!widget.shouldPopOnEnd)
-          Positioned(
-            bottom: 20,
-            left: 24,
-            right: 24,
-            child: actionButton,
-          ),
+        Positioned(
+          bottom: 20,
+          left: 24,
+          right: 24,
+          child: actionButton,
+        ),
       ],
     );
   }
