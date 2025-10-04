@@ -172,19 +172,19 @@ class _LLMThinkingBubbleState extends State<LLMThinkingBubble> {
                       color: colorScheme.primary,
                     ),
                   ),
-                  const SizedBox(width: 6),
+                  const SizedBox(width: 8),
+                  AnimatedThinkingDots(
+                    color: colorScheme.primary,
+                    size: 4,
+                    spacing: 1.5,
+                  ),
+                  Spacer(),
                   Text(
                     '• Tap to view full',
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: colorScheme.onSurfaceVariant.withAlpha(153),
                       fontSize: 10,
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  AnimatedThinkingDots(
-                    color: colorScheme.primary,
-                    size: 4,
-                    spacing: 1.5,
                   ),
                 ],
               ),

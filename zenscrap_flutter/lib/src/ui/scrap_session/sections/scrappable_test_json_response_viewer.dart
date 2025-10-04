@@ -191,12 +191,15 @@ class _JsonTab extends StatelessWidget {
         children: [
           SingleChildScrollView(
             padding: const EdgeInsets.all(16),
-            child: SelectableText(
-              const JsonEncoder.withIndent('  ').convert(testResponse),
-              style: TextStyle(
-                fontSize: fontSize,
-                fontFamily: 'monospace',
-                color: context.c.outline,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: SelectableText(
+                const JsonEncoder.withIndent('  ').convert(testResponse),
+                style: TextStyle(
+                  fontSize: fontSize,
+                  fontFamily: 'monospace',
+                  color: context.c.onSurface,
+                ),
               ),
             ),
           ),
@@ -243,6 +246,10 @@ class _HtmlTab extends StatelessWidget {
 
     final htmlString = utf8.decode(htmlData!.buffer.asUint8List());
 
+    if (htmlString.isEmpty) {
+      return const _EmptyStateWidget(message: 'No HTML content available');
+    }
+
     return MouseRegion(
       onEnter: (_) => onHoverChanged(true),
       onExit: (_) => onHoverChanged(false),
@@ -250,12 +257,15 @@ class _HtmlTab extends StatelessWidget {
         children: [
           SingleChildScrollView(
             padding: const EdgeInsets.all(16),
-            child: SelectableText(
-              htmlString,
-              style: TextStyle(
-                fontSize: fontSize,
-                fontFamily: 'monospace',
-                color: context.c.outline,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: SelectableText(
+                htmlString,
+                style: TextStyle(
+                  fontSize: fontSize,
+                  fontFamily: 'monospace',
+                  color: context.c.onSurface,
+                ),
               ),
             ),
           ),

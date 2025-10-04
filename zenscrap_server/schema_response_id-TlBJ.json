@@ -1,0 +1,21 @@
+{
+  "responseType": "data",
+  "message": null,
+  "errorMessage": null,
+  "resumeActionMessage": "Validated selectors for the Cuca profile; ScrapingBee now returns coach name, current club name, and crest without extra options.",
+  "request": null,
+  "scrappingBeeFetchSettings": {
+    "url": "https://www.transfermarkt.com.br/cuca/profil/trainer/4732",
+    "extract_rules": "{\"coach_name\":{\"selector\":\".data-header__headline-container h1\"},\"current_club_name\":{\"selector\":\".data-header__club-info .data-header__club a\"},\"current_club_logo\":{\"selector\":\".data-header__box--big img\",\"output\":\"@src\"}}",
+    "js_scenario": null,
+    "render_js": false,
+    "wait": null,
+    "wait_for": null,
+    "wait_browser": null,
+    "premium_proxy": false,
+    "stealth_proxy": false,
+    "country_code": null,
+    "session_id": null,
+    "custom_google": null
+  }
+}
