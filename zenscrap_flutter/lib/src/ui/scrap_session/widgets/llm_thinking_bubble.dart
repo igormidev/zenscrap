@@ -45,8 +45,13 @@ class _LLMThinkingBubbleState extends State<LLMThinkingBubble> {
 
     // Split by newline and get EXACTLY the last 10 lines
     final allLines = fullText.split('\n');
-    final linesToShow = allLines.sublist(allLines.length - 10);
-    final displayText = linesToShow.join('\n');
+    final linesToShow =
+        allLines.sublist(allLines.length - 10 < 0 ? 0 : allLines.length - 10);
+    final cleanedLines =
+        linesToShow.join('\n').replaceAll(r'\n', '\n').split('\n');
+    final displayText = cleanedLines
+        .sublist(cleanedLines.length - 10 < 0 ? 0 : cleanedLines.length - 10)
+        .join('\n');
 
     return GestureDetector(
       onTap: () => _showFullThinkingDialog(context),
