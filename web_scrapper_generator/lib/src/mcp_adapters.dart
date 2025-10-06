@@ -291,7 +291,11 @@ class UnifiedScrapingBeeSetup {
   }
 
   Future<void> _compileServerIfNeeded() async {
-    final projectRoot = Directory.current.path;
+    // Find the web_scrapper_generator package root
+    final webScrapperGenPath = _findWebScrapperGeneratorPath();
+
+    // Place the executable in the project root's build directory
+    final projectRoot = _findProjectRoot();
     final serverExePath = path.join(
       projectRoot,
       'build',
@@ -312,14 +316,20 @@ class UnifiedScrapingBeeSetup {
       buildDir.createSync(recursive: true);
     }
 
-    // Compile the Dart script to an executable
+    // Compile the Dart script to an executable using the bin entry point
+    final serverSourcePath = path.join(
+      webScrapperGenPath,
+      'bin',
+      'scraping_bee_mcp_server.dart',
+    );
+
     final result = await Process.run('dart', [
       'compile',
       'exe',
-      path.join(projectRoot, 'lib', 'src', 'scraping_bee_mcp.dart'),
+      serverSourcePath,
       '-o',
       serverExePath,
-    ], workingDirectory: projectRoot);
+    ], workingDirectory: webScrapperGenPath);
 
     if (result.exitCode != 0) {
       throw Exception(
@@ -330,9 +340,56 @@ class UnifiedScrapingBeeSetup {
     print('  ✅ ScrapingBee MCP server compiled successfully');
   }
 
+  /// Find the web_scrapper_generator package root directory
+  String _findWebScrapperGeneratorPath() {
+    // Start from current directory and search upwards for the monorepo root
+    var current = Directory.current;
+
+    // First, find the project root (where zenscrap lives)
+    while (current.path != current.parent.path) {
+      final webScrapperGenDir = Directory(
+        path.join(current.path, 'web_scrapper_generator'),
+      );
+      if (webScrapperGenDir.existsSync()) {
+        final pubspecFile = File(
+          path.join(webScrapperGenDir.path, 'pubspec.yaml'),
+        );
+        if (pubspecFile.existsSync()) {
+          return webScrapperGenDir.path;
+        }
+      }
+      current = current.parent;
+    }
+
+    throw Exception(
+      'Could not find web_scrapper_generator package. '
+      'Make sure you are running from within the zenscrap project.',
+    );
+  }
+
+  /// Find the project root directory (where build/ should be placed)
+  String _findProjectRoot() {
+    var current = Directory.current;
+
+    while (current.path != current.parent.path) {
+      // Check if this directory contains web_scrapper_generator
+      final webScrapperGenDir = Directory(
+        path.join(current.path, 'web_scrapper_generator'),
+      );
+      if (webScrapperGenDir.existsSync()) {
+        return current.path;
+      }
+      current = current.parent;
+    }
+
+    // Fallback to current directory
+    return Directory.current.path;
+  }
+
   Future<void> _configureMcpScrapingBee(McpAdapter adapter) async {
+    final projectRoot = _findProjectRoot();
     final serverExePath = path.join(
-      Directory.current.path,
+      projectRoot,
       'build',
       'scraping_bee_mcp_server',
     );

@@ -18,16 +18,13 @@ class ChatControllerGeminiSdkImpl extends IChatController
     required int scrappableId,
     required ReferenceTestData referenceTestData,
     required ScrappableRequest scrapperRequest,
+    required ScrappingBeeExtractLogic? currentFetchSettings,
   }) {
-    final webScrapperRequest = WebScrapperRequest(
-      url: scrapperRequest.url,
-      pathParams: scrapperRequest.pathParams,
-      queryParam: scrapperRequest.queryParams,
-    );
     final controller = WebScrapperGeminiImpl.startChat(
-      initialPayload: InitialPayloadDataCreatingFromZero(
-        targetExampleUrl: referenceTestData.referenceLinkUsed,
-        webScrapperRequest: webScrapperRequest,
+      initialPayload: IChatController.getInitialPayloadDate(
+        referenceTestData: referenceTestData,
+        scrapperRequest: scrapperRequest,
+        currentFetchSettings: currentFetchSettings,
       ),
       model: GeminiModel.gemini25Flash,
     );

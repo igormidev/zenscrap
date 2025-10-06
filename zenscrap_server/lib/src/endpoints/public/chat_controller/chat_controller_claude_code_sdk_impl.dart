@@ -18,17 +18,14 @@ class ChatControllerClaudeCodeSdkImpl extends IChatController
     required int scrappableId,
     required ReferenceTestData referenceTestData,
     required ScrappableRequest scrapperRequest,
+    required ScrappingBeeExtractLogic? currentFetchSettings,
     ClaudeModel model = ClaudeModel.claudeSonnet4,
   }) {
-    final webScrapperRequest = WebScrapperRequest(
-      url: scrapperRequest.url,
-      pathParams: scrapperRequest.pathParams,
-      queryParam: scrapperRequest.queryParams,
-    );
     final controller = WebScrapperClaudeImpl.startChat(
-      initialPayload: InitialPayloadDataCreatingFromZero(
-        targetExampleUrl: referenceTestData.referenceLinkUsed,
-        webScrapperRequest: webScrapperRequest,
+      initialPayload: IChatController.getInitialPayloadDate(
+        referenceTestData: referenceTestData,
+        scrapperRequest: scrapperRequest,
+        currentFetchSettings: currentFetchSettings,
       ),
       model: model,
     );

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:serverpod/serverpod.dart';
+import 'package:web_scrapper_generator/web_scrapper_generator.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 abstract class IChatController {
@@ -18,4 +19,40 @@ abstract class IChatController {
     required StreamController<ChatResponse> chatSeason,
     required StreamController<String> thinkingStream,
   });
+
+  static InitialPayloadData getInitialPayloadDate({
+    required ReferenceTestData referenceTestData,
+    required ScrappableRequest scrapperRequest,
+    required ScrappingBeeExtractLogic? currentFetchSettings,
+  }) {
+    final webScrapperRequest = WebScrapperRequest(
+      url: scrapperRequest.url,
+      pathParams: scrapperRequest.pathParams,
+      queryParam: scrapperRequest.queryParams,
+    );
+    if (currentFetchSettings != null) {
+      return InitialPayloadDataEditingExistingWebScrapper(
+        currentFetchSettings: ScrappingBeeFetchSettings(
+          url: referenceTestData.referenceLinkUsed,
+          extract_rules: currentFetchSettings.extractRules,
+          js_scenario: currentFetchSettings.jsScenario,
+          render_js: currentFetchSettings.renderJs,
+          premium_proxy: currentFetchSettings.premiumProxy,
+          stealth_proxy: currentFetchSettings.stealthProxy,
+          wait: currentFetchSettings.wait,
+          wait_for: currentFetchSettings.waitFor,
+          wait_browser: currentFetchSettings.waitBrowser,
+          country_code: currentFetchSettings.countryCode,
+          session_id: currentFetchSettings.sessionId,
+          custom_google: currentFetchSettings.customGoogle,
+        ),
+        currentRequest: webScrapperRequest,
+      );
+    }
+
+    return InitialPayloadDataCreatingFromZero(
+      targetExampleUrl: referenceTestData.referenceLinkUsed,
+      webScrapperRequest: webScrapperRequest,
+    );
+  }
 }

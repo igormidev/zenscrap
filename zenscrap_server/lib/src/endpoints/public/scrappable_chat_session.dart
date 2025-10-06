@@ -103,6 +103,7 @@ class ScrappableChatSession extends Endpoint {
       scrappableId: scrappable.id!,
       scrapperRequest: scrapperRequest,
       referenceTestData: referenceTestData,
+      currentFetchSettings: scrappable.scrappingBeeExtractRules,
     );
     _cacheRefTestData[sessionUuid] = referenceTestData;
     _cacheScrappingBeeExtractLogic[sessionUuid] = scrappingBeeExtractLogic;

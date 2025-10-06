@@ -11,29 +11,30 @@ class ChatControllerCodexSdkImpl extends IChatController
   @override
   String get providerName => 'Codex';
 
-  const ChatControllerCodexSdkImpl._(
-      {required this.controller, required super.scrappableId});
+  const ChatControllerCodexSdkImpl._({
+    required this.controller,
+    required super.scrappableId,
+  });
 
   factory ChatControllerCodexSdkImpl.startChat({
     required int scrappableId,
     required ReferenceTestData referenceTestData,
     required ScrappableRequest scrapperRequest,
+    required ScrappingBeeExtractLogic? currentFetchSettings,
     CodexModel model = CodexModel.gpt5Codex,
   }) {
-    final webScrapperRequest = WebScrapperRequest(
-      url: scrapperRequest.url,
-      pathParams: scrapperRequest.pathParams,
-      queryParam: scrapperRequest.queryParams,
-    );
     final controller = WebScrapperCodexImpl.startChat(
-      initialPayload: InitialPayloadDataCreatingFromZero(
-        targetExampleUrl: referenceTestData.referenceLinkUsed,
-        webScrapperRequest: webScrapperRequest,
+      initialPayload: IChatController.getInitialPayloadDate(
+        referenceTestData: referenceTestData,
+        scrapperRequest: scrapperRequest,
+        currentFetchSettings: currentFetchSettings,
       ),
     );
 
     return ChatControllerCodexSdkImpl._(
-        controller: controller, scrappableId: scrappableId);
+      controller: controller,
+      scrappableId: scrappableId,
+    );
   }
 
   @override
