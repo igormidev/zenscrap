@@ -20,6 +20,7 @@ class GeminiChatOptions extends CliChatOptions {
     super.systemPrompt,
     super.model,
     super.cwd,
+    super.runType,
   });
 
   /// Explicit list of tools Gemini is allowed to call.
@@ -168,6 +169,7 @@ class GeminiChatOptions extends CliChatOptions {
     String? systemPrompt,
     String? model,
     String? cwd,
+    RunType? runType,
   }) {
     return GeminiChatOptions(
       allowedTools: allowedTools ?? this.allowedTools,
@@ -188,6 +190,7 @@ class GeminiChatOptions extends CliChatOptions {
       systemPrompt: systemPrompt ?? this.systemPrompt,
       model: model ?? this.model,
       cwd: cwd ?? this.cwd,
+      runType: runType ?? this.runType,
     );
   }
 }

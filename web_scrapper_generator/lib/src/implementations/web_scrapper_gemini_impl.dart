@@ -15,7 +15,7 @@ class WebScrapperGeminiImpl
 
   /// Initialize the Gemini SDK and its MCP servers
   static Future<void> initGemini({
-    required String geminiApiKey,
+    required String? geminiApiKey,
     required String scrappingBeeApiKey,
     required ScrappingBeeProxyConfig proxyConfig,
   }) async {
@@ -26,6 +26,9 @@ class WebScrapperGeminiImpl
     );
 
     print('🚀 Initializing Gemini SDK for web scraper generator...\n');
+    if (geminiApiKey == null || geminiApiKey.isEmpty) {
+      print('⚠️  No Gemini API key provided. Gemini will use logged-in credentials if available.');
+    }
     _geminiSDK = GeminiSDK(apiKey: geminiApiKey);
 
     // Ensure Gemini CLI is installed and up to date

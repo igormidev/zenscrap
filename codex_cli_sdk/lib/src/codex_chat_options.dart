@@ -69,6 +69,7 @@ class CodexChatOptions extends CliChatOptions {
     super.systemPrompt,
     super.model,
     super.cwd,
+    super.runType,
   });
 
   /// Converts the options into command line arguments that are handed to the Codex CLI.
@@ -154,6 +155,7 @@ class CodexChatOptions extends CliChatOptions {
     String? systemPrompt,
     String? model,
     String? cwd,
+    RunType? runType,
   }) {
     return CodexChatOptions(
       maxTurns: maxTurns ?? this.maxTurns,
@@ -174,6 +176,7 @@ class CodexChatOptions extends CliChatOptions {
       systemPrompt: systemPrompt ?? this.systemPrompt,
       model: model ?? this.model,
       cwd: cwd ?? this.cwd,
+      runType: runType ?? this.runType,
     );
   }
 }

@@ -11,7 +11,8 @@ class CreateScrappableEndpoint extends Endpoint {
     final userId = (await session.authenticated)?.userId;
 
     final GenerativeModel geminiModel = GenerativeModel(
-      model: 'gemini-2.5-pro',
+      // model: 'gemini-2.5-pro',
+      model: 'gemini-2.5-flash-lite-preview-09-2025',
       apiKey: session.passwords['geminiApiKey']!,
       systemInstruction: Content.system(
           'You are a helpful assistant that analyzes URLs and converts them into structured data for API request handling. '
@@ -49,32 +50,6 @@ class CreateScrappableEndpoint extends Endpoint {
     late final List<String> pathParams;
     late final Map<String, String> referenceLinkPathParameters;
     late final ScraperCategory category;
-
-    // final scrapingResult = await scrappingBee.fetchHtmlAndScreenshot(
-    //   targetUrl: referenceLink,
-    //   scrappingBeeExtractLogic: extractLogic,
-    // );
-
-    // scrapingResult.when(
-    //   withData: (result, html, pageFullscreenScreenshot) {
-    //     // Process the successful result
-    //     final Map<String, dynamic> extractedData = result;
-    //     final String htmlContent = html;
-    //     final Uint8List screenshot = pageFullscreenScreenshot;
-    //   },
-    //   error: (errorMessage) {
-    //     throw ZenScrapException(
-    //       title: 'Failed to fetch webpage',
-    //       description: errorMessage,
-    //     );
-    //   },
-    // );
-
-    // // Convert HTML to bytes for file-like upload
-    // final Uint8List htmlBytes = utf8.encode(html);
-    // final ByteData htmlByteData = ByteData.view(htmlBytes.buffer);
-    // final ByteData screenshotByteData =
-    //     ByteData.view(pageFullscreenScreenshot.buffer);
 
     try {
       final Map<String, dynamic> convertedData =

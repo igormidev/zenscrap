@@ -8,7 +8,7 @@ import 'codex_chat_options.dart';
 
 /// Main Codex SDK class for interacting with the OpenAI Codex CLI.
 class Codex extends CodingCliInterface<CodexChat, CodexChatOptions> {
-  Codex({required super.apiKey});
+  Codex({super.apiKey});
 
   @override
   CodexChat createNewChat({CodexChatOptions? options}) {
@@ -178,7 +178,15 @@ class Codex extends CodingCliInterface<CodexChat, CodexChatOptions> {
   /// Note: when invoked from a child process this will not mutate the parent
   /// shell's environment. It is mainly intended for scripted setups where the
   /// command output is piped into the user's shell.
+  ///
+  /// Throws [CliException] if no API key is provided or export fails.
   Future<void> exportApiKeyToEnvironment() async {
+    if (apiKey == null || apiKey!.isEmpty) {
+      throw CliException(
+        'Cannot export API key: No API key provided. Use logged-in credentials instead.',
+      );
+    }
+
     final command = Platform.isWindows
         ? 'setx OPENAI_API_KEY "$apiKey"'
         : 'export OPENAI_API_KEY="$apiKey"';

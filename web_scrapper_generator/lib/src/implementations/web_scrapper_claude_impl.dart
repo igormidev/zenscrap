@@ -15,7 +15,7 @@ class WebScrapperClaudeImpl
 
   /// Initialize the Claude SDK and its MCP servers
   static Future<void> initClaude({
-    required String claudeApiKey,
+    required String? claudeApiKey,
     required String scrappingBeeApiKey,
     required ScrappingBeeProxyConfig proxyConfig,
   }) async {
@@ -26,6 +26,9 @@ class WebScrapperClaudeImpl
     );
 
     print('🚀 Initializing Claude SDK for web scraper generator...\n');
+    if (claudeApiKey == null || claudeApiKey.isEmpty) {
+      print('⚠️  No Claude API key provided. Claude will use logged-in credentials if available.');
+    }
     _claudeSDK = Claude(apiKey: claudeApiKey);
 
     // Ensure Claude Code CLI is installed and up to date

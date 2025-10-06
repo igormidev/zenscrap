@@ -20,6 +20,7 @@ class ClaudeChatOptions extends CliChatOptions {
     super.systemPrompt,
     super.model,
     super.cwd,
+    super.runType,
   });
 
   List<String> toCliArgs() {
@@ -67,6 +68,7 @@ class ClaudeChatOptions extends CliChatOptions {
     String? systemPrompt,
     String? model,
     String? cwd,
+    RunType? runType,
   }) {
     return ClaudeChatOptions(
       maxTurns: maxTurns ?? this.maxTurns,
@@ -79,6 +81,7 @@ class ClaudeChatOptions extends CliChatOptions {
       systemPrompt: systemPrompt ?? this.systemPrompt,
       model: model ?? this.model,
       cwd: cwd ?? this.cwd,
+      runType: runType ?? this.runType,
     );
   }
 }

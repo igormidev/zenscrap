@@ -12,7 +12,7 @@ class GeminiChat extends CliChatInterface<GeminiChatOptions> {
     super.options,
   })  : _sessionId = options?.resumeSessionId;
 
-  final String apiKey;
+  final String? apiKey;
   bool _didSendFirstMessage = false;
   bool _isDisposed = false;
   Process? _activeProcess;
@@ -170,13 +170,35 @@ ${_options.systemPrompt}
 
   Map<String, String> _buildEnvironment() {
     final env = Map<String, String>.from(Platform.environment);
-    env['GEMINI_API_KEY'] = apiKey;
+
+    // Determine if we should use API key based on runType or fallback to default behavior
+    final shouldUseApiKey = _shouldUseApiKey();
+
+    if (shouldUseApiKey && apiKey != null && apiKey!.isNotEmpty) {
+      env['GEMINI_API_KEY'] = apiKey!;
+    }
 
     if (_options.environment != null) {
       env.addAll(_options.environment!);
     }
 
     return env;
+  }
+
+  /// Determines whether to use API key authentication based on runType and apiKey availability
+  bool _shouldUseApiKey() {
+    final runType = _options.runType;
+
+    // If runType is explicitly set, respect that choice
+    if (runType == RunType.withApiKey) {
+      return true;
+    }
+    if (runType == RunType.withLoggedInAccountCredits) {
+      return false;
+    }
+
+    // Default behavior: use API key if provided and not empty
+    return apiKey != null && apiKey!.isNotEmpty;
   }
 
   Stream<String> _decorateStream(Stream<String> stream) {

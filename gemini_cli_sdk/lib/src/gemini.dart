@@ -8,7 +8,7 @@ import 'gemini_chat.dart';
 import 'gemini_chat_options.dart';
 
 class Gemini extends CodingCliInterface<GeminiChat, GeminiChatOptions> {
-  Gemini({required super.apiKey});
+  Gemini({super.apiKey});
 
   @override
   GeminiChat createNewChat({GeminiChatOptions? options}) {
@@ -165,6 +165,12 @@ class Gemini extends CodingCliInterface<GeminiChat, GeminiChatOptions> {
   }
 
   Future<void> exportApiKeyToEnvironment() async {
+    if (apiKey == null || apiKey!.isEmpty) {
+      throw CliException(
+        'Cannot export API key: No API key provided. Use logged-in credentials instead.',
+      );
+    }
+
     final command = Platform.isWindows
         ? 'setx GEMINI_API_KEY "$apiKey"'
         : 'export GEMINI_API_KEY="$apiKey"';

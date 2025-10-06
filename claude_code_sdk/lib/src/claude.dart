@@ -8,7 +8,7 @@ import 'claude_chat.dart';
 import 'claude_chat_options.dart';
 
 class Claude extends CodingCliInterface<ClaudeChat, ClaudeChatOptions> {
-  Claude({required super.apiKey});
+  Claude({super.apiKey});
 
   @override
   ClaudeChat createNewChat({ClaudeChatOptions? options}) {
@@ -232,6 +232,12 @@ class Claude extends CodingCliInterface<ClaudeChat, ClaudeChatOptions> {
   }
 
   Future<void> exportApiKeyToEnvironment() async {
+    if (apiKey == null || apiKey!.isEmpty) {
+      throw CliException(
+        'Cannot export API key: No API key provided. Use logged-in credentials instead.',
+      );
+    }
+
     final command = Platform.isWindows
         ? 'setx ANTHROPIC_API_KEY "$apiKey"'
         : 'export ANTHROPIC_API_KEY="$apiKey"';

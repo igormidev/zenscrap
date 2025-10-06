@@ -2,18 +2,16 @@
 
 import 'package:programming_cli_core_sdk/src/cli_chat_interface.dart';
 import 'package:programming_cli_core_sdk/src/cli_chat_options_interface.dart';
-import 'package:programming_cli_core_sdk/src/cli_exception.dart';
 
 abstract class CodingCliInterface<
   C extends CliChatInterface,
   O extends CliChatOptions
 > {
-  /// The API key for authenticating with the cli provider service
-  final String apiKey;
+  /// The API key for authenticating with the cli provider service.
+  /// If null or empty, the CLI will use logged-in credentials if available.
+  final String? apiKey;
 
-  CodingCliInterface({required this.apiKey}) {
-    if (apiKey.isEmpty) throw CliException('API key cannot be empty');
-  }
+  CodingCliInterface({this.apiKey});
 
   /// List of active chat sessions for cleanup
   final List<C> activeSessions = [];

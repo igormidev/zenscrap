@@ -17,7 +17,7 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
 
   /// Initialize the Codex SDK and its MCP servers
   static Future<void> initCodex({
-    required String codexApiKey,
+    required String? codexApiKey,
     required String scrappingBeeApiKey,
     required ScrappingBeeProxyConfig proxyConfig,
     bool skipCliSetup = false,
@@ -29,6 +29,9 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
     );
 
     print('🚀 Initializing Codex SDK for web scraper generator...\n');
+    if (codexApiKey == null || codexApiKey.isEmpty) {
+      print('⚠️  No OpenAI API key provided. Codex will use logged-in credentials if available.');
+    }
     _codexSDK = Codex(apiKey: codexApiKey);
 
     if (skipCliSetup) {
@@ -100,6 +103,7 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
       systemPrompt: overrides?.systemPrompt ?? defaultOptions.systemPrompt,
       model: overrides?.model ?? defaultOptions.model,
       cwd: overrides?.cwd ?? defaultOptions.cwd,
+      runType: overrides?.runType ?? defaultOptions.runType,
     );
 
     final chat = _codexSDK.createNewChat(options: mergedOptions);
