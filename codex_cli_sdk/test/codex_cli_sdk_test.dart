@@ -3,10 +3,6 @@ import 'package:test/test.dart';
 
 void main() {
   group('Codex', () {
-    test('throws when API key is empty', () {
-      expect(() => Codex(apiKey: ''), throwsA(isA<CliException>()));
-    });
-
     test('creates chat instances', () {
       final sdk = Codex(apiKey: 'test-key');
       final chat = sdk.createNewChat();
@@ -14,9 +10,9 @@ void main() {
       expect(chat.didSendFirstMessage, isFalse);
     });
 
-    test('exportApiKeyToEnvironment runs without throwing', () async {
+    test('addApiKeyToEnvironment runs without throwing', () async {
       final sdk = Codex(apiKey: 'secret');
-      await sdk.exportApiKeyToEnvironment();
+      await sdk.addApiKeyToEnvironment('secret');
     });
   });
 

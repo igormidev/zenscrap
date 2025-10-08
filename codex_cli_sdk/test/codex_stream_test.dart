@@ -9,7 +9,7 @@ void main() {
           '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';
       final sdk = Codex(apiKey: codexApiKey);
 
-      await sdk.exportApiKeyToEnvironment();
+      await sdk.addApiKeyToEnvironment(codexApiKey);
 
       final chat = sdk.createNewChat(
         options: const CodexChatOptions(

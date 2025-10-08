@@ -1,6 +1,6 @@
 name: codex_cli_sdk
 description: A powerful Dart SDK for interacting with OpenAI Codex CLI, providing seamless integration with AI-powered coding assistance through the Codex CLI tool.
-version: 3.0.0
+version: 4.0.0
 publish_to: none
 homepage: https://github.com/yourusername/codex_cli_sdk
 repository: https://github.com/yourusername/codex_cli_sdk

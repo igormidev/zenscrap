@@ -5,10 +5,6 @@ import 'package:test/test.dart';
 
 void main() {
   group('Claude', () {
-    test('throws when API key is empty', () {
-      expect(() => Claude(apiKey: ''), throwsA(isA<CliException>()));
-    });
-
     test('creates chat instances', () {
       final sdk = Claude(apiKey: 'test-key');
       final chat = sdk.createNewChat();
@@ -16,13 +12,13 @@ void main() {
       expect(chat.didSendFirstMessage, isFalse);
     });
 
-    test('exportApiKeyToEnvironment runs without throwing', () async {
+    test('addApiKeyToEnvironment runs without throwing', () async {
       final sdk = Claude(apiKey: 'secret');
       if (Platform.isWindows) {
         // Avoid modifying the persistent env on Windows during tests.
-        await expectLater(sdk.exportApiKeyToEnvironment(), completes);
+        await expectLater(sdk.addApiKeyToEnvironment('secret'), completes);
       } else {
-        await sdk.exportApiKeyToEnvironment();
+        await sdk.addApiKeyToEnvironment('secret');
       }
     });
   });

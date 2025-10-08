@@ -1,3 +1,18 @@
+## 4.0.0
+
+### Breaking Changes
+- **API Key Management Refactor**: `Gemini` class now manages its own `apiKey` field directly instead of inheriting from base class.
+- **Method Renamed**: `exportApiKeyToEnvironment()` has been replaced with `addApiKeyToEnvironment(String apiKey)` to match the new abstract interface signature.
+
+### Added
+- **Implements new `addApiKeyToEnvironment(String apiKey)` method**: Sets the `GEMINI_API_KEY` environment variable to allow CLI authentication without login.
+- **Explicit API Key Field**: The `apiKey` is now a final field in the `Gemini` class for better clarity.
+
+### Migration Guide
+- No changes needed for SDK instantiation: `Gemini(apiKey: 'your-key')` remains the same.
+- Call `await gemini.addApiKeyToEnvironment(apiKey)` after creating the instance to ensure CLI authentication works.
+- If you were using `exportApiKeyToEnvironment()`, rename it to `addApiKeyToEnvironment(apiKey)`.
+
 ## 3.0.0
 
 ### Breaking Changes

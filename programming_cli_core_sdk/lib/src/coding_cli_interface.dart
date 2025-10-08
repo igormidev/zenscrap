@@ -7,12 +7,6 @@ abstract class CodingCliInterface<
   C extends CliChatInterface,
   O extends CliChatOptions
 > {
-  /// The API key for authenticating with the cli provider service.
-  /// If null or empty, the CLI will use logged-in credentials if available.
-  final String? apiKey;
-
-  CodingCliInterface({this.apiKey});
-
   /// List of active chat sessions for cleanup
   final List<C> activeSessions = [];
 
@@ -30,5 +24,14 @@ abstract class CodingCliInterface<
 
   /// Gets information about the installed SDK
   Future<Map<String, dynamic>> getSDKInfo();
+
+  /// Adds the API key to the environment variables for the current process.
+  /// This allows the CLI tool to authenticate without requiring login.
+  ///
+  /// Each implementation should set the appropriate environment variable:
+  /// - Codex: OPENAI_API_KEY
+  /// - Claude: ANTHROPIC_API_KEY
+  /// - Gemini: GEMINI_API_KEY
+  Future<void> addApiKeyToEnvironment(String apiKey);
 }
 
