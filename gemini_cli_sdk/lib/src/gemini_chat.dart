@@ -8,11 +8,10 @@ import 'gemini_chat_options.dart';
 
 class GeminiChat extends CliChatInterface<GeminiChatOptions> {
   GeminiChat({
-    required this.apiKey,
+    super.apiKey,
     super.options,
   })  : _sessionId = options?.resumeSessionId;
 
-  final String apiKey;
   bool _didSendFirstMessage = false;
   bool _isDisposed = false;
   Process? _activeProcess;
@@ -170,7 +169,11 @@ ${_options.systemPrompt}
 
   Map<String, String> _buildEnvironment() {
     final env = Map<String, String>.from(Platform.environment);
-    env['GEMINI_API_KEY'] = apiKey;
+
+    // Only set API key if provided
+    if (apiKey != null) {
+      env['GEMINI_API_KEY'] = apiKey!;
+    }
 
     if (_options.environment != null) {
       env.addAll(_options.environment!);

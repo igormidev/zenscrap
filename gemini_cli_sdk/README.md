@@ -20,9 +20,10 @@ A powerful Dart SDK for interacting with Google Gemini CLI, providing seamless i
    - Install globally: `npm install -g @google/gemini-cli`
    - Or use the SDK's `installGeminiCLI()` helper
 
-3. **Gemini API Key**
+3. **Gemini API Key** (Optional)
    - Create one in [Google AI Studio](https://makersuite.google.com/app/apikey)
-   - Export it as `GEMINI_API_KEY` or pass it directly to the SDK
+   - Or sign in to Gemini CLI with: `gemini login`
+   - Or export it as `GEMINI_API_KEY` environment variable
 
 ## Installation
 
@@ -47,10 +48,60 @@ As of v3.0.0 the Gemini SDK is a thin implementation on top of `programming_cli_
 
 ## Quick Start
 
+### Authentication Options
+
+The SDK supports three authentication methods:
+
+**Option 1: Use CLI Login (Recommended for Development)**
 ```dart
 import 'package:gemini_cli_sdk/gemini_cli_sdk.dart';
 
 Future<void> main() async {
+  // No API key needed - uses existing CLI authentication
+  final gemini = Gemini();
+
+  final chat = gemini.createNewChat();
+  // ... use the chat
+}
+```
+
+**Option 2: Provide API Key to SDK**
+```dart
+import 'package:gemini_cli_sdk/gemini_cli_sdk.dart';
+
+Future<void> main() async {
+  // API key applies to all chats from this SDK instance
+  final gemini = Gemini(apiKey: 'YOUR_API_KEY');
+
+  final chat = gemini.createNewChat();
+  // ... use the chat
+}
+```
+
+**Option 3: Provide API Key Per Chat**
+```dart
+import 'package:gemini_cli_sdk/gemini_cli_sdk.dart';
+
+Future<void> main() async {
+  final gemini = Gemini(apiKey: 'DEFAULT_KEY');
+
+  // This chat uses the SDK's default key
+  final chat1 = gemini.createNewChat();
+
+  // This chat overrides with a different key
+  final chat2 = gemini.createNewChat(apiKey: 'SPECIAL_KEY');
+
+  // ... use the chats
+}
+```
+
+### Basic Usage
+
+```dart
+import 'package:gemini_cli_sdk/gemini_cli_sdk.dart';
+
+Future<void> main() async {
+  // Initialize the SDK (API key is optional)
   final gemini = Gemini(apiKey: 'YOUR_API_KEY');
   final chat = gemini.createNewChat(
     options: const GeminiChatOptions(

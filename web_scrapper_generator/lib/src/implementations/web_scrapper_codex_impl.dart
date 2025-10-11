@@ -31,8 +31,10 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
     print('🚀 Initializing Codex SDK for web scraper generator...\n');
     _codexSDK = Codex(apiKey: codexApiKey);
 
-    // Add API key to environment so CLI can authenticate
-    await _codexSDK.addApiKeyToEnvironment(codexApiKey);
+    // Add API key to environment so CLI can authenticate (only if provided)
+    if (codexApiKey.isNotEmpty) {
+      await _codexSDK.addApiKeyToEnvironment(codexApiKey);
+    }
 
     if (skipCliSetup) {
       return;

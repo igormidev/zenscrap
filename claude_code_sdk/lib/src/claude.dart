@@ -8,14 +8,17 @@ import 'claude_chat.dart';
 import 'claude_chat_options.dart';
 
 class Claude extends CodingCliInterface<ClaudeChat, ClaudeChatOptions> {
-  Claude({required this.apiKey});
+  Claude({this.apiKey});
 
-  /// The API key for authenticating with Claude Code CLI
-  final String apiKey;
+  /// Optional default API key for authenticating with Claude Code CLI.
+  /// If not provided, assumes the CLI is already configured via login or environment.
+  final String? apiKey;
 
   @override
-  ClaudeChat createNewChat({ClaudeChatOptions? options}) {
-    final chat = ClaudeChat(apiKey: apiKey, options: options);
+  ClaudeChat createNewChat({ClaudeChatOptions? options, String? apiKey}) {
+    // Use chat-specific apiKey if provided, otherwise use SDK's default
+    final effectiveApiKey = apiKey ?? this.apiKey;
+    final chat = ClaudeChat(apiKey: effectiveApiKey, options: options);
     activeSessions.add(chat);
     return chat;
   }

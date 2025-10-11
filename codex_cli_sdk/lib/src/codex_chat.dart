@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:programming_cli_core_sdk/programming_cli_core_sdk.dart';
@@ -7,14 +8,14 @@ import 'codex_chat_options.dart';
 
 class CodexChat extends CliChatInterface<CodexChatOptions> {
   CodexChat({
-    required this.apiKey,
+    super.apiKey,
     super.options,
   }) : _sessionId = options?.resumeSessionId;
 
-  final String apiKey;
   bool _didSendFirstMessage = false;
   bool _isDisposed = false;
   String? _sessionId;
+  Directory? _codexHomeDir;
 
   CodexChatOptions get _options => options ?? const CodexChatOptions();
 
@@ -49,6 +50,16 @@ class CodexChat extends CliChatInterface<CodexChatOptions> {
   Future<void> dispose() async {
     if (_isDisposed) return;
     await super.dispose();
+
+    // Clean up isolated CODEX_HOME directory
+    if (_codexHomeDir != null) {
+      try {
+        await _codexHomeDir!.parent.delete(recursive: true);
+      } catch (_) {
+        // Ignore cleanup errors
+      }
+    }
+
     _isDisposed = true;
   }
 
@@ -57,6 +68,11 @@ class CodexChat extends CliChatInterface<CodexChatOptions> {
     _ensureNotDisposed();
     filePreffix = '';
     await _ensureBaseDirExists();
+
+    // If API key is provided and we haven't logged in yet, do stdin login
+    if (apiKey != null && _codexHomeDir == null) {
+      await _loginViaStdin();
+    }
 
     final args = _buildCommandArgs(message);
     final environment = _buildEnvironment();
@@ -133,9 +149,54 @@ class CodexChat extends CliChatInterface<CodexChatOptions> {
     return _sessionId ?? _options.resumeSessionId;
   }
 
+  /// Logs in to Codex CLI using API key via stdin (Codex >= 0.36.0 approach)
+  Future<void> _loginViaStdin() async {
+    // Create isolated CODEX_HOME directory
+    final tempDir = await Directory.systemTemp.createTemp('codex_cli_');
+    _codexHomeDir = Directory('${tempDir.path}/.codex')
+      ..createSync(recursive: true);
+
+    // Build environment for login
+    final loginEnv = {
+      ...Platform.environment,
+      'CODEX_HOME': _codexHomeDir!.path,
+      'HOME': tempDir.path,
+      // Disable any parent OPENAI_* vars
+      'OPENAI_API_KEY': '',
+      'AZURE_OPENAI_API_KEY': '',
+    };
+
+    // Run: codex login --with-api-key (and pipe API key to stdin)
+    final loginProc = await Process.start(
+      'codex',
+      ['login', '--with-api-key'],
+      environment: loginEnv,
+    );
+
+    // Write API key to stdin
+    loginProc.stdin
+      ..write(apiKey!)
+      ..close();
+
+    // Wait for login to complete
+    final exitCode = await loginProc.exitCode;
+    if (exitCode != 0) {
+      final stderr = await loginProc.stderr.transform(utf8.decoder).join();
+      throw CliException('Codex login failed with exit code $exitCode: $stderr');
+    }
+  }
+
   Map<String, String> _buildEnvironment() {
     final env = Map<String, String>.from(Platform.environment);
-    env['OPENAI_API_KEY'] = apiKey;
+
+    // If we created an isolated CODEX_HOME, use it
+    if (_codexHomeDir != null) {
+      env['CODEX_HOME'] = _codexHomeDir!.path;
+      env['HOME'] = _codexHomeDir!.parent.path;
+      // Disable parent OPENAI_* vars to avoid conflicts
+      env['OPENAI_API_KEY'] = '';
+      env['AZURE_OPENAI_API_KEY'] = '';
+    }
 
     if (_options.environment != null) {
       env.addAll(_options.environment!);

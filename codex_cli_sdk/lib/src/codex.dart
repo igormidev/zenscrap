@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:path/path.dart' as path;
@@ -8,14 +9,17 @@ import 'codex_chat_options.dart';
 
 /// Main Codex SDK class for interacting with the OpenAI Codex CLI.
 class Codex extends CodingCliInterface<CodexChat, CodexChatOptions> {
-  Codex({required this.apiKey});
+  Codex({this.apiKey});
 
-  /// The API key for authenticating with OpenAI Codex CLI
-  final String apiKey;
+  /// Optional default API key for authenticating with OpenAI Codex CLI.
+  /// If not provided, assumes the CLI is already configured via login or environment.
+  final String? apiKey;
 
   @override
-  CodexChat createNewChat({CodexChatOptions? options}) {
-    final chat = CodexChat(apiKey: apiKey, options: options);
+  CodexChat createNewChat({CodexChatOptions? options, String? apiKey}) {
+    // Use chat-specific apiKey if provided, otherwise use SDK's default
+    final effectiveApiKey = apiKey ?? this.apiKey;
+    final chat = CodexChat(apiKey: effectiveApiKey, options: options);
     activeSessions.add(chat);
     return chat;
   }
@@ -174,21 +178,23 @@ class Codex extends CodingCliInterface<CodexChat, CodexChatOptions> {
 
   @override
   Future<void> addApiKeyToEnvironment(String apiKey) async {
-    final command = Platform.isWindows
-        ? 'setx OPENAI_API_KEY "$apiKey"'
-        : 'export OPENAI_API_KEY="$apiKey"';
-
-    final result = await Process.run(
-      _shellCommand,
-      _shellArgs(command),
+    // Since Codex >= 0.36.0, we use stdin login instead of env vars
+    // This method now performs a login to make the API key available system-wide
+    final loginProc = await Process.start(
+      'codex',
+      ['login', '--with-api-key'],
     );
 
-    if (result.exitCode != 0) {
-      final errorOutput = (result.stderr as String?)?.trim().isNotEmpty == true
-          ? result.stderr.toString().trim()
-          : result.stdout.toString().trim();
+    // Write API key to stdin
+    loginProc.stdin
+      ..write(apiKey)
+      ..close();
+
+    final exitCode = await loginProc.exitCode;
+    if (exitCode != 0) {
+      final stderr = await loginProc.stderr.transform(utf8.decoder).join();
       throw CliException(
-        'Failed to export OPENAI_API_KEY. Exit code ${result.exitCode}.${errorOutput.isEmpty ? '' : ' Error: $errorOutput'}',
+        'Failed to login to Codex CLI. Exit code $exitCode. Error: $stderr',
       );
     }
   }

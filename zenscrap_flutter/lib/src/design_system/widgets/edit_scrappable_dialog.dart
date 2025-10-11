@@ -234,8 +234,9 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
                             // Get the form state to access the setWillHideFromMarketplace method
                             final formState = context.findAncestorStateOfType<
                                 _ScrappableEditFormState>();
-                            if (formState == null)
+                            if (formState == null) {
                               return const SizedBox.shrink();
+                            }
 
                             return HideFromMarketplaceToggle(
                               initialValue:

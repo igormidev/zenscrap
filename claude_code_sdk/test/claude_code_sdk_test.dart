@@ -5,15 +5,30 @@ import 'package:test/test.dart';
 
 void main() {
   group('Claude', () {
-    test('creates chat instances', () {
+    test('creates chat instances without API key', () {
+      final sdk = Claude();
+      final chat = sdk.createNewChat();
+      expect(chat, isA<ClaudeChat>());
+      expect(chat.didSendFirstMessage, isFalse);
+      expect(chat.apiKey, isNull);
+    });
+
+    test('creates chat instances with API key', () {
       final sdk = Claude(apiKey: 'test-key');
       final chat = sdk.createNewChat();
       expect(chat, isA<ClaudeChat>());
       expect(chat.didSendFirstMessage, isFalse);
+      expect(chat.apiKey, equals('test-key'));
+    });
+
+    test('chat can override SDK API key', () {
+      final sdk = Claude(apiKey: 'sdk-key');
+      final chat = sdk.createNewChat(apiKey: 'chat-key');
+      expect(chat.apiKey, equals('chat-key'));
     });
 
     test('addApiKeyToEnvironment runs without throwing', () async {
-      final sdk = Claude(apiKey: 'secret');
+      final sdk = Claude();
       if (Platform.isWindows) {
         // Avoid modifying the persistent env on Windows during tests.
         await expectLater(sdk.addApiKeyToEnvironment('secret'), completes);

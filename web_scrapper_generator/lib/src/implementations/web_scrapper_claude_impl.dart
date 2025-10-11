@@ -28,8 +28,10 @@ class WebScrapperClaudeImpl
     print('🚀 Initializing Claude SDK for web scraper generator...\n');
     _claudeSDK = Claude(apiKey: claudeApiKey);
 
-    // Add API key to environment so CLI can authenticate
-    await _claudeSDK.addApiKeyToEnvironment(claudeApiKey);
+    // Add API key to environment so CLI can authenticate (only if provided)
+    if (claudeApiKey.isNotEmpty) {
+      await _claudeSDK.addApiKeyToEnvironment(claudeApiKey);
+    }
 
     // Ensure Claude Code CLI is installed and up to date
     await _claudeSDK.updateToNewestVersionIfNeeded(global: true);

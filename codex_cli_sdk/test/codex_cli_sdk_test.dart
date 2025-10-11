@@ -3,15 +3,30 @@ import 'package:test/test.dart';
 
 void main() {
   group('Codex', () {
-    test('creates chat instances', () {
+    test('creates chat instances without API key', () {
+      final sdk = Codex();
+      final chat = sdk.createNewChat();
+      expect(chat, isA<CodexChat>());
+      expect(chat.didSendFirstMessage, isFalse);
+      expect(chat.apiKey, isNull);
+    });
+
+    test('creates chat instances with API key', () {
       final sdk = Codex(apiKey: 'test-key');
       final chat = sdk.createNewChat();
       expect(chat, isA<CodexChat>());
       expect(chat.didSendFirstMessage, isFalse);
+      expect(chat.apiKey, equals('test-key'));
+    });
+
+    test('chat can override SDK API key', () {
+      final sdk = Codex(apiKey: 'sdk-key');
+      final chat = sdk.createNewChat(apiKey: 'chat-key');
+      expect(chat.apiKey, equals('chat-key'));
     });
 
     test('addApiKeyToEnvironment runs without throwing', () async {
-      final sdk = Codex(apiKey: 'secret');
+      final sdk = Codex();
       await sdk.addApiKeyToEnvironment('secret');
     });
   });

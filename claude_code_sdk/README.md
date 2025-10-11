@@ -26,8 +26,9 @@ Before using this SDK, you need:
    - Install globally: `npm install -g @anthropic-ai/claude-code`
    - Or use the SDK's built-in installer (see below)
 
-3. **Anthropic API Key**
+3. **Anthropic API Key** (Optional)
    - Get your API key from [Anthropic Console](https://console.anthropic.com/)
+   - Or sign in to Claude Code CLI (if supported by your version)
 
 ## Installation
 
@@ -69,24 +70,71 @@ As of version 2.0.0, the SDK supports the latest Claude models:
 
 ## Quick Start
 
+### Authentication Options
+
+The SDK supports three authentication methods:
+
+**Option 1: Use CLI Login (Recommended for Development)**
+```dart
+import 'package:claude_code_sdk/claude_code_sdk.dart';
+
+void main() async {
+  // No API key needed - uses existing CLI authentication
+  final claudeSDK = Claude();
+
+  final claudeChat = claudeSDK.createNewChat();
+  // ... use the chat
+}
+```
+
+**Option 2: Provide API Key to SDK**
+```dart
+import 'package:claude_code_sdk/claude_code_sdk.dart';
+
+void main() async {
+  // API key applies to all chats from this SDK instance
+  final claudeSDK = Claude(apiKey: 'YOUR_API_KEY');
+
+  final claudeChat = claudeSDK.createNewChat();
+  // ... use the chat
+}
+```
+
+**Option 3: Provide API Key Per Chat**
+```dart
+import 'package:claude_code_sdk/claude_code_sdk.dart';
+
+void main() async {
+  final claudeSDK = Claude(apiKey: 'DEFAULT_KEY');
+
+  // This chat uses the SDK's default key
+  final chat1 = claudeSDK.createNewChat();
+
+  // This chat overrides with a different key
+  final chat2 = claudeSDK.createNewChat(apiKey: 'SPECIAL_KEY');
+
+  // ... use the chats
+}
+```
+
 ### Basic Usage
 
 ```dart
 import 'package:claude_code_sdk/claude_code_sdk.dart';
 
 void main() async {
-  // Initialize the SDK with your API key
+  // Initialize the SDK (API key is optional)
   final claudeSDK = Claude(apiKey: 'YOUR_API_KEY');
-  
+
   // Create a new chat session
   final claudeChat = claudeSDK.createNewChat();
-  
+
   try {
     // Send a simple text message
     final result = await claudeChat.sendMessage([
       PromptContent.text('What is the capital of France?'),
     ]);
-    
+
     print('Claude says: $result');
   } finally {
     // Always dispose of the chat when done

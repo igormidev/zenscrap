@@ -159,7 +159,7 @@ packages:
       path: "../claude_code_sdk"
       relative: true
     source: path
-    version: "4.0.0"
+    version: "5.0.0"
   cli_config:
     dependency: transitive
     description:
@@ -190,7 +190,7 @@ packages:
       path: "../codex_cli_sdk"
       relative: true
     source: path
-    version: "3.0.0"
+    version: "4.1.0"
   collection:
     dependency: "direct main"
     description:
@@ -333,7 +333,7 @@ packages:
       path: "../gemini_cli_sdk"
       relative: true
     source: path
-    version: "3.0.0"
+    version: "4.0.0"
   glob:
     dependency: transitive
     description:
@@ -620,7 +620,7 @@ packages:
       path: "../programming_cli_core_sdk"
       relative: true
     source: path
-    version: "1.0.0"
+    version: "2.0.0"
   pub_semver:
     dependency: transitive
     description:

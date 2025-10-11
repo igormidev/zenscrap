@@ -1,5 +1,24 @@
 # Changelog
 
+## 4.1.0
+
+### Breaking Changes
+- **Authentication Method Changed**: Codex CLI >= 0.36.0 no longer reads `OPENAI_API_KEY` from environment variables. The SDK now uses `codex login --with-api-key` with stdin authentication.
+
+### Added
+- **Stdin API Key Login**: When an API key is provided, the SDK automatically performs `codex login --with-api-key` and pipes the API key via stdin
+- **Isolated CODEX_HOME**: Each chat session with an API key creates an isolated temporary `CODEX_HOME` directory to avoid polluting the global `~/.codex` configuration
+- **Automatic Cleanup**: Temporary `CODEX_HOME` directories are automatically cleaned up on dispose
+
+### Fixed
+- **401 Unauthorized Errors**: Fixed authentication failures that occurred with Codex CLI >= 0.36.0 when trying to use environment variables
+- **CLI Authentication**: SDK now properly authenticates with modern Codex CLI versions
+
+### Migration Guide
+- **No code changes required** - API usage remains the same
+- If you have Codex CLI >= 0.36.0, authentication will now work correctly with API keys
+- For older Codex CLI versions (<0.36.0), consider upgrading to benefit from improved authentication
+
 ## 4.0.0
 
 ### Breaking Changes
@@ -7,13 +26,12 @@
 - **Method Renamed**: `exportApiKeyToEnvironment()` has been replaced with `addApiKeyToEnvironment(String apiKey)` to match the new abstract interface signature.
 
 ### Added
-- **Implements new `addApiKeyToEnvironment(String apiKey)` method**: Sets the `OPENAI_API_KEY` environment variable to allow CLI authentication without login.
-- **Explicit API Key Field**: The `apiKey` is now a final field in the `Codex` class for better clarity.
+- **Implements new `addApiKeyToEnvironment(String apiKey)` method**: Performs `codex login --with-api-key` to authenticate the CLI.
+- **Explicit API Key Field**: The `apiKey` is now an optional field in the `Codex` class.
 
 ### Migration Guide
 - No changes needed for SDK instantiation: `Codex(apiKey: 'your-key')` remains the same.
-- Call `await codex.addApiKeyToEnvironment(apiKey)` after creating the instance to ensure CLI authentication works.
-- If you were using `exportApiKeyToEnvironment()`, rename it to `addApiKeyToEnvironment(apiKey)`.
+- API key is now optional - you can use `Codex()` if the CLI is already logged in.
 
 ## 3.0.0
 

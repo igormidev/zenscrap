@@ -8,14 +8,17 @@ import 'gemini_chat.dart';
 import 'gemini_chat_options.dart';
 
 class Gemini extends CodingCliInterface<GeminiChat, GeminiChatOptions> {
-  Gemini({required this.apiKey});
+  Gemini({this.apiKey});
 
-  /// The API key for authenticating with Gemini CLI
-  final String apiKey;
+  /// Optional default API key for authenticating with Gemini CLI.
+  /// If not provided, assumes the CLI is already configured via login or environment.
+  final String? apiKey;
 
   @override
-  GeminiChat createNewChat({GeminiChatOptions? options}) {
-    final chat = GeminiChat(apiKey: apiKey, options: options);
+  GeminiChat createNewChat({GeminiChatOptions? options, String? apiKey}) {
+    // Use chat-specific apiKey if provided, otherwise use SDK's default
+    final effectiveApiKey = apiKey ?? this.apiKey;
+    final chat = GeminiChat(apiKey: effectiveApiKey, options: options);
     activeSessions.add(chat);
     return chat;
   }

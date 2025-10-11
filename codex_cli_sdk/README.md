@@ -28,9 +28,10 @@ Before using this SDK, you need:
    - Install globally: `npm install -g @openai/codex`
    - Or use the SDK's built-in installer (see below)
 
-3. **OpenAI API Key**
+3. **OpenAI API Key** (Optional)
    - Get your API key from [OpenAI Platform](https://platform.openai.com/api-keys)
-   - Or sign in with ChatGPT Plus/Pro/Team subscription
+   - Or sign in to Codex CLI with: `codex login`
+   - Or use ChatGPT Plus/Pro/Team subscription credentials
 
 ## Installation
 
@@ -85,13 +86,60 @@ As of v3.0.0 this package is built on top of the shared `programming_cli_core_sd
 
 ## Quick Start
 
+### Authentication Options
+
+The SDK supports three authentication methods:
+
+**Option 1: Use CLI Login (Recommended for Development)**
+```dart
+import 'package:codex_cli_sdk/codex_cli_sdk.dart';
+
+void main() async {
+  // No API key needed - uses existing CLI authentication
+  final codexSDK = Codex();
+
+  final codexChat = codexSDK.createNewChat();
+  // ... use the chat
+}
+```
+
+**Option 2: Provide API Key to SDK**
+```dart
+import 'package:codex_cli_sdk/codex_cli_sdk.dart';
+
+void main() async {
+  // API key applies to all chats from this SDK instance
+  final codexSDK = Codex(apiKey: 'YOUR_API_KEY');
+
+  final codexChat = codexSDK.createNewChat();
+  // ... use the chat
+}
+```
+
+**Option 3: Provide API Key Per Chat**
+```dart
+import 'package:codex_cli_sdk/codex_cli_sdk.dart';
+
+void main() async {
+  final codexSDK = Codex(apiKey: 'DEFAULT_KEY');
+
+  // This chat uses the SDK's default key
+  final chat1 = codexSDK.createNewChat();
+
+  // This chat overrides with a different key
+  final chat2 = codexSDK.createNewChat(apiKey: 'SPECIAL_KEY');
+
+  // ... use the chats
+}
+```
+
 ### Basic Usage
 
 ```dart
 import 'package:codex_cli_sdk/codex_cli_sdk.dart';
 
 void main() async {
-  // Initialize the SDK with your API key
+  // Initialize the SDK (API key is optional)
   final codexSDK = Codex(apiKey: 'YOUR_API_KEY');
 
   // Create a new chat session

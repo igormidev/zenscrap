@@ -11,7 +11,11 @@ abstract class CodingCliInterface<
   final List<C> activeSessions = [];
 
   /// Creates a new chat session with Codex
-  C createNewChat({O? options});
+  ///
+  /// [options] - Optional chat configuration options
+  /// [apiKey] - Optional API key for this specific chat. If provided, overrides
+  ///            any default API key from the SDK instance.
+  C createNewChat({O? options, String? apiKey});
 
   /// Checks if the CLI is installed
   Future<bool> isCodexCLIInstalled();

@@ -8,12 +8,11 @@ import 'claude_chat_options.dart';
 
 class ClaudeChat extends CliChatInterface<ClaudeChatOptions> {
   ClaudeChat({
-    required this.apiKey,
+    String? apiKey,
     ClaudeChatOptions? options,
   })  : _sessionId = options?.resumeSessionId,
-        super(options: options);
+        super(options: options, apiKey: apiKey);
 
-  final String apiKey;
   bool _didSendFirstMessage = false;
   bool _isDisposed = false;
   bool _useStreamingFormat = false;
@@ -124,7 +123,12 @@ class ClaudeChat extends CliChatInterface<ClaudeChatOptions> {
 
   Map<String, String> _buildEnvironment() {
     final env = Map<String, String>.from(Platform.environment);
-    env['ANTHROPIC_API_KEY'] = apiKey;
+
+    // Only set API key if provided
+    if (apiKey != null) {
+      env['ANTHROPIC_API_KEY'] = apiKey!;
+    }
+
     if (_options.environment != null) {
       env.addAll(_options.environment!);
     }

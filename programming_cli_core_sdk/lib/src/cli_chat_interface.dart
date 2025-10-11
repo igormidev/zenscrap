@@ -13,8 +13,12 @@ import 'package:programming_cli_core_sdk/src/prompt_content.dart';
 import 'package:programming_cli_core_sdk/src/schema_property.dart';
 
 abstract class CliChatInterface<T extends CliChatOptions> {
-  CliChatInterface({required this.options});
+  CliChatInterface({required this.options, this.apiKey});
   T? options;
+
+  /// Optional API key for this specific chat session.
+  /// If provided, this overrides any default API key from the SDK instance.
+  final String? apiKey;
 
   bool get didSendFirstMessage;
 

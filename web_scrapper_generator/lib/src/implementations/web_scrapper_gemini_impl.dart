@@ -28,8 +28,10 @@ class WebScrapperGeminiImpl
     print('🚀 Initializing Gemini SDK for web scraper generator...\n');
     _geminiSDK = GeminiSDK(apiKey: geminiApiKey);
 
-    // Add API key to environment so CLI can authenticate
-    await _geminiSDK.addApiKeyToEnvironment(geminiApiKey);
+    // Add API key to environment so CLI can authenticate (only if provided)
+    if (geminiApiKey.isNotEmpty) {
+      await _geminiSDK.addApiKeyToEnvironment(geminiApiKey);
+    }
 
     // Ensure Gemini CLI is installed and up to date
     await _geminiSDK.updateToNewestVersionIfNeeded(global: true);
