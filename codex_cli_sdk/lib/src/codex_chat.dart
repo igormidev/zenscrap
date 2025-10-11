@@ -77,9 +77,31 @@ class CodexChat extends CliChatInterface<CodexChatOptions> {
     final args = _buildCommandArgs(message);
     final environment = _buildEnvironment();
 
+    // Use script command to create a pseudo-terminal for unbuffered output
+    // This works on both macOS and Linux
+    final String executable;
+    final List<String> processArgs;
+
+    if (Platform.isWindows) {
+      // Windows: just run codex directly (no PTY support easily available)
+      executable = 'codex';
+      processArgs = args;
+    } else if (Platform.isMacOS) {
+      // macOS: use script with -q flag (quiet mode, no startup/done messages)
+      // Format: script -q /dev/null command args...
+      executable = 'script';
+      processArgs = ['-q', '/dev/null', 'codex', ...args];
+    } else {
+      // Linux: use script with -q -c flags
+      // Format: script -qc "command args..." /dev/null
+      final codexCommand = 'codex ${args.join(' ')}';
+      executable = 'script';
+      processArgs = ['-qec', codexCommand, '/dev/null'];
+    }
+
     final process = await Process.start(
-      'codex',
-      args,
+      executable,
+      processArgs,
       workingDirectory: baseDir.path,
       environment: environment,
     );

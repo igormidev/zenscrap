@@ -257,15 +257,12 @@ class _HtmlTab extends StatelessWidget {
         children: [
           SingleChildScrollView(
             padding: const EdgeInsets.all(16),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: SelectableText(
-                htmlString,
-                style: TextStyle(
-                  fontSize: fontSize,
-                  fontFamily: 'monospace',
-                  color: context.c.onSurface,
-                ),
+            child: SelectableText(
+              htmlString,
+              style: TextStyle(
+                fontSize: fontSize,
+                fontFamily: 'monospace',
+                color: context.c.onSurface,
               ),
             ),
           ),

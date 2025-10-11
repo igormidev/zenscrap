@@ -122,7 +122,10 @@ class _LLMThinkingBubbleState extends State<LLMThinkingBubble> {
                 },
                 blendMode: BlendMode.dstIn,
                 child: Text(
-                  displayText,
+                  // RegExp('^\s*$'),
+                  displayText.replaceAll(RegExp(r'^\s*$'), ''),
+                  // displayText.replaceAll('\n\n', '\n'),
+                  // RegExp().,
                   overflow: TextOverflow.visible,
                   softWrap: true,
                   style: theme.textTheme.bodySmall?.copyWith(

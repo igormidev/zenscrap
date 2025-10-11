@@ -9,14 +9,22 @@
 - **Stdin API Key Login**: When an API key is provided, the SDK automatically performs `codex login --with-api-key` and pipes the API key via stdin
 - **Isolated CODEX_HOME**: Each chat session with an API key creates an isolated temporary `CODEX_HOME` directory to avoid polluting the global `~/.codex` configuration
 - **Automatic Cleanup**: Temporary `CODEX_HOME` directories are automatically cleaned up on dispose
+- **Real-time Streaming**: Uses `script` command to create a pseudo-terminal (PTY) for unbuffered output, enabling true real-time streaming of LLM responses
 
 ### Fixed
 - **401 Unauthorized Errors**: Fixed authentication failures that occurred with Codex CLI >= 0.36.0 when trying to use environment variables
 - **CLI Authentication**: SDK now properly authenticates with modern Codex CLI versions
+- **Streaming Buffering**: Fixed issue where streaming responses would buffer and appear all at once at the end instead of incrementally
+
+### Technical Details
+- On macOS: Uses `script -q /dev/null codex [args...]` to force line-buffering
+- On Linux: Uses `script -qec "codex [args...]" /dev/null` to force line-buffering
+- On Windows: Runs `codex` directly (PTY support may be limited)
 
 ### Migration Guide
 - **No code changes required** - API usage remains the same
 - If you have Codex CLI >= 0.36.0, authentication will now work correctly with API keys
+- Streaming now works in real-time without any code changes
 - For older Codex CLI versions (<0.36.0), consider upgrading to benefit from improved authentication
 
 ## 4.0.0
