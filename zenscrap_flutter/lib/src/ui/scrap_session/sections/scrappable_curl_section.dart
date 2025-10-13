@@ -35,7 +35,7 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection>
   void initState() {
     super.initState();
     final client = ref.read(clientProvider);
-    final baseUrl = client.host.replaceAll('localhost:8080', 'localhost:8082');
+    final baseUrl = client.host.replaceAll('localhost:8080/', 'localhost:8082');
 
     code = buildCurl(
       baseUrl: baseUrl,

@@ -29,6 +29,13 @@ class StripeWebhookRoute extends Route {
         secret: StripeConfig.webhookSecret,
       );
 
+      print(JsonEncoder.withIndent('  ').convert({
+        'payload': jsonDecode(body),
+        'signature': signature,
+        'secret': StripeConfig.webhookSecret,
+        'isValid': isValid,
+      }));
+
       if (!isValid) {
         session.log('Invalid Stripe signature');
         request.response.statusCode = HttpStatus.forbidden;
@@ -116,7 +123,8 @@ class StripeWebhookRoute extends Route {
 
       // Handle credit package purchase
       if (purchaseType == 'credit_package') {
-        await _handleCreditPackagePurchase(session, checkoutSession, accountInfoId);
+        await _handleCreditPackagePurchase(
+            session, checkoutSession, accountInfoId);
         return;
       }
 
@@ -224,10 +232,12 @@ class StripeWebhookRoute extends Route {
             creditUsage: CreditUsage.include(),
           ),
         );
-        
+
         if (apiUsage == null || apiUsage.creditUsage == null) {
-          session.log('API usage or credit usage not found for account $accountInfoId');
-          throw Exception('API usage or credit usage not found for account $accountInfoId');
+          session.log(
+              'API usage or credit usage not found for account $accountInfoId');
+          throw Exception(
+              'API usage or credit usage not found for account $accountInfoId');
         }
 
         // Add one-time purchase credits
@@ -266,9 +276,9 @@ class StripeWebhookRoute extends Route {
         ApiHelperMixin.resetNanoId(apiUsage.nanoId);
       });
 
-      session.log(
-          'Credit package purchase completed for account $accountInfoId: '
-          '$creditAmount credits added ($creditPackage package)');
+      session
+          .log('Credit package purchase completed for account $accountInfoId: '
+              '$creditAmount credits added ($creditPackage package)');
     } catch (e) {
       session.log('Error handling credit package purchase: $e');
     }
@@ -358,10 +368,12 @@ class StripeWebhookRoute extends Route {
             MonthlyCreditsData(
               accountInfoId: accountInfo.id!,
             ),
-            Duration.zero, // Execute immediately to give user credits right away
+            Duration
+                .zero, // Execute immediately to give user credits right away
           );
 
-          session.log('Scheduled immediate and monthly credits for account ${accountInfo.id}');
+          session.log(
+              'Scheduled immediate and monthly credits for account ${accountInfo.id}');
         }
       });
 
@@ -396,7 +408,8 @@ class StripeWebhookRoute extends Route {
 
         if (accountInfo == null) {
           session.log('Account not found for subscription: $subscriptionId');
-          throw Exception('Account not found for subscription: $subscriptionId');
+          throw Exception(
+              'Account not found for subscription: $subscriptionId');
         }
 
         // Get the price ID to determine the plan tier
@@ -464,7 +477,8 @@ class StripeWebhookRoute extends Route {
 
         if (accountInfo == null) {
           session.log('Account not found for subscription: $subscriptionId');
-          throw Exception('Account not found for subscription: $subscriptionId');
+          throw Exception(
+              'Account not found for subscription: $subscriptionId');
         }
 
         // Update account info
@@ -548,7 +562,8 @@ class StripeWebhookRoute extends Route {
 
         if (accountInfo == null) {
           session.log('Account not found for subscription: $subscriptionId');
-          throw Exception('Account not found for subscription: $subscriptionId');
+          throw Exception(
+              'Account not found for subscription: $subscriptionId');
         }
 
         // Update subscription status
