@@ -41,12 +41,12 @@ class PrivateAccountEndpoint extends Endpoint with DeployEndpointMixin {
       final acountApiKey = '$nanoId::${_uuid.v7()}';
       try {
         return await session.db.transaction((transaction) async {
-          // Create CreditUsage first
+          // Create CreditUsage first with 100 initial credits for free tier
           final creditUsage = await CreditUsage.db.insertRow(
             session,
             CreditUsage(
               purchasedCredits: 0,
-              subscriptionCredits: 0,
+              subscriptionCredits: 100, // Free tier gets 100 credits initially
             ),
             transaction: transaction,
           );
@@ -112,6 +112,21 @@ class PrivateAccountEndpoint extends Endpoint with DeployEndpointMixin {
           }
 
           return accountAdded;
+        }).then((accountInfo) async {
+          // Schedule monthly credit addition for free tier users
+          // This runs outside the transaction after account creation succeeds
+          await session.serverpod.futureCallWithDelay(
+            'monthly_subscription_credits',
+            MonthlyCreditsData(
+              accountInfoId: accountInfo.id!,
+            ),
+            const Duration(days: 30), // First monthly credit in 30 days
+          );
+
+          session.log(
+              'Scheduled monthly credits for new free tier account ${accountInfo.id}');
+
+          return accountInfo;
         });
       } catch (error, stackTrace) {
         session.log(

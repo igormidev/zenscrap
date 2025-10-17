@@ -1,4 +1,6 @@
-import 'package:serverpod/serverpod.dart';
+import 'dart:io';
+import 'package:result_dart/result_dart.dart';
+import 'package:serverpod/serverpod.dart' hide Result;
 import 'package:zenscrap_server/server.dart';
 import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';
 import 'package:zenscrap_server/src/core/extension/scrapping_bee_extract_logic_extension.dart';
@@ -37,18 +39,25 @@ mixin ApiHelperMixin {
       return nanoId;
     }
 
-    final PlanTier? planTier = (await AccountInfo.db.findFirstRow(
+    final accountInfo = await AccountInfo.db.findFirstRow(
       session,
       where: (p0) =>
           p0.accountApiUsage.nanoId.equals(nanoId) &
           p0.accountApiUsage.apiKeys.any(
               (key) => key.apiKey.equals(apikey) & key.isActive.equals(true)),
-    ))
-        ?.planTier;
+      include: AccountInfo.include(
+        accountApiUsage: AccountApiUsage.include(
+          creditUsage: CreditUsage.include(),
+        ),
+      ),
+    );
+
+    final PlanTier? planTier = accountInfo?.planTier;
 
     if (planTier == null) throw _invalidApiKey;
     if (cachePlanTier == PlanTier.none) throw _noActivePlan;
     _currentAccountPlanTierCache[nanoId] = planTier;
+    _currentCreditUsage[nanoId] = accountInfo!.accountApiUsage!.creditUsage!;
     _apiKeysAttachedToNanoId[nanoId] ??= [apikey];
 
     return nanoId;
@@ -166,7 +175,8 @@ mixin ApiHelperMixin {
     // First, try to deduct from subscription credits
     if (subscriptionCredits >= creditCost) {
       _remainingSubscriptionCredits[nanoId] =
-          (_remainingSubscriptionCredits[nanoId] ?? subscriptionCredits) - creditCost;
+          (_remainingSubscriptionCredits[nanoId] ?? subscriptionCredits) -
+              creditCost;
       return;
     }
 
@@ -175,7 +185,8 @@ mixin ApiHelperMixin {
       final remainingCost = creditCost - subscriptionCredits;
       _remainingSubscriptionCredits[nanoId] = 0;
       _remainingPurchasedCredits[nanoId] =
-          (_remainingPurchasedCredits[nanoId] ?? purchasedCredits) - remainingCost;
+          (_remainingPurchasedCredits[nanoId] ?? purchasedCredits) -
+              remainingCost;
       return;
     }
 
@@ -284,7 +295,7 @@ mixin ApiHelperMixin {
       return await call((s) {
         scrappable = s;
       }, nanoId);
-    } on _ApiError catch (error, stackTrace) {
+    } on ApiError catch (error, stackTrace) {
       await _setScrappableAnalytics(
           session, scrappable, error.status, apiKey, nanoId);
       session.log(
@@ -358,42 +369,76 @@ mixin ApiHelperMixin {
     }
   }
 
-  Future<Map<String, dynamic>> callFunc(
+  AsyncResultDart<Map<String, dynamic>, ApiError> callFunc(
     Session session, {
     required int scrappableId,
+    required HttpRequest request,
     String? apiKey,
     required Map<String, dynamic> payload,
   }) async {
-    return wrapAnalytics(session, apiKey,
-        (setScrappableCallback, nanoId) async {
-      final (Scrappable scrappable, ScrappableRequest targetRequest) =
-          await getScrappableById(session, scrappableId, nanoId);
-      setScrappableCallback(scrappable);
-      throwErrorIfIsATestRequestAndTestTimeExpired(apiKey, scrappable);
+    try {
+      return wrapAnalytics(session, apiKey,
+          (setScrappableCallback, nanoId) async {
+        final (Scrappable scrappable, ScrappableRequest targetRequest) =
+            await getScrappableById(session, scrappableId, nanoId);
+        setScrappableCallback(scrappable);
+        throwErrorIfIsATestRequestAndTestTimeExpired(apiKey, scrappable);
 
-      final ScrappingBeeExtractLogic extractRules =
-          await _getExtractRules(session, scrappable, apiKey);
+        final ScrappingBeeExtractLogic extractRules =
+            await _getExtractRules(session, scrappable, apiKey);
 
-      // Calculate the actual credit cost for this extraction
-      final creditCost = extractRules.totalCreditCost;
+        // Calculate the actual credit cost for this extraction
+        final creditCost = extractRules.totalCreditCost;
 
-      // Discount the actual cost from the account
-      await discountApiTokens(session, nanoId: nanoId, creditCost: creditCost);
+        // Discount the actual cost from the account
+        await discountApiTokens(session,
+            nanoId: nanoId, creditCost: creditCost);
 
-      final String targetUrl = composeUrl(payload, targetRequest);
+        final String targetUrl = composeUrl(payload, targetRequest);
 
-      final ExtractDataByRule result =
-          await scrappingBee.extractByRulesWithLogic(
-        targetUrl: targetUrl,
-        scrappingBeeExtractLogic: extractRules,
+        final ExtractDataByRule result =
+            await scrappingBee.extractByRulesWithLogic(
+          targetUrl: targetUrl,
+          scrappingBeeExtractLogic: extractRules,
+        );
+
+        return result.when(
+            withData: (r) => r.toSuccess(),
+            error: (errorMessage) {
+              return ApiError(
+                  RequestStatus.serverError,
+                  ZenScrapException(
+                    title: 'Scraping Error',
+                    description: errorMessage,
+                  )).toFailure();
+            });
+      });
+    } on ZenScrapException catch (error) {
+      return ApiError(
+        RequestStatus.serverError,
+        error,
+      ).toFailure();
+    } on ApiError catch (error) {
+      return error.toFailure();
+    } catch (error, stackTrace) {
+      session.log(
+        'Unexpected error in ScrappableApiRoute',
+        level: LogLevel.error,
+        exception: error,
+        stackTrace: stackTrace,
       );
-
-      return result.when(withData: (r) => r, error: scrappingError);
-    });
+      return ApiError(
+        RequestStatus.serverError,
+        ZenScrapException(
+          title: 'Unexpected Error',
+          description: 'An unexpected error occurred: ${error.toString()}',
+        ),
+      ).toFailure();
+    }
   }
 }
 
-_ApiError _noCreditUsageModelFound(ApiKey apiKey) => _ApiError(
+ApiError _noCreditUsageModelFound(ApiKey apiKey) => ApiError(
       RequestStatus.clientError,
       ZenScrapException(
         title: 'No Credit Usage Model Found',
@@ -402,7 +447,7 @@ _ApiError _noCreditUsageModelFound(ApiKey apiKey) => _ApiError(
             'It could be that the account was deleted or has no plan assigned - check in your api key tab on ZenScrap site.',
       ),
     );
-_ApiError _apiKeyNotFound(ApiKey apiKey) => _ApiError(
+ApiError _apiKeyNotFound(ApiKey apiKey) => ApiError(
       RequestStatus.clientError,
       ZenScrapException(
         title: 'Valid API Key Not Found',
@@ -411,7 +456,7 @@ _ApiError _apiKeyNotFound(ApiKey apiKey) => _ApiError(
             'It could be that the key was deleted or deactivated - check in your api key tab on ZenScrap site.',
       ),
     );
-final _noActiveTestSessionFinded = _ApiError(
+final _noActiveTestSessionFinded = ApiError(
   RequestStatus.clientError,
   ZenScrapException(
     title: 'No Active Test Session Found',
@@ -419,7 +464,7 @@ final _noActiveTestSessionFinded = _ApiError(
         'There is no active test session found for the provided scrappable.',
   ),
 );
-final _testPeriodExpired = _ApiError(
+final _testPeriodExpired = ApiError(
   RequestStatus.clientError,
   ZenScrapException(
     title: 'Test Period Expired',
@@ -430,7 +475,7 @@ You can:
 - Call the production endpoint with a valid API key if you have an account''',
   ),
 );
-final _noApiFound = _ApiError(
+final _noApiFound = ApiError(
   RequestStatus.clientError,
   ZenScrapException(
     title: 'API Key Not Found',
@@ -438,28 +483,28 @@ final _noApiFound = _ApiError(
         'No account API key matched the provided value (key not found in database).',
   ),
 );
-final _insufficientCredits = _ApiError(
+final _insufficientCredits = ApiError(
     RequestStatus.insufficientCredits,
-    throw ZenScrapException(
+    ZenScrapException(
       title: 'Insufficient Credits',
       description:
           'Your account has no remaining credits. Purchase or allocate more credits to continue making requests.',
     ));
-final _missingExtractRules = _ApiError(
+final _missingExtractRules = ApiError(
     RequestStatus.clientError,
     ZenScrapException(
       title: 'Missing Extract Rules',
       description:
           'No extract rules are defined for this scrappable. Please define extraction rules before invoking this endpoint.',
     ));
-final _invalidApiKey = _ApiError(
+final _invalidApiKey = ApiError(
   RequestStatus.clientError,
   ZenScrapException(
     title: 'Invalid API Key',
     description: 'The provided API key does not have a user account.',
   ),
 );
-final _noActivePlan = _ApiError(
+final _noActivePlan = ApiError(
   RequestStatus.clientError,
   ZenScrapException(
     title: 'No Active Plan',
@@ -467,7 +512,7 @@ final _noActivePlan = _ApiError(
         'Your account does not have an active plan. Subscribe to a plan to access the API.',
   ),
 );
-final _maxConcurrency = _ApiError(
+final _maxConcurrency = ApiError(
     RequestStatus.maxConcurrencyExceeded,
     ZenScrapException(
       title: 'Concurrency Limit Exceeded',
@@ -475,22 +520,22 @@ final _maxConcurrency = _ApiError(
           'You have reached the maximum number of concurrent requests allowed for your plan tier.',
     ));
 
-T scrappingError<T>(String errorMessage) => throw _ApiError(
-    RequestStatus.serverError,
-    ZenScrapException(
-      title: 'Scraping Error',
-      description: errorMessage,
-    ));
+// T scrappingError<T>(String errorMessage) =>throw _ApiError(
+//     RequestStatus.serverError,
+//     ZenScrapException(
+//       title: 'Scraping Error',
+//       description: errorMessage,
+//     ));
 
-_ApiError _noScrappableFound(String scrappableId) => _ApiError(
+ApiError _noScrappableFound(String scrappableId) => ApiError(
     RequestStatus.clientError,
-    throw ZenScrapException(
+    ZenScrapException(
       title: 'Scrappable Not Found',
       description:
           'The scrappable resource with id $scrappableId does not exist or has no target request configured.',
     ));
 
-final _invalidApiKeyFormat = _ApiError(
+final _invalidApiKeyFormat = ApiError(
   RequestStatus.clientError,
   ZenScrapException(
     title: 'Invalid API Key Format',
@@ -498,9 +543,9 @@ final _invalidApiKeyFormat = _ApiError(
   ),
 );
 
-class _ApiError {
+class ApiError {
   final RequestStatus status;
   final ZenScrapException exception;
 
-  _ApiError(this.status, this.exception);
+  ApiError(this.status, this.exception);
 }

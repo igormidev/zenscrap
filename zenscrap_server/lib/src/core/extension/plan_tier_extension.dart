@@ -5,7 +5,7 @@ extension PlanTierExt on PlanTier {
   /// Each month, the user receives a certain number of api credits based on their plan tier.
   int get apiCreditsToBeAddedPerMonth {
     return switch (this) {
-      PlanTier.none => 0,
+      PlanTier.none => 100,
       PlanTier.basic => 50000,
       PlanTier.pro => 200000,
       PlanTier.ultra => 1000000,

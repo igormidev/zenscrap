@@ -21,10 +21,14 @@ enum ClaudeModel {
   // Claude 3.7 family
   claude37Sonnet('claude-3-7-sonnet-20250219'),
 
-  // Claude 4 family (latest)
+  // Claude 4 family
   claudeSonnet4('claude-sonnet-4-20250514'),
   claudeOpus4('claude-opus-4-20250514'),
-  claudeOpus41('claude-opus-4-1-20250805');
+  claudeOpus41('claude-opus-4-1-20250805'),
+
+  // Claude 4.5 family
+  claude45Sonnet('claude-sonnet-4-20250514'),
+  claude45Haiku('claude-haiku-4-5');
 
   final String apiName;
   const ClaudeModel(this.apiName);
@@ -50,6 +54,10 @@ enum ClaudeModel {
         return 'Claude Opus 4 (Most Powerful)';
       case ClaudeModel.claudeOpus41:
         return 'Claude Opus 4.1 (Latest & Greatest)';
+      case ClaudeModel.claude45Sonnet:
+        return 'Claude 4.5 Sonnet (Fast & Smart)';
+      case ClaudeModel.claude45Haiku:
+        return 'Claude 4.5 Haiku (Ultra-Fast)';
     }
   }
 }

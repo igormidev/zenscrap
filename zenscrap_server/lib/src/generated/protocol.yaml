@@ -34,9 +34,6 @@ marketplace:
   - getItems:
 publicTier:
   - updatePlayerTier:
-scrappableApi:
-  - prod:
-  - test:
 scrappableChatSession:
   - disposeSession:
   - createSession:

@@ -29,12 +29,12 @@ class StripeWebhookRoute extends Route {
         secret: StripeConfig.webhookSecret,
       );
 
-      print(JsonEncoder.withIndent('  ').convert({
-        'payload': jsonDecode(body),
-        'signature': signature,
-        'secret': StripeConfig.webhookSecret,
-        'isValid': isValid,
-      }));
+      // print(JsonEncoder.withIndent('  ').convert({
+      //   'payload': jsonDecode(body),
+      //   'signature': signature,
+      //   'secret': StripeConfig.webhookSecret,
+      //   'isValid': isValid,
+      // }));
 
       if (!isValid) {
         session.log('Invalid Stripe signature');

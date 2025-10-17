@@ -380,42 +380,6 @@ class EndpointPublicTier extends _i1.EndpointRef {
 }
 
 /// {@category Endpoint}
-class EndpointScrappableApi extends _i1.EndpointRef {
-  EndpointScrappableApi(_i1.EndpointCaller caller) : super(caller);
-
-  @override
-  String get name => 'scrappableApi';
-
-  _i2.Future<Map<String, dynamic>> prod({
-    required int scrappableId,
-    required String apiKey,
-    required Map<String, dynamic> payload,
-  }) =>
-      caller.callServerEndpoint<Map<String, dynamic>>(
-        'scrappableApi',
-        'prod',
-        {
-          'scrappableId': scrappableId,
-          'apiKey': apiKey,
-          'payload': payload,
-        },
-      );
-
-  _i2.Future<Map<String, dynamic>> test({
-    required int scrappableId,
-    required Map<String, dynamic> payload,
-  }) =>
-      caller.callServerEndpoint<Map<String, dynamic>>(
-        'scrappableApi',
-        'test',
-        {
-          'scrappableId': scrappableId,
-          'payload': payload,
-        },
-      );
-}
-
-/// {@category Endpoint}
 class EndpointScrappableChatSession extends _i1.EndpointRef {
   EndpointScrappableChatSession(_i1.EndpointCaller caller) : super(caller);
 
@@ -521,7 +485,6 @@ class Client extends _i1.ServerpodClientShared {
     editScrappable = EndpointEditScrappable(this);
     marketplace = EndpointMarketplace(this);
     publicTier = EndpointPublicTier(this);
-    scrappableApi = EndpointScrappableApi(this);
     scrappableChatSession = EndpointScrappableChatSession(this);
     modules = Modules(this);
   }
@@ -550,8 +513,6 @@ class Client extends _i1.ServerpodClientShared {
 
   late final EndpointPublicTier publicTier;
 
-  late final EndpointScrappableApi scrappableApi;
-
   late final EndpointScrappableChatSession scrappableChatSession;
 
   late final Modules modules;
@@ -570,7 +531,6 @@ class Client extends _i1.ServerpodClientShared {
         'editScrappable': editScrappable,
         'marketplace': marketplace,
         'publicTier': publicTier,
-        'scrappableApi': scrappableApi,
         'scrappableChatSession': scrappableChatSession,
       };
 

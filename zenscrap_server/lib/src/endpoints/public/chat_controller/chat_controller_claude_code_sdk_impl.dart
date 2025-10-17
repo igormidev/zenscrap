@@ -38,8 +38,8 @@ class ChatControllerClaudeCodeSdkImpl extends IChatController
   Future<void> changeModel(AiModel aiModel) async {
     // Map the normal/powerful models to appropriate Claude models
     final claudeModel = switch (aiModel) {
-      AiModel.normal => ClaudeModel.claude35Haiku, // Fast model
-      AiModel.powerful => ClaudeModel.claudeSonnet4, // Latest balanced model
+      AiModel.normal => ClaudeModel.claude45Haiku, // Fast model
+      AiModel.powerful => ClaudeModel.claude45Sonnet, // Latest balanced model
     };
 
     await controller.changeModel(claudeModel);
