@@ -135,10 +135,18 @@ abstract class CliChatInterface<T extends CliChatOptions> {
 
     () async {
       await _lock.synchronized(() async {
+        bool schemaFilesCreated = false;
+        bool temporaryFilesCreated = false;
+
         try {
-          if (schema != null) await _setupSchemaFiles(schema);
+          if (schema != null) {
+            await _setupSchemaFiles(schema);
+            schemaFilesCreated = true;
+          }
           await _saveNewPromptContents(promptsOfCurrentMessage);
           await _setTemporaryFiles();
+          temporaryFilesCreated = true;
+
           await _runCli(
             await createProcess(
               message: [
@@ -162,7 +170,6 @@ ${options?.systemPrompt}
           if (schema == null) {
             controller.close();
             responseCompleter.complete(null);
-
             return;
           }
 
@@ -200,6 +207,7 @@ Write valid JSON to the file $filePreffix${p.basename(schemaResponseFilePath)} t
             if (stillFailed) {
               controller.close();
               responseCompleter.completeError(errorMessage);
+              // Don't return here - let finally block handle cleanup
               return;
             }
           }
@@ -217,18 +225,22 @@ Write valid JSON to the file $filePreffix${p.basename(schemaResponseFilePath)} t
             );
           }
           final json = jsonDecode(fileContent) as Map<String, dynamic>;
-          await _cleanupTemporaryFiles();
-          await _removeSchemaFiles();
           controller.close();
           responseCompleter.complete(json);
         } catch (error, stackTrace) {
-          await _cleanupTemporaryFiles();
-          if (schema != null) await _removeSchemaFiles();
           controller.close();
           if (!responseCompleter.isCompleted) {
             responseCompleter.completeError(error, stackTrace);
           }
           rethrow;
+        } finally {
+          // GUARANTEED CLEANUP: This ALWAYS runs, no matter what happens above
+          if (temporaryFilesCreated) {
+            await _cleanupTemporaryFiles();
+          }
+          if (schemaFilesCreated) {
+            await _removeSchemaFiles();
+          }
         }
       });
     }();

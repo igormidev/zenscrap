@@ -15,6 +15,26 @@ Affected packages:
 - `codex_cli_sdk/`
 - `programming_cli_core_sdk/`
 
+### 🔗 Core SDK Dependency Rule
+
+**When `programming_cli_core_sdk` is updated, ALL three CLI packages MUST be updated:**
+
+The three CLI packages depend on `programming_cli_core_sdk` as a shared foundation. When the core SDK version changes, you MUST:
+
+1. **Update `programming_cli_core_sdk`** version and changelog
+2. **Update ALL three CLI SDKs** (`claude_code_sdk`, `gemini_cli_sdk`, `codex_cli_sdk`):
+   - Bump their patch version (e.g., 5.0.1 → 5.0.2)
+   - Add a changelog entry under "Dependencies" section
+   - Example changelog entry:
+     ```markdown
+     ## X.Y.Z
+
+     ### Dependencies
+     - **Updated `programming_cli_core_sdk` to A.B.C**: [Brief description of inherited changes]
+     ```
+
+**Why?** All three CLI SDKs inherit critical fixes and improvements from the core SDK. Updating all packages ensures version consistency and makes it clear which packages have the latest fixes.
+
 ## ⚠️ IMPORTANT: Serverpod Code Generation
 
 **ALWAYS use the experimental features flag when generating Serverpod files:**

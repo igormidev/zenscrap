@@ -1,6 +1,4 @@
 import 'dart:async';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:result_dart/result_dart.dart';
@@ -68,7 +66,6 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
         .sendPromptMessage(sessionId: sessionUuid, userPrompt: userPrompt)
         .toRawResult(
       (Stream<String> llmThinkingStream) {
-        debugPrint('stream set');
         _aiCurrentThinkingSubscription = llmThinkingStream.listen(
             (thinking) {
               state.mapOrNull(standard: (value) {

@@ -1,3 +1,16 @@
+## 2.0.1
+
+### Critical Bug Fixes
+- **Fixed file cleanup leak in `_handleTemporaryFilesWrapper`**: Refactored to use try-finally pattern to **guarantee** cleanup of temporary files and schema test files in ALL scenarios, including:
+  - When schema validation fails after retry (previously leaked files at line 200-203)
+  - When exceptions are thrown during processing
+  - When early returns occur in the flow
+- **Added tracking flags**: `schemaFilesCreated` and `temporaryFilesCreated` flags ensure cleanup only runs when files were actually created
+- **Removed redundant cleanup calls**: Cleanup now happens exclusively in the `finally` block, ensuring it runs exactly once regardless of success, failure, or early return
+
+### Impact
+This fix ensures that `ai_generated_files/` directory never accumulates leftover test files or schema response files, preventing disk space leaks and maintaining a clean working directory.
+
 ## 2.0.0
 
 ### Breaking Changes

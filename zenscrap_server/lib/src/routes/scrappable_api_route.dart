@@ -123,36 +123,6 @@ class ScrappableApiRoute extends Route with ApiHelperMixin {
   }
 }
 
-int _getStatusCodeForException(ZenScrapException exception) {
-  // Map exception titles to appropriate HTTP status codes
-  switch (exception.title) {
-    case 'Valid API Key Not Found':
-    case 'API Key Not Found':
-    case 'Invalid API Key':
-    case 'Invalid API Key Format':
-      return HttpStatus.unauthorized;
-
-    case 'No Active Test Session Found':
-    case 'Test Period Expired':
-    case 'Missing Extract Rules':
-    case 'Missing Path Parameter':
-    case 'Scrappable Not Found':
-      return HttpStatus.badRequest;
-
-    case 'No Active Plan':
-    case 'Insufficient Credits':
-      return HttpStatus.paymentRequired;
-
-    case 'Concurrency Limit Exceeded':
-      return HttpStatus.tooManyRequests;
-
-    case 'Scraping Error':
-    case 'Unexpected Error':
-    default:
-      return HttpStatus.internalServerError;
-  }
-}
-
 Future<void> _sendError(
   HttpRequest request,
   int statusCode,

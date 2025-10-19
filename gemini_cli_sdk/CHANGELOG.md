@@ -1,3 +1,8 @@
+## 4.0.2
+
+### Dependencies
+- **Updated `programming_cli_core_sdk` to 2.0.1**: Inherits critical file cleanup fix that guarantees temporary files and schema test files are always deleted, even when errors occur.
+
 ## 4.0.1
 
 ### Bug Fixes
