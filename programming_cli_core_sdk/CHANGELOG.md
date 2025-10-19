@@ -1,3 +1,18 @@
+## 2.1.0
+
+### Features
+- **Made `chatNanoId` public**: The `_chatNanoId` field is now public, allowing implementations to access the unique chat identifier for scoping file operations.
+- **Added `updateOptions` method**: New method allows updating chat options after the chat has been created, enabling dynamic configuration changes like setting the working directory.
+- **Added `aiGeneratedFilesDir` getter**: Smart getter that returns the correct directory for AI-generated files, handling both cases where `cwd` is explicitly set (web scrapper implementations) and when it's not (direct SDK usage).
+
+### Improvements
+- **Optimized cleanup process**: Replaced file-by-file deletion with directory-level deletion. The `_cleanupTemporaryFiles` method now deletes the entire AI-generated files directory recursively, which is more efficient and ensures complete cleanup.
+- **Fixed nested directory issue**: Corrected path construction to prevent creating nested `ai_generated_files/` directories. When `cwd` is set, paths now use it directly instead of adding the scoped path again.
+- **Better scoping of file operations**: With the public `chatNanoId` and `updateOptions` method, implementations can now properly scope all CLI operations to their specific chat directory, preventing files from being created at the root level.
+
+### Breaking Changes
+- `_chatNanoId` is now `chatNanoId` (public instead of private).
+
 ## 2.0.1
 
 ### Critical Bug Fixes

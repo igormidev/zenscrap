@@ -199,6 +199,8 @@ mixin ChatControllerHandlerMixin {
         return null;
       },
       error: (String errorMessage) {
+        session.log('#$attemptNumber retrying due to error: $errorMessage',
+            level: LogLevel.warning);
         chatSeason.add(ErrorTextResponse(
           role: PromptRole.system,
           errorMessage:

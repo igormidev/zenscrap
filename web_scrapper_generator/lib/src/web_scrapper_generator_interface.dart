@@ -64,7 +64,7 @@ final SchemaDefinition webScrapperResponseSchema = SchemaDefinition(
           nullable: false,
           description: SchemaDescriptions.fetchRenderJs,
         ),
-        'wait': SchemaProperty.double(
+        'wait': SchemaProperty.integer(
           nullable: true,
           description: SchemaDescriptions.fetchWait,
         ),

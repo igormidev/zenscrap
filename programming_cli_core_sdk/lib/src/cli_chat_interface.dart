@@ -23,7 +23,7 @@ abstract class CliChatInterface<T extends CliChatOptions> {
   bool get didSendFirstMessage;
 
   final Lock _lock = Lock();
-  final String _chatNanoId = nanoid(length: 4);
+  final String chatNanoId = nanoid(length: 4);
   String? get sessionId;
 
   final List<TemporaryFiles> _temporaryFiles = [];
@@ -37,6 +37,25 @@ abstract class CliChatInterface<T extends CliChatOptions> {
   Future<Process> createProcess({required String message});
 
   Directory get baseDir;
+
+  /// Returns the directory where AI-generated files should be stored.
+  /// If cwd is set in options, assumes it already points to the scoped directory.
+  /// Otherwise, creates a scoped directory under baseDir.
+  Directory get aiGeneratedFilesDir {
+    // If cwd is explicitly set (like in web scrapper implementations),
+    // baseDir already points to the scoped directory
+    if (options?.cwd != null) {
+      return baseDir;
+    }
+    // Otherwise, create the scoped directory under baseDir
+    return Directory('${baseDir.path}/ai_generated_files/$chatNanoId');
+  }
+
+  /// Updates the chat options.
+  /// This allows modifying options like cwd after the chat has been created.
+  void updateOptions(T newOptions) {
+    options = newOptions;
+  }
 
   Future<String> sendMessage(List<PromptContent> contents) async {
     final (
@@ -118,9 +137,9 @@ abstract class CliChatInterface<T extends CliChatOptions> {
   }
 
   String get schemaResponseFilePath =>
-      '${baseDir.path}/ai_generated_files/$_chatNanoId/schema_response_id-$_chatNanoId.json';
+      '${aiGeneratedFilesDir.path}/schema_response_id-$chatNanoId.json';
   String get schemaTestFilePath =>
-      '${baseDir.path}/ai_generated_files/$_chatNanoId/is_schema_correct_in_id-${_chatNanoId}_test.dart';
+      '${aiGeneratedFilesDir.path}/is_schema_correct_in_id-${chatNanoId}_test.dart';
 
   ({
     Stream<String> llmMessage,
@@ -162,7 +181,7 @@ ${options?.systemPrompt}
                     await _generateSchemaPrompt(schema: schema),
                   ),
                 ...promptsOfCurrentMessage,
-              ].getPromptMessage(_chatNanoId),
+              ].getPromptMessage(chatNanoId),
             ),
             controller.sink,
           );
@@ -409,7 +428,7 @@ $schemaClassDeclaration
   Future<void> _removeSchemaFiles() async {
     try {
       print(
-        '[$_chatNanoId] _removeSchemaFiles - $schemaResponseFilePath - $schemaTestFilePath',
+        '[$chatNanoId] _removeSchemaFiles - $schemaResponseFilePath - $schemaTestFilePath',
       );
       await File(schemaResponseFilePath).delete();
       await File(schemaTestFilePath).delete();
@@ -425,14 +444,14 @@ $schemaClassDeclaration
       if (p is FileContent) {
         _temporaryFiles.add(
           TemporaryFiles(
-            fileName: p.inChatFilePath(_chatNanoId),
+            fileName: p.inChatFilePath(chatNanoId),
             fileContent: await p.file.readAsBytes(),
           ),
         );
       } else if (p is BytesContent) {
         _temporaryFiles.add(
           TemporaryFiles(
-            fileName: p.inChatFilePath(_chatNanoId),
+            fileName: p.inChatFilePath(chatNanoId),
             fileContent: p.data,
           ),
         );
@@ -443,7 +462,7 @@ $schemaClassDeclaration
   Future<void> _setTemporaryFiles() async {
     for (final tempFile in _temporaryFiles) {
       final file = File(
-        '${baseDir.path}/ai_generated_files/$_chatNanoId/${tempFile.fileName}',
+        '${aiGeneratedFilesDir.path}/${tempFile.fileName}',
       );
       if (!await file.exists()) {
         final createdFile = await file.create(recursive: true);
@@ -455,18 +474,15 @@ $schemaClassDeclaration
   }
 
   Future<void> _cleanupTemporaryFiles() async {
-    for (final tempFile in _temporaryFiles) {
-      try {
-        final path =
-            '${baseDir.path}/ai_generated_files/$_chatNanoId/${tempFile.fileName}';
-        final file = File(path);
-        print('[${await file.exists()}] $path');
-        if (await file.exists()) {
-          await file.delete();
-        }
-      } catch (_) {
-        // Ignore errors during cleanup
+    try {
+      final chatDir = aiGeneratedFilesDir;
+      if (await chatDir.exists()) {
+        print('[$chatNanoId] Deleting directory: ${chatDir.path}');
+        await chatDir.delete(recursive: true);
       }
+    } catch (e) {
+      print('[$chatNanoId] Error during cleanup: $e');
+      // Ignore errors during cleanup
     }
   }
 

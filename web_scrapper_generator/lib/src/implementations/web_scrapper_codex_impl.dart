@@ -117,6 +117,10 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
 
     final chat = _codexSDK.createNewChat(options: mergedOptions);
 
+    // Update the cwd to the chat-specific directory to scope all file operations
+    final scopedCwd = 'ai_generated_files/${chat.chatNanoId}';
+    chat.updateOptions(mergedOptions.copyWith(cwd: scopedCwd));
+
     return WebScrapperCodexImpl._(initialPayload, chat);
   }
 

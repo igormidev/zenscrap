@@ -128,6 +128,7 @@ class ScrappableChatSession extends Endpoint {
     Session session, {
     required int scrappableId,
   }) async {
+    final int? userId = (await session.authenticated)?.userId;
     final Scrappable? scrappable = await Scrappable.db.findById(
       session,
       scrappableId,
@@ -139,6 +140,7 @@ class ScrappableChatSession extends Endpoint {
         ),
       ),
     );
+
     final ReferenceTestData? referenceTestData = scrappable?.referenceTestData;
     final ScrappableRequest? scrapperRequest = scrappable?.targetRequest;
     final ScrappingBeeExtractLogic? scrappingBeeExtractLogic =
@@ -153,6 +155,22 @@ class ScrappableChatSession extends Endpoint {
         description: 'No scrappable found with id $scrappableId.',
       );
     }
+
+    final doesScrappableHasOwner = scrappable.accountId != null;
+    if (doesScrappableHasOwner) {
+      final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
+        session,
+        where: (p0) => p0.userInfoId.equals(userId),
+      );
+      if (accountInfo == null || accountInfo.id != scrappable.accountId) {
+        throw ZenScrapException(
+          title: 'Authentication Required',
+          description:
+              'You must be the owner of this scrappable to create a session for it.',
+        );
+      }
+    }
+
     if (referenceTestData == null) {
       session.log(
         'No reference test data found for scrappable with id ${scrappable.id}.',

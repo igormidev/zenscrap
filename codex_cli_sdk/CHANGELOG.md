@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.1.2
+
+### Dependencies
+- **Updated `programming_cli_core_sdk` to 2.1.0**: Inherits improvements including public `chatNanoId`, `updateOptions` method, and optimized directory-level cleanup.
+
+### Improvements
+- **File operation scoping**: Now properly scopes all CLI file operations to `ai_generated_files/$chatNanoId/` by updating the `cwd` option after chat creation. This prevents the Codex CLI from creating files at the root directory.
+
 ## 4.1.1
 
 ### Dependencies

@@ -57,15 +57,19 @@ class WebScrapperGeminiImpl
     required InitialPayloadData initialPayload,
     GeminiModel model = GeminiModel.gemini25Flash,
   }) {
-    final chat = _geminiSDK.createNewChat(
-      options: GeminiChatOptions(
-        systemPrompt: systemPrompt,
-        model: model.apiName,
-        allowedMcpServerNames: ['playwright', 'scraping-bee-mcp'],
-        allowedTools: ['*'], // Allow all tools from the allowed MCP servers
-        approvalMode: 'yolo', // Automatically approve all tool usage
-      ),
+    final initialOptions = GeminiChatOptions(
+      systemPrompt: systemPrompt,
+      model: model.apiName,
+      allowedMcpServerNames: ['playwright', 'scraping-bee-mcp'],
+      allowedTools: ['*'], // Allow all tools from the allowed MCP servers
+      approvalMode: 'yolo', // Automatically approve all tool usage
     );
+
+    final chat = _geminiSDK.createNewChat(options: initialOptions);
+
+    // Update the cwd to the chat-specific directory to scope all file operations
+    final scopedCwd = 'ai_generated_files/${chat.chatNanoId}';
+    chat.updateOptions(initialOptions.copyWith(cwd: scopedCwd));
 
     final instance = WebScrapperGeminiImpl._(initialPayload, chat);
     return instance;

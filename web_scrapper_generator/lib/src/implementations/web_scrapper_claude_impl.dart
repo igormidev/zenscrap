@@ -60,14 +60,18 @@ class WebScrapperClaudeImpl
     required InitialPayloadData initialPayload,
     ClaudeModel model = ClaudeModel.claudeSonnet4,
   }) {
-    final chat = _claudeSDK.createNewChat(
-      options: ClaudeChatOptions(
-        systemPrompt: _convertSystemPromptForClaude(),
-        model: model.apiName,
-        permissionMode: 'bypassPermissions',
-        // MCP servers are configured at SDK level in initClaude
-      ),
+    final initialOptions = ClaudeChatOptions(
+      systemPrompt: _convertSystemPromptForClaude(),
+      model: model.apiName,
+      permissionMode: 'bypassPermissions',
+      // MCP servers are configured at SDK level in initClaude
     );
+
+    final chat = _claudeSDK.createNewChat(options: initialOptions);
+
+    // Update the cwd to the chat-specific directory to scope all file operations
+    final scopedCwd = 'ai_generated_files/${chat.chatNanoId}';
+    chat.updateOptions(initialOptions.copyWith(cwd: scopedCwd));
 
     return WebScrapperClaudeImpl._(initialPayload, chat);
   }
