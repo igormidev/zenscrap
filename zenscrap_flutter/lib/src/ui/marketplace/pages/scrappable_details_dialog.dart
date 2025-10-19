@@ -123,6 +123,12 @@ class _ScrappableDetailsDialogState
       orElse: () => <AccountApiKey>[],
     );
 
+    // Check if user is logged in
+    final isLoggedIn = accountState.maybeWhen(
+      withData: (_) => true,
+      orElse: () => false,
+    );
+
     return Row(
       spacing: 32,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -275,6 +281,35 @@ class _ScrappableDetailsDialogState
                             '${selectedApiKey!.apiKey.substring(0, 8)}...'),
                     copyCode: curlCommand,
                     fontSize: 12,
+                  ),
+                ] else if (!isLoggedIn) ...[
+                  const SizedBox(height: 24),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: context.c.primaryContainer.withAlpha(51),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: context.c.primary.withAlpha(77),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.info_outline,
+                          color: context.c.primary,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Please log in to use this scrappable.',
+                            style: context.t.bodyMedium?.copyWith(
+                              color: context.c.onPrimaryContainer,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ] else if (apiKeys.isEmpty) ...[
                   const SizedBox(height: 24),

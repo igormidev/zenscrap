@@ -156,15 +156,15 @@ class PrivateAccountEndpoint extends Endpoint {
     AccountInfo accountInfo,
     int targetAttachScrappableId,
   ) async {
-    final Scrappable? existingScrappable = await Scrappable.db.findById(
+    Scrappable? existingScrappable = await Scrappable.db.findById(
       session,
       targetAttachScrappableId,
       transaction: transaction,
     );
     final existsScrappableWithTargetId = existingScrappable != null;
+    final scrappableAccountId = existingScrappable?.accountId;
     final isAccountAlreadyAttachedToOtherUser =
-        existingScrappable?.accountId != null &&
-            existingScrappable!.accountId != accountInfo.id;
+        scrappableAccountId != null && scrappableAccountId != accountInfo.id;
 
     if (!existsScrappableWithTargetId) {
       throw ZenScrapException(
@@ -182,12 +182,10 @@ class PrivateAccountEndpoint extends Endpoint {
       );
     }
 
-    await Scrappable.db.updateRow(
-        session, existingScrappable.copyWith(accountId: accountInfo.id),
-        transaction: transaction);
-    await AccountInfo.db.attachRow.scrappables(
-        session, accountInfo, existingScrappable,
-        transaction: transaction);
+    existingScrappable = existingScrappable.copyWith(accountId: accountInfo.id);
+
+    await Scrappable.db
+        .updateRow(session, existingScrappable, transaction: transaction);
     await AccountInfo.db.attachRow.scrappables(
         session, accountInfo, existingScrappable,
         transaction: transaction);

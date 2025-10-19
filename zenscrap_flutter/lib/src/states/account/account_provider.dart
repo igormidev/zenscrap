@@ -35,10 +35,11 @@ class AccountStateNotifier extends StateNotifier<AccountState> {
         );
 
     Future<void> setAccountInfo() async {
+      final scrappableId = scrappable?.id;
       final result = await ref
           .read(clientProvider)
           .privateAccount
-          .getAccountInfo(initialScrappableId: scrappable?.id)
+          .getAccountInfo(initialScrappableId: scrappableId)
           .toResult;
 
       result.fold(
