@@ -39,7 +39,7 @@ void main() {
         messages: [
           PromptContent.text(
             'List the first 10 presidents of the United States in JSON format '
-            'with their name and term start year.',
+            'with their name and term start year. DO THIS TASK FAST - no need elaborate too much.',
           ),
         ],
         schema: schema,
@@ -54,6 +54,6 @@ void main() {
       // ignore: avoid_print
       print(structured);
     },
-    timeout: const Timeout(Duration(minutes: 3)),
+    timeout: const Timeout(Duration(minutes: 6)),
   );
 }

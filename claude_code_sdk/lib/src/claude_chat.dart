@@ -54,8 +54,12 @@ class ClaudeChat extends CliChatInterface<ClaudeChatOptions> {
     filePreffix = '@';
     await _ensureBaseDirExists();
 
-    final args = _buildCommandArgs(message, _useStreamingFormat);
+    final useStreaming = _useStreamingFormat;
+    final args = _buildCommandArgs(message, useStreaming);
     final environment = _buildEnvironment();
+
+    // Reset the flag after using it
+    _useStreamingFormat = false;
 
     final process = await _spawnClaudeProcess(args, environment);
     _didSendFirstMessage = true;
@@ -87,12 +91,7 @@ class ClaudeChat extends CliChatInterface<ClaudeChatOptions> {
   Stream<String> streamResponse(List<PromptContent> contents) {
     _ensureNotDisposed();
     _useStreamingFormat = true;
-    Stream<String> base;
-    try {
-      base = super.streamResponse(contents);
-    } finally {
-      _useStreamingFormat = false;
-    }
+    final base = super.streamResponse(contents);
     return _transformClaudeStream(base);
   }
 
@@ -106,15 +105,7 @@ class ClaudeChat extends CliChatInterface<ClaudeChatOptions> {
   }) {
     _ensureNotDisposed();
     _useStreamingFormat = true;
-    ({
-      Stream<String> llmMessage,
-      Completer<Map<String, dynamic>> structuredSchemaData
-    }) base;
-    try {
-      base = super.streamResponseWithSchema(messages: messages, schema: schema);
-    } finally {
-      _useStreamingFormat = false;
-    }
+    final base = super.streamResponseWithSchema(messages: messages, schema: schema);
     return (
       llmMessage: _transformClaudeStream(base.llmMessage),
       structuredSchemaData: base.structuredSchemaData,
@@ -146,8 +137,12 @@ class ClaudeChat extends CliChatInterface<ClaudeChatOptions> {
     args.addAll(['-p', message]);
 
     if (streaming) {
-      args.addAll(
-          ['--output-format', 'stream-json', '--include-partial-messages']);
+      args.addAll([
+        '--output-format',
+        'stream-json',
+        '--include-partial-messages',
+        '--verbose', // Required by Claude CLI for stream-json with -p flag
+      ]);
     } else {
       args.addAll(['--output-format', 'json']);
     }
@@ -168,11 +163,34 @@ class ClaudeChat extends CliChatInterface<ClaudeChatOptions> {
     Map<String, String> environment,
   ) async {
     final candidates = ['claude', 'claude-code'];
+
     for (final executable in candidates) {
       try {
+        // Use script command to create a pseudo-terminal for unbuffered output
+        // This is critical for streaming to work properly
+        final String processExecutable;
+        final List<String> processArgs;
+
+        if (Platform.isWindows) {
+          // Windows: just run claude directly (no PTY support easily available)
+          processExecutable = executable;
+          processArgs = args;
+        } else if (Platform.isMacOS) {
+          // macOS: use script with -q flag (quiet mode, no startup/done messages)
+          // Format: script -q /dev/null command args...
+          processExecutable = 'script';
+          processArgs = ['-q', '/dev/null', executable, ...args];
+        } else {
+          // Linux: use script with -q -c flags
+          // Format: script -qec "command args..." /dev/null
+          final claudeCommand = '$executable ${args.join(' ')}';
+          processExecutable = 'script';
+          processArgs = ['-qec', claudeCommand, '/dev/null'];
+        }
+
         return await Process.start(
-          executable,
-          args,
+          processExecutable,
+          processArgs,
           workingDirectory: baseDir.path,
           environment: environment,
         );
@@ -238,37 +256,58 @@ class ClaudeChat extends CliChatInterface<ClaudeChatOptions> {
   Iterable<String> _extractTexts(Map<String, dynamic> event) sync* {
     final type = event['type'];
 
-    if (type == 'content_block_delta' || type == 'message_delta') {
-      final delta = event['delta'];
-      if (delta is Map<String, dynamic> && delta['type'] == 'text_delta') {
-        final text = delta['text']?.toString();
-        if (text != null) {
-          yield text;
+    // Handle Claude CLI assistant event format
+    if (type == 'assistant') {
+      final message = event['message'];
+      if (message is Map<String, dynamic>) {
+        final content = message['content'];
+        if (content is List) {
+          for (final block in content) {
+            if (block is Map<String, dynamic>) {
+              // Handle thinking content blocks
+              if (block['type'] == 'thinking') {
+                final thinking = block['thinking']?.toString();
+                if (thinking != null && thinking.isNotEmpty) {
+                  yield '[THINKING] $thinking\n';
+                }
+              }
+              // Handle text content blocks
+              else if (block['type'] == 'text') {
+                final text = block['text']?.toString();
+                if (text != null && text.isNotEmpty) {
+                  yield text;
+                }
+              }
+            }
+          }
         }
       }
       return;
     }
 
+    // Handle result event
     if (type == 'result' && event['result'] != null) {
       yield event['result'].toString();
       return;
     }
 
-    final message = event['message'];
-    if (message is Map<String, dynamic>) {
-      final messageType = message['type'];
-      if (messageType == 'text' && message['text'] != null) {
-        yield message['text'].toString();
-        return;
+    // Legacy fallback for API-level events (in case --verbose mode changes this)
+    if (type == 'content_block_delta' || type == 'message_delta') {
+      final delta = event['delta'];
+      if (delta is Map<String, dynamic>) {
+        if (delta['type'] == 'thinking_delta') {
+          final thinking = delta['thinking']?.toString();
+          if (thinking != null && thinking.isNotEmpty) {
+            yield '[THINKING] $thinking';
+          }
+        } else if (delta['type'] == 'text_delta') {
+          final text = delta['text']?.toString();
+          if (text != null) {
+            yield text;
+          }
+        }
       }
-    }
-
-    if (event['delta'] is Map<String, dynamic>) {
-      final delta = event['delta'] as Map<String, dynamic>;
-      if (delta['type'] == 'text_delta' && delta['text'] != null) {
-        yield delta['text'].toString();
-        return;
-      }
+      return;
     }
   }
 
@@ -293,6 +332,7 @@ class ClaudeChat extends CliChatInterface<ClaudeChatOptions> {
         for (final line in lines) {
           final trimmed = line.trim();
           if (trimmed.isEmpty) continue;
+
           final event = _tryParseEvent(trimmed);
           if (event != null) {
             _updateSessionFromEvent(event);
