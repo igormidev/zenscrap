@@ -1,0 +1,44 @@
+{
+  "presidents": [
+    {
+      "name": "George Washington",
+      "termStartYear": "1789"
+    },
+    {
+      "name": "John Adams",
+      "termStartYear": "1797"
+    },
+    {
+      "name": "Thomas Jefferson",
+      "termStartYear": "1801"
+    },
+    {
+      "name": "James Madison",
+      "termStartYear": "1809"
+    },
+    {
+      "name": "James Monroe",
+      "termStartYear": "1817"
+    },
+    {
+      "name": "John Quincy Adams",
+      "termStartYear": "1825"
+    },
+    {
+      "name": "Andrew Jackson",
+      "termStartYear": "1829"
+    },
+    {
+      "name": "Martin Van Buren",
+      "termStartYear": "1837"
+    },
+    {
+      "name": "William Henry Harrison",
+      "termStartYear": "1841"
+    },
+    {
+      "name": "John Tyler",
+      "termStartYear": "1841"
+    }
+  ]
+}

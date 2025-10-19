@@ -64,6 +64,7 @@ class WebScrapperClaudeImpl
       options: ClaudeChatOptions(
         systemPrompt: _convertSystemPromptForClaude(),
         model: model.apiName,
+        permissionMode: 'bypassPermissions',
         // MCP servers are configured at SDK level in initClaude
       ),
     );
