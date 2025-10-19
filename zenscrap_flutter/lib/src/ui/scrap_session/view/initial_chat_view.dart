@@ -30,6 +30,7 @@ class _InitialChatViewState extends ConsumerState<InitialChatView> {
     super.initState();
     // WidgetsBinding.instance.addPostFrameCallback((_) async {
     if (widget.scrappableId != null) {
+      unawaited(ref.read(scrapChatProvider.notifier).endSession());
       Future.delayed(const Duration(seconds: 3), () async {
         await ref
             .read(scrapChatProvider.notifier)

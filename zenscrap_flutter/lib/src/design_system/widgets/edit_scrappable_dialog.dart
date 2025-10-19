@@ -310,6 +310,10 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
                                       .read(userScrappables.notifier)
                                       .getScrappables());
                                 }
+
+                                ref
+                                    .read(scrapChatProvider.notifier)
+                                    .endSession();
                                 if (context.mounted) Navigator.pop(context);
                               },
                         child: Text('Edit scrapper extract logic'),

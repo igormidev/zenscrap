@@ -7,12 +7,17 @@ import 'package:web_scrapper_generator/src/web_scrapper_response.dart';
 void main() {
   group('WebScrapperCodexImpl', () {
     test('should have correct model options', () {
-      expect(CodexModel.values.length, equals(2));
+      expect(CodexModel.values.length, equals(3));
+      expect(CodexModel.gpt5Mini.apiName, equals('gpt-5-mini'));
       expect(CodexModel.gpt5.apiName, equals('gpt-5'));
       expect(CodexModel.gpt5Codex.apiName, equals('gpt-5-codex'));
     });
 
     test('should have correct display names', () {
+      expect(
+        CodexModel.gpt5Mini.displayName,
+        equals('GPT-5 Mini (Fast & Efficient)'),
+      );
       expect(CodexModel.gpt5.displayName, equals('GPT-5 (Fast Reasoning)'));
       expect(
         CodexModel.gpt5Codex.displayName,

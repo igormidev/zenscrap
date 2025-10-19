@@ -31,6 +31,11 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
   void reset() {
     ref.read(chatMessagesProvider.notifier).state = const AsyncValue.data([]);
     state = ScrapChatSessionState.blank();
+
+    _chatResponseSubscription?.cancel();
+    _aiCurrentThinkingSubscription?.cancel();
+    _chatResponseSubscription = null;
+    _aiCurrentThinkingSubscription = null;
   }
 
   Future<void> createScrappable({
@@ -105,6 +110,7 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
         .read(clientProvider)
         .scrappableChatSession
         .disposeSession(sessionId: sessionUuid);
+    reset();
   }
 
   void onChange(ChatResponse chatResponse) {

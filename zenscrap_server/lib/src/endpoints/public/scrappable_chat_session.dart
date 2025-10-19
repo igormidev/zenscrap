@@ -4,6 +4,7 @@ import 'package:rxdart/subjects.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/core/default_classes.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_claude_code_sdk_impl.dart';
+import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_codex_sdk_impl.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/i_chat_controller.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
@@ -61,7 +62,8 @@ class ScrappableChatSession extends Endpoint {
         if (userId == null) {
           // If not authenticated, should only be able to modify scrappables that are not attached to any account
           scrappable = await Scrappable.db.findFirstRow(session,
-              where: (t) => t.id.equals(scrappableId) & t.accountId.equals(null),
+              where: (t) =>
+                  t.id.equals(scrappableId) & t.accountId.equals(null),
               transaction: transaction);
         } else {
           final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
@@ -69,15 +71,16 @@ class ScrappableChatSession extends Endpoint {
             where: (p0) => p0.userInfoId.equals(userId),
             transaction: transaction,
           );
-          if (accountInfo == null) {
+          final accountId = accountInfo?.id;
+
+          scrappable = await Scrappable.db.findFirstRow(session,
+              where: (t) =>
+                  t.id.equals(scrappableId) & t.accountId.equals(accountId),
+              transaction: transaction);
+
+          if (scrappable == null) {
             throw defaultAuthenticationException;
           }
-          scrappable = await Scrappable.db.findFirstRow(
-            session,
-            where: (t) =>
-                t.id.equals(scrappableId) & t.accountId.equals(accountInfo.id),
-            transaction: transaction,
-          );
         }
 
         if (scrappable == null) {
@@ -205,8 +208,8 @@ class ScrappableChatSession extends Endpoint {
     final RedraftSrappableSessionId sessionUuid = uuid.v4();
     _scrappableOpenedSessionsIds[scrappable.id!] = sessionUuid;
     _scrapRedraftSessions[sessionUuid] = ReplaySubject<ChatResponse>();
-    // _chatSessions[sessionUuid] = ChatControllerCodexSdkImpl.startChat(
-    _chatSessions[sessionUuid] = ChatControllerClaudeCodeSdkImpl.startChat(
+    _chatSessions[sessionUuid] = ChatControllerCodexSdkImpl.startChat(
+      // _chatSessions[sessionUuid] = ChatControllerClaudeCodeSdkImpl.startChat(
       scrappableId: scrappable.id!,
       scrapperRequest: scrapperRequest,
       referenceTestData: referenceTestData,

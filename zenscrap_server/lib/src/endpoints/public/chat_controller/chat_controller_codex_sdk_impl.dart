@@ -21,7 +21,7 @@ class ChatControllerCodexSdkImpl extends IChatController
     required ReferenceTestData referenceTestData,
     required ScrappableRequest scrapperRequest,
     required ScrappingBeeExtractLogic? currentFetchSettings,
-    CodexModel model = CodexModel.gpt5Codex,
+    CodexModel model = CodexModel.gpt5Mini,
   }) {
     final controller = WebScrapperCodexImpl.startChat(
       initialPayload: IChatController.getInitialPayloadDate(
@@ -42,12 +42,12 @@ class ChatControllerCodexSdkImpl extends IChatController
     // Map the normal/powerful models to appropriate Codex models with high reasoning effort
     switch (aiModel) {
       case AiModel.normal:
-        // GPT-5 Codex with high reasoning effort for balanced performance
-        await controller.changeModelWithEffort(CodexModel.gpt5Codex, 'high');
+        // GPT-5 Mini with high reasoning effort for fast and efficient performance
+        await controller.changeModelWithEffort(CodexModel.gpt5Mini, 'high');
         break;
       case AiModel.powerful:
         // GPT-5 with high reasoning effort for maximum capability
-        await controller.changeModelWithEffort(CodexModel.gpt5, 'medium');
+        await controller.changeModelWithEffort(CodexModel.gpt5Codex, 'high');
         break;
     }
   }

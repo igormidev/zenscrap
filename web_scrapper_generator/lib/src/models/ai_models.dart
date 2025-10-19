@@ -64,6 +64,7 @@ enum ClaudeModel {
 
 /// Available Codex models for web scraping
 enum CodexModel {
+  gpt5Mini('gpt-5-mini'),
   gpt5('gpt-5'),
   gpt5Codex('gpt-5-codex');
 
@@ -73,6 +74,8 @@ enum CodexModel {
   /// Get a human-readable display name
   String get displayName {
     switch (this) {
+      case CodexModel.gpt5Mini:
+        return 'GPT-5 Mini (Fast & Efficient)';
       case CodexModel.gpt5:
         return 'GPT-5 (Fast Reasoning)';
       case CodexModel.gpt5Codex:
