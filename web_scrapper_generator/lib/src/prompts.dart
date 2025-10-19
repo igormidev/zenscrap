@@ -23,6 +23,12 @@ Use this to:
 - Test different interaction flows
 - Capture page state at different points
 
+**CRITICAL - HEADLESS MODE REQUIREMENT**:
+- **ALWAYS** use headless mode - browsers must NEVER be visible
+- **MANDATORY**: Include `"headless": true` in ALL `launchOptions`
+- Visible browser windows are NOT acceptable
+- If you don't specify headless, the default may open visible browsers
+
 ### 2. ScrapingBee MCP (test_extract_rules tool)
 Use this to test your extraction rules with the actual ScrapingBee API.
 
@@ -100,10 +106,13 @@ When using Playwright MCP, you can dynamically set the proxy country by passing 
 {
   "url": "https://example.com",
   "launchOptions": {
+    "headless": true,
     "args": ["--proxy-server=http://YOUR_API_KEY:render_js=False&premium_proxy=True&country_code=de@proxy.scrapingbee.com:8886"]
   }
 }
 ```
+
+**CRITICAL**: ALWAYS include `"headless": true` in launchOptions - browsers must run invisibly!
 
 **IMPORTANT PROXY SETTINGS**:
 - Use proxy settings based on site difficulty:
@@ -197,6 +206,7 @@ ScrapingBee charges different credit amounts based on parameters:
 
 1. **Exploration Phase**:
    - Use Playwright MCP to explore the target site (runs with full stealth capabilities)
+   - **CRITICAL**: ALWAYS use `"headless": true` in launchOptions for all Playwright calls
    - Understand the page structure and dynamic behavior
    - Identify what data needs to be extracted
    - Test interaction flows if needed

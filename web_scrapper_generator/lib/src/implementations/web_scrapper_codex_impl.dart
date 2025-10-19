@@ -77,9 +77,18 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
       reasoningEffort: 'medium',
       // Note: Removed mode as Codex exec doesn't support --auto-edit
       outputJson: false, // We'll use schema for structured output
+      // CRITICAL: Enable experimental RMCP client for MCP tools to work
+      additionalArgs: ['-c', 'experimental_use_rmcp_client=true'],
     );
 
     final overrides = options;
+
+    // Merge additionalArgs to ensure experimental_use_rmcp_client is always set
+    final List<String> mergedAdditionalArgs = [
+      ...defaultOptions.additionalArgs ?? [],
+      ...overrides?.additionalArgs ?? [],
+    ];
+
     final mergedOptions = CodexChatOptions(
       maxTurns: overrides?.maxTurns ?? defaultOptions.maxTurns,
       mode: overrides?.mode ?? defaultOptions.mode,
@@ -98,8 +107,7 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
       allowedDirectories:
           overrides?.allowedDirectories ?? defaultOptions.allowedDirectories,
       configPath: overrides?.configPath ?? defaultOptions.configPath,
-      additionalArgs:
-          overrides?.additionalArgs ?? defaultOptions.additionalArgs,
+      additionalArgs: mergedAdditionalArgs,
       reasoningEffort:
           overrides?.reasoningEffort ?? defaultOptions.reasoningEffort,
       systemPrompt: overrides?.systemPrompt ?? defaultOptions.systemPrompt,
@@ -244,6 +252,12 @@ Use the playwright tools to navigate and interact with web pages:
 - playwright_fill: Fill in form fields
 - playwright_select: Select dropdown options
 - playwright_evaluate: Execute JavaScript in the page context
+
+**CRITICAL - HEADLESS MODE REQUIREMENT**:
+- **ALWAYS** use headless mode - browsers must NEVER be visible
+- **MANDATORY**: Include `"headless": true` in ALL `launchOptions` when using Playwright tools
+- Visible browser windows are NOT acceptable
+- Example: `{"url": "https://example.com", "launchOptions": {"headless": true}}`
 
 ### 2. ScrapingBee MCP Server
 Use the test_extract_rules tool to validate your extraction rules:

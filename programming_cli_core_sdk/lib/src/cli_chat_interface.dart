@@ -118,9 +118,9 @@ abstract class CliChatInterface<T extends CliChatOptions> {
   }
 
   String get schemaResponseFilePath =>
-      '${baseDir.path}/ai_generated_files/schema_response_id-$_chatNanoId.json';
+      '${baseDir.path}/ai_generated_files/$_chatNanoId/schema_response_id-$_chatNanoId.json';
   String get schemaTestFilePath =>
-      '${baseDir.path}/ai_generated_files/is_schema_correct_in_id-${_chatNanoId}_test.dart';
+      '${baseDir.path}/ai_generated_files/$_chatNanoId/is_schema_correct_in_id-${_chatNanoId}_test.dart';
 
   ({
     Stream<String> llmMessage,
@@ -443,7 +443,7 @@ $schemaClassDeclaration
   Future<void> _setTemporaryFiles() async {
     for (final tempFile in _temporaryFiles) {
       final file = File(
-        '${baseDir.path}/ai_generated_files/${tempFile.fileName}',
+        '${baseDir.path}/ai_generated_files/$_chatNanoId/${tempFile.fileName}',
       );
       if (!await file.exists()) {
         final createdFile = await file.create(recursive: true);
@@ -457,7 +457,8 @@ $schemaClassDeclaration
   Future<void> _cleanupTemporaryFiles() async {
     for (final tempFile in _temporaryFiles) {
       try {
-        final path = '${baseDir.path}/ai_generated_files/${tempFile.fileName}';
+        final path =
+            '${baseDir.path}/ai_generated_files/$_chatNanoId/${tempFile.fileName}';
         final file = File(path);
         print('[${await file.exists()}] $path');
         if (await file.exists()) {
