@@ -145,7 +145,11 @@ class SchemaPropertyStructuredObjectWithDefinedProperties
     return _validateValueForSchema(this, model, 'root');
   }
 
-  static String? _validateValueForSchema(SchemaProperty schema, dynamic value, String path) {
+  static String? _validateValueForSchema(
+    SchemaProperty schema,
+    dynamic value,
+    String path,
+  ) {
     if (value == null) {
       if (!schema.nullable) {
         return 'Expected non-null value at $path but got null (field is not nullable)';
@@ -218,7 +222,11 @@ class SchemaPropertyStructuredObjectWithDefinedProperties
           }
 
           final propertyValue = value[key];
-          final error = _validateValueForSchema(propertySchema, propertyValue, '$path.$key');
+          final error = _validateValueForSchema(
+            propertySchema,
+            propertyValue,
+            '$path.$key',
+          );
           if (error != null) {
             return error;
           }
@@ -242,7 +250,7 @@ class SchemaPropertyStructuredObjectWithDefinedProperties
     void writeDescriptionLine() {
       if (schema.description != null) {
         buffer.writeln(
-          "${childIndent}description: '${_escape(schema.description!)}',",
+          "${childIndent}description: '''${_escape(schema.description!)}''',",
         );
       }
     }
@@ -309,7 +317,7 @@ class SchemaPropertyStructuredObjectWithDefinedProperties
         }
         if (schema.description != null) {
           buffer.writeln(
-            "${childIndent}description: '${_escape(schema.description!)}',",
+            "${childIndent}description: '''${_escape(schema.description!)}''',",
           );
         }
         buffer.writeln('${childIndent}nullable: ${schema.nullable},');
@@ -346,7 +354,7 @@ class SchemaPropertyStructuredObjectWithDefinedProperties
         buffer.writeln('$childIndent},');
         if (schema.description != null) {
           buffer.writeln(
-            "${childIndent}description: '${_escape(schema.description!)}',",
+            "${childIndent}description: '''${_escape(schema.description!)}''',",
           );
         }
         buffer.writeln('${childIndent}nullable: ${schema.nullable},');

@@ -34,7 +34,60 @@ Use this to test your extraction rules with the actual ScrapingBee API.
 
 **Available Parameters:**
 - **url** (string, required): The target page URL to scrape
-- **extract_rules** (string, required): JSON-encoded extraction rules using CSS/XPath selectors. See: https://www.scrapingbee.com/documentation/data-extraction/
+- **extract_rules** (string, required): JSON-encoded extraction rules using CSS/XPath selectors.
+
+**🚨 CRITICAL: extract_rules FORMAT REQUIREMENTS 🚨**
+
+ScrapingBee has STRICT format requirements. Using the wrong format will cause 500 errors!
+
+**✅ CORRECT FORMAT (Simple - use for ALL single fields):**
+```json
+{
+  "title": "h1.page-title",
+  "description": "p.description",
+  "image_url": "img.main-image@src",
+  "link": "a.read-more@href"
+}
+```
+
+**✅ CORRECT FORMAT (List - use ONLY for arrays):**
+```json
+{
+  "products": {
+    "selector": ".product-card",
+    "type": "list",
+    "output": {
+      "name": ".product-name",
+      "price": ".price@data-value",
+      "image": "img@src"
+    }
+  }
+}
+```
+
+**❌ ABSOLUTELY FORBIDDEN (Verbose - causes 500 errors):**
+```json
+{
+  "title": {
+    "selector": "h1.page-title",
+    "type": "text"  // ❌ DO NOT DO THIS!
+  },
+  "image_url": {
+    "selector": "img@src",
+    "type": "attribute"  // ❌ DO NOT DO THIS!
+  }
+}
+```
+
+**FORMAT RULES YOU MUST FOLLOW:**
+1. For single text/attribute fields: Use SIMPLE format `"field": "selector"` or `"field": "selector@attribute"`
+2. For arrays/lists: Use nested format with `"type": "list"` and `"output"`
+3. NEVER use `"type": "text"` or `"type": "attribute"` for single fields
+4. To extract attributes, use the `@` syntax: `"img@src"`, `"a@href"`, `"div@data-id"`
+5. The format `{"selector": "...", "type": "text"}` is INVALID and will fail!
+
+**See:** https://www.scrapingbee.com/documentation/data-extraction/
+
 - **js_scenario** (string, optional): JSON-encoded scripted actions to run before extraction (click, type, scroll, wait, infinite_scroll, etc.). See: https://www.scrapingbee.com/documentation/javascript-scenario/
 - **render_js** (boolean, default: true): Enable headless browser for JavaScript execution
 - **wait** (integer, optional): Fixed delay in milliseconds (0-35000) before extraction

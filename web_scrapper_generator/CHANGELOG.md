@@ -2,6 +2,12 @@
 
 ### Bug Fixes
 - **Fixed type mismatch in schema**: Changed `wait` field from `SchemaProperty.double()` to `SchemaProperty.integer()` to match the expected `int?` type in `ScrappingBeeFetchSettings`. This resolves the runtime error: "type 'double' is not a subtype of type 'int?' in type cast"
+- **Fixed ScrapingBee 500 errors due to invalid extract_rules format**:
+  - Added comprehensive format validation and auto-correction for extract_rules
+  - Enhanced prompts with explicit format examples showing correct vs incorrect formats
+  - Updated schema descriptions to clearly forbid verbose format for single fields
+  - Auto-converts verbose format `{"field": {"selector": "...", "type": "text"}}` to simple format `{"field": "selector"}`
+  - Prevents 500 errors caused by using verbose format for single text/attribute fields
 
 ## 2.0.0
 

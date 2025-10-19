@@ -75,6 +75,77 @@ mixin ScrapingBeeApiMixin {
       '37N8150Q1JBVN85NS4RUOUIUYZ2AEUFX69QBM0X74VD13M9TLNRVOFWS7HZMKRG1X4SOH4BKJT5EUN6K';
   static const String _baseUrl = 'https://app.scrapingbee.com/api/v1/';
 
+  /// Validates and corrects extract_rules format to ensure compatibility with ScrapingBee API
+  ///
+  /// ScrapingBee REQUIRES:
+  /// - Simple format for single fields: {"field": "selector"} or {"field": "selector@attribute"}
+  /// - Nested format ONLY for lists: {"items": {"selector": "...", "type": "list", "output": {...}}}
+  ///
+  /// This method auto-corrects the common mistake of using verbose format for single fields
+  String validateAndCorrectExtractRules(String extractRules) {
+    try {
+      final decoded = jsonDecode(extractRules);
+
+      if (decoded is! Map<String, dynamic>) {
+        return extractRules; // Not a map, return as-is
+      }
+
+      bool needsCorrection = false;
+      final corrected = <String, dynamic>{};
+
+      for (final entry in decoded.entries) {
+        final key = entry.key;
+        final value = entry.value;
+
+        // Check if this is a single field using verbose format (WRONG)
+        if (value is Map<String, dynamic>) {
+          // Check if this is a list (correct usage of nested format)
+          if (value['type'] == 'list') {
+            // This is correct - it's a list, keep as-is
+            corrected[key] = value;
+          }
+          // Check if this is a WRONG verbose format for single field
+          else if (value.containsKey('selector')) {
+            needsCorrection = true;
+            final selector = value['selector'] as String;
+
+            // Check if it's trying to extract an attribute
+            if (value['type'] == 'attribute' && value.containsKey('attribute')) {
+              // Convert to simple format with @ syntax
+              final attribute = value['attribute'] as String;
+              corrected[key] = '$selector@$attribute';
+              print('⚠️ Auto-corrected extract_rules: "$key" from verbose to simple format ($selector@$attribute)');
+            } else {
+              // Convert to simple format (text content)
+              corrected[key] = selector;
+              print('⚠️ Auto-corrected extract_rules: "$key" from verbose to simple format ($selector)');
+            }
+          } else {
+            // Unknown nested structure, keep as-is
+            corrected[key] = value;
+          }
+        } else {
+          // Simple format (correct) - keep as-is
+          corrected[key] = value;
+        }
+      }
+
+      if (needsCorrection) {
+        final correctedJson = jsonEncode(corrected);
+        print('✅ Extract rules format corrected successfully');
+        print('   Original: $extractRules');
+        print('   Corrected: $correctedJson');
+        return correctedJson;
+      }
+
+      return extractRules; // No correction needed
+    } catch (e) {
+      // If we can't parse/correct it, return as-is and let the API handle it
+      print('⚠️ Could not validate extract_rules format: $e');
+      return extractRules;
+    }
+  }
+
   /// Dio client for making requests
   Dio get dio => Dio(
     BaseOptions(
@@ -194,9 +265,12 @@ mixin ScrapingBeeApiMixin {
     required String? session_id,
     required bool? custom_google,
   }) async {
+    // Validate and auto-correct extract_rules format
+    final correctedExtractRules = validateAndCorrectExtractRules(extract_rules);
+
     final queryParams = buildQueryParameters(
       targetUrl: targetUrl,
-      extract_rules: extract_rules,
+      extract_rules: correctedExtractRules,
       js_scenario: js_scenario,
       render_js: render_js,
       wait: wait,
@@ -332,9 +406,12 @@ mixin ScrapingBeeApiMixin {
     required String? session_id,
     required bool? custom_google,
   }) async {
+    // Validate and auto-correct extract_rules format
+    final correctedExtractRules = validateAndCorrectExtractRules(extract_rules);
+
     final queryParams = buildQueryParameters(
       targetUrl: targetUrl,
-      extract_rules: extract_rules,
+      extract_rules: correctedExtractRules,
       js_scenario: js_scenario,
       render_js: render_js,
       wait: wait,
