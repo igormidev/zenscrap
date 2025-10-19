@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:result_dart/result_dart.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/serverpod_to_result.dart';
 import 'package:zenscrap_flutter/src/core/utils/talker.dart';
@@ -202,5 +203,16 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
     },
         (failure) async =>
             state = ScrapChatSessionState.withError(error: failure));
+  }
+
+  Future<ResultDart<void, ZenScrapException>> commitCurrentChanges() async {
+    final sessionUuid = state.mapOrNull(standard: (value) => value.sessionUuid);
+    if (sessionUuid == null) return Failure(defaultException);
+
+    return ref
+        .read(clientProvider)
+        .scrappableChatSession
+        .commitCurrentEditState(sessionUuid: sessionUuid)
+        .toResult;
   }
 }

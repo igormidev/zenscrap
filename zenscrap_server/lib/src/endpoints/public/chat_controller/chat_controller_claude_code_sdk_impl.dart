@@ -11,8 +11,10 @@ class ChatControllerClaudeCodeSdkImpl extends IChatController
   @override
   String get providerName => 'Claude';
 
-  const ChatControllerClaudeCodeSdkImpl._(
-      {required this.controller, required super.scrappableId});
+  const ChatControllerClaudeCodeSdkImpl._({
+    required this.controller,
+    required super.scrappableId,
+  });
 
   factory ChatControllerClaudeCodeSdkImpl.startChat({
     required int scrappableId,

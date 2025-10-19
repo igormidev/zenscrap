@@ -1,18 +1,19 @@
+import 'dart:math';
+
 import 'package:nanoid2/nanoid2.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart';
 import 'package:zenscrap_server/src/core/default_classes.dart';
-import 'package:zenscrap_server/src/core/mixins/deploy_endpoint_mixin.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
-class PrivateAccountEndpoint extends Endpoint with DeployEndpointMixin {
+class PrivateAccountEndpoint extends Endpoint {
   final Uuid _uuid = Uuid();
   @override
   bool get requireLogin => true;
 
   Future<AccountInfo> getAccountInfo(
     Session session, {
-    required Scrappable? initialScrappableIfNewUser,
+    required int? initialScrappableId,
   }) async {
     final authenticationInfo = await session.authenticated;
     if (authenticationInfo == null) {
@@ -36,160 +37,162 @@ class PrivateAccountEndpoint extends Endpoint with DeployEndpointMixin {
       );
     }
 
-    if (accountInfo == null) {
-      final String nanoId = nanoid(length: 8);
-      final acountApiKey = '$nanoId::${_uuid.v7()}';
-      try {
-        return await session.db.transaction((transaction) async {
-          // Create CreditUsage first with 100 initial credits for free tier
-          final creditUsage = await CreditUsage.db.insertRow(
-            session,
-            CreditUsage(
-              purchasedCredits: 0,
-              subscriptionCredits: 100, // Free tier gets 100 credits initially
-            ),
-            transaction: transaction,
-          );
+    final isNewAccount = accountInfo == null;
 
-          // Create AccountApiUsage with creditUsageId
-          final accountApiUsage = await AccountApiUsage.db.insertRow(
-            session,
-            AccountApiUsage(
-              creditUsageId: creditUsage.id!,
-              nanoId: nanoId,
-            ),
-            transaction: transaction,
-          );
-          final apiKey = await AccountApiKey.db.insertRow(
-            session,
-            AccountApiKey(
-              name: 'Default API Key',
-              apiKey: acountApiKey,
-              accountApiUsageId: accountApiUsage.id!,
-              accountApiUsage: accountApiUsage,
-              createdAt: DateTime.now(),
-            ),
-            transaction: transaction,
-          );
-
-          await AccountApiKey.db.attachRow.accountApiUsage(
-            session,
-            apiKey,
-            accountApiUsage,
-            transaction: transaction,
-          );
-          AccountInfo accountInfo = AccountInfo(
-            userInfoId: userId,
-            accountApiUsageId: accountApiUsage.id!,
-            accountApiUsage: accountApiUsage,
-            planTier: PlanTier.none,
-          );
-
-          accountInfo = await AccountInfo.db
-              .insertRow(session, accountInfo, transaction: transaction);
-
-          await AccountInfo.db.attachRow.accountApiUsage(
-              session, accountInfo, accountApiUsage,
-              transaction: transaction);
-
-          final accountAdded = await AccountInfo.db.findFirstRow(
-            session,
-            where: (p0) => p0.userInfoId.equals(userId),
-            include: include,
-            transaction: transaction,
-          );
-          if (accountAdded == null) {
-            throw ZenScrapException(
-              title: 'Account Creation Failed',
-              description:
-                  'Unable to create new account. Please try again later.',
-            );
-          }
-
-          if (initialScrappableIfNewUser != null) {
-            await _attachScrappable(
-                session, transaction, accountInfo, initialScrappableIfNewUser);
-          }
-
-          return accountAdded;
-        }).then((accountInfo) async {
-          // Schedule monthly credit addition for free tier users
-          // This runs outside the transaction after account creation succeeds
-          await session.serverpod.futureCallWithDelay(
-            'monthly_subscription_credits',
-            MonthlyCreditsData(
-              accountInfoId: accountInfo.id!,
-            ),
-            const Duration(days: 30), // First monthly credit in 30 days
-          );
-
-          session.log(
-              'Scheduled monthly credits for new free tier account ${accountInfo.id}');
-
-          return accountInfo;
-        });
-      } catch (error, stackTrace) {
-        session.log(
-          'Error creating new account for userId $userId',
-          exception: error,
-          level: LogLevel.error,
-          stackTrace: stackTrace,
-        );
-        throw ZenScrapException(
-          title: 'Account Creation Failed',
-          description: 'This is a Internal error. Please try again later.',
-        );
-      }
-    } else {
-      if (initialScrappableIfNewUser != null) {
-        await session.db.transaction((transaction) async {
-          await _attachScrappable(
-              session, transaction, accountInfo!, initialScrappableIfNewUser);
-        });
-      }
+    if (isNewAccount && initialScrappableId != null) {
+      return await session.db.transaction((transaction) async {
+        await _attachScrappable(
+            session, transaction, accountInfo!, initialScrappableId);
+        return accountInfo;
+      });
     }
 
-    return accountInfo;
+    final String nanoId = nanoid(length: 8);
+    final acountApiKey = '$nanoId::${_uuid.v7()}';
+    try {
+      return await session.db.transaction((transaction) async {
+        // Create CreditUsage first with 100 initial credits for free tier
+        final creditUsage = await CreditUsage.db.insertRow(
+          session,
+          CreditUsage(
+            purchasedCredits: 0,
+            subscriptionCredits: 100, // Free tier gets 100 credits initially
+          ),
+          transaction: transaction,
+        );
+
+        // Create AccountApiUsage with creditUsageId
+        final accountApiUsage = await AccountApiUsage.db.insertRow(
+          session,
+          AccountApiUsage(
+            creditUsageId: creditUsage.id!,
+            nanoId: nanoId,
+          ),
+          transaction: transaction,
+        );
+        final apiKey = await AccountApiKey.db.insertRow(
+          session,
+          AccountApiKey(
+            name: 'Default API Key',
+            apiKey: acountApiKey,
+            accountApiUsageId: accountApiUsage.id!,
+            accountApiUsage: accountApiUsage,
+            createdAt: DateTime.now(),
+          ),
+          transaction: transaction,
+        );
+
+        await AccountApiKey.db.attachRow.accountApiUsage(
+          session,
+          apiKey,
+          accountApiUsage,
+          transaction: transaction,
+        );
+        AccountInfo accountInfo = AccountInfo(
+          userInfoId: userId,
+          accountApiUsageId: accountApiUsage.id!,
+          accountApiUsage: accountApiUsage,
+          planTier: PlanTier.none,
+        );
+
+        accountInfo = await AccountInfo.db
+            .insertRow(session, accountInfo, transaction: transaction);
+
+        await AccountInfo.db.attachRow.accountApiUsage(
+            session, accountInfo, accountApiUsage,
+            transaction: transaction);
+
+        final accountAdded = await AccountInfo.db.findFirstRow(
+          session,
+          where: (p0) => p0.userInfoId.equals(userId),
+          include: include,
+          transaction: transaction,
+        );
+        if (accountAdded == null) {
+          throw ZenScrapException(
+            title: 'Account Creation Failed',
+            description:
+                'Unable to create new account. Please try again later.',
+          );
+        }
+
+        if (initialScrappableId != null) {
+          await _attachScrappable(
+              session, transaction, accountInfo, initialScrappableId);
+        }
+
+        return accountAdded;
+      }).then((accountInfo) async {
+        // Schedule monthly credit addition for free tier users
+        // This runs outside the transaction after account creation succeeds
+        await session.serverpod.futureCallWithDelay(
+          'monthly_subscription_credits',
+          MonthlyCreditsData(
+            accountInfoId: accountInfo.id!,
+          ),
+          const Duration(days: 30), // First monthly credit in 30 days
+        );
+
+        session.log(
+            'Scheduled monthly credits for new free tier account ${accountInfo.id}');
+
+        return accountInfo;
+      });
+    } catch (error, stackTrace) {
+      session.log(
+        'Error creating new account for userId $userId',
+        exception: error,
+        level: LogLevel.error,
+        stackTrace: stackTrace,
+      );
+      throw ZenScrapException(
+        title: 'Account Creation Failed',
+        description: 'This is a Internal error. Please try again later.',
+      );
+    }
   }
 
   Future<void> _attachScrappable(
     Session session,
     Transaction transaction,
     AccountInfo accountInfo,
-    Scrappable scrappable,
+    int targetAttachScrappableId,
   ) async {
     final Scrappable? existingScrappable = await Scrappable.db.findById(
       session,
-      scrappable.id!,
-      include: Scrappable.include(
-        scrappingBeeExtractRules: ScrappingBeeExtractLogic.include(),
-        referenceTestData: ReferenceTestData.include(),
-      ),
-    );
-    if (existingScrappable == null ||
-        existingScrappable.accountId != null ||
-        existingScrappable.isDeleted) {
-      // Already have a account attached, just ignore...
-      return;
-    }
-    await Scrappable.db.updateRow(
-        session, scrappable.copyWith(accountId: accountInfo.id),
-        transaction: transaction);
-    await AccountInfo.db.attachRow.scrappables(session, accountInfo, scrappable,
-        transaction: transaction);
-    await deployReferenceTestData(
-      session: session,
+      targetAttachScrappableId,
       transaction: transaction,
-      testData: scrappable.referenceTestData!,
-      scrappingBeeExtractLogic: scrappable.scrappingBeeExtractRules!,
-      // testData: scrappable.referenceTestData!.copyWith(
-      //   id: existingScrappable.referenceTestData!.id,
-      // ),
-      // scrappingBeeExtractLogic: scrappable.scrappingBeeExtractRules!.copyWith(
-      //   id: existingScrappable.scrappingBeeExtractRules!.id,
-      // ),
-      scrappableRequest: scrappable.targetRequest!,
     );
+    final existsScrappableWithTargetId = existingScrappable != null;
+    final isAccountAlreadyAttachedToOtherUser =
+        existingScrappable?.accountId != null &&
+            existingScrappable!.accountId != accountInfo.id;
+
+    if (!existsScrappableWithTargetId) {
+      throw ZenScrapException(
+        title: 'Scrappable Not Found',
+        description: 'The scrappable you are trying to attach does not exist.',
+      );
+    }
+
+    if (isAccountAlreadyAttachedToOtherUser == true) {
+      // Already attached to another account
+      throw ZenScrapException(
+        title: 'Scrappable Already Attached',
+        description:
+            'The scrappable you are trying to attach is already linked to another account.',
+      );
+    }
+
+    await Scrappable.db.updateRow(
+        session, existingScrappable.copyWith(accountId: accountInfo.id),
+        transaction: transaction);
+    await AccountInfo.db.attachRow.scrappables(
+        session, accountInfo, existingScrappable,
+        transaction: transaction);
+    await AccountInfo.db.attachRow.scrappables(
+        session, accountInfo, existingScrappable,
+        transaction: transaction);
   }
 
   final include = AccountInfo.include(

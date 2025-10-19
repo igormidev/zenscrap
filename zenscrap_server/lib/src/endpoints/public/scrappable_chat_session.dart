@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:serverpod/serverpod.dart';
+import 'package:zenscrap_server/src/core/default_classes.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_claude_code_sdk_impl.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/i_chat_controller.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
@@ -14,6 +15,7 @@ final Map<RedraftSrappableSessionId, ReplaySubject<ChatResponse>>
 final Map<ThinkingSessionId, StreamController<String>> _thinkingStream = {};
 final Map<RedraftSrappableSessionId, IChatController> _chatSessions = {};
 final Map<int, RedraftSrappableSessionId> _scrappableOpenedSessionsIds = {};
+final Map<RedraftSrappableSessionId, int> _cacheScrappableIds = {};
 final Map<RedraftSrappableSessionId, ReferenceTestData> _cacheRefTestData = {};
 final Map<RedraftSrappableSessionId, ScrappingBeeExtractLogic?>
     _cacheScrappingBeeExtractLogic = {};
@@ -27,6 +29,93 @@ ScrappingBeeExtractLogic? getTestExtractRules(int scrappableId) {
 
 class ScrappableChatSession extends Endpoint {
   final Uuid uuid = Uuid();
+
+  Future<void> commitCurrentEditState(
+    Session session, {
+    required RedraftSrappableSessionId sessionUuid,
+  }) async {
+    final int? scrappableId = _cacheScrappableIds[sessionUuid];
+    if (scrappableId == null) {
+      throw ZenScrapException(
+        title: 'Cache Scrappable ID Not Found',
+        description: 'No cache scrappable ID found for session $sessionUuid.',
+      );
+    }
+    final int? userId = (await session.authenticated)?.userId;
+    final ReferenceTestData? testData = _cacheRefTestData[sessionUuid];
+    final ScrappingBeeExtractLogic? scrappingBeeExtractLogic =
+        _cacheScrappingBeeExtractLogic[sessionUuid];
+    final ScrappableRequest? scrappableRequest =
+        _cacheScrappableRequest[sessionUuid];
+    if (testData == null ||
+        scrappingBeeExtractLogic == null ||
+        scrappableRequest == null) {
+      throw ZenScrapException(
+        title: 'Cache Test Data Not Found',
+        description: 'No cache test data found for session $sessionUuid.',
+      );
+    }
+    await session.db.transaction((transaction) async {
+      final Scrappable? scrappable;
+      if (userId == null) {
+        // If not autenticated, should only be able to modify scrappables that are not attached to any account
+        scrappable = await Scrappable.db.findFirstRow(session,
+            where: (t) =>
+                t.referenceTestDataId.equals(testData.id) &
+                t.referenceTestData.byteData.id.equals(testData.byteData?.id) &
+                t.scrappingBeeExtractRules.id
+                    .equals(scrappingBeeExtractLogic.id) &
+                t.targetRequest.id.equals(scrappableRequest.id) &
+                t.accountId.equals(null),
+            transaction: transaction);
+      } else {
+        final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
+          session,
+          where: (p0) => p0.userInfoId.equals(userId),
+          transaction: transaction,
+        );
+        if (accountInfo == null) {
+          throw defaultAuthenticationException;
+        }
+        scrappable = await Scrappable.db.findFirstRow(
+          session,
+          where: (t) =>
+              t.referenceTestDataId.equals(testData.id) &
+              t.referenceTestData.byteData.id.equals(testData.byteData?.id) &
+              t.scrappingBeeExtractRules.id
+                  .equals(scrappingBeeExtractLogic.id) &
+              t.targetRequest.id.equals(scrappableRequest.id) &
+              t.accountId.equals(accountInfo.id),
+          transaction: transaction,
+        );
+      }
+
+      if (scrappable == null) {
+        throw ZenScrapException(
+          title: 'Authentication Required or Reference Data does not exist',
+          description:
+              'You probably must be authenticated to modify this reference test data - or you misstyped the id of it',
+        );
+      }
+
+      await Scrappable.db.updateRow(
+          session,
+          scrappable.copyWith(
+            extractRulesUpdatedAt: DateTime.now(),
+          ),
+          transaction: transaction);
+
+      await ScrappingBeeExtractLogic.db.updateRow(
+          session, scrappingBeeExtractLogic,
+          transaction: transaction);
+      await ScrappableRequest.db
+          .updateRow(session, scrappableRequest, transaction: transaction);
+      await ByteTestData.db
+          .updateRow(session, testData.byteData!, transaction: transaction);
+      await ReferenceTestData.db
+          .updateRow(session, testData, transaction: transaction);
+    });
+  }
 
   Future<void> disposeSession(
     Session session, {
@@ -121,6 +210,7 @@ class ScrappableChatSession extends Endpoint {
       duration + Duration(minutes: 1),
     );
     session.log('Scheduled dispose for session $sessionUuid');
+    _cacheScrappableIds[sessionUuid] = scrappable.id!;
     await Scrappable.db.updateRow(
         session,
         scrappable.copyWith(
@@ -256,6 +346,7 @@ Future<void> _disposeSession({
   _chatSessions.remove(sessionId);
   final subject = _scrapRedraftSessions.remove(sessionId);
   await subject?.close();
+  _cacheScrappableIds.remove(sessionId);
   _cacheRefTestData.remove(sessionId);
   _cacheScrappingBeeExtractLogic.remove(sessionId);
   _cacheScrappableRequest.remove(sessionId);

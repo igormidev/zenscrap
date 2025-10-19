@@ -5,8 +5,8 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/serverpod_to_result.dart';
 import 'package:zenscrap_flutter/src/design_system/default_error_snackbar.dart';
 import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
-import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/is_chat_loading_provider.dart';
+import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
@@ -63,13 +63,8 @@ class _DeployButtonState extends ConsumerState<DeployButton> {
                         await ref.globalLoadingSetter(() async {
                           _isDeployingVN.value = true;
                           final deployResult = await ref
-                              .read(clientProvider)
-                              .deployScrappable(
-                                testData: widget.testData!,
-                                scrappableRequest: widget.scrappableRequest!,
-                                scrappingBeeExtractLogic:
-                                    widget.scrappingBeeExtractLogic!,
-                              )
+                              .read(scrapChatProvider.notifier)
+                              .commitCurrentChanges()
                               .toResult;
                           _isDeployingVN.value = false;
 

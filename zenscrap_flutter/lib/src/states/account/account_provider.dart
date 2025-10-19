@@ -33,29 +33,45 @@ class AccountStateNotifier extends StateNotifier<AccountState> {
     final scrappable = ref.read(scrapChatProvider).mapOrNull(
           standard: (value) => value.data,
         );
-    final result = await ref
-        .read(clientProvider)
-        .privateAccount
-        .getAccountInfo(
-          initialScrappableIfNewUser: scrappable,
-        )
-        .toResult;
 
-    result.fold(
-      (accountInfo) {
-        state = AccountState.withData(accountInfo: accountInfo);
-      },
-      (failure) {
-        state = AccountState.withError(exception: failure);
-      },
-    );
+    Future<void> setAccountInfo() async {
+      final result = await ref
+          .read(clientProvider)
+          .privateAccount
+          .getAccountInfo(initialScrappableId: scrappable?.id)
+          .toResult;
+
+      result.fold(
+        (accountInfo) {
+          state = AccountState.withData(accountInfo: accountInfo);
+        },
+        (failure) {
+          state = AccountState.withError(exception: failure);
+        },
+      );
+    }
+
+    if (scrappable != null) {
+      final commitResult =
+          await ref.read(scrapChatProvider.notifier).commitCurrentChanges();
+      await commitResult.fold(
+        (success) async {
+          await setAccountInfo();
+        },
+        (failure) {
+          state = AccountState.withError(exception: failure);
+        },
+      );
+    } else {
+      await setAccountInfo();
+    }
   }
 
   Future<AccountInfo> getUser() async {
     return await ref
         .read(clientProvider)
         .privateAccount
-        .getAccountInfo(initialScrappableIfNewUser: null);
+        .getAccountInfo(initialScrappableId: null);
   }
 
   void setUser(AccountInfo accountInfo) {

@@ -26,8 +26,6 @@ createScrappable:
   - call:
 deleteScrappable:
   - call:
-deployScrappable:
-  - call:
 editScrappable:
   - call:
 marketplace:
@@ -35,6 +33,7 @@ marketplace:
 publicTier:
   - updatePlayerTier:
 scrappableChatSession:
+  - commitCurrentEditState:
   - disposeSession:
   - createSession:
   - listenToScrappableRedraftSession:
