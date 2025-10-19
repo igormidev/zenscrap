@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
-import 'package:zenscrap_flutter/src/core/extensions/serverpod_to_result.dart';
 import 'package:zenscrap_flutter/src/design_system/default_error_snackbar.dart';
 import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/is_chat_loading_provider.dart';
@@ -61,26 +60,28 @@ class _DeployButtonState extends ConsumerState<DeployButton> {
                         await Future.delayed(
                             const Duration(milliseconds: 1200));
                         await ref.globalLoadingSetter(() async {
-                          _isDeployingVN.value = true;
-                          final deployResult = await ref
-                              .read(scrapChatProvider.notifier)
-                              .commitCurrentChanges()
-                              .toResult;
-                          _isDeployingVN.value = false;
+                          try {
+                            _isDeployingVN.value = true;
+                            final deployResult = await ref
+                                .read(scrapChatProvider.notifier)
+                                .commitCurrentChanges();
 
-                          deployResult.fold(
-                            (_) {
-                              if (context.canPop()) {
-                                context.pop(true);
-                              } else {
-                                context.go(DashboardNavigationType
-                                    .userEndpoints.routeOnClick!);
-                              }
-                            },
-                            (failure) {
-                              handleBabelException(context, failure);
-                            },
-                          );
+                            deployResult.fold(
+                              (_) {
+                                if (context.canPop()) {
+                                  context.pop(true);
+                                } else {
+                                  context.go(DashboardNavigationType
+                                      .userEndpoints.routeOnClick!);
+                                }
+                              },
+                              (failure) {
+                                handleBabelException(context, failure);
+                              },
+                            );
+                          } finally {
+                            _isDeployingVN.value = false;
+                          }
                         });
                       } else {
                         await context.push('/auth');
