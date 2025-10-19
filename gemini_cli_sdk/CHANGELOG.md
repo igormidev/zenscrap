@@ -1,3 +1,8 @@
+## 4.0.1
+
+### Bug Fixes
+- **Fixed stream subscription error**: Changed `_decorateStream` to use `StreamController<String>.broadcast()` instead of `StreamController<String>()`. This fixes the "Stream has already been listened to" error when the stream is consumed by multiple listeners (e.g., when both forwarding chunks and collecting all messages).
+
 ## 4.0.0
 
 ### Breaking Changes

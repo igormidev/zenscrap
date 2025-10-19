@@ -1,5 +1,20 @@
 # Claude Development Guidelines
 
+## ⚠️ IMPORTANT: Package Update Guidelines
+
+**ALWAYS update version, changelog, and README when modifying these packages:**
+
+When you make changes to any of these SDK packages, you MUST update:
+1. **Version** in `pubspec.yaml` - Follow semantic versioning
+2. **CHANGELOG.md** - Add entry describing the changes
+3. **README.md** - Update if there are API changes or new features
+
+Affected packages:
+- `claude_code_sdk/`
+- `gemini_cli_sdk/`
+- `codex_cli_sdk/`
+- `programming_cli_core_sdk/`
+
 ## ⚠️ IMPORTANT: Serverpod Code Generation
 
 **ALWAYS use the experimental features flag when generating Serverpod files:**

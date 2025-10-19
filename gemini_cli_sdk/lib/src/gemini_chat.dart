@@ -184,7 +184,7 @@ ${_options.systemPrompt}
 
   Stream<String> _decorateStream(Stream<String> stream) {
     final rawBuffer = StringBuffer();
-    final controller = StreamController<String>();
+    final controller = StreamController<String>.broadcast();
     StreamSubscription<String>? subscription;
 
     subscription = stream.transform(const LineSplitter()).listen(

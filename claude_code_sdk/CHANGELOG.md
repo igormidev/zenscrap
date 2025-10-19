@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.0.1
+
+### Bug Fixes
+- **Fixed stream subscription error**: Changed `_transformClaudeStream` to use `StreamController<String>.broadcast()` instead of `StreamController<String>()`. This fixes the "Stream has already been listened to" error when the stream is consumed by multiple listeners (e.g., when both forwarding chunks and collecting all messages).
+
 ## 5.0.0
 
 ### Breaking Changes

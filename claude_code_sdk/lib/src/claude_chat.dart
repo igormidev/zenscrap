@@ -273,7 +273,7 @@ class ClaudeChat extends CliChatInterface<ClaudeChatOptions> {
   }
 
   Stream<String> _transformClaudeStream(Stream<String> raw) {
-    final controller = StreamController<String>();
+    final controller = StreamController<String>.broadcast();
     final partial = StringBuffer();
 
     late final StreamSubscription<String> subscription;

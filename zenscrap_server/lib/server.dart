@@ -81,16 +81,12 @@ void run(List<String> args) async {
     scrappingBeeApiKey: scrapingBeeApiKey ?? '',
     proxyConfig: proxyConfig,
   );
-
-  // Initialize Claude implementation (if Claude API key is available)
-  final claudeApiKey = pod.getPassword('claudeApiKey');
-  if (claudeApiKey != null && claudeApiKey.isNotEmpty) {
-    await WebScrapperClaudeImpl.initClaude(
-      claudeApiKey: claudeApiKey,
-      scrappingBeeApiKey: scrapingBeeApiKey ?? '',
-      proxyConfig: proxyConfig,
-    );
-  }
+  // Initialize Gemini implementation
+  await WebScrapperClaudeImpl.initClaude(
+    claudeApiKey: pod.getPassword('claudeApiKey') ?? '',
+    scrappingBeeApiKey: scrapingBeeApiKey ?? '',
+    proxyConfig: proxyConfig,
+  );
 
   // Initialize Stripe configuration
   StripeConfig.initialize({
