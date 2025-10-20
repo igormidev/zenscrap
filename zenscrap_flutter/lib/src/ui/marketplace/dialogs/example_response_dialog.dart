@@ -176,7 +176,27 @@ class _ExampleResponseDialogState extends ConsumerState<ExampleResponseDialog>
             width: MediaQuery.sizeOf(context).width * 0.3,
             child: Column(
               children: [
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: Text(
+                          (widget.scrappable.referenceTestData
+                                      ?.referenceLinkUsed ??
+                                  '')
+                              .replaceAll('https://', '')
+                              .replaceAll('www.', ''),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 4),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: ZenAnimatedSwitch(

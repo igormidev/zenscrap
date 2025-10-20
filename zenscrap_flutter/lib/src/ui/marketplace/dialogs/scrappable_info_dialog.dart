@@ -243,6 +243,7 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
                 copyTooltipMessage: 'Copy the test cURL command',
                 code: curlCommand
                     .replaceAll(r'\"', '"')
+                    .replaceAll('//api', '/api')
                     // replace the api key
                     .replaceAll(selectedApiKey!.apiKey,
                         '${selectedApiKey!.apiKey.substring(0, 8)}...'),
