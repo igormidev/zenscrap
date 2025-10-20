@@ -35,16 +35,18 @@ import 'package:zenscrap_client/src/protocol/entities/scrappable/scraper_categor
     as _i13;
 import 'package:zenscrap_client/src/protocol/entities/marketplace/paginated_scrappable_response.dart'
     as _i14;
-import 'package:zenscrap_client/src/protocol/entities/account/plan_tier.dart'
+import 'package:zenscrap_client/src/protocol/entities/scrappable/byte_test_data.dart'
     as _i15;
-import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/create_session_response.dart'
+import 'package:zenscrap_client/src/protocol/entities/account/plan_tier.dart'
     as _i16;
-import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/chat_response.dart'
+import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/create_session_response.dart'
     as _i17;
-import 'package:zenscrap_client/src/protocol/entities/scrappable/ai_model.dart'
+import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/chat_response.dart'
     as _i18;
-import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i19;
-import 'protocol.dart' as _i20;
+import 'package:zenscrap_client/src/protocol/entities/scrappable/ai_model.dart'
+    as _i19;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i20;
+import 'protocol.dart' as _i21;
 
 /// {@category Endpoint}
 class EndpointPrivateAccount extends _i1.EndpointRef {
@@ -328,6 +330,23 @@ class EndpointMarketplace extends _i1.EndpointRef {
 }
 
 /// {@category Endpoint}
+class EndpointPublicScrappable extends _i1.EndpointRef {
+  EndpointPublicScrappable(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'publicScrappable';
+
+  /// Retrieves ByteTestData for a scrappable
+  /// This is a public endpoint to allow viewing test data in the marketplace
+  _i2.Future<_i15.ByteTestData?> getByteTestData(int scrappableId) =>
+      caller.callServerEndpoint<_i15.ByteTestData?>(
+        'publicScrappable',
+        'getByteTestData',
+        {'scrappableId': scrappableId},
+      );
+}
+
+/// {@category Endpoint}
 class EndpointPublicTier extends _i1.EndpointRef {
   EndpointPublicTier(_i1.EndpointCaller caller) : super(caller);
 
@@ -337,7 +356,7 @@ class EndpointPublicTier extends _i1.EndpointRef {
   _i2.Future<void> updatePlayerTier({
     required String email,
     required String tierManipulationKey,
-    required _i15.PlanTier planTier,
+    required _i16.PlanTier planTier,
   }) =>
       caller.callServerEndpoint<void>(
         'publicTier',
@@ -371,18 +390,18 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
         {'sessionId': sessionId},
       );
 
-  _i2.Future<_i16.CreateSessionResponse> createSession(
+  _i2.Future<_i17.CreateSessionResponse> createSession(
           {required int scrappableId}) =>
-      caller.callServerEndpoint<_i16.CreateSessionResponse>(
+      caller.callServerEndpoint<_i17.CreateSessionResponse>(
         'scrappableChatSession',
         'createSession',
         {'scrappableId': scrappableId},
       );
 
-  _i2.Stream<_i17.ChatResponse> listenToScrappableRedraftSession(
+  _i2.Stream<_i18.ChatResponse> listenToScrappableRedraftSession(
           {required String sessionUuid}) =>
-      caller.callStreamingServerEndpoint<_i2.Stream<_i17.ChatResponse>,
-          _i17.ChatResponse>(
+      caller.callStreamingServerEndpoint<_i2.Stream<_i18.ChatResponse>,
+          _i18.ChatResponse>(
         'scrappableChatSession',
         'listenToScrappableRedraftSession',
         {'sessionUuid': sessionUuid},
@@ -391,7 +410,7 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
 
   _i2.Future<void> changeChatModel({
     required String sessionUuid,
-    required _i18.AiModel aiModel,
+    required _i19.AiModel aiModel,
   }) =>
       caller.callServerEndpoint<void>(
         'scrappableChatSession',
@@ -419,10 +438,10 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
 
 class Modules {
   Modules(Client client) {
-    auth = _i19.Caller(client);
+    auth = _i20.Caller(client);
   }
 
-  late final _i19.Caller auth;
+  late final _i20.Caller auth;
 }
 
 class Client extends _i1.ServerpodClientShared {
@@ -441,7 +460,7 @@ class Client extends _i1.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
           host,
-          _i20.Protocol(),
+          _i21.Protocol(),
           securityContext: securityContext,
           authenticationKeyManager: authenticationKeyManager,
           streamingConnectionTimeout: streamingConnectionTimeout,
@@ -461,6 +480,7 @@ class Client extends _i1.ServerpodClientShared {
     deleteScrappable = EndpointDeleteScrappable(this);
     editScrappable = EndpointEditScrappable(this);
     marketplace = EndpointMarketplace(this);
+    publicScrappable = EndpointPublicScrappable(this);
     publicTier = EndpointPublicTier(this);
     scrappableChatSession = EndpointScrappableChatSession(this);
     modules = Modules(this);
@@ -486,6 +506,8 @@ class Client extends _i1.ServerpodClientShared {
 
   late final EndpointMarketplace marketplace;
 
+  late final EndpointPublicScrappable publicScrappable;
+
   late final EndpointPublicTier publicTier;
 
   late final EndpointScrappableChatSession scrappableChatSession;
@@ -504,6 +526,7 @@ class Client extends _i1.ServerpodClientShared {
         'deleteScrappable': deleteScrappable,
         'editScrappable': editScrappable,
         'marketplace': marketplace,
+        'publicScrappable': publicScrappable,
         'publicTier': publicTier,
         'scrappableChatSession': scrappableChatSession,
       };

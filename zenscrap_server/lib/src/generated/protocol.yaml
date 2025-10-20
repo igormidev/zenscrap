@@ -30,6 +30,8 @@ editScrappable:
   - call:
 marketplace:
   - getItems:
+publicScrappable:
+  - getByteTestData:
 publicTier:
   - updatePlayerTier:
 scrappableChatSession:
