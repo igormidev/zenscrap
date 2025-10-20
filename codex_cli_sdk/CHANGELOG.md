@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.1.3
+
+### Fixed
+- **MCP Support**: Fixed critical bug where MCP (Model Context Protocol) servers were not accessible in chat sessions. When `enableMcp: true`, the SDK now uses the global CODEX_HOME instead of creating an isolated one, allowing the chat to access globally configured MCP servers like Playwright and ScrapingBee.
+- **API Key with MCP**: When MCP is enabled and an API key is provided, the SDK now sets `OPENAI_API_KEY` via environment variable instead of using isolated authentication, ensuring both MCP access and authentication work together.
+
 ## 4.1.2
 
 ### Dependencies

@@ -143,7 +143,7 @@ class _ScrappableDetailsDialogState
             width: MediaQuery.sizeOf(context).width * 0.3,
             child: Builder(builder: (context) {
               final String? result =
-                  widget.scrappable.scrappingBeeExtractRules?.extractRules;
+                  widget.scrappable.referenceTestData?.scrapResultJson;
 
               final decodedJson = tryDecode(result);
 

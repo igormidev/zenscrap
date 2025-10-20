@@ -70,7 +70,8 @@ class CodexChat extends CliChatInterface<CodexChatOptions> {
     await _ensureBaseDirExists();
 
     // If API key is provided and we haven't logged in yet, do stdin login
-    if (apiKey != null && _codexHomeDir == null) {
+    // BUT: Don't use isolated CODEX_HOME if MCP is enabled (MCPs are configured globally)
+    if (apiKey != null && _codexHomeDir == null && _options.enableMcp != true) {
       await _loginViaStdin();
     }
 
@@ -219,6 +220,9 @@ class CodexChat extends CliChatInterface<CodexChatOptions> {
       // Disable parent OPENAI_* vars to avoid conflicts
       env['OPENAI_API_KEY'] = '';
       env['AZURE_OPENAI_API_KEY'] = '';
+    } else if (apiKey != null && _options.enableMcp == true) {
+      // When MCP is enabled and we're not using isolated HOME, set API key via environment
+      env['OPENAI_API_KEY'] = apiKey!;
     }
 
     if (_options.environment != null) {
