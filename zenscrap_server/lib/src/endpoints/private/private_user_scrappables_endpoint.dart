@@ -40,11 +40,12 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
         t.accountId.equals(accountInfo.id) & t.isDeleted.equals(false);
 
     // Add search filter if query is provided
-    Expression whereClause(ScrappableTable t) => searchQuery != null && searchQuery.isNotEmpty
-        ? baseWhere(t) &
-            (t.name.ilike('%$searchQuery%') |
-                t.description.ilike('%$searchQuery%'))
-        : baseWhere(t);
+    Expression whereClause(ScrappableTable t) =>
+        searchQuery != null && searchQuery.isNotEmpty
+            ? baseWhere(t) &
+                (t.name.ilike('%$searchQuery%') |
+                    t.description.ilike('%$searchQuery%'))
+            : baseWhere(t);
 
     // Get total count for pagination
     final totalCount = await Scrappable.db.count(
@@ -74,6 +75,13 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
         referenceTestData: ReferenceTestData.include(),
       ),
     );
+    print('--- scrappable page ---');
+    for (var s in scrappables) {
+      print(
+        'Scrappable: ${s.id} - ${s.name} - has scrappingBeeExtractRules: ${s.scrappingBeeExtractRules != null}',
+      );
+    }
+    // scrappables.firstOrNull.scr;
 
     return UserPaginatedScrappableResponse(
       data: scrappables,

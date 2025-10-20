@@ -37,12 +37,16 @@ class PrivateAccountEndpoint extends Endpoint {
 
     final isNewAccount = accountInfo == null;
 
-    if (isNewAccount && initialScrappableId != null) {
+    if (!isNewAccount && initialScrappableId != null) {
       return await session.db.transaction((transaction) async {
         await _attachScrappable(
             session, transaction, accountInfo!, initialScrappableId);
         return accountInfo;
       });
+    }
+
+    if (!isNewAccount) {
+      return accountInfo;
     }
 
     final String nanoId = nanoid(length: 8);

@@ -33,7 +33,7 @@ class _LLMThinkingBubbleState extends State<LLMThinkingBubble> {
   void _showFullThinkingDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (dialogContext) => const LLMThinkingDialog(),
+      builder: (dialogContext) => LLMThinkingDialog(),
     );
   }
 

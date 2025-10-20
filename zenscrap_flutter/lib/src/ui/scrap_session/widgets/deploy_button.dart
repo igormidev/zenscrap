@@ -1,9 +1,13 @@
+import 'dart:async';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/default_error_snackbar.dart';
 import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
+import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/is_chat_loading_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
@@ -11,11 +15,13 @@ import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
 
 class DeployButton extends ConsumerStatefulWidget {
+  final int scrappableId;
   final ReferenceTestData? testData;
   final ScrappingBeeExtractLogic? scrappingBeeExtractLogic;
   final ScrappableRequest? scrappableRequest;
   const DeployButton({
     super.key,
+    required this.scrappableId,
     required this.testData,
     required this.scrappingBeeExtractLogic,
     required this.scrappableRequest,
@@ -56,40 +62,48 @@ class _DeployButtonState extends ConsumerState<DeployButton> {
                       widget.scrappingBeeExtractLogic == null
                   ? null
                   : () async {
-                      if (isLoggedIn) {
-                        await Future.delayed(
-                            const Duration(milliseconds: 1200));
-                        await ref.globalLoadingSetter(() async {
-                          try {
-                            _isDeployingVN.value = true;
-                            final deployResult = await ref
-                                .read(scrapChatProvider.notifier)
-                                .commitCurrentChanges();
+                      await ref.globalLoadingSetter(() async {
+                        try {
+                          _isDeployingVN.value = true;
+                          await Future.delayed(
+                              const Duration(milliseconds: 400));
 
-                            deployResult.fold(
-                              (_) {
+                          final deployResult = await ref
+                              .read(scrapChatProvider.notifier)
+                              .commitCurrentChanges();
+
+                          deployResult.fold(
+                            (_) async {
+                              if (isLoggedIn) {
                                 if (context.canPop()) {
                                   context.pop(true);
                                 } else {
                                   context.go(DashboardNavigationType
                                       .userEndpoints.routeOnClick!);
                                 }
-                              },
-                              (failure) {
-                                handleBabelException(context, failure);
-                              },
-                            );
-                          } finally {
-                            _isDeployingVN.value = false;
-                          }
-                        });
-                      } else {
-                        await context.push('/auth');
-                      }
+                              } else {
+                                _isDeployingVN.value = false;
+                                ref
+                                        .read(accountProvider.notifier)
+                                        .scrappableIdToBeAttached =
+                                    widget.scrappableId;
+                                unawaited(context.push('/auth'));
+                              }
+                            },
+                            (failure) {
+                              handleBabelException(context, failure);
+                            },
+                          );
+                        } finally {
+                          _isDeployingVN.value = false;
+                        }
+                      });
                     },
               label: Text('DEPLOY ENDPOINT'),
               iconAlignment: IconAlignment.end,
-              icon: Icon(Icons.rocket),
+              icon: isDeploying
+                  ? CupertinoActivityIndicator()
+                  : Icon(Icons.rocket),
             );
           }),
     );

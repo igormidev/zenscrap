@@ -12,8 +12,15 @@ final accountProvider =
 });
 
 class AccountStateNotifier extends StateNotifier<AccountState> {
+  int? scrappableIdToBeAttached;
   AccountStateNotifier(this.ref) : super(AccountState.initial());
   final Ref ref;
+
+  @override
+  void dispose() {
+    scrappableIdToBeAttached = null;
+    super.dispose();
+  }
 
   void logOut() async {
     state = AccountState.initial();
@@ -34,38 +41,23 @@ class AccountStateNotifier extends StateNotifier<AccountState> {
           standard: (value) => value.data,
         );
 
-    Future<void> setAccountInfo() async {
-      final scrappableId = scrappable?.id;
-      final result = await ref
-          .read(clientProvider)
-          .privateAccount
-          .getAccountInfo(initialScrappableId: scrappableId)
-          .toResult;
+    final scrappableId = scrappable?.id ?? scrappableIdToBeAttached;
+    final result = await ref
+        .read(clientProvider)
+        .privateAccount
+        .getAccountInfo(initialScrappableId: scrappableId)
+        .toResult;
 
-      result.fold(
-        (accountInfo) {
-          state = AccountState.withData(accountInfo: accountInfo);
-        },
-        (failure) {
-          state = AccountState.withError(exception: failure);
-        },
-      );
-    }
-
-    if (scrappable != null) {
-      final commitResult =
-          await ref.read(scrapChatProvider.notifier).commitCurrentChanges();
-      await commitResult.fold(
-        (success) async {
-          await setAccountInfo();
-        },
-        (failure) {
-          state = AccountState.withError(exception: failure);
-        },
-      );
-    } else {
-      await setAccountInfo();
-    }
+    await result.fold(
+      (accountInfo) async {
+        await ref.read(scrapChatProvider.notifier).endSession();
+        scrappableIdToBeAttached = null;
+        state = AccountState.withData(accountInfo: accountInfo);
+      },
+      (failure) {
+        state = AccountState.withError(exception: failure);
+      },
+    );
   }
 
   Future<AccountInfo> getUser() async {

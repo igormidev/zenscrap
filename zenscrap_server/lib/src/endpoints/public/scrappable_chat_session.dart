@@ -107,6 +107,7 @@ class ScrappableChatSession extends Endpoint {
             .updateRow(session, testData.byteData!, transaction: transaction);
         await ReferenceTestData.db
             .updateRow(session, testData, transaction: transaction);
+        print('Committed changes for scrappable $scrappableId');
       } catch (e, s) {
         session.log(
           'Failed to commit changes for session $sessionUuid',

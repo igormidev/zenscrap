@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_state.dart';
@@ -20,8 +22,23 @@ class LLMThinkingDialog extends ConsumerWidget {
     return cleaned;
   }
 
+  static String fullContext = '';
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Listen for state changes and auto-close when thinking ends
+    ref.listen(scrapChatProvider, (previous, next) {
+      final thinkingStream = next.maybeMap(
+        standard: (value) => value.llmThinkingStream,
+        orElse: () => null,
+      );
+
+      // If thinking stream becomes null, the AI has finished thinking
+      if ((thinkingStream == null || thinkingStream.isEmpty) && !kDebugMode) {
+        Navigator.of(context).pop();
+      }
+    });
+
     final scrapChatState = ref.watch(scrapChatProvider);
 
     // Extract thinking stream from the state
@@ -31,7 +48,7 @@ class LLMThinkingDialog extends ConsumerWidget {
     );
 
     // Join the thinking stream into full text
-    final fullText = thinkingStream != null && thinkingStream.isNotEmpty
+    fullContext = thinkingStream != null && thinkingStream.isNotEmpty
         ? _cleanText(thinkingStream.join())
         : '';
 
@@ -70,6 +87,18 @@ class LLMThinkingDialog extends ConsumerWidget {
                         ),
                   ),
                   const Spacer(),
+                  if (kDebugMode)
+                    IconButton(
+                      icon: const Icon(Icons.copy),
+                      onPressed: () async {
+                        await Clipboard.setData(
+                            ClipboardData(text: fullContext));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Copied to clipboard')),
+                        );
+                      },
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    ),
                   IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: () => Navigator.of(context).pop(),
@@ -85,7 +114,7 @@ class LLMThinkingDialog extends ConsumerWidget {
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: SelectableText(
-                    fullText,
+                    fullContext,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           fontFamily: 'monospace',
                           height: 1.6,
