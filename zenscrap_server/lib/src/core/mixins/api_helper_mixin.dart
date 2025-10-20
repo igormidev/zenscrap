@@ -285,13 +285,16 @@ mixin ApiHelperMixin {
         call,
   ) async {
     Scrappable? scrappable;
-    final NanoId? nanoId = await getNanoId(session, apiKey);
-    increaseConcurrency(nanoId);
-    final doesApiKeyExists = checkIdApiKeyExists(nanoId, apiKey);
-    // Will throw if not exists and cache result if exist so new calls to db are not needed each time
-    if (!doesApiKeyExists) await garanteeApiKeyExists(session, nanoId, apiKey);
-
+    NanoId? nanoId;
     try {
+      nanoId = await getNanoId(session, apiKey);
+      increaseConcurrency(nanoId);
+      final doesApiKeyExists = checkIdApiKeyExists(nanoId, apiKey);
+      // Will throw if not exists and cache result if exist so new calls to db are not needed each time
+      if (!doesApiKeyExists) {
+        await garanteeApiKeyExists(session, nanoId, apiKey);
+      }
+
       return await call((s) {
         scrappable = s;
       }, nanoId);
@@ -377,7 +380,7 @@ mixin ApiHelperMixin {
     required Map<String, dynamic> payload,
   }) async {
     try {
-      return wrapAnalytics(session, apiKey,
+      return await wrapAnalytics(session, apiKey,
           (setScrappableCallback, nanoId) async {
         final (Scrappable scrappable, ScrappableRequest targetRequest) =
             await getScrappableById(session, scrappableId, nanoId);
