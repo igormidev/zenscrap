@@ -48,9 +48,9 @@ class LLMThinkingDialog extends ConsumerWidget {
     );
 
     // Join the thinking stream into full text
-    fullContext = thinkingStream != null && thinkingStream.isNotEmpty
-        ? _cleanText(thinkingStream.join())
-        : '';
+    if (thinkingStream != null && thinkingStream.isNotEmpty) {
+      fullContext = _cleanText(thinkingStream.join());
+    }
 
     return Dialog(
       child: Container(

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:claude_code_sdk/claude_code_sdk.dart';
 import 'package:web_scrapper_generator/src/prompts.dart';
@@ -70,7 +71,8 @@ class WebScrapperClaudeImpl
     final chat = _claudeSDK.createNewChat(options: initialOptions);
 
     // Update the cwd to the chat-specific directory to scope all file operations
-    final scopedCwd = 'ai_generated_files/${chat.chatNanoId}';
+    // Use absolute path to prevent path duplication issues
+    final scopedCwd = '${Directory.current.absolute.path}/ai_generated_files/${chat.chatNanoId}';
     chat.updateOptions(initialOptions.copyWith(cwd: scopedCwd));
 
     return WebScrapperClaudeImpl._(initialPayload, chat);
@@ -179,38 +181,8 @@ class WebScrapperClaudeImpl
 
   /// Convert the system prompt to be Claude-compatible
   static String _convertSystemPromptForClaude() {
-    // Claude doesn't have MCP support configured yet, so we use a simplified prompt
-    return '''You are a world-class expert in web scraping, web automation, and web data extraction with deep knowledge of HTML, CSS, JavaScript, HTTP protocols, and modern web scraping techniques.
-
-## Your Task
-You are helping to create web scraping configurations using ScrapingBee API. You will analyze web pages and create extraction rules that work with ScrapingBee's data extraction system.
-
-## ScrapingBee Extraction Rules
-You need to create JSON extraction rules using CSS/XPath selectors. See: https://www.scrapingbee.com/documentation/data-extraction/
-
-## Response Format
-You MUST respond in a structured JSON format with one of three response types:
-
-### 1. Message Response (responseType: "message")
-Use when you need to ask for clarification or provide information.
-
-### 2. Error Response (responseType: "error")
-Use when something blocks you from creating extraction rules.
-
-### 3. Data Response (responseType: "data")
-Use when you have successfully created extraction rules. Include:
-- resumeActionMessage: Summary of what you accomplished
-- fetchSettings: The complete ScrapingBee configuration
-- request: Modified WebScrapperRequest (or null if unchanged)
-
-## Important Guidelines
-1. Create reliable, cost-effective extraction rules
-2. Start with premium settings (premium_proxy=true, render_js=true) for testing
-3. Optimize for cost after confirming rules work
-4. Handle dynamic content with appropriate wait parameters
-5. For Google domains, always set custom_google=true
-
-Remember: Your goal is to create extraction rules that consistently retrieve the requested data.''';
+    // Claude Code has full MCP support - use complete prompt with MCP instructions
+    return systemPrompt; // Use the full system prompt from prompts.dart
   }
 
   /// Convert initial prompts from Gemini format to Claude format

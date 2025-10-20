@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:gemini_cli_sdk/gemini_cli_sdk.dart';
 import 'package:web_scrapper_generator/src/prompts.dart';
@@ -68,7 +69,8 @@ class WebScrapperGeminiImpl
     final chat = _geminiSDK.createNewChat(options: initialOptions);
 
     // Update the cwd to the chat-specific directory to scope all file operations
-    final scopedCwd = 'ai_generated_files/${chat.chatNanoId}';
+    // Use absolute path to prevent path duplication issues
+    final scopedCwd = '${Directory.current.absolute.path}/ai_generated_files/${chat.chatNanoId}';
     chat.updateOptions(initialOptions.copyWith(cwd: scopedCwd));
 
     final instance = WebScrapperGeminiImpl._(initialPayload, chat);

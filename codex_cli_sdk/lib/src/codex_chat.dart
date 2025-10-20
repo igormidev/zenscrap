@@ -204,7 +204,8 @@ class CodexChat extends CliChatInterface<CodexChatOptions> {
     final exitCode = await loginProc.exitCode;
     if (exitCode != 0) {
       final stderr = await loginProc.stderr.transform(utf8.decoder).join();
-      throw CliException('Codex login failed with exit code $exitCode: $stderr');
+      throw CliException(
+          'Codex login failed with exit code $exitCode: $stderr');
     }
   }
 

@@ -182,8 +182,14 @@ mixin ChatControllerHandlerMixin {
                 session, newScrappingBeeLogic,
                 transaction: transaction);
 
+            // CRITICAL: Update the in-memory object with the scrappableId that was set by attachRow
+            // Without this, the cached object will have scrappableId = null, and commitCurrentEditState
+            // will break the relationship when it calls updateRow!
+            newScrappingBeeLogic = newScrappingBeeLogic.copyWith(
+              scrappableId: scrappable!.id,
+            );
             await Scrappable.db.attachRow.scrappingBeeExtractRules(
-                session, scrappable!, newScrappingBeeLogic,
+                session, scrappable, newScrappingBeeLogic,
                 transaction: transaction);
           });
         } else {
