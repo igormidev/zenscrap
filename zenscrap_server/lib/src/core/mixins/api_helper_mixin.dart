@@ -71,7 +71,7 @@ mixin ApiHelperMixin {
 
     final canIncrease =
         (_currentConcurrencyRequests[nanoId] ?? 0) + 1 <= maxConcurrentRequests;
-    if (!canIncrease) throw _maxConcurrency;
+    if (!canIncrease) throw _maxConcurrencyReached(maxConcurrentRequests);
 
     _currentConcurrencyRequests[nanoId] =
         (_currentConcurrencyRequests[nanoId] ?? 0) + 1;
@@ -515,12 +515,13 @@ final _noActivePlan = ApiError(
         'Your account does not have an active plan. Subscribe to a plan to access the API.',
   ),
 );
-final _maxConcurrency = ApiError(
+ApiError _maxConcurrencyReached(int maxQuantityOfParallelRequests) => ApiError(
     RequestStatus.maxConcurrencyExceeded,
     ZenScrapException(
       title: 'Concurrency Limit Exceeded',
       description:
-          'You have reached the maximum number of concurrent requests allowed for your plan tier.',
+          '''You have reached the maximum number of concurrent requests allowed for your plan tier.'''
+          ''' (Max allowed concurrent requests: $maxQuantityOfParallelRequests)''',
     ));
 
 // T scrappingError<T>(String errorMessage) =>throw _ApiError(

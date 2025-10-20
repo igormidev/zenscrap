@@ -29,9 +29,9 @@ Implemented an automated monthly credit addition system for active subscriptions
    - Updates `ApiHelperMixin.remainingSubscriptionCredits` cache
 
 #### Credit Amounts by Plan:
-- **Base/Basic**: 50,000 credits/month
-- **Pro**: 200,000 credits/month  
-- **Unlimited/Ultra**: 1,000,000 credits/month
+- **Base/Basic**: 250,000 credits/month
+- **Pro**: 1,000,000 credits/month
+- **Unlimited/Ultra**: 4,000,000 credits/month
 
 ### 4. ApiHelperMixin Updates
 The mixin now tracks two separate credit pools:

@@ -309,7 +309,7 @@ class _UpgradePlanDialogState extends ConsumerState<_UpgradePlanDialog> {
           _BenefitItem(
             icon: Icons.all_inclusive_rounded,
             title: 'Plus Everything in Ultra',
-            description: '1M API calls, 100 concurrent requests, priority support & more',
+            description: '4M API credits, 100 concurrent requests, priority support & more',
           ),
         ];
       case PlanTier.pro:
@@ -322,7 +322,7 @@ class _UpgradePlanDialogState extends ConsumerState<_UpgradePlanDialog> {
           const SizedBox(height: 12),
           _BenefitItem(
             icon: Icons.api_rounded,
-            title: '200,000 API Calls',
+            title: '1,000,000 API Credits',
             description: 'Plenty of requests for growing projects',
           ),
           const SizedBox(height: 12),
@@ -348,7 +348,7 @@ class _UpgradePlanDialogState extends ConsumerState<_UpgradePlanDialog> {
           const SizedBox(height: 12),
           _BenefitItem(
             icon: Icons.api_rounded,
-            title: '50,000 API Calls',
+            title: '250,000 API Credits',
             description: 'Perfect for side projects and small applications',
           ),
           const SizedBox(height: 12),

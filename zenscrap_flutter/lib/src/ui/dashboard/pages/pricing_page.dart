@@ -37,7 +37,7 @@ class ZenScrapPricingPage extends ConsumerWidget {
                 monthlyPrice: 100,
                 yearlyPrice: 1050,
                 advantagesListage: [
-                  '<b><u><tC>50.000<tC><u><b> api calls',
+                  '<b><u><tC>250.000<tC><u><b> api credits',
                   '<b><u><tC>10<tC><u><b> concurrent requests',
                   '<b><u><tC>3<tC><u><b> active endpoints',
                 ],
@@ -54,7 +54,7 @@ class ZenScrapPricingPage extends ConsumerWidget {
                 monthlyPrice: 199,
                 yearlyPrice: 1999,
                 advantagesListage: [
-                  '<b><u><tC>200.000<tC><u><b> api calls',
+                  '<b><u><tC>1.000.000<tC><u><b> api credits',
                   '<b><u><tC>30<tC><u><b> concurrent requests',
                   '<b><u><tC>10<tC><u><b> active endpoints',
                   'Access a best AI model',
@@ -71,7 +71,7 @@ class ZenScrapPricingPage extends ConsumerWidget {
                 monthlyPrice: 500,
                 yearlyPrice: 5500,
                 advantagesListage: [
-                  '<b><u><tC>1.000.000<tC><u><b> api calls',
+                  '<b><u><tC>4.000.000<tC><u><b> api credits',
                   '<b><u><tC>100<tC><u><b> concurrent requests',
                   '<b><u><tC>100<tC><u><b> active endpoints',
                   'Access a best AI model',

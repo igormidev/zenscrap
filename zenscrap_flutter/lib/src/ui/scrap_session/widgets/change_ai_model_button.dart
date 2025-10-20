@@ -178,8 +178,8 @@ class _ChangeAiModelButtonState extends ConsumerState<ChangeAiModelButton> {
               const SizedBox(height: 12),
               _SignInBenefit(
                 icon: Icons.api_rounded,
-                title: 'More API Calls',
-                description: 'Get thousands of API calls per month',
+                title: 'More API Credits',
+                description: 'Get thousands of API credits per month',
               ),
               const SizedBox(height: 12),
               _SignInBenefit(

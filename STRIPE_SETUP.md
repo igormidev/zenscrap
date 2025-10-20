@@ -130,9 +130,9 @@ Credits are automatically managed based on subscription events:
 - **On cancellation**: Plan tier set to 'none', stopping credit additions
 
 Plan tier credits per month:
-- Basic: 50,000 credits
-- Pro: 200,000 credits
-- Ultra: 1,000,000 credits
+- Basic: 250,000 credits
+- Pro: 1,000,000 credits
+- Ultra: 4,000,000 credits
 
 ## Troubleshooting
 

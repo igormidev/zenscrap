@@ -6,16 +6,16 @@ extension PlanTierExt on PlanTier {
   int get apiCreditsToBeAddedPerMonth {
     return switch (this) {
       PlanTier.none => 100,
-      PlanTier.basic => 50000,
-      PlanTier.pro => 200000,
-      PlanTier.ultra => 1000000,
+      PlanTier.basic => 250000,
+      PlanTier.pro => 1000000,
+      PlanTier.ultra => 4000000,
     };
   }
 
   /// The number of api-calls/concurrent requests allowed by the user's current plan.
   int get numberOfConcurrentRequestsAllowedByPlan {
     return switch (this) {
-      PlanTier.none => 0,
+      PlanTier.none => 3,
       PlanTier.basic => 10,
       PlanTier.pro => 30,
       PlanTier.ultra => 100,
