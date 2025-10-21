@@ -101,8 +101,11 @@ class ScrappableApiRoute extends Route with ApiHelperMixin {
       payload: payload,
     );
     await result.fold(
-      (Map<String, dynamic> success) async {
-        await _sendSuccess(request, success);
+      (Map<String, dynamic> response) async {
+        // Extract data and credits from the response
+        final data = response['data'] as Map<String, dynamic>;
+        final credits = response['credits'] as Map<String, dynamic>?;
+        await _sendSuccess(request, data, credits);
       },
       (ApiError error) async {
         await _sendError(
@@ -147,13 +150,15 @@ Future<void> _sendError(
 Future<void> _sendSuccess(
   HttpRequest request,
   Map<String, dynamic> data,
+  Map<String, dynamic>? credits,
 ) async {
   request.response.statusCode = HttpStatus.ok;
   request.response.headers.contentType = ContentType.json;
 
-  final successResponse = {
+  final successResponse = <String, dynamic>{
     'success': true,
     'data': data,
+    if (credits != null) 'credits': credits,
   };
 
   request.response.write(jsonEncode(successResponse));

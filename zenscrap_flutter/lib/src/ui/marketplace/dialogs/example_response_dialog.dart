@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/convert_extensions.dart';
+import 'package:zenscrap_flutter/src/core/extensions/string_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/elements/animated_switch.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
@@ -185,12 +186,19 @@ class _ExampleResponseDialogState extends ConsumerState<ExampleResponseDialog>
                           horizontal: 8, vertical: 4),
                       child: SizedBox(
                         width: double.infinity,
-                        child: Text(
-                          (widget.scrappable.referenceTestData
-                                      ?.referenceLinkUsed ??
-                                  '')
-                              .replaceAll('https://', '')
-                              .replaceAll('www.', ''),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Reference url used for example:',
+                                style: context.t.titleSmall
+                                    ?.copyWith(color: context.c.primary)),
+                            Text(
+                              (widget.scrappable.referenceTestData
+                                          ?.referenceLinkUsed ??
+                                      '')
+                                  .shortUrl,
+                            ),
+                          ],
                         ),
                       ),
                     ),

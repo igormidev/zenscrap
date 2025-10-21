@@ -372,6 +372,25 @@ mixin ApiHelperMixin {
     }
   }
 
+  /// Gets the current credit information for a nanoId
+  /// Returns null if nanoId is null (test requests)
+  Map<String, dynamic>? _getCreditInfo(NanoId? nanoId, int creditCost) {
+    if (nanoId == null) return null;
+
+    final subscriptionCredits = _remainingSubscriptionCredits[nanoId] ?? 0;
+    final purchasedCredits = _remainingPurchasedCredits[nanoId] ?? 0;
+    final totalCredits = subscriptionCredits + purchasedCredits;
+
+    return {
+      'spent': creditCost,
+      'remaining': {
+        'subscription': subscriptionCredits,
+        'purchased': purchasedCredits,
+        'total': totalCredits,
+      },
+    };
+  }
+
   AsyncResultDart<Map<String, dynamic>, ApiError> callFunc(
     Session session, {
     required int scrappableId,
@@ -390,7 +409,7 @@ mixin ApiHelperMixin {
         final ScrappingBeeExtractLogic extractRules =
             await _getExtractRules(session, scrappable, apiKey);
 
-        // Calculate the actual credit cost for this extraction
+        // Calculate the actual credit cost for this extraction using the totalCreditCost getter
         final creditCost = extractRules.totalCreditCost;
 
         // Discount the actual cost from the account
@@ -406,7 +425,14 @@ mixin ApiHelperMixin {
         );
 
         return result.when(
-            withData: (r) => r.toSuccess(),
+            withData: (scrapedData) {
+              // Create response with scraped data and credit information
+              final response = <String, dynamic>{
+                'data': scrapedData,
+                'credits': _getCreditInfo(nanoId, creditCost),
+              };
+              return response.toSuccess();
+            },
             error: (errorMessage) {
               return ApiError(
                   RequestStatus.serverError,
