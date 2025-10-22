@@ -33,9 +33,14 @@ mixin ApiHelperMixin {
     if (splitted.length != 2) throw _invalidApiKeyFormat;
     final nanoId = splitted[0];
 
-    final PlanTier? cachePlanTier = _currentAccountPlanTierCache[nanoId];
-    if (cachePlanTier != null) {
-      if (cachePlanTier == PlanTier.none) throw _noActivePlan;
+    final alreadyExistsInCache = _apiKeysAttachedToNanoId[nanoId];
+    if (alreadyExistsInCache != null &&
+        alreadyExistsInCache.contains(apikey) &&
+        _currentAccountPlanTierCache.containsKey(nanoId) &&
+        _currentCreditUsage.containsKey(nanoId) &&
+        _apiKeysAttachedToNanoId[nanoId]!.contains(apikey)) {
+      final cachePlanTier = _currentAccountPlanTierCache[nanoId];
+      if (cachePlanTier == null) throw _invalidApiKey;
       return nanoId;
     }
 
@@ -55,10 +60,13 @@ mixin ApiHelperMixin {
     final PlanTier? planTier = accountInfo?.planTier;
 
     if (planTier == null) throw _invalidApiKey;
-    if (cachePlanTier == PlanTier.none) throw _noActivePlan;
-    _currentAccountPlanTierCache[nanoId] = planTier;
     _currentCreditUsage[nanoId] = accountInfo!.accountApiUsage!.creditUsage!;
-    _apiKeysAttachedToNanoId[nanoId] ??= [apikey];
+    _currentAccountPlanTierCache[nanoId] = planTier;
+    if (_apiKeysAttachedToNanoId[nanoId] == null) {
+      _apiKeysAttachedToNanoId[nanoId] = [apikey];
+    } else if (!_apiKeysAttachedToNanoId[nanoId]!.contains(apikey)) {
+      _apiKeysAttachedToNanoId[nanoId]!.add(apikey);
+    }
 
     return nanoId;
   }
@@ -418,29 +426,30 @@ mixin ApiHelperMixin {
 
         final String targetUrl = composeUrl(payload, targetRequest);
 
-        final ExtractDataByRule result =
+        final ExtractDataByRule extractResponse =
             await scrappingBee.extractByRulesWithLogic(
           targetUrl: targetUrl,
           scrappingBeeExtractLogic: extractRules,
         );
 
-        return result.when(
-            withData: (scrapedData) {
-              // Create response with scraped data and credit information
-              final response = <String, dynamic>{
-                'data': scrapedData,
-                'credits': _getCreditInfo(nanoId, creditCost),
-              };
-              return response.toSuccess();
-            },
-            error: (errorMessage) {
-              return ApiError(
-                  RequestStatus.serverError,
-                  ZenScrapException(
-                    title: 'Scraping Error',
-                    description: errorMessage,
-                  )).toFailure();
-            });
+        await _setScrappableAnalytics(
+            session, scrappable, RequestStatus.success, apiKey, nanoId);
+
+        return extractResponse.when(withData: (scrapedData) {
+          // Create response with scraped data and credit information
+          final response = <String, dynamic>{
+            'data': scrapedData,
+            'credits': _getCreditInfo(nanoId, creditCost),
+          };
+          return response.toSuccess();
+        }, error: (errorMessage) {
+          return ApiError(
+              RequestStatus.serverError,
+              ZenScrapException(
+                title: 'Scraping Error',
+                description: errorMessage,
+              )).toFailure();
+        });
       });
     } on ZenScrapException catch (error) {
       return ApiError(
