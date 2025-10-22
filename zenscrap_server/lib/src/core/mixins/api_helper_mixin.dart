@@ -5,6 +5,7 @@ import 'package:zenscrap_server/server.dart';
 import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';
 import 'package:zenscrap_server/src/core/extension/scrapping_bee_extract_logic_extension.dart';
 import 'package:zenscrap_server/src/core/scraping_bee.dart';
+import 'package:zenscrap_server/src/endpoints/public/marketplace_endpoint.dart';
 import 'package:zenscrap_server/src/endpoints/public/scrappable_chat_session.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
@@ -17,8 +18,13 @@ mixin ApiHelperMixin {
   static final Map<NanoId, int> _remainingSubscriptionCredits = {};
   static final Map<NanoId, int> _remainingPurchasedCredits = {};
   static final Map<NanoId, List<ApiKey>> _apiKeysAttachedToNanoId = {};
+  static final Map<NanoId, List<ScrappableId>> _allowedScrappableIdsToUse = {};
+  static final Map<ScrappableId, Scrappable> _scrappables = {};
+  static final Map<ScrappableId,
+      Map<NanoId, Map<ApiKey, List<AnalyticsPayload>>>> _pendingAnalytics = {};
 
   static void resetNanoId(NanoId nanoId) {
+    _allowedScrappableIdsToUse.remove(nanoId);
     _currentConcurrencyRequests.remove(nanoId);
     _currentAccountPlanTierCache.remove(nanoId);
     _currentCreditUsage.remove(nanoId);
@@ -27,55 +33,119 @@ mixin ApiHelperMixin {
     _apiKeysAttachedToNanoId.remove(nanoId);
   }
 
-  Future<NanoId?> getNanoId(Session session, ApiKey? apikey) async {
-    if (apikey == null) return null;
-    final splitted = apikey.split('::');
-    if (splitted.length != 2) throw _invalidApiKeyFormat;
-    final nanoId = splitted[0];
+  Future<({NanoId? nanoId, Scrappable scrappable})> setAllDependencies(
+    Session session,
+    ScrappableId scrappableId,
+    ApiKey? apiKey,
+  ) async {
+    final Scrappable? cacheScrappable = _scrappables[scrappableId];
+    if (apiKey == null && cacheScrappable != null) {
+      return (nanoId: null, scrappable: cacheScrappable);
+    }
+    String? nanoId;
+    if (apiKey != null) {
+      final splitted = apiKey.split('::');
+      if (splitted.length != 2) throw _invalidApiKeyFormat;
+      nanoId = splitted[0];
 
-    final alreadyExistsInCache = _apiKeysAttachedToNanoId[nanoId];
-    if (alreadyExistsInCache != null &&
-        alreadyExistsInCache.contains(apikey) &&
-        _currentAccountPlanTierCache.containsKey(nanoId) &&
-        _currentCreditUsage.containsKey(nanoId) &&
-        _apiKeysAttachedToNanoId[nanoId]!.contains(apikey)) {
-      final cachePlanTier = _currentAccountPlanTierCache[nanoId];
-      if (cachePlanTier == null) throw _invalidApiKey;
-      return nanoId;
+      final alreadyExistsInCache = _apiKeysAttachedToNanoId[nanoId];
+      if (alreadyExistsInCache != null &&
+          alreadyExistsInCache.contains(apiKey) &&
+          _currentAccountPlanTierCache.containsKey(nanoId) &&
+          _currentCreditUsage.containsKey(nanoId) &&
+          _apiKeysAttachedToNanoId[nanoId]?.contains(apiKey) == true &&
+          _allowedScrappableIdsToUse[nanoId]?.contains(scrappableId) == true &&
+          cacheScrappable != null &&
+          _pendingAnalytics[scrappableId]?[nanoId]?[apiKey] != null) {
+        final cachePlanTier = _currentAccountPlanTierCache[nanoId];
+        if (cachePlanTier == null) throw _invalidApiKey;
+        return (nanoId: nanoId, scrappable: cacheScrappable);
+      }
+
+      final accountInfo = await AccountInfo.db.findFirstRow(
+        session,
+        where: (p0) =>
+            p0.accountApiUsage.nanoId.equals(nanoId) &
+            p0.accountApiUsage.apiKeys.any(
+                (key) => key.apiKey.equals(apiKey) & key.isActive.equals(true)),
+        include: AccountInfo.include(
+          accountApiUsage: AccountApiUsage.include(
+            creditUsage: CreditUsage.include(),
+          ),
+        ),
+      );
+      final PlanTier? planTier = accountInfo?.planTier;
+      final CreditUsage? creditUsage =
+          accountInfo!.accountApiUsage!.creditUsage;
+      if (planTier == null) throw _invalidApiKey;
+      if (creditUsage == null) throw _invalidApiKey;
+      _currentAccountPlanTierCache[nanoId] = planTier;
+      _currentCreditUsage[nanoId] = creditUsage;
     }
 
-    final accountInfo = await AccountInfo.db.findFirstRow(
+    final Scrappable? scrappable = await Scrappable.db.findFirstRow(
       session,
-      where: (p0) =>
-          p0.accountApiUsage.nanoId.equals(nanoId) &
-          p0.accountApiUsage.apiKeys.any(
-              (key) => key.apiKey.equals(apikey) & key.isActive.equals(true)),
-      include: AccountInfo.include(
-        accountApiUsage: AccountApiUsage.include(
-          creditUsage: CreditUsage.include(),
-        ),
+      where: (t) =>
+          t.id.equals(scrappableId) &
+          (t.apiUsageOwnerNanoId.equals(null) |
+
+              // If not private, allow all
+              t.willHideFromMarketplace.equals(false) |
+
+              // If private, allow only if the nanoId matches
+              (t.willHideFromMarketplace.equals(true) &
+                  t.apiUsageOwnerNanoId.notEquals(null) &
+                  t.apiUsageOwnerNanoId.equals(nanoId))),
+      include: Scrappable.include(
+        targetRequest: ScrappableRequest.include(),
+        scrappingBeeExtractRules: ScrappingBeeExtractLogic.include(),
       ),
     );
-
-    final PlanTier? planTier = accountInfo?.planTier;
-
-    if (planTier == null) throw _invalidApiKey;
-    _currentCreditUsage[nanoId] = accountInfo!.accountApiUsage!.creditUsage!;
-    _currentAccountPlanTierCache[nanoId] = planTier;
-    if (_apiKeysAttachedToNanoId[nanoId] == null) {
-      _apiKeysAttachedToNanoId[nanoId] = [apikey];
-    } else if (!_apiKeysAttachedToNanoId[nanoId]!.contains(apikey)) {
-      _apiKeysAttachedToNanoId[nanoId]!.add(apikey);
+    final ScrappableRequest? targetRequest = scrappable?.targetRequest;
+    final ScrappingBeeExtractLogic? extractRules =
+        scrappable?.scrappingBeeExtractRules;
+    if (scrappable == null || targetRequest == null || extractRules == null) {
+      throw _noScrappableFound(scrappableId.toString());
     }
 
-    return nanoId;
+    // Check if scrappable is deleted
+    if (scrappable.isDeleted == true) {
+      throw _noScrappableFound(scrappableId.toString());
+    }
+
+    _scrappables[scrappableId] = scrappable;
+
+    if (nanoId != null && apiKey != null) {
+      _pendingAnalytics[scrappableId]?[nanoId]?[apiKey] ??= [];
+      if (_allowedScrappableIdsToUse[nanoId] == null) {
+        _allowedScrappableIdsToUse[nanoId] = [scrappableId];
+      } else if (!_allowedScrappableIdsToUse[nanoId]!.contains(scrappableId)) {
+        _allowedScrappableIdsToUse[nanoId]!.add(scrappableId);
+      }
+      if (!_pendingAnalytics.containsKey(scrappableId)) {
+        _pendingAnalytics[scrappableId] = {};
+      }
+      if (!_pendingAnalytics[scrappableId]!.containsKey(nanoId)) {
+        _pendingAnalytics[scrappableId]![nanoId] = {};
+      }
+      if (!_pendingAnalytics[scrappableId]![nanoId]!.containsKey(apiKey)) {
+        _pendingAnalytics[scrappableId]![nanoId]![apiKey] = [];
+      }
+      if (_apiKeysAttachedToNanoId[nanoId] == null) {
+        _apiKeysAttachedToNanoId[nanoId] = [apiKey];
+      } else if (!_apiKeysAttachedToNanoId[nanoId]!.contains(apiKey)) {
+        _apiKeysAttachedToNanoId[nanoId]!.add(apiKey);
+      }
+    }
+
+    return (nanoId: nanoId, scrappable: scrappable);
   }
 
   void increaseConcurrency(NanoId? nanoId) {
     if (nanoId == null) return;
     final maxConcurrentRequests = _currentAccountPlanTierCache[nanoId]
         ?.numberOfConcurrentRequestsAllowedByPlan;
-    if (maxConcurrentRequests == null) throw _noActivePlan;
+    if (maxConcurrentRequests == null) throw _scrappableDataDissasociated;
 
     final canIncrease =
         (_currentConcurrencyRequests[nanoId] ?? 0) + 1 <= maxConcurrentRequests;
@@ -97,6 +167,7 @@ mixin ApiHelperMixin {
   void throwErrorIfIsATestRequestAndTestTimeExpired(
       ApiKey? apiKey, Scrappable scrappable) {
     final isTest = apiKey == null;
+
     if (isTest) {
       final testExpiry = scrappable.testEndpointAvailableUntil;
       if (testExpiry == null || testExpiry.isBefore(DateTime.now())) {
@@ -106,13 +177,11 @@ mixin ApiHelperMixin {
   }
 
   String composeUrl(
-    Map<String, dynamic> payload,
-    ScrappableRequest targetRequest,
-  ) {
-    String targetUrl = targetRequest.url;
+      Map<String, dynamic> payload, ScrappableRequest scrappableRequest) {
+    String targetUrl = scrappableRequest.url;
 
     // First, add the path parameters
-    for (final String pathParam in targetRequest.pathParams) {
+    for (final String pathParam in scrappableRequest.pathParams) {
       final String? payloadParam = payload[pathParam];
       if (payloadParam == null) {
         throw ZenScrapException(
@@ -127,7 +196,7 @@ mixin ApiHelperMixin {
     // Now, let's add query parameters
     final Map<String, String> queryParams = {};
     for (final MapEntry<String, String?> entry
-        in targetRequest.queryParams.entries) {
+        in scrappableRequest.queryParams.entries) {
       final String queryParamName = entry.key;
       final String? defaultQueryParam = entry.value;
       final String? payloadQueryParam = payload[queryParamName];
@@ -208,39 +277,6 @@ mixin ApiHelperMixin {
     throw _insufficientCredits;
   }
 
-  Future<(Scrappable, ScrappableRequest)> getScrappableById(
-      Session session, int scrappableId, NanoId? nanoId) async {
-    final Scrappable? scrappable = await Scrappable.db.findFirstRow(
-      session,
-      where: (t) =>
-          t.id.equals(scrappableId) &
-          ( // If not private, allow all
-              t.willHideFromMarketplace.equals(false) |
-
-                  // If private, allow only if the nanoId matches
-                  (t.willHideFromMarketplace.equals(true) &
-                      t.apiUsageOwnerNanoId.notEquals(null) &
-                      t.apiUsageOwnerNanoId.equals(nanoId))),
-      include: Scrappable.include(
-        targetRequest: ScrappableRequest.include(),
-        scrappingBeeExtractRules: ScrappingBeeExtractLogic.include(),
-      ),
-    );
-
-    final ScrappableRequest? targetRequest = scrappable?.targetRequest;
-
-    if (scrappable == null || targetRequest == null) {
-      throw _noScrappableFound(scrappableId.toString());
-    }
-
-    // Check if scrappable is deleted
-    if (scrappable.isDeleted == true) {
-      throw _noScrappableFound(scrappableId.toString());
-    }
-
-    return (scrappable, targetRequest);
-  }
-
   Future<ScrappingBeeExtractLogic> _getExtractRules(Session session,
       Scrappable scrappable, String? accountApiKeyString) async {
     final isTest = accountApiKeyString == null;
@@ -287,15 +323,17 @@ mixin ApiHelperMixin {
 
   Future<T> wrapAnalytics<T>(
     Session session,
+    ScrappableId scrappableId,
     ApiKey? apiKey,
-    Future<T> Function(void Function(Scrappable? scrappable) onSetScrapable,
-            NanoId? nanoId)
-        call,
+    Future<T> Function(NanoId? nanoId, Scrappable scrappable) call,
   ) async {
-    Scrappable? scrappable;
+    final now = DateTime.now();
+    Scrappable scrappable;
     NanoId? nanoId;
     try {
-      nanoId = await getNanoId(session, apiKey);
+      final result = await setAllDependencies(session, scrappableId, apiKey);
+      nanoId = result.nanoId;
+      scrappable = result.scrappable;
       increaseConcurrency(nanoId);
       final doesApiKeyExists = checkIdApiKeyExists(nanoId, apiKey);
       // Will throw if not exists and cache result if exist so new calls to db are not needed each time
@@ -303,28 +341,40 @@ mixin ApiHelperMixin {
         await garanteeApiKeyExists(session, nanoId, apiKey);
       }
 
-      return await call((s) {
-        scrappable = s;
-      }, nanoId);
+      return await call(nanoId, scrappable);
     } on ApiError catch (error, stackTrace) {
-      await _setScrappableAnalytics(
-          session, scrappable, error.status, apiKey, nanoId);
       session.log(
         '[${error.status.name.toUpperCase()}] ${_noApiFound.exception.title}',
         exception: error.exception,
         stackTrace: stackTrace,
         level: LogLevel.error,
       );
+      if (_pendingAnalytics[scrappableId]?[nanoId]?.containsKey(apiKey) ==
+          true) {
+        _pendingAnalytics[scrappableId]![nanoId]![apiKey]!.add(
+          AnalyticsPayload(
+            time: now,
+            status: error.status,
+          ),
+        );
+      }
       rethrow;
     } catch (error, stackTrace) {
-      await _setScrappableAnalytics(
-          session, scrappable, RequestStatus.serverError, apiKey, nanoId);
       session.log(
         'An unknown error occurred in api',
         exception: error,
         stackTrace: stackTrace,
         level: LogLevel.error,
       );
+      if (_pendingAnalytics[scrappableId]?[nanoId]?.containsKey(apiKey) ==
+          true) {
+        _pendingAnalytics[scrappableId]![nanoId]![apiKey]!.add(
+          AnalyticsPayload(
+            time: now,
+            status: RequestStatus.serverError,
+          ),
+        );
+      }
       // Handle any other exceptions
       throw ZenScrapException(
         title: 'Unexpected Error',
@@ -332,51 +382,6 @@ mixin ApiHelperMixin {
       );
     } finally {
       decreaseConcurrency(nanoId);
-    }
-  }
-
-  Future<void> _setScrappableAnalytics(
-    Session session,
-    Scrappable? scrappable,
-    RequestStatus status,
-    ApiKey? apiKey,
-    NanoId? nanoId,
-  ) async {
-    if (scrappable != null && apiKey != null && nanoId != null) {
-      final CreditUsage? credit = _currentCreditUsage[nanoId];
-      if (credit == null) {
-        session.log(
-          'Credit usage not found for nanoId $nanoId when trying to log scrappable analytics',
-          level: LogLevel.error,
-        );
-        throw _noCreditUsageModelFound(apiKey);
-      }
-
-      await session.db.transaction((transaction) async {
-        final newCredit = credit.copyWith(
-          subscriptionCredits: _remainingSubscriptionCredits[nanoId],
-          purchasedCredits: _remainingPurchasedCredits[nanoId],
-        );
-        await CreditUsage.db
-            .updateRow(session, newCredit, transaction: transaction);
-        final analytics = await ScrappableAnalytics.db.insertRow(
-            session,
-            ScrappableAnalytics(
-              requestStatus: status,
-              scrappableId: scrappable.id!,
-              scrappable: scrappable,
-              requestedAt: DateTime.now(),
-              attachedApiKey: apiKey,
-              attachedNanoId: nanoId,
-            ),
-            transaction: transaction);
-        await Scrappable.db.attachRow.scrappableAnalytics(
-          session,
-          scrappable,
-          analytics,
-          transaction: transaction,
-        );
-      });
     }
   }
 
@@ -407,11 +412,11 @@ mixin ApiHelperMixin {
     required Map<String, dynamic> payload,
   }) async {
     try {
-      return await wrapAnalytics(session, apiKey,
-          (setScrappableCallback, nanoId) async {
-        final (Scrappable scrappable, ScrappableRequest targetRequest) =
-            await getScrappableById(session, scrappableId, nanoId);
-        setScrappableCallback(scrappable);
+      return await wrapAnalytics(session, scrappableId, apiKey,
+          (nanoId, scrappable) async {
+        // final (Scrappable scrappable, ScrappableRequest targetRequest) =
+        //     await getScrappableById(session, scrappableId, nanoId);
+        // setScrappableCallback(scrappable);
         throwErrorIfIsATestRequestAndTestTimeExpired(apiKey, scrappable);
 
         final ScrappingBeeExtractLogic extractRules =
@@ -424,7 +429,7 @@ mixin ApiHelperMixin {
         await discountApiTokens(session,
             nanoId: nanoId, creditCost: creditCost);
 
-        final String targetUrl = composeUrl(payload, targetRequest);
+        final String targetUrl = composeUrl(payload, scrappable.targetRequest!);
 
         final ExtractDataByRule extractResponse =
             await scrappingBee.extractByRulesWithLogic(
@@ -432,8 +437,15 @@ mixin ApiHelperMixin {
           scrappingBeeExtractLogic: extractRules,
         );
 
-        await _setScrappableAnalytics(
-            session, scrappable, RequestStatus.success, apiKey, nanoId);
+        if (_pendingAnalytics[scrappableId]?[nanoId]?.containsKey(apiKey) ==
+            true) {
+          _pendingAnalytics[scrappableId]![nanoId]![apiKey]!.add(
+            AnalyticsPayload(
+              time: DateTime.now(),
+              status: RequestStatus.success,
+            ),
+          );
+        }
 
         return extractResponse.when(withData: (scrapedData) {
           // Create response with scraped data and credit information
@@ -521,6 +533,14 @@ final _noApiFound = ApiError(
         'No account API key matched the provided value (key not found in database).',
   ),
 );
+final _scrappableDataDissasociated = ApiError(
+  RequestStatus.serverError,
+  ZenScrapException(
+    title: 'Scrappable Data Dissasociated',
+    description:
+        'The scrappable data is dissasociated the current stack. This is a rare error that can happen after a server migration - your next scrapping request should work fine. If the error persists, contact support.',
+  ),
+);
 final _insufficientCredits = ApiError(
     RequestStatus.insufficientCredits,
     ZenScrapException(
@@ -540,14 +560,6 @@ final _invalidApiKey = ApiError(
   ZenScrapException(
     title: 'Invalid API Key',
     description: 'The provided API key does not have a user account.',
-  ),
-);
-final _noActivePlan = ApiError(
-  RequestStatus.clientError,
-  ZenScrapException(
-    title: 'No Active Plan',
-    description:
-        'Your account does not have an active plan. Subscribe to a plan to access the API.',
   ),
 );
 ApiError _maxConcurrencyReached(int maxQuantityOfParallelRequests) => ApiError(
@@ -587,4 +599,100 @@ class ApiError {
   final ZenScrapException exception;
 
   ApiError(this.status, this.exception);
+}
+
+class AnalyticsPayload {
+  final RequestStatus status;
+  final DateTime time;
+  const AnalyticsPayload({
+    required this.time,
+    required this.status,
+  });
+}
+
+class PeriodicSetRequestsAnalytics extends FutureCall {
+  @override
+  Future<void> invoke(Session session, SerializableModel? _) async {
+    Map<ScrappableId, Map<NanoId, Map<ApiKey, List<AnalyticsPayload>>>>
+        pendingAnalytics = {...ApiHelperMixin._pendingAnalytics};
+    ApiHelperMixin._pendingAnalytics.clear();
+
+    for (final entry in pendingAnalytics.entries) {
+      final scrappableId = entry.key;
+      final scrappable = ApiHelperMixin._scrappables[scrappableId];
+      for (final requestEntry in entry.value.entries) {
+        final nanoId = requestEntry.key;
+        final apiKeys = requestEntry.value;
+        for (final apiKeyEntry in apiKeys.entries) {
+          final apiKey = apiKeyEntry.key;
+          final analyticsPayload = apiKeyEntry.value;
+
+          await _setScrappableAnalytics(
+            session,
+            scrappable: scrappable,
+            apiKey: apiKey,
+            nanoId: nanoId,
+            items: analyticsPayload,
+          );
+        }
+      }
+    }
+
+    // Schedule the next execution
+    await session.serverpod.futureCallWithDelay(
+      'periodicSetRequestsAnalytics',
+      null,
+      Duration(minutes: 5), // Adjust interval as needed
+    );
+  }
+}
+
+Future<void> _setScrappableAnalytics(
+  Session session, {
+  Scrappable? scrappable,
+  ApiKey? apiKey,
+  NanoId? nanoId,
+  required List<AnalyticsPayload> items,
+}) async {
+  if (scrappable != null && apiKey != null && nanoId != null) {
+    final CreditUsage? credit = ApiHelperMixin._currentCreditUsage[nanoId];
+    if (credit == null) {
+      session.log(
+        'Credit usage not found for nanoId $nanoId when trying to log scrappable analytics',
+        level: LogLevel.error,
+      );
+      throw _noCreditUsageModelFound(apiKey);
+    }
+
+    await session.db.transaction((transaction) async {
+      final newCredit = credit.copyWith(
+        subscriptionCredits:
+            ApiHelperMixin._remainingSubscriptionCredits[nanoId],
+        purchasedCredits: ApiHelperMixin._remainingPurchasedCredits[nanoId],
+      );
+      await CreditUsage.db
+          .updateRow(session, newCredit, transaction: transaction);
+      final analytics = await ScrappableAnalytics.db.insert(
+          session,
+          items.map(
+            (e) {
+              return ScrappableAnalytics(
+                requestStatus: e.status,
+                scrappableId: scrappable.id!,
+                scrappable: scrappable,
+                requestedAt: e.time,
+                attachedApiKey: apiKey,
+                attachedNanoId: nanoId,
+              );
+            },
+          ).toList(),
+          transaction: transaction);
+      await Scrappable.db.attach.scrappableAnalytics(
+        session,
+        scrappable,
+        analytics,
+        transaction: transaction,
+      );
+    });
+  }
 }

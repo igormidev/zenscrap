@@ -3,6 +3,7 @@ import 'package:serverpod/serverpod.dart';
 import 'package:web_scrapper_generator/web_scrapper_generator.dart';
 import 'package:zenscrap_server/src/auth/handlers/on_send_reset_email.dart';
 import 'package:zenscrap_server/src/auth/handlers/on_send_validation_email.dart';
+import 'package:zenscrap_server/src/core/mixins/api_helper_mixin.dart';
 import 'package:zenscrap_server/src/core/scraping_bee.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_config.dart';
 import 'package:zenscrap_server/src/future_calls/monthly_subscription_credits_future_call.dart';
@@ -116,6 +117,13 @@ void run(List<String> args) async {
   pod.registerFutureCall(
       MonthlySubscriptionCreditsFutureCall(), 'monthly_subscription_credits');
   pod.registerFutureCall(SessionPromptFutureCall(), 'session_prompt');
+  pod.registerFutureCall(
+      PeriodicSetRequestsAnalytics(), 'periodicSetRequestsAnalytics');
+  await pod.futureCallWithDelay(
+    'periodicSetRequestsAnalytics',
+    null,
+    Duration(minutes: 2),
+  );
 
   // Start the server.
   await pod.start();
