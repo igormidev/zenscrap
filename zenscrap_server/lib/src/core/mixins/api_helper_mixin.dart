@@ -33,25 +33,32 @@ mixin ApiHelperMixin {
     _apiKeysAttachedToNanoId.remove(nanoId);
   }
 
-  Future<({NanoId? nanoId, Scrappable scrappable})> setAllDependencies(
+  Future<({NanoId? nanoId, Scrappable scrappable, PlanTier? planTier})>
+      setAllDependencies(
     Session session,
     ScrappableId scrappableId,
     ApiKey? apiKey,
   ) async {
     final Scrappable? cacheScrappable = _scrappables[scrappableId];
-    if (apiKey == null && cacheScrappable != null) {
-      return (nanoId: null, scrappable: cacheScrappable);
-    }
     String? nanoId;
     if (apiKey != null) {
       final splitted = apiKey.split('::');
       if (splitted.length != 2) throw _invalidApiKeyFormat;
       nanoId = splitted[0];
+    }
 
-      final alreadyExistsInCache = _apiKeysAttachedToNanoId[nanoId];
-      if (alreadyExistsInCache != null &&
-          alreadyExistsInCache.contains(apiKey) &&
-          _currentAccountPlanTierCache.containsKey(nanoId) &&
+    PlanTier? cachePlanTier =
+        nanoId == null ? null : _currentAccountPlanTierCache[nanoId];
+
+    if (apiKey == null && cacheScrappable != null) {
+      return (
+        nanoId: null,
+        scrappable: cacheScrappable,
+        planTier: cachePlanTier,
+      );
+    }
+    if (apiKey != null && nanoId != null) {
+      if (cachePlanTier != null &&
           _currentCreditUsage.containsKey(nanoId) &&
           _apiKeysAttachedToNanoId[nanoId]?.contains(apiKey) == true &&
           _allowedScrappableIdsToUse[nanoId]?.contains(scrappableId) == true &&
@@ -59,7 +66,11 @@ mixin ApiHelperMixin {
           _pendingAnalytics[scrappableId]?[nanoId]?[apiKey] != null) {
         final cachePlanTier = _currentAccountPlanTierCache[nanoId];
         if (cachePlanTier == null) throw _invalidApiKey;
-        return (nanoId: nanoId, scrappable: cacheScrappable);
+        return (
+          nanoId: nanoId,
+          scrappable: cacheScrappable,
+          planTier: cachePlanTier
+        );
       }
 
       final accountInfo = await AccountInfo.db.findFirstRow(
@@ -74,13 +85,14 @@ mixin ApiHelperMixin {
           ),
         ),
       );
-      final PlanTier? planTier = accountInfo?.planTier;
+      final PlanTier? newPlanTier = accountInfo?.planTier;
       final CreditUsage? creditUsage =
           accountInfo!.accountApiUsage!.creditUsage;
-      if (planTier == null) throw _invalidApiKey;
+      if (newPlanTier == null) throw _invalidApiKey;
       if (creditUsage == null) throw _invalidApiKey;
-      _currentAccountPlanTierCache[nanoId] = planTier;
+      _currentAccountPlanTierCache[nanoId] = newPlanTier;
       _currentCreditUsage[nanoId] = creditUsage;
+      cachePlanTier = newPlanTier;
     }
 
     final Scrappable? scrappable = await Scrappable.db.findFirstRow(
@@ -138,14 +150,14 @@ mixin ApiHelperMixin {
       }
     }
 
-    return (nanoId: nanoId, scrappable: scrappable);
+    return (nanoId: nanoId, scrappable: scrappable, planTier: cachePlanTier);
   }
 
-  void increaseConcurrency(NanoId? nanoId) {
+  void increaseConcurrency(NanoId? nanoId, PlanTier? planTier) {
     if (nanoId == null) return;
-    final maxConcurrentRequests = _currentAccountPlanTierCache[nanoId]
-        ?.numberOfConcurrentRequestsAllowedByPlan;
-    if (maxConcurrentRequests == null) throw _scrappableDataDissasociated;
+    final maxConcurrentRequests =
+        planTier?.numberOfConcurrentRequestsAllowedByPlan;
+    if (maxConcurrentRequests == null) throw _invalidApiKey;
 
     final canIncrease =
         (_currentConcurrencyRequests[nanoId] ?? 0) + 1 <= maxConcurrentRequests;
@@ -334,7 +346,10 @@ mixin ApiHelperMixin {
       final result = await setAllDependencies(session, scrappableId, apiKey);
       nanoId = result.nanoId;
       scrappable = result.scrappable;
-      increaseConcurrency(nanoId);
+      increaseConcurrency(
+        nanoId,
+        result.planTier,
+      );
       final doesApiKeyExists = checkIdApiKeyExists(nanoId, apiKey);
       // Will throw if not exists and cache result if exist so new calls to db are not needed each time
       if (!doesApiKeyExists) {
@@ -533,14 +548,14 @@ final _noApiFound = ApiError(
         'No account API key matched the provided value (key not found in database).',
   ),
 );
-final _scrappableDataDissasociated = ApiError(
-  RequestStatus.serverError,
-  ZenScrapException(
-    title: 'Scrappable Data Dissasociated',
-    description:
-        'The scrappable data is dissasociated the current stack. This is a rare error that can happen after a server migration - your next scrapping request should work fine. If the error persists, contact support.',
-  ),
-);
+// final _scrappableDataDissasociated = ApiError(
+//   RequestStatus.serverError,
+//   ZenScrapException(
+//     title: 'Scrappable Data Dissasociated',
+//     description:
+//         'The scrappable data is dissasociated the current stack. This is a rare error that can happen after a server migration - your next scrapping request should work fine. If the error persists, contact support.',
+//   ),
+// );
 final _insufficientCredits = ApiError(
     RequestStatus.insufficientCredits,
     ZenScrapException(
@@ -570,14 +585,6 @@ ApiError _maxConcurrencyReached(int maxQuantityOfParallelRequests) => ApiError(
           '''You have reached the maximum number of concurrent requests allowed for your plan tier.'''
           ''' (Max allowed concurrent requests: $maxQuantityOfParallelRequests)''',
     ));
-
-// T scrappingError<T>(String errorMessage) =>throw _ApiError(
-//     RequestStatus.serverError,
-//     ZenScrapException(
-//       title: 'Scraping Error',
-//       description: errorMessage,
-//     ));
-
 ApiError _noScrappableFound(String scrappableId) => ApiError(
     RequestStatus.clientError,
     ZenScrapException(
