@@ -465,8 +465,8 @@ mixin ApiHelperMixin {
         return extractResponse.when(withData: (scrapedData) {
           // Create response with scraped data and credit information
           final response = <String, dynamic>{
-            'data': scrapedData,
             'credits': _getCreditInfo(nanoId, creditCost),
+            'data': scrapedData,
           };
           return response.toSuccess();
         }, error: (errorMessage) {
