@@ -25,13 +25,15 @@ import '../endpoints/public/public_tier_endpoint.dart' as _i13;
 import '../endpoints/public/scrappable_chat_session.dart' as _i14;
 import 'package:zenscrap_server/src/generated/entities/account/credit_purchase_option.dart'
     as _i15;
-import 'package:zenscrap_server/src/generated/entities/scrappable/scraper_category.dart'
+import 'package:zenscrap_server/src/generated/entities/analytics/analytics_time_scope.dart'
     as _i16;
-import 'package:zenscrap_server/src/generated/entities/account/plan_tier.dart'
+import 'package:zenscrap_server/src/generated/entities/scrappable/scraper_category.dart'
     as _i17;
-import 'package:zenscrap_server/src/generated/entities/scrappable/ai_model.dart'
+import 'package:zenscrap_server/src/generated/entities/account/plan_tier.dart'
     as _i18;
-import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i19;
+import 'package:zenscrap_server/src/generated/entities/scrappable/ai_model.dart'
+    as _i19;
+import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i20;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -299,14 +301,19 @@ class Endpoints extends _i1.EndpointDispatch {
       name: 'privateScrappableAnalytics',
       endpoint: endpoints['privateScrappableAnalytics']!,
       methodConnectors: {
-        'getScrappableAnalyticsOfTheLast12Hours': _i1.MethodConnector(
-          name: 'getScrappableAnalyticsOfTheLast12Hours',
+        'getScrappableAnalyticsWithScope': _i1.MethodConnector(
+          name: 'getScrappableAnalyticsWithScope',
           params: {
             'page': _i1.ParameterDescription(
               name: 'page',
               type: _i1.getType<int>(),
               nullable: false,
-            )
+            ),
+            'scope': _i1.ParameterDescription(
+              name: 'scope',
+              type: _i1.getType<_i16.AnalyticsTimeScope>(),
+              nullable: false,
+            ),
           },
           call: (
             _i1.Session session,
@@ -314,9 +321,10 @@ class Endpoints extends _i1.EndpointDispatch {
           ) async =>
               (endpoints['privateScrappableAnalytics']
                       as _i5.PrivateScrappableAnalyticsEndpoint)
-                  .getScrappableAnalyticsOfTheLast12Hours(
+                  .getScrappableAnalyticsWithScope(
             session,
             page: params['page'],
+            scope: params['scope'],
           ),
         ),
         'getScrappableAnalytics': _i1.MethodConnector(
@@ -541,7 +549,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'category': _i1.ParameterDescription(
               name: 'category',
-              type: _i1.getType<_i16.ScraperCategory?>(),
+              type: _i1.getType<_i17.ScraperCategory?>(),
               nullable: true,
             ),
             'willHideFromMarketplace': _i1.ParameterDescription(
@@ -639,7 +647,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'planTier': _i1.ParameterDescription(
               name: 'planTier',
-              type: _i1.getType<_i17.PlanTier>(),
+              type: _i1.getType<_i18.PlanTier>(),
               nullable: false,
             ),
           },
@@ -728,7 +736,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'aiModel': _i1.ParameterDescription(
               name: 'aiModel',
-              type: _i1.getType<_i18.AiModel>(),
+              type: _i1.getType<_i19.AiModel>(),
               nullable: false,
             ),
           },
@@ -795,6 +803,6 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
       },
     );
-    modules['serverpod_auth'] = _i19.Endpoints()..initializeEndpoints(server);
+    modules['serverpod_auth'] = _i20.Endpoints()..initializeEndpoints(server);
   }
 }

@@ -9,10 +9,11 @@
 // ignore_for_file: use_super_parameters
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:serverpod_client/serverpod_client.dart' as _i1;
+import 'package:serverpod/serverpod.dart' as _i1;
 
-abstract class ScrappableRequestPerHour implements _i1.SerializableModel {
-  ScrappableRequestPerHour._({
+abstract class ScrappableRequestPerTimeScope
+    implements _i1.SerializableModel, _i1.ProtocolSerialization {
+  ScrappableRequestPerTimeScope._({
     required this.start,
     required this.end,
     required this.successCount,
@@ -22,7 +23,7 @@ abstract class ScrappableRequestPerHour implements _i1.SerializableModel {
     required this.maxConcurrencyExceededCount,
   });
 
-  factory ScrappableRequestPerHour({
+  factory ScrappableRequestPerTimeScope({
     required DateTime start,
     required DateTime end,
     required int successCount,
@@ -30,11 +31,11 @@ abstract class ScrappableRequestPerHour implements _i1.SerializableModel {
     required int serverErrorCount,
     required int insufficientCreditsCount,
     required int maxConcurrencyExceededCount,
-  }) = _ScrappableRequestPerHourImpl;
+  }) = _ScrappableRequestPerTimeScopeImpl;
 
-  factory ScrappableRequestPerHour.fromJson(
+  factory ScrappableRequestPerTimeScope.fromJson(
       Map<String, dynamic> jsonSerialization) {
-    return ScrappableRequestPerHour(
+    return ScrappableRequestPerTimeScope(
       start: _i1.DateTimeJsonExtension.fromJson(jsonSerialization['start']),
       end: _i1.DateTimeJsonExtension.fromJson(jsonSerialization['end']),
       successCount: jsonSerialization['successCount'] as int,
@@ -61,10 +62,10 @@ abstract class ScrappableRequestPerHour implements _i1.SerializableModel {
 
   int maxConcurrencyExceededCount;
 
-  /// Returns a shallow copy of this [ScrappableRequestPerHour]
+  /// Returns a shallow copy of this [ScrappableRequestPerTimeScope]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
-  ScrappableRequestPerHour copyWith({
+  ScrappableRequestPerTimeScope copyWith({
     DateTime? start,
     DateTime? end,
     int? successCount,
@@ -87,13 +88,26 @@ abstract class ScrappableRequestPerHour implements _i1.SerializableModel {
   }
 
   @override
+  Map<String, dynamic> toJsonForProtocol() {
+    return {
+      'start': start.toJson(),
+      'end': end.toJson(),
+      'successCount': successCount,
+      'clientErrorCount': clientErrorCount,
+      'serverErrorCount': serverErrorCount,
+      'insufficientCreditsCount': insufficientCreditsCount,
+      'maxConcurrencyExceededCount': maxConcurrencyExceededCount,
+    };
+  }
+
+  @override
   String toString() {
     return _i1.SerializationManager.encode(this);
   }
 }
 
-class _ScrappableRequestPerHourImpl extends ScrappableRequestPerHour {
-  _ScrappableRequestPerHourImpl({
+class _ScrappableRequestPerTimeScopeImpl extends ScrappableRequestPerTimeScope {
+  _ScrappableRequestPerTimeScopeImpl({
     required DateTime start,
     required DateTime end,
     required int successCount,
@@ -111,11 +125,11 @@ class _ScrappableRequestPerHourImpl extends ScrappableRequestPerHour {
           maxConcurrencyExceededCount: maxConcurrencyExceededCount,
         );
 
-  /// Returns a shallow copy of this [ScrappableRequestPerHour]
+  /// Returns a shallow copy of this [ScrappableRequestPerTimeScope]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   @override
-  ScrappableRequestPerHour copyWith({
+  ScrappableRequestPerTimeScope copyWith({
     DateTime? start,
     DateTime? end,
     int? successCount,
@@ -124,7 +138,7 @@ class _ScrappableRequestPerHourImpl extends ScrappableRequestPerHour {
     int? insufficientCreditsCount,
     int? maxConcurrencyExceededCount,
   }) {
-    return ScrappableRequestPerHour(
+    return ScrappableRequestPerTimeScope(
       start: start ?? this.start,
       end: end ?? this.end,
       successCount: successCount ?? this.successCount,

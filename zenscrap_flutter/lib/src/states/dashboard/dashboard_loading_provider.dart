@@ -29,7 +29,7 @@ final dashboardLoadingProvider = Provider<HaveAnyActiveLoading>((ref) {
             value.maybeMap(loading: (loading) => true, orElse: () => false))),
       ],
     DashboardNavigationType.userEndpoints => [
-        ref.watch(userScrappables.select((value) =>
+        ref.watch(userScrappablesProvider.select((value) =>
             value.maybeMap(loading: (loading) => true, orElse: () => false))),
       ],
     DashboardNavigationType.marketPlace => [

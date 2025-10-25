@@ -10,12 +10,14 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
+import '../../entities/analytics/analytics_time_scope.dart' as _i2;
 import '../../entities/analytics/scrappable_requests_analytics_item.dart'
-    as _i2;
+    as _i3;
 
 abstract class PaginatedScrappableRequestsAnalytics
     implements _i1.SerializableModel {
   PaginatedScrappableRequestsAnalytics._({
+    required this.scope,
     required this.items,
     required this.hasNextPage,
     required this.totalCount,
@@ -24,7 +26,8 @@ abstract class PaginatedScrappableRequestsAnalytics
   });
 
   factory PaginatedScrappableRequestsAnalytics({
-    required List<_i2.ScrappableRequestsAnalyticsItem> items,
+    required _i2.AnalyticsTimeScope scope,
+    required List<_i3.ScrappableRequestsAnalyticsItem> items,
     required bool hasNextPage,
     required int totalCount,
     required int currentPage,
@@ -34,8 +37,10 @@ abstract class PaginatedScrappableRequestsAnalytics
   factory PaginatedScrappableRequestsAnalytics.fromJson(
       Map<String, dynamic> jsonSerialization) {
     return PaginatedScrappableRequestsAnalytics(
+      scope:
+          _i2.AnalyticsTimeScope.fromJson((jsonSerialization['scope'] as int)),
       items: (jsonSerialization['items'] as List)
-          .map((e) => _i2.ScrappableRequestsAnalyticsItem.fromJson(
+          .map((e) => _i3.ScrappableRequestsAnalyticsItem.fromJson(
               (e as Map<String, dynamic>)))
           .toList(),
       hasNextPage: jsonSerialization['hasNextPage'] as bool,
@@ -45,7 +50,9 @@ abstract class PaginatedScrappableRequestsAnalytics
     );
   }
 
-  List<_i2.ScrappableRequestsAnalyticsItem> items;
+  _i2.AnalyticsTimeScope scope;
+
+  List<_i3.ScrappableRequestsAnalyticsItem> items;
 
   bool hasNextPage;
 
@@ -59,7 +66,8 @@ abstract class PaginatedScrappableRequestsAnalytics
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   PaginatedScrappableRequestsAnalytics copyWith({
-    List<_i2.ScrappableRequestsAnalyticsItem>? items,
+    _i2.AnalyticsTimeScope? scope,
+    List<_i3.ScrappableRequestsAnalyticsItem>? items,
     bool? hasNextPage,
     int? totalCount,
     int? currentPage,
@@ -68,6 +76,7 @@ abstract class PaginatedScrappableRequestsAnalytics
   @override
   Map<String, dynamic> toJson() {
     return {
+      'scope': scope.toJson(),
       'items': items.toJson(valueToJson: (v) => v.toJson()),
       'hasNextPage': hasNextPage,
       'totalCount': totalCount,
@@ -85,12 +94,14 @@ abstract class PaginatedScrappableRequestsAnalytics
 class _PaginatedScrappableRequestsAnalyticsImpl
     extends PaginatedScrappableRequestsAnalytics {
   _PaginatedScrappableRequestsAnalyticsImpl({
-    required List<_i2.ScrappableRequestsAnalyticsItem> items,
+    required _i2.AnalyticsTimeScope scope,
+    required List<_i3.ScrappableRequestsAnalyticsItem> items,
     required bool hasNextPage,
     required int totalCount,
     required int currentPage,
     required int pageSize,
   }) : super._(
+          scope: scope,
           items: items,
           hasNextPage: hasNextPage,
           totalCount: totalCount,
@@ -103,13 +114,15 @@ class _PaginatedScrappableRequestsAnalyticsImpl
   @_i1.useResult
   @override
   PaginatedScrappableRequestsAnalytics copyWith({
-    List<_i2.ScrappableRequestsAnalyticsItem>? items,
+    _i2.AnalyticsTimeScope? scope,
+    List<_i3.ScrappableRequestsAnalyticsItem>? items,
     bool? hasNextPage,
     int? totalCount,
     int? currentPage,
     int? pageSize,
   }) {
     return PaginatedScrappableRequestsAnalytics(
+      scope: scope ?? this.scope,
       items: items ?? this.items.map((e0) => e0.copyWith()).toList(),
       hasNextPage: hasNextPage ?? this.hasNextPage,
       totalCount: totalCount ?? this.totalCount,

@@ -6,7 +6,7 @@ import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables_state.dart';
 
-final userScrappables =
+final userScrappablesProvider =
     StateNotifierProvider<UserScrappablesNotifier, UserScrappablesState>(
         UserScrappablesNotifier.new);
 

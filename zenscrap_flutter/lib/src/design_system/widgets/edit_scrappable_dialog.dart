@@ -104,7 +104,7 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
     return result.fold(
       (success) {
         // Refresh the scrappables list
-        unawaited(ref.read(userScrappables.notifier).getScrappables());
+        unawaited(ref.read(userScrappablesProvider.notifier).getScrappables());
         if (context.mounted) {
           showSnackbar(
             context,
@@ -212,8 +212,9 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
                     category,
                     willHideFromMarketplace,
                     () {
-                      unawaited(
-                          ref.read(userScrappables.notifier).getScrappables());
+                      unawaited(ref
+                          .read(userScrappablesProvider.notifier)
+                          .getScrappables());
                       // Update the scrappable in the state provider
                       ref
                           .read(scrapChatProvider.notifier)
@@ -307,7 +308,7 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
 
                                 if (didChange == true) {
                                   unawaited(ref
-                                      .read(userScrappables.notifier)
+                                      .read(userScrappablesProvider.notifier)
                                       .getScrappables());
                                 }
 

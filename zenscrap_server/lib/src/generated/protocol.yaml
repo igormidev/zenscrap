@@ -12,7 +12,7 @@ privateApiUsage:
 privateCloneScrappable:
   - cloneFromMarketplace:
 privateScrappableAnalytics:
-  - getScrappableAnalyticsOfTheLast12Hours:
+  - getScrappableAnalyticsWithScope:
   - getScrappableAnalytics:
 privateSubscription:
   - createCheckoutSession:

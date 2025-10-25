@@ -10,21 +10,26 @@ final analyticsProvider =
 class AnalyticsNotifier extends StateNotifier<AnalyticsState> {
   final Ref ref;
   AnalyticsNotifier(this.ref) : super(AnalyticsState.initial());
-  
-  int _currentPage = 1;
 
-  Future<void> getAnalyticsData() async {
+  int _currentPage = 1;
+  AnalyticsTimeScope _currentScope = AnalyticsTimeScope.last12Hours;
+
+  Future<void> getAnalyticsData({AnalyticsTimeScope? scope}) async {
+    if (scope != null) {
+      _currentScope = scope;
+    }
     _currentPage = 1;
     state = AnalyticsState.loading();
-    
+
     try {
       final result = await ref
           .read(clientProvider)
           .privateScrappableAnalytics
-          .getScrappableAnalyticsOfTheLast12Hours(
+          .getScrappableAnalyticsWithScope(
             page: _currentPage,
+            scope: _currentScope,
           );
-      
+
       if (result.items.isEmpty) {
         state = AnalyticsState.emptyData();
       } else {
@@ -32,8 +37,8 @@ class AnalyticsNotifier extends StateNotifier<AnalyticsState> {
       }
     } catch (error) {
       state = AnalyticsState.withError(
-        error: error is ZenScrapException 
-            ? error 
+        error: error is ZenScrapException
+            ? error
             : ZenScrapException(
                 title: 'Error',
                 description: error.toString(),
@@ -48,31 +53,35 @@ class AnalyticsNotifier extends StateNotifier<AnalyticsState> {
     );
     if (currentData == null) return;
     if (!currentData.hasNextPage) return;
-    
+
     state = AnalyticsState.loadingMore(currentData: currentData);
-    
+
     try {
       _currentPage++;
       final result = await ref
           .read(clientProvider)
           .privateScrappableAnalytics
-          .getScrappableAnalyticsOfTheLast12Hours(
+          .getScrappableAnalyticsWithScope(
             page: _currentPage,
+            scope: _currentScope,
           );
-      
+
       // Merge the new data with existing data
       final mergedData = PaginatedScrappableRequestsAnalytics(
+        scope: result.scope,
         items: [...currentData.items, ...result.items],
         hasNextPage: result.hasNextPage,
         totalCount: result.totalCount,
         currentPage: result.currentPage,
         pageSize: result.pageSize,
       );
-      
+
       state = AnalyticsState.withData(mergedData);
     } catch (error) {
       // Revert to previous data on error
       state = AnalyticsState.withData(currentData);
     }
   }
+
+  AnalyticsTimeScope get currentScope => _currentScope;
 }

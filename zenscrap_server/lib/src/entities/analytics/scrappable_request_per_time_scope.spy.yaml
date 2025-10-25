@@ -1,4 +1,4 @@
-class: ScrappableRequestPerHour
+class: ScrappableRequestPerTimeScope
 fields:
   start: DateTime
   end: DateTime

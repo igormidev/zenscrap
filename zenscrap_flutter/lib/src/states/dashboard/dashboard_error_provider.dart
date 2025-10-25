@@ -31,7 +31,7 @@ final dashboardErrorProvider = Provider<ZenScrapException?>((ref) {
             .select((value) => value.whenOrNull(withError: (error) => error))),
       ],
     DashboardNavigationType.userEndpoints => [
-        ref.watch(userScrappables
+        ref.watch(userScrappablesProvider
             .select((value) => value.whenOrNull(withError: (error) => error))),
       ],
     DashboardNavigationType.marketPlace => [

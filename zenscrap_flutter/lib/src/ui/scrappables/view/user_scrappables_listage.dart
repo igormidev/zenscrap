@@ -28,7 +28,7 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      unawaited(ref.read(userScrappables.notifier).getScrappables());
+      unawaited(ref.read(userScrappablesProvider.notifier).getScrappables());
     });
   }
 
@@ -37,7 +37,7 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
     final accountId = ref.watch(accountProvider).mapOrNull(
           withData: (value) => value.accountInfo.id,
         );
-    final state = ref.watch(userScrappables);
+    final state = ref.watch(userScrappablesProvider);
 
     return state.map(
       initial: (_) => EmptyScrappableListageIndicatorPage(),
@@ -68,8 +68,9 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
                     ref.read(scrapChatProvider.notifier).reset();
                     final result = await context.push('/scrappable-form');
                     if (result == true) {
-                      unawaited(
-                          ref.read(userScrappables.notifier).getScrappables());
+                      unawaited(ref
+                          .read(userScrappablesProvider.notifier)
+                          .getScrappables());
                     }
                   },
                   label: Text('Create new endpoint'),
@@ -136,7 +137,7 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
                         child: FilledButton.tonal(
                           onPressed: () {
                             ref
-                                .read(userScrappables.notifier)
+                                .read(userScrappablesProvider.notifier)
                                 .changePage(pagination.currentPage + 1);
                           },
                           child: Text(

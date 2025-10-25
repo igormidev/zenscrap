@@ -26,7 +26,7 @@ class _UserScrappablesSearchBarState
 
   void _onSearchChanged(String value) {
     _debouncer.resetDebounce(() {
-      ref.read(userScrappables.notifier).search(value);
+      ref.read(userScrappablesProvider.notifier).search(value);
     });
   }
 
@@ -60,7 +60,7 @@ class _UserScrappablesSearchBarState
               ? IconButton(
                   onPressed: () {
                     _searchController.clear();
-                    ref.read(userScrappables.notifier).search('');
+                    ref.read(userScrappablesProvider.notifier).search('');
                   },
                   icon: Icon(
                     Icons.clear_rounded,
