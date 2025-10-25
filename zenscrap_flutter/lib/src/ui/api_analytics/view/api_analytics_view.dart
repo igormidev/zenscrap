@@ -29,57 +29,79 @@ class _ApiAnalyticsViewState extends ConsumerState<ApiAnalyticsView> {
   @override
   Widget build(BuildContext context) {
     final analyticsState = ref.watch(analyticsProvider);
-    
+
     return analyticsState.when(
       initial: () => const Center(child: CircularProgressIndicator()),
       loading: () => const Center(child: CircularProgressIndicator()),
-      loadingMore: (currentData) => _buildContent(currentData),
+      loadingMore: (currentData) => _AnalyticsContent(data: currentData),
       emptyData: () => const EmptyScrappableListageIndicatorPage(),
-      withData: (data) => _buildContent(data),
-      withError: (error) => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: context.c.error,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              error.title,
-              style: context.t.headlineSmall?.copyWith(
-                color: context.c.error,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              error.description,
-              style: context.t.bodyMedium?.copyWith(
-                color: context.c.onSurface.withAlpha(150),
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                ref.read(analyticsProvider.notifier).getAnalyticsData();
-              },
-              child: const Text('Retry'),
-            ),
-          ],
-        ),
-      ),
+      withData: (data) => _AnalyticsContent(data: data),
+      withError: (error) => _AnalyticsErrorView(error: error),
     );
   }
-  
-  Widget _buildContent(PaginatedScrappableRequestsAnalytics data) {
+}
+
+class _AnalyticsContent extends StatelessWidget {
+  final PaginatedScrappableRequestsAnalytics data;
+
+  const _AnalyticsContent({
+    required this.data,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       children: [
         ScrappablesAnalyticsResumeCardListagePage(data: data),
         const VerticalDivider(width: 1),
         const Expanded(child: SelectedScrappablePage()),
       ],
+    );
+  }
+}
+
+class _AnalyticsErrorView extends ConsumerWidget {
+  final ZenScrapException error;
+
+  const _AnalyticsErrorView({
+    required this.error,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.error_outline,
+            size: 64,
+            color: context.c.error,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            error.title,
+            style: context.t.headlineSmall?.copyWith(
+              color: context.c.error,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            error.description,
+            style: context.t.bodyMedium?.copyWith(
+              color: context.c.onSurface.withAlpha(150),
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () {
+              ref.read(analyticsProvider.notifier).getAnalyticsData();
+            },
+            child: const Text('Retry'),
+          ),
+        ],
+      ),
     );
   }
 }
