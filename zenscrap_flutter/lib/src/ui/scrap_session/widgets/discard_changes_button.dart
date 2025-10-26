@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_messages_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
@@ -62,9 +63,30 @@ class _DiscardChangesButtonState extends ConsumerState<DiscardChangesButton> {
                 onPressed: isDiscarding
                     ? null
                     : () async {
+                        final analytics = ref.read(analyticsServiceProvider);
+
+                        // Get scrappableId for tracking
+                        final scrappableId = ref.read(scrapChatProvider).mapOrNull(
+                          standard: (value) => value.data.id ?? 0,
+                        ) ?? 0;
+
                         if (hasAtLeastOneMessage) {
+                          // Track discard changes
+                          if (scrappableId > 0) {
+                            await analytics.trackScrappableDiscardChanges(
+                              scrappableId: scrappableId,
+                            );
+                          }
                           return context.pop(true);
                         }
+
+                        // Track go back
+                        if (scrappableId > 0) {
+                          await analytics.trackScrappableGoBack(
+                            scrappableId: scrappableId,
+                          );
+                        }
+
                         await ref.globalLoadingSetter(() async {
                           _isDiscardingVN.value = true;
                           try {

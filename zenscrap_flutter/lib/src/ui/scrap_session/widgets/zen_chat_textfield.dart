@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_validator/form_validator.dart';
 import 'package:zenscrap_flutter/src/core/utils/talker.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/chat_scroll_controller_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
+import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_state.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/change_ai_model_button.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/zen_textfield.dart';
 
@@ -63,6 +65,7 @@ class _ZenChatTextfieldState extends ConsumerState<ZenChatTextfield> {
     if (!(_formKey.currentState?.validate() ?? false) || _isLoading) return;
 
     final message = _promptEC.text.trim();
+    final analytics = ref.read(analyticsServiceProvider);
 
     setState(() {
       _isLoading = true;
@@ -73,6 +76,19 @@ class _ZenChatTextfieldState extends ConsumerState<ZenChatTextfield> {
     ref.read(chatScrollHelperProvider).scrollToBottom();
 
     try {
+      // Track message send before sending
+      final scrappable = ref.read(scrapChatProvider).mapOrNull(
+        standard: (value) => value.data,
+      );
+
+      if (scrappable != null && scrappable.id != null) {
+        await analytics.trackScrappableChatMessageSend(
+          scrappableId: scrappable.id!,
+          messageLength: message.length,
+          messageCount: 0, // Count not available in state
+        );
+      }
+
       await ref.read(scrapChatProvider.notifier).sendMessage(message);
       // The thinking message will be automatically removed by onChange when the response arrives
       ref.read(chatScrollHelperProvider).scrollToBottom();

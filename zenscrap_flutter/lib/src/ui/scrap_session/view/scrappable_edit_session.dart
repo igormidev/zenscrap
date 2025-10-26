@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
+import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/sections/scrappable_chat_message_stream_section.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/sections/scrappable_curl_section.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/sections/scrappable_test_response.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/discard_changes_button.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/zen_chat_textfield.dart';
 
-class ScrappableEditSessionView extends StatelessWidget {
+class ScrappableEditSessionView extends ConsumerWidget {
   final Scrappable scrappable;
   final DateTime testExpirationDate;
   final List<String>? llmThinkingStream;
@@ -18,7 +21,17 @@ class ScrappableEditSessionView extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Track edit session view
+    final analytics = ref.read(analyticsServiceProvider);
+    final isAuthenticated = ref.read(sessionManagerProvider).isSignedIn;
+
+    analytics.trackScrappableEditSessionView(
+      scrappableId: scrappable.id ?? 0,
+      targetUrl: scrappable.targetRequest?.url ?? '',
+      isAuthenticated: isAuthenticated,
+    );
+
     final ScrappableRequest? request = scrappable.targetRequest;
     final ScrappingBeeExtractLogic? extractLogic =
         scrappable.scrappingBeeExtractRules;

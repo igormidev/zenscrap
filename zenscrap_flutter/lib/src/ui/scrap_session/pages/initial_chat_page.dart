@@ -8,6 +8,7 @@ import 'package:lottie/lottie.dart';
 import 'package:simple_platform/simple_platform.dart';
 import 'package:zenscrap_flutter/src/design_system/components/adaptive_progress_indicator.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
@@ -26,6 +27,8 @@ class _ChatViewPageState extends ConsumerState<InitialChatPage>
   late AnimationController _controller;
   final ValueNotifier<bool> _isLoading = ValueNotifier(false);
   final _formKey = GlobalKey<FormState>();
+  bool _hasStartedUrlInput = false;
+  bool _hasStartedPromptInput = false;
 
   @override
   void initState() {
@@ -34,6 +37,24 @@ class _ChatViewPageState extends ConsumerState<InitialChatPage>
       vsync: this,
       duration: const Duration(seconds: 22),
     );
+
+    // Add listeners to track when user starts typing
+    _referenceLinkEC.addListener(_onUrlInputChanged);
+    _promptEC.addListener(_onPromptInputChanged);
+  }
+
+  void _onUrlInputChanged() {
+    if (_referenceLinkEC.text.isNotEmpty && !_hasStartedUrlInput) {
+      _hasStartedUrlInput = true;
+      ref.read(analyticsServiceProvider).trackScrappableUrlInputStart();
+    }
+  }
+
+  void _onPromptInputChanged() {
+    if (_promptEC.text.isNotEmpty && !_hasStartedPromptInput) {
+      _hasStartedPromptInput = true;
+      ref.read(analyticsServiceProvider).trackScrappablePromptInputStart();
+    }
   }
 
   late final TextEditingController _referenceLinkEC = TextEditingController(
@@ -50,17 +71,44 @@ class _ChatViewPageState extends ConsumerState<InitialChatPage>
   Future<void> _submitForm() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
+    final analytics = ref.read(analyticsServiceProvider);
+    final targetUrl = _referenceLinkEC.text;
+
+    // Track creation attempt
+    await analytics.trackScrappableCreationAttempt(
+      targetUrl: targetUrl,
+      promptLength: _promptEC.text.length,
+    );
+
     _isLoading.value = true;
-    await ref.read(scrapChatProvider.notifier).createScrappable(
-          targetUrl: _referenceLinkEC.text,
-          userPrompt: _promptEC.text,
-        );
-    _isLoading.value = false;
+    try {
+      await ref.read(scrapChatProvider.notifier).createScrappable(
+        targetUrl: targetUrl,
+        userPrompt: _promptEC.text,
+      );
+
+      // Track success
+      // Note: scrappableId will be 0 here as the state might not be updated yet
+      await analytics.trackScrappableCreationSuccess(
+        targetUrl: targetUrl,
+        scrappableId: 0,
+      );
+    } catch (e) {
+      // Track failure
+      await analytics.trackScrappableCreationFailure(
+        targetUrl: targetUrl,
+        errorMessage: e.toString(),
+      );
+    } finally {
+      _isLoading.value = false;
+    }
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _referenceLinkEC.removeListener(_onUrlInputChanged);
+    _promptEC.removeListener(_onPromptInputChanged);
     _referenceLinkEC.dispose();
     _promptEC.dispose();
     super.dispose();
@@ -68,6 +116,14 @@ class _ChatViewPageState extends ConsumerState<InitialChatPage>
 
   @override
   Widget build(BuildContext context) {
+    // Track page view with authentication status
+    final analytics = ref.read(analyticsServiceProvider);
+    final isAuthenticated = ref.watch(sessionProvider).maybeMap(
+      orElse: () => false,
+      logged: (_) => true,
+    );
+    analytics.trackScrappableCreationFormView(isAuthenticated: isAuthenticated);
+
     return Stack(
       children: [
         if (!DevicePlatform.isWindows)
@@ -201,6 +257,9 @@ class _ChatViewPageState extends ConsumerState<InitialChatPage>
             alignment: Alignment.topRight,
             child: TextButton.icon(
               onPressed: () {
+                // Track login click
+                analytics.trackScrappableCreationLoginClick();
+
                 ref.read(scrapChatProvider.notifier).reset();
                 context.push('/auth');
               },

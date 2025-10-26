@@ -7,9 +7,11 @@ import 'package:go_router/go_router.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/default_error_snackbar.dart';
 import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/is_chat_loading_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
+import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_state.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
@@ -62,6 +64,20 @@ class _DeployButtonState extends ConsumerState<DeployButton> {
                       widget.scrappingBeeExtractLogic == null
                   ? null
                   : () async {
+                      final analytics = ref.read(analyticsServiceProvider);
+
+                      // Get message count for tracking
+                      final messageCount = ref.read(scrapChatProvider).mapOrNull(
+                        standard: (state) => 0, // Count not available
+                      ) ?? 0;
+
+                      // Track deploy attempt
+                      await analytics.trackScrappableDeployAttempt(
+                        scrappableId: widget.scrappableId,
+                        messageCount: messageCount,
+                        isAuthenticated: isLoggedIn,
+                      );
+
                       await ref.globalLoadingSetter(() async {
                         try {
                           _isDeployingVN.value = true;
@@ -74,6 +90,12 @@ class _DeployButtonState extends ConsumerState<DeployButton> {
 
                           deployResult.fold(
                             (_) async {
+                              // Track deploy success
+                              await analytics.trackScrappableDeploySuccess(
+                                scrappableId: widget.scrappableId,
+                                messageCount: messageCount,
+                              );
+
                               if (isLoggedIn) {
                                 if (context.canPop()) {
                                   context.pop(true);
@@ -82,6 +104,11 @@ class _DeployButtonState extends ConsumerState<DeployButton> {
                                       .userEndpoints.routeOnClick!);
                                 }
                               } else {
+                                // Track unauthenticated attempt
+                                await analytics.trackScrappableDeployUnauthenticatedAttempt(
+                                  scrappableId: widget.scrappableId,
+                                );
+
                                 _isDeployingVN.value = false;
                                 ref
                                         .read(accountProvider.notifier)
@@ -91,6 +118,12 @@ class _DeployButtonState extends ConsumerState<DeployButton> {
                               }
                             },
                             (failure) {
+                              // Track deploy failure
+                              analytics.trackScrappableDeployFailure(
+                                scrappableId: widget.scrappableId,
+                                errorMessage: failure.toString(),
+                              );
+
                               handleBabelException(context, failure);
                             },
                           );

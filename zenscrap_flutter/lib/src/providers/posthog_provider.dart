@@ -441,6 +441,301 @@ class AnalyticsService {
   }
 
   // ========================================
+  // Scrappable Creation Flow Events (InitialChatPage)
+  // ========================================
+
+  /// Track when user views the scrappable creation form
+  Future<void> trackScrappableCreationFormView({
+    bool isAuthenticated = false,
+  }) async {
+    await _posthog.capture(
+      eventName: 'scrappable:creation_form_view',
+      properties: {
+        'is_authenticated': isAuthenticated,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user starts typing in URL field
+  Future<void> trackScrappableUrlInputStart() async {
+    await _posthog.capture(
+      eventName: 'scrappable:url_input_start',
+      properties: {
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user starts typing in prompt field
+  Future<void> trackScrappablePromptInputStart() async {
+    await _posthog.capture(
+      eventName: 'scrappable:prompt_input_start',
+      properties: {
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track scrappable creation attempt
+  Future<void> trackScrappableCreationAttempt({
+    required String targetUrl,
+    required int promptLength,
+  }) async {
+    await _posthog.capture(
+      eventName: 'scrappable:creation_attempt',
+      properties: {
+        'target_url': targetUrl,
+        'prompt_length': promptLength,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track successful scrappable creation
+  Future<void> trackScrappableCreationSuccess({
+    required String targetUrl,
+    required int scrappableId,
+  }) async {
+    await _posthog.capture(
+      eventName: 'scrappable:creation_success',
+      properties: {
+        'target_url': targetUrl,
+        'scrappable_id': scrappableId,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track scrappable creation failure
+  Future<void> trackScrappableCreationFailure({
+    required String targetUrl,
+    String? errorMessage,
+  }) async {
+    await _posthog.capture(
+      eventName: 'scrappable:creation_failure',
+      properties: {
+        'target_url': targetUrl,
+        if (errorMessage != null) 'error_message': errorMessage,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track login button click from creation page
+  Future<void> trackScrappableCreationLoginClick() async {
+    await _posthog.capture(
+      eventName: 'scrappable:creation_login_click',
+      properties: {
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  // ========================================
+  // Scrappable Edit Session Events
+  // ========================================
+
+  /// Track when user views edit session (with existing scrappable)
+  Future<void> trackScrappableEditSessionView({
+    required int scrappableId,
+    required String targetUrl,
+    bool isAuthenticated = false,
+  }) async {
+    await _posthog.capture(
+      eventName: 'scrappable:edit_session_view',
+      properties: {
+        'scrappable_id': scrappableId,
+        'target_url': targetUrl,
+        'is_authenticated': isAuthenticated,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user sends a message in chat
+  Future<void> trackScrappableChatMessageSend({
+    required int scrappableId,
+    required int messageLength,
+    required int messageCount,
+  }) async {
+    await _posthog.capture(
+      eventName: 'scrappable:chat_message_send',
+      properties: {
+        'scrappable_id': scrappableId,
+        'message_length': messageLength,
+        'message_count': messageCount,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when AI responds to user message
+  Future<void> trackScrappableChatMessageReceive({
+    required int scrappableId,
+    required int messageCount,
+    required Duration responseTime,
+  }) async {
+    await _posthog.capture(
+      eventName: 'scrappable:chat_message_receive',
+      properties: {
+        'scrappable_id': scrappableId,
+        'message_count': messageCount,
+        'response_time_ms': responseTime.inMilliseconds,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user changes AI model
+  Future<void> trackScrappableAiModelChange({
+    required int scrappableId,
+    required String fromModel,
+    required String toModel,
+  }) async {
+    await _posthog.capture(
+      eventName: 'scrappable:ai_model_change',
+      properties: {
+        'scrappable_id': scrappableId,
+        'from_model': fromModel,
+        'to_model': toModel,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user copies CURL command
+  Future<void> trackScrappableCurlCopy({
+    required int scrappableId,
+  }) async {
+    await _posthog.capture(
+      eventName: 'scrappable:curl_copy',
+      properties: {
+        'scrappable_id': scrappableId,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user switches tabs in test response
+  Future<void> trackScrappableTestTabSwitch({
+    required int scrappableId,
+    required String tabName,
+  }) async {
+    await _posthog.capture(
+      eventName: 'scrappable:test_tab_switch',
+      properties: {
+        'scrappable_id': scrappableId,
+        'tab_name': tabName,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track deploy button click
+  Future<void> trackScrappableDeployAttempt({
+    required int scrappableId,
+    required int messageCount,
+    bool isAuthenticated = false,
+  }) async {
+    await _posthog.capture(
+      eventName: 'scrappable:deploy_attempt',
+      properties: {
+        'scrappable_id': scrappableId,
+        'message_count': messageCount,
+        'is_authenticated': isAuthenticated,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track successful deployment
+  Future<void> trackScrappableDeploySuccess({
+    required int scrappableId,
+    required int messageCount,
+  }) async {
+    await _posthog.capture(
+      eventName: 'scrappable:deploy_success',
+      properties: {
+        'scrappable_id': scrappableId,
+        'message_count': messageCount,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track deployment failure
+  Future<void> trackScrappableDeployFailure({
+    required int scrappableId,
+    String? errorMessage,
+  }) async {
+    await _posthog.capture(
+      eventName: 'scrappable:deploy_failure',
+      properties: {
+        'scrappable_id': scrappableId,
+        if (errorMessage != null) 'error_message': errorMessage,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when unauthenticated user tries to deploy
+  Future<void> trackScrappableDeployUnauthenticatedAttempt({
+    required int scrappableId,
+  }) async {
+    await _posthog.capture(
+      eventName: 'scrappable:deploy_unauthenticated_attempt',
+      properties: {
+        'scrappable_id': scrappableId,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user discards changes
+  Future<void> trackScrappableDiscardChanges({
+    required int scrappableId,
+    required int messageCount,
+  }) async {
+    await _posthog.capture(
+      eventName: 'scrappable:discard_changes',
+      properties: {
+        'scrappable_id': scrappableId,
+        'message_count': messageCount,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user navigates back
+  Future<void> trackScrappableGoBack({
+    required int scrappableId,
+  }) async {
+    await _posthog.capture(
+      eventName: 'scrappable:go_back',
+      properties: {
+        'scrappable_id': scrappableId,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when test session expires
+  Future<void> trackScrappableSessionExpired({
+    required int scrappableId,
+    required int messageCount,
+  }) async {
+    await _posthog.capture(
+      eventName: 'scrappable:session_expired',
+      properties: {
+        'scrappable_id': scrappableId,
+        'message_count': messageCount,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  // ========================================
   // General Utility Methods
   // ========================================
 
