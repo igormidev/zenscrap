@@ -13,7 +13,7 @@ class ScrappableHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.only(top: 20, bottom: 16, left: 20, right: 20),
       decoration: BoxDecoration(
         color: context.c.surface,
         border: Border(
@@ -31,31 +31,26 @@ class ScrappableHeader extends StatelessWidget {
                 Icons.analytics_outlined,
                 color: context.c.primary,
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 8),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      scrappable.name,
-                      style: context.t.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    if (scrappable.description.isNotEmpty) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        scrappable.description,
-                        style: context.t.bodySmall?.copyWith(
-                          color: context.c.onSurface.withAlpha(150),
-                        ),
-                      ),
-                    ],
-                  ],
+                child: Text(
+                  scrappable.name,
+                  style: context.t.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
           ),
+          if (scrappable.description.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(
+              scrappable.description,
+              style: context.t.bodySmall?.copyWith(
+                color: context.c.onSurface.withAlpha(150),
+              ),
+            ),
+          ],
         ],
       ),
     );

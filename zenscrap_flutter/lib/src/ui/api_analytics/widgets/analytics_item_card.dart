@@ -17,38 +17,39 @@ class AnalyticsItemCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final statusInfo = _getStatusInfo();
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        color: context.c.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: context.c.outline.withAlpha(50)),
+      ),
       child: ListTile(
+        dense: true,
+        contentPadding: EdgeInsets.zero,
         leading: Icon(
           statusInfo.icon,
           color: statusInfo.color,
         ),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: statusInfo.color.withAlpha(30),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(
-                statusInfo.text,
-                style: context.t.bodySmall?.copyWith(
-                  color: statusInfo.color,
-                  fontWeight: FontWeight.w600,
-                ),
+        title: Align(
+          alignment: Alignment.centerLeft,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: statusInfo.color.withAlpha(30),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(
+              statusInfo.text,
+              style: context.t.bodyMedium?.copyWith(
+                color: statusInfo.color,
+                fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(width: 12),
-            Text(
-              dateFormat.format(analytics.requestedAt),
-              style: context.t.bodyMedium,
-            ),
-          ],
+          ),
         ),
         trailing: Text(
-          analytics.attachedApiKey,
+          dateFormat.format(analytics.requestedAt),
           style: context.t.bodySmall?.copyWith(
             color: context.c.onSurface.withAlpha(150),
           ),

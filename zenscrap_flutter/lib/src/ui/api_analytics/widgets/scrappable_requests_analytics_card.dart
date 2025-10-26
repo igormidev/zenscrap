@@ -172,7 +172,7 @@ class ScrappableRequestsAnalyticsCard extends StatelessWidget {
     );
   }
   
-  Widget _buildBar(BuildContext context, ScrappableRequestPerHour hourData, int maxCount) {
+  Widget _buildBar(BuildContext context, ScrappableRequestPerTimeScope hourData, int maxCount) {
     final totalRequests = hourData.successCount + 
         hourData.clientErrorCount + 
         hourData.serverErrorCount +

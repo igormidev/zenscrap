@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/states/analytics/selected_scrappable_provider.dart';
 import 'package:zenscrap_flutter/src/states/analytics/selected_scrappable_analytics_provider.dart';
 import 'package:zenscrap_flutter/src/states/analytics/selected_scrappable_analytics_state.dart';
 import 'package:zenscrap_flutter/src/ui/api_analytics/pages/no_selected_scrappable_indicator_page.dart';
@@ -42,20 +44,74 @@ class _SelectedScrappablePageState
 
   @override
   Widget build(BuildContext context) {
+    final selectedItem = ref.watch(selectedScrappableProvider);
     final state = ref.watch(selectedScrappableAnalyticsProvider);
 
+    // When a scrappable is selected, load its detailed analytics
+    ref.listen(selectedScrappableProvider, (previous, next) {
+      if (next == null) {
+        // Reset state when nothing is selected
+        ref.read(selectedScrappableAnalyticsProvider.notifier).resetState();
+      } else if (next.scrappable.id != previous?.scrappable.id) {
+        // Load analytics for the newly selected scrappable
+        unawaited(
+          ref
+              .read(selectedScrappableAnalyticsProvider.notifier)
+              .selectScrappable(next.scrappable),
+        );
+      }
+    });
+
+    if (selectedItem == null) {
+      return const NoSelectedScrappableIndicatorPage();
+    }
+
+    // Check if we need to trigger initial load (ref.listen doesn't fire on first build)
+    final needsInitialLoad = state.whenOrNull(
+          none: () => true,
+          withData: (data) => data.scrappable.id != selectedItem.scrappable.id,
+          loadingMore: (data) =>
+              data.scrappable.id != selectedItem.scrappable.id,
+        ) ??
+        false;
+
+    if (needsInitialLoad) {
+      // Trigger load after this frame
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ref
+              .read(selectedScrappableAnalyticsProvider.notifier)
+              .selectScrappable(selectedItem.scrappable);
+        }
+      });
+    }
+
+    // Show the state
     return state.when(
-      none: () => const NoSelectedScrappableIndicatorPage(),
+      none: () => const Center(child: CircularProgressIndicator()),
       loading: () => const Center(child: CircularProgressIndicator()),
-      loadingMore: (currentData) => _AnalyticsListView(
-        data: currentData,
-        scrollController: _scrollController,
-        isLoadingMore: true,
-      ),
-      withData: (data) => _AnalyticsListView(
-        data: data,
-        scrollController: _scrollController,
-      ),
+      loadingMore: (currentData) {
+        // Check if data is for the current selection
+        if (currentData.scrappable.id == selectedItem.scrappable.id) {
+          return _AnalyticsListView(
+            data: currentData,
+            scrollController: _scrollController,
+            isLoadingMore: true,
+          );
+        }
+        return const Center(child: CircularProgressIndicator());
+      },
+      withData: (data) {
+        // Check if data is for the current selection
+        if (data.scrappable.id == selectedItem.scrappable.id) {
+          return _AnalyticsListView(
+            data: data,
+            scrollController: _scrollController,
+          );
+        }
+        // Data is for a different scrappable, show loading while new data loads
+        return const Center(child: CircularProgressIndicator());
+      },
       withError: (error) => _AnalyticsErrorState(error: error),
     );
   }
@@ -82,7 +138,8 @@ class _AnalyticsListView extends StatelessWidget {
         ScrappableHeader(scrappable: data.scrappable),
         AnalyticsStatsSummary(data: data),
         Expanded(
-          child: ListView.builder(
+          child: ListView.separated(
+            separatorBuilder: (context, index) => const SizedBox(height: 12),
             controller: scrollController,
             padding: const EdgeInsets.all(16),
             itemCount: data.items.length + 1,

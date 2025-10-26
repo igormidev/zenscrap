@@ -1,0 +1,94 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/states/analytics/analytics_provider.dart';
+
+class ScopeSelectorDropdown extends ConsumerWidget {
+  const ScopeSelectorDropdown({super.key});
+
+  String _getScopeLabel(AnalyticsTimeScope scope) {
+    switch (scope) {
+      case AnalyticsTimeScope.lastHour:
+        return 'Last Hour';
+      case AnalyticsTimeScope.last12Hours:
+        return 'Last 12 Hours';
+      case AnalyticsTimeScope.last24Hours:
+        return 'Last 24 Hours';
+      case AnalyticsTimeScope.last7Days:
+        return 'Last 7 Days';
+      case AnalyticsTimeScope.last30Days:
+        return 'Last 30 Days';
+    }
+  }
+
+  IconData _getScopeIcon(AnalyticsTimeScope scope) {
+    switch (scope) {
+      case AnalyticsTimeScope.lastHour:
+        return Icons.schedule;
+      case AnalyticsTimeScope.last12Hours:
+        return Icons.access_time;
+      case AnalyticsTimeScope.last24Hours:
+        return Icons.today;
+      case AnalyticsTimeScope.last7Days:
+        return Icons.date_range;
+      case AnalyticsTimeScope.last30Days:
+        return Icons.calendar_month;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentScope = ref.watch(analyticsProvider.notifier).currentScope;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      height: 43,
+      decoration: BoxDecoration(
+        color: context.c.surfaceContainerHighest.withAlpha(50),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: context.c.outline.withAlpha(50),
+        ),
+      ),
+      child: DropdownButton<AnalyticsTimeScope>(
+        value: currentScope,
+        underline: const SizedBox.shrink(),
+        icon: Icon(
+          Icons.arrow_drop_down,
+          color: context.c.onSurface,
+        ),
+        dropdownColor: context.c.surface,
+        borderRadius: BorderRadius.circular(12),
+        items: AnalyticsTimeScope.values.map((scope) {
+          return DropdownMenuItem<AnalyticsTimeScope>(
+            value: scope,
+            child: Row(
+              children: [
+                Icon(
+                  _getScopeIcon(scope),
+                  size: 18,
+                  color: context.c.primary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  _getScopeLabel(scope),
+                  style: context.t.labelLarge?.copyWith(
+                    color: context.c.onSurface,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }).toList(),
+        onChanged: (AnalyticsTimeScope? newScope) {
+          if (newScope != null) {
+            ref
+                .read(analyticsProvider.notifier)
+                .getAnalyticsData(scope: newScope);
+          }
+        },
+      ),
+    );
+  }
+}

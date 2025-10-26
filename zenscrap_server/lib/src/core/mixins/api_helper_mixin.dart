@@ -87,7 +87,7 @@ mixin ApiHelperMixin {
       );
       final PlanTier? newPlanTier = accountInfo?.planTier;
       final CreditUsage? creditUsage =
-          accountInfo!.accountApiUsage!.creditUsage;
+          accountInfo?.accountApiUsage?.creditUsage;
       if (newPlanTier == null) throw _invalidApiKey;
       if (creditUsage == null) throw _invalidApiKey;
       _currentAccountPlanTierCache[nanoId] = newPlanTier;

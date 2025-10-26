@@ -30,33 +30,27 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
     }
     final now = DateTime.now();
 
-    // Calculate target date and time scopes based on selected scope
-    final DateTime targetDate;
+    // Calculate time scopes based on selected scope
     final List<Duration> timeScopes;
 
     switch (scope) {
       case AnalyticsTimeScope.lastHour:
-        targetDate = now.subtract(Duration(hours: 1));
         // 12 intervals of 5 minutes each
         timeScopes = List.generate(12, (i) => Duration(minutes: 5 * (i + 1)));
         break;
       case AnalyticsTimeScope.last12Hours:
-        targetDate = now.subtract(Duration(hours: 12));
         // 12 intervals of 1 hour each
         timeScopes = List.generate(12, (i) => Duration(hours: i + 1));
         break;
       case AnalyticsTimeScope.last24Hours:
-        targetDate = now.subtract(Duration(hours: 24));
         // 24 intervals of 1 hour each
         timeScopes = List.generate(24, (i) => Duration(hours: i + 1));
         break;
       case AnalyticsTimeScope.last7Days:
-        targetDate = now.subtract(Duration(days: 7));
         // 7 intervals of 1 day each
         timeScopes = List.generate(7, (i) => Duration(days: i + 1));
         break;
       case AnalyticsTimeScope.last30Days:
-        targetDate = now.subtract(Duration(days: 30));
         // 30 intervals of 1 day each
         timeScopes = List.generate(30, (i) => Duration(days: i + 1));
         break;
