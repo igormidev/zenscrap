@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
 
@@ -68,19 +69,40 @@ class _UserEditableProfileImageState
                 message: 'Change image',
                 child: InkWell(
                   onTap: () async {
-                    AccountInfo? user;
-                    await ref.globalLoadingSetter(() async {
-                      isUpdatingImage.value = true;
-                      await ImageUploader.updateUserImage(
-                        context: context,
-                        sessionManager: ref.read(sessionManagerProvider),
-                      );
-                      user = await ref.read(accountProvider.notifier).getUser();
+                    final analytics = ref.read(analyticsServiceProvider);
 
-                      isUpdatingImage.value = false;
-                    });
-                    if (user != null) {
-                      ref.read(accountProvider.notifier).setUser(user!);
+                    // Track profile image change click
+                    await analytics.trackAccountProfileImageChangeClick();
+
+                    AccountInfo? user;
+                    try {
+                      await ref.globalLoadingSetter(() async {
+                        isUpdatingImage.value = true;
+                        await ImageUploader.updateUserImage(
+                          context: context,
+                          sessionManager: ref.read(sessionManagerProvider),
+                        );
+                        user = await ref.read(accountProvider.notifier).getUser();
+
+                        isUpdatingImage.value = false;
+                      });
+
+                      if (user != null) {
+                        ref.read(accountProvider.notifier).setUser(user!);
+
+                        // Track successful profile image change
+                        await analytics.trackAccountProfileImageChangeSuccess();
+                      } else {
+                        // Track failure if user is null
+                        await analytics.trackAccountProfileImageChangeFailure(
+                          errorMessage: 'User data is null after update',
+                        );
+                      }
+                    } catch (e) {
+                      // Track failure
+                      await analytics.trackAccountProfileImageChangeFailure(
+                        errorMessage: e.toString(),
+                      );
                     }
                   },
                   child: const Icon(

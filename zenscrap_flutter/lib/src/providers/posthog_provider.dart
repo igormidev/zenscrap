@@ -267,6 +267,180 @@ class AnalyticsService {
   }
 
   // ========================================
+  // Pricing Page Events
+  // ========================================
+
+  /// Track when user views the pricing page
+  Future<void> trackPricingPageView() async {
+    await _posthog.capture(
+      eventName: 'pricing:page_view',
+      properties: {
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user clicks on a subscription plan
+  Future<void> trackPricingPlanClick({
+    required String planTier,
+    required bool isYearly,
+    required double price,
+  }) async {
+    await _posthog.capture(
+      eventName: 'pricing:plan_button_click',
+      properties: {
+        'plan_tier': planTier,
+        'billing_period': isYearly ? 'yearly' : 'monthly',
+        'price': price,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when unauthenticated user tries to subscribe
+  Future<void> trackPricingUnauthenticatedAttempt({
+    required String planTier,
+    required bool isYearly,
+  }) async {
+    await _posthog.capture(
+      eventName: 'pricing:unauthenticated_attempt',
+      properties: {
+        'plan_tier': planTier,
+        'billing_period': isYearly ? 'yearly' : 'monthly',
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when checkout session is successfully created
+  Future<void> trackPricingCheckoutSessionCreated({
+    required String planTier,
+    required bool isYearly,
+    required double price,
+  }) async {
+    await _posthog.capture(
+      eventName: 'pricing:checkout_session_created',
+      properties: {
+        'plan_tier': planTier,
+        'billing_period': isYearly ? 'yearly' : 'monthly',
+        'price': price,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when Stripe checkout page is opened
+  Future<void> trackPricingCheckoutOpened({
+    required String planTier,
+    required bool isYearly,
+  }) async {
+    await _posthog.capture(
+      eventName: 'pricing:checkout_opened',
+      properties: {
+        'plan_tier': planTier,
+        'billing_period': isYearly ? 'yearly' : 'monthly',
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track checkout failure
+  Future<void> trackPricingCheckoutFailure({
+    required String planTier,
+    required bool isYearly,
+    String? errorMessage,
+  }) async {
+    await _posthog.capture(
+      eventName: 'pricing:checkout_failure',
+      properties: {
+        'plan_tier': planTier,
+        'billing_period': isYearly ? 'yearly' : 'monthly',
+        if (errorMessage != null) 'error_message': errorMessage,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  // ========================================
+  // Account Page Events
+  // ========================================
+
+  /// Track when user views the account page
+  Future<void> trackAccountPageView({
+    required String userName,
+    required String email,
+    required String planTier,
+  }) async {
+    await _posthog.capture(
+      eventName: 'account:page_view',
+      properties: {
+        'user_name': userName,
+        'email': email,
+        'plan_tier': planTier,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user clicks to change profile image
+  Future<void> trackAccountProfileImageChangeClick() async {
+    await _posthog.capture(
+      eventName: 'account:profile_image_change_click',
+      properties: {
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track successful profile image update
+  Future<void> trackAccountProfileImageChangeSuccess() async {
+    await _posthog.capture(
+      eventName: 'account:profile_image_change_success',
+      properties: {
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track profile image update failure
+  Future<void> trackAccountProfileImageChangeFailure({
+    String? errorMessage,
+  }) async {
+    await _posthog.capture(
+      eventName: 'account:profile_image_change_failure',
+      properties: {
+        if (errorMessage != null) 'error_message': errorMessage,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user copies information from account page
+  Future<void> trackAccountInfoCopy({
+    required String fieldName,
+    required String fieldValue,
+  }) async {
+    await _posthog.capture(
+      eventName: 'account:info_copy',
+      properties: {
+        'field_name': fieldName,
+        'field_value': fieldValue,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user clicks contact support
+  Future<void> trackAccountContactSupportClick() async {
+    await _posthog.capture(
+      eventName: 'account:contact_support_click',
+      properties: {
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  // ========================================
   // General Utility Methods
   // ========================================
 

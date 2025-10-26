@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_flutter/src/core/extensions/plan_tier_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/contact_support_button.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_state.dart';
@@ -17,6 +18,7 @@ class AccountView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final analytics = ref.read(analyticsServiceProvider);
     final user = ref.read(sessionManagerProvider).signedInUser;
 
     final accountInfo = ref
@@ -27,6 +29,13 @@ class AccountView extends ConsumerWidget {
     if (accountInfo == null || session == null) {
       return SizedBox.fromSize();
     }
+
+    // Track page view when account page is displayed
+    analytics.trackAccountPageView(
+      userName: session.user.userName,
+      email: session.user.email,
+      planTier: accountInfo.planTier.displayName,
+    );
 
     return Center(
       child: ConstrainedBox(
@@ -53,16 +62,19 @@ class AccountView extends ConsumerWidget {
                   AccountDisplayTime(
                     title: 'User name',
                     content: session.user.userName,
+                    analytics: analytics,
                   ),
                   const SizedBox(height: 16),
                   AccountDisplayTime(
                     title: 'Email',
                     content: session.user.email,
+                    analytics: analytics,
                   ),
                   const SizedBox(height: 16),
                   AccountDisplayTime(
                     title: 'Your subscription plan',
                     content: accountInfo.planTier.displayName,
+                    analytics: analytics,
                     // content: accountInfo.accountApiKey?.apiKey ?? '',
                   ),
                   // AccountDisplayTime(
@@ -91,10 +103,12 @@ class AccountDisplayTime extends StatelessWidget {
   final String title;
   final String content;
   final String? copyText;
+  final AnalyticsService analytics;
   const AccountDisplayTime({
     super.key,
     required this.title,
     required this.content,
+    required this.analytics,
     this.copyText,
   });
 
@@ -124,8 +138,15 @@ class AccountDisplayTime extends StatelessWidget {
               ),
               IconButton(
                 onPressed: () async {
+                  final textToCopy = copyText ?? content;
                   await Clipboard.setData(
-                    ClipboardData(text: copyText ?? content),
+                    ClipboardData(text: textToCopy),
+                  );
+
+                  // Track copy action
+                  await analytics.trackAccountInfoCopy(
+                    fieldName: title,
+                    fieldValue: textToCopy,
                   );
                 },
                 icon: const Icon(Icons.copy),
