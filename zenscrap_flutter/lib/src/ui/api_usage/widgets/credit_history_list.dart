@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 
-class CreditHistoryList extends StatelessWidget {
+class CreditHistoryList extends ConsumerWidget {
   final List<CreditHistoryItem> creditHistory;
   final bool isLoadingMore;
   final VoidCallback onLoadMore;
@@ -16,7 +18,7 @@ class CreditHistoryList extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (creditHistory.isEmpty) {
       return Center(
         child: Padding(
@@ -70,7 +72,16 @@ class CreditHistoryList extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: OutlinedButton(
-              onPressed: isLoadingMore ? null : onLoadMore,
+              onPressed: isLoadingMore
+                  ? null
+                  : () {
+                      // Track load more history click
+                      ref.read(analyticsServiceProvider).trackApiUsageLoadMoreHistoryClick(
+                        currentCount: creditHistory.length,
+                        hasMore: true,
+                      );
+                      onLoadMore();
+                    },
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/request_status_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/analytics/selected_scrappable_provider.dart';
 import 'package:zenscrap_flutter/src/ui/api_analytics/widgets/segmented_column_bar.dart';
 
@@ -39,6 +40,13 @@ class ScrappableAnalyticsCard extends ConsumerWidget {
       height: cardHeight,
       child: GestureDetector(
         onTap: () {
+          // Track scrappable card click
+          ref.read(analyticsServiceProvider).trackApiAnalyticsScrappableCardClick(
+            scrappableId: item.scrappable.id!,
+            scrappableName: item.scrappable.name,
+            isSelecting: !isSelected,
+          );
+
           if (isSelected) {
             ref.read(selectedScrappableProvider.notifier).state = null;
           } else {

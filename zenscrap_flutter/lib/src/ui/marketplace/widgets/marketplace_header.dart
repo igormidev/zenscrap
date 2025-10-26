@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/marketplace/marketplace_provider.dart';
 import 'package:zenscrap_flutter/src/ui/marketplace/widgets/marketplace_search_bar.dart';
 
@@ -43,6 +44,9 @@ class MarketplaceHeader extends ConsumerWidget {
             IconButton(
               tooltip: 'Refresh page',
               onPressed: () {
+                // Track refresh click
+                ref.read(analyticsServiceProvider).trackMarketplaceRefreshClick();
+
                 ref.read(marketplaceProvider.notifier).refresh();
               },
               icon: Icon(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/marketplace/marketplace_provider.dart';
 import 'package:zenscrap_flutter/src/states/marketplace/marketplace_state.dart';
 
@@ -57,6 +58,12 @@ class MarketplacePaginationControls extends ConsumerWidget {
     return IconButton(
       onPressed: pagination.hasPreviousPage
           ? () {
+              // Track previous page click
+              ref.read(analyticsServiceProvider).trackMarketplacePaginationPrevious(
+                fromPage: pagination.currentPage,
+                toPage: pagination.currentPage - 1,
+              );
+
               ref
                   .read(marketplaceProvider.notifier)
                   .changePage(pagination.currentPage - 1);
@@ -84,6 +91,12 @@ class MarketplacePaginationControls extends ConsumerWidget {
     return IconButton(
       onPressed: pagination.hasNextPage
           ? () {
+              // Track next page click
+              ref.read(analyticsServiceProvider).trackMarketplacePaginationNext(
+                fromPage: pagination.currentPage,
+                toPage: pagination.currentPage + 1,
+              );
+
               ref
                   .read(marketplaceProvider.notifier)
                   .changePage(pagination.currentPage + 1);
@@ -178,13 +191,19 @@ class MarketplacePaginationControls extends ConsumerWidget {
     int currentPage,
   ) {
     final isActive = pageNumber == currentPage;
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2),
       child: TextButton(
         onPressed: isActive
             ? null
             : () {
+                // Track page number click
+                ref.read(analyticsServiceProvider).trackMarketplacePaginationPage(
+                  fromPage: currentPage,
+                  toPage: pageNumber,
+                );
+
                 ref.read(marketplaceProvider.notifier).changePage(pageNumber);
               },
         style: TextButton.styleFrom(

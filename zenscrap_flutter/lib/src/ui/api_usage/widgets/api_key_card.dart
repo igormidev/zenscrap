@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 
-class ApiKeyCard extends StatefulWidget {
+class ApiKeyCard extends ConsumerStatefulWidget {
   final AccountApiKey apiKey;
   final int usageCount;
   final bool canDelete;
@@ -19,10 +21,10 @@ class ApiKeyCard extends StatefulWidget {
   });
 
   @override
-  State<ApiKeyCard> createState() => _ApiKeyCardState();
+  ConsumerState<ApiKeyCard> createState() => _ApiKeyCardState();
 }
 
-class _ApiKeyCardState extends State<ApiKeyCard> {
+class _ApiKeyCardState extends ConsumerState<ApiKeyCard> {
   bool _isHovered = false;
 
   String _maskApiKey(String apiKey) {
@@ -194,6 +196,12 @@ class _ApiKeyCardState extends State<ApiKeyCard> {
                             color: context.c.primary,
                           ),
                           onPressed: () {
+                            // Track copy API key from card
+                            ref.read(analyticsServiceProvider).trackApiUsageCopyApiKeyCard(
+                              keyId: widget.apiKey.id!,
+                              keyName: widget.apiKey.name,
+                            );
+
                             Clipboard.setData(
                               ClipboardData(text: widget.apiKey.apiKey),
                             );

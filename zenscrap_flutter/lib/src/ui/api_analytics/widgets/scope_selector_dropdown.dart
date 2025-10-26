@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/analytics/analytics_provider.dart';
 
 class ScopeSelectorDropdown extends ConsumerWidget {
@@ -83,6 +84,12 @@ class ScopeSelectorDropdown extends ConsumerWidget {
         }).toList(),
         onChanged: (AnalyticsTimeScope? newScope) {
           if (newScope != null) {
+            // Track time scope change
+            ref.read(analyticsServiceProvider).trackApiAnalyticsTimeScopeChange(
+              fromScope: currentScope.name,
+              toScope: newScope.name,
+            );
+
             ref
                 .read(analyticsProvider.notifier)
                 .getAnalyticsData(scope: newScope);

@@ -5,6 +5,7 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/mixins/curl_builder_mixin.dart';
 import 'package:zenscrap_flutter/src/design_system/elements/scrappable_grid_listage.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/scrappable_card_indicator.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_state.dart';
 import 'package:zenscrap_flutter/src/states/marketplace/marketplace_provider.dart';
@@ -33,6 +34,7 @@ class _MarketplaceViewState extends ConsumerState<MarketplaceView>
 
   @override
   Widget build(BuildContext context) {
+    final analytics = ref.read(analyticsServiceProvider);
     final accountId = ref.watch(accountProvider).mapOrNull(
           withData: (value) => value.accountInfo.id,
         );
@@ -49,6 +51,13 @@ class _MarketplaceViewState extends ConsumerState<MarketplaceView>
             ),
             loading: () => const SizedBox.shrink(),
             loaded: (response, searchQuery) {
+              // Track marketplace page view
+              analytics.trackMarketplacePageView(
+                scrappableCount: response.data.length,
+                currentPage: response.pagination.currentPage,
+                hasSearchQuery: searchQuery.isNotEmpty,
+              );
+
               if (response.data.isEmpty) {
                 return EmptyMarketplacePage(
                   isSearchResult: searchQuery.isNotEmpty,
@@ -69,6 +78,7 @@ class _MarketplaceViewState extends ConsumerState<MarketplaceView>
                           accountId: accountId,
                           scrappable: marketPlaceItem.scrappable,
                           usageCount: marketPlaceItem.usageCount,
+                          source: ScrappableCardSource.marketplace,
                         );
                       },
                     ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/analytics/selected_scrappable_provider.dart';
 import 'package:zenscrap_flutter/src/states/analytics/selected_scrappable_analytics_provider.dart';
 import 'package:zenscrap_flutter/src/states/analytics/selected_scrappable_analytics_state.dart';
@@ -53,6 +54,12 @@ class _SelectedScrappablePageState
         // Reset state when nothing is selected
         ref.read(selectedScrappableAnalyticsProvider.notifier).resetState();
       } else if (next.scrappable.id != previous?.scrappable.id) {
+        // Track selected scrappable view
+        ref.read(analyticsServiceProvider).trackApiAnalyticsSelectedScrappableView(
+          scrappableId: next.scrappable.id!,
+          scrappableName: next.scrappable.name,
+        );
+
         // Load analytics for the newly selected scrappable
         unawaited(
           ref
@@ -196,6 +203,12 @@ class _LoadMoreSection extends ConsumerWidget {
             ? const CircularProgressIndicator()
             : ElevatedButton.icon(
                 onPressed: () {
+                  // Track load more details click
+                  ref.read(analyticsServiceProvider).trackApiAnalyticsLoadMoreDetailsClick(
+                    scrappableId: data.scrappable.id!,
+                    currentCount: data.items.length,
+                  );
+
                   ref
                       .read(selectedScrappableAnalyticsProvider.notifier)
                       .loadMoreAnalytics();

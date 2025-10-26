@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_state.dart';
 import 'package:zenscrap_flutter/src/states/api_usage/api_usage_provider.dart';
@@ -53,9 +54,21 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
 
   Future<void> _createApiKey(String name) async {
     if (!mounted) return;
+
+    // Track create API key submit
+    ref.read(analyticsServiceProvider).trackApiUsageCreateApiKeySubmit(
+      keyName: name,
+    );
+
     final newKey =
         await ref.read(apiKeysProvider.notifier).createApiKey(context, name);
     if (newKey != null && mounted) {
+      // Track successful creation
+      ref.read(analyticsServiceProvider).trackApiUsageCreateApiKeySuccess(
+        keyId: newKey.id!,
+        keyName: newKey.name,
+      );
+
       Navigator.of(context).pop();
       // Show the API key in a dialog for copying
       _showApiKeyDialog(newKey);
@@ -97,6 +110,11 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
                   IconButton(
                     icon: Icon(Icons.copy),
                     onPressed: () {
+                      // Track copy API key from dialog
+                      ref.read(analyticsServiceProvider).trackApiUsageCopyApiKeyDialog(
+                        keyId: apiKey.id!,
+                      );
+
                       Clipboard.setData(ClipboardData(text: apiKey.apiKey));
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('API key copied to clipboard')),
@@ -119,6 +137,19 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
   }
 
   Future<void> _deactivateApiKey(int keyId) async {
+    // Find the key name for tracking
+    final apiKeys = ref.read(apiKeysProvider).maybeWhen(
+      loaded: (keys, _) => keys,
+      orElse: () => <AccountApiKey>[],
+    );
+    final apiKey = apiKeys.firstWhere((key) => key.id == keyId);
+
+    // Track deactivate click
+    ref.read(analyticsServiceProvider).trackApiUsageDeactivateApiKeyClick(
+      keyId: keyId,
+      keyName: apiKey.name,
+    );
+
     // Show confirmation dialog
     final confirm = await showDialog<bool>(
       context: context,
@@ -128,7 +159,13 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
             'Are you sure you want to deactivate this API key? This action cannot be undone.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
+            onPressed: () {
+              // Track cancel
+              ref.read(analyticsServiceProvider).trackApiUsageDeactivateApiKeyCancel(
+                keyId: keyId,
+              );
+              Navigator.of(context).pop(false);
+            },
             child: const Text('Cancel'),
           ),
           TextButton(
@@ -144,11 +181,20 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
 
     if (confirm != true) return;
 
+    // Track confirm
+    ref.read(analyticsServiceProvider).trackApiUsageDeactivateApiKeyConfirm(
+      keyId: keyId,
+      keyName: apiKey.name,
+    );
+
     if (!mounted) return;
     await ref.read(apiKeysProvider.notifier).deactivateApiKey(context, keyId);
   }
 
   void _showCreateApiKeyDialog() {
+    // Track create API key button click
+    ref.read(analyticsServiceProvider).trackApiUsageCreateApiKeyClick();
+
     showDialog(
       context: context,
       builder: (context) => CreateApiKeyDialog(
@@ -159,6 +205,7 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
 
   @override
   Widget build(BuildContext context) {
+    final analytics = ref.read(analyticsServiceProvider);
     final planTier = ref.watch(accountProvider).maybeWhen(
           withData: (account) => account.planTier,
           orElse: () => PlanTier.none,
@@ -256,6 +303,16 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
       );
     }
 
+    // Track page view with credit and API key data
+    final totalCredits = (apiUsage.creditUsage?.subscriptionCredits ?? 0) +
+        (apiUsage.creditUsage?.purchasedCredits ?? 0);
+    analytics.trackApiUsagePageView(
+      subscriptionCredits: apiUsage.creditUsage?.subscriptionCredits ?? 0,
+      purchasedCredits: apiUsage.creditUsage?.purchasedCredits ?? 0,
+      totalCredits: totalCredits,
+      apiKeyCount: apiKeys.length,
+    );
+
     return ValueListenableBuilder(
       valueListenable: _isRefreshVN,
       builder: (context, isRefresh, child) {
@@ -306,7 +363,7 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
   }
 }
 
-class MobileLayout extends StatelessWidget {
+class MobileLayout extends ConsumerWidget {
   final int selectedTabIndex;
   final PlanTier planTier;
   final Function(int) onTabSelected;
@@ -335,7 +392,7 @@ class MobileLayout extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final tabs = [
       OverviewTab(
         apiUsage: apiUsage,
@@ -354,6 +411,8 @@ class MobileLayout extends StatelessWidget {
       ),
     ];
 
+    final tabNames = ['Overview', 'API Keys', 'History'];
+
     return Scaffold(
       body: IndexedStack(
         index: selectedTabIndex,
@@ -361,7 +420,14 @@ class MobileLayout extends StatelessWidget {
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: selectedTabIndex,
-        onDestinationSelected: onTabSelected,
+        onDestinationSelected: (index) {
+          // Track tab selection
+          ref.read(analyticsServiceProvider).trackApiUsageMobileTabSelect(
+            tabName: tabNames[index],
+            tabIndex: index,
+          );
+          onTabSelected(index);
+        },
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.dashboard_outlined),
@@ -435,6 +501,9 @@ class DesktopLayout extends StatelessWidget {
                           onPressed: isRefresh
                               ? null
                               : () async {
+                                  // Track refresh click
+                                  ref.read(analyticsServiceProvider).trackApiUsageRefreshClick();
+
                                   isRefreshVN.value = true;
                                   try {
                                     await Future.delayed(

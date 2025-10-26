@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 
-class CreditsOverviewCard extends StatelessWidget {
+class CreditsOverviewCard extends ConsumerWidget {
   final int subscriptionCredits;
   final int purchasedCredits;
   final String accountId;
@@ -15,7 +17,7 @@ class CreditsOverviewCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final totalCredits = subscriptionCredits + purchasedCredits;
 
     return Container(
@@ -134,6 +136,11 @@ class CreditsOverviewCard extends StatelessWidget {
                     size: 20,
                   ),
                   onPressed: () {
+                    // Track copy account ID
+                    ref.read(analyticsServiceProvider).trackApiUsageCopyAccountId(
+                      accountId: accountId,
+                    );
+
                     Clipboard.setData(ClipboardData(text: accountId));
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(

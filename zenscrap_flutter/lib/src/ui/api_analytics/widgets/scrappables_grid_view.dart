@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/analytics/analytics_provider.dart';
 import 'package:zenscrap_flutter/src/states/analytics/selected_scrappable_provider.dart';
 import 'package:zenscrap_flutter/src/ui/api_analytics/widgets/scrappable_analytics_card.dart';
@@ -111,6 +112,12 @@ class _ScrappablesGridViewState extends ConsumerState<ScrappablesGridView> {
 
   @override
   Widget build(BuildContext context) {
+    // Track page view
+    ref.read(analyticsServiceProvider).trackApiAnalyticsPageView(
+      scrappableCount: widget.data.items.length,
+      timeScope: widget.data.scope.name,
+    );
+
     // Calculate the max count for normalizing bar heights
     double maxTotalCount = 0;
     for (final item in widget.data.items) {
@@ -155,6 +162,11 @@ class _ScrappablesGridViewState extends ConsumerState<ScrappablesGridView> {
                     onPressed: isRefresh
                         ? null
                         : () async {
+                            // Track refresh click
+                            ref.read(analyticsServiceProvider).trackApiAnalyticsRefreshClick(
+                              timeScope: widget.data.scope.name,
+                            );
+
                             widget.isRefreshVN.value = true;
                             try {
                               await Future.delayed(

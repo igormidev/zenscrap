@@ -6,6 +6,7 @@ import 'package:zenscrap_flutter/src/core/mixins/edit_scrappable.dart';
 import 'package:zenscrap_flutter/src/design_system/elements/scrappable_grid_listage.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/scrappable_card_indicator.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_state.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
@@ -34,6 +35,7 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
 
   @override
   Widget build(BuildContext context) {
+    final analytics = ref.read(analyticsServiceProvider);
     final accountId = ref.watch(accountProvider).mapOrNull(
           withData: (value) => value.accountInfo.id,
         );
@@ -48,6 +50,12 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
         final searchQuery = data.searchQuery;
         final scrappables = response.data;
         final pagination = response.pagination;
+
+        // Track page view
+        analytics.trackUserScrappablesPageView(
+          scrappableCount: scrappables.length,
+          hasSearchQuery: searchQuery.isNotEmpty,
+        );
 
         if (scrappables.isEmpty && searchQuery.isEmpty) {
           return EmptyScrappableListageIndicatorPage();
@@ -65,6 +73,9 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
                 Spacer(),
                 FilledButton.tonalIcon(
                   onPressed: () async {
+                    // Track create new click
+                    await analytics.trackUserScrappablesCreateNewClick();
+
                     ref.read(scrapChatProvider.notifier).reset();
                     final result = await context.push('/scrappable-form');
                     if (result == true) {
@@ -135,7 +146,13 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: FilledButton.tonal(
-                          onPressed: () {
+                          onPressed: () async {
+                            // Track load more click
+                            await analytics.trackUserScrappablesLoadMoreClick(
+                              currentPage: pagination.currentPage,
+                              totalPages: pagination.totalPages,
+                            );
+
                             ref
                                 .read(userScrappablesProvider.notifier)
                                 .changePage(pagination.currentPage + 1);

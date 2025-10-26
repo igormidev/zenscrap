@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/analytics/analytics_provider.dart';
 import 'package:zenscrap_flutter/src/states/analytics/analytics_state.dart';
 import 'package:zenscrap_flutter/src/states/analytics/selected_scrappable_provider.dart';
@@ -46,6 +47,16 @@ class _ApiAnalyticsViewState extends ConsumerState<ApiAnalyticsView> {
         withData: (data) => data.hasNextPage,
       );
       if (hasNextPage == true) {
+        // Track load more trigger
+        analyticsState.whenOrNull(
+          withData: (data) {
+            ref.read(analyticsServiceProvider).trackApiAnalyticsLoadMoreCardsTrigger(
+              currentCount: data.items.length,
+              totalCount: data.totalCount,
+            );
+          },
+        );
+
         ref.read(analyticsProvider.notifier).loadMoreAnalytics();
       }
     }
@@ -114,6 +125,11 @@ class _AnalyticsContent extends ConsumerWidget {
                         IconButton(
                           icon: const Icon(Icons.arrow_back),
                           onPressed: () {
+                            // Track mobile back click
+                            ref.read(analyticsServiceProvider).trackApiAnalyticsMobileBackClick(
+                              scrappableId: selectedItem.scrappable.id!,
+                            );
+
                             ref
                                 .read(selectedScrappableProvider.notifier)
                                 .state = null;
@@ -201,6 +217,11 @@ class _AnalyticsErrorView extends ConsumerWidget {
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () {
+              // Track error retry
+              ref.read(analyticsServiceProvider).trackApiAnalyticsErrorRetryClick(
+                errorType: error.title,
+              );
+
               ref.read(analyticsProvider.notifier).getAnalyticsData();
             },
             child: const Text('Retry'),

@@ -2,6 +2,7 @@ import 'package:dart_debouncer/dart_debouncer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables_provider.dart';
 
 class UserScrappablesSearchBar extends ConsumerStatefulWidget {
@@ -26,6 +27,14 @@ class _UserScrappablesSearchBarState
 
   void _onSearchChanged(String value) {
     _debouncer.resetDebounce(() {
+      // Track search start
+      if (value.isNotEmpty) {
+        ref.read(analyticsServiceProvider).trackUserScrappablesSearchStart(
+          searchQuery: value,
+          queryLength: value.length,
+        );
+      }
+
       ref.read(userScrappablesProvider.notifier).search(value);
     });
   }
@@ -59,6 +68,9 @@ class _UserScrappablesSearchBarState
           suffixIcon: _searchController.text.isNotEmpty
               ? IconButton(
                   onPressed: () {
+                    // Track search clear
+                    ref.read(analyticsServiceProvider).trackUserScrappablesSearchClear();
+
                     _searchController.clear();
                     ref.read(userScrappablesProvider.notifier).search('');
                   },
