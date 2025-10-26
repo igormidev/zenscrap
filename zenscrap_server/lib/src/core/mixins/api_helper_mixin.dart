@@ -374,6 +374,25 @@ mixin ApiHelperMixin {
         );
       }
       rethrow;
+    } on ZenScrapException catch (error, stackTrace) {
+      // Convert ZenScrapException to ApiError to preserve error details
+      final apiError = ApiError(RequestStatus.clientError, error);
+      session.log(
+        '[${apiError.status.name.toUpperCase()}] ${error.title}',
+        exception: error,
+        stackTrace: stackTrace,
+        level: LogLevel.error,
+      );
+      if (_pendingAnalytics[scrappableId]?[nanoId]?.containsKey(apiKey) ==
+          true) {
+        _pendingAnalytics[scrappableId]![nanoId]![apiKey]!.add(
+          AnalyticsPayload(
+            time: now,
+            status: apiError.status,
+          ),
+        );
+      }
+      throw apiError;
     } catch (error, stackTrace) {
       session.log(
         'An unknown error occurred in api',

@@ -31,6 +31,21 @@ class ScrappablesGridView extends ConsumerStatefulWidget {
 class _ScrappablesGridViewState extends ConsumerState<ScrappablesGridView> {
   int? _selectedCardIndex;
 
+  String _getScopeExplanation() {
+    switch (widget.data.scope) {
+      case AnalyticsTimeScope.lastHour:
+        return 'Each column represents 5 minutes';
+      case AnalyticsTimeScope.last12Hours:
+        return 'Each column represents 1 hour';
+      case AnalyticsTimeScope.last24Hours:
+        return 'Each column represents 2 hours';
+      case AnalyticsTimeScope.last7Days:
+        return 'Each column represents 1 day';
+      case AnalyticsTimeScope.last30Days:
+        return 'Each column represents 1 day';
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -165,36 +180,70 @@ class _ScrappablesGridViewState extends ConsumerState<ScrappablesGridView> {
             ],
           ),
           const SizedBox(height: 8),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Container(
-              decoration: BoxDecoration(
-                color: context.c.surface.withAlpha(30),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: context.c.outline.withAlpha(100),
+          Row(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: context.c.primaryContainer.withAlpha(60),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: context.c.primary.withAlpha(60),
+                  ),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.warning_rounded,
+                      color: context.c.primary.withAlpha(150),
+                      size: 16,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'A request can take up to 10 minutes to appear here',
+                      style: context.t.bodySmall?.copyWith(
+                        color: context.c.onSurface.withAlpha(150),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.info,
-                    // Icons.storage_outlined,
-                    color: context.c.onSurface.withAlpha(150),
-                    size: 16,
+              SizedBox(width: 12),
+              Container(
+                decoration: BoxDecoration(
+                  color: context.c.surface.withAlpha(30),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: context.c.outline.withAlpha(100),
                   ),
-                  const SizedBox(width: 4),
-                  Text(
-                    'A request can take up to 10 minutes to appear here',
-                    style: context.t.bodySmall?.copyWith(
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.info,
                       color: context.c.onSurface.withAlpha(150),
+                      size: 14,
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 4),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 1),
+                      child: Text(
+                        _getScopeExplanation(),
+                        // 'A request can take up to 10 minutes to appear here',
+                        style: context.t.bodySmall?.copyWith(
+                          color: context.c.onSurface.withAlpha(150),
+                          fontSize: 11,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
+            ],
           ),
           const SizedBox(height: 16),
           // Wrap with cards

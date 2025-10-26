@@ -52,7 +52,7 @@ class SegmentedColumnBar extends StatelessWidget {
 
     return Tooltip(
       message: _buildTooltipMessage(),
-      preferBelow: false,
+      preferBelow: true,
       verticalOffset: 20,
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -66,47 +66,31 @@ class SegmentedColumnBar extends StatelessWidget {
               Container(
                 height: barHeight,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(4),
+                    topRight: Radius.circular(4),
+                  ),
                   border: Border.all(
                     color: context.c.outline.withAlpha(30),
                     width: 0.5,
                   ),
                 ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(4),
+                topRight: Radius.circular(4),
+              ),
               child: Column(
                 children: [
-                  // Success segment
-                  if (timeScope.successCount > 0)
+                  // Max concurrency segment (top)
+                  if (timeScope.maxConcurrencyExceededCount > 0)
                     Expanded(
-                      flex: (successPercentage * 1000).toInt(),
+                      flex: (maxConcurrencyPercentage * 1000).toInt(),
                       child: _BarSegment(
-                        color: RequestStatus.success.color,
-                        count: timeScope.successCount,
-                        label: RequestStatus.success.label,
-                        percentage: successPercentage,
-                      ),
-                    ),
-                  // Client error segment
-                  if (timeScope.clientErrorCount > 0)
-                    Expanded(
-                      flex: (clientErrorPercentage * 1000).toInt(),
-                      child: _BarSegment(
-                        color: RequestStatus.clientError.color,
-                        count: timeScope.clientErrorCount,
-                        label: RequestStatus.clientError.label,
-                        percentage: clientErrorPercentage,
-                      ),
-                    ),
-                  // Server error segment
-                  if (timeScope.serverErrorCount > 0)
-                    Expanded(
-                      flex: (serverErrorPercentage * 1000).toInt(),
-                      child: _BarSegment(
-                        color: RequestStatus.serverError.color,
-                        count: timeScope.serverErrorCount,
-                        label: RequestStatus.serverError.label,
-                        percentage: serverErrorPercentage,
+                        color: RequestStatus.maxConcurrencyExceeded.color,
+                        count: timeScope.maxConcurrencyExceededCount,
+                        label: RequestStatus.maxConcurrencyExceeded.label,
+                        percentage: maxConcurrencyPercentage,
                       ),
                     ),
                   // Insufficient credits segment
@@ -120,15 +104,37 @@ class SegmentedColumnBar extends StatelessWidget {
                         percentage: insufficientCreditsPercentage,
                       ),
                     ),
-                  // Max concurrency segment
-                  if (timeScope.maxConcurrencyExceededCount > 0)
+                  // Server error segment
+                  if (timeScope.serverErrorCount > 0)
                     Expanded(
-                      flex: (maxConcurrencyPercentage * 1000).toInt(),
+                      flex: (serverErrorPercentage * 1000).toInt(),
                       child: _BarSegment(
-                        color: RequestStatus.maxConcurrencyExceeded.color,
-                        count: timeScope.maxConcurrencyExceededCount,
-                        label: RequestStatus.maxConcurrencyExceeded.label,
-                        percentage: maxConcurrencyPercentage,
+                        color: RequestStatus.serverError.color,
+                        count: timeScope.serverErrorCount,
+                        label: RequestStatus.serverError.label,
+                        percentage: serverErrorPercentage,
+                      ),
+                    ),
+                  // Client error segment
+                  if (timeScope.clientErrorCount > 0)
+                    Expanded(
+                      flex: (clientErrorPercentage * 1000).toInt(),
+                      child: _BarSegment(
+                        color: RequestStatus.clientError.color,
+                        count: timeScope.clientErrorCount,
+                        label: RequestStatus.clientError.label,
+                        percentage: clientErrorPercentage,
+                      ),
+                    ),
+                  // Success segment (bottom - green at the base)
+                  if (timeScope.successCount > 0)
+                    Expanded(
+                      flex: (successPercentage * 1000).toInt(),
+                      child: _BarSegment(
+                        color: RequestStatus.success.color,
+                        count: timeScope.successCount,
+                        label: RequestStatus.success.label,
+                        percentage: successPercentage,
                       ),
                     ),
                 ],
@@ -220,18 +226,6 @@ class _BarSegmentState extends State<_BarSegment> {
           border: _isHovered
               ? Border.all(color: Colors.white.withAlpha(100), width: 1)
               : null,
-        ),
-        child: Center(
-          child: _isHovered && widget.percentage > 0.15
-              ? Text(
-                  '${(widget.percentage * 100).toStringAsFixed(0)}%',
-                  style: context.t.labelSmall?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 10,
-                  ),
-                )
-              : const SizedBox.shrink(),
         ),
       ),
     );

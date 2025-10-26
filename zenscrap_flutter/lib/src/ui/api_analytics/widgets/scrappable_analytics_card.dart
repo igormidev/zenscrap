@@ -10,10 +10,9 @@ import 'package:zenscrap_flutter/src/ui/api_analytics/widgets/segmented_column_b
 class ScrappableAnalyticsCard extends ConsumerWidget {
   final ScrappableRequestsAnalyticsItem item;
   final double maxTotalCount;
-
   // Fixed dimensions for the card
   static const double cardWidth = 320;
-  static const double cardHeight = 250;
+  static const double cardHeight = 245;
 
   const ScrappableAnalyticsCard({
     super.key,
@@ -61,7 +60,7 @@ class ScrappableAnalyticsCard extends ConsumerWidget {
           ),
           child: hasData
               ? _buildCardWithData(context, isSelected, totalRequests)
-              : _buildEmptyCard(context, isSelected),
+              : EmptyIndicatorOfRequests(item: item, isSelected: isSelected),
         ),
       )
           .animate()
@@ -137,43 +136,38 @@ class ScrappableAnalyticsCard extends ConsumerWidget {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                if (item.successTotalCount > 0)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 4),
-                    child: _CompactStatusIndicator(
-                      status: RequestStatus.success,
-                      count: item.successTotalCount,
-                    ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 4),
+                  child: _CompactStatusIndicator(
+                    status: RequestStatus.success,
+                    count: item.successTotalCount,
                   ),
-                if (item.clientErrorTotalCount > 0)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 4),
-                    child: _CompactStatusIndicator(
-                      status: RequestStatus.clientError,
-                      count: item.clientErrorTotalCount,
-                    ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 4),
+                  child: _CompactStatusIndicator(
+                    status: RequestStatus.clientError,
+                    count: item.clientErrorTotalCount,
                   ),
-                if (item.serverErrorTotalCount > 0)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 4),
-                    child: _CompactStatusIndicator(
-                      status: RequestStatus.serverError,
-                      count: item.serverErrorTotalCount,
-                    ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 4),
+                  child: _CompactStatusIndicator(
+                    status: RequestStatus.serverError,
+                    count: item.serverErrorTotalCount,
                   ),
-                if (item.insufficientCreditsTotalCount > 0)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 4),
-                    child: _CompactStatusIndicator(
-                      status: RequestStatus.insufficientCredits,
-                      count: item.insufficientCreditsTotalCount,
-                    ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 4),
+                  child: _CompactStatusIndicator(
+                    status: RequestStatus.insufficientCredits,
+                    count: item.insufficientCreditsTotalCount,
                   ),
-                if (item.maxConcurrencyExceededTotalCount > 0)
-                  _CompactStatusIndicator(
-                    status: RequestStatus.maxConcurrencyExceeded,
-                    count: item.maxConcurrencyExceededTotalCount,
-                  ),
+                ),
+                _CompactStatusIndicator(
+                  status: RequestStatus.maxConcurrencyExceeded,
+                  count: item.maxConcurrencyExceededTotalCount,
+                ),
               ],
             ),
           ),
@@ -218,8 +212,20 @@ class ScrappableAnalyticsCard extends ConsumerWidget {
       ],
     );
   }
+}
 
-  Widget _buildEmptyCard(BuildContext context, bool isSelected) {
+class EmptyIndicatorOfRequests extends StatelessWidget {
+  const EmptyIndicatorOfRequests({
+    super.key,
+    required this.item,
+    required this.isSelected,
+  });
+  final bool isSelected;
+
+  final ScrappableRequestsAnalyticsItem item;
+
+  @override
+  Widget build(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -264,34 +270,38 @@ class _CompactStatusIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-      decoration: BoxDecoration(
-        color: status.color.withAlpha(30),
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(
-          color: status.color.withAlpha(80),
-          width: 1,
+    return Tooltip(
+      message: status.label,
+      preferBelow: true,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+        decoration: BoxDecoration(
+          color: status.color.withAlpha(30),
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(
+            color: status.color.withAlpha(80),
+            width: 1,
+          ),
         ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            status.icon,
-            size: 10,
-            color: status.color,
-          ),
-          const SizedBox(width: 3),
-          Text(
-            count.toString(),
-            style: context.t.labelSmall?.copyWith(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              status.icon,
+              size: 11,
               color: status.color,
-              fontWeight: FontWeight.bold,
-              fontSize: 10,
             ),
-          ),
-        ],
+            const SizedBox(width: 3),
+            Text(
+              count.toString(),
+              style: context.t.labelSmall?.copyWith(
+                color: status.color,
+                fontWeight: FontWeight.bold,
+                fontSize: 11, // 10% bigger (10 * 1.1 = 11)
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
