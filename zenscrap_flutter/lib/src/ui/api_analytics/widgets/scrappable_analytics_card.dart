@@ -29,7 +29,8 @@ class ScrappableAnalyticsCard extends ConsumerWidget {
         item.clientErrorTotalCount +
         item.serverErrorTotalCount +
         item.insufficientCreditsTotalCount +
-        item.maxConcurrencyExceededTotalCount;
+        item.maxConcurrencyExceededTotalCount +
+        item.failedAtScrappingBeeTotalCount;
 
     final hasData = totalRequests > 0;
 
@@ -160,6 +161,13 @@ class ScrappableAnalyticsCard extends ConsumerWidget {
                 Padding(
                   padding: const EdgeInsets.only(right: 4),
                   child: _CompactStatusIndicator(
+                    status: RequestStatus.failedAtScrappingBee,
+                    count: item.failedAtScrappingBeeTotalCount,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 4),
+                  child: _CompactStatusIndicator(
                     status: RequestStatus.insufficientCredits,
                     count: item.insufficientCreditsTotalCount,
                   ),
@@ -274,7 +282,7 @@ class _CompactStatusIndicator extends StatelessWidget {
       message: status.label,
       preferBelow: true,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+        padding: const EdgeInsets.symmetric(horizontal: 6),
         decoration: BoxDecoration(
           color: status.color.withAlpha(30),
           borderRadius: BorderRadius.circular(6),
@@ -288,7 +296,7 @@ class _CompactStatusIndicator extends StatelessWidget {
           children: [
             Icon(
               status.icon,
-              size: 11,
+              size: 12,
               color: status.color,
             ),
             const SizedBox(width: 3),
@@ -297,7 +305,7 @@ class _CompactStatusIndicator extends StatelessWidget {
               style: context.t.labelSmall?.copyWith(
                 color: status.color,
                 fontWeight: FontWeight.bold,
-                fontSize: 11, // 10% bigger (10 * 1.1 = 11)
+                fontSize: 13,
               ),
             ),
           ],

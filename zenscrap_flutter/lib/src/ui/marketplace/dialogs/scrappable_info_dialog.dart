@@ -128,6 +128,7 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
       withData: (_) => true,
       orElse: () => false,
     );
+    final isNewScrappable = widget.scrappable.accountId == null;
 
     return AlertDialog(
       insetPadding: const EdgeInsets.symmetric(vertical: 20),
@@ -150,10 +151,10 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
         ),
       ),
       content: SizedBox(
-        height: MediaQuery.sizeOf(context).height * 0.63,
+        height: MediaQuery.sizeOf(context).height * 0.7,
         width: MediaQuery.sizeOf(context).width * 0.3,
         child: ListView(
-          padding: const EdgeInsets.only(bottom: 20, top: 6),
+          // padding: const EdgeInsets.only(bottom: 20, top: 6),
           children: [
             Text(
               widget.scrappable.description,
@@ -251,10 +252,12 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
                 copyCode: curlCommand,
                 fontSize: 12,
               ),
-              const SizedBox(height: 24),
-              ScrappableUsageMetricsWidget(
-                scrappableId: widget.scrappable.id!,
-              ),
+              if (isNewScrappable == false) ...[
+                const SizedBox(height: 24),
+                ScrappableUsageMetricsWidget(
+                  scrappableId: widget.scrappable.id!,
+                ),
+              ],
             ] else if (!isLoggedIn) ...[
               const SizedBox(height: 24),
               Container(
@@ -329,18 +332,18 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
               ),
             ),
             const SizedBox(height: 16),
+            if (isMyScrappable == false)
+              FilledButton.icon(
+                onPressed: () => _handleClone(context),
+                icon: const Icon(Icons.copy_rounded),
+                label: const Text('Clone to My Endpoints'),
+              ),
+            if (isMyScrappable != false) const SizedBox(height: 42)
           ],
         ),
       ),
-      actions: [
-        if (isMyScrappable == false)
-          FilledButton.icon(
-            onPressed: () => _handleClone(context),
-            icon: const Icon(Icons.copy_rounded),
-            label: const Text('Clone to My Endpoints'),
-          ),
-        if (isMyScrappable != false) const SizedBox(height: 42)
-      ],
+      // actions: [
+      // ],
     );
   }
 

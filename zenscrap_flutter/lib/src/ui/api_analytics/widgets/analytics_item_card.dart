@@ -90,6 +90,12 @@ class AnalyticsItemCard extends StatelessWidget {
           icon: Icons.traffic,
           text: 'Max Concurrency',
         );
+      case RequestStatus.failedAtScrappingBee:
+        return _StatusInfo(
+          color: const Color(0xFFE91E63),
+          icon: Icons.bug_report,
+          text: 'ScrapingBee Error',
+        );
     }
   }
 }

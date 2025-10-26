@@ -118,7 +118,8 @@ class _ScrappablesGridViewState extends ConsumerState<ScrappablesGridView> {
           item.clientErrorTotalCount +
           item.serverErrorTotalCount +
           item.insufficientCreditsTotalCount +
-          item.maxConcurrencyExceededTotalCount;
+          item.maxConcurrencyExceededTotalCount +
+          item.failedAtScrappingBeeTotalCount;
       if (totalCount > maxTotalCount) {
         maxTotalCount = totalCount.toDouble();
       }

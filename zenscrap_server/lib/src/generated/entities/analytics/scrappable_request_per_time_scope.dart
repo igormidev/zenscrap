@@ -21,6 +21,7 @@ abstract class ScrappableRequestPerTimeScope
     required this.serverErrorCount,
     required this.insufficientCreditsCount,
     required this.maxConcurrencyExceededCount,
+    required this.failedAtScrappingBeeCount,
   });
 
   factory ScrappableRequestPerTimeScope({
@@ -31,6 +32,7 @@ abstract class ScrappableRequestPerTimeScope
     required int serverErrorCount,
     required int insufficientCreditsCount,
     required int maxConcurrencyExceededCount,
+    required int failedAtScrappingBeeCount,
   }) = _ScrappableRequestPerTimeScopeImpl;
 
   factory ScrappableRequestPerTimeScope.fromJson(
@@ -45,6 +47,8 @@ abstract class ScrappableRequestPerTimeScope
           jsonSerialization['insufficientCreditsCount'] as int,
       maxConcurrencyExceededCount:
           jsonSerialization['maxConcurrencyExceededCount'] as int,
+      failedAtScrappingBeeCount:
+          jsonSerialization['failedAtScrappingBeeCount'] as int,
     );
   }
 
@@ -62,6 +66,8 @@ abstract class ScrappableRequestPerTimeScope
 
   int maxConcurrencyExceededCount;
 
+  int failedAtScrappingBeeCount;
+
   /// Returns a shallow copy of this [ScrappableRequestPerTimeScope]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
@@ -73,6 +79,7 @@ abstract class ScrappableRequestPerTimeScope
     int? serverErrorCount,
     int? insufficientCreditsCount,
     int? maxConcurrencyExceededCount,
+    int? failedAtScrappingBeeCount,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -84,6 +91,7 @@ abstract class ScrappableRequestPerTimeScope
       'serverErrorCount': serverErrorCount,
       'insufficientCreditsCount': insufficientCreditsCount,
       'maxConcurrencyExceededCount': maxConcurrencyExceededCount,
+      'failedAtScrappingBeeCount': failedAtScrappingBeeCount,
     };
   }
 
@@ -97,6 +105,7 @@ abstract class ScrappableRequestPerTimeScope
       'serverErrorCount': serverErrorCount,
       'insufficientCreditsCount': insufficientCreditsCount,
       'maxConcurrencyExceededCount': maxConcurrencyExceededCount,
+      'failedAtScrappingBeeCount': failedAtScrappingBeeCount,
     };
   }
 
@@ -115,6 +124,7 @@ class _ScrappableRequestPerTimeScopeImpl extends ScrappableRequestPerTimeScope {
     required int serverErrorCount,
     required int insufficientCreditsCount,
     required int maxConcurrencyExceededCount,
+    required int failedAtScrappingBeeCount,
   }) : super._(
           start: start,
           end: end,
@@ -123,6 +133,7 @@ class _ScrappableRequestPerTimeScopeImpl extends ScrappableRequestPerTimeScope {
           serverErrorCount: serverErrorCount,
           insufficientCreditsCount: insufficientCreditsCount,
           maxConcurrencyExceededCount: maxConcurrencyExceededCount,
+          failedAtScrappingBeeCount: failedAtScrappingBeeCount,
         );
 
   /// Returns a shallow copy of this [ScrappableRequestPerTimeScope]
@@ -137,6 +148,7 @@ class _ScrappableRequestPerTimeScopeImpl extends ScrappableRequestPerTimeScope {
     int? serverErrorCount,
     int? insufficientCreditsCount,
     int? maxConcurrencyExceededCount,
+    int? failedAtScrappingBeeCount,
   }) {
     return ScrappableRequestPerTimeScope(
       start: start ?? this.start,
@@ -148,6 +160,8 @@ class _ScrappableRequestPerTimeScopeImpl extends ScrappableRequestPerTimeScope {
           insufficientCreditsCount ?? this.insufficientCreditsCount,
       maxConcurrencyExceededCount:
           maxConcurrencyExceededCount ?? this.maxConcurrencyExceededCount,
+      failedAtScrappingBeeCount:
+          failedAtScrappingBeeCount ?? this.failedAtScrappingBeeCount,
     );
   }
 }

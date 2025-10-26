@@ -205,7 +205,7 @@ class _MetricsNumbers extends StatelessWidget {
         _MetricRow(
           icon: Icons.error,
           iconColor: context.c.error,
-          label: 'Errors (5xx)',
+          label: 'Errors',
           count: metrics.errorCount,
           percentage: errorRate,
         ),

@@ -471,17 +471,17 @@ mixin ApiHelperMixin {
           scrappingBeeExtractLogic: extractRules,
         );
 
-        if (_pendingAnalytics[scrappableId]?[nanoId]?.containsKey(apiKey) ==
-            true) {
-          _pendingAnalytics[scrappableId]![nanoId]![apiKey]!.add(
-            AnalyticsPayload(
-              time: DateTime.now(),
-              status: RequestStatus.success,
-            ),
-          );
-        }
-
         return extractResponse.when(withData: (scrapedData) {
+          // Track success analytics
+          if (_pendingAnalytics[scrappableId]?[nanoId]?.containsKey(apiKey) ==
+              true) {
+            _pendingAnalytics[scrappableId]![nanoId]![apiKey]!.add(
+              AnalyticsPayload(
+                time: DateTime.now(),
+                status: RequestStatus.success,
+              ),
+            );
+          }
           // Create response with scraped data and credit information
           final response = <String, dynamic>{
             'credits': _getCreditInfo(nanoId, creditCost),
@@ -489,8 +489,18 @@ mixin ApiHelperMixin {
           };
           return response.toSuccess();
         }, error: (errorMessage) {
+          // Track ScrapingBee errors separately
+          if (_pendingAnalytics[scrappableId]?[nanoId]?.containsKey(apiKey) ==
+              true) {
+            _pendingAnalytics[scrappableId]![nanoId]![apiKey]!.add(
+              AnalyticsPayload(
+                time: DateTime.now(),
+                status: RequestStatus.failedAtScrappingBee,
+              ),
+            );
+          }
           return ApiError(
-              RequestStatus.serverError,
+              RequestStatus.failedAtScrappingBee,
               ZenScrapException(
                 title: 'Scraping Error',
                 description: errorMessage,

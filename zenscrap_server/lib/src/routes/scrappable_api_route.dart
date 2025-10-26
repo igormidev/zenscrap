@@ -116,6 +116,7 @@ class ScrappableApiRoute extends Route with ApiHelperMixin {
             RequestStatus.serverError => HttpStatus.internalServerError,
             RequestStatus.insufficientCredits => HttpStatus.paymentRequired,
             RequestStatus.maxConcurrencyExceeded => HttpStatus.tooManyRequests,
+            RequestStatus.failedAtScrappingBee => HttpStatus.badGateway,
           },
           error.exception.title,
           error.exception.description,

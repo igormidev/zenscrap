@@ -19,6 +19,7 @@ class AnalyticsStatsSummary extends StatelessWidget {
     int totalServerError = 0;
     int totalInsufficientCredits = 0;
     int totalMaxConcurrency = 0;
+    int totalFailedAtScrappingBee = 0;
 
     for (final item in data.items) {
       switch (item.requestStatus) {
@@ -37,42 +38,60 @@ class AnalyticsStatsSummary extends StatelessWidget {
         case RequestStatus.maxConcurrencyExceeded:
           totalMaxConcurrency++;
           break;
+        case RequestStatus.failedAtScrappingBee:
+          totalFailedAtScrappingBee++;
+          break;
       }
     }
 
     return Container(
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: context.c.surfaceContainerHighest.withAlpha(50),
       ),
       child: Column(
         children: [
-          Row(
-            children: [
-              StatCard(
-                  label: 'Success', count: totalSuccess, color: Colors.green),
-              const SizedBox(width: 16),
-              StatCard(
-                  label: '4xx', count: totalClientError, color: Colors.orange),
-              const SizedBox(width: 16),
-              StatCard(
-                  label: '5xx', count: totalServerError, color: Colors.red),
-              const SizedBox(width: 16),
-              StatCard(
-                  label: 'No Credits',
-                  count: totalInsufficientCredits,
-                  color: Colors.purple),
-              const SizedBox(width: 16),
-              StatCard(
-                  label: 'Max Concurrency',
-                  count: totalMaxConcurrency,
-                  color: Colors.cyan),
-            ],
+          SizedBox(height: 12),
+          SizedBox(
+            height: 60,
+            child: ListView(
+              shrinkWrap: true,
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.zero,
+              children: [
+                SizedBox(width: 16),
+                StatCard(
+                    label: 'Success', count: totalSuccess, color: Colors.green),
+                const SizedBox(width: 16),
+                StatCard(
+                    label: '4xx',
+                    count: totalClientError,
+                    color: Colors.orange),
+                const SizedBox(width: 16),
+                StatCard(
+                    label: '5xx', count: totalServerError, color: Colors.red),
+                const SizedBox(width: 16),
+                StatCard(
+                    label: 'Extract rules errors',
+                    count: totalFailedAtScrappingBee,
+                    color: const Color(0xFFE91E63)),
+                const SizedBox(width: 16),
+                StatCard(
+                    label: 'No Credits',
+                    count: totalInsufficientCredits,
+                    color: Colors.purple),
+                const SizedBox(width: 16),
+                StatCard(
+                    label: 'Max Concurrency',
+                    count: totalMaxConcurrency,
+                    color: Colors.cyan),
+              ],
+            ),
           ),
           SizedBox(height: 12),
           Align(
             alignment: Alignment.centerRight,
             child: Container(
+              margin: const EdgeInsets.only(right: 16),
               decoration: BoxDecoration(
                 color: context.c.surface.withAlpha(30),
                 borderRadius: BorderRadius.circular(8),

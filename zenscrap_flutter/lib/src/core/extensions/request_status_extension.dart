@@ -14,6 +14,8 @@ extension RequestStatusColors on RequestStatus {
         return const Color(0xFF9C27B0); // Purple
       case RequestStatus.maxConcurrencyExceeded:
         return const Color(0xFF00BCD4); // Cyan
+      case RequestStatus.failedAtScrappingBee:
+        return const Color(0xFFE91E63); // Pink/Magenta
     }
   }
 
@@ -29,6 +31,8 @@ extension RequestStatusColors on RequestStatus {
         return Icons.money_off;
       case RequestStatus.maxConcurrencyExceeded:
         return Icons.speed;
+      case RequestStatus.failedAtScrappingBee:
+        return Icons.bug_report;
     }
   }
 
@@ -44,6 +48,8 @@ extension RequestStatusColors on RequestStatus {
         return 'No Credits';
       case RequestStatus.maxConcurrencyExceeded:
         return 'Max Concurrency';
+      case RequestStatus.failedAtScrappingBee:
+        return 'Extract Rules Error';
     }
   }
 }

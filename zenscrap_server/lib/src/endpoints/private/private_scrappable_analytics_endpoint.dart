@@ -82,6 +82,7 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
       int serverErrorTotalCount = 0;
       int insufficientCreditsTotalCount = 0;
       int maxConcurrencyExceededTotalCount = 0;
+      int failedAtScrappingBeeTotalCount = 0;
 
       DateTime end = now;
       for (final Duration duration in timeScopes) {
@@ -104,12 +105,16 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
         final maxConcurrencyExceededCount = await ScrappableAnalytics.db.count(
             session,
             where: (p0) => dWC(p0, RequestStatus.maxConcurrencyExceeded));
+        final failedAtScrappingBeeCount = await ScrappableAnalytics.db.count(
+            session,
+            where: (p0) => dWC(p0, RequestStatus.failedAtScrappingBee));
 
         successTotalCount += successCount;
         clientErrorTotalCount += clientErrorCount;
         serverErrorTotalCount += serverErrorCount;
         insufficientCreditsTotalCount += insufficientCreditsCount;
         maxConcurrencyExceededTotalCount += maxConcurrencyExceededCount;
+        failedAtScrappingBeeTotalCount += failedAtScrappingBeeCount;
 
         data.add(ScrappableRequestPerTimeScope(
           start: start,
@@ -119,6 +124,7 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
           serverErrorCount: serverErrorCount,
           insufficientCreditsCount: insufficientCreditsCount,
           maxConcurrencyExceededCount: maxConcurrencyExceededCount,
+          failedAtScrappingBeeCount: failedAtScrappingBeeCount,
         ));
 
         end = start;
@@ -131,6 +137,7 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
         serverErrorTotalCount: serverErrorTotalCount,
         insufficientCreditsTotalCount: insufficientCreditsTotalCount,
         maxConcurrencyExceededTotalCount: maxConcurrencyExceededTotalCount,
+        failedAtScrappingBeeTotalCount: failedAtScrappingBeeTotalCount,
         data: data.reversed.toList(),
       ));
     }
@@ -240,7 +247,7 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
     );
 
     // Count server error (5xx) requests (from ANY user)
-    final errorCount = await ScrappableAnalytics.db.count(
+    final serverErrorCount = await ScrappableAnalytics.db.count(
       session,
       where: (t) =>
           t.scrappableId.equals(scrappableId) &
@@ -248,6 +255,17 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
           t.requestStatus.equals(RequestStatus.serverError),
     );
 
+    // Count ScrapingBee error requests (from ANY user)
+    final scrappingBeeErrorCount = await ScrappableAnalytics.db.count(
+      session,
+      where: (t) =>
+          t.scrappableId.equals(scrappableId) &
+          t.requestedAt.between(thirtyDaysAgo, now) &
+          t.requestStatus.equals(RequestStatus.failedAtScrappingBee),
+    );
+
+    // Total error count includes both server errors and ScrapingBee errors
+    final errorCount = serverErrorCount + scrappingBeeErrorCount;
     final totalCount = successCount + errorCount;
 
     return ScrappableUsageMetrics(

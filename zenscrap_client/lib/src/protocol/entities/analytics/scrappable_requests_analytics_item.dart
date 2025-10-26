@@ -22,6 +22,7 @@ abstract class ScrappableRequestsAnalyticsItem
     required this.serverErrorTotalCount,
     required this.insufficientCreditsTotalCount,
     required this.maxConcurrencyExceededTotalCount,
+    required this.failedAtScrappingBeeTotalCount,
     required this.data,
   });
 
@@ -32,6 +33,7 @@ abstract class ScrappableRequestsAnalyticsItem
     required int serverErrorTotalCount,
     required int insufficientCreditsTotalCount,
     required int maxConcurrencyExceededTotalCount,
+    required int failedAtScrappingBeeTotalCount,
     required List<_i3.ScrappableRequestPerTimeScope> data,
   }) = _ScrappableRequestsAnalyticsItemImpl;
 
@@ -47,6 +49,8 @@ abstract class ScrappableRequestsAnalyticsItem
           jsonSerialization['insufficientCreditsTotalCount'] as int,
       maxConcurrencyExceededTotalCount:
           jsonSerialization['maxConcurrencyExceededTotalCount'] as int,
+      failedAtScrappingBeeTotalCount:
+          jsonSerialization['failedAtScrappingBeeTotalCount'] as int,
       data: (jsonSerialization['data'] as List)
           .map((e) => _i3.ScrappableRequestPerTimeScope.fromJson(
               (e as Map<String, dynamic>)))
@@ -66,6 +70,8 @@ abstract class ScrappableRequestsAnalyticsItem
 
   int maxConcurrencyExceededTotalCount;
 
+  int failedAtScrappingBeeTotalCount;
+
   List<_i3.ScrappableRequestPerTimeScope> data;
 
   /// Returns a shallow copy of this [ScrappableRequestsAnalyticsItem]
@@ -78,6 +84,7 @@ abstract class ScrappableRequestsAnalyticsItem
     int? serverErrorTotalCount,
     int? insufficientCreditsTotalCount,
     int? maxConcurrencyExceededTotalCount,
+    int? failedAtScrappingBeeTotalCount,
     List<_i3.ScrappableRequestPerTimeScope>? data,
   });
   @override
@@ -89,6 +96,7 @@ abstract class ScrappableRequestsAnalyticsItem
       'serverErrorTotalCount': serverErrorTotalCount,
       'insufficientCreditsTotalCount': insufficientCreditsTotalCount,
       'maxConcurrencyExceededTotalCount': maxConcurrencyExceededTotalCount,
+      'failedAtScrappingBeeTotalCount': failedAtScrappingBeeTotalCount,
       'data': data.toJson(valueToJson: (v) => v.toJson()),
     };
   }
@@ -108,6 +116,7 @@ class _ScrappableRequestsAnalyticsItemImpl
     required int serverErrorTotalCount,
     required int insufficientCreditsTotalCount,
     required int maxConcurrencyExceededTotalCount,
+    required int failedAtScrappingBeeTotalCount,
     required List<_i3.ScrappableRequestPerTimeScope> data,
   }) : super._(
           scrappable: scrappable,
@@ -116,6 +125,7 @@ class _ScrappableRequestsAnalyticsItemImpl
           serverErrorTotalCount: serverErrorTotalCount,
           insufficientCreditsTotalCount: insufficientCreditsTotalCount,
           maxConcurrencyExceededTotalCount: maxConcurrencyExceededTotalCount,
+          failedAtScrappingBeeTotalCount: failedAtScrappingBeeTotalCount,
           data: data,
         );
 
@@ -130,6 +140,7 @@ class _ScrappableRequestsAnalyticsItemImpl
     int? serverErrorTotalCount,
     int? insufficientCreditsTotalCount,
     int? maxConcurrencyExceededTotalCount,
+    int? failedAtScrappingBeeTotalCount,
     List<_i3.ScrappableRequestPerTimeScope>? data,
   }) {
     return ScrappableRequestsAnalyticsItem(
@@ -143,6 +154,8 @@ class _ScrappableRequestsAnalyticsItemImpl
           insufficientCreditsTotalCount ?? this.insufficientCreditsTotalCount,
       maxConcurrencyExceededTotalCount: maxConcurrencyExceededTotalCount ??
           this.maxConcurrencyExceededTotalCount,
+      failedAtScrappingBeeTotalCount:
+          failedAtScrappingBeeTotalCount ?? this.failedAtScrappingBeeTotalCount,
       data: data ?? this.data.map((e0) => e0.copyWith()).toList(),
     );
   }

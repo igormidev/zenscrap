@@ -20,7 +20,8 @@ class SegmentedColumnBar extends StatelessWidget {
         timeScope.clientErrorCount +
         timeScope.serverErrorCount +
         timeScope.insufficientCreditsCount +
-        timeScope.maxConcurrencyExceededCount;
+        timeScope.maxConcurrencyExceededCount +
+        timeScope.failedAtScrappingBeeCount;
 
     // Calculate the percentage height based on maxCount
     final heightPercentage = maxCount > 0 ? totalCount / maxCount : 0;
@@ -49,6 +50,8 @@ class SegmentedColumnBar extends StatelessWidget {
         timeScope.insufficientCreditsCount / totalCount;
     final maxConcurrencyPercentage =
         timeScope.maxConcurrencyExceededCount / totalCount;
+    final failedAtScrappingBeePercentage =
+        timeScope.failedAtScrappingBeeCount / totalCount;
 
     return Tooltip(
       message: _buildTooltipMessage(),
@@ -115,6 +118,17 @@ class SegmentedColumnBar extends StatelessWidget {
                         percentage: serverErrorPercentage,
                       ),
                     ),
+                  // Failed at ScrapingBee segment
+                  if (timeScope.failedAtScrappingBeeCount > 0)
+                    Expanded(
+                      flex: (failedAtScrappingBeePercentage * 1000).toInt(),
+                      child: _BarSegment(
+                        color: RequestStatus.failedAtScrappingBee.color,
+                        count: timeScope.failedAtScrappingBeeCount,
+                        label: RequestStatus.failedAtScrappingBee.label,
+                        percentage: failedAtScrappingBeePercentage,
+                      ),
+                    ),
                   // Client error segment
                   if (timeScope.clientErrorCount > 0)
                     Expanded(
@@ -154,7 +168,8 @@ class SegmentedColumnBar extends StatelessWidget {
         timeScope.clientErrorCount +
         timeScope.serverErrorCount +
         timeScope.insufficientCreditsCount +
-        timeScope.maxConcurrencyExceededCount;
+        timeScope.maxConcurrencyExceededCount +
+        timeScope.failedAtScrappingBeeCount;
 
     final buffer = StringBuffer();
     buffer.writeln('${dateFormat.format(timeScope.start)} - ${dateFormat.format(timeScope.end)}');
@@ -175,6 +190,13 @@ class SegmentedColumnBar extends StatelessWidget {
       final percentage =
           (timeScope.serverErrorCount / totalCount * 100).toStringAsFixed(1);
       buffer.writeln('✗ 5xx: ${timeScope.serverErrorCount} ($percentage%)');
+    }
+    if (timeScope.failedAtScrappingBeeCount > 0) {
+      final percentage =
+          (timeScope.failedAtScrappingBeeCount / totalCount * 100)
+              .toStringAsFixed(1);
+      buffer.writeln(
+          '🐝 ScrapingBee Error: ${timeScope.failedAtScrappingBeeCount} ($percentage%)');
     }
     if (timeScope.insufficientCreditsCount > 0) {
       final percentage = (timeScope.insufficientCreditsCount / totalCount * 100)

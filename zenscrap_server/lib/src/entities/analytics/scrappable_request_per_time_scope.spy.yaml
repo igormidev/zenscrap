@@ -7,4 +7,5 @@ fields:
   serverErrorCount: int
   insufficientCreditsCount: int
   maxConcurrencyExceededCount: int
+  failedAtScrappingBeeCount: int
 
