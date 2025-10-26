@@ -52,6 +52,7 @@ dependencies:
   flutter_animate: ^4.5.2
   synchronized: ^3.4.0
   flutter_json_view: ^1.1.5
+  fl_chart: ^1.1.1
 
   talker: ^4.9.3
   talker_flutter: ^4.9.3

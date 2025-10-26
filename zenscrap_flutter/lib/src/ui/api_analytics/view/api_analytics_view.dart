@@ -153,7 +153,7 @@ class _AnalyticsContent extends ConsumerWidget {
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
           child: SizedBox(
-            width: selectedItem != null ? 489 : 0,
+            width: selectedItem != null ? 429 : 0,
             child: const SelectedScrappablePage()
                 .animate()
                 .fadeIn(duration: 200.ms, delay: 100.ms)

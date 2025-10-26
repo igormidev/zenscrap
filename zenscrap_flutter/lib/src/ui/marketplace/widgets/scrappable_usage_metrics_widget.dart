@@ -1,5 +1,4 @@
-import 'dart:math';
-
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
@@ -196,7 +195,7 @@ class _MetricsNumbers extends StatelessWidget {
       children: [
         _MetricRow(
           icon: Icons.check_circle,
-          iconColor: context.c.primary,
+          iconColor: const Color(0xFF81C784), // Pastel green
           label: 'Success',
           count: metrics.successCount,
           percentage: successRate,
@@ -204,7 +203,7 @@ class _MetricsNumbers extends StatelessWidget {
         const SizedBox(height: 12),
         _MetricRow(
           icon: Icons.error,
-          iconColor: context.c.error,
+          iconColor: const Color(0xFFE57373), // Pastel red
           label: 'Errors',
           count: metrics.errorCount,
           percentage: errorRate,
@@ -302,107 +301,54 @@ class _DonutChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final total = metrics.successCount + metrics.errorCount;
+
+    if (total == 0) {
+      return SizedBox(
+        width: 100,
+        height: 100,
+        child: Center(
+          child: Container(
+            width: 70,
+            height: 70,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: context.c.outline.withAlpha(51),
+                width: 15,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     return SizedBox(
       width: 100,
       height: 100,
-      child: CustomPaint(
-        painter: _DonutChartPainter(
-          successCount: metrics.successCount,
-          errorCount: metrics.errorCount,
-          successColor: context.c.primary,
-          errorColor: context.c.error,
-          backgroundColor: context.c.outline.withAlpha(51),
+      child: PieChart(
+        PieChartData(
+          sectionsSpace: 0,
+          centerSpaceRadius: 30,
+          startDegreeOffset: -90,
+          sections: [
+            if (metrics.successCount > 0)
+              PieChartSectionData(
+                value: metrics.successCount.toDouble(),
+                color: const Color(0xFF81C784), // Pastel green
+                radius: 20,
+                showTitle: false,
+              ),
+            if (metrics.errorCount > 0)
+              PieChartSectionData(
+                value: metrics.errorCount.toDouble(),
+                color: const Color(0xFFE57373), // Pastel red
+                radius: 20,
+                showTitle: false,
+              ),
+          ],
         ),
       ),
     );
-  }
-}
-
-class _DonutChartPainter extends CustomPainter {
-  final int successCount;
-  final int errorCount;
-  final Color successColor;
-  final Color errorColor;
-  final Color backgroundColor;
-
-  _DonutChartPainter({
-    required this.successCount,
-    required this.errorCount,
-    required this.successColor,
-    required this.errorColor,
-    required this.backgroundColor,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = min(size.width, size.height) / 2;
-    final strokeWidth = radius * 0.3;
-
-    // Draw background circle
-    final backgroundPaint = Paint()
-      ..color = backgroundColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth
-      ..strokeCap = StrokeCap.round;
-
-    canvas.drawCircle(center, radius - strokeWidth / 2, backgroundPaint);
-
-    final total = successCount + errorCount;
-    if (total == 0) return;
-
-    // Calculate angles
-    final successPercentage = successCount / total;
-    final errorPercentage = errorCount / total;
-
-    const startAngle = -pi / 2; // Start from top
-
-    // Draw success arc
-    if (successCount > 0) {
-      final successPaint = Paint()
-        ..color = successColor
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = strokeWidth
-        ..strokeCap = StrokeCap.round;
-
-      final successSweepAngle = 2 * pi * successPercentage;
-
-      canvas.drawArc(
-        Rect.fromCircle(center: center, radius: radius - strokeWidth / 2),
-        startAngle,
-        successSweepAngle,
-        false,
-        successPaint,
-      );
-    }
-
-    // Draw error arc
-    if (errorCount > 0) {
-      final errorPaint = Paint()
-        ..color = errorColor
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = strokeWidth
-        ..strokeCap = StrokeCap.round;
-
-      final successSweepAngle = 2 * pi * successPercentage;
-      final errorSweepAngle = 2 * pi * errorPercentage;
-
-      canvas.drawArc(
-        Rect.fromCircle(center: center, radius: radius - strokeWidth / 2),
-        startAngle + successSweepAngle,
-        errorSweepAngle,
-        false,
-        errorPaint,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(_DonutChartPainter oldDelegate) {
-    return oldDelegate.successCount != successCount ||
-        oldDelegate.errorCount != errorCount ||
-        oldDelegate.successColor != successColor ||
-        oldDelegate.errorColor != errorColor ||
-        oldDelegate.backgroundColor != backgroundColor;
   }
 }

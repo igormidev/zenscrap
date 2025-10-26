@@ -5,17 +5,19 @@ class StatCard extends StatelessWidget {
   final String label;
   final int count;
   final Color color;
+  final String? tooltip;
 
   const StatCard({
     super.key,
     required this.label,
     required this.count,
     required this.color,
+    this.tooltip,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final card = Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: color.withAlpha(30),
@@ -42,5 +44,16 @@ class StatCard extends StatelessWidget {
         ],
       ),
     );
+
+    if (tooltip != null) {
+      return Tooltip(
+        message: tooltip!,
+        // Change hover time to trigger faster
+        waitDuration: const Duration(milliseconds: 900),
+        child: card,
+      );
+    }
+
+    return card;
   }
 }
