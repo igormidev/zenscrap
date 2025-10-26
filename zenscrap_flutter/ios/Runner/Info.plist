@@ -47,5 +47,13 @@
 		<true/>
 		<key>UIStatusBarHidden</key>
 		<false/>
+		<key>com.posthog.posthog.API_KEY</key>
+		<string>phc_ctZsxdHMUJjuLPTyjASz0vVzbbPvx3ov0VdqoY7D0vh</string>
+		<key>com.posthog.posthog.POSTHOG_HOST</key>
+		<string>https://us.i.posthog.com</string>
+		<key>com.posthog.posthog.CAPTURE_APPLICATION_LIFECYCLE_EVENTS</key>
+		<true/>
+		<key>com.posthog.posthog.DEBUG</key>
+		<true/>
 	</dict>
 </plist>
