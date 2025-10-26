@@ -206,6 +206,7 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
       orderDescending: true,
       include: ScrappableAnalytics.include(
         scrappable: Scrappable.include(),
+        details: AnalyticsRequestDetails.include(),
       ),
     );
 

@@ -119,10 +119,21 @@ void run(List<String> args) async {
   pod.registerFutureCall(SessionPromptFutureCall(), 'session_prompt');
   pod.registerFutureCall(
       PeriodicSetRequestsAnalytics(), 'periodicSetRequestsAnalytics');
+  pod.registerFutureCall(PeriodicCleanupOldAnalyticsDetails(),
+      'periodicCleanupOldAnalyticsDetails');
+
+  // Schedule periodic analytics batching
   await pod.futureCallWithDelay(
     'periodicSetRequestsAnalytics',
     null,
     Duration(minutes: 2),
+  );
+
+  // Schedule periodic cleanup of old analytics details (runs every hour)
+  await pod.futureCallWithDelay(
+    'periodicCleanupOldAnalyticsDetails',
+    null,
+    Duration(hours: 1),
   );
 
   // Start the server.

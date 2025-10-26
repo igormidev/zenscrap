@@ -16,7 +16,6 @@ class ZenScrapPricingPage extends ConsumerWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.cyanAccent),
       ),
       child: LayoutBuilder(builder: (context, constraints) {
-        final isMobile = constraints.maxWidth < 600;
         return Scaffold(
           backgroundColor: const Color.fromARGB(255, 224, 240, 255),
           body: PricingBackground(

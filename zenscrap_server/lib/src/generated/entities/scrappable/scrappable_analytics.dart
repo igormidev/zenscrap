@@ -14,6 +14,7 @@
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../entities/scrappable/request_status.dart' as _i2;
 import '../../entities/scrappable/scrappable.dart' as _i3;
+import '../../entities/analytics/analytics_request_details.dart' as _i4;
 
 abstract class ScrappableAnalytics
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -25,6 +26,8 @@ abstract class ScrappableAnalytics
     required this.attachedApiKey,
     required this.scrappableId,
     this.scrappable,
+    this.detailsId,
+    this.details,
   });
 
   factory ScrappableAnalytics({
@@ -35,6 +38,8 @@ abstract class ScrappableAnalytics
     required String attachedApiKey,
     required int scrappableId,
     _i3.Scrappable? scrappable,
+    int? detailsId,
+    _i4.AnalyticsRequestDetails? details,
   }) = _ScrappableAnalyticsImpl;
 
   factory ScrappableAnalytics.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -51,6 +56,11 @@ abstract class ScrappableAnalytics
           ? null
           : _i3.Scrappable.fromJson(
               (jsonSerialization['scrappable'] as Map<String, dynamic>)),
+      detailsId: jsonSerialization['detailsId'] as int?,
+      details: jsonSerialization['details'] == null
+          ? null
+          : _i4.AnalyticsRequestDetails.fromJson(
+              (jsonSerialization['details'] as Map<String, dynamic>)),
     );
   }
 
@@ -73,6 +83,10 @@ abstract class ScrappableAnalytics
 
   _i3.Scrappable? scrappable;
 
+  int? detailsId;
+
+  _i4.AnalyticsRequestDetails? details;
+
   @override
   _i1.Table<int?> get table => t;
 
@@ -87,6 +101,8 @@ abstract class ScrappableAnalytics
     String? attachedApiKey,
     int? scrappableId,
     _i3.Scrappable? scrappable,
+    int? detailsId,
+    _i4.AnalyticsRequestDetails? details,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -98,6 +114,8 @@ abstract class ScrappableAnalytics
       'attachedApiKey': attachedApiKey,
       'scrappableId': scrappableId,
       if (scrappable != null) 'scrappable': scrappable?.toJson(),
+      if (detailsId != null) 'detailsId': detailsId,
+      if (details != null) 'details': details?.toJson(),
     };
   }
 
@@ -111,12 +129,19 @@ abstract class ScrappableAnalytics
       'attachedApiKey': attachedApiKey,
       'scrappableId': scrappableId,
       if (scrappable != null) 'scrappable': scrappable?.toJsonForProtocol(),
+      if (detailsId != null) 'detailsId': detailsId,
+      if (details != null) 'details': details?.toJsonForProtocol(),
     };
   }
 
-  static ScrappableAnalyticsInclude include(
-      {_i3.ScrappableInclude? scrappable}) {
-    return ScrappableAnalyticsInclude._(scrappable: scrappable);
+  static ScrappableAnalyticsInclude include({
+    _i3.ScrappableInclude? scrappable,
+    _i4.AnalyticsRequestDetailsInclude? details,
+  }) {
+    return ScrappableAnalyticsInclude._(
+      scrappable: scrappable,
+      details: details,
+    );
   }
 
   static ScrappableAnalyticsIncludeList includeList({
@@ -156,6 +181,8 @@ class _ScrappableAnalyticsImpl extends ScrappableAnalytics {
     required String attachedApiKey,
     required int scrappableId,
     _i3.Scrappable? scrappable,
+    int? detailsId,
+    _i4.AnalyticsRequestDetails? details,
   }) : super._(
           id: id,
           requestStatus: requestStatus,
@@ -164,6 +191,8 @@ class _ScrappableAnalyticsImpl extends ScrappableAnalytics {
           attachedApiKey: attachedApiKey,
           scrappableId: scrappableId,
           scrappable: scrappable,
+          detailsId: detailsId,
+          details: details,
         );
 
   /// Returns a shallow copy of this [ScrappableAnalytics]
@@ -178,6 +207,8 @@ class _ScrappableAnalyticsImpl extends ScrappableAnalytics {
     String? attachedApiKey,
     int? scrappableId,
     Object? scrappable = _Undefined,
+    Object? detailsId = _Undefined,
+    Object? details = _Undefined,
   }) {
     return ScrappableAnalytics(
       id: id is int? ? id : this.id,
@@ -189,6 +220,10 @@ class _ScrappableAnalyticsImpl extends ScrappableAnalytics {
       scrappable: scrappable is _i3.Scrappable?
           ? scrappable
           : this.scrappable?.copyWith(),
+      detailsId: detailsId is int? ? detailsId : this.detailsId,
+      details: details is _i4.AnalyticsRequestDetails?
+          ? details
+          : this.details?.copyWith(),
     );
   }
 }
@@ -217,6 +252,10 @@ class ScrappableAnalyticsTable extends _i1.Table<int?> {
       'scrappableId',
       this,
     );
+    detailsId = _i1.ColumnInt(
+      'detailsId',
+      this,
+    );
   }
 
   late final _i1.ColumnEnum<_i2.RequestStatus> requestStatus;
@@ -231,6 +270,10 @@ class ScrappableAnalyticsTable extends _i1.Table<int?> {
 
   _i3.ScrappableTable? _scrappable;
 
+  late final _i1.ColumnInt detailsId;
+
+  _i4.AnalyticsRequestDetailsTable? _details;
+
   _i3.ScrappableTable get scrappable {
     if (_scrappable != null) return _scrappable!;
     _scrappable = _i1.createRelationTable(
@@ -244,6 +287,19 @@ class ScrappableAnalyticsTable extends _i1.Table<int?> {
     return _scrappable!;
   }
 
+  _i4.AnalyticsRequestDetailsTable get details {
+    if (_details != null) return _details!;
+    _details = _i1.createRelationTable(
+      relationFieldName: 'details',
+      field: ScrappableAnalytics.t.detailsId,
+      foreignField: _i4.AnalyticsRequestDetails.t.id,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _i4.AnalyticsRequestDetailsTable(tableRelation: foreignTableRelation),
+    );
+    return _details!;
+  }
+
   @override
   List<_i1.Column> get columns => [
         id,
@@ -252,6 +308,7 @@ class ScrappableAnalyticsTable extends _i1.Table<int?> {
         attachedNanoId,
         attachedApiKey,
         scrappableId,
+        detailsId,
       ];
 
   @override
@@ -259,19 +316,31 @@ class ScrappableAnalyticsTable extends _i1.Table<int?> {
     if (relationField == 'scrappable') {
       return scrappable;
     }
+    if (relationField == 'details') {
+      return details;
+    }
     return null;
   }
 }
 
 class ScrappableAnalyticsInclude extends _i1.IncludeObject {
-  ScrappableAnalyticsInclude._({_i3.ScrappableInclude? scrappable}) {
+  ScrappableAnalyticsInclude._({
+    _i3.ScrappableInclude? scrappable,
+    _i4.AnalyticsRequestDetailsInclude? details,
+  }) {
     _scrappable = scrappable;
+    _details = details;
   }
 
   _i3.ScrappableInclude? _scrappable;
 
+  _i4.AnalyticsRequestDetailsInclude? _details;
+
   @override
-  Map<String, _i1.Include?> get includes => {'scrappable': _scrappable};
+  Map<String, _i1.Include?> get includes => {
+        'scrappable': _scrappable,
+        'details': _details,
+      };
 
   @override
   _i1.Table<int?> get table => ScrappableAnalytics.t;
@@ -301,6 +370,8 @@ class ScrappableAnalyticsRepository {
   const ScrappableAnalyticsRepository._();
 
   final attachRow = const ScrappableAnalyticsAttachRowRepository._();
+
+  final detachRow = const ScrappableAnalyticsDetachRowRepository._();
 
   /// Returns a list of [ScrappableAnalytics]s matching the given query parameters.
   ///
@@ -541,6 +612,56 @@ class ScrappableAnalyticsAttachRowRepository {
     await session.db.updateRow<ScrappableAnalytics>(
       $scrappableAnalytics,
       columns: [ScrappableAnalytics.t.scrappableId],
+      transaction: transaction,
+    );
+  }
+
+  /// Creates a relation between the given [ScrappableAnalytics] and [AnalyticsRequestDetails]
+  /// by setting the [ScrappableAnalytics]'s foreign key `detailsId` to refer to the [AnalyticsRequestDetails].
+  Future<void> details(
+    _i1.Session session,
+    ScrappableAnalytics scrappableAnalytics,
+    _i4.AnalyticsRequestDetails details, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (scrappableAnalytics.id == null) {
+      throw ArgumentError.notNull('scrappableAnalytics.id');
+    }
+    if (details.id == null) {
+      throw ArgumentError.notNull('details.id');
+    }
+
+    var $scrappableAnalytics =
+        scrappableAnalytics.copyWith(detailsId: details.id);
+    await session.db.updateRow<ScrappableAnalytics>(
+      $scrappableAnalytics,
+      columns: [ScrappableAnalytics.t.detailsId],
+      transaction: transaction,
+    );
+  }
+}
+
+class ScrappableAnalyticsDetachRowRepository {
+  const ScrappableAnalyticsDetachRowRepository._();
+
+  /// Detaches the relation between this [ScrappableAnalytics] and the [AnalyticsRequestDetails] set in `details`
+  /// by setting the [ScrappableAnalytics]'s foreign key `detailsId` to `null`.
+  ///
+  /// This removes the association between the two models without deleting
+  /// the related record.
+  Future<void> details(
+    _i1.Session session,
+    ScrappableAnalytics scrappableanalytics, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (scrappableanalytics.id == null) {
+      throw ArgumentError.notNull('scrappableanalytics.id');
+    }
+
+    var $scrappableanalytics = scrappableanalytics.copyWith(detailsId: null);
+    await session.db.updateRow<ScrappableAnalytics>(
+      $scrappableanalytics,
+      columns: [ScrappableAnalytics.t.detailsId],
       transaction: transaction,
     );
   }

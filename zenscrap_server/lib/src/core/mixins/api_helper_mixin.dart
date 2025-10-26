@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:result_dart/result_dart.dart';
 import 'package:serverpod/serverpod.dart' hide Result;
@@ -337,9 +338,11 @@ mixin ApiHelperMixin {
     Session session,
     ScrappableId scrappableId,
     ApiKey? apiKey,
+    Map<String, dynamic> payload,
     Future<T> Function(NanoId? nanoId, Scrappable scrappable) call,
   ) async {
     final now = DateTime.now();
+    final String stringifiedPayload = jsonEncode(payload);
     Scrappable scrappable;
     NanoId? nanoId;
     try {
@@ -370,6 +373,11 @@ mixin ApiHelperMixin {
           AnalyticsPayload(
             time: now,
             status: error.status,
+            stringifiedPayload: stringifiedPayload,
+            title: error.exception.title,
+            description: error.exception.description,
+            errorObjectAsString: error.exception.toString(),
+            errorStackTraceAsString: stackTrace.toString(),
           ),
         );
       }
@@ -389,6 +397,11 @@ mixin ApiHelperMixin {
           AnalyticsPayload(
             time: now,
             status: apiError.status,
+            stringifiedPayload: stringifiedPayload,
+            title: error.title,
+            description: error.description,
+            errorObjectAsString: error.toString(),
+            errorStackTraceAsString: stackTrace.toString(),
           ),
         );
       }
@@ -406,6 +419,11 @@ mixin ApiHelperMixin {
           AnalyticsPayload(
             time: now,
             status: RequestStatus.serverError,
+            stringifiedPayload: stringifiedPayload,
+            title: 'Unexpected Error',
+            description: 'An unexpected error occurred',
+            errorObjectAsString: error.toString(),
+            errorStackTraceAsString: stackTrace.toString(),
           ),
         );
       }
@@ -445,8 +463,9 @@ mixin ApiHelperMixin {
     String? apiKey,
     required Map<String, dynamic> payload,
   }) async {
+    final String stringifiedPayload = jsonEncode(payload);
     try {
-      return await wrapAnalytics(session, scrappableId, apiKey,
+      return await wrapAnalytics(session, scrappableId, apiKey, payload,
           (nanoId, scrappable) async {
         // final (Scrappable scrappable, ScrappableRequest targetRequest) =
         //     await getScrappableById(session, scrappableId, nanoId);
@@ -479,6 +498,7 @@ mixin ApiHelperMixin {
               AnalyticsPayload(
                 time: DateTime.now(),
                 status: RequestStatus.success,
+                stringifiedPayload: stringifiedPayload,
               ),
             );
           }
@@ -496,6 +516,9 @@ mixin ApiHelperMixin {
               AnalyticsPayload(
                 time: DateTime.now(),
                 status: RequestStatus.failedAtScrappingBee,
+                stringifiedPayload: stringifiedPayload,
+                title: 'Scraping Error',
+                description: errorMessage,
               ),
             );
           }
@@ -640,9 +663,20 @@ class ApiError {
 class AnalyticsPayload {
   final RequestStatus status;
   final DateTime time;
+  final String? title;
+  final String? description;
+  final String? errorObjectAsString;
+  final String? errorStackTraceAsString;
+  final String stringifiedPayload;
+
   const AnalyticsPayload({
     required this.time,
     required this.status,
+    required this.stringifiedPayload,
+    this.title,
+    this.description,
+    this.errorObjectAsString,
+    this.errorStackTraceAsString,
   });
 }
 
@@ -683,6 +717,41 @@ class PeriodicSetRequestsAnalytics extends FutureCall {
   }
 }
 
+class PeriodicCleanupOldAnalyticsDetails extends FutureCall {
+  @override
+  Future<void> invoke(Session session, SerializableModel? _) async {
+    try {
+      final now = DateTime.now();
+      final sevenDaysAgo = now.subtract(const Duration(days: 7));
+
+      // Delete all AnalyticsRequestDetails older than 7 days
+      final deletedCount = await AnalyticsRequestDetails.db.deleteWhere(
+        session,
+        where: (t) => t.timeStamp < sevenDaysAgo,
+      );
+
+      session.log(
+        'Cleaned up $deletedCount old analytics details (older than 7 days)',
+        level: LogLevel.info,
+      );
+    } catch (e, stackTrace) {
+      session.log(
+        'Error during periodic cleanup of analytics details',
+        exception: e,
+        stackTrace: stackTrace,
+        level: LogLevel.error,
+      );
+    }
+
+    // Schedule the next execution in 1 hour
+    await session.serverpod.futureCallWithDelay(
+      'periodicCleanupOldAnalyticsDetails',
+      null,
+      const Duration(hours: 1),
+    );
+  }
+}
+
 Future<void> _setScrappableAnalytics(
   Session session, {
   Scrappable? scrappable,
@@ -708,21 +777,39 @@ Future<void> _setScrappableAnalytics(
       );
       await CreditUsage.db
           .updateRow(session, newCredit, transaction: transaction);
+
+      // First, create all AnalyticsRequestDetails
+      final detailsList = await AnalyticsRequestDetails.db.insert(
+        session,
+        items.map((e) {
+          return AnalyticsRequestDetails(
+            timeStamp: e.time,
+            title: e.title,
+            description: e.description,
+            errorObjectAsString: e.errorObjectAsString,
+            errorStackTraceAsString: e.errorStackTraceAsString,
+            stringifiedPayload: e.stringifiedPayload,
+          );
+        }).toList(),
+        transaction: transaction,
+      );
+
+      // Then create ScrappableAnalytics with detailsId set
       final analytics = await ScrappableAnalytics.db.insert(
           session,
-          items.map(
-            (e) {
-              return ScrappableAnalytics(
-                requestStatus: e.status,
-                scrappableId: scrappable.id!,
-                scrappable: scrappable,
-                requestedAt: e.time,
-                attachedApiKey: apiKey,
-                attachedNanoId: nanoId,
-              );
-            },
-          ).toList(),
+          List.generate(items.length, (i) {
+            return ScrappableAnalytics(
+              requestStatus: items[i].status,
+              scrappableId: scrappable.id!,
+              scrappable: scrappable,
+              requestedAt: items[i].time,
+              attachedApiKey: apiKey,
+              attachedNanoId: nanoId,
+              detailsId: detailsList[i].id,
+            );
+          }),
           transaction: transaction);
+
       await Scrappable.db.attach.scrappableAnalytics(
         session,
         scrappable,
