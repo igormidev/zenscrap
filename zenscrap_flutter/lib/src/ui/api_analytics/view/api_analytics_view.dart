@@ -1,17 +1,14 @@
 import 'dart:async';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
-import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 import 'package:zenscrap_flutter/src/states/analytics/analytics_provider.dart';
 import 'package:zenscrap_flutter/src/states/analytics/analytics_state.dart';
 import 'package:zenscrap_flutter/src/states/analytics/selected_scrappable_provider.dart';
 import 'package:zenscrap_flutter/src/ui/api_analytics/pages/selected_scrappable_page.dart';
-import 'package:zenscrap_flutter/src/ui/api_analytics/widgets/scrappable_analytics_card.dart';
-import 'package:zenscrap_flutter/src/ui/api_analytics/widgets/scope_selector_dropdown.dart';
+import 'package:zenscrap_flutter/src/ui/api_analytics/widgets/scrappables_grid_view.dart';
 import 'package:zenscrap_flutter/src/ui/scrappables/pages/empty_scrappable_listage_indicator_page.dart';
 
 class ApiAnalyticsView extends ConsumerStatefulWidget {
@@ -96,24 +93,16 @@ class _AnalyticsContent extends ConsumerWidget {
     final selectedItem = ref.watch(selectedScrappableProvider);
     final isMobile = MediaQuery.of(context).size.width < 768;
 
-    // Calculate the max count for normalizing bar heights
-    double maxTotalCount = 0;
-    for (final item in data.items) {
-      final totalCount = item.successTotalCount +
-          item.clientErrorTotalCount +
-          item.serverErrorTotalCount +
-          item.insufficientCreditsTotalCount +
-          item.maxConcurrencyExceededTotalCount;
-      if (totalCount > maxTotalCount) {
-        maxTotalCount = totalCount.toDouble();
-      }
-    }
-
     if (isMobile) {
       // Mobile layout with tabs
       return Scaffold(
         body: selectedItem == null
-            ? _buildScrappablesList(context, ref, maxTotalCount)
+            ? ScrappablesGridView(
+                data: data,
+                scrollController: scrollController,
+                isRefreshVN: isRefreshVN,
+                isLoadingMore: isLoadingMore,
+              )
             : const SelectedScrappablePage(),
         bottomNavigationBar: selectedItem != null
             ? BottomAppBar(
@@ -150,9 +139,14 @@ class _AnalyticsContent extends ConsumerWidget {
     // Desktop layout with animated side panel
     return Row(
       children: [
-        // Scrappables list (left side)
+        // Scrappables grid (left side)
         Expanded(
-          child: _buildScrappablesList(context, ref, maxTotalCount),
+          child: ScrappablesGridView(
+            data: data,
+            scrollController: scrollController,
+            isRefreshVN: isRefreshVN,
+            isLoadingMore: isLoadingMore,
+          ),
         ),
         const VerticalDivider(width: 1),
         AnimatedSize(
@@ -167,96 +161,6 @@ class _AnalyticsContent extends ConsumerWidget {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildScrappablesList(
-      BuildContext context, WidgetRef ref, double maxTotalCount) {
-    return ValueListenableBuilder(
-      valueListenable: isRefreshVN,
-      builder: (context, isRefresh, child) {
-        return Opacity(
-          opacity: isRefresh ? 0.5 : 1.0,
-          child: IgnorePointer(
-            ignoring: isRefresh,
-            child: child!,
-          ),
-        );
-      },
-      child: Column(
-        children: [
-          // Header with title, scope selector, and refresh button
-          Container(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'API Analytics',
-                    style: context.t.displaySmall,
-                  ),
-                ),
-                ValueListenableBuilder(
-                  valueListenable: isRefreshVN,
-                  builder: (context, isRefresh, _) {
-                    return FilledButton.tonalIcon(
-                      onPressed: isRefresh
-                          ? null
-                          : () async {
-                              isRefreshVN.value = true;
-                              try {
-                                await Future.delayed(
-                                    const Duration(milliseconds: 600));
-                                await ref.globalLoadingSetter(() async {
-                                  await ref
-                                      .read(analyticsProvider.notifier)
-                                      .getAnalyticsData();
-                                });
-                              } finally {
-                                isRefreshVN.value = false;
-                              }
-                            },
-                      label: const Text('Refresh'),
-                      icon: isRefresh
-                          ? const CupertinoActivityIndicator()
-                          : const Icon(Icons.refresh),
-                    );
-                  },
-                ),
-                const SizedBox(width: 12),
-                const ScopeSelectorDropdown(),
-              ],
-            ),
-          ),
-          // Scrappables grid
-          Expanded(
-            child: ListView.builder(
-              controller: scrollController,
-              padding: const EdgeInsets.all(16),
-              itemCount: data.items.length + (isLoadingMore ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (index == data.items.length) {
-                  return const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(16),
-                      child: CircularProgressIndicator(),
-                    ),
-                  );
-                }
-
-                final item = data.items[index];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: ScrappableAnalyticsCard(
-                    item: item,
-                    maxTotalCount: maxTotalCount,
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

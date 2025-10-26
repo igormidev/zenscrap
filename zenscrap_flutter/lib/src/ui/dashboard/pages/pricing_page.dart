@@ -15,81 +15,90 @@ class ZenScrapPricingPage extends ConsumerWidget {
       data: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.cyanAccent),
       ),
-      child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 224, 240, 255),
-        body: PricingBackground(
-          child: PricingPage(
-            width: 865,
-            childAspectRatio: 0.45,
-            perMonthText: 'Per month',
-            perYearText: 'Per year',
-            subtitle:
-                "We have you covered, whether you're an unique person running\na side-project, a startup or even an enterprise company.",
-            decorationMapper: (decoration) {
-              return decoration.copyWith(
-                color: Theme.of(context).colorScheme.onSecondary,
-              );
-            },
-            pricesList: [
-              PricesModel(
-                title: 'BASIC',
-                subTitle: 'FOR SIDE-PROJECTS',
-                monthlyPrice: 100,
-                yearlyPrice: 1050,
-                advantagesListage: [
-                  '<b><u><tC>250.000<tC><u><b> api credits',
-                  '<b><u><tC>10<tC><u><b> concurrent requests',
-                  '<b><u><tC>3<tC><u><b> active endpoints',
-                ],
-                onTap: (bool isYearly) async {
-                  await ref.globalLoadingSetter(() async {
-                    await _handleSubscription(ref, context, 'basic', isYearly);
-                  });
+      child: LayoutBuilder(builder: (context, constraints) {
+        final isMobile = constraints.maxWidth < 600;
+        return Scaffold(
+          backgroundColor: const Color.fromARGB(255, 224, 240, 255),
+          body: PricingBackground(
+            child: Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: PricingPage(
+                width: 865,
+                childAspectRatio: 0.45,
+                perMonthText: 'Per month',
+                perYearText: 'Per year',
+                subtitle:
+                    "We have you covered, whether you're an unique person running\na side-project, a startup or even an enterprise company.",
+                decorationMapper: (decoration) {
+                  return decoration.copyWith(
+                    color: Theme.of(context).colorScheme.onSecondary,
+                  );
                 },
-              ),
-              PricesModel(
-                title: 'PRO',
-                subTitle: 'FOR STARTUP',
-                emphasisText: 'MOST POPULAR',
-                monthlyPrice: 199,
-                yearlyPrice: 1999,
-                advantagesListage: [
-                  '<b><u><tC>1.000.000<tC><u><b> api credits',
-                  '<b><u><tC>30<tC><u><b> concurrent requests',
-                  '<b><u><tC>10<tC><u><b> active endpoints',
-                  'Access a best AI model',
+                pricesList: [
+                  PricesModel(
+                    title: 'BASIC',
+                    subTitle: 'FOR SIDE-PROJECTS',
+                    monthlyPrice: 100,
+                    yearlyPrice: 1050,
+                    advantagesListage: [
+                      '<b><u><tC>250.000<tC><u><b> api credits',
+                      '<b><u><tC>10<tC><u><b> concurrent requests',
+                      '<b><u><tC>3<tC><u><b> active endpoints',
+                    ],
+                    onTap: (bool isYearly) async {
+                      await ref.globalLoadingSetter(() async {
+                        await _handleSubscription(
+                            ref, context, 'basic', isYearly);
+                      });
+                    },
+                  ),
+                  PricesModel(
+                    title: 'PRO',
+                    subTitle: 'FOR STARTUP',
+                    emphasisText: 'MOST POPULAR',
+                    monthlyPrice: 199,
+                    yearlyPrice: 1999,
+                    advantagesListage: [
+                      '<b><u><tC>1.000.000<tC><u><b> api credits',
+                      '<b><u><tC>30<tC><u><b> concurrent requests',
+                      '<b><u><tC>10<tC><u><b> active endpoints',
+                      'Access a best AI model',
+                    ],
+                    onTap: (bool isYearly) async {
+                      await ref.globalLoadingSetter(() async {
+                        await _handleSubscription(
+                            ref, context, 'pro', isYearly);
+                      });
+                    },
+                  ),
+                  PricesModel(
+                    title: 'ULTRA',
+                    subTitle: 'ENTERPRISE USAGE',
+                    monthlyPrice: 500,
+                    yearlyPrice: 5500,
+                    advantagesListage: [
+                      '<b><u><tC>4.000.000<tC><u><b> api credits',
+                      '<b><u><tC>100<tC><u><b> concurrent requests',
+                      '<b><u><tC>100<tC><u><b> active endpoints',
+                      'Access a best AI model',
+                      'Priority Support',
+                      'Hide your endpoints from marketplace',
+                      'Copy endpoints from marketplace',
+                      'Ability to purchase one time add-on api credits',
+                    ],
+                    onTap: (bool isYearly) async {
+                      await ref.globalLoadingSetter(() async {
+                        await _handleSubscription(
+                            ref, context, 'ultra', isYearly);
+                      });
+                    },
+                  ),
                 ],
-                onTap: (bool isYearly) async {
-                  await ref.globalLoadingSetter(() async {
-                    await _handleSubscription(ref, context, 'pro', isYearly);
-                  });
-                },
               ),
-              PricesModel(
-                title: 'ULTRA',
-                subTitle: 'ENTERPRISE USAGE',
-                monthlyPrice: 500,
-                yearlyPrice: 5500,
-                advantagesListage: [
-                  '<b><u><tC>4.000.000<tC><u><b> api credits',
-                  '<b><u><tC>100<tC><u><b> concurrent requests',
-                  '<b><u><tC>100<tC><u><b> active endpoints',
-                  'Access a best AI model',
-                  'Priority Support',
-                  'Hide your endpoints from marketplace',
-                  'Copy endpoints from marketplace',
-                  'Ability to purchase one time add-on api credits',
-                ],
-                onTap: (bool isYearly) async {
-                  await ref.globalLoadingSetter(() async {
-                    await _handleSubscription(ref, context, 'ultra', isYearly);
-                  });
-                },
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 

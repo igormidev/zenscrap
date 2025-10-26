@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/src/core/extensions/request_status_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 
 class SegmentedColumnBar extends StatelessWidget {
@@ -53,74 +54,80 @@ class SegmentedColumnBar extends StatelessWidget {
       message: _buildTooltipMessage(),
       preferBelow: false,
       verticalOffset: 20,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Container(
-            height: (300 * heightPercentage).toDouble(),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(4),
-              border: Border.all(
-                color: context.c.outline.withAlpha(30),
-                width: 0.5,
-              ),
-            ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // Use the actual available height from parent constraints
+          final availableHeight = constraints.maxHeight;
+          final barHeight = availableHeight * heightPercentage;
+
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Container(
+                height: barHeight,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(
+                    color: context.c.outline.withAlpha(30),
+                    width: 0.5,
+                  ),
+                ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(4),
               child: Column(
                 children: [
-                  // Success segment (tertiary/green)
+                  // Success segment
                   if (timeScope.successCount > 0)
                     Expanded(
                       flex: (successPercentage * 1000).toInt(),
                       child: _BarSegment(
-                        color: context.c.tertiary,
+                        color: RequestStatus.success.color,
                         count: timeScope.successCount,
-                        label: 'Success',
+                        label: RequestStatus.success.label,
                         percentage: successPercentage,
                       ),
                     ),
-                  // Client error segment (orange)
+                  // Client error segment
                   if (timeScope.clientErrorCount > 0)
                     Expanded(
                       flex: (clientErrorPercentage * 1000).toInt(),
                       child: _BarSegment(
-                        color: Colors.orange,
+                        color: RequestStatus.clientError.color,
                         count: timeScope.clientErrorCount,
-                        label: '4xx Error',
+                        label: RequestStatus.clientError.label,
                         percentage: clientErrorPercentage,
                       ),
                     ),
-                  // Server error segment (red)
+                  // Server error segment
                   if (timeScope.serverErrorCount > 0)
                     Expanded(
                       flex: (serverErrorPercentage * 1000).toInt(),
                       child: _BarSegment(
-                        color: context.c.error,
+                        color: RequestStatus.serverError.color,
                         count: timeScope.serverErrorCount,
-                        label: '5xx Error',
+                        label: RequestStatus.serverError.label,
                         percentage: serverErrorPercentage,
                       ),
                     ),
-                  // Insufficient credits segment (purple)
+                  // Insufficient credits segment
                   if (timeScope.insufficientCreditsCount > 0)
                     Expanded(
                       flex: (insufficientCreditsPercentage * 1000).toInt(),
                       child: _BarSegment(
-                        color: Colors.purple,
+                        color: RequestStatus.insufficientCredits.color,
                         count: timeScope.insufficientCreditsCount,
-                        label: 'No Credits',
+                        label: RequestStatus.insufficientCredits.label,
                         percentage: insufficientCreditsPercentage,
                       ),
                     ),
-                  // Max concurrency segment (cyan)
+                  // Max concurrency segment
                   if (timeScope.maxConcurrencyExceededCount > 0)
                     Expanded(
                       flex: (maxConcurrencyPercentage * 1000).toInt(),
                       child: _BarSegment(
-                        color: Colors.cyan,
+                        color: RequestStatus.maxConcurrencyExceeded.color,
                         count: timeScope.maxConcurrencyExceededCount,
-                        label: 'Max Concurrency',
+                        label: RequestStatus.maxConcurrencyExceeded.label,
                         percentage: maxConcurrencyPercentage,
                       ),
                     ),
@@ -129,8 +136,10 @@ class SegmentedColumnBar extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
+      );
+    },
+  ),
+);
   }
 
   String _buildTooltipMessage() {
