@@ -20,6 +20,7 @@ import 'package:zenscrap_flutter/src/states/account/account_state.dart';
 import 'package:zenscrap_flutter/src/ui/marketplace/dialogs/clone_success_dialog.dart';
 import 'package:zenscrap_flutter/src/ui/marketplace/dialogs/upgrade_plan_dialog.dart';
 import 'package:zenscrap_flutter/src/ui/marketplace/widgets/api_key_selector_dialog.dart';
+import 'package:zenscrap_flutter/src/ui/marketplace/widgets/scrappable_usage_metrics_widget.dart';
 
 class ScrappableInfoDialog extends ConsumerStatefulWidget {
   final Scrappable scrappable;
@@ -249,6 +250,10 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
                         '${selectedApiKey!.apiKey.substring(0, 8)}...'),
                 copyCode: curlCommand,
                 fontSize: 12,
+              ),
+              const SizedBox(height: 24),
+              ScrappableUsageMetricsWidget(
+                scrappableId: widget.scrappable.id!,
               ),
             ] else if (!isLoggedIn) ...[
               const SizedBox(height: 24),

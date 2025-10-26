@@ -211,6 +211,51 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
       pageSize: pageSize,
     );
   }
+
+  /// Get usage metrics for a scrappable in the last 30 days
+  /// This includes ALL requests from ANY user who called this scrappable
+  Future<ScrappableUsageMetrics> getScrappableUsageMetrics(
+    Session session, {
+    required int scrappableId,
+  }) async {
+    // Verify scrappable exists
+    final scrappable = await Scrappable.db.findById(session, scrappableId);
+    if (scrappable == null) {
+      throw ZenScrapException(
+        title: 'Scrappable Not Found',
+        description: 'The requested scrappable was not found.',
+      );
+    }
+
+    final now = DateTime.now();
+    final thirtyDaysAgo = now.subtract(const Duration(days: 30));
+
+    // Count success requests (from ANY user)
+    final successCount = await ScrappableAnalytics.db.count(
+      session,
+      where: (t) =>
+          t.scrappableId.equals(scrappableId) &
+          t.requestedAt.between(thirtyDaysAgo, now) &
+          t.requestStatus.equals(RequestStatus.success),
+    );
+
+    // Count server error (5xx) requests (from ANY user)
+    final errorCount = await ScrappableAnalytics.db.count(
+      session,
+      where: (t) =>
+          t.scrappableId.equals(scrappableId) &
+          t.requestedAt.between(thirtyDaysAgo, now) &
+          t.requestStatus.equals(RequestStatus.serverError),
+    );
+
+    final totalCount = successCount + errorCount;
+
+    return ScrappableUsageMetrics(
+      successCount: successCount,
+      errorCount: errorCount,
+      totalCount: totalCount,
+    );
+  }
 }
 
 const int MAX_DAYS_ALLOWED = 30;

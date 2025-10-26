@@ -72,6 +72,30 @@ class PrivateAccountEndpoint extends Endpoint {
           ),
           transaction: transaction,
         );
+
+        // Create monthly subscription credit deposit record for initial credits
+        final initialDeposit = MonthlySubscriptionCreditDeposit(
+          creditsAmount: 100, // Initial free tier credits
+          planTier: PlanTier.none, // Free tier
+        );
+        await MonthlySubscriptionCreditDeposit.db.insertRow(
+          session,
+          initialDeposit,
+          transaction: transaction,
+        );
+
+        // Create credit history item for initial credits
+        final creditHistoryItem = CreditHistoryItem(
+          date: DateTime.now(),
+          monthlySubscriptionCreditDeposit: initialDeposit,
+          creaditPackagePurchase: null,
+          accountApiUsageId: accountApiUsage.id!,
+        );
+        await CreditHistoryItem.db.insertRow(
+          session,
+          creditHistoryItem,
+          transaction: transaction,
+        );
         final apiKey = await AccountApiKey.db.insertRow(
           session,
           AccountApiKey(
