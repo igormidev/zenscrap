@@ -7,6 +7,7 @@ import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_messages_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
+import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_state.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 
@@ -70,11 +71,18 @@ class _DiscardChangesButtonState extends ConsumerState<DiscardChangesButton> {
                           standard: (value) => value.data.id ?? 0,
                         ) ?? 0;
 
+                        // Get message count
+                        final messageCount = ref.read(chatMessagesProvider).maybeMap(
+                          data: (data) => data.value.length,
+                          orElse: () => 0,
+                        );
+
                         if (hasAtLeastOneMessage) {
                           // Track discard changes
                           if (scrappableId > 0) {
                             await analytics.trackScrappableDiscardChanges(
                               scrappableId: scrappableId,
+                              messageCount: messageCount,
                             );
                           }
                           return context.pop(true);
