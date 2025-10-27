@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:enchanted_regex/enchanted_regex.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 
 class UrlSyntaxTextField extends StatefulWidget {
