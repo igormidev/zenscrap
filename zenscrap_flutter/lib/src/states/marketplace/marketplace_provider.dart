@@ -17,25 +17,32 @@ class MarketplaceNotifier extends StateNotifier<MarketplaceState> {
   MarketplaceNotifier(this._client) : super(const MarketplaceState.initial());
 
   String _currentSearchQuery = '';
+  Set<ScraperCategory> _currentCategories = {};
   int _currentPage = 1;
 
   Future<void> loadMarketplace({
     int page = 1,
     String searchQuery = '',
+    Set<ScraperCategory>? categories,
   }) async {
     try {
       state = const MarketplaceState.loading();
       _currentPage = page;
       _currentSearchQuery = searchQuery;
+      _currentCategories = categories ?? _currentCategories;
 
       final response = await _client.marketplace.getItems(
         page: page,
         searchQuery: searchQuery.isNotEmpty ? searchQuery : null,
+        categories: _currentCategories.isEmpty
+            ? null
+            : _currentCategories.toList(),
       );
 
       state = MarketplaceState.loaded(
         response: response,
         searchQuery: searchQuery,
+        selectedCategories: _currentCategories,
       );
     } on ZenScrapException catch (e) {
       state = MarketplaceState.withError(e);
@@ -59,6 +66,7 @@ class MarketplaceNotifier extends StateNotifier<MarketplaceState> {
     await loadMarketplace(
       page: page,
       searchQuery: _currentSearchQuery,
+      categories: _currentCategories,
     );
   }
 
@@ -66,6 +74,15 @@ class MarketplaceNotifier extends StateNotifier<MarketplaceState> {
     await loadMarketplace(
       page: 1,
       searchQuery: query,
+      categories: _currentCategories,
+    );
+  }
+
+  Future<void> filterByCategories(Set<ScraperCategory> categories) async {
+    await loadMarketplace(
+      page: 1,
+      searchQuery: _currentSearchQuery,
+      categories: categories,
     );
   }
 
@@ -73,6 +90,7 @@ class MarketplaceNotifier extends StateNotifier<MarketplaceState> {
     await loadMarketplace(
       page: _currentPage,
       searchQuery: _currentSearchQuery,
+      categories: _currentCategories,
     );
   }
 }

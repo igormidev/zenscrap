@@ -457,6 +457,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<String?>(),
               nullable: true,
             ),
+            'categories': _i1.ParameterDescription(
+              name: 'categories',
+              type: _i1.getType<List<_i17.ScraperCategory>?>(),
+              nullable: true,
+            ),
           },
           call: (
             _i1.Session session,
@@ -468,6 +473,7 @@ class Endpoints extends _i1.EndpointDispatch {
             session,
             page: params['page'],
             searchQuery: params['searchQuery'],
+            categories: params['categories'],
           ),
         ),
         'getScrappableById': _i1.MethodConnector(
@@ -610,6 +616,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<String?>(),
               nullable: true,
             ),
+            'categories': _i1.ParameterDescription(
+              name: 'categories',
+              type: _i1.getType<List<_i17.ScraperCategory>?>(),
+              nullable: true,
+            ),
           },
           call: (
             _i1.Session session,
@@ -619,6 +630,7 @@ class Endpoints extends _i1.EndpointDispatch {
             session,
             page: params['page'],
             searchQuery: params['searchQuery'],
+            categories: params['categories'],
           ),
         )
       },

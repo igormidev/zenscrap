@@ -251,6 +251,7 @@ class EndpointPrivateUserScrappables extends _i1.EndpointRef {
   _i2.Future<_i14.UserPaginatedScrappableResponse> call({
     required int page,
     String? searchQuery,
+    List<_i15.ScraperCategory>? categories,
   }) =>
       caller.callServerEndpoint<_i14.UserPaginatedScrappableResponse>(
         'privateUserScrappables',
@@ -258,6 +259,7 @@ class EndpointPrivateUserScrappables extends _i1.EndpointRef {
         {
           'page': page,
           'searchQuery': searchQuery,
+          'categories': categories,
         },
       );
 
@@ -338,6 +340,7 @@ class EndpointMarketplace extends _i1.EndpointRef {
   _i2.Future<_i16.PaginatedScrappableResponse> getItems({
     required int page,
     String? searchQuery,
+    List<_i15.ScraperCategory>? categories,
   }) =>
       caller.callServerEndpoint<_i16.PaginatedScrappableResponse>(
         'marketplace',
@@ -345,6 +348,7 @@ class EndpointMarketplace extends _i1.EndpointRef {
         {
           'page': page,
           'searchQuery': searchQuery,
+          'categories': categories,
         },
       );
 }

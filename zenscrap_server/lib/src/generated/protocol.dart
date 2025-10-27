@@ -58,6 +58,8 @@ import 'package:zenscrap_server/src/generated/entities/account/api_usage/api_cre
     as _i40;
 import 'package:zenscrap_server/src/generated/entities/account/account_api_key.dart'
     as _i41;
+import 'package:zenscrap_server/src/generated/entities/scrappable/scraper_category.dart'
+    as _i42;
 export 'entities/account/account.dart';
 export 'entities/account/account_api_key.dart';
 export 'entities/account/api_usage/account_api_usage.dart';
@@ -1629,6 +1631,13 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == Map<String, dynamic>) {
       return (data as Map).map((k, v) =>
           MapEntry(deserialize<String>(k), deserialize<dynamic>(v))) as T;
+    }
+    if (t == _i1.getType<List<_i42.ScraperCategory>?>()) {
+      return (data != null
+          ? (data as List)
+              .map((e) => deserialize<_i42.ScraperCategory>(e))
+              .toList()
+          : null) as T;
     }
     try {
       return _i3.Protocol().deserialize<T>(data, t);

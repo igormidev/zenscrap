@@ -14,9 +14,9 @@ class MarketplacePaginationControls extends ConsumerWidget {
     final marketplaceState = ref.watch(marketplaceProvider);
     
     return marketplaceState.maybeWhen(
-      loaded: (response, searchQuery) {
+      loaded: (response, searchQuery, selectedCategories) {
         final pagination = response.pagination;
-        
+
         if (pagination.totalPages <= 1) {
           return const SizedBox.shrink();
         }

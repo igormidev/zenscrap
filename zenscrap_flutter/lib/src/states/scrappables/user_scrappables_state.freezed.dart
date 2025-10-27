@@ -158,8 +158,8 @@ extension UserScrappablesStatePatterns on UserScrappablesState {
     TResult Function()? initial,
     TResult Function()? loading,
     TResult Function(ZenScrapException error)? withError,
-    TResult Function(
-            UserPaginatedScrappableResponse response, String searchQuery)?
+    TResult Function(UserPaginatedScrappableResponse response,
+            String searchQuery, Set<ScraperCategory> selectedCategories)?
         withData,
     required TResult orElse(),
   }) {
@@ -172,7 +172,8 @@ extension UserScrappablesStatePatterns on UserScrappablesState {
       case _UserScrappablesListageWithError() when withError != null:
         return withError(_that.error);
       case _UserScrappablesListageWithData() when withData != null:
-        return withData(_that.response, _that.searchQuery);
+        return withData(
+            _that.response, _that.searchQuery, _that.selectedCategories);
       case _:
         return orElse();
     }
@@ -196,8 +197,8 @@ extension UserScrappablesStatePatterns on UserScrappablesState {
     required TResult Function() initial,
     required TResult Function() loading,
     required TResult Function(ZenScrapException error) withError,
-    required TResult Function(
-            UserPaginatedScrappableResponse response, String searchQuery)
+    required TResult Function(UserPaginatedScrappableResponse response,
+            String searchQuery, Set<ScraperCategory> selectedCategories)
         withData,
   }) {
     final _that = this;
@@ -209,7 +210,8 @@ extension UserScrappablesStatePatterns on UserScrappablesState {
       case _UserScrappablesListageWithError():
         return withError(_that.error);
       case _UserScrappablesListageWithData():
-        return withData(_that.response, _that.searchQuery);
+        return withData(
+            _that.response, _that.searchQuery, _that.selectedCategories);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -232,8 +234,8 @@ extension UserScrappablesStatePatterns on UserScrappablesState {
     TResult? Function()? initial,
     TResult? Function()? loading,
     TResult? Function(ZenScrapException error)? withError,
-    TResult? Function(
-            UserPaginatedScrappableResponse response, String searchQuery)?
+    TResult? Function(UserPaginatedScrappableResponse response,
+            String searchQuery, Set<ScraperCategory> selectedCategories)?
         withData,
   }) {
     final _that = this;
@@ -245,7 +247,8 @@ extension UserScrappablesStatePatterns on UserScrappablesState {
       case _UserScrappablesListageWithError() when withError != null:
         return withError(_that.error);
       case _UserScrappablesListageWithData() when withData != null:
-        return withData(_that.response, _that.searchQuery);
+        return withData(
+            _that.response, _that.searchQuery, _that.selectedCategories);
       case _:
         return null;
     }
@@ -364,10 +367,20 @@ class __$UserScrappablesListageWithErrorCopyWithImpl<$Res>
 
 class _UserScrappablesListageWithData implements UserScrappablesState {
   _UserScrappablesListageWithData(
-      {required this.response, required this.searchQuery});
+      {required this.response,
+      required this.searchQuery,
+      required final Set<ScraperCategory> selectedCategories})
+      : _selectedCategories = selectedCategories;
 
   final UserPaginatedScrappableResponse response;
   final String searchQuery;
+  final Set<ScraperCategory> _selectedCategories;
+  Set<ScraperCategory> get selectedCategories {
+    if (_selectedCategories is EqualUnmodifiableSetView)
+      return _selectedCategories;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableSetView(_selectedCategories);
+  }
 
   /// Create a copy of UserScrappablesState
   /// with the given fields replaced by the non-null parameter values.
@@ -385,15 +398,18 @@ class _UserScrappablesListageWithData implements UserScrappablesState {
             (identical(other.response, response) ||
                 other.response == response) &&
             (identical(other.searchQuery, searchQuery) ||
-                other.searchQuery == searchQuery));
+                other.searchQuery == searchQuery) &&
+            const DeepCollectionEquality()
+                .equals(other._selectedCategories, _selectedCategories));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, response, searchQuery);
+  int get hashCode => Object.hash(runtimeType, response, searchQuery,
+      const DeepCollectionEquality().hash(_selectedCategories));
 
   @override
   String toString() {
-    return 'UserScrappablesState.withData(response: $response, searchQuery: $searchQuery)';
+    return 'UserScrappablesState.withData(response: $response, searchQuery: $searchQuery, selectedCategories: $selectedCategories)';
   }
 }
 
@@ -405,7 +421,10 @@ abstract mixin class _$UserScrappablesListageWithDataCopyWith<$Res>
           $Res Function(_UserScrappablesListageWithData) _then) =
       __$UserScrappablesListageWithDataCopyWithImpl;
   @useResult
-  $Res call({UserPaginatedScrappableResponse response, String searchQuery});
+  $Res call(
+      {UserPaginatedScrappableResponse response,
+      String searchQuery,
+      Set<ScraperCategory> selectedCategories});
 }
 
 /// @nodoc
@@ -422,6 +441,7 @@ class __$UserScrappablesListageWithDataCopyWithImpl<$Res>
   $Res call({
     Object? response = null,
     Object? searchQuery = null,
+    Object? selectedCategories = null,
   }) {
     return _then(_UserScrappablesListageWithData(
       response: null == response
@@ -432,6 +452,10 @@ class __$UserScrappablesListageWithDataCopyWithImpl<$Res>
           ? _self.searchQuery
           : searchQuery // ignore: cast_nullable_to_non_nullable
               as String,
+      selectedCategories: null == selectedCategories
+          ? _self._selectedCategories
+          : selectedCategories // ignore: cast_nullable_to_non_nullable
+              as Set<ScraperCategory>,
     ));
   }
 }

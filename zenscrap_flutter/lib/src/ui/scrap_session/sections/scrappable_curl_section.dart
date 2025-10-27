@@ -42,7 +42,7 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection>
       scrappableId: widget.scrappableId,
       testData: widget.testData,
       isProd: false, // This is the test endpoint
-    );
+    ).replaceAll(r'\"', '"').replaceAll('//api', '/api');
   }
 
   @override

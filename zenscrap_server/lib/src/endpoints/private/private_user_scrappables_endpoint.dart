@@ -9,6 +9,7 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
     Session session, {
     int page = 1,
     String? searchQuery,
+    List<ScraperCategory>? categories,
   }) async {
     final userId = (await session.authenticated)?.userId;
     if (userId == null) {
@@ -39,13 +40,34 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
     Expression baseWhere(ScrappableTable t) =>
         t.accountId.equals(accountInfo.id) & t.isDeleted.equals(false);
 
-    // Add search filter if query is provided
-    Expression whereClause(ScrappableTable t) =>
-        searchQuery != null && searchQuery.isNotEmpty
-            ? baseWhere(t) &
-                (t.name.ilike('%$searchQuery%') |
-                    t.description.ilike('%$searchQuery%'))
-            : baseWhere(t);
+    // Add search filter and category filter if provided
+    Expression whereClause(ScrappableTable t) {
+      Expression where = baseWhere(t);
+
+      // Add search filter
+      if (searchQuery != null && searchQuery.isNotEmpty) {
+        where = where &
+            (t.name.ilike('%$searchQuery%') |
+                t.description.ilike('%$searchQuery%'));
+      }
+
+      // Add category filter
+      if (categories != null && categories.isNotEmpty) {
+        // Build OR expression for categories
+        Expression? categoryExpression;
+        for (final category in categories) {
+          final categoryMatch = t.category.equals(category);
+          categoryExpression = categoryExpression == null
+              ? categoryMatch
+              : categoryExpression | categoryMatch;
+        }
+        if (categoryExpression != null) {
+          where = where & categoryExpression;
+        }
+      }
+
+      return where;
+    }
 
     // Get total count for pagination
     final totalCount = await Scrappable.db.count(
@@ -75,13 +97,6 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
         referenceTestData: ReferenceTestData.include(),
       ),
     );
-    print('--- scrappable page ---');
-    for (var s in scrappables) {
-      print(
-        'Scrappable: ${s.id} - ${s.name} - has scrappingBeeExtractRules: ${s.scrappingBeeExtractRules != null}',
-      );
-    }
-    // scrappables.firstOrNull.scr;
 
     return UserPaginatedScrappableResponse(
       data: scrappables,

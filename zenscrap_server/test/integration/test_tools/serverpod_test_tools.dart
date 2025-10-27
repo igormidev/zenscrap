@@ -793,6 +793,7 @@ class _PrivateUserScrappablesEndpoint {
     _i1.TestSessionBuilder sessionBuilder, {
     required int page,
     String? searchQuery,
+    List<_i16.ScraperCategory>? categories,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -808,6 +809,7 @@ class _PrivateUserScrappablesEndpoint {
           parameters: _i1.testObjectToJson({
             'page': page,
             'searchQuery': searchQuery,
+            'categories': categories,
           }),
           serializationManager: _serializationManager,
         );
@@ -999,6 +1001,7 @@ class _MarketplaceEndpoint {
     _i1.TestSessionBuilder sessionBuilder, {
     required int page,
     String? searchQuery,
+    List<_i16.ScraperCategory>? categories,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1014,6 +1017,7 @@ class _MarketplaceEndpoint {
           parameters: _i1.testObjectToJson({
             'page': page,
             'searchQuery': searchQuery,
+            'categories': categories,
           }),
           serializationManager: _serializationManager,
         );

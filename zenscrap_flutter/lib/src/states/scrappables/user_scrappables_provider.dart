@@ -15,11 +15,13 @@ class UserScrappablesNotifier extends StateNotifier<UserScrappablesState> {
   UserScrappablesNotifier(this.ref) : super(UserScrappablesState.initial());
 
   String _currentSearchQuery = '';
+  Set<ScraperCategory> _currentCategories = {};
   int _currentPage = 1;
 
   Future<void> loadScrappables({
     int page = 1,
     String searchQuery = '',
+    Set<ScraperCategory>? categories,
   }) async {
     final sessionManager = ref.read(sessionManagerProvider);
     final signedInUser = sessionManager.signedInUser;
@@ -29,12 +31,16 @@ class UserScrappablesNotifier extends StateNotifier<UserScrappablesState> {
       state = UserScrappablesState.loading();
       _currentPage = page;
       _currentSearchQuery = searchQuery;
+      _currentCategories = categories ?? _currentCategories;
 
       final result = await ref
           .read(clientProvider)
           .privateUserScrappables(
             page: page,
             searchQuery: searchQuery.isNotEmpty ? searchQuery : null,
+            categories: _currentCategories.isEmpty
+                ? null
+                : _currentCategories.toList(),
           )
           .toResult;
 
@@ -42,6 +48,7 @@ class UserScrappablesNotifier extends StateNotifier<UserScrappablesState> {
         state = UserScrappablesState.withData(
           response: response,
           searchQuery: searchQuery,
+          selectedCategories: _currentCategories,
         );
       }, (error) {
         state = UserScrappablesState.withError(error: error);
@@ -68,6 +75,7 @@ class UserScrappablesNotifier extends StateNotifier<UserScrappablesState> {
     await loadScrappables(
       page: page,
       searchQuery: _currentSearchQuery,
+      categories: _currentCategories,
     );
   }
 
@@ -75,6 +83,15 @@ class UserScrappablesNotifier extends StateNotifier<UserScrappablesState> {
     await loadScrappables(
       page: 1,
       searchQuery: query,
+      categories: _currentCategories,
+    );
+  }
+
+  Future<void> filterByCategories(Set<ScraperCategory> categories) async {
+    await loadScrappables(
+      page: 1,
+      searchQuery: _currentSearchQuery,
+      categories: categories,
     );
   }
 
@@ -82,6 +99,7 @@ class UserScrappablesNotifier extends StateNotifier<UserScrappablesState> {
     await loadScrappables(
       page: _currentPage,
       searchQuery: _currentSearchQuery,
+      categories: _currentCategories,
     );
   }
 

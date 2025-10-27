@@ -14,5 +14,6 @@ abstract class UserScrappablesState with _$UserScrappablesState {
   factory UserScrappablesState.withData({
     required UserPaginatedScrappableResponse response,
     required String searchQuery,
+    required Set<ScraperCategory> selectedCategories,
   }) = _UserScrappablesListageWithData;
 }

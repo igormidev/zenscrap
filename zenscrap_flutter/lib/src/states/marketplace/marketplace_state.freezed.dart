@@ -157,7 +157,8 @@ extension MarketplaceStatePatterns on MarketplaceState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(PaginatedScrappableResponse response, String searchQuery)?
+    TResult Function(PaginatedScrappableResponse response, String searchQuery,
+            Set<ScraperCategory> selectedCategories)?
         loaded,
     TResult Function(ZenScrapException error)? withError,
     required TResult orElse(),
@@ -169,7 +170,8 @@ extension MarketplaceStatePatterns on MarketplaceState {
       case _Loading() when loading != null:
         return loading();
       case _Loaded() when loaded != null:
-        return loaded(_that.response, _that.searchQuery);
+        return loaded(
+            _that.response, _that.searchQuery, _that.selectedCategories);
       case _WithError() when withError != null:
         return withError(_that.error);
       case _:
@@ -194,8 +196,8 @@ extension MarketplaceStatePatterns on MarketplaceState {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(
-            PaginatedScrappableResponse response, String searchQuery)
+    required TResult Function(PaginatedScrappableResponse response,
+            String searchQuery, Set<ScraperCategory> selectedCategories)
         loaded,
     required TResult Function(ZenScrapException error) withError,
   }) {
@@ -206,7 +208,8 @@ extension MarketplaceStatePatterns on MarketplaceState {
       case _Loading():
         return loading();
       case _Loaded():
-        return loaded(_that.response, _that.searchQuery);
+        return loaded(
+            _that.response, _that.searchQuery, _that.selectedCategories);
       case _WithError():
         return withError(_that.error);
       case _:
@@ -230,7 +233,8 @@ extension MarketplaceStatePatterns on MarketplaceState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(PaginatedScrappableResponse response, String searchQuery)?
+    TResult? Function(PaginatedScrappableResponse response, String searchQuery,
+            Set<ScraperCategory> selectedCategories)?
         loaded,
     TResult? Function(ZenScrapException error)? withError,
   }) {
@@ -241,7 +245,8 @@ extension MarketplaceStatePatterns on MarketplaceState {
       case _Loading() when loading != null:
         return loading();
       case _Loaded() when loaded != null:
-        return loaded(_that.response, _that.searchQuery);
+        return loaded(
+            _that.response, _that.searchQuery, _that.selectedCategories);
       case _WithError() when withError != null:
         return withError(_that.error);
       case _:
@@ -293,10 +298,21 @@ class _Loading implements MarketplaceState {
 /// @nodoc
 
 class _Loaded implements MarketplaceState {
-  const _Loaded({required this.response, required this.searchQuery});
+  const _Loaded(
+      {required this.response,
+      required this.searchQuery,
+      required final Set<ScraperCategory> selectedCategories})
+      : _selectedCategories = selectedCategories;
 
   final PaginatedScrappableResponse response;
   final String searchQuery;
+  final Set<ScraperCategory> _selectedCategories;
+  Set<ScraperCategory> get selectedCategories {
+    if (_selectedCategories is EqualUnmodifiableSetView)
+      return _selectedCategories;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableSetView(_selectedCategories);
+  }
 
   /// Create a copy of MarketplaceState
   /// with the given fields replaced by the non-null parameter values.
@@ -313,15 +329,18 @@ class _Loaded implements MarketplaceState {
             (identical(other.response, response) ||
                 other.response == response) &&
             (identical(other.searchQuery, searchQuery) ||
-                other.searchQuery == searchQuery));
+                other.searchQuery == searchQuery) &&
+            const DeepCollectionEquality()
+                .equals(other._selectedCategories, _selectedCategories));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, response, searchQuery);
+  int get hashCode => Object.hash(runtimeType, response, searchQuery,
+      const DeepCollectionEquality().hash(_selectedCategories));
 
   @override
   String toString() {
-    return 'MarketplaceState.loaded(response: $response, searchQuery: $searchQuery)';
+    return 'MarketplaceState.loaded(response: $response, searchQuery: $searchQuery, selectedCategories: $selectedCategories)';
   }
 }
 
@@ -331,7 +350,10 @@ abstract mixin class _$LoadedCopyWith<$Res>
   factory _$LoadedCopyWith(_Loaded value, $Res Function(_Loaded) _then) =
       __$LoadedCopyWithImpl;
   @useResult
-  $Res call({PaginatedScrappableResponse response, String searchQuery});
+  $Res call(
+      {PaginatedScrappableResponse response,
+      String searchQuery,
+      Set<ScraperCategory> selectedCategories});
 }
 
 /// @nodoc
@@ -347,6 +369,7 @@ class __$LoadedCopyWithImpl<$Res> implements _$LoadedCopyWith<$Res> {
   $Res call({
     Object? response = null,
     Object? searchQuery = null,
+    Object? selectedCategories = null,
   }) {
     return _then(_Loaded(
       response: null == response
@@ -357,6 +380,10 @@ class __$LoadedCopyWithImpl<$Res> implements _$LoadedCopyWith<$Res> {
           ? _self.searchQuery
           : searchQuery // ignore: cast_nullable_to_non_nullable
               as String,
+      selectedCategories: null == selectedCategories
+          ? _self._selectedCategories
+          : selectedCategories // ignore: cast_nullable_to_non_nullable
+              as Set<ScraperCategory>,
     ));
   }
 }

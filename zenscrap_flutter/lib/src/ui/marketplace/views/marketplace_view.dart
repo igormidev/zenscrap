@@ -50,7 +50,7 @@ class _MarketplaceViewState extends ConsumerState<MarketplaceView>
               child: Text('Loading marketplace...'),
             ),
             loading: () => const SizedBox.shrink(),
-            loaded: (response, searchQuery) {
+            loaded: (response, searchQuery, selectedCategories) {
               // Track marketplace page view
               analytics.trackMarketplacePageView(
                 scrappableCount: response.data.length,

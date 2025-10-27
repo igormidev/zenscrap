@@ -81,7 +81,12 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
         scrappableId: widget.scrappable.id!,
         apiKey: selectedApiKey!.apiKey,
         examplePayload: examplePayload,
-      );
+      )
+          .replaceAll(r'\"', '"')
+          .replaceAll('//api', '/api')
+          // replace the api key
+          .replaceAll(selectedApiKey!.apiKey,
+              '${selectedApiKey!.apiKey.substring(0, 8)}...');
     });
   }
 
@@ -243,12 +248,7 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
               const SizedBox(height: 12),
               CodeBlock(
                 copyTooltipMessage: 'Copy the test cURL command',
-                code: curlCommand
-                    .replaceAll(r'\"', '"')
-                    .replaceAll('//api', '/api')
-                    // replace the api key
-                    .replaceAll(selectedApiKey!.apiKey,
-                        '${selectedApiKey!.apiKey.substring(0, 8)}...'),
+                code: curlCommand,
                 copyCode: curlCommand,
                 fontSize: 12,
               ),

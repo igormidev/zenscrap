@@ -55,7 +55,9 @@ import 'package:zenscrap_client/src/protocol/entities/account/api_usage/api_cred
     as _i38;
 import 'package:zenscrap_client/src/protocol/entities/account/account_api_key.dart'
     as _i39;
-import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i40;
+import 'package:zenscrap_client/src/protocol/entities/scrappable/scraper_category.dart'
+    as _i40;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i41;
 export 'entities/account/account.dart';
 export 'entities/account/account_api_key.dart';
 export 'entities/account/api_usage/account_api_usage.dart';
@@ -471,8 +473,15 @@ class Protocol extends _i1.SerializationManager {
       return (data as Map).map((k, v) =>
           MapEntry(deserialize<String>(k), deserialize<dynamic>(v))) as T;
     }
+    if (t == _i1.getType<List<_i40.ScraperCategory>?>()) {
+      return (data != null
+          ? (data as List)
+              .map((e) => deserialize<_i40.ScraperCategory>(e))
+              .toList()
+          : null) as T;
+    }
     try {
-      return _i40.Protocol().deserialize<T>(data, t);
+      return _i41.Protocol().deserialize<T>(data, t);
     } on _i1.DeserializationTypeNotFoundException catch (_) {}
     return super.deserialize<T>(data, t);
   }
@@ -604,7 +613,7 @@ class Protocol extends _i1.SerializationManager {
     if (data is _i37.CreditUsage) {
       return 'CreditUsage';
     }
-    className = _i40.Protocol().getClassNameForObject(data);
+    className = _i41.Protocol().getClassNameForObject(data);
     if (className != null) {
       return 'serverpod_auth.$className';
     }
@@ -743,7 +752,7 @@ class Protocol extends _i1.SerializationManager {
     }
     if (dataClassName.startsWith('serverpod_auth.')) {
       data['className'] = dataClassName.substring(15);
-      return _i40.Protocol().deserializeByClassName(data);
+      return _i41.Protocol().deserializeByClassName(data);
     }
     return super.deserializeByClassName(data);
   }
