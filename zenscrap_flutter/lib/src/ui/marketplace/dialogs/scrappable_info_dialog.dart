@@ -79,6 +79,7 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
       curlCommand = buildSimpleCurl(
         baseUrl: baseUrl,
         scrappableId: widget.scrappable.id!,
+        isProd: true, // Marketplace always uses prod endpoint
         apiKey: selectedApiKey!.apiKey,
         examplePayload: examplePayload,
       )

@@ -23,9 +23,9 @@ abstract class NewExtractRuleResponse extends _i1.ChatResponse
   factory NewExtractRuleResponse({
     required _i3.PromptRole role,
     required String messageText,
-    required _i6.ReferenceTestData referenceTestData,
+    required _i5.ReferenceTestData referenceTestData,
     required _i4.ScrappingBeeExtractLogic scrappingBeeExtractLogic,
-    required _i5.ScrappableRequest scrapperRequest,
+    required _i6.ScrappableRequest scrapperRequest,
   }) = _NewExtractRuleResponseImpl;
 
   factory NewExtractRuleResponse.fromJson(
@@ -33,23 +33,23 @@ abstract class NewExtractRuleResponse extends _i1.ChatResponse
     return NewExtractRuleResponse(
       role: _i3.PromptRole.fromJson((jsonSerialization['role'] as String)),
       messageText: jsonSerialization['messageText'] as String,
-      referenceTestData: _i6.ReferenceTestData.fromJson(
+      referenceTestData: _i5.ReferenceTestData.fromJson(
           (jsonSerialization['referenceTestData'] as Map<String, dynamic>)),
       scrappingBeeExtractLogic: _i4.ScrappingBeeExtractLogic.fromJson(
           (jsonSerialization['scrappingBeeExtractLogic']
               as Map<String, dynamic>)),
-      scrapperRequest: _i5.ScrappableRequest.fromJson(
+      scrapperRequest: _i6.ScrappableRequest.fromJson(
           (jsonSerialization['scrapperRequest'] as Map<String, dynamic>)),
     );
   }
 
   String messageText;
 
-  _i6.ReferenceTestData referenceTestData;
+  _i5.ReferenceTestData referenceTestData;
 
   _i4.ScrappingBeeExtractLogic scrappingBeeExtractLogic;
 
-  _i5.ScrappableRequest scrapperRequest;
+  _i6.ScrappableRequest scrapperRequest;
 
   /// Returns a shallow copy of this [NewExtractRuleResponse]
   /// with some or all fields replaced by the given arguments.
@@ -57,9 +57,9 @@ abstract class NewExtractRuleResponse extends _i1.ChatResponse
   NewExtractRuleResponse copyWith({
     _i3.PromptRole? role,
     String? messageText,
-    _i6.ReferenceTestData? referenceTestData,
+    _i5.ReferenceTestData? referenceTestData,
     _i4.ScrappingBeeExtractLogic? scrappingBeeExtractLogic,
-    _i5.ScrappableRequest? scrapperRequest,
+    _i6.ScrappableRequest? scrapperRequest,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -82,9 +82,9 @@ class _NewExtractRuleResponseImpl extends NewExtractRuleResponse {
   _NewExtractRuleResponseImpl({
     required _i3.PromptRole role,
     required String messageText,
-    required _i6.ReferenceTestData referenceTestData,
+    required _i5.ReferenceTestData referenceTestData,
     required _i4.ScrappingBeeExtractLogic scrappingBeeExtractLogic,
-    required _i5.ScrappableRequest scrapperRequest,
+    required _i6.ScrappableRequest scrapperRequest,
   }) : super._(
           role: role,
           messageText: messageText,
@@ -100,9 +100,9 @@ class _NewExtractRuleResponseImpl extends NewExtractRuleResponse {
   NewExtractRuleResponse copyWith({
     _i3.PromptRole? role,
     String? messageText,
-    _i6.ReferenceTestData? referenceTestData,
+    _i5.ReferenceTestData? referenceTestData,
     _i4.ScrappingBeeExtractLogic? scrappingBeeExtractLogic,
-    _i5.ScrappableRequest? scrapperRequest,
+    _i6.ScrappableRequest? scrapperRequest,
   }) {
     return NewExtractRuleResponse(
       role: role ?? this.role,

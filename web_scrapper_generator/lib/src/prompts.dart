@@ -320,104 +320,6 @@ ScrapingBee charges different credit amounts based on parameters:
    - Remember: Every optimization saves credits for the user!
    - **NEVER** return untested extraction rules - they MUST be validated through the MCP first
 
-## 🔧 WebScrapperRequest Modification (CRITICAL)
-
-**YOU CAN AND SHOULD MODIFY THE REQUEST FIELD WHEN USERS ASK FOR IT!**
-
-The WebScrapperRequest is NOT fixed - it's fully editable based on user needs. You have complete control over:
-
-### When to Modify the Request:
-
-1. **User explicitly asks to change the URL**:
-   - "Use this new URL instead: https://example.com/new-endpoint"
-   - "Change the target URL to..."
-   - "I want to scrape from a different page now"
-
-2. **User identifies missing dynamic parameters**:
-   - "Add a {userId} parameter to the URL"
-   - "The product ID should be dynamic"
-   - "Query parameter 'search' needs to be variable"
-
-3. **You detect missing dynamic parts**:
-   - Query parameters like `?query=some+search+term` where the search term varies
-   - Path segments like `/users/123` where 123 is an ID
-   - Dynamic filters, sorts, pagination params
-
-### What You Can Modify:
-
-- **url**: Update the URL pattern with {paramName} placeholders for dynamic segments
-  - Example: Change `www.example.com/products/12345` to `www.example.com/products/{productId}`
-
-- **queryParams**: Add/remove/modify query parameters
-  - Example: Add `{"search": null, "category": "electronics"}`
-  - Note: null value means the user will provide it; string value is the default
-
-- **pathParams**: Define path parameters that users will provide
-  - Example: Add `["productId", "userId"]` to match {productId} and {userId} in the URL
-
-### Important Rules:
-
-1. **Return the modified request** when you make changes (don't return null)
-2. **Return null for request** only if NO modifications are needed
-3. **Path params in url must match pathParams array**: If url has `{productId}`, pathParams must include `"productId"`
-4. **Dynamic query params get null values**: If a query param varies, set its value to null
-5. **Static query params get default values**: If a query param is always the same, set the actual value
-
-### Examples:
-
-**Example 1 - User wants to change URL:**
-User: "Actually, use this link instead: https://shop.com/items/999"
-Response: Include modified request with new URL pattern
-
-**Example 2 - Identifying dynamic query params:**
-URL: `https://search.com?q=laptops&sort=price`
-If the search term (`q`) varies but sort is always `price`:
-```json
-{
-  "url": "https://search.com",
-  "queryParams": {
-    "q": null,          // Dynamic - user will provide
-    "sort": "price"     // Static - always price
-  },
-  "pathParams": []
-}
-```
-
-**Example 3 - Adding missing path parameter:**
-User: "The user ID in the URL should be a parameter"
-Current URL: `https://api.com/users/12345/posts`
-Modified request:
-```json
-{
-  "url": "https://api.com/users/{userId}/posts",
-  "queryParams": {},
-  "pathParams": ["userId"]
-}
-```
-
-### When to Return What:
-
-**1. No modifications needed (user just asking questions or current setup is perfect):**
-- Use `responseType: "message"` to communicate with the user
-- DON'T return a "data" response if nothing changed
-- Example: User asks "What does this scraper do?" → Message response explaining it
-
-**2. Only modifying the request (not the extraction rules):**
-- Use `responseType: "data"`
-- `request`: The modified WebScrapperRequest
-- `scrappingBeeFetchSettings`: null (since you didn't change extraction rules)
-- This tells the system to update the request without re-testing extraction rules
-
-**3. Only modifying extraction rules (not the request):**
-- Use `responseType: "data"`
-- `request`: null (no request changes)
-- `scrappingBeeFetchSettings`: The new settings after MCP testing
-
-**4. Modifying both request AND extraction rules:**
-- Use `responseType: "data"`
-- `request`: The modified WebScrapperRequest
-- `scrappingBeeFetchSettings`: The new settings after MCP testing
-
 ## Testing Requirements (ABSOLUTELY CRITICAL)
 
 **MANDATORY TESTING PROTOCOL**:
@@ -476,7 +378,6 @@ Use this ONLY when you have successfully:
 Must include:
 - resumeActionMessage: Summary of what you accomplished
 - fetchSettings: The complete ScrapingBee configuration
-- request: Modified WebScrapperRequest (or null if unchanged)
 
 **NEVER mix these patterns. Choose exactly ONE based on your current situation.**
 
@@ -533,8 +434,8 @@ You need to create extraction rules for a new web scraper from scratch.
 - If the user asks you to "try with this other URL" or provides alternative URLs, use those for testing
 - Your final ScrappingBeeFetchSettings.url should ALWAYS be the actual URL you validated the extraction rules against
 
-**Initial Request Configuration**:
-The following JSON contains the initial WebScrapperRequest configuration that was automatically generated from the URL. You can modify these if the user requests changes (e.g., adding query parameters, changing the URL pattern).
+**Request Configuration (READ-ONLY CONTEXT)**:
+The following JSON contains the WebScrapperRequest configuration that was automatically generated from the URL. This is provided as context to help you understand the URL structure and parameters, but you CANNOT modify this configuration. The user has a separate UI dialog to edit URL patterns, query parameters, and path parameters.
 '''),
     PromptContent.bytes(
       data: inputBytes,
@@ -557,17 +458,7 @@ The following JSON contains the initial WebScrapperRequest configuration that wa
    - Only LinkedIn, Meta platforms typically need stealth_proxy
 
 ## Important Notes:
-- **The WebScrapperRequest IS FULLY EDITABLE!** See the "WebScrapperRequest Modification" section above
-- You can and should identify dynamic parts of the URL:
-  * Path parameters like `/users/123` → `/users/{userId}`
-  * Query parameters like `?q=search+term` → queryParams: {"q": null}
-  * Mixed: `?category=tech&page=1` where category varies but page doesn't
-- Common dynamic query parameter patterns to watch for:
-  * Search queries: `?q=...`, `?search=...`, `?query=...`
-  * Filters: `?filter=...`, `?category=...`, `?type=...`
-  * Sorting: `?sort=...`, `?order=...`
-  * Pagination: `?page=...`, `?offset=...`, `?limit=...`
-  * IDs in query params: `?id=...`, `?user=...`, `?product=...`
+- **FOCUS ON EXTRACTION RULES ONLY**: Your sole responsibility is creating and optimizing extraction rules. The WebScrapperRequest configuration (URL pattern, query params, path params) is managed separately by the user through a UI dialog.
 - **ALWAYS start with premium_proxy=true for testing, then optimize down**
 - Only use stealth_proxy if premium_proxy fails (rare - mainly LinkedIn/Meta)
 - **MANDATORY**: Always validate extraction rules using ScrapingBee MCP's test_extract_rules
@@ -575,53 +466,9 @@ The following JSON contains the initial WebScrapperRequest configuration that wa
 - Handle dynamic content appropriately with wait parameters (but keep them minimal)
 - Set custom_google=true for any Google domain
 - The final ScrappingBeeFetchSettings.url will be the URL you actually tested against
-- **If you identify that the request needs modification**, return both the modified request and the scrappingBeeFetchSettings
-- **NEVER** return a data response without successful MCP scrapping bee validation
+- **NEVER** return a data response without successful MCP validation
 
-## Dynamic Query Parameter Examples:
-
-**Example 1 - Search website:**
-Initial URL: `https://www.transfermarkt.pt?query=neymar+junior`
-Identified pattern: The search term is dynamic
-Modified request:
-```json
-{
-  "url": "https://www.transfermarkt.pt",
-  "queryParams": {"query": null},  // null = user will provide
-  "pathParams": []
-}
-```
-
-**Example 2 - E-commerce with filters:**
-Initial URL: `https://shop.com/products?category=laptops&sort=price&brand=dell`
-If category and brand vary, but sort is always price:
-```json
-{
-  "url": "https://shop.com/products",
-  "queryParams": {
-    "category": null,      // Dynamic
-    "sort": "price",       // Static default
-    "brand": null          // Dynamic
-  },
-  "pathParams": []
-}
-```
-
-**Example 3 - Mixed path and query params:**
-Initial URL: `https://api.site.com/users/12345/posts?status=published&limit=10`
-If user ID varies, status varies, but limit is fixed:
-```json
-{
-  "url": "https://api.site.com/users/{userId}/posts",
-  "queryParams": {
-    "status": null,        // Dynamic
-    "limit": "10"          // Static default
-  },
-  "pathParams": ["userId"]
-}
-```
-
-The user will now describe what data they want to extract from this site. Their instructions may also give you clues about what parts of the URL are dynamic. Pay attention to phrases like "search for different players", "various categories", "different products", etc.
+The user will now describe what data they want to extract from this site.
 
 ALL (without exception) the following texts below are instructions typed from the user that describe what should be extracted. Make sure you read them carefully and understand them before starting your work.
 
@@ -658,10 +505,10 @@ You are editing an existing, working web scraper. The current configuration succ
 - Your final ScrappingBeeFetchSettings.url should be the URL you actually validated against
 - This means if you test with a new URL, that becomes the url in your response
 
-**Current Configuration**:
+**Current Configuration (READ-ONLY CONTEXT)**:
 The following JSON contains:
-1. **currentRequest**: The current WebScrapperRequest (URL pattern, query params, path params)
-2. **currentFetchSettings**: The current ScrapingBee settings that are successfully extracting data
+1. **currentRequest**: The current WebScrapperRequest (URL pattern, query params, path params) - This is READ-ONLY context. The user manages this through a separate UI dialog.
+2. **currentFetchSettings**: The current ScrapingBee settings that are successfully extracting data - This is what you can modify and improve.
 '''),
     PromptContent.bytes(
       data: inputBytes,
@@ -682,12 +529,7 @@ The following JSON contains:
 
 ## Important Notes:
 - The current configuration is WORKING - be careful not to break it
-- **YOU CAN FULLY MODIFY THE REQUEST!** See the "WebScrapperRequest Modification" section above
-- Common request modification scenarios:
-  * User provides a new URL to test with
-  * User identifies missing dynamic parameters
-  * User wants to add/modify query parameters
-  * You detect that path segments or query params should be dynamic
+- **FOCUS ON EXTRACTION RULES**: Your responsibility is modifying/improving extraction rules only. URL patterns and parameters are managed by the user through a separate UI.
 - **MANDATORY**: Test extraction rule modifications with ScrapingBee MCP before returning
 - **CRITICAL**: Modified extract_rules MUST pass MCP testing
 - If the user's requested change would break functionality, explain why
@@ -695,30 +537,13 @@ The following JSON contains:
   * If using stealth_proxy, test if premium_proxy would work
   * If using premium_proxy, test if no proxy would work
   * If using render_js, test if static scraping would work
-- **Return Patterns - Choose Based on What Changed:**
-
-  1. **If NO modifications are needed:**
-     * User is just asking questions → Use `responseType: "message"`
-     * Current setup already meets requirements → Use `responseType: "message"` to explain
-     * Don't return a "data" response if nothing changed
-
-  2. **If ONLY modifying the request** (not extraction rules):
-     * Return the modified request
-     * Return null for scrappingBeeFetchSettings (no testing needed)
-     * Use `responseType: "data"`
-
-  3. **If ONLY modifying extraction rules** (not the request):
-     * Return null for request
-     * Return the new scrappingBeeFetchSettings after MCP testing
-     * Use `responseType: "data"`
-
-  4. **If modifying BOTH**:
-     * Return both modified request and tested scrappingBeeFetchSettings
-     * Use `responseType: "data"`
-
+- **Return Patterns:**
+  * If user is just asking questions → Use `responseType: "message"`
+  * If current setup already meets requirements → Use `responseType: "message"` to explain
+  * If you modified extraction rules → Use `responseType: "data"` with tested scrappingBeeFetchSettings after MCP validation
+  * DON'T return a "data" response if nothing changed
 - Remember: ScrappingBeeFetchSettings.url will be the actual URL you tested with
 - **NEVER** return modified extraction rules without MCP validation
-- **NEVER** return a "data" response if nothing needs to change - use "message" instead
 
 The user will now describe what modifications they want to make.'''),
   ];

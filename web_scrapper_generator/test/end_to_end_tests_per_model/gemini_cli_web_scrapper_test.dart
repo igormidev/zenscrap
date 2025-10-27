@@ -61,16 +61,12 @@ void main() {
           errorDescription,
         WebScrapperChatAIResponseWithDataResponse(
           :final String resumeActionMessage,
-          :final WebScrapperRequest? request,
-          :final ScrappingBeeFetchSettings? fetchSettings,
+          :final ScrappingBeeFetchSettings fetchSettings,
         ) =>
           '''$resumeActionMessage
 
-Request used:
-$request
-
 Fetch settings used:
-${fetchSettings != null ? '''{
+{
   'url': ${fetchSettings.url},
   'extract_rules': ${fetchSettings.extract_rules},
   'js_scenario': ${fetchSettings.js_scenario},
@@ -82,7 +78,7 @@ ${fetchSettings != null ? '''{
   'country_code': ${fetchSettings.country_code},
   'session_id': ${fetchSettings.session_id},
   'custom_google': ${fetchSettings.custom_google},
-}''' : 'null (only request was modified)'}''',
+}''',
       });
 
       // Clean up

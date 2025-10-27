@@ -17,7 +17,6 @@ abstract class CandidateExtractLogicUpdate extends _i1.ChatResponse
     required this.messageText,
     required this.thinkingSentences,
     required this.scrappingBeeExtractLogic,
-    required this.scrapperRequest,
     required this.referenceTestData,
   });
 
@@ -26,8 +25,7 @@ abstract class CandidateExtractLogicUpdate extends _i1.ChatResponse
     required String messageText,
     required List<String> thinkingSentences,
     required _i4.ScrappingBeeExtractLogic scrappingBeeExtractLogic,
-    required _i5.ScrappableRequest scrapperRequest,
-    required _i6.ReferenceTestData referenceTestData,
+    required _i5.ReferenceTestData referenceTestData,
   }) = _CandidateExtractLogicUpdateImpl;
 
   factory CandidateExtractLogicUpdate.fromJson(
@@ -41,9 +39,7 @@ abstract class CandidateExtractLogicUpdate extends _i1.ChatResponse
       scrappingBeeExtractLogic: _i4.ScrappingBeeExtractLogic.fromJson(
           (jsonSerialization['scrappingBeeExtractLogic']
               as Map<String, dynamic>)),
-      scrapperRequest: _i5.ScrappableRequest.fromJson(
-          (jsonSerialization['scrapperRequest'] as Map<String, dynamic>)),
-      referenceTestData: _i6.ReferenceTestData.fromJson(
+      referenceTestData: _i5.ReferenceTestData.fromJson(
           (jsonSerialization['referenceTestData'] as Map<String, dynamic>)),
     );
   }
@@ -54,9 +50,7 @@ abstract class CandidateExtractLogicUpdate extends _i1.ChatResponse
 
   _i4.ScrappingBeeExtractLogic scrappingBeeExtractLogic;
 
-  _i5.ScrappableRequest scrapperRequest;
-
-  _i6.ReferenceTestData referenceTestData;
+  _i5.ReferenceTestData referenceTestData;
 
   /// Returns a shallow copy of this [CandidateExtractLogicUpdate]
   /// with some or all fields replaced by the given arguments.
@@ -66,8 +60,7 @@ abstract class CandidateExtractLogicUpdate extends _i1.ChatResponse
     String? messageText,
     List<String>? thinkingSentences,
     _i4.ScrappingBeeExtractLogic? scrappingBeeExtractLogic,
-    _i5.ScrappableRequest? scrapperRequest,
-    _i6.ReferenceTestData? referenceTestData,
+    _i5.ReferenceTestData? referenceTestData,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -76,7 +69,6 @@ abstract class CandidateExtractLogicUpdate extends _i1.ChatResponse
       'messageText': messageText,
       'thinkingSentences': thinkingSentences.toJson(),
       'scrappingBeeExtractLogic': scrappingBeeExtractLogic.toJson(),
-      'scrapperRequest': scrapperRequest.toJson(),
       'referenceTestData': referenceTestData.toJson(),
     };
   }
@@ -88,7 +80,6 @@ abstract class CandidateExtractLogicUpdate extends _i1.ChatResponse
       'messageText': messageText,
       'thinkingSentences': thinkingSentences.toJson(),
       'scrappingBeeExtractLogic': scrappingBeeExtractLogic.toJsonForProtocol(),
-      'scrapperRequest': scrapperRequest.toJsonForProtocol(),
       'referenceTestData': referenceTestData.toJsonForProtocol(),
     };
   }
@@ -105,14 +96,12 @@ class _CandidateExtractLogicUpdateImpl extends CandidateExtractLogicUpdate {
     required String messageText,
     required List<String> thinkingSentences,
     required _i4.ScrappingBeeExtractLogic scrappingBeeExtractLogic,
-    required _i5.ScrappableRequest scrapperRequest,
-    required _i6.ReferenceTestData referenceTestData,
+    required _i5.ReferenceTestData referenceTestData,
   }) : super._(
           role: role,
           messageText: messageText,
           thinkingSentences: thinkingSentences,
           scrappingBeeExtractLogic: scrappingBeeExtractLogic,
-          scrapperRequest: scrapperRequest,
           referenceTestData: referenceTestData,
         );
 
@@ -125,8 +114,7 @@ class _CandidateExtractLogicUpdateImpl extends CandidateExtractLogicUpdate {
     String? messageText,
     List<String>? thinkingSentences,
     _i4.ScrappingBeeExtractLogic? scrappingBeeExtractLogic,
-    _i5.ScrappableRequest? scrapperRequest,
-    _i6.ReferenceTestData? referenceTestData,
+    _i5.ReferenceTestData? referenceTestData,
   }) {
     return CandidateExtractLogicUpdate(
       role: role ?? this.role,
@@ -135,7 +123,6 @@ class _CandidateExtractLogicUpdateImpl extends CandidateExtractLogicUpdate {
           thinkingSentences ?? this.thinkingSentences.map((e0) => e0).toList(),
       scrappingBeeExtractLogic:
           scrappingBeeExtractLogic ?? this.scrappingBeeExtractLogic.copyWith(),
-      scrapperRequest: scrapperRequest ?? this.scrapperRequest.copyWith(),
       referenceTestData: referenceTestData ?? this.referenceTestData.copyWith(),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/src/core/extensions/convert_extensions.dart';
 import 'package:zenscrap_flutter/src/core/mixins/curl_builder_mixin.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/code_bloc.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
@@ -38,12 +39,20 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection>
     final client = ref.read(clientProvider);
     final baseUrl = client.host.replaceAll('localhost:8080/', 'localhost:8082');
 
-    code = buildCurl(
-      baseUrl: baseUrl,
-      scrappableId: widget.scrappableId,
-      testData: widget.testData,
-      isProd: false, // This is the test endpoint
-    ).replaceAll(r'\"', '"').replaceAll('//api', '/api');
+    // Handle test data and extract payload
+    if (widget.testData == null) {
+      code = 'No test data available';
+    } else {
+      final examplePayload =
+          tryDecode(widget.testData!.referenceQueryParametersJson);
+
+      code = buildSimpleCurl(
+        baseUrl: baseUrl,
+        scrappableId: widget.scrappableId,
+        isProd: false, // This is the test endpoint
+        examplePayload: examplePayload,
+      ).replaceAll(r'\"', '"').replaceAll('//api', '/api');
+    }
   }
 
   @override
