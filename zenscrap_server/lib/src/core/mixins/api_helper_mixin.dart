@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:result_dart/result_dart.dart';
 import 'package:serverpod/serverpod.dart' hide Result;
 import 'package:zenscrap_server/server.dart';
@@ -492,27 +493,70 @@ mixin ApiHelperMixin {
 
         final String targetUrl = composeUrl(payload, scrappableRequest);
 
-        final ExtractDataByRule extractResponse =
-            await scrappingBee.extractByRulesWithLogic(
-          targetUrl: targetUrl,
-          scrappingBeeExtractLogic: extractRules,
-        );
+        // For test requests, use fetchHtmlAndScreenshotWithLogic (heavier, includes screenshot)
+        // For production requests, use extractByRulesWithLogic (lighter, no screenshot)
+        if (isTestRequest) {
+          // Get the current reference test data from cache
+          final ReferenceTestData? currentTestData =
+              getReferenceTestData(scrappable.id!);
 
-        return extractResponse.when(withData: (scrapedData) {
-          // Track success analytics
-          if (_pendingAnalytics[scrappableId]?[nanoId]?.containsKey(apiKey) ==
-              true) {
-            _pendingAnalytics[scrappableId]![nanoId]![apiKey]!.add(
-              AnalyticsPayload(
-                time: DateTime.now(),
-                status: RequestStatus.success,
-                stringifiedPayload: stringifiedPayload,
+          if (currentTestData == null) {
+            return ApiError(
+              RequestStatus.serverError,
+              ZenScrapException(
+                title: 'Test Data Not Found',
+                description:
+                    'No reference test data found for this scrappable session.',
               ),
-            );
+            ).toFailure();
           }
 
-          // Send success notification to chat session if this is a test request
-          if (isTestRequest) {
+          final ExtractFullDataByRule extractResponse =
+              await scrappingBee.fetchHtmlAndScreenshotWithLogic(
+            targetUrl: targetUrl,
+            scrappingBeeExtractLogic: extractRules,
+          );
+
+          return extractResponse.when(
+              withData: (scrapedData, html, pageFullscreenScreenshot) async {
+            // Track success analytics
+            if (_pendingAnalytics[scrappableId]?[nanoId]?.containsKey(apiKey) ==
+                true) {
+              _pendingAnalytics[scrappableId]![nanoId]![apiKey]!.add(
+                AnalyticsPayload(
+                  time: DateTime.now(),
+                  status: RequestStatus.success,
+                  stringifiedPayload: stringifiedPayload,
+                ),
+              );
+            }
+
+            // Create ByteTestData with the new HTML and screenshot
+            final Uint8List htmlBytes = utf8.encode(html);
+            final ByteData htmlByteData = ByteData.view(htmlBytes.buffer);
+            final ByteData screenshotByteData =
+                ByteData.view(pageFullscreenScreenshot.buffer);
+
+            ByteTestData byteTestData = currentTestData.byteData?.copyWith(
+                  referenceHtmlPage: htmlByteData,
+                  referenceSiteScreenshot: screenshotByteData,
+                ) ??
+                ByteTestData(
+                  referenceHtmlPage: htmlByteData,
+                  referenceSiteScreenshot: screenshotByteData,
+                );
+
+            // Create new ReferenceTestData with updated data
+            ReferenceTestData newReferenceTestData = currentTestData.copyWith(
+              scrapResultJson: jsonEncode(scrapedData),
+              byteData: byteTestData,
+              referenceLinkUsed: targetUrl,
+            );
+
+            // Update the cache with new reference test data
+            updateTestReferenceData(scrappable.id!, newReferenceTestData);
+
+            // Send success notification to chat session with updated test data
             sendSystemMessageToScrappableSession(
               scrappableId: scrappable.id!,
               response: TestEndpointCalledSuccessResponse(
@@ -520,33 +564,32 @@ mixin ApiHelperMixin {
                 inputPayload: stringifiedPayload,
                 responseData: jsonEncode(scrapedData),
                 timestamp: DateTime.now(),
+                referenceTestData: newReferenceTestData,
               ),
             );
-          }
 
-          // Create response with scraped data and credit information
-          final response = <String, dynamic>{
-            'credits': _getCreditInfo(nanoId, creditCost),
-            'data': scrapedData,
-          };
-          return response.toSuccess();
-        }, error: (errorMessage) {
-          // Track ScrapingBee errors separately
-          if (_pendingAnalytics[scrappableId]?[nanoId]?.containsKey(apiKey) ==
-              true) {
-            _pendingAnalytics[scrappableId]![nanoId]![apiKey]!.add(
-              AnalyticsPayload(
-                time: DateTime.now(),
-                status: RequestStatus.failedAtScrappingBee,
-                stringifiedPayload: stringifiedPayload,
-                title: 'Scraping Error',
-                description: errorMessage,
-              ),
-            );
-          }
+            // Create response with scraped data and credit information
+            final response = <String, dynamic>{
+              'credits': _getCreditInfo(nanoId, creditCost),
+              'data': scrapedData,
+            };
+            return response.toSuccess();
+          }, error: (errorMessage) {
+            // Track ScrapingBee errors separately
+            if (_pendingAnalytics[scrappableId]?[nanoId]?.containsKey(apiKey) ==
+                true) {
+              _pendingAnalytics[scrappableId]![nanoId]![apiKey]!.add(
+                AnalyticsPayload(
+                  time: DateTime.now(),
+                  status: RequestStatus.failedAtScrappingBee,
+                  stringifiedPayload: stringifiedPayload,
+                  title: 'Scraping Error',
+                  description: errorMessage,
+                ),
+              );
+            }
 
-          // Send error notification to chat session if this is a test request
-          if (isTestRequest) {
+            // Send error notification to chat session
             sendSystemMessageToScrappableSession(
               scrappableId: scrappable.id!,
               response: TestEndpointCalledErrorResponse(
@@ -557,15 +600,64 @@ mixin ApiHelperMixin {
                 timestamp: DateTime.now(),
               ),
             );
-          }
 
-          return ApiError(
-              RequestStatus.failedAtScrappingBee,
-              ZenScrapException(
-                title: 'Scraping Error',
-                description: errorMessage,
-              )).toFailure();
-        });
+            return ApiError(
+                RequestStatus.failedAtScrappingBee,
+                ZenScrapException(
+                  title: 'Scraping Error',
+                  description: errorMessage,
+                )).toFailure();
+          });
+        } else {
+          // Production request - use lighter extraction without screenshot
+          final ExtractDataByRule extractResponse =
+              await scrappingBee.extractByRulesWithLogic(
+            targetUrl: targetUrl,
+            scrappingBeeExtractLogic: extractRules,
+          );
+
+          return extractResponse.when(withData: (scrapedData) {
+            // Track success analytics
+            if (_pendingAnalytics[scrappableId]?[nanoId]?.containsKey(apiKey) ==
+                true) {
+              _pendingAnalytics[scrappableId]![nanoId]![apiKey]!.add(
+                AnalyticsPayload(
+                  time: DateTime.now(),
+                  status: RequestStatus.success,
+                  stringifiedPayload: stringifiedPayload,
+                ),
+              );
+            }
+
+            // Create response with scraped data and credit information
+            final response = <String, dynamic>{
+              'credits': _getCreditInfo(nanoId, creditCost),
+              'data': scrapedData,
+            };
+            return response.toSuccess();
+          }, error: (errorMessage) {
+            // Track ScrapingBee errors separately
+            if (_pendingAnalytics[scrappableId]?[nanoId]?.containsKey(apiKey) ==
+                true) {
+              _pendingAnalytics[scrappableId]![nanoId]![apiKey]!.add(
+                AnalyticsPayload(
+                  time: DateTime.now(),
+                  status: RequestStatus.failedAtScrappingBee,
+                  stringifiedPayload: stringifiedPayload,
+                  title: 'Scraping Error',
+                  description: errorMessage,
+                ),
+              );
+            }
+
+            return ApiError(
+                RequestStatus.failedAtScrappingBee,
+                ZenScrapException(
+                  title: 'Scraping Error',
+                  description: errorMessage,
+                )).toFailure();
+          });
+        }
       });
     } on ZenScrapException catch (error) {
       return ApiError(

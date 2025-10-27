@@ -114,6 +114,34 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
   }
 
   void onChange(ChatResponse chatResponse) {
+    if (chatResponse is UpdatedScrappableRequestResponse) {
+      state.mapOrNull(
+        standard: (value) {
+          state = value.copyWith(
+            data: value.data.copyWith(
+              targetRequest: value.data.targetRequest?.copyWith(
+                url: chatResponse.url,
+                pathParams: chatResponse.pathParams,
+                queryParams: chatResponse.queryParams,
+              ),
+            ),
+          );
+        },
+      );
+      return;
+    }
+    if (chatResponse is TestEndpointCalledSuccessResponse) {
+      state.mapOrNull(
+        standard: (value) {
+          state = value.copyWith(
+            data: value.data.copyWith(
+              referenceTestData: chatResponse.referenceTestData,
+            ),
+          );
+        },
+      );
+      // Don't return here - we want to add the message to the chat
+    }
     if (chatResponse is NewExtractRuleResponse) {
       state.mapOrNull(
         standard: (value) {

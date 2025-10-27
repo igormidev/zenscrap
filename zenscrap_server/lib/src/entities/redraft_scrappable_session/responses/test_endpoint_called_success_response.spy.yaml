@@ -4,3 +4,4 @@ fields:
     inputPayload: String
     responseData: String
     timestamp: DateTime
+    referenceTestData: ReferenceTestData

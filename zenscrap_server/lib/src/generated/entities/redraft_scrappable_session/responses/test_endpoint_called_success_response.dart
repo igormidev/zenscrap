@@ -17,6 +17,7 @@ abstract class TestEndpointCalledSuccessResponse extends _i1.ChatResponse
     required this.inputPayload,
     required this.responseData,
     required this.timestamp,
+    required this.referenceTestData,
   });
 
   factory TestEndpointCalledSuccessResponse({
@@ -24,6 +25,7 @@ abstract class TestEndpointCalledSuccessResponse extends _i1.ChatResponse
     required String inputPayload,
     required String responseData,
     required DateTime timestamp,
+    required _i5.ReferenceTestData referenceTestData,
   }) = _TestEndpointCalledSuccessResponseImpl;
 
   factory TestEndpointCalledSuccessResponse.fromJson(
@@ -34,6 +36,8 @@ abstract class TestEndpointCalledSuccessResponse extends _i1.ChatResponse
       responseData: jsonSerialization['responseData'] as String,
       timestamp:
           _i2.DateTimeJsonExtension.fromJson(jsonSerialization['timestamp']),
+      referenceTestData: _i5.ReferenceTestData.fromJson(
+          (jsonSerialization['referenceTestData'] as Map<String, dynamic>)),
     );
   }
 
@@ -43,6 +47,8 @@ abstract class TestEndpointCalledSuccessResponse extends _i1.ChatResponse
 
   DateTime timestamp;
 
+  _i5.ReferenceTestData referenceTestData;
+
   /// Returns a shallow copy of this [TestEndpointCalledSuccessResponse]
   /// with some or all fields replaced by the given arguments.
   @_i2.useResult
@@ -51,6 +57,7 @@ abstract class TestEndpointCalledSuccessResponse extends _i1.ChatResponse
     String? inputPayload,
     String? responseData,
     DateTime? timestamp,
+    _i5.ReferenceTestData? referenceTestData,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -59,6 +66,7 @@ abstract class TestEndpointCalledSuccessResponse extends _i1.ChatResponse
       'inputPayload': inputPayload,
       'responseData': responseData,
       'timestamp': timestamp.toJson(),
+      'referenceTestData': referenceTestData.toJson(),
     };
   }
 
@@ -69,6 +77,7 @@ abstract class TestEndpointCalledSuccessResponse extends _i1.ChatResponse
       'inputPayload': inputPayload,
       'responseData': responseData,
       'timestamp': timestamp.toJson(),
+      'referenceTestData': referenceTestData.toJsonForProtocol(),
     };
   }
 
@@ -85,11 +94,13 @@ class _TestEndpointCalledSuccessResponseImpl
     required String inputPayload,
     required String responseData,
     required DateTime timestamp,
+    required _i5.ReferenceTestData referenceTestData,
   }) : super._(
           role: role,
           inputPayload: inputPayload,
           responseData: responseData,
           timestamp: timestamp,
+          referenceTestData: referenceTestData,
         );
 
   /// Returns a shallow copy of this [TestEndpointCalledSuccessResponse]
@@ -101,12 +112,14 @@ class _TestEndpointCalledSuccessResponseImpl
     String? inputPayload,
     String? responseData,
     DateTime? timestamp,
+    _i5.ReferenceTestData? referenceTestData,
   }) {
     return TestEndpointCalledSuccessResponse(
       role: role ?? this.role,
       inputPayload: inputPayload ?? this.inputPayload,
       responseData: responseData ?? this.responseData,
       timestamp: timestamp ?? this.timestamp,
+      referenceTestData: referenceTestData ?? this.referenceTestData.copyWith(),
     );
   }
 }

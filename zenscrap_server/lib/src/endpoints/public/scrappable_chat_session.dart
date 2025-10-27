@@ -31,6 +31,17 @@ ScrappableRequest? getScrappableRequest(int scrappableId) {
   return _cacheScrappableRequest[_scrappableOpenedSessionsIds[scrappableId]];
 }
 
+ReferenceTestData? getReferenceTestData(int scrappableId) {
+  return _cacheRefTestData[_scrappableOpenedSessionsIds[scrappableId]];
+}
+
+void updateTestReferenceData(int scrappableId, ReferenceTestData testData) {
+  final sessionId = _scrappableOpenedSessionsIds[scrappableId];
+  if (sessionId != null) {
+    _cacheRefTestData[sessionId] = testData;
+  }
+}
+
 /// Sends a chat response to an active chat session for a given scrappable ID
 /// Returns true if message was sent, false if no active session exists
 bool sendSystemMessageToScrappableSession({
