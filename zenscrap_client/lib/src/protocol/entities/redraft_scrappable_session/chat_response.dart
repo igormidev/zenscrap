@@ -21,6 +21,7 @@ part 'responses/message_text_response.dart';
 part 'responses/new_extract_rule_response.dart';
 part 'responses/test_endpoint_called_error_response.dart';
 part 'responses/test_endpoint_called_success_response.dart';
+part 'responses/updated_scrappable_request_response.dart';
 
 sealed class ChatResponse implements _i2.SerializableModel {
   ChatResponse({required this.role});

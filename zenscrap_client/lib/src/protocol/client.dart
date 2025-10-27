@@ -414,6 +414,23 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
         {'sessionId': sessionId},
       );
 
+  _i2.Future<void> updateScrappableRequest({
+    required int scrappableId,
+    required String url,
+    required List<String> pathParams,
+    required Map<String, String?> queryParams,
+  }) =>
+      caller.callServerEndpoint<void>(
+        'scrappableChatSession',
+        'updateScrappableRequest',
+        {
+          'scrappableId': scrappableId,
+          'url': url,
+          'pathParams': pathParams,
+          'queryParams': queryParams,
+        },
+      );
+
   _i2.Future<_i19.CreateSessionResponse> createSession(
           {required int scrappableId}) =>
       caller.callServerEndpoint<_i19.CreateSessionResponse>(

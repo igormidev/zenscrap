@@ -6,6 +6,7 @@ import 'package:zenscrap_flutter/src/design_system/widgets/code_bloc.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/is_chat_loading_provider.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/deploy_button.dart';
+import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/edit_scrappable_request_button.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/remaining_time_indicator.dart';
 
 class ScrappableCurlSection extends ConsumerStatefulWidget {
@@ -55,7 +56,13 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection>
           opacity: 0.6,
           child: CodeBlock(
             code: code,
-            leadingWidgets: [RemainingTimeIndicator(widget.targetTime)],
+            leadingWidgets: [
+              EditScrappableRequestButton(
+                scrappableRequest: widget.scrappableRequest,
+                scrappableId: widget.scrappableId,
+              ),
+              RemainingTimeIndicator(widget.targetTime),
+            ],
             trailingWidgets: [
               DeployButton(
                 scrappableId: widget.scrappableId,
@@ -73,7 +80,13 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection>
       copyTooltipMessage: 'Copy the test cURL command',
       code: code.replaceAll(r'\"', '"'),
       copyCode: code,
-      leadingWidgets: [RemainingTimeIndicator(widget.targetTime)],
+      leadingWidgets: [
+        EditScrappableRequestButton(
+          scrappableRequest: widget.scrappableRequest,
+          scrappableId: widget.scrappableId,
+        ),
+        RemainingTimeIndicator(widget.targetTime),
+      ],
       trailingWidgets: [
         DeployButton(
           scrappableId: widget.scrappableId,

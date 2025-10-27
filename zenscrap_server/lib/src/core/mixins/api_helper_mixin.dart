@@ -484,7 +484,12 @@ mixin ApiHelperMixin {
         await discountApiTokens(session,
             nanoId: nanoId, creditCost: creditCost);
 
-        final String targetUrl = composeUrl(payload, scrappable.targetRequest!);
+        // Get the scrappable request - use cached version for test requests
+        final ScrappableRequest scrappableRequest = isTestRequest
+            ? (getScrappableRequest(scrappable.id!) ?? scrappable.targetRequest!)
+            : scrappable.targetRequest!;
+
+        final String targetUrl = composeUrl(payload, scrappableRequest);
 
         final ExtractDataByRule extractResponse =
             await scrappingBee.extractByRulesWithLogic(

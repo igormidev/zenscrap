@@ -27,6 +27,11 @@ ScrappingBeeExtractLogic? getTestExtractRules(int scrappableId) {
       _scrappableOpenedSessionsIds[scrappableId]];
 }
 
+ScrappableRequest? getScrappableRequest(int scrappableId) {
+  return _cacheScrappableRequest[
+      _scrappableOpenedSessionsIds[scrappableId]];
+}
+
 /// Sends a chat response to an active chat session for a given scrappable ID
 /// Returns true if message was sent, false if no active session exists
 bool sendSystemMessageToScrappableSession({
@@ -146,6 +151,49 @@ class ScrappableChatSession extends Endpoint {
     required RedraftSrappableSessionId sessionId,
   }) {
     return _disposeSession(sessionId: sessionId);
+  }
+
+  Future<void> updateScrappableRequest(
+    Session session, {
+    required int scrappableId,
+    required String url,
+    required List<String> pathParams,
+    required Map<String, String?> queryParams,
+  }) async {
+    final sessionId = _scrappableOpenedSessionsIds[scrappableId];
+    if (sessionId == null) {
+      throw ZenScrapException(
+        title: 'Session Not Found',
+        description: 'No active session found for scrappable $scrappableId.',
+      );
+    }
+
+    final ScrappableRequest? cachedRequest = _cacheScrappableRequest[sessionId];
+    if (cachedRequest == null) {
+      throw ZenScrapException(
+        title: 'Scrappable Request Not Found',
+        description: 'No scrappable request found for session $sessionId.',
+      );
+    }
+
+    // Update the cached scrappable request
+    _cacheScrappableRequest[sessionId] = cachedRequest.copyWith(
+      url: url,
+      pathParams: pathParams,
+      queryParams: queryParams,
+    );
+
+    // Send notification to the chat session
+    sendSystemMessageToScrappableSession(
+      scrappableId: scrappableId,
+      response: UpdatedScrappableRequestResponse(
+        role: PromptRole.system,
+        messageText: 'Scrappable request configuration updated successfully',
+        url: url,
+        pathParams: pathParams,
+        queryParams: queryParams,
+      ),
+    );
   }
 
   Future<CreateSessionResponse> createSession(

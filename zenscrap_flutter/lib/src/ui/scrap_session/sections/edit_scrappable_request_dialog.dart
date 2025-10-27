@@ -1,0 +1,378 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/src/core/extensions/serverpod_to_result.dart';
+import 'package:zenscrap_flutter/src/design_system/default_error_snackbar.dart';
+import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
+import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/path_parameters_section.dart';
+import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/query_parameters_section.dart';
+import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/url_syntax_textfield.dart';
+
+class EditScrappableRequestDialog extends ConsumerStatefulWidget {
+  final ScrappableRequest scrappableRequest;
+  final int scrappableId;
+
+  const EditScrappableRequestDialog({
+    super.key,
+    required this.scrappableRequest,
+    required this.scrappableId,
+  });
+
+  @override
+  ConsumerState<EditScrappableRequestDialog> createState() =>
+      _EditScrappableRequestDialogState();
+}
+
+class _EditScrappableRequestDialogState
+    extends ConsumerState<EditScrappableRequestDialog> {
+  late final HighlightTextEditingController _urlController;
+  late List<String> _pathParams;
+  late Map<String, String?> _queryParams;
+  bool _hasChanges = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _urlController =
+        HighlightTextEditingController(text: widget.scrappableRequest.url);
+    _pathParams = List.from(widget.scrappableRequest.pathParams);
+    _queryParams = Map.from(widget.scrappableRequest.queryParams);
+
+    // Initialize the controller with path parameters
+    _urlController.updatePathParameters(_pathParams);
+    _urlController.addListener(_onUrlChanged);
+  }
+
+  @override
+  void dispose() {
+    _urlController.removeListener(_onUrlChanged);
+    _urlController.dispose();
+    super.dispose();
+  }
+
+  void _onUrlChanged() {
+    _markAsChanged();
+  }
+
+  void _markAsChanged() {
+    if (!_hasChanges) {
+      setState(() {
+        _hasChanges = true;
+      });
+    }
+  }
+
+  Future<void> _handleAddPathParam() async {
+    final paramName = await showAddPathParameterDialog(context);
+    if (paramName != null && paramName.isNotEmpty) {
+      if (_pathParams.contains(paramName)) {
+        if (mounted) {
+          await showErrorDialog(
+            context,
+            title: 'Duplicate Parameter',
+            description: 'This path parameter already exists.',
+          );
+        }
+        return;
+      }
+
+      setState(() {
+        _pathParams.add(paramName);
+        _urlController.updatePathParameters(_pathParams);
+        _markAsChanged();
+      });
+
+      // Update URL to show the new parameter
+      final currentUrl = _urlController.text;
+      if (!currentUrl.contains('{$paramName}')) {
+        _urlController.text = '$currentUrl/{$paramName}';
+      }
+    }
+  }
+
+  void _handleRemovePathParam(String param) {
+    setState(() {
+      _pathParams.remove(param);
+      _urlController.updatePathParameters(_pathParams);
+      _markAsChanged();
+    });
+  }
+
+  Future<void> _handleAddQueryParam() async {
+    final result = await showQueryParameterDialog(context);
+    if (result != null) {
+      if (_queryParams.containsKey(result.key)) {
+        if (mounted) {
+          await showErrorDialog(
+            context,
+            title: 'Duplicate Parameter',
+            description: 'This query parameter already exists.',
+          );
+        }
+        return;
+      }
+
+      setState(() {
+        _queryParams[result.key] = result.value;
+        _markAsChanged();
+      });
+    }
+  }
+
+  void _handleRemoveQueryParam(String key) {
+    setState(() {
+      _queryParams.remove(key);
+      _markAsChanged();
+    });
+  }
+
+  Future<void> _handleEditQueryParam(String oldKey) async {
+    final currentValue = _queryParams[oldKey];
+    final result = await showQueryParameterDialog(
+      context,
+      initialKey: oldKey,
+      initialValue: currentValue,
+      isEdit: true,
+    );
+
+    if (result != null) {
+      setState(() {
+        if (result.key != oldKey) {
+          // Key changed, remove old and add new
+          _queryParams.remove(oldKey);
+        }
+        _queryParams[result.key] = result.value;
+        _markAsChanged();
+      });
+    }
+  }
+
+  Future<void> _handleSave() async {
+    // Validate that all path parameters in URL are defined
+    final url = _urlController.text;
+    final urlPathParams = _extractPathParamsFromUrl(url);
+
+    // Check if all path params in URL are in the pathParams list
+    final missingParams =
+        urlPathParams.where((param) => !_pathParams.contains(param)).toList();
+    if (missingParams.isNotEmpty) {
+      await showErrorDialog(
+        context,
+        title: 'Missing Path Parameters',
+        description:
+            'The following path parameters are used in the URL but not defined: ${missingParams.join(", ")}\n\nPlease add them to the path parameters section or remove them from the URL.',
+      );
+      return;
+    }
+
+    // Check if all defined path params are used in URL
+    final unusedParams =
+        _pathParams.where((param) => !urlPathParams.contains(param)).toList();
+    if (unusedParams.isNotEmpty) {
+      await showErrorDialog(
+        context,
+        title: 'Unused Path Parameters',
+        description:
+            'The following path parameters are defined but not used in the URL: ${unusedParams.join(", ")}\n\nPlease use them in the URL as {paramName} or remove them from the path parameters section.',
+      );
+      return;
+    }
+
+    // Call API to update the scrappable request
+    final client = ref.read(clientProvider);
+    final result = await client.scrappableChatSession
+        .updateScrappableRequest(
+          scrappableId: widget.scrappableId,
+          url: url,
+          pathParams: _pathParams,
+          queryParams: _queryParams,
+        )
+        .toResult;
+
+    result.fold(
+      (_) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Scrappable request updated successfully!'),
+            ),
+          );
+          Navigator.of(context).pop();
+        }
+      },
+      (error) {
+        if (mounted) {
+          handleBabelException(context, error);
+        }
+      },
+    );
+  }
+
+  List<String> _extractPathParamsFromUrl(String url) {
+    final regex = RegExp(r'\{([^}]+)\}');
+    final matches = regex.allMatches(url);
+    return matches.map((match) => match.group(1)!).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.7,
+        height: MediaQuery.of(context).size.height * 0.85,
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Row(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: context.c.primaryContainer,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  padding: const EdgeInsets.all(12),
+                  child: Icon(
+                    Icons.edit_document,
+                    size: 34,
+                    color: context.c.primary,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Edit Scrappable Request',
+                        style: context.t.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Customize the URL template, path parameters, and query parameters',
+                        style: context.t.bodyMedium?.copyWith(
+                          color: context.c.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.of(context).pop(),
+                  tooltip: 'Close',
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // Info card
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: context.c.primaryContainer.withAlpha(51),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: context.c.primary.withAlpha(77),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.lightbulb_outline,
+                    color: context.c.primary,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Path parameters should be wrapped in curly braces like {userId} or {postId}. They represent dynamic segments in the URL that will be replaced with actual values.',
+                      style: context.t.bodySmall?.copyWith(
+                        color: context.c.onSurface,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Scrollable content
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // URL Section
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _urlController,
+                            decoration: InputDecoration(
+                              hintText: 'https://example.com/users/{userId}',
+                              border: const OutlineInputBorder(),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                              helperText: 'Use {paramName} for path parameters',
+                              helperMaxLines: 2,
+                            ),
+                            style: context.t.bodyMedium?.copyWith(
+                              fontFamily: 'monospace',
+                            ),
+                            maxLines: 3,
+                            minLines: 1,
+                            onChanged: (_) => _markAsChanged(),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        SizedBox(
+                          height: 48,
+                          child: FilledButton.icon(
+                            onPressed: _hasChanges ? _handleSave : null,
+                            icon: const Icon(Icons.save),
+                            label: const Text('Save Changes'),
+                            style: FilledButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 16,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Path Parameters Section
+                    PathParametersSection(
+                      pathParams: _pathParams,
+                      onAddPathParam: _handleAddPathParam,
+                      onRemovePathParam: _handleRemovePathParam,
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Query Parameters Section
+                    QueryParametersSection(
+                      queryParams: _queryParams,
+                      onAddQueryParam: _handleAddQueryParam,
+                      onRemoveQueryParam: _handleRemoveQueryParam,
+                      onEditQueryParam: _handleEditQueryParam,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

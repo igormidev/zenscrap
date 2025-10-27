@@ -68,6 +68,7 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.5
+  enchanted_regex: ^1.0.7
   freezed_annotation: ^3.1.0
   json_annotation: ^4.9.0
   intl: ^0.20.0

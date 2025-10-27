@@ -739,6 +739,43 @@ class Endpoints extends _i1.EndpointDispatch {
             sessionId: params['sessionId'],
           ),
         ),
+        'updateScrappableRequest': _i1.MethodConnector(
+          name: 'updateScrappableRequest',
+          params: {
+            'scrappableId': _i1.ParameterDescription(
+              name: 'scrappableId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'url': _i1.ParameterDescription(
+              name: 'url',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'pathParams': _i1.ParameterDescription(
+              name: 'pathParams',
+              type: _i1.getType<List<String>>(),
+              nullable: false,
+            ),
+            'queryParams': _i1.ParameterDescription(
+              name: 'queryParams',
+              type: _i1.getType<Map<String, String?>>(),
+              nullable: false,
+            ),
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['scrappableChatSession'] as _i14.ScrappableChatSession)
+                  .updateScrappableRequest(
+            session,
+            scrappableId: params['scrappableId'],
+            url: params['url'],
+            pathParams: params['pathParams'],
+            queryParams: params['queryParams'],
+          ),
+        ),
         'createSession': _i1.MethodConnector(
           name: 'createSession',
           params: {

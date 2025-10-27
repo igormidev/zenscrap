@@ -292,6 +292,16 @@ class _ChatMessageBubble extends StatelessWidget {
         messageText: newRuleMessage.messageText,
         textColor: textColor,
       );
+    } else if (message is UpdatedScrappableRequestResponse) {
+      final updatedRequest = message as UpdatedScrappableRequestResponse;
+      messageContent = _UpdatedScrappableRequestMessage(
+        messageText: updatedRequest.messageText,
+        url: updatedRequest.url,
+        pathParams: updatedRequest.pathParams,
+        queryParams: updatedRequest.queryParams,
+        textColor: textColor,
+        backgroundColor: backgroundColor,
+      );
     }
 
     return Padding(
@@ -675,6 +685,143 @@ class _NewRuleMessage extends StatelessWidget {
                   height: 1.4,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
+                ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _UpdatedScrappableRequestMessage extends StatelessWidget {
+  final String messageText;
+  final String url;
+  final List<String> pathParams;
+  final Map<String, String?> queryParams;
+  final Color textColor;
+  final Color backgroundColor;
+
+  const _UpdatedScrappableRequestMessage({
+    required this.messageText,
+    required this.url,
+    required this.pathParams,
+    required this.queryParams,
+    required this.textColor,
+    required this.backgroundColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.edit_rounded,
+              size: 16,
+              color: textColor.withValues(alpha: 0.9),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                messageText,
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: textColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: backgroundColor.withValues(alpha: 0.3),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: textColor.withValues(alpha: 0.2),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _InfoRow(
+                icon: Icons.link,
+                label: 'URL:',
+                value: url,
+                textColor: textColor,
+              ),
+              if (pathParams.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                _InfoRow(
+                  icon: Icons.label_outline,
+                  label: 'Path Parameters:',
+                  value: pathParams.map((p) => '{$p}').join(', '),
+                  textColor: textColor,
+                ),
+              ],
+              if (queryParams.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                _InfoRow(
+                  icon: Icons.tune,
+                  label: 'Query Parameters:',
+                  value: queryParams.entries
+                      .map((e) =>
+                          '${e.key}=${e.value ?? "dynamic"}')
+                      .join(', '),
+                  textColor: textColor,
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color textColor;
+
+  const _InfoRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.textColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(
+          icon,
+          size: 14,
+          color: textColor.withValues(alpha: 0.7),
+        ),
+        const SizedBox(width: 6),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: textColor.withValues(alpha: 0.8),
+                fontWeight: FontWeight.w600,
+              ),
+        ),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            value,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: textColor,
+                  fontFamily: 'monospace',
                 ),
           ),
         ),
