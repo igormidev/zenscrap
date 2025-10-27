@@ -288,51 +288,62 @@ extension WebScrapperChatAIResponseMapExt on WebScrapperChatAIResponse {
       WebScrapperChatAIResponseWithDataResponse(
         :final String resumeActionMessage,
         :final WebScrapperRequest? request,
-        :final ScrappingBeeFetchSettings fetchSettings,
+        :final ScrappingBeeFetchSettings? fetchSettings,
       ) =>
         () {
-          final scrappingBeeNewExtractRules =
-              scrappingBeeExtractLogic?.copyWith(
-                    extractRules: fetchSettings.extract_rules,
-                    jsScenario: fetchSettings.js_scenario,
-                    renderJs: fetchSettings.render_js,
-                    wait: fetchSettings.wait,
-                    waitFor: fetchSettings.wait_for,
-                    waitBrowser: fetchSettings.wait_browser,
-                    premiumProxy: fetchSettings.premium_proxy,
-                    stealthProxy: fetchSettings.stealth_proxy,
-                    countryCode: fetchSettings.country_code,
-                    sessionId: fetchSettings.session_id,
-                    customGoogle: fetchSettings.custom_google,
-                  ) ??
-                  ScrappingBeeExtractLogic(
-                    extractRules: fetchSettings.extract_rules,
-                    jsScenario: fetchSettings.js_scenario,
-                    renderJs: fetchSettings.render_js,
-                    wait: fetchSettings.wait,
-                    waitFor: fetchSettings.wait_for,
-                    waitBrowser: fetchSettings.wait_browser,
-                    premiumProxy: fetchSettings.premium_proxy,
-                    stealthProxy: fetchSettings.stealth_proxy,
-                    countryCode: fetchSettings.country_code,
-                    sessionId: fetchSettings.session_id,
-                    customGoogle: fetchSettings.custom_google,
-                  );
+          // Determine if we need to create new extract rules or keep existing ones
+          final bool hasNewFetchSettings = fetchSettings != null;
+
+          // Create new extract rules only if fetchSettings were provided
+          final ScrappingBeeExtractLogic updatedExtractLogic =
+              hasNewFetchSettings
+                  ? (scrappingBeeExtractLogic?.copyWith(
+                        extractRules: fetchSettings.extract_rules,
+                        jsScenario: fetchSettings.js_scenario,
+                        renderJs: fetchSettings.render_js,
+                        wait: fetchSettings.wait,
+                        waitFor: fetchSettings.wait_for,
+                        waitBrowser: fetchSettings.wait_browser,
+                        premiumProxy: fetchSettings.premium_proxy,
+                        stealthProxy: fetchSettings.stealth_proxy,
+                        countryCode: fetchSettings.country_code,
+                        sessionId: fetchSettings.session_id,
+                        customGoogle: fetchSettings.custom_google,
+                      ) ??
+                      ScrappingBeeExtractLogic(
+                        extractRules: fetchSettings.extract_rules,
+                        jsScenario: fetchSettings.js_scenario,
+                        renderJs: fetchSettings.render_js,
+                        wait: fetchSettings.wait,
+                        waitFor: fetchSettings.wait_for,
+                        waitBrowser: fetchSettings.wait_browser,
+                        premiumProxy: fetchSettings.premium_proxy,
+                        stealthProxy: fetchSettings.stealth_proxy,
+                        countryCode: fetchSettings.country_code,
+                        sessionId: fetchSettings.session_id,
+                        customGoogle: fetchSettings.custom_google,
+                      ))
+                  : scrappingBeeExtractLogic!; // Use existing if only request was modified
+
+          // Update the request if it was modified
+          final updatedRequest = scrapperRequest.copyWith(
+            id: scrapperRequest.id,
+            url: request?.url,
+            pathParams: request?.pathParams,
+            queryParams: request?.queryParam,
+          );
+
           return (
             CandidateExtractLogicUpdate(
-              scrapperRequest: scrapperRequest.copyWith(
-                id: scrapperRequest.id,
-                url: request?.url,
-                pathParams: request?.pathParams,
-                queryParams: request?.queryParam,
-              ),
+              scrapperRequest: updatedRequest,
               thinkingSentences: thinkingSentences,
               role: PromptRole.model,
               referenceTestData: referenceTestData,
               messageText: resumeActionMessage,
-              scrappingBeeExtractLogic: scrappingBeeNewExtractRules,
+              scrappingBeeExtractLogic: updatedExtractLogic,
             ),
-            scrappingBeeNewExtractRules
+            // Return new extract logic only if it was actually modified (null = no testing needed)
+            hasNewFetchSettings ? updatedExtractLogic : null
           );
         }(),
     };

@@ -27,6 +27,28 @@ ScrappingBeeExtractLogic? getTestExtractRules(int scrappableId) {
       _scrappableOpenedSessionsIds[scrappableId]];
 }
 
+/// Sends a chat response to an active chat session for a given scrappable ID
+/// Returns true if message was sent, false if no active session exists
+bool sendSystemMessageToScrappableSession({
+  required int scrappableId,
+  required ChatResponse response,
+}) {
+  final sessionId = _scrappableOpenedSessionsIds[scrappableId];
+  if (sessionId == null) {
+    return false; // No active session for this scrappable
+  }
+
+  final subject = _scrapRedraftSessions[sessionId];
+  if (subject == null) {
+    return false; // Session exists in map but stream was closed
+  }
+
+  // Add the response to the chat
+  subject.add(response);
+
+  return true;
+}
+
 class ScrappableChatSession extends Endpoint {
   final Uuid uuid = Uuid();
 

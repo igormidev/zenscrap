@@ -11,8 +11,8 @@ class CreateScrappableEndpoint extends Endpoint {
     final userId = (await session.authenticated)?.userId;
 
     final GenerativeModel geminiModel = GenerativeModel(
-      // model: 'gemini-2.5-pro',
-      model: 'gemini-2.5-flash-lite-preview-09-2025',
+      model: 'gemini-2.5-pro',
+      // model: 'gemini-2.5-flash-lite-preview-09-2025',
       apiKey: session.passwords['geminiApiKey']!,
       systemInstruction: Content.system(
           'You are a helpful assistant that analyzes URLs and converts them into structured data for API request handling. '
@@ -25,7 +25,7 @@ class CreateScrappableEndpoint extends Endpoint {
       Content.text(getPromptToGenerateScrappableTargetRequest(referenceLink)),
     );
     var text = result.text;
-    if (text == null) {
+    if (text == null || text.isEmpty) {
       throw ZenScrapException(
           title: 'Gemini AI could not generate the scrappable data.',
           description: 'No text was returned from the AI. Try again later.');
@@ -46,7 +46,7 @@ class CreateScrappableEndpoint extends Endpoint {
     late final String name;
     late final String description;
     late final String url;
-    late final Map<String, String> queryParams;
+    late final Map<String, String?> queryParams;
     late final List<String> pathParams;
     late final Map<String, String> referenceLinkPathParameters;
     late final ScraperCategory category;
@@ -62,7 +62,7 @@ class CreateScrappableEndpoint extends Endpoint {
       final Map<String, dynamic> rawQueryParams =
           Map<String, dynamic>.from(convertedData['queryParams'] as Map? ?? {});
       rawQueryParams.remove('__example__');
-      queryParams = Map<String, String>.from(rawQueryParams);
+      queryParams = Map<String, String?>.from(rawQueryParams);
 
       pathParams =
           List<String>.from(convertedData['pathParams'] as List? ?? []);
@@ -83,8 +83,10 @@ class CreateScrappableEndpoint extends Endpoint {
         category = ScraperCategory.general;
       }
     } catch (error, stackTrace) {
-      session.log('Error decoding JSON from Gemini AI response:\n$error',
-          level: LogLevel.error, stackTrace: stackTrace);
+      session.log(
+          'Error decoding JSON from Gemini AI response:\n$error\n\nResponse Text:\n$text',
+          level: LogLevel.error,
+          stackTrace: stackTrace);
       throw ZenScrapException(
           title: 'Gemini AI could not generate the scrappable data.',
           description:
@@ -155,7 +157,8 @@ class CreateScrappableEndpoint extends Endpoint {
   }
 }
 
-String getPromptToGenerateScrappableTargetRequest(String url) =>
+String getPromptToGenerateScrappableTargetRequest(String url,
+        {String? userContext}) =>
     '''I need you to analyze a URL and return a SINGLE flat JSON object with specific fields.
 
 The reference URL to analyze is: "$url"
@@ -169,10 +172,33 @@ You must return a JSON object with EXACTLY these fields at the root level:
 - referenceLinkPathParameters: An object mapping parameter names to their actual values from the reference URL
 - category: The most appropriate category for this URL (see category selection rules below)
 
-EXAMPLE:
-If the input URL is: www.mySocialMedia.com/posts/123/comments/3854?sort=asc&filter=all
+## CRITICAL: Identifying Dynamic vs Static Parameters
 
-You should return EXACTLY this structure:
+**Path Parameters** - Replace with {paramName} if they are:
+- Numeric IDs (user IDs, post IDs, product IDs, etc.)
+- Unique identifiers (UUIDs, slugs, hashes)
+- Variable names (usernames, product names that change)
+
+**Query Parameters** - Mark as dynamic (value: null) if they represent:
+- **Search queries**: ?q=..., ?search=..., ?query=..., ?term=...
+  * Example: ?query=neymar+junior → {"query": null}
+- **Filters**: ?filter=..., ?category=..., ?type=..., ?brand=...
+  * Example: ?category=laptops → {"category": null}
+- **Variable IDs**: ?id=..., ?user=..., ?product=...
+  * Example: ?productId=12345 → {"productId": null}
+- **Pagination**: ?page=..., ?offset=..., ?start=...
+  * Example: ?page=1 → {"page": null}
+
+**Query Parameters** - Keep as static (actual value) if they are:
+- Configuration options that rarely change
+- Default sorting/ordering preferences
+- API version numbers
+- Fixed limits or counts
+
+EXAMPLE 1 - Social Media with Static Params:
+Input URL: www.mySocialMedia.com/posts/123/comments/3854?sort=asc&filter=all
+
+Output:
 {
   "name": "Social Media Post Comments",
   "description": "Retrieves comments for a specific post on the social media platform, with sorting and filtering options.",
@@ -189,13 +215,75 @@ You should return EXACTLY this structure:
   "category": "social_media"
 }
 
+EXAMPLE 2 - Search with Dynamic Query (CRITICAL):
+Input URL: https://www.transfermarkt.pt?query=neymar+junior
+
+Analysis: The search term "neymar+junior" will vary - users will search for different players
+Output:
+{
+  "name": "Transfermarkt Player Search",
+  "description": "Searches for football players on Transfermarkt with variable search terms.",
+  "url": "https://www.transfermarkt.pt",
+  "queryParams": {
+    "query": null
+  },
+  "pathParams": [],
+  "referenceLinkPathParameters": {},
+  "category": "sports"
+}
+
+EXAMPLE 3 - E-commerce with Mixed Dynamic/Static:
+Input URL: https://shop.com/products/12345?category=laptops&sort=price&limit=20
+
+Analysis:
+- Product ID (12345) varies per product
+- Category (laptops) will vary as users browse different categories
+- Sort (price) is a common preference, but might vary
+- Limit (20) is probably fixed
+
+Output:
+{
+  "name": "Shop Product Listing",
+  "description": "Product listings for an e-commerce site with category filtering and configurable sorting.",
+  "url": "https://shop.com/products/{categoryId}",
+  "queryParams": {
+    "category": null,
+    "sort": null,
+    "limit": "20"
+  },
+  "pathParams": ["categoryId"],
+  "referenceLinkPathParameters": {
+    "categoryId": "12345"
+  },
+  "category": "ecommerce"
+}
+
+EXAMPLE 4 - News Article with Slug:
+Input URL: https://news.com/articles/2024-01-15/breaking-news-headline-here
+
+Analysis: The date and headline slug will vary for different articles
+Output:
+{
+  "name": "News Article",
+  "description": "Individual news articles identified by date and headline slug.",
+  "url": "https://news.com/articles/{articleSlug}",
+  "queryParams": {},
+  "pathParams": ["articleSlug"],
+  "referenceLinkPathParameters": {
+    "articleSlug": "2024-01-15/breaking-news-headline-here"
+  },
+  "category": "news"
+}
+
 IMPORTANT RULES:
 1. Return ONLY a single flat JSON object - no nesting under "scrappable" or "scrappableTargetRequest"
 2. ALL seven fields must be at the root level of the JSON (including category)
 3. Intelligently identify dynamic URL segments (numbers, IDs, slugs) and replace them with descriptive {paramName} placeholders
-4. The pathParams array must contain the exact same parameter names used in the url placeholders
-5. The referenceLinkPathParameters must map these parameter names to their actual values from the reference URL
-6. Return raw JSON only - no markdown, no code blocks, no extra text
+4. **CRITICAL**: For query parameters with search terms, filters, or variable values, set their value to null (not the actual value)
+5. The pathParams array must contain the exact same parameter names used in the url placeholders
+6. The referenceLinkPathParameters must map these parameter names to their actual values from the reference URL
+7. **Think carefully**: Would a user typically want to use different values for this parameter? If yes → null. If no → actual value.
+8. Return raw JSON only - no markdown, no code blocks, no extra text
 
 CATEGORY SELECTION RULES - EXTREMELY IMPORTANT:
 You MUST carefully analyze the URL content and domain to select the MOST SPECIFIC category. 
@@ -258,6 +346,22 @@ CATEGORY SELECTION EXAMPLES:
 Return JSON that exactly matches this schema. Do not add or remove fields.
 
 Analyze the URL pattern, identify what appears to be dynamic content (IDs, slugs, usernames, etc.), and create a reusable template.
+
+${userContext != null ? '''
+IMPORTANT - USER CONTEXT:
+The user provided additional context about what they want to scrape:
+"""
+$userContext
+"""
+
+This context may give you clues about:
+- What data they want to extract
+- Which parts of the URL are dynamic vs static
+- What search terms or filters might vary
+- The purpose of the scraper
+
+Use this information to better identify dynamic parameters!
+''' : ''}
 
 Return only raw json, without anything more (not even md notations like "```" in the begining... just the raw json).
 ''';

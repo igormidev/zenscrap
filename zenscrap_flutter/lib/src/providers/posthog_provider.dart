@@ -1358,6 +1358,272 @@ class AnalyticsService {
   }
 
   // ========================================
+  // Edit Scrappable Dialog Events
+  // ========================================
+
+  /// Track when edit scrappable dialog is opened
+  Future<void> trackEditScrappableDialogView({
+    required int scrappableId,
+    required String scrappableName,
+  }) async {
+    await _safeCapture(
+      eventName: 'edit_scrappable:dialog_view',
+      properties: {
+        'scrappable_id': scrappableId,
+        'scrappable_name': scrappableName,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user closes the edit dialog
+  Future<void> trackEditScrappableDialogClose({
+    required int scrappableId,
+    required bool hadUnsavedChanges,
+  }) async {
+    await _safeCapture(
+      eventName: 'edit_scrappable:dialog_close',
+      properties: {
+        'scrappable_id': scrappableId,
+        'had_unsaved_changes': hadUnsavedChanges,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user changes the scrappable name
+  Future<void> trackEditScrappableNameChange({
+    required int scrappableId,
+    required int nameLength,
+  }) async {
+    await _safeCapture(
+      eventName: 'edit_scrappable:name_change',
+      properties: {
+        'scrappable_id': scrappableId,
+        'name_length': nameLength,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user changes the scrappable description
+  Future<void> trackEditScrappableDescriptionChange({
+    required int scrappableId,
+    required int descriptionLength,
+  }) async {
+    await _safeCapture(
+      eventName: 'edit_scrappable:description_change',
+      properties: {
+        'scrappable_id': scrappableId,
+        'description_length': descriptionLength,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user opens category selection dialog
+  Future<void> trackEditScrappableCategoryDialogOpen({
+    required int scrappableId,
+    required String currentCategory,
+  }) async {
+    await _safeCapture(
+      eventName: 'edit_scrappable:category_dialog_open',
+      properties: {
+        'scrappable_id': scrappableId,
+        'current_category': currentCategory,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user selects a new category
+  Future<void> trackEditScrappableCategoryChange({
+    required int scrappableId,
+    required String fromCategory,
+    required String toCategory,
+  }) async {
+    await _safeCapture(
+      eventName: 'edit_scrappable:category_change',
+      properties: {
+        'scrappable_id': scrappableId,
+        'from_category': fromCategory,
+        'to_category': toCategory,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user clicks save button
+  Future<void> trackEditScrappableSaveClick({
+    required int scrappableId,
+    required bool hasNameChange,
+    required bool hasDescriptionChange,
+    required bool hasCategoryChange,
+    required bool hasMarketplaceVisibilityChange,
+  }) async {
+    await _safeCapture(
+      eventName: 'edit_scrappable:save_click',
+      properties: {
+        'scrappable_id': scrappableId,
+        'has_name_change': hasNameChange,
+        'has_description_change': hasDescriptionChange,
+        'has_category_change': hasCategoryChange,
+        'has_marketplace_visibility_change': hasMarketplaceVisibilityChange,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when save operation succeeds
+  Future<void> trackEditScrappableSaveSuccess({
+    required int scrappableId,
+    required String scrappableName,
+  }) async {
+    await _safeCapture(
+      eventName: 'edit_scrappable:save_success',
+      properties: {
+        'scrappable_id': scrappableId,
+        'scrappable_name': scrappableName,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when save operation fails
+  Future<void> trackEditScrappableSaveFailure({
+    required int scrappableId,
+    String? errorMessage,
+  }) async {
+    await _safeCapture(
+      eventName: 'edit_scrappable:save_failure',
+      properties: {
+        'scrappable_id': scrappableId,
+        if (errorMessage != null) 'error_message': errorMessage,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user clicks delete button
+  Future<void> trackEditScrappableDeleteClick({
+    required int scrappableId,
+    required String scrappableName,
+  }) async {
+    await _safeCapture(
+      eventName: 'edit_scrappable:delete_click',
+      properties: {
+        'scrappable_id': scrappableId,
+        'scrappable_name': scrappableName,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user cancels deletion
+  Future<void> trackEditScrappableDeleteCancel({
+    required int scrappableId,
+  }) async {
+    await _safeCapture(
+      eventName: 'edit_scrappable:delete_cancel',
+      properties: {
+        'scrappable_id': scrappableId,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user confirms deletion
+  Future<void> trackEditScrappableDeleteConfirm({
+    required int scrappableId,
+    required String scrappableName,
+  }) async {
+    await _safeCapture(
+      eventName: 'edit_scrappable:delete_confirm',
+      properties: {
+        'scrappable_id': scrappableId,
+        'scrappable_name': scrappableName,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when deletion succeeds
+  Future<void> trackEditScrappableDeleteSuccess({
+    required int scrappableId,
+    required String scrappableName,
+  }) async {
+    await _safeCapture(
+      eventName: 'edit_scrappable:delete_success',
+      properties: {
+        'scrappable_id': scrappableId,
+        'scrappable_name': scrappableName,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when deletion fails
+  Future<void> trackEditScrappableDeleteFailure({
+    required int scrappableId,
+    String? errorMessage,
+  }) async {
+    await _safeCapture(
+      eventName: 'edit_scrappable:delete_failure',
+      properties: {
+        'scrappable_id': scrappableId,
+        if (errorMessage != null) 'error_message': errorMessage,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user clicks "Edit scrapper extract logic" button
+  Future<void> trackEditScrappableEditExtractLogicClick({
+    required int scrappableId,
+    required String scrappableName,
+  }) async {
+    await _safeCapture(
+      eventName: 'edit_scrappable:edit_extract_logic_click',
+      properties: {
+        'scrappable_id': scrappableId,
+        'scrappable_name': scrappableName,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user toggles hide from marketplace
+  Future<void> trackEditScrappableMarketplaceToggle({
+    required int scrappableId,
+    required bool newValue,
+    required bool hadPermission,
+  }) async {
+    await _safeCapture(
+      eventName: 'edit_scrappable:marketplace_toggle',
+      properties: {
+        'scrappable_id': scrappableId,
+        'new_value': newValue,
+        'had_permission': hadPermission,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when upgrade dialog is shown for marketplace hiding
+  Future<void> trackEditScrappableUpgradeDialogShown({
+    required int scrappableId,
+  }) async {
+    await _safeCapture(
+      eventName: 'edit_scrappable:upgrade_dialog_shown',
+      properties: {
+        'scrappable_id': scrappableId,
+        'feature': 'hide_from_marketplace',
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  // ========================================
   // General Utility Methods
   // ========================================
 

@@ -1,0 +1,6 @@
+class: TestEndpointCalledSuccessResponse
+extends: ChatResponse
+fields:
+    inputPayload: String
+    responseData: String
+    timestamp: DateTime

@@ -12,6 +12,7 @@ import 'package:zenscrap_flutter/src/design_system/default_error_snackbar.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/scrapping_bee_cost_table.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
@@ -42,6 +43,18 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
   final ValueNotifier<bool> _isDeleting = ValueNotifier<bool>(false);
 
   @override
+  void initState() {
+    super.initState();
+    // Track dialog view
+    if (widget.scrappable.id != null) {
+      ref.read(analyticsServiceProvider).trackEditScrappableDialogView(
+        scrappableId: widget.scrappable.id!,
+        scrappableName: widget.scrappable.name,
+      );
+    }
+  }
+
+  @override
   void dispose() {
     _hasChangesVN.dispose();
     _isDeleting.dispose();
@@ -49,6 +62,14 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
   }
 
   Future<void> _handleDelete() async {
+    // Track delete button click
+    if (widget.scrappable.id != null) {
+      ref.read(analyticsServiceProvider).trackEditScrappableDeleteClick(
+        scrappableId: widget.scrappable.id!,
+        scrappableName: widget.scrappable.name,
+      );
+    }
+
     // Show confirmation dialog
     final shouldDelete = await showDialog<bool>(
       context: context,
@@ -58,7 +79,15 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
             'Are you sure you want to delete "${widget.scrappable.name}"? This action cannot be undone.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
+            onPressed: () {
+              // Track delete cancel
+              if (widget.scrappable.id != null) {
+                ref.read(analyticsServiceProvider).trackEditScrappableDeleteCancel(
+                  scrappableId: widget.scrappable.id!,
+                );
+              }
+              Navigator.of(dialogContext).pop(false);
+            },
             child: Text('Cancel'),
           ),
           FilledButton(
@@ -73,6 +102,14 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
     );
 
     if (shouldDelete != true) return;
+
+    // Track delete confirm
+    if (widget.scrappable.id != null) {
+      ref.read(analyticsServiceProvider).trackEditScrappableDeleteConfirm(
+        scrappableId: widget.scrappable.id!,
+        scrappableName: widget.scrappable.name,
+      );
+    }
 
     _isDeleting.value = true;
     try {
@@ -103,6 +140,14 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
 
     return result.fold(
       (success) {
+        // Track delete success
+        if (widget.scrappable.id != null) {
+          ref.read(analyticsServiceProvider).trackEditScrappableDeleteSuccess(
+            scrappableId: widget.scrappable.id!,
+            scrappableName: widget.scrappable.name,
+          );
+        }
+
         // Refresh the scrappables list
         unawaited(ref.read(userScrappablesProvider.notifier).getScrappables());
         if (context.mounted) {
@@ -114,6 +159,14 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
         return success;
       },
       (error) {
+        // Track delete failure
+        if (widget.scrappable.id != null) {
+          ref.read(analyticsServiceProvider).trackEditScrappableDeleteFailure(
+            scrappableId: widget.scrappable.id!,
+            errorMessage: error.title,
+          );
+        }
+
         if (context.mounted) {
           handleBabelException(context, error);
         }
@@ -188,7 +241,16 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
                     ),
                   ),
                   IconButton(
-                    onPressed: () => Navigator.of(context).pop(),
+                    onPressed: () {
+                      // Track dialog close
+                      if (widget.scrappable.id != null) {
+                        ref.read(analyticsServiceProvider).trackEditScrappableDialogClose(
+                          scrappableId: widget.scrappable.id!,
+                          hadUnsavedChanges: _hasChangesVN.value,
+                        );
+                      }
+                      Navigator.of(context).pop();
+                    },
                     icon: Icon(
                       Icons.close,
                       color: context.c.onPrimaryContainer.withAlpha(180),
@@ -300,6 +362,14 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
                         onPressed: hasChanges
                             ? null
                             : () async {
+                                // Track edit extract logic click
+                                if (widget.scrappable.id != null) {
+                                  ref.read(analyticsServiceProvider).trackEditScrappableEditExtractLogicClick(
+                                    scrappableId: widget.scrappable.id!,
+                                    scrappableName: widget.scrappable.name,
+                                  );
+                                }
+
                                 ref.read(scrapChatProvider.notifier).reset();
                                 final router = GoRouter.of(context);
                                 final didChange = await router.push(
@@ -418,6 +488,17 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
   Future<void> _handleSave() async {
     if (!_hasChanges || _isLoading) return;
 
+    // Track save click with details about what changed
+    if (widget.scrappable.id != null) {
+      context.findAncestorStateOfType<_EditScrappableDialogState>()?.ref.read(analyticsServiceProvider).trackEditScrappableSaveClick(
+        scrappableId: widget.scrappable.id!,
+        hasNameChange: _nameController.text != _initialName,
+        hasDescriptionChange: _descriptionController.text != _initialDescription,
+        hasCategoryChange: _selectedCategory != _initialCategory,
+        hasMarketplaceVisibilityChange: _willHideFromMarketplace != _initialWillHideFromMarketplace,
+      );
+    }
+
     setState(() {
       _isLoading = true;
     });
@@ -434,6 +515,14 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
       );
 
       if (success && mounted) {
+        // Track save success
+        if (widget.scrappable.id != null) {
+          context.findAncestorStateOfType<_EditScrappableDialogState>()?.ref.read(analyticsServiceProvider).trackEditScrappableSaveSuccess(
+            scrappableId: widget.scrappable.id!,
+            scrappableName: _nameController.text.trim(),
+          );
+        }
+
         if (widget.shouldPopOnEnd) {
           context.pop(true);
         } else {
@@ -442,12 +531,28 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
           });
         }
       } else if (mounted) {
+        // Track save failure
+        if (widget.scrappable.id != null) {
+          context.findAncestorStateOfType<_EditScrappableDialogState>()?.ref.read(analyticsServiceProvider).trackEditScrappableSaveFailure(
+            scrappableId: widget.scrappable.id!,
+            errorMessage: 'Failed to update scrappable',
+          );
+        }
+
         showErrorSnackbar(
           context,
           'Failed to update scrappable',
         );
       }
     } catch (e) {
+      // Track save failure
+      if (widget.scrappable.id != null && mounted) {
+        context.findAncestorStateOfType<_EditScrappableDialogState>()?.ref.read(analyticsServiceProvider).trackEditScrappableSaveFailure(
+          scrappableId: widget.scrappable.id!,
+          errorMessage: e.toString(),
+        );
+      }
+
       if (mounted) {
         showErrorSnackbar(context, 'Error: ${e.toString()}');
       }
@@ -729,6 +834,14 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
   }
 
   void _showCategorySelectionDialog() {
+    // Track category dialog open
+    if (widget.scrappable.id != null) {
+      context.findAncestorStateOfType<_EditScrappableDialogState>()?.ref.read(analyticsServiceProvider).trackEditScrappableCategoryDialogOpen(
+        scrappableId: widget.scrappable.id!,
+        currentCategory: _selectedCategory!.name,
+      );
+    }
+
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
@@ -843,6 +956,15 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
                             ),
                           ),
                           onTap: () {
+                            // Track category change
+                            if (widget.scrappable.id != null && _selectedCategory != category) {
+                              context.findAncestorStateOfType<_EditScrappableDialogState>()?.ref.read(analyticsServiceProvider).trackEditScrappableCategoryChange(
+                                scrappableId: widget.scrappable.id!,
+                                fromCategory: _selectedCategory!.name,
+                                toCategory: category.name,
+                              );
+                            }
+
                             setState(() {
                               _selectedCategory = category;
                               _checkForChanges();
@@ -897,7 +1019,29 @@ class _HideFromMarketplaceToggleState
       account = accountState.accountInfo;
     }
 
-    if (newValue && (account == null || account.planTier != PlanTier.ultra)) {
+    final hasPermission = account != null && account.planTier == PlanTier.ultra;
+
+    // Get scrappable ID from parent dialog
+    final dialogState = context.findAncestorStateOfType<_EditScrappableDialogState>();
+    final scrappableId = dialogState?.widget.scrappable.id;
+
+    // Track toggle attempt
+    if (scrappableId != null) {
+      ref.read(analyticsServiceProvider).trackEditScrappableMarketplaceToggle(
+        scrappableId: scrappableId,
+        newValue: newValue,
+        hadPermission: hasPermission,
+      );
+    }
+
+    if (newValue && !hasPermission) {
+      // Track upgrade dialog shown
+      if (scrappableId != null) {
+        ref.read(analyticsServiceProvider).trackEditScrappableUpgradeDialogShown(
+          scrappableId: scrappableId,
+        );
+      }
+
       // Show upgrade dialog
       await showHideFromMarketplaceUpgradeDialog(context);
       return;

@@ -89,18 +89,22 @@ void main() async {
           print('🔄 Modified request URL: ${request.url}');
         }
 
-        print('⚙️ Fetch Settings:');
-        print('  - URL: ${fetchSettings.url}');
-        print('  - Render JS: ${fetchSettings.render_js}');
-        print('  - Premium Proxy: ${fetchSettings.premium_proxy}');
-        print('  - Extract Rules: ${fetchSettings.extract_rules}');
+        if (fetchSettings != null) {
+          print('⚙️ Fetch Settings:');
+          print('  - URL: ${fetchSettings.url}');
+          print('  - Render JS: ${fetchSettings.render_js}');
+          print('  - Premium Proxy: ${fetchSettings.premium_proxy}');
+          print('  - Extract Rules: ${fetchSettings.extract_rules}');
 
-        if (fetchSettings.js_scenario != null) {
-          print('  - JS Scenario: ${fetchSettings.js_scenario}');
-        }
+          if (fetchSettings.js_scenario != null) {
+            print('  - JS Scenario: ${fetchSettings.js_scenario}');
+          }
 
-        if (fetchSettings.wait != null) {
-          print('  - Wait: ${fetchSettings.wait}ms');
+          if (fetchSettings.wait != null) {
+            print('  - Wait: ${fetchSettings.wait}ms');
+          }
+        } else {
+          print('ℹ️ Only request was modified (no new fetch settings)');
         }
         break;
     }

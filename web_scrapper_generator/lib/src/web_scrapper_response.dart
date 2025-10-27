@@ -23,13 +23,13 @@ final class WebScrapperChatAIResponseWithDataResponse
   /// The request that the AI generated based on the user prompt - should be null if the ai did not need to update this
   final WebScrapperRequest? request;
 
-  /// The fetch settings that will be used when calling scrapping bee
-  final ScrappingBeeFetchSettings fetchSettings;
+  /// The fetch settings that will be used when calling scrapping bee - should be null if the ai only modified the request
+  final ScrappingBeeFetchSettings? fetchSettings;
 
   const WebScrapperChatAIResponseWithDataResponse({
-    required this.fetchSettings,
+    this.fetchSettings,
     required this.resumeActionMessage,
-    required this.request,
+    this.request,
   });
 }
 

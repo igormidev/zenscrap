@@ -258,9 +258,31 @@ class _ChatMessageBubble extends StatelessWidget {
       );
     } else if (message is CandidateExtractLogicUpdate) {
       final extractMessage = message as CandidateExtractLogicUpdate;
-      messageContent = _ExtractRulesMessage(
+      messageContent = _JsonDisplayMessage(
         messageText: extractMessage.messageText,
-        extractRules: extractMessage.scrappingBeeExtractLogic.extractRules,
+        jsonData: extractMessage.scrappingBeeExtractLogic.extractRules,
+        jsonTitle: 'Extract Rules',
+        icon: Icons.code_rounded,
+        textColor: textColor,
+        backgroundColor: backgroundColor,
+      );
+    } else if (message is TestEndpointCalledSuccessResponse) {
+      final successMessage = message as TestEndpointCalledSuccessResponse;
+      messageContent = _TestEndpointSuccessMessage(
+        inputPayload: successMessage.inputPayload,
+        responseData: successMessage.responseData,
+        textColor: textColor,
+        backgroundColor: backgroundColor,
+      );
+    } else if (message is TestEndpointCalledErrorResponse) {
+      final errorMessage = message as TestEndpointCalledErrorResponse;
+      // Override bubble color for error
+      backgroundColor = colorScheme.errorContainer;
+      textColor = colorScheme.onErrorContainer;
+      messageContent = _TestEndpointErrorMessage(
+        errorTitle: errorMessage.errorTitle,
+        errorDescription: errorMessage.errorDescription,
+        inputPayload: errorMessage.inputPayload,
         textColor: textColor,
         backgroundColor: backgroundColor,
       );
@@ -451,29 +473,34 @@ class _ErrorMessage extends StatelessWidget {
   }
 }
 
-class _ExtractRulesMessage extends StatefulWidget {
-  final String messageText;
-  final String extractRules;
+/// Reusable template widget for displaying JSON data with expandable/collapsible UI
+class _JsonDisplayMessage extends StatefulWidget {
+  final String? messageText;
+  final String jsonData;
+  final String jsonTitle;
+  final IconData icon;
   final Color textColor;
   final Color backgroundColor;
 
-  const _ExtractRulesMessage({
-    required this.messageText,
-    required this.extractRules,
+  const _JsonDisplayMessage({
+    this.messageText,
+    required this.jsonData,
+    required this.jsonTitle,
+    required this.icon,
     required this.textColor,
     required this.backgroundColor,
   });
 
   @override
-  State<_ExtractRulesMessage> createState() => _ExtractRulesMessageState();
+  State<_JsonDisplayMessage> createState() => _JsonDisplayMessageState();
 }
 
-class _ExtractRulesMessageState extends State<_ExtractRulesMessage> {
+class _JsonDisplayMessageState extends State<_JsonDisplayMessage> {
   bool _isExpanded = false;
 
   void _copyToClipboard() {
     // Try to decode the JSON and format it properly
-    final decodedJson = tryDecode(widget.extractRules);
+    final decodedJson = tryDecode(widget.jsonData);
     String textToCopy;
 
     if (decodedJson != null) {
@@ -482,14 +509,14 @@ class _ExtractRulesMessageState extends State<_ExtractRulesMessage> {
       textToCopy = encoder.convert(decodedJson);
     } else {
       // If not valid JSON, copy as-is
-      textToCopy = widget.extractRules;
+      textToCopy = widget.jsonData;
     }
 
     Clipboard.setData(ClipboardData(text: textToCopy));
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Extract rules copied to clipboard'),
-        duration: Duration(seconds: 2),
+      SnackBar(
+        content: Text('${widget.jsonTitle} copied to clipboard'),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -497,21 +524,23 @@ class _ExtractRulesMessageState extends State<_ExtractRulesMessage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final decodedJson = tryDecode(widget.extractRules);
+    final decodedJson = tryDecode(widget.jsonData);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        SelectableText(
-          widget.messageText,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: widget.textColor,
-            height: 1.4,
-            fontSize: 14,
+        if (widget.messageText != null) ...[
+          SelectableText(
+            widget.messageText!,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: widget.textColor,
+              height: 1.4,
+              fontSize: 14,
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
+          const SizedBox(height: 8),
+        ],
         Container(
           decoration: BoxDecoration(
             color: widget.textColor.withValues(alpha: 0.05),
@@ -535,13 +564,13 @@ class _ExtractRulesMessageState extends State<_ExtractRulesMessage> {
                   child: Row(
                     children: [
                       Icon(
-                        Icons.code_rounded,
+                        widget.icon,
                         size: 16,
                         color: widget.textColor.withValues(alpha: 0.8),
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        'Extract Rules',
+                        widget.jsonTitle,
                         style: theme.textTheme.labelMedium?.copyWith(
                           color: widget.textColor.withValues(alpha: 0.9),
                           fontWeight: FontWeight.w500,
@@ -582,18 +611,20 @@ class _ExtractRulesMessageState extends State<_ExtractRulesMessage> {
                   constraints: const BoxConstraints(maxHeight: 300),
                   padding: const EdgeInsets.all(10),
                   child: decodedJson != null
-                      ? Text(
-                          JsonEncoder.withIndent('  ').convert(decodedJson),
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            fontFamily: 'monospace',
-                            color: widget.textColor.withValues(alpha: 0.85),
-                            height: 1.3,
-                            fontSize: 14,
+                      ? SingleChildScrollView(
+                          child: SelectableText(
+                            JsonEncoder.withIndent('  ').convert(decodedJson),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              fontFamily: 'monospace',
+                              color: widget.textColor.withValues(alpha: 0.85),
+                              height: 1.3,
+                              fontSize: 14,
+                            ),
                           ),
                         )
                       : SingleChildScrollView(
                           child: SelectableText(
-                            widget.extractRules,
+                            widget.jsonData,
                             style: theme.textTheme.bodySmall?.copyWith(
                               fontFamily: 'monospace',
                               color: widget.textColor.withValues(alpha: 0.85),
@@ -646,6 +677,150 @@ class _NewRuleMessage extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
           ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TestEndpointSuccessMessage extends StatelessWidget {
+  final String inputPayload;
+  final String responseData;
+  final Color textColor;
+  final Color backgroundColor;
+
+  const _TestEndpointSuccessMessage({
+    required this.inputPayload,
+    required this.responseData,
+    required this.textColor,
+    required this.backgroundColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.check_circle_rounded,
+              size: 16,
+              color: textColor.withValues(alpha: 0.9),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              'Test Endpoint Called Successfully',
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: textColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        _JsonDisplayMessage(
+          jsonData: inputPayload,
+          jsonTitle: 'Request Payload',
+          icon: Icons.input_rounded,
+          textColor: textColor,
+          backgroundColor: backgroundColor,
+        ),
+        const SizedBox(height: 8),
+        _JsonDisplayMessage(
+          jsonData: responseData,
+          jsonTitle: 'Response Data',
+          icon: Icons.output_rounded,
+          textColor: textColor,
+          backgroundColor: backgroundColor,
+        ),
+      ],
+    );
+  }
+}
+
+class _TestEndpointErrorMessage extends StatelessWidget {
+  final String errorTitle;
+  final String errorDescription;
+  final String inputPayload;
+  final Color textColor;
+  final Color backgroundColor;
+
+  const _TestEndpointErrorMessage({
+    required this.errorTitle,
+    required this.errorDescription,
+    required this.inputPayload,
+    required this.textColor,
+    required this.backgroundColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.error_rounded,
+              size: 16,
+              color: textColor.withValues(alpha: 0.9),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              'Test Endpoint Failed',
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: textColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: textColor.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: textColor.withValues(alpha: 0.15),
+              width: 0.5,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                errorTitle,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      color: textColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+              const SizedBox(height: 4),
+              SelectableText(
+                errorDescription,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: textColor.withValues(alpha: 0.9),
+                      height: 1.4,
+                      fontSize: 14,
+                    ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        _JsonDisplayMessage(
+          jsonData: inputPayload,
+          jsonTitle: 'Request Payload',
+          icon: Icons.input_rounded,
+          textColor: textColor,
+          backgroundColor: backgroundColor,
         ),
       ],
     );

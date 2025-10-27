@@ -472,6 +472,8 @@ mixin ApiHelperMixin {
         // setScrappableCallback(scrappable);
         throwErrorIfIsATestRequestAndTestTimeExpired(apiKey, scrappable);
 
+        final isTestRequest = apiKey == null;
+
         final ScrappingBeeExtractLogic extractRules =
             await _getExtractRules(session, scrappable, apiKey);
 
@@ -502,6 +504,20 @@ mixin ApiHelperMixin {
               ),
             );
           }
+
+          // Send success notification to chat session if this is a test request
+          if (isTestRequest) {
+            sendSystemMessageToScrappableSession(
+              scrappableId: scrappable.id!,
+              response: TestEndpointCalledSuccessResponse(
+                role: PromptRole.system,
+                inputPayload: stringifiedPayload,
+                responseData: jsonEncode(scrapedData),
+                timestamp: DateTime.now(),
+              ),
+            );
+          }
+
           // Create response with scraped data and credit information
           final response = <String, dynamic>{
             'credits': _getCreditInfo(nanoId, creditCost),
@@ -522,6 +538,21 @@ mixin ApiHelperMixin {
               ),
             );
           }
+
+          // Send error notification to chat session if this is a test request
+          if (isTestRequest) {
+            sendSystemMessageToScrappableSession(
+              scrappableId: scrappable.id!,
+              response: TestEndpointCalledErrorResponse(
+                role: PromptRole.system,
+                errorTitle: 'Scraping Error',
+                errorDescription: errorMessage,
+                inputPayload: stringifiedPayload,
+                timestamp: DateTime.now(),
+              ),
+            );
+          }
+
           return ApiError(
               RequestStatus.failedAtScrappingBee,
               ZenScrapException(
