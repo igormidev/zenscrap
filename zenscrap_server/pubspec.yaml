@@ -2,9 +2,10 @@ name: zenscrap_server
 description: Starting point for a Serverpod server.
 # version: 1.0.0
 # homepage: https://www.example.com
+resolution: workspace
 
 environment:
-  sdk: '>=3.5.0 <4.0.0'
+  sdk: ^3.6.0
 
 dependencies:
   nanoid2: ^2.0.1
@@ -25,8 +26,7 @@ dependencies:
   crypto: ^3.0.5
   # claude_code_sdk: ^1.0.0
   path: ^1.9.1
-  web_scrapper_generator:
-    path: ../web_scrapper_generator
+  web_scrapper_generator: ^2.0.1
   # claude_code_sdk:
   #   path: ../claude_code_sdk
 

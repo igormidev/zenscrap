@@ -5,15 +5,15 @@ publish_to: none
 homepage: https://github.com/yourusername/codex_cli_sdk
 repository: https://github.com/yourusername/codex_cli_sdk
 issue_tracker: https://github.com/yourusername/codex_cli_sdk/issues
+resolution: workspace
 
 environment:
-  sdk: ^3.0.0
+  sdk: ^3.6.0
 
 dependencies:
   path: ^1.9.0
-  programming_cli_core_sdk:
-    path: ../programming_cli_core_sdk/
+  programming_cli_core_sdk: ^2.1.0
 
 dev_dependencies:
-  lints: ^3.0.0
+  lints: ^5.0.0
   test: ^1.24.0
