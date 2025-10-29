@@ -4,8 +4,3 @@ environment:
   sdk: "^3.6.0"
 workspace:
   - "zenscrap_server"
-  - "web_scrapper_generator"
-  - "claude_code_sdk"
-  - "programming_cli_core_sdk"
-  - "gemini_cli_sdk"
-  - "codex_cli_sdk"
