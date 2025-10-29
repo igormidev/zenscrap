@@ -975,67 +975,67 @@
     },
     {
       "name": "serverpod",
-      "rootUri": "file:///Users/igor/.pub-cache/hosted/pub.dev/serverpod-2.9.1",
+      "rootUri": "file:///Users/igor/.pub-cache/hosted/pub.dev/serverpod-2.9.2",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },
     {
       "name": "serverpod_auth_client",
-      "rootUri": "file:///Users/igor/.pub-cache/hosted/pub.dev/serverpod_auth_client-2.9.1",
+      "rootUri": "file:///Users/igor/.pub-cache/hosted/pub.dev/serverpod_auth_client-2.9.2",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },
     {
       "name": "serverpod_auth_email_flutter",
-      "rootUri": "file:///Users/igor/.pub-cache/hosted/pub.dev/serverpod_auth_email_flutter-2.9.1",
+      "rootUri": "file:///Users/igor/.pub-cache/hosted/pub.dev/serverpod_auth_email_flutter-2.9.2",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },
     {
       "name": "serverpod_auth_server",
-      "rootUri": "file:///Users/igor/.pub-cache/hosted/pub.dev/serverpod_auth_server-2.9.1",
+      "rootUri": "file:///Users/igor/.pub-cache/hosted/pub.dev/serverpod_auth_server-2.9.2",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },
     {
       "name": "serverpod_auth_shared_flutter",
-      "rootUri": "file:///Users/igor/.pub-cache/hosted/pub.dev/serverpod_auth_shared_flutter-2.9.1",
+      "rootUri": "file:///Users/igor/.pub-cache/hosted/pub.dev/serverpod_auth_shared_flutter-2.9.2",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },
     {
       "name": "serverpod_client",
-      "rootUri": "file:///Users/igor/.pub-cache/hosted/pub.dev/serverpod_client-2.9.1",
+      "rootUri": "file:///Users/igor/.pub-cache/hosted/pub.dev/serverpod_client-2.9.2",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },
     {
       "name": "serverpod_flutter",
-      "rootUri": "file:///Users/igor/.pub-cache/hosted/pub.dev/serverpod_flutter-2.9.1",
+      "rootUri": "file:///Users/igor/.pub-cache/hosted/pub.dev/serverpod_flutter-2.9.2",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },
     {
       "name": "serverpod_lints",
-      "rootUri": "file:///Users/igor/.pub-cache/hosted/pub.dev/serverpod_lints-2.9.1",
+      "rootUri": "file:///Users/igor/.pub-cache/hosted/pub.dev/serverpod_lints-2.9.2",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },
     {
       "name": "serverpod_serialization",
-      "rootUri": "file:///Users/igor/.pub-cache/hosted/pub.dev/serverpod_serialization-2.9.1",
+      "rootUri": "file:///Users/igor/.pub-cache/hosted/pub.dev/serverpod_serialization-2.9.2",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },
     {
       "name": "serverpod_shared",
-      "rootUri": "file:///Users/igor/.pub-cache/hosted/pub.dev/serverpod_shared-2.9.1",
+      "rootUri": "file:///Users/igor/.pub-cache/hosted/pub.dev/serverpod_shared-2.9.2",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },
     {
       "name": "serverpod_test",
-      "rootUri": "file:///Users/igor/.pub-cache/hosted/pub.dev/serverpod_test-2.9.1",
+      "rootUri": "file:///Users/igor/.pub-cache/hosted/pub.dev/serverpod_test-2.9.2",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },

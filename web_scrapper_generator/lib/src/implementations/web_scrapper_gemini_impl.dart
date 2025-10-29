@@ -29,11 +29,6 @@ class WebScrapperGeminiImpl
     print('🚀 Initializing Gemini SDK for web scraper generator...\n');
     _geminiSDK = GeminiSDK(apiKey: geminiApiKey);
 
-    // Add API key to environment so CLI can authenticate (only if provided)
-    if (geminiApiKey.isNotEmpty) {
-      await _geminiSDK.addApiKeyToEnvironment(geminiApiKey);
-    }
-
     // Ensure Gemini CLI is installed and up to date
     await _geminiSDK.updateToNewestVersionIfNeeded(global: true);
 
@@ -50,8 +45,8 @@ class WebScrapperGeminiImpl
   final GeminiChat _chat;
 
   WebScrapperGeminiImpl._(InitialPayloadData initialPayload, GeminiChat chat)
-    : _chat = chat,
-      super(initialPayload: initialPayload);
+      : _chat = chat,
+        super(initialPayload: initialPayload);
 
   /// Factory method to create a new chat instance
   static WebScrapperGeminiImpl startChat({
@@ -70,7 +65,8 @@ class WebScrapperGeminiImpl
 
     // Update the cwd to the chat-specific directory to scope all file operations
     // Use absolute path to prevent path duplication issues
-    final scopedCwd = '${Directory.current.absolute.path}/ai_generated_files/${chat.chatNanoId}';
+    final scopedCwd =
+        '${Directory.current.absolute.path}/ai_generated_files/${chat.chatNanoId}';
     chat.updateOptions(initialOptions.copyWith(cwd: scopedCwd));
 
     final instance = WebScrapperGeminiImpl._(initialPayload, chat);
@@ -121,8 +117,7 @@ class WebScrapperGeminiImpl
   ({
     Stream<String> llmMessage,
     Future<WebScrapperChatAIResponse> structuredSchemaDataCompleter,
-  })
-  streamMessage({required String userPrompt}) {
+  }) streamMessage({required String userPrompt}) {
     List<PromptContent> messages = [];
 
     // Add initial prompts if this is the first message

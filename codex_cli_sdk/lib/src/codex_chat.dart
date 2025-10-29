@@ -105,6 +105,8 @@ class CodexChat extends CliChatInterface<CodexChatOptions> {
       processArgs,
       workingDirectory: baseDir.path,
       environment: environment,
+      includeParentEnvironment: apiKey == null, // Isolate when API key is provided
+      runInShell: false,
     );
 
     _didSendFirstMessage = true;
@@ -179,14 +181,12 @@ class CodexChat extends CliChatInterface<CodexChatOptions> {
     _codexHomeDir = Directory('${tempDir.path}/.codex')
       ..createSync(recursive: true);
 
-    // Build environment for login
+    // Build isolated environment for login
+    // Only include essential PATH and HOME to prevent credential leakage
     final loginEnv = {
-      ...Platform.environment,
-      'CODEX_HOME': _codexHomeDir!.path,
+      'PATH': Platform.environment['PATH'] ?? '',
       'HOME': tempDir.path,
-      // Disable any parent OPENAI_* vars
-      'OPENAI_API_KEY': '',
-      'AZURE_OPENAI_API_KEY': '',
+      'CODEX_HOME': _codexHomeDir!.path,
     };
 
     // Run: codex login --with-api-key (and pipe API key to stdin)
@@ -194,6 +194,8 @@ class CodexChat extends CliChatInterface<CodexChatOptions> {
       'codex',
       ['login', '--with-api-key'],
       environment: loginEnv,
+      includeParentEnvironment: false, // Isolate from parent secrets
+      runInShell: false,
     );
 
     // Write API key to stdin
@@ -211,20 +213,30 @@ class CodexChat extends CliChatInterface<CodexChatOptions> {
   }
 
   Map<String, String> _buildEnvironment() {
-    final env = Map<String, String>.from(Platform.environment);
+    final Map<String, String> env;
 
-    // If we created an isolated CODEX_HOME, use it
-    if (_codexHomeDir != null) {
-      env['CODEX_HOME'] = _codexHomeDir!.path;
-      env['HOME'] = _codexHomeDir!.parent.path;
-      // Disable parent OPENAI_* vars to avoid conflicts
-      env['OPENAI_API_KEY'] = '';
-      env['AZURE_OPENAI_API_KEY'] = '';
-    } else if (apiKey != null && _options.enableMcp == true) {
-      // When MCP is enabled and we're not using isolated HOME, set API key via environment
-      env['OPENAI_API_KEY'] = apiKey!;
+    if (apiKey != null) {
+      // Create isolated environment when API key is provided
+      // This prevents leaking parent environment credentials
+      env = {
+        'PATH': Platform.environment['PATH'] ?? '',
+        'HOME': Platform.environment['HOME'] ?? '',
+      };
+
+      // If we created an isolated CODEX_HOME, use it
+      if (_codexHomeDir != null) {
+        env['CODEX_HOME'] = _codexHomeDir!.path;
+        env['HOME'] = _codexHomeDir!.parent.path;
+      } else if (_options.enableMcp == true) {
+        // When MCP is enabled and we're not using isolated HOME, set API key via environment
+        env['OPENAI_API_KEY'] = apiKey!;
+      }
+    } else {
+      // No API key: use full parent environment
+      env = Map<String, String>.from(Platform.environment);
     }
 
+    // Add custom environment variables from options
     if (_options.environment != null) {
       env.addAll(_options.environment!);
     }

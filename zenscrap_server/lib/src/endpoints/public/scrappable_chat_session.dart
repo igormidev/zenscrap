@@ -3,6 +3,7 @@ import 'package:collection/collection.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/core/default_classes.dart';
+import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_claude_code_sdk_impl.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_codex_sdk_impl.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/i_chat_controller.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
@@ -287,8 +288,8 @@ class ScrappableChatSession extends Endpoint {
     final RedraftSrappableSessionId sessionUuid = uuid.v4();
     _scrappableOpenedSessionsIds[scrappable.id!] = sessionUuid;
     _scrapRedraftSessions[sessionUuid] = ReplaySubject<ChatResponse>();
-    _chatSessions[sessionUuid] = ChatControllerCodexSdkImpl.startChat(
-      // _chatSessions[sessionUuid] = ChatControllerClaudeCodeSdkImpl.startChat(
+    // _chatSessions[sessionUuid] = ChatControllerCodexSdkImpl.startChat(
+    _chatSessions[sessionUuid] = ChatControllerClaudeCodeSdkImpl.startChat(
       scrappableId: scrappable.id!,
       scrapperRequest: scrapperRequest,
       referenceTestData: referenceTestData,

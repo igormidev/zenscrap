@@ -32,11 +32,6 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
     print('🚀 Initializing Codex SDK for web scraper generator...\n');
     _codexSDK = Codex(apiKey: codexApiKey);
 
-    // Add API key to environment so CLI can authenticate (only if provided)
-    if (codexApiKey.isNotEmpty) {
-      await _codexSDK.addApiKeyToEnvironment(codexApiKey);
-    }
-
     if (skipCliSetup) {
       return;
     }
@@ -60,8 +55,8 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
   final CodexChat _chat;
 
   WebScrapperCodexImpl._(InitialPayloadData initialPayload, CodexChat chat)
-    : _chat = chat,
-      super(initialPayload: initialPayload);
+      : _chat = chat,
+        super(initialPayload: initialPayload);
 
   /// Factory method to create a new chat instance
   static WebScrapperCodexImpl startChat({
@@ -186,8 +181,7 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
   ({
     Stream<String> llmMessage,
     Future<WebScrapperChatAIResponse> structuredSchemaDataCompleter,
-  })
-  streamMessage({required String userPrompt}) {
+  }) streamMessage({required String userPrompt}) {
     List<PromptContent> messages = [];
 
     // Add initial prompts if this is the first message

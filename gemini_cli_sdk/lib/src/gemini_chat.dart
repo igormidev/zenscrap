@@ -69,6 +69,8 @@ class GeminiChat extends CliChatInterface<GeminiChatOptions> {
       command.args,
       workingDirectory: baseDir.path,
       environment: environment,
+      includeParentEnvironment: apiKey == null, // Isolate when API key is provided
+      runInShell: false,
     );
 
     if (command.writePromptToStdin) {
@@ -168,13 +170,22 @@ ${_options.systemPrompt}
   }
 
   Map<String, String> _buildEnvironment() {
-    final env = Map<String, String>.from(Platform.environment);
+    final Map<String, String> env;
 
-    // Only set API key if provided
     if (apiKey != null) {
-      env['GEMINI_API_KEY'] = apiKey!;
+      // Create isolated environment when API key is provided
+      // This prevents leaking parent environment credentials
+      env = {
+        'PATH': Platform.environment['PATH'] ?? '',
+        'HOME': Platform.environment['HOME'] ?? '',
+        'GEMINI_API_KEY': apiKey!,
+      };
+    } else {
+      // No API key: use full parent environment
+      env = Map<String, String>.from(Platform.environment);
     }
 
+    // Add custom environment variables from options
     if (_options.environment != null) {
       env.addAll(_options.environment!);
     }

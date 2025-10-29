@@ -1,5 +1,16 @@
 # Changelog
 
+## 5.0.4
+
+### Security
+- **Isolated API Key Environment**: When an API key is provided via the SDK, the chat process now runs in a completely isolated environment. Only essential variables (PATH, HOME, ANTHROPIC_API_KEY) are passed to the CLI, preventing any parent environment credentials from leaking through.
+- **Enhanced Process Security**: All processes spawned with an API key now use `includeParentEnvironment: false` and `runInShell: false` for maximum security isolation.
+
+### Technical Details
+- Modified `_buildEnvironment()` to create minimal isolated environments when `apiKey` is provided
+- Updated `_spawnClaudeProcess()` to explicitly disable parent environment inheritance when using API keys
+- Backward compatible: when no API key is provided, the SDK continues to use the full parent environment
+
 ## 5.0.3
 
 ### Dependencies

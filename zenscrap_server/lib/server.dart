@@ -70,18 +70,18 @@ void run(List<String> args) async {
     countryCode: 'us',
   );
 
-  // Initialize Codex implementation
-  await WebScrapperCodexImpl.initCodex(
-    codexApiKey: pod.getPassword('openAiApiKey') ?? '',
-    scrappingBeeApiKey: scrapingBeeApiKey ?? '',
-    proxyConfig: proxyConfig,
-  );
+  // // Initialize Codex implementation
+  // await WebScrapperCodexImpl.initCodex(
+  //   codexApiKey: pod.getPassword('openAiApiKey') ?? '',
+  //   scrappingBeeApiKey: scrapingBeeApiKey ?? '',
+  //   proxyConfig: proxyConfig,
+  // );
   // Initialize Gemini implementation
-  await WebScrapperGeminiImpl.initGemini(
-    geminiApiKey: pod.getPassword('geminiApiKey') ?? '',
-    scrappingBeeApiKey: scrapingBeeApiKey ?? '',
-    proxyConfig: proxyConfig,
-  );
+  // await WebScrapperGeminiImpl.initGemini(
+  //   geminiApiKey: pod.getPassword('geminiApiKey') ?? '',
+  //   scrappingBeeApiKey: scrapingBeeApiKey ?? '',
+  //   proxyConfig: proxyConfig,
+  // );
   // Initialize Gemini implementation
   await WebScrapperClaudeImpl.initClaude(
     claudeApiKey: pod.getPassword('claudeApiKey') ?? '',

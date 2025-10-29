@@ -12,7 +12,7 @@ A powerful Dart SDK for interacting with Claude Code, providing seamless integra
 - 🛠️ **Auto-Installation**: Built-in methods to check and install Claude Code SDK
 - 🔌 **MCP Support**: Full Model Context Protocol integration for connecting to external tools
 - 🧹 **Resource Management**: Proper cleanup and disposal of chat sessions and temp files
-- 🔐 **Secure**: API key management with environment variable support
+- 🔐 **Secure**: Isolated environment per API key prevents credential leakage
 - ⚡ **Reliable**: Simple Process.run based implementation (no streaming complexity)
 
 ## Prerequisites

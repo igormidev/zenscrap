@@ -29,11 +29,6 @@ class WebScrapperClaudeImpl
     print('🚀 Initializing Claude SDK for web scraper generator...\n');
     _claudeSDK = Claude(apiKey: claudeApiKey);
 
-    // Add API key to environment so CLI can authenticate (only if provided)
-    if (claudeApiKey.isNotEmpty) {
-      await _claudeSDK.addApiKeyToEnvironment(claudeApiKey);
-    }
-
     // Ensure Claude Code CLI is installed and up to date
     await _claudeSDK.updateToNewestVersionIfNeeded(global: true);
 
@@ -53,8 +48,8 @@ class WebScrapperClaudeImpl
   final ClaudeChat _chat;
 
   WebScrapperClaudeImpl._(InitialPayloadData initialPayload, ClaudeChat chat)
-    : _chat = chat,
-      super(initialPayload: initialPayload);
+      : _chat = chat,
+        super(initialPayload: initialPayload);
 
   /// Factory method to create a new chat instance
   static WebScrapperClaudeImpl startChat({
@@ -72,7 +67,8 @@ class WebScrapperClaudeImpl
 
     // Update the cwd to the chat-specific directory to scope all file operations
     // Use absolute path to prevent path duplication issues
-    final scopedCwd = '${Directory.current.absolute.path}/ai_generated_files/${chat.chatNanoId}';
+    final scopedCwd =
+        '${Directory.current.absolute.path}/ai_generated_files/${chat.chatNanoId}';
     chat.updateOptions(initialOptions.copyWith(cwd: scopedCwd));
 
     return WebScrapperClaudeImpl._(initialPayload, chat);
@@ -125,8 +121,7 @@ class WebScrapperClaudeImpl
   ({
     Stream<String> llmMessage,
     Future<WebScrapperChatAIResponse> structuredSchemaDataCompleter,
-  })
-  streamMessage({required String userPrompt}) {
+  }) streamMessage({required String userPrompt}) {
     List<PromptContent> messages = [];
 
     // Add initial prompts if this is the first message

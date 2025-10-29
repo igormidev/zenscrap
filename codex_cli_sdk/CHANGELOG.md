@@ -1,5 +1,17 @@
 # Changelog
 
+## 4.1.4
+
+### Security
+- **Isolated API Key Environment**: When an API key is provided via the SDK, the chat process now runs in a completely isolated environment. Only essential variables (PATH, HOME) plus the API key are passed to the CLI, preventing any parent environment credentials from leaking through.
+- **Enhanced Process Security**: All processes spawned with an API key now use `includeParentEnvironment: false` and `runInShell: false` for maximum security isolation.
+
+### Technical Details
+- Modified `_buildEnvironment()` to create minimal isolated environments when `apiKey` is provided
+- Updated `_loginViaStdin()` to use isolated environment during authentication
+- Updated `Process.start()` calls to explicitly disable parent environment inheritance when using API keys
+- Backward compatible: when no API key is provided, the SDK continues to use the full parent environment
+
 ## 4.1.3
 
 ### Fixed

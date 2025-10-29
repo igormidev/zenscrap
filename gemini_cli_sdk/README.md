@@ -10,6 +10,7 @@ A powerful Dart SDK for interacting with Google Gemini CLI, providing seamless i
 - 🔌 **MCP Management**: Inspect and configure Model Context Protocol servers using the shared MCP models.
 - 🌊 **Streaming**: Stream Gemini responses while the core handles cleanup and schema validation.
 - 🛠️ **CLI Utilities**: Check, install, and upgrade the Gemini CLI with convenience helpers.
+- 🔐 **Secure**: Isolated environment per API key prevents credential leakage.
 
 ## Prerequisites
 
