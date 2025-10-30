@@ -10,7 +10,7 @@ class GeminiChat extends CliChatInterface<GeminiChatOptions> {
   GeminiChat({
     super.apiKey,
     super.options,
-  })  : _sessionId = options?.resumeSessionId;
+  }) : _sessionId = options?.resumeSessionId;
 
   bool _didSendFirstMessage = false;
   bool _isDisposed = false;
@@ -28,7 +28,7 @@ class GeminiChat extends CliChatInterface<GeminiChatOptions> {
   String? get sessionId => _sessionId;
 
   @override
-  Directory get baseDir => _options.cwd != null && _options.cwd!.isNotEmpty
+  Directory get baseDir => _options.cwd != null
       ? Directory(_options.cwd!).absolute
       : Directory.current.absolute;
 
@@ -69,7 +69,8 @@ class GeminiChat extends CliChatInterface<GeminiChatOptions> {
       command.args,
       workingDirectory: baseDir.path,
       environment: environment,
-      includeParentEnvironment: apiKey == null, // Isolate when API key is provided
+      includeParentEnvironment:
+          apiKey == null, // Isolate when API key is provided
       runInShell: false,
     );
 
@@ -181,14 +182,20 @@ ${_options.systemPrompt}
         'HOME': Platform.environment['HOME'] ?? '',
         'GEMINI_API_KEY': apiKey!,
         // Essential for npm/node operations (MCP servers)
-        if (Platform.environment['USER'] != null) 'USER': Platform.environment['USER']!,
-        if (Platform.environment['TMPDIR'] != null) 'TMPDIR': Platform.environment['TMPDIR']!,
-        if (Platform.environment['TEMP'] != null) 'TEMP': Platform.environment['TEMP']!,
-        if (Platform.environment['TMP'] != null) 'TMP': Platform.environment['TMP']!,
+        if (Platform.environment['USER'] != null)
+          'USER': Platform.environment['USER']!,
+        if (Platform.environment['TMPDIR'] != null)
+          'TMPDIR': Platform.environment['TMPDIR']!,
+        if (Platform.environment['TEMP'] != null)
+          'TEMP': Platform.environment['TEMP']!,
+        if (Platform.environment['TMP'] != null)
+          'TMP': Platform.environment['TMP']!,
         // Shell context for some CLI operations
-        if (Platform.environment['SHELL'] != null) 'SHELL': Platform.environment['SHELL']!,
+        if (Platform.environment['SHELL'] != null)
+          'SHELL': Platform.environment['SHELL']!,
         // Node.js module resolution
-        if (Platform.environment['NODE_PATH'] != null) 'NODE_PATH': Platform.environment['NODE_PATH']!,
+        if (Platform.environment['NODE_PATH'] != null)
+          'NODE_PATH': Platform.environment['NODE_PATH']!,
       };
     } else {
       // No API key: use full parent environment

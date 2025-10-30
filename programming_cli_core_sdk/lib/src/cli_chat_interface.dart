@@ -140,6 +140,8 @@ abstract class CliChatInterface<T extends CliChatOptions> {
       '${aiGeneratedFilesDir.path}/schema_response_id-$chatNanoId.json';
   String get schemaTestFilePath =>
       '${aiGeneratedFilesDir.path}/is_schema_correct_in_id-${chatNanoId}_test.dart';
+  String get schemaPubspecFilePath =>
+      '${baseDir.path}/pubspec.yaml';
 
   ({
     Stream<String> llmMessage,
@@ -423,15 +425,34 @@ $schemaClassDeclaration
 ''';
 
     await schemaTestFolder.writeAsString(testContent);
+
+    // Create a minimal pubspec.yaml so dart test can run
+    // Use chatNanoId to ensure unique package name (no spaces or special chars)
+    final pubspecFile = File(schemaPubspecFilePath);
+    final pubspecContent = '''name: cli_schema_test_$chatNanoId
+description: Temporary package for schema validation testing
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: ^3.0.0
+
+dependencies:
+  test: ^1.24.0
+''';
+
+    await pubspecFile.create(recursive: true);
+    await pubspecFile.writeAsString(pubspecContent);
   }
 
   Future<void> _removeSchemaFiles() async {
     try {
       print(
-        '[$chatNanoId] _removeSchemaFiles - $schemaResponseFilePath - $schemaTestFilePath',
+        '[$chatNanoId] _removeSchemaFiles - $schemaResponseFilePath - $schemaTestFilePath - $schemaPubspecFilePath',
       );
       await File(schemaResponseFilePath).delete();
       await File(schemaTestFilePath).delete();
+      await File(schemaPubspecFilePath).delete();
     } catch (_) {
       // Ignore errors during cleanup
     }

@@ -113,7 +113,7 @@
     },
     {
       "name": "programming_cli_core_sdk",
-      "version": "2.1.0",
+      "version": "2.1.1",
       "dependencies": [
         "meta",
         "nanoid2",
@@ -127,7 +127,7 @@
     },
     {
       "name": "claude_code_sdk",
-      "version": "5.0.5",
+      "version": "5.0.6",
       "dependencies": [
         "path",
         "programming_cli_core_sdk"
@@ -139,7 +139,7 @@
     },
     {
       "name": "codex_cli_sdk",
-      "version": "4.1.5",
+      "version": "4.1.6",
       "dependencies": [
         "path",
         "programming_cli_core_sdk"
@@ -151,7 +151,7 @@
     },
     {
       "name": "gemini_cli_sdk",
-      "version": "4.0.5",
+      "version": "4.0.6",
       "dependencies": [
         "path",
         "programming_cli_core_sdk"

@@ -1,3 +1,17 @@
+## 2.1.1
+
+### Bug Fixes
+- **Fixed "No pubspec.yaml file found" error during schema validation**: The schema test functionality now creates a minimal `pubspec.yaml` file in the chat's working directory before running `dart test`. This ensures the Dart test runner can execute properly even in isolated/scoped directories.
+
+### Technical Details
+- Added `schemaPubspecFilePath` getter to track the pubspec.yaml location
+- `_setupSchemaFiles()` now creates a temporary `pubspec.yaml` with the `test` package dependency
+- `_removeSchemaFiles()` now cleans up the temporary `pubspec.yaml` file
+- The pubspec uses a unique package name (`cli_schema_test_$chatNanoId`) to prevent conflicts
+
+### Context
+When using schema validation (`sendMessageWithSchema`), the AI is instructed to run `dart test` to validate its JSON output. Previously, this would fail with "No pubspec.yaml file found" when the chat was scoped to an isolated directory (`ai_generated_files/$chatNanoId/`). Now, a minimal pubspec.yaml is automatically created and cleaned up, allowing the test to run successfully.
+
 ## 2.1.0
 
 ### Features

@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.0.6
+
+### Dependencies
+- **Updated `programming_cli_core_sdk` to 2.1.1**: Inherits critical bug fix that resolves "No pubspec.yaml file found" error during schema validation. The core SDK now automatically creates and cleans up a minimal pubspec.yaml when running schema tests, enabling successful validation in isolated/scoped directories.
+
 ## 5.0.5
 
 ### Improvements

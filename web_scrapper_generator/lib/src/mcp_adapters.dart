@@ -246,10 +246,12 @@ class UnifiedPlaywrightSetup {
 
   Future<void> _configureMcpPlaywright(McpAdapter adapter) async {
     // Use the official Microsoft Playwright MCP
+    // Include NODE_PATH so it can find locally installed playwright
     await adapter.addMcpServer(
       'playwright',
       command: 'npx',
       args: ['@playwright/mcp@latest', '--headless'],
+      env: {'NODE_PATH': path.join(Directory.current.path, 'node_modules')},
     );
   }
 }
