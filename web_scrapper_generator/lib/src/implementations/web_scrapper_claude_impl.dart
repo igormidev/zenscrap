@@ -43,6 +43,45 @@ class WebScrapperClaudeImpl
 
     // Setup ScrapingBee MCP server using the unified setup
     await UnifiedScrapingBeeSetup.instance.setupWithAdapter(adapter);
+
+    // Verify MCPs are properly installed
+    print('🔍 Verifying MCP server installation...\n');
+    final mcpServers = await _claudeSDK.listMcpServers();
+
+    // Log all registered MCP servers
+    print('📋 Registered MCP servers (${mcpServers.length}):');
+    for (final server in mcpServers) {
+      print('  - ${server.name}: ${server.command} ${server.args.join(' ')}');
+    }
+    print('');
+
+    // Check for required MCP servers
+    final hasPlaywright = mcpServers.any(
+      (s) => s.name.toLowerCase().contains('playwright'),
+    );
+    final hasScrapingBee = mcpServers.any(
+      (s) => s.name == 'scraping-bee-mcp' || s.name.contains('scraping_bee'),
+    );
+
+    if (!hasPlaywright) {
+      throw Exception(
+        '❌ Playwright MCP server is not installed!\n'
+        'The AI needs Playwright MCP to interact with web pages.\n'
+        'Please check the setup logs above for errors.',
+      );
+    }
+
+    if (!hasScrapingBee) {
+      throw Exception(
+        '❌ ScrapingBee MCP server is not installed!\n'
+        'The AI needs ScrapingBee MCP to test extraction rules.\n'
+        'Please check the setup logs above for errors.',
+      );
+    }
+
+    print('✅ All required MCP servers are installed and ready!\n');
+    print('   ✓ Playwright MCP: Available for web page interaction');
+    print('   ✓ ScrapingBee MCP: Available for extraction rule testing\n');
   }
 
   final ClaudeChat _chat;

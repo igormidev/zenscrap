@@ -32,15 +32,5 @@ void main() {
       expect(ClaudeModel.claude35Sonnet, isNotNull);
       expect(ClaudeModel.claude35Haiku, isNotNull);
     });
-
-    test('Claude implementation extends correct base class', () {
-      // Verify inheritance structure
-      expect(
-        WebScrapperClaudeImpl,
-        isA<Type>(),
-      );
-      // Note: Can't directly test inheritance without an instance,
-      // but compilation success proves it extends WebScrapperGeneratorController
-    });
   });
 }

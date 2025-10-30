@@ -1,5 +1,18 @@
 # Changelog
 
+## 5.0.5
+
+### Improvements
+- **Enhanced MCP Compatibility**: Expanded the isolated environment to include additional essential environment variables (USER, TMPDIR, TEMP, TMP, SHELL, NODE_PATH) when an API key is provided. This ensures MCP servers (which run as Node.js processes via npx) have sufficient context to function properly while maintaining security isolation.
+
+### Technical Details
+- Modified `_buildEnvironment()` in `claude_chat.dart` to conditionally include essential system environment variables that MCP servers need to operate
+- Maintains security: still uses `includeParentEnvironment: false` and only includes whitelisted essential variables
+- Backward compatible: when no API key is provided, behavior remains unchanged
+
+### Context
+This change fixes issues where Claude CLI with API key isolation couldn't access MCP servers because npm/node processes lacked necessary environment context. Now MCP tools (Playwright, ScrapingBee, etc.) work correctly even with API key isolation enabled.
+
 ## 5.0.4
 
 ### Security

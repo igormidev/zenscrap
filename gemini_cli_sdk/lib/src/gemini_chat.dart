@@ -175,10 +175,20 @@ ${_options.systemPrompt}
     if (apiKey != null) {
       // Create isolated environment when API key is provided
       // This prevents leaking parent environment credentials
+      // Include essential vars for MCP servers (Node.js processes) to function
       env = {
         'PATH': Platform.environment['PATH'] ?? '',
         'HOME': Platform.environment['HOME'] ?? '',
         'GEMINI_API_KEY': apiKey!,
+        // Essential for npm/node operations (MCP servers)
+        if (Platform.environment['USER'] != null) 'USER': Platform.environment['USER']!,
+        if (Platform.environment['TMPDIR'] != null) 'TMPDIR': Platform.environment['TMPDIR']!,
+        if (Platform.environment['TEMP'] != null) 'TEMP': Platform.environment['TEMP']!,
+        if (Platform.environment['TMP'] != null) 'TMP': Platform.environment['TMP']!,
+        // Shell context for some CLI operations
+        if (Platform.environment['SHELL'] != null) 'SHELL': Platform.environment['SHELL']!,
+        // Node.js module resolution
+        if (Platform.environment['NODE_PATH'] != null) 'NODE_PATH': Platform.environment['NODE_PATH']!,
       };
     } else {
       // No API key: use full parent environment

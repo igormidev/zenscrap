@@ -182,11 +182,18 @@ class CodexChat extends CliChatInterface<CodexChatOptions> {
       ..createSync(recursive: true);
 
     // Build isolated environment for login
-    // Only include essential PATH and HOME to prevent credential leakage
+    // Include essential vars for proper CLI operation
     final loginEnv = {
       'PATH': Platform.environment['PATH'] ?? '',
       'HOME': tempDir.path,
       'CODEX_HOME': _codexHomeDir!.path,
+      // Essential for npm/node operations
+      if (Platform.environment['USER'] != null) 'USER': Platform.environment['USER']!,
+      if (Platform.environment['TMPDIR'] != null) 'TMPDIR': Platform.environment['TMPDIR']!,
+      if (Platform.environment['TEMP'] != null) 'TEMP': Platform.environment['TEMP']!,
+      if (Platform.environment['TMP'] != null) 'TMP': Platform.environment['TMP']!,
+      if (Platform.environment['SHELL'] != null) 'SHELL': Platform.environment['SHELL']!,
+      if (Platform.environment['NODE_PATH'] != null) 'NODE_PATH': Platform.environment['NODE_PATH']!,
     };
 
     // Run: codex login --with-api-key (and pipe API key to stdin)
@@ -218,9 +225,19 @@ class CodexChat extends CliChatInterface<CodexChatOptions> {
     if (apiKey != null) {
       // Create isolated environment when API key is provided
       // This prevents leaking parent environment credentials
+      // Include essential vars for MCP servers (Node.js processes) to function
       env = {
         'PATH': Platform.environment['PATH'] ?? '',
         'HOME': Platform.environment['HOME'] ?? '',
+        // Essential for npm/node operations (MCP servers)
+        if (Platform.environment['USER'] != null) 'USER': Platform.environment['USER']!,
+        if (Platform.environment['TMPDIR'] != null) 'TMPDIR': Platform.environment['TMPDIR']!,
+        if (Platform.environment['TEMP'] != null) 'TEMP': Platform.environment['TEMP']!,
+        if (Platform.environment['TMP'] != null) 'TMP': Platform.environment['TMP']!,
+        // Shell context for some CLI operations
+        if (Platform.environment['SHELL'] != null) 'SHELL': Platform.environment['SHELL']!,
+        // Node.js module resolution
+        if (Platform.environment['NODE_PATH'] != null) 'NODE_PATH': Platform.environment['NODE_PATH']!,
       };
 
       // If we created an isolated CODEX_HOME, use it
