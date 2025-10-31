@@ -99,7 +99,7 @@ class WebScrapperClaudeImpl
       systemPrompt: _convertSystemPromptForClaude(),
       model: model.apiName,
       permissionMode: 'bypassPermissions',
-      // MCP servers are configured at SDK level in initClaude
+      enableMcp: true, // Enable MCP to access globally configured servers
     );
 
     final chat = _claudeSDK.createNewChat(options: initialOptions);

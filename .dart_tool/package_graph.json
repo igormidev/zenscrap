@@ -127,7 +127,7 @@
     },
     {
       "name": "claude_code_sdk",
-      "version": "5.0.6",
+      "version": "5.0.8",
       "dependencies": [
         "path",
         "programming_cli_core_sdk"

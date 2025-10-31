@@ -122,7 +122,6 @@ class ClaudeChat extends CliChatInterface<ClaudeChatOptions> {
       env = {
         'PATH': Platform.environment['PATH'] ?? '',
         'HOME': Platform.environment['HOME'] ?? '',
-        'ANTHROPIC_API_KEY': apiKey!,
         // Essential for npm/node operations (MCP servers)
         if (Platform.environment['USER'] != null) 'USER': Platform.environment['USER']!,
         if (Platform.environment['TMPDIR'] != null) 'TMPDIR': Platform.environment['TMPDIR']!,
@@ -133,6 +132,23 @@ class ClaudeChat extends CliChatInterface<ClaudeChatOptions> {
         // Node.js module resolution
         if (Platform.environment['NODE_PATH'] != null) 'NODE_PATH': Platform.environment['NODE_PATH']!,
       };
+
+      // FIX #3: When MCP is enabled, use global config location
+      // Don't set CLAUDE_HOME - let CLI use default location based on HOME
+      // This mirrors the Codex SDK fix in v4.1.3
+      if (_options.enableMcp == true) {
+        // Set API key via environment variable when MCP is enabled
+        // This allows access to globally configured MCP servers
+        env['ANTHROPIC_API_KEY'] = apiKey!;
+
+        // Preserve CLAUDE_HOME from parent if it exists
+        if (Platform.environment['CLAUDE_HOME'] != null) {
+          env['CLAUDE_HOME'] = Platform.environment['CLAUDE_HOME']!;
+        }
+      } else {
+        // Non-MCP mode: use API key in isolated environment
+        env['ANTHROPIC_API_KEY'] = apiKey!;
+      }
     } else {
       // No API key: use full parent environment
       env = Map<String, String>.from(Platform.environment);

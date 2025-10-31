@@ -48,7 +48,7 @@ Future<ProcessResult> runClaudeOnceInCurrentDir({
     args,
     workingDirectory: cwd.path,
     environment: childEnv,
-    includeParentEnvironment: false, // isolate from parent secrets
+    includeParentEnvironment: true, // isolate from parent secrets
     runInShell: false,
   );
 

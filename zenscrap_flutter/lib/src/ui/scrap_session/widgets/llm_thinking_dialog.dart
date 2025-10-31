@@ -10,6 +10,7 @@ class LLMThinkingDialog extends ConsumerWidget {
 
   /// Removes ANSI escape codes and other control characters
   String _cleanText(String text) {
+    return text;
     // Remove ANSI escape codes (color codes, cursor movements, etc.)
     // Pattern matches ESC[ followed by any characters up to a letter
     final ansiPattern = RegExp(r'\x1B\[[0-9;]*[a-zA-Z]');

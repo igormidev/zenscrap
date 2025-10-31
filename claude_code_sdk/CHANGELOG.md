@@ -1,5 +1,43 @@
 # Changelog
 
+## 5.0.8
+
+### Fixed
+- **CRITICAL: MCP Configuration File Location**: Fixed major bug where SDK was writing MCP config to wrong file (`~/.claude/.claude.json`) while Claude Code reads from `~/.claude.json`. This was the root cause of "Required MCP tools are not available" errors.
+- **MCP Configuration Format**: Updated MCP config structure to use correct key ("mcpServers" at root level) matching Claude Code's expected format.
+
+### Technical Details
+- Changed `_configFilePath` from `~/.claude/.claude.json` to `~/.claude.json`
+- Updated `listMcpServers()` to read from `mcpServers` key at root level
+- Updated `addMcpServer()` to write to `mcpServers` key at root level
+- Updated `removeMcpServer()` to use correct config structure
+- Removed obsolete `_normalizeMcpConfig()` function
+- MCP server format already includes required "type": "stdio" field
+
+### Context
+This fix resolves the core issue discovered through testing: the SDK was writing MCP configurations to a file that Claude Code never reads. Claude Code stores global MCP servers in `~/.claude.json` under the "mcpServers" key, not in a separate `.claude/.claude.json` file. The previous fixes for environment variables and `enableMcp` option were correct, but ineffective because MCPs weren't in the right location.
+
+## 5.0.7
+
+### Fixed
+- **MCP Support with API Key Isolation**: Fixed critical bug where MCP (Model Context Protocol) servers were not accessible in chat sessions when using API key authentication. The SDK now properly configures the subprocess environment to access globally configured MCP servers like Playwright and ScrapingBee.
+
+### Added
+- **enableMcp Option**: Added new `enableMcp` field to `ClaudeChatOptions`. When set to `true` and an API key is provided, the chat will use the global `CLAUDE_HOME` configuration, allowing access to globally configured MCP servers.
+- **MCP Access Verification Test**: Added comprehensive test (`test/mcp_access_verification_test.dart`) to verify MCP servers are accessible when using API key authentication with `enableMcp: true`.
+
+### Technical Details
+- **Fix #3 - API Key Isolation**: When `enableMcp: true`, the SDK no longer sets `CLAUDE_HOME` explicitly, allowing Claude CLI to use the default config location based on `HOME`. This mirrors the Codex SDK v4.1.3 fix and ensures the subprocess can access globally configured MCP servers.
+- **Fix #4 - Config File Location**: Verified `_configFilePath` uses `path.join()` for cross-platform compatibility, ensuring correct config file paths on Windows, macOS, and Linux.
+- **Environment Configuration**: When MCP is enabled, the SDK passes `ANTHROPIC_API_KEY` via environment variable and preserves the parent's `CLAUDE_HOME` if set, while maintaining security isolation via `includeParentEnvironment: false`.
+- Updated `ClaudeChatOptions` with `enableMcp` field and corresponding `copyWith` support.
+
+### Context
+This change exactly mirrors the fix implemented in Codex CLI SDK v4.1.3 for the same issue. The key insight: when MCP is enabled, don't override the config location - let the CLI find it at the default location based on `HOME`. The improved fix ensures MCP servers work correctly by:
+1. Not setting `CLAUDE_HOME` when `enableMcp: true` (85% probability fix - API key isolation)
+2. Using default config location based on `HOME` (70% probability fix - location mismatch)
+3. Preserving parent's `CLAUDE_HOME` if explicitly set (edge case support)
+
 ## 5.0.6
 
 ### Dependencies

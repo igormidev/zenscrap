@@ -9,6 +9,12 @@ class ClaudeChatOptions extends CliChatOptions {
   final Map<String, String>? environment;
   final List<String>? additionalArgs;
 
+  /// Enable MCP (Model Context Protocol) support.
+  /// When true and an API key is provided, the chat will use the global
+  /// CLAUDE_HOME configuration instead of creating an isolated one.
+  /// This allows access to globally configured MCP servers.
+  final bool? enableMcp;
+
   const ClaudeChatOptions({
     this.maxTurns,
     this.allowedTools,
@@ -17,6 +23,7 @@ class ClaudeChatOptions extends CliChatOptions {
     this.resumeSessionId,
     this.environment,
     this.additionalArgs,
+    this.enableMcp,
     super.systemPrompt,
     super.model,
     super.cwd,
@@ -64,6 +71,7 @@ class ClaudeChatOptions extends CliChatOptions {
     String? resumeSessionId,
     Map<String, String>? environment,
     List<String>? additionalArgs,
+    bool? enableMcp,
     String? systemPrompt,
     String? model,
     String? cwd,
@@ -76,6 +84,7 @@ class ClaudeChatOptions extends CliChatOptions {
       resumeSessionId: resumeSessionId ?? this.resumeSessionId,
       environment: environment ?? this.environment,
       additionalArgs: additionalArgs ?? this.additionalArgs,
+      enableMcp: enableMcp ?? this.enableMcp,
       systemPrompt: systemPrompt ?? this.systemPrompt,
       model: model ?? this.model,
       cwd: cwd ?? this.cwd,

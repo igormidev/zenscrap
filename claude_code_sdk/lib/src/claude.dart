@@ -167,9 +167,16 @@ class Claude extends CodingCliInterface<ClaudeChat, ClaudeChatOptions> {
 
     try {
       final content = await file.readAsString();
-      final json = _normalizeMcpConfig(jsonDecode(content));
-      final config = McpConfig.fromJson(json);
-      return config.serverList;
+      final json = jsonDecode(content) as Map<String, dynamic>;
+      // Claude Code stores MCP servers at root level under "mcpServers" key
+      final mcpServers = json['mcpServers'] as Map<String, dynamic>? ?? {};
+      final servers = <McpServer>[];
+      mcpServers.forEach((name, config) {
+        if (config is Map<String, dynamic>) {
+          servers.add(McpServer.fromJson(name, config));
+        }
+      });
+      return servers;
     } catch (_) {
       return [];
     }
@@ -209,13 +216,13 @@ class Claude extends CodingCliInterface<ClaudeChat, ClaudeChatOptions> {
       }
     }
 
-    final normalized = _normalizeMcpConfig(configJson);
-    final servers = (normalized['mcp_servers'] as Map<String, dynamic>? ?? {})
+    // Claude Code stores MCP servers at root level under "mcpServers" key
+    final mcpServers = (configJson['mcpServers'] as Map<String, dynamic>? ?? {})
       ..[server.name] = server.toJson();
-    normalized['mcp_servers'] = servers;
+    configJson['mcpServers'] = mcpServers;
 
     final encoder = JsonEncoder.withIndent('  ');
-    await file.writeAsString(encoder.convert(normalized));
+    await file.writeAsString(encoder.convert(configJson));
   }
 
   Future<void> removeMcpServer(String name) async {
@@ -225,14 +232,15 @@ class Claude extends CodingCliInterface<ClaudeChat, ClaudeChatOptions> {
     }
 
     final content = await file.readAsString();
-    final configJson = _normalizeMcpConfig(jsonDecode(content));
-    final servers = configJson['mcp_servers'] as Map<String, dynamic>?;
+    final configJson = jsonDecode(content) as Map<String, dynamic>;
+    // Claude Code stores MCP servers at root level under "mcpServers" key
+    final mcpServers = configJson['mcpServers'] as Map<String, dynamic>?;
 
-    if (servers == null || !servers.containsKey(name)) {
+    if (mcpServers == null || !mcpServers.containsKey(name)) {
       throw CliException('MCP server "$name" not found in configuration.');
     }
 
-    servers.remove(name);
+    mcpServers.remove(name);
     final encoder = JsonEncoder.withIndent('  ');
     await file.writeAsString(encoder.convert(configJson));
   }
@@ -286,7 +294,8 @@ class Claude extends CodingCliInterface<ClaudeChat, ClaudeChatOptions> {
     final home = Platform.environment['HOME'] ??
         Platform.environment['USERPROFILE'] ??
         '';
-    return File(path.join(home, '.claude', '.claude.json'));
+    // Claude Code reads MCP config from ~/.claude.json, not ~/.claude/.claude.json
+    return File(path.join(home, '.claude.json'));
   }
 
   Future<String?> _resolveInstalledVersion() async {
@@ -340,14 +349,6 @@ class Claude extends CodingCliInterface<ClaudeChat, ClaudeChatOptions> {
     }
   }
 
-  Map<String, dynamic> _normalizeMcpConfig(Map<String, dynamic> json) {
-    if (json.containsKey('mcpServers') && !json.containsKey('mcp_servers')) {
-      json = Map<String, dynamic>.from(json);
-      json['mcp_servers'] = json['mcpServers'];
-      json.remove('mcpServers');
-    }
-    return json;
-  }
 
   McpServer? _popularServerTemplate(String name) {
     switch (name) {

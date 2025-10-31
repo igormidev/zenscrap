@@ -82,14 +82,14 @@ void run(List<String> args) async {
   //   scrappingBeeApiKey: scrapingBeeApiKey ?? '',
   //   proxyConfig: proxyConfig,
   // );
-  // Initialize Gemini implementation
+  // Initialize Claude implementation
   await WebScrapperClaudeImpl.initClaude(
     claudeApiKey: pod.getPassword('claudeApiKey') ?? '',
     scrappingBeeApiKey: scrapingBeeApiKey ?? '',
     proxyConfig: proxyConfig,
   );
 
-  // Initialize Stripe configuration
+  // // Initialize Stripe configuration
   StripeConfig.initialize({
     'stripe_secret_key': pod.getPassword('stripeSecretKey') ?? '',
     'stripe_webhook_secret': pod.getPassword('stripeWebhookSecret') ?? '',
@@ -111,7 +111,7 @@ void run(List<String> args) async {
         pod.getPassword('stripeCancelUrl') ?? 'https://yourdomain.com/cancel',
   });
 
-  // Register your future calls
+  // // Register your future calls
   pod.registerFutureCall(
       TestScrappableDisposeFutureCall(), 'dispose_temporary_scrappable');
   pod.registerFutureCall(

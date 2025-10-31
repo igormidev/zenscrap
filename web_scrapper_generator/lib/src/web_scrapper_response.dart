@@ -7,12 +7,18 @@ final class WebScrapperChatAIResponseJustMessage
     extends WebScrapperChatAIResponse {
   final String message;
   const WebScrapperChatAIResponseJustMessage(this.message);
+
+  @override
+  String toString() => message;
 }
 
 final class WebScrapperChatAIResponseErrorMessage
     extends WebScrapperChatAIResponse {
   final String errorDescription;
   const WebScrapperChatAIResponseErrorMessage(this.errorDescription);
+
+  @override
+  String toString() => errorDescription;
 }
 
 final class WebScrapperChatAIResponseWithDataResponse
@@ -22,6 +28,10 @@ final class WebScrapperChatAIResponseWithDataResponse
 
   /// The fetch settings that will be used when calling scrapping bee
   final ScrappingBeeFetchSettings fetchSettings;
+
+  @override
+  String toString() =>
+      '$resumeActionMessage\nFetch Settings: ${fetchSettings.toString()}';
 
   const WebScrapperChatAIResponseWithDataResponse({
     required this.fetchSettings,
