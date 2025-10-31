@@ -6,10 +6,8 @@ void main() {
     'Web scrapper generator with Claude implementation',
     () async {
       // Get API key from environment or use a test key
-      final claudeCodeSdkApiKey =
-          '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';
-      final scrapingBeeApiKey =
-          '37N8150Q1JBVN85NS4RUOUIUYZ2AEUFX69QBM0X74VD13M9TLNRVOFWS7HZMKRG1X4SOH4BKJT5EUN6K';
+      final claudeCodeSdkApiKey = '_';
+      final scrapingBeeApiKey = '_';
 
       // Initialize WebScrapperGeneratorController with proper proxy configuration
       final proxyConfig = ScrappingBeeProxyConfig(

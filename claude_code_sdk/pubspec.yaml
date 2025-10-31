@@ -3,7 +3,6 @@ description: A Dart SDK for interacting with Claude Code, providing seamless int
 version: 5.0.8
 homepage: https://github.com/yourusername/claude_code_sdk
 repository: https://github.com/yourusername/claude_code_sdk
-publish_to: none
 resolution: workspace
 
 environment:

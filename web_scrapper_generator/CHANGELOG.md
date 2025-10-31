@@ -1,3 +1,6 @@
+## 2.0.3
+- General minor refactors
+
 ## 2.0.1
 
 ### Bug Fixes

@@ -6,9 +6,8 @@ void main() {
     'Web scrapper generator with Gemini implementation',
     () async {
       // Get API key from environment or use a test key
-      final geminiApiKey = 'AIzaSyAk2TIoAFf99fVORelCV_KEcg3cJ_GI9AA';
-      final scrapingBeeApiKey =
-          '37N8150Q1JBVN85NS4RUOUIUYZ2AEUFX69QBM0X74VD13M9TLNRVOFWS7HZMKRG1X4SOH4BKJT5EUN6K';
+      final geminiApiKey = '_';
+      final scrapingBeeApiKey = '_';
 
       // Initialize WebScrapperGeneratorController with proper proxy configuration
       final proxyConfig = ScrappingBeeProxyConfig(

@@ -8,10 +8,8 @@ void main() {
     'Web scrapper generator with Codex implementation',
     () async {
       // Get API key from environment or use a test key
-      final codexApiKey =
-          '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';
-      final scrapingBeeApiKey =
-          '37N8150Q1JBVN85NS4RUOUIUYZ2AEUFX69QBM0X74VD13M9TLNRVOFWS7HZMKRG1X4SOH4BKJT5EUN6K';
+      final codexApiKey = '_';
+      final scrapingBeeApiKey = '_';
 
       // Initialize WebScrapperGeneratorController with proper proxy configuration
       final proxyConfig = ScrappingBeeProxyConfig(

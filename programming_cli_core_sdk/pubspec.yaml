@@ -1,7 +1,8 @@
 name: programming_cli_core_sdk
-description: A starting point for Dart libraries or applications.
+description: Core abstractions shared across the Zenscrap CLI SDK packages.
 version: 2.1.1
-# repository: https://github.com/my_org/my_repo
+homepage: https://github.com/yourusername/programming_cli_core_sdk
+repository: https://github.com/yourusername/programming_cli_core_sdk
 resolution: workspace
 
 environment:
