@@ -5,6 +5,7 @@ import 'package:zenscrap_flutter/src/core/mixins/curl_builder_mixin.dart';
 import 'package:zenscrap_flutter/src/design_system/scrappables_listage_ui_template/scrappables_listage_template.dart';
 import 'package:zenscrap_flutter/src/design_system/scrappables_listage_ui_template/pagination_controls.dart';
 import 'package:zenscrap_flutter/src/design_system/scrappables_listage_ui_template/empty_scrappables_state.dart';
+import 'package:zenscrap_flutter/src/design_system/scrappables_listage_ui_template/loading_scrappables_state.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/scrappable_card_indicator.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
@@ -45,10 +46,8 @@ class _MarketplaceViewState extends ConsumerState<MarketplaceView>
         SizedBox(height: 16),
         Expanded(
           child: marketplaceState.when(
-            initial: () => const Center(
-              child: Text('Loading marketplace...'),
-            ),
-            loading: () => const SizedBox.shrink(),
+            initial: () => const LoadingScrappablesState(),
+            loading: () => const LoadingScrappablesState(),
             loaded: (response, searchQuery, selectedCategories) {
               // Track marketplace page view
               analytics.trackMarketplacePageView(
@@ -111,7 +110,12 @@ class _MarketplaceViewState extends ConsumerState<MarketplaceView>
                 ),
               );
             },
-            withError: (error) => const SizedBox.shrink(),
+            withError: (error) => EmptyScrappablesState(
+              isSearchResult: false,
+              title: 'Error loading marketplace',
+              description: error.description,
+              icon: Icons.error_outline_rounded,
+            ),
           ),
         ),
       ],

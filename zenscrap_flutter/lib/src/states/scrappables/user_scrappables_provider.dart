@@ -27,11 +27,24 @@ class UserScrappablesNotifier extends StateNotifier<UserScrappablesState> {
     final signedInUser = sessionManager.signedInUser;
     if (signedInUser == null) return;
 
+    _currentPage = page;
+    _currentSearchQuery = searchQuery;
+    _currentCategories = categories ?? _currentCategories;
+
+    // Preserve previous response if available
+    final previousResponse = state.mapOrNull(
+      withData: (data) => data.response,
+      loading: (loading) => loading.response,
+      withError: (error) => error.response,
+    );
+
     try {
-      state = UserScrappablesState.loading();
-      _currentPage = page;
-      _currentSearchQuery = searchQuery;
-      _currentCategories = categories ?? _currentCategories;
+
+      state = UserScrappablesState.loading(
+        response: previousResponse,
+        searchQuery: _currentSearchQuery,
+        selectedCategories: _currentCategories,
+      );
 
       final result = await ref
           .read(clientProvider)
@@ -47,14 +60,24 @@ class UserScrappablesNotifier extends StateNotifier<UserScrappablesState> {
       result.fold((response) {
         state = UserScrappablesState.withData(
           response: response,
-          searchQuery: searchQuery,
+          searchQuery: _currentSearchQuery,
           selectedCategories: _currentCategories,
         );
       }, (error) {
-        state = UserScrappablesState.withError(error: error);
+        state = UserScrappablesState.withError(
+          error: error,
+          response: previousResponse,
+          searchQuery: _currentSearchQuery,
+          selectedCategories: _currentCategories,
+        );
       });
     } on ZenScrapException catch (e) {
-      state = UserScrappablesState.withError(error: e);
+      state = UserScrappablesState.withError(
+        error: e,
+        response: previousResponse,
+        searchQuery: _currentSearchQuery,
+        selectedCategories: _currentCategories,
+      );
     } catch (error, stackTrace) {
       talker.log(
         'Error loading user scrappables',
@@ -67,6 +90,9 @@ class UserScrappablesNotifier extends StateNotifier<UserScrappablesState> {
           title: 'Error loading scrappables',
           description: 'An unexpected error occurred:\n$error',
         ),
+        response: previousResponse,
+        searchQuery: _currentSearchQuery,
+        selectedCategories: _currentCategories,
       );
     }
   }
