@@ -349,7 +349,6 @@ class Claude extends CodingCliInterface<ClaudeChat, ClaudeChatOptions> {
     }
   }
 
-
   McpServer? _popularServerTemplate(String name) {
     switch (name) {
       case 'filesystem':

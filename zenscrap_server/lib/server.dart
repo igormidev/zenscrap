@@ -4,6 +4,7 @@ import 'package:web_scrapper_generator/web_scrapper_generator.dart';
 import 'package:zenscrap_server/src/auth/handlers/on_send_reset_email.dart';
 import 'package:zenscrap_server/src/auth/handlers/on_send_validation_email.dart';
 import 'package:zenscrap_server/src/core/mixins/api_helper_mixin.dart';
+import 'package:zenscrap_server/src/core/npm_installer.dart';
 import 'package:zenscrap_server/src/core/scraping_bee.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_config.dart';
 import 'package:zenscrap_server/src/future_calls/monthly_subscription_credits_future_call.dart';
@@ -82,6 +83,18 @@ void run(List<String> args) async {
   //   scrappingBeeApiKey: scrapingBeeApiKey ?? '',
   //   proxyConfig: proxyConfig,
   // );
+
+  // Ensure npm is installed before initializing Claude (required for Claude CLI)
+  // This is critical for cloud deployments where npm might not be pre-installed
+  try {
+    await NpmInstaller.ensureNpmInstalled();
+  } catch (e) {
+    print('⚠️  Warning: Failed to ensure npm is installed: $e');
+    print('   Claude Code CLI may not function properly without npm.');
+    print('   Consider installing Node.js manually in your deployment environment.');
+    // Continue anyway - the error will be more specific when Claude tries to use npm
+  }
+
   // Initialize Claude implementation
   await WebScrapperClaudeImpl.initClaude(
     claudeApiKey: pod.getPassword('claudeApiKey') ?? '',
