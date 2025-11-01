@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
@@ -67,9 +69,12 @@ class _DeployButtonState extends ConsumerState<DeployButton> {
                       final analytics = ref.read(analyticsServiceProvider);
 
                       // Get message count for tracking
-                      final messageCount = ref.read(scrapChatProvider).mapOrNull(
-                        standard: (state) => 0, // Count not available
-                      ) ?? 0;
+                      final messageCount =
+                          ref.read(scrapChatProvider).mapOrNull(
+                                    standard: (state) =>
+                                        0, // Count not available
+                                  ) ??
+                              0;
 
                       // Track deploy attempt
                       await analytics.trackScrappableDeployAttempt(
@@ -105,7 +110,8 @@ class _DeployButtonState extends ConsumerState<DeployButton> {
                                 }
                               } else {
                                 // Track unauthenticated attempt
-                                await analytics.trackScrappableDeployUnauthenticatedAttempt(
+                                await analytics
+                                    .trackScrappableDeployUnauthenticatedAttempt(
                                   scrappableId: widget.scrappableId,
                                 );
 
