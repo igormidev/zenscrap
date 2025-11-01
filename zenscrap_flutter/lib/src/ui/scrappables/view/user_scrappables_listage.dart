@@ -2,11 +2,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/mixins/edit_scrappable.dart';
-import 'package:zenscrap_flutter/src/design_system/elements/scrappable_grid_listage.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
-import 'package:zenscrap_flutter/src/design_system/widgets/category_filter.dart';
+import 'package:zenscrap_flutter/src/design_system/scrappables_listage_ui_template/scrappables_listage_template.dart';
+import 'package:zenscrap_flutter/src/design_system/scrappables_listage_ui_template/pagination_controls.dart';
+import 'package:zenscrap_flutter/src/design_system/scrappables_listage_ui_template/scrappables_search_bar.dart';
+import 'package:zenscrap_flutter/src/design_system/scrappables_listage_ui_template/category_filter_section.dart';
+import 'package:zenscrap_flutter/src/design_system/scrappables_listage_ui_template/empty_scrappables_state.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/scrappable_card_indicator.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
@@ -15,7 +17,6 @@ import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_prov
 import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables_provider.dart';
 import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables_state.dart';
 import 'package:zenscrap_flutter/src/ui/scrappables/pages/empty_scrappable_listage_indicator_page.dart';
-import 'package:zenscrap_flutter/src/ui/scrappables/widgets/user_scrappables_search_bar.dart';
 
 class UserScrappablesListage extends ConsumerStatefulWidget {
   const UserScrappablesListage({super.key});
@@ -44,9 +45,9 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
     final state = ref.watch(userScrappablesProvider);
 
     return state.map(
-      initial: (_) => EmptyScrappableListageIndicatorPage(),
-      loading: (_) => EmptyScrappableListageIndicatorPage(),
-      withError: (_) => EmptyScrappableListageIndicatorPage(),
+      initial: (_) => const EmptyScrappableListageIndicatorPage(),
+      loading: (_) => const EmptyScrappableListageIndicatorPage(),
+      withError: (_) => const EmptyScrappableListageIndicatorPage(),
       withData: (data) {
         final response = data.response;
         final searchQuery = data.searchQuery;
@@ -60,26 +61,31 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
           hasSearchQuery: searchQuery.isNotEmpty,
         );
 
-        if (scrappables.isEmpty && searchQuery.isEmpty) {
-          return EmptyScrappableListageIndicatorPage();
+        // If no scrappables at all (initial state), show the special empty page
+        if (scrappables.isEmpty &&
+            searchQuery.isEmpty &&
+            selectedCategories.isEmpty) {
+          return const EmptyScrappableListageIndicatorPage();
         }
 
+        // Otherwise, show the main layout with search/filter always visible
         return Column(
           children: [
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Row(
               children: [
                 Text(
                   'Your endpoints',
                   style: context.t.displaySmall,
                 ),
-                Spacer(),
+                const Spacer(),
                 FilledButton.tonalIcon(
                   onPressed: () async {
                     // Track create new click
                     await analytics.trackUserScrappablesCreateNewClick();
 
                     ref.read(scrapChatProvider.notifier).reset();
+                    if (!context.mounted) return;
                     final result = await context.push('/scrappable-form');
                     if (result == true) {
                       unawaited(ref
@@ -87,184 +93,91 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
                           .getScrappables());
                     }
                   },
-                  label: Text('Create new endpoint'),
-                  icon: Icon(Icons.add),
+                  label: const Text('Create new endpoint'),
+                  icon: const Icon(Icons.add),
                 ),
-                SizedBox(width: 20),
+                const SizedBox(width: 20),
               ],
             ),
-            SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: UserScrappablesSearchBar(),
+            const SizedBox(height: 16),
+            ScrappablesSearchBar(
+              hintText: 'Search your endpoints by name or description...',
+              onSearch: (query) {
+                ref.read(userScrappablesProvider.notifier).search(query);
+              },
+              onSearchStart: (query) {
+                analytics.trackUserScrappablesSearchStart(
+                  searchQuery: query,
+                  queryLength: query.length,
+                );
+              },
+              onSearchClear: () {
+                analytics.trackUserScrappablesSearchClear();
+              },
             ),
-            SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: _CategoryFilterSection(
-                selectedCategories: selectedCategories,
-                onCategoriesChanged: (categories) {
-                  ref
-                      .read(userScrappablesProvider.notifier)
-                      .filterByCategories(categories);
-                },
-              ),
+
+            const SizedBox(height: 16),
+            CategoryFilterSection(
+              selectedCategories: selectedCategories,
+              onCategoriesChanged: (categories) {
+                ref
+                    .read(userScrappablesProvider.notifier)
+                    .filterByCategories(categories);
+              },
             ),
-            SizedBox(height: 16),
-            if (scrappables.isEmpty && searchQuery.isNotEmpty)
+
+            const SizedBox(height: 16),
+            // Show empty state if no results, but keep it below filters (FIX for the bug)
+            if (scrappables.isEmpty)
               Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.search_off_rounded,
-                        size: 64,
-                        color: context.c.onSurfaceVariant.withAlpha(128),
-                      ),
-                      SizedBox(height: 16),
-                      Text(
-                        'No endpoints found',
-                        style: context.t.titleLarge?.copyWith(
-                          color: context.c.onSurfaceVariant,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Try searching with different keywords',
-                        style: context.t.bodyMedium?.copyWith(
-                          color: context.c.onSurfaceVariant.withAlpha(179),
-                        ),
-                      ),
-                    ],
-                  ),
+                child: EmptyScrappablesState(
+                  isSearchResult: true,
+                  searchQuery: searchQuery.isNotEmpty
+                      ? searchQuery
+                      : 'the selected ${selectedCategories.length == 1 ? 'category' : 'categories'}',
+                  onClearSearch: () {
+                    if (searchQuery.isNotEmpty) {
+                      ref.read(userScrappablesProvider.notifier).search('');
+                    }
+                    if (selectedCategories.isNotEmpty) {
+                      ref
+                          .read(userScrappablesProvider.notifier)
+                          .filterByCategories({});
+                    }
+                  },
+                  title: 'No endpoints found',
+                  description: searchQuery.isNotEmpty
+                      ? 'Try searching with different keywords or adjust your filters.'
+                      : 'Try selecting different categories or clear your filters.',
                 ),
               )
             else
               Expanded(
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: ScrappableGridListage(
-                        itemCount: scrappables.length,
-                        itemBuilder: (context, index) {
-                          final scrappable = scrappables[index];
-                          return ScrappableCardIndicator(
-                            accountId: accountId,
-                            scrappable: scrappable,
-                          );
-                        },
-                      ),
-                    ),
-                    if (pagination.hasNextPage) ...[
-                      SizedBox(height: 16),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: FilledButton.tonal(
-                          onPressed: () async {
-                            // Track load more click
-                            await analytics.trackUserScrappablesLoadMoreClick(
-                              currentPage: pagination.currentPage,
-                              totalPages: pagination.totalPages,
-                            );
-
-                            ref
-                                .read(userScrappablesProvider.notifier)
-                                .changePage(pagination.currentPage + 1);
-                          },
-                          child: Text(
-                            'Load more (${pagination.currentPage}/${pagination.totalPages})',
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                    ],
-                  ],
+                child: ScrappablesListageTemplate(
+                  scrappables: scrappables,
+                  pagination: pagination,
+                  accountId: accountId,
+                  source: ScrappableCardSource.userScrappables,
+                  paginationControls: PaginationControls(
+                    pagination: pagination,
+                    onPageChanged: (page) {
+                      ref
+                          .read(userScrappablesProvider.notifier)
+                          .changePage(page);
+                    },
+                    mode: PaginationMode.pageNumbers,
+                    onLoadMoreAnalytics: () {
+                      analytics.trackUserScrappablesLoadMoreClick(
+                        currentPage: pagination.currentPage,
+                        totalPages: pagination.totalPages,
+                      );
+                    },
+                  ),
                 ),
               ),
           ],
         );
       },
-    );
-  }
-}
-
-class _CategoryFilterSection extends StatefulWidget {
-  const _CategoryFilterSection({
-    required this.selectedCategories,
-    required this.onCategoriesChanged,
-  });
-
-  final Set<ScraperCategory> selectedCategories;
-  final ValueChanged<Set<ScraperCategory>> onCategoriesChanged;
-
-  @override
-  State<_CategoryFilterSection> createState() => _CategoryFilterSectionState();
-}
-
-class _CategoryFilterSectionState extends State<_CategoryFilterSection> {
-  bool _isExpanded = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: context.c.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: context.c.outlineVariant.withAlpha(128),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        children: [
-          InkWell(
-            onTap: () {
-              setState(() {
-                _isExpanded = !_isExpanded;
-              });
-            },
-            borderRadius: BorderRadius.circular(12),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.filter_list_rounded,
-                    size: 20,
-                    color: context.c.primary,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    widget.selectedCategories.isEmpty
-                        ? 'Filter by category'
-                        : '${widget.selectedCategories.length} ${widget.selectedCategories.length == 1 ? 'category' : 'categories'} selected',
-                    style: context.t.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: context.c.onSurface,
-                    ),
-                  ),
-                  const Spacer(),
-                  Icon(
-                    _isExpanded
-                        ? Icons.keyboard_arrow_up_rounded
-                        : Icons.keyboard_arrow_down_rounded,
-                    color: context.c.onSurfaceVariant,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          if (_isExpanded)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: CategoryFilter(
-                selectedCategories: widget.selectedCategories,
-                onCategoriesChanged: widget.onCategoriesChanged,
-              ),
-            ),
-        ],
-      ),
     );
   }
 }
