@@ -91,7 +91,8 @@ void run(List<String> args) async {
   } catch (e) {
     print('⚠️  Warning: Failed to ensure npm is installed: $e');
     print('   Claude Code CLI may not function properly without npm.');
-    print('   Consider installing Node.js manually in your deployment environment.');
+    print(
+        '   Consider installing Node.js manually in your deployment environment.');
     // Continue anyway - the error will be more specific when Claude tries to use npm
   }
 

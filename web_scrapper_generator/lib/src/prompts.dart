@@ -99,6 +99,7 @@ ScrapingBee has STRICT format requirements. Using the wrong format will cause 50
 5. The format `{"selector": "...", "type": "text"}` is INVALID and will fail!
 
 **See:** https://www.scrapingbee.com/documentation/data-extraction/
+I am SERIous about this - use you web research tool and ENTER THE FUCKING DOCUMENTATION AND FOLLOW THE FORMAT RULES to avoid 500 errors!
 
 - **js_scenario** (string, optional): JSON-encoded scripted actions to run before extraction (click, type, scroll, wait, infinite_scroll, etc.). See: https://www.scrapingbee.com/documentation/javascript-scenario/
 - **render_js** (boolean, default: true): Enable headless browser for JavaScript execution
@@ -405,8 +406,8 @@ Remember: Your goal is to create reliable, cost-effective extraction rules that 
 List<PromptContent> handleInitialPrompts(InitialPayloadData payload) {
   return switch (payload) {
     InitialPayloadDataCreatingFromZero() => creatingFromZeroInitialPrompt(
-      payload: payload,
-    ),
+        payload: payload,
+      ),
     InitialPayloadDataEditingExistingWebScrapper() =>
       editingExistingWebScrapperInitialPrompt(payload: payload),
   };
