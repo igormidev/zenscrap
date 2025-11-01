@@ -5,6 +5,7 @@ mixin CurlBuilderMixin {
     required String baseUrl,
     required int scrappableId,
     required bool isProd,
+    required bool isDisplayCurl,
     String? apiKey,
     Map<String, dynamic>? examplePayload,
     Map<String, String>? additionalHeaders,
@@ -48,6 +49,15 @@ mixin CurlBuilderMixin {
     final escapedPayload = jsonPayload.replaceAll('"', '\\"');
     buffer.write(' \\\n  -d "$escapedPayload"');
 
-    return buffer.toString();
+    String result = buffer.toString();
+
+    if (isDisplayCurl) {
+      result = result.replaceAll(r'\"', '"');
+      if (apiKey != null) {
+        result = result.replaceAll(apiKey, '${apiKey.substring(0, 8)}...');
+      }
+    }
+
+    return result.replaceAll('//api', '/api');
   }
 }

@@ -32,7 +32,8 @@ class ScrappableCurlSection extends ConsumerStatefulWidget {
 
 class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection>
     with CurlBuilderMixin {
-  late final String code;
+  late final String displayCurlCommand;
+  late final String copiableCurlCommand;
   @override
   void initState() {
     super.initState();
@@ -41,17 +42,25 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection>
 
     // Handle test data and extract payload
     if (widget.testData == null) {
-      code = 'No test data available';
+      displayCurlCommand = 'No test data available';
     } else {
       final examplePayload =
           tryDecode(widget.testData!.referenceQueryParametersJson);
 
-      code = buildSimpleCurl(
+      displayCurlCommand = buildSimpleCurl(
+        isDisplayCurl: true,
         baseUrl: baseUrl,
         scrappableId: widget.scrappableId,
         isProd: false, // This is the test endpoint
         examplePayload: examplePayload,
-      ).replaceAll(r'\"', '"').replaceAll('//api', '/api');
+      );
+      copiableCurlCommand = buildSimpleCurl(
+        isDisplayCurl: false,
+        baseUrl: baseUrl,
+        scrappableId: widget.scrappableId,
+        isProd: false, // This is the test endpoint
+        examplePayload: examplePayload,
+      );
     }
   }
 
@@ -64,7 +73,7 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection>
         child: Opacity(
           opacity: 0.6,
           child: CodeBlock(
-            code: code,
+            code: displayCurlCommand,
             leadingWidgets: [
               EditScrappableRequestButton(
                 scrappableRequest: widget.scrappableRequest,
@@ -87,8 +96,8 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection>
 
     return CodeBlock(
       copyTooltipMessage: 'Copy the test cURL command',
-      code: code.replaceAll(r'\"', '"'),
-      copyCode: code,
+      code: displayCurlCommand,
+      copyCode: copiableCurlCommand,
       leadingWidgets: [
         EditScrappableRequestButton(
           scrappableRequest: widget.scrappableRequest,

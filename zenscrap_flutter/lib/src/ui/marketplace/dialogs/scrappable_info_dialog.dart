@@ -38,7 +38,8 @@ class ScrappableInfoDialog extends ConsumerStatefulWidget {
 class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
     with CurlBuilderMixin {
   AccountApiKey? selectedApiKey;
-  String curlCommand = '';
+  String displayCurlCommand = '';
+  String copiableCurlCommand = '';
 
   @override
   void initState() {
@@ -76,18 +77,22 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
     }
 
     setState(() {
-      curlCommand = buildSimpleCurl(
+      displayCurlCommand = buildSimpleCurl(
+        isDisplayCurl: true,
         baseUrl: baseUrl,
         scrappableId: widget.scrappable.id!,
         isProd: true, // Marketplace always uses prod endpoint
         apiKey: selectedApiKey!.apiKey,
         examplePayload: examplePayload,
-      )
-          .replaceAll(r'\"', '"')
-          .replaceAll('//api', '/api')
-          // replace the api key
-          .replaceAll(selectedApiKey!.apiKey,
-              '${selectedApiKey!.apiKey.substring(0, 8)}...');
+      );
+      copiableCurlCommand = buildSimpleCurl(
+        isDisplayCurl: false,
+        baseUrl: baseUrl,
+        scrappableId: widget.scrappable.id!,
+        isProd: true, // Marketplace always uses prod endpoint
+        apiKey: selectedApiKey!.apiKey,
+        examplePayload: examplePayload,
+      );
     });
   }
 
@@ -249,8 +254,8 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
               const SizedBox(height: 12),
               CodeBlock(
                 copyTooltipMessage: 'Copy the test cURL command',
-                code: curlCommand,
-                copyCode: curlCommand,
+                code: displayCurlCommand,
+                copyCode: copiableCurlCommand,
                 fontSize: 12,
               ),
               if (isNewScrappable == false) ...[

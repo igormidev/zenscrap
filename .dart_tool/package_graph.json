@@ -37,8 +37,7 @@
         "rxdart",
         "serverpod",
         "serverpod_auth_server",
-        "uuid",
-        "web_scrapper_generator"
+        "uuid"
       ],
       "devDependencies": [
         "build_runner",
