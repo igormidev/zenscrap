@@ -714,11 +714,8 @@ final _testPeriodExpired = ApiError(
   RequestStatus.clientError,
   ZenScrapException(
     title: 'Test Period Expired',
-    description: '''The test period for this scrappable has expired.
-
-You can:
-- Start a new testing session, that will start a new test period
-- Call the production endpoint with a valid API key if you have an account''',
+    description:
+        'The test period for this scrappable has expired.\nYou can:\n- Start a new testing session, that will start a new test period\n- Call the production endpoint with a valid API key if you have an account',
   ),
 );
 final _noApiFound = ApiError(
