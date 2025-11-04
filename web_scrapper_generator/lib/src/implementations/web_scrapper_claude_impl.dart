@@ -127,11 +127,15 @@ class WebScrapperClaudeImpl
     required String userPrompt,
   }) async {
     List<PromptContent> messages = [];
-
     // Add initial prompts if this is the first message
     final isFirstMessage = !_chat.didSendFirstMessage;
     if (isFirstMessage) {
       messages.addAll(_convertInitialPromptsForClaude());
+    } else {
+      final bool isNew = switch (initialPayload) {
+        InitialPayloadDataCreatingFromZero() => false,
+        InitialPayloadDataEditingExistingWebScrapper() => true,
+      };
     }
 
     // Add the user's prompt
@@ -148,7 +152,10 @@ class WebScrapperClaudeImpl
       );
 
       // Parse the structured response
-      return parseStructuredResponse(result.structuredSchemaData);
+      final structuredResponse =
+          parseStructuredResponse(result.structuredSchemaData);
+
+      return structuredResponse;
     } catch (e) {
       // If there's an error, return an error response
       return WebScrapperChatAIResponseErrorMessage(

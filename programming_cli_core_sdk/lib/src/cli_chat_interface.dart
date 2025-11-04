@@ -25,8 +25,11 @@ abstract class CliChatInterface<T extends CliChatOptions> {
   final Lock _lock = Lock();
   final String chatId = nanoid(length: 4);
   String? get sessionId;
-
   final List<TemporaryFiles> _temporaryFiles = [];
+
+  void removeTemporaryFilesWhere(bool Function(TemporaryFiles tempFile) test) {
+    _temporaryFiles.removeWhere(test);
+  }
 
   Future<void> dispose() async {
     await _cleanupTemporaryFiles();
