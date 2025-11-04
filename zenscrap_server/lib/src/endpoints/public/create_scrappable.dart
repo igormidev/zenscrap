@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:serverpod/serverpod.dart';
+import 'package:web_scrapper_generator/src/documentation/documentation_constants.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class CreateScrappableEndpoint extends Endpoint {
@@ -47,6 +48,7 @@ class CreateScrappableEndpoint extends Endpoint {
     late final String description;
     late final String url;
     late final Map<String, String?> queryParams;
+    late final Map<String, String?> queryParamsNotRelatedToUrl;
     late final List<String> pathParams;
     late final Map<String, String> referenceLinkPathParameters;
     late final ScraperCategory category;
@@ -63,6 +65,12 @@ class CreateScrappableEndpoint extends Endpoint {
           Map<String, dynamic>.from(convertedData['queryParams'] as Map? ?? {});
       rawQueryParams.remove('__example__');
       queryParams = Map<String, String?>.from(rawQueryParams);
+
+      // Remove the __example__ key if present (it's just for schema validation)
+      final Map<String, dynamic> rawQueryParamsNotRelatedToUrl =
+          Map<String, dynamic>.from(convertedData['queryParamsNotRelatedToUrl'] as Map? ?? {});
+      rawQueryParamsNotRelatedToUrl.remove('__example__');
+      queryParamsNotRelatedToUrl = Map<String, String?>.from(rawQueryParamsNotRelatedToUrl);
 
       pathParams =
           List<String>.from(convertedData['pathParams'] as List? ?? []);
@@ -108,6 +116,7 @@ class CreateScrappableEndpoint extends Endpoint {
         ScrappableRequest(
           url: url,
           queryParams: queryParams,
+          queryParamsNotRelatedToUrl: queryParamsNotRelatedToUrl,
           pathParams: pathParams,
         ),
         transaction: transaction,
@@ -167,7 +176,8 @@ You must return a JSON object with EXACTLY these fields at the root level:
 - name: A short descriptive name for this URL pattern (max 50 chars)
 - description: A 1-3 sentence description of what this URL represents
 - url: The URL with dynamic parts replaced by {paramName} placeholders
-- queryParams: An object with query parameters and their values from the URL
+- queryParams: Query parameters that actually appear in or modify the URL (added via Uri.queryParameters)
+- queryParamsNotRelatedToUrl: Parameters for client-side interactions that do NOT modify the URL (used ONLY as {paramName} placeholders in extract_rules/js_scenario)
 - pathParams: An array of parameter names that were replaced in the URL
 - referenceLinkPathParameters: An object mapping parameter names to their actual values from the reference URL
 - category: The most appropriate category for this URL (see category selection rules below)
@@ -195,6 +205,8 @@ You must return a JSON object with EXACTLY these fields at the root level:
 - API version numbers
 - Fixed limits or counts
 
+$scrappableRequestStructureGuide
+
 EXAMPLE 1 - Social Media with Static Params:
 Input URL: www.mySocialMedia.com/posts/123/comments/3854?sort=asc&filter=all
 
@@ -207,6 +219,7 @@ Output:
     "sort": "asc",
     "filter": "all"
   },
+  "queryParamsNotRelatedToUrl": {},
   "pathParams": ["postId", "commentId"],
   "referenceLinkPathParameters": {
     "postId": "123",
@@ -215,10 +228,10 @@ Output:
   "category": "social_media"
 }
 
-EXAMPLE 2 - Search with Dynamic Query (CRITICAL):
+EXAMPLE 2 - Search with Dynamic Query (URL-based search):
 Input URL: https://www.transfermarkt.pt?query=neymar+junior
 
-Analysis: The search term "neymar+junior" will vary - users will search for different players
+Analysis: The search term "neymar+junior" appears in the URL and varies - users will search for different players
 Output:
 {
   "name": "Transfermarkt Player Search",
@@ -227,6 +240,7 @@ Output:
   "queryParams": {
     "query": null
   },
+  "queryParamsNotRelatedToUrl": {},
   "pathParams": [],
   "referenceLinkPathParameters": {},
   "category": "sports"
@@ -237,9 +251,9 @@ Input URL: https://shop.com/products/12345?category=laptops&sort=price&limit=20
 
 Analysis:
 - Product ID (12345) varies per product
-- Category (laptops) will vary as users browse different categories
-- Sort (price) is a common preference, but might vary
-- Limit (20) is probably fixed
+- Category (laptops) appears in URL and varies as users browse different categories
+- Sort (price) appears in URL and is a common preference, but might vary
+- Limit (20) appears in URL and is probably fixed
 
 Output:
 {
@@ -251,6 +265,7 @@ Output:
     "sort": null,
     "limit": "20"
   },
+  "queryParamsNotRelatedToUrl": {},
   "pathParams": ["categoryId"],
   "referenceLinkPathParameters": {
     "categoryId": "12345"
@@ -268,6 +283,7 @@ Output:
   "description": "Individual news articles identified by date and headline slug.",
   "url": "https://news.com/articles/{articleSlug}",
   "queryParams": {},
+  "queryParamsNotRelatedToUrl": {},
   "pathParams": ["articleSlug"],
   "referenceLinkPathParameters": {
     "articleSlug": "2024-01-15/breaking-news-headline-here"
@@ -275,14 +291,71 @@ Output:
   "category": "news"
 }
 
+EXAMPLE 5 - E-commerce with Client-Side Search (queryParamsNotRelatedToUrl):
+Input URL: https://shop.example.com/products
+User Context: "I want to search for products and navigate through pages"
+
+Analysis:
+- The URL doesn't have search or pagination params
+- But the site has a search box and page navigation buttons (client-side only)
+- Create parameters in queryParamsNotRelatedToUrl for search and pagination
+- These will be used as {searchQuery} and {currentPage} placeholders in js_scenario
+- They will NOT be added to the URL
+
+Output:
+{
+  "name": "E-commerce Product Search",
+  "description": "Search for products on the e-commerce site with pagination support. Uses client-side search and page navigation.",
+  "url": "https://shop.example.com/products",
+  "queryParams": {},
+  "queryParamsNotRelatedToUrl": {
+    "searchQuery": null,
+    "currentPage": null
+  },
+  "pathParams": [],
+  "referenceLinkPathParameters": {},
+  "category": "ecommerce"
+}
+
+Note: The searchQuery and currentPage parameters will be used as {searchQuery} and {currentPage} placeholders in the extraction rules that the AI will create later. They will be replaced at runtime with values from the user's API payload.
+
+EXAMPLE 6 - Site with Filters (queryParamsNotRelatedToUrl):
+Input URL: https://realestate.com/listings
+User Context: "I want to filter by location, price range, and number of bedrooms"
+
+Analysis:
+- Site has dropdown filters but they don't update the URL (client-side only)
+- Create parameters in queryParamsNotRelatedToUrl for each filter option
+- Users can control these in their API payloads
+- These will be used as {location}, {minPrice}, etc. in js_scenario
+
+Output:
+{
+  "name": "Real Estate Listings",
+  "description": "Search real estate listings with dynamic filters for location, price range, and bedrooms.",
+  "url": "https://realestate.com/listings",
+  "queryParams": {},
+  "queryParamsNotRelatedToUrl": {
+    "location": null,
+    "minPrice": null,
+    "maxPrice": null,
+    "bedrooms": null
+  },
+  "pathParams": [],
+  "referenceLinkPathParameters": {},
+  "category": "real_estate"
+}
+
 IMPORTANT RULES:
 1. Return ONLY a single flat JSON object - no nesting under "scrappable" or "scrappableTargetRequest"
-2. ALL seven fields must be at the root level of the JSON (including category)
+2. ALL EIGHT fields must be at the root level of the JSON (name, description, url, queryParams, queryParamsNotRelatedToUrl, pathParams, referenceLinkPathParameters, category)
 3. Intelligently identify dynamic URL segments (numbers, IDs, slugs) and replace them with descriptive {paramName} placeholders
-4. **CRITICAL**: For query parameters with search terms, filters, or variable values, set their value to null (not the actual value)
-5. The pathParams array must contain the exact same parameter names used in the url placeholders
-6. The referenceLinkPathParameters must map these parameter names to their actual values from the reference URL
-7. **Think carefully**: Would a user typically want to use different values for this parameter? If yes → null. If no → actual value.
+4. **CRITICAL**: Think carefully about queryParams vs queryParamsNotRelatedToUrl:
+   - Does this parameter appear in the URL? → queryParams
+   - Is this for client-side interaction only? → queryParamsNotRelatedToUrl
+5. For dynamic parameters, set their value to null (not the actual value)
+6. The pathParams array must contain the exact same parameter names used in the url placeholders
+7. The referenceLinkPathParameters must map these parameter names to their actual values from the reference URL
 8. Return raw JSON only - no markdown, no code blocks, no extra text
 
 CATEGORY SELECTION RULES - EXTREMELY IMPORTANT:
@@ -401,7 +474,24 @@ final createScrappableSchema = Schema(
       SchemaType.object,
       nullable: false,
       description:
-          'The query parameters that will be requested by the user in his payload. This is a dynamic map where keys are parameter names and values are their default values.',
+          'Query parameters that will be added to the URL via Uri(queryParameters:). Use this for parameters that actually modify the URL. This is a dynamic map where keys are parameter names and values are their default values (or null for dynamic values).',
+      properties: {
+        '__example__': Schema(
+          SchemaType.string,
+          nullable: true,
+          description:
+              'This is just an example property to satisfy the schema requirement. The actual properties will be dynamic.',
+        ),
+      },
+    ),
+    'queryParamsNotRelatedToUrl': Schema(
+      SchemaType.object,
+      nullable: false,
+      description:
+          'Dynamic parameters used ONLY in extract_rules/js_scenario placeholders as {paramName}, NOT added to the URL. '
+          'Use this for client-side interactions like search boxes, pagination buttons, filters, form inputs that do NOT modify the URL. '
+          'These parameters will be replaced at runtime when users provide values in their API payload. '
+          'Example: {"searchQuery": null, "currentPage": null} - these will become {searchQuery} and {currentPage} placeholders in js_scenario.',
       properties: {
         '__example__': Schema(
           SchemaType.string,

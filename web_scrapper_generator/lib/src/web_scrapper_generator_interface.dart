@@ -25,6 +25,29 @@ final SchemaDefinition webScrapperResponseSchema = SchemaDefinition(
       nullable: true,
       description: SchemaDescriptions.resumeActionMessage,
     ),
+    'scrappableRequest': SchemaProperty.structuredObject(
+      nullable: true,
+      description: SchemaDescriptions.scrappableRequest,
+      properties: {
+        'url': SchemaProperty.text(
+          nullable: false,
+          description: SchemaDescriptions.requestUrl,
+        ),
+        'queryParam': SchemaProperty.objectWithUndefinedProperties(
+          nullable: false,
+          description: SchemaDescriptions.requestQueryParam,
+        ),
+        'queryParamsNotRelatedToUrl': SchemaProperty.objectWithUndefinedProperties(
+          nullable: false,
+          description: SchemaDescriptions.requestQueryParamsNotRelatedToUrl,
+        ),
+        'pathParams': SchemaProperty.array(
+          items: SchemaProperty.text(nullable: false),
+          nullable: false,
+          description: SchemaDescriptions.requestPathParams,
+        ),
+      },
+    ),
     'scrappingBeeFetchSettings': SchemaProperty.structuredObject(
       nullable: true,
       description: SchemaDescriptions.fetchSettings,
@@ -149,6 +172,8 @@ abstract class WebScrapperGeneratorController<TModel> {
         final resumeActionMessage = data['resumeActionMessage'] as String?;
         final scrappingBeeFetchSettingsData =
             data['scrappingBeeFetchSettings'] as Map<String, dynamic>?;
+        final scrappableRequestData =
+            data['scrappableRequest'] as Map<String, dynamic>?;
 
         if (resumeActionMessage == null) {
           return const WebScrapperChatAIResponseErrorMessage(
@@ -156,36 +181,85 @@ abstract class WebScrapperGeneratorController<TModel> {
           );
         }
 
-        // Parse the fetch settings (required for data type)
-        if (scrappingBeeFetchSettingsData == null) {
+        // At least one of fetchSettings or scrappableRequest must be provided
+        if (scrappingBeeFetchSettingsData == null &&
+            scrappableRequestData == null) {
           return const WebScrapperChatAIResponseErrorMessage(
-            'Invalid response: data type must include scrappingBeeFetchSettings',
+            'Invalid response: data type must include either scrappingBeeFetchSettings, scrappableRequest, or both',
           );
         }
 
-        final fetchSettings = ScrappingBeeFetchSettings(
-          url: scrappingBeeFetchSettingsData['url'] as String,
-          extract_rules:
-              scrappingBeeFetchSettingsData['extract_rules'] as String,
-          js_scenario: scrappingBeeFetchSettingsData['js_scenario'] as String?,
-          render_js: scrappingBeeFetchSettingsData['render_js'] as bool,
-          premium_proxy: scrappingBeeFetchSettingsData['premium_proxy'] as bool,
-          stealth_proxy: scrappingBeeFetchSettingsData['stealth_proxy'] as bool,
-          wait: scrappingBeeFetchSettingsData['wait'] as int?,
-          wait_for: scrappingBeeFetchSettingsData['wait_for'] as String?,
-          wait_browser:
-              scrappingBeeFetchSettingsData['wait_browser'] as String?,
-          country_code:
-              scrappingBeeFetchSettingsData['country_code'] as String?,
-          session_id: scrappingBeeFetchSettingsData['session_id'] as String?,
-          custom_google:
-              scrappingBeeFetchSettingsData['custom_google'] as bool?,
-        );
+        // Parse fetch settings if provided
+        ScrappingBeeFetchSettings? fetchSettings;
+        if (scrappingBeeFetchSettingsData != null) {
+          fetchSettings = ScrappingBeeFetchSettings(
+            url: scrappingBeeFetchSettingsData['url'] as String,
+            extract_rules:
+                scrappingBeeFetchSettingsData['extract_rules'] as String,
+            js_scenario:
+                scrappingBeeFetchSettingsData['js_scenario'] as String?,
+            render_js: scrappingBeeFetchSettingsData['render_js'] as bool,
+            premium_proxy:
+                scrappingBeeFetchSettingsData['premium_proxy'] as bool,
+            stealth_proxy:
+                scrappingBeeFetchSettingsData['stealth_proxy'] as bool,
+            wait: scrappingBeeFetchSettingsData['wait'] as int?,
+            wait_for: scrappingBeeFetchSettingsData['wait_for'] as String?,
+            wait_browser:
+                scrappingBeeFetchSettingsData['wait_browser'] as String?,
+            country_code:
+                scrappingBeeFetchSettingsData['country_code'] as String?,
+            session_id: scrappingBeeFetchSettingsData['session_id'] as String?,
+            custom_google:
+                scrappingBeeFetchSettingsData['custom_google'] as bool?,
+          );
+        }
 
-        return WebScrapperChatAIResponseWithDataResponse(
-          resumeActionMessage: resumeActionMessage,
-          fetchSettings: fetchSettings,
-        );
+        // Parse scrappable request if provided
+        WebScrapperRequest? scrappableRequest;
+        if (scrappableRequestData != null) {
+          scrappableRequest = WebScrapperRequest(
+            url: scrappableRequestData['url'] as String,
+            queryParam:
+                (scrappableRequestData['queryParam'] as Map<String, dynamic>)
+                    .map((k, v) => MapEntry(k, v as String?)),
+            queryParamsNotRelatedToUrl:
+                (scrappableRequestData['queryParamsNotRelatedToUrl']
+                            as Map<String, dynamic>?)
+                        ?.map((k, v) => MapEntry(k, v as String?)) ??
+                    {},
+            pathParams: (scrappableRequestData['pathParams'] as List)
+                .map((e) => e as String)
+                .toList(),
+          );
+        }
+
+        // Return appropriate response type based on what was provided
+        if (fetchSettings != null && scrappableRequest != null) {
+          // Both modified
+          return WebScrapperChatAIResponseBothModified(
+            resumeActionMessage: resumeActionMessage,
+            fetchSettings: fetchSettings,
+            scrappableRequest: scrappableRequest,
+          );
+        } else if (fetchSettings != null) {
+          // Only extract rules modified
+          return WebScrapperChatAIResponseOnlyExtractRulesModified(
+            resumeActionMessage: resumeActionMessage,
+            fetchSettings: fetchSettings,
+          );
+        } else if (scrappableRequest != null) {
+          // Only request modified
+          return WebScrapperChatAIResponseOnlyRequestModified(
+            resumeActionMessage: resumeActionMessage,
+            scrappableRequest: scrappableRequest,
+          );
+        } else {
+          // This should never happen due to the check above
+          return const WebScrapperChatAIResponseErrorMessage(
+            'Invalid response: unexpected state in data parsing',
+          );
+        }
 
       default:
         return WebScrapperChatAIResponseErrorMessage(

@@ -13,6 +13,44 @@ import 'package:zenscrap_server/src/generated/protocol.dart';
 
 typedef ApiKey = String;
 typedef NanoId = String;
+
+/// Replaces placeholder patterns {paramName} in a string with actual values from the payload
+String replacePlaceholders(String? input, Map<String, dynamic> payload) {
+  if (input == null || input.isEmpty || payload.isEmpty) return input ?? '';
+
+  String result = input;
+
+  // Create a regex pattern that matches only the keys present in the payload
+  // This is more efficient than matching all {.*} patterns
+  final keys = payload.keys.where((k) => k.isNotEmpty).toList();
+  if (keys.isEmpty) return result;
+
+  // Build pattern like {(?:key1|key2|key3)}
+  final pattern = '{(?:${keys.map(RegExp.escape).join('|')})}';
+  final placeholderPattern = RegExp(pattern);
+
+  // Replace all matches
+  result = result.replaceAllMapped(placeholderPattern, (match) {
+    final fullMatch = match.group(0)!; // e.g., "{searchQuery}"
+    final paramName = fullMatch.substring(1, fullMatch.length - 1); // Remove { and }
+    final value = payload[paramName];
+    return value?.toString() ?? '';
+  });
+
+  return result;
+}
+
+/// Creates a copy of ScrappingBeeExtractLogic with all placeholders replaced
+ScrappingBeeExtractLogic replaceExtractLogicPlaceholders(
+  ScrappingBeeExtractLogic extractLogic,
+  Map<String, dynamic> payload,
+) {
+  return extractLogic.copyWith(
+    extractRules: replacePlaceholders(extractLogic.extractRules, payload),
+    jsScenario: replacePlaceholders(extractLogic.jsScenario, payload),
+  );
+}
+
 mixin ApiHelperMixin {
   static final Map<NanoId, int> _currentConcurrencyRequests = {};
   static final Map<NanoId, PlanTier> _currentAccountPlanTierCache = {};
@@ -511,10 +549,14 @@ mixin ApiHelperMixin {
             ).toFailure();
           }
 
+          // Replace placeholders in extract logic before calling ScrapingBee
+          final extractLogicWithReplacedPlaceholders =
+              replaceExtractLogicPlaceholders(extractRules, payload);
+
           final ExtractFullDataByRule extractResponse =
               await scrappingBee.fetchHtmlAndScreenshotWithLogic(
             targetUrl: targetUrl,
-            scrappingBeeExtractLogic: extractRules,
+            scrappingBeeExtractLogic: extractLogicWithReplacedPlaceholders,
           );
 
           return extractResponse.when(
@@ -610,10 +652,14 @@ mixin ApiHelperMixin {
           });
         } else {
           // Production request - use lighter extraction without screenshot
+          // Replace placeholders in extract logic before calling ScrapingBee
+          final extractLogicWithReplacedPlaceholders =
+              replaceExtractLogicPlaceholders(extractRules, payload);
+
           final ExtractDataByRule extractResponse =
               await scrappingBee.extractByRulesWithLogic(
             targetUrl: targetUrl,
-            scrappingBeeExtractLogic: extractRules,
+            scrappingBeeExtractLogic: extractLogicWithReplacedPlaceholders,
           );
 
           return extractResponse.when(withData: (scrapedData) {

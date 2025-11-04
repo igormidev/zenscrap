@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:gemini_cli_sdk/gemini_cli_sdk.dart';
+import 'package:web_scrapper_generator/src/documentation/documentation_constants.dart';
 import 'package:web_scrapper_generator/src/prompts.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_generator_interface.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_response.dart';

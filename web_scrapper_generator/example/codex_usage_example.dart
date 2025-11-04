@@ -77,7 +77,7 @@ void main() async {
         print('❌ Error: $errorDescription\n');
         break;
 
-      case WebScrapperChatAIResponseWithDataResponse(
+      case WebScrapperChatAIResponseOnlyExtractRulesModified(
         :final resumeActionMessage,
         :final fetchSettings,
       ):
@@ -98,6 +98,22 @@ void main() async {
           print('  - Wait: ${fetchSettings.wait}ms');
         }
         break;
+
+      case WebScrapperChatAIResponseOnlyRequestModified(
+        :final resumeActionMessage,
+      ):
+        print('✅ Success! Codex modified the request structure.\n');
+        print('📋 Summary: $resumeActionMessage\n');
+        break;
+
+      case WebScrapperChatAIResponseBothModified(
+        :final resumeActionMessage,
+        :final fetchSettings,
+      ):
+        print('✅ Success! Codex modified both extraction rules and request.\n');
+        print('📋 Summary: $resumeActionMessage\n');
+        print('  - Updated fetch settings and request structure');
+        break;
     }
 
     // Example: Change model mid-conversation
@@ -117,10 +133,22 @@ void main() async {
         print('📝 GPT-5 says: $message\n');
         break;
 
-      case WebScrapperChatAIResponseWithDataResponse(
+      case WebScrapperChatAIResponseOnlyExtractRulesModified(
         :final resumeActionMessage,
       ):
-        print('✅ GPT-5 updated the configuration: $resumeActionMessage\n');
+        print('✅ GPT-5 updated the extraction rules: $resumeActionMessage\n');
+        break;
+
+      case WebScrapperChatAIResponseOnlyRequestModified(
+        :final resumeActionMessage,
+      ):
+        print('✅ GPT-5 updated the request structure: $resumeActionMessage\n');
+        break;
+
+      case WebScrapperChatAIResponseBothModified(
+        :final resumeActionMessage,
+      ):
+        print('✅ GPT-5 updated both extraction rules and request: $resumeActionMessage\n');
         break;
 
       case WebScrapperChatAIResponseErrorMessage(:final errorDescription):

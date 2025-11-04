@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:claude_code_sdk/claude_code_sdk.dart';
+import 'package:web_scrapper_generator/src/documentation/documentation_constants.dart';
 import 'package:web_scrapper_generator/src/prompts.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_generator_interface.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_response.dart';
@@ -216,7 +217,7 @@ class WebScrapperClaudeImpl
   /// Convert the system prompt to be Claude-compatible
   static String _convertSystemPromptForClaude() {
     // Claude Code has full MCP support - use complete prompt with MCP instructions
-    return systemPrompt; // Use the full system prompt from prompts.dart
+    return systemPrompt; // Use the full system prompt from documentation_constants.dart
   }
 
   /// Convert initial prompts from Gemini format to Claude format

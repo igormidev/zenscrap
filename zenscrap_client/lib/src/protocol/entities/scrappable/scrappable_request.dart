@@ -17,6 +17,7 @@ abstract class ScrappableRequest implements _i1.SerializableModel {
     this.id,
     required this.url,
     required this.queryParams,
+    required this.queryParamsNotRelatedToUrl,
     required this.pathParams,
     this.scrappable,
   });
@@ -25,6 +26,7 @@ abstract class ScrappableRequest implements _i1.SerializableModel {
     int? id,
     required String url,
     required Map<String, String?> queryParams,
+    required Map<String, String?> queryParamsNotRelatedToUrl,
     required List<String> pathParams,
     _i2.Scrappable? scrappable,
   }) = _ScrappableRequestImpl;
@@ -38,6 +40,12 @@ abstract class ScrappableRequest implements _i1.SerializableModel {
                 k as String,
                 v as String?,
               )),
+      queryParamsNotRelatedToUrl:
+          (jsonSerialization['queryParamsNotRelatedToUrl'] as Map)
+              .map((k, v) => MapEntry(
+                    k as String,
+                    v as String?,
+                  )),
       pathParams: (jsonSerialization['pathParams'] as List)
           .map((e) => e as String)
           .toList(),
@@ -57,6 +65,8 @@ abstract class ScrappableRequest implements _i1.SerializableModel {
 
   Map<String, String?> queryParams;
 
+  Map<String, String?> queryParamsNotRelatedToUrl;
+
   List<String> pathParams;
 
   _i2.Scrappable? scrappable;
@@ -68,6 +78,7 @@ abstract class ScrappableRequest implements _i1.SerializableModel {
     int? id,
     String? url,
     Map<String, String?>? queryParams,
+    Map<String, String?>? queryParamsNotRelatedToUrl,
     List<String>? pathParams,
     _i2.Scrappable? scrappable,
   });
@@ -77,6 +88,7 @@ abstract class ScrappableRequest implements _i1.SerializableModel {
       if (id != null) 'id': id,
       'url': url,
       'queryParams': queryParams.toJson(),
+      'queryParamsNotRelatedToUrl': queryParamsNotRelatedToUrl.toJson(),
       'pathParams': pathParams.toJson(),
       if (scrappable != null) 'scrappable': scrappable?.toJson(),
     };
@@ -95,12 +107,14 @@ class _ScrappableRequestImpl extends ScrappableRequest {
     int? id,
     required String url,
     required Map<String, String?> queryParams,
+    required Map<String, String?> queryParamsNotRelatedToUrl,
     required List<String> pathParams,
     _i2.Scrappable? scrappable,
   }) : super._(
           id: id,
           url: url,
           queryParams: queryParams,
+          queryParamsNotRelatedToUrl: queryParamsNotRelatedToUrl,
           pathParams: pathParams,
           scrappable: scrappable,
         );
@@ -113,6 +127,7 @@ class _ScrappableRequestImpl extends ScrappableRequest {
     Object? id = _Undefined,
     String? url,
     Map<String, String?>? queryParams,
+    Map<String, String?>? queryParamsNotRelatedToUrl,
     List<String>? pathParams,
     Object? scrappable = _Undefined,
   }) {
@@ -121,6 +136,15 @@ class _ScrappableRequestImpl extends ScrappableRequest {
       url: url ?? this.url,
       queryParams: queryParams ??
           this.queryParams.map((
+                key0,
+                value0,
+              ) =>
+                  MapEntry(
+                    key0,
+                    value0,
+                  )),
+      queryParamsNotRelatedToUrl: queryParamsNotRelatedToUrl ??
+          this.queryParamsNotRelatedToUrl.map((
                 key0,
                 value0,
               ) =>

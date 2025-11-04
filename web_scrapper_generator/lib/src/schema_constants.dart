@@ -13,20 +13,20 @@ class SchemaDescriptions {
   static const String resumeActionMessage =
       'A summary of what the AI did (used for responseType "data")';
 
-  // Request descriptions
-  static const String request =
-      'Modified WebScrapperRequest if changes were made, null if no changes needed';
+  // Request descriptions (for responseType "data")
+  static const String scrappableRequest =
+      'Modified ScrappableRequest structure if the AI needs to add/modify dynamic parameters. Include this when adding queryParams or queryParamsNotRelatedToUrl fields. Optional - only include if request structure needs modification.';
   static const String requestUrl =
       'URL pattern with {paramName} placeholders for dynamic segments';
   static const String requestQueryParam =
-      'Query parameters with optional default values';
-  static const String requestQueryParamDynamic =
-      'Dynamic key-value pairs for query parameters';
-  static const String requestPathParams = 'List of path parameter names';
+      'Query parameters that will be added to the URL. Map values are default values if not in user payload. Example: {"sort": "asc", "filter": null}';
+  static const String requestQueryParamsNotRelatedToUrl =
+      'Dynamic parameters used ONLY in extract_rules/js_scenario placeholders, NOT added to URL. For client-side interactions like search boxes, pagination buttons, filters. Example: {"searchQuery": null, "currentPage": null}';
+  static const String requestPathParams = 'List of path parameter names that appear as {paramName} in the URL';
 
-  // Fetch settings descriptions
+  // Fetch settings descriptions (for responseType "data")
   static const String fetchSettings =
-      'ScrapingBee fetch settings (used for responseType "data")';
+      'ScrapingBee fetch settings with extraction rules. Required for responseType "data".';
   static const String fetchUrl = 'The target URL for scraping';
   static const String fetchExtractRules =
       '''JSON-encoded extraction rules. CRITICAL FORMAT REQUIREMENTS:\n

@@ -1038,6 +1038,12 @@ class Protocol extends _i1.SerializationManagerServer {
           dartType: 'Map<String,String?>',
         ),
         _i2.ColumnDefinition(
+          name: 'queryParamsNotRelatedToUrl',
+          columnType: _i2.ColumnType.json,
+          isNullable: false,
+          dartType: 'Map<String,String?>',
+        ),
+        _i2.ColumnDefinition(
           name: 'pathParams',
           columnType: _i2.ColumnType.json,
           isNullable: false,

@@ -2,13 +2,13 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:gemini_cli_sdk/gemini_cli_sdk.dart';
+import 'package:web_scrapper_generator/src/documentation/documentation_constants.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_generator_interface.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_response.dart';
 
-const String systemPrompt =
-    '''You are a world-class expert in web scraping, web automation, and web data extraction with deep knowledge of HTML, CSS, JavaScript, HTTP protocols, and modern web scraping techniques.
-
-🚨 **ABSOLUTE REQUIREMENTS - NO EXCEPTIONS** 🚨
+// NOTE: systemPrompt, howToWriteEffectiveScrapingBeeExtractRules, costOptimization,
+// and scrappableRequestStructureGuide are now imported from documentation_constants.dart
+// This provides a single source of truth for all documentation.
 
 1. **MCP TOOLS ARE MANDATORY**: You MUST use the Playwright MCP and ScrapingBee MCP tools. These are NOT optional.
 
@@ -111,6 +111,163 @@ I am SERIous about this - use you web research tool and ENTER THE FUCKING DOCUME
 - **country_code** (string, optional): Proxy geolocation (2-letter code like us, de, br)
 - **session_id** (integer, optional): Maintain same IP across requests (sticky session)
 - **custom_google** (boolean, optional): MUST be true for Google domains (google.com, news.google.com, etc.)
+
+## 🔧 Dynamic Parameter Placeholders (CRITICAL NEW FEATURE)
+
+### What Are Placeholders?
+
+The system supports **dynamic parameter placeholders** using the syntax `{parameterName}` in both `extract_rules` and `js_scenario`. These placeholders allow you to create extraction rules that work with user-provided values.
+
+### When to Use Placeholders
+
+Use placeholders for parameters that users will provide in their API payload:
+- **Search queries**: `{searchQuery}`, `{query}`, `{searchTerm}`
+- **Pagination**: `{currentPage}`, `{page}`, `{pageNumber}`
+- **Filters**: `{category}`, `{location}`, `{minPrice}`, `{maxPrice}`
+- **Form inputs**: `{startDate}`, `{endDate}`, `{quantity}`
+- **Any dynamic value**: Users control via API payload
+
+### How Placeholders Work
+
+1. **Creation**: You use `{parameterName}` in your extraction rules
+2. **Testing**: When testing with ScrapingBee MCP, use realistic mock values (explained below)
+3. **Runtime**: The system replaces `{parameterName}` with actual values from the user's API payload
+4. **Available Parameters**: Check the `WebScrapperRequest` queryParams and pathParams to see what's available
+
+### Using Placeholders in js_scenario
+
+**CRITICAL**: Placeholders are especially powerful in `js_scenario` for user interactions!
+
+**Example 1 - Search Box Interaction**:
+```json
+{
+  "instructions": [
+    {"wait": 1000},
+    {"click": "input#search-box"},
+    {"type": "{searchQuery}"},
+    {"click": "button.search-submit"},
+    {"wait_for": "div.results-loaded"}
+  ]
+}
+```
+At runtime: `{searchQuery}` is replaced with the actual search term from the user's payload (e.g., "laptop")
+
+**Example 2 - Pagination via Button Clicks**:
+```json
+{
+  "instructions": [
+    {"wait": 1000},
+    {"click": "button[data-page='{currentPage}']"},
+    {"wait_for": "div.page-loaded"}
+  ]
+}
+```
+At runtime: `{currentPage}` is replaced with "2" if user sends `{"currentPage": "2"}`
+
+**Example 3 - Multiple Filters**:
+```json
+{
+  "instructions": [
+    {"select": {"selector": "select#category", "value": "{category}"}},
+    {"fill": {"selector": "input#min-price", "value": "{minPrice}"}},
+    {"fill": {"selector": "input#max-price", "value": "{maxPrice}"}},
+    {"click": "button#apply-filters"},
+    {"wait_for": "div.filtered-results"}
+  ]
+}
+```
+
+### Using Placeholders in extract_rules
+
+You can also use placeholders in CSS selectors if needed:
+
+**Example - Dynamic attribute selection**:
+```json
+{
+  "products": {
+    "selector": ".product-card",
+    "type": "list",
+    "output": {
+      "name": ".product-name",
+      "price": ".price"
+    }
+  }
+}
+```
+
+Note: Placeholders in extract_rules are less common than in js_scenario, but can be useful for dynamic selector construction.
+
+### Testing with Mock Values (MANDATORY)
+
+**CRITICAL**: When testing your extraction rules with the ScrapingBee MCP `test_extract_rules` tool, you MUST replace placeholders with realistic mock values!
+
+**Why?** The ScrapingBee API doesn't understand `{parameterName}` syntax - it needs actual values to test.
+
+**How to test**:
+1. Before calling `test_extract_rules`, create a test version of your rules
+2. Replace ALL placeholders with realistic mock values
+3. Test with ScrapingBee MCP
+4. Once validated, return the ORIGINAL rules (with placeholders intact)
+
+**Example Testing Process**:
+
+Your original js_scenario (with placeholders):
+```json
+{
+  "instructions": [
+    {"click": "input.search"},
+    {"type": "{searchQuery}"},
+    {"click": "button.submit"}
+  ]
+}
+```
+
+For testing with MCP, use:
+```json
+{
+  "instructions": [
+    {"click": "input.search"},
+    {"type": "test product"},
+    {"click": "button.submit"}
+  ]
+}
+```
+
+After successful test, return the ORIGINAL with placeholders:
+```json
+{
+  "instructions": [
+    {"click": "input.search"},
+    {"type": "{searchQuery}"},
+    {"click": "button.submit"}
+  ]
+}
+```
+
+### Placeholder Best Practices
+
+1. **Use descriptive names**: `{searchQuery}` not `{q}`, `{currentPage}` not `{p}`
+2. **Match parameter names**: Use the exact parameter names from `WebScrapperRequest.queryParams`
+3. **Test thoroughly**: Always test with realistic mock values before returning
+4. **Document in resumeActionMessage**: Explain which placeholders users need to provide
+5. **Set sensible defaults**: When possible, suggest default values in your message
+
+### Common Placeholder Patterns
+
+- Search: `{searchQuery}`, `{query}`, `{keyword}`
+- Pagination: `{currentPage}`, `{page}`, `{offset}`, `{limit}`
+- Filters: `{category}`, `{brand}`, `{color}`, `{size}`
+- Price: `{minPrice}`, `{maxPrice}`, `{priceRange}`
+- Date: `{startDate}`, `{endDate}`, `{dateFrom}`, `{dateTo}`
+- Location: `{location}`, `{city}`, `{country}`, `{zipCode}`
+
+### Important Notes
+
+- Placeholders are case-sensitive: `{searchQuery}` ≠ `{searchquery}`
+- Use them in js_scenario for maximum power (interactions)
+- Always test with mock values via ScrapingBee MCP
+- Return the placeholder version (not the mock version) in your final response
+- The system will handle replacement at runtime automatically
 
 ## Dynamic Country Proxy Selection (IMPORTANT)
 
@@ -423,6 +580,18 @@ List<PromptContent> creatingFromZeroInitialPrompt({
   final inputBytes = Uint8List.fromList(e.convert(requestJson).codeUnits);
 
   return [
+    // System prompt
+    PromptContent.text(systemPrompt),
+
+    // How to write effective ScrapingBee extract rules
+    PromptContent.text(howToWriteEffectiveScrapingBeeExtractRules),
+
+    // Cost optimization guide
+    PromptContent.text(costOptimization),
+
+    // Scrappable request structure guide
+    PromptContent.text(scrappableRequestStructureGuide),
+
     PromptContent.text('''## Task: Create New Web Scraper
 
 You need to create extraction rules for a new web scraper from scratch.
@@ -435,8 +604,20 @@ You need to create extraction rules for a new web scraper from scratch.
 - If the user asks you to "try with this other URL" or provides alternative URLs, use those for testing
 - Your final ScrappingBeeFetchSettings.url should ALWAYS be the actual URL you validated the extraction rules against
 
-**Request Configuration (READ-ONLY CONTEXT)**:
-The following JSON contains the WebScrapperRequest configuration that was automatically generated from the URL. This is provided as context to help you understand the URL structure and parameters, but you CANNOT modify this configuration. The user has a separate UI dialog to edit URL patterns, query parameters, and path parameters.
+**Request Configuration**:
+The following JSON contains the WebScrapperRequest configuration that was automatically generated from the URL. This provides context about the URL structure and existing parameters.
+
+**IMPORTANT - You CAN Modify This Configuration**:
+- If your extraction rules need additional dynamic parameters (for search, pagination, filters, etc.), you can modify the request structure
+- Add parameters to `queryParams` if they appear in the URL
+- Add parameters to `queryParamsNotRelatedToUrl` for client-side interactions (search boxes, pagination buttons)
+- Use `{parameterName}` placeholders in your extraction rules for any parameters with `null` values
+- Check the scrappable_request_structure_guide.md for full details on when to use queryParams vs queryParamsNotRelatedToUrl
+
+**Response Type Selection**:
+- If you only modify extraction rules → return scrappingBeeFetchSettings (only)
+- If you only modify request structure → return scrappableRequest (only)
+- If you modify both → return both scrappingBeeFetchSettings and scrappableRequest
 '''),
     PromptContent.bytes(
       data: inputBytes,
@@ -447,19 +628,35 @@ The following JSON contains the WebScrapperRequest configuration that was automa
 ## Your Process:
 
 1. **Explore the Site**: Use Playwright MCP to open and analyze the target URL
-2. **Understand Requirements**: Based on the user's request, identify what data needs to be extracted
-3. **Create Extraction Rules**: Design CSS/XPath selectors to extract the required data
-4. **Test with ScrapingBee** (MANDATORY): Use the test_extract_rules tool to validate your rules
-   - **CRITICAL**: You MUST test the EXACT extract_rules JSON you created
+2. **Understand Requirements**: Based on the user's request, identify what data needs to be extracted and what interactions are needed
+3. **Determine Parameter Needs**:
+   - If extraction requires user inputs (search, pagination, filters), check if those parameters exist in the current request
+   - If needed parameters don't exist, you'll need to modify the request structure
+   - Decide whether parameters should be queryParams (URL-based) or queryParamsNotRelatedToUrl (client-side only)
+4. **Create/Modify Request Structure** (if needed):
+   - Add new parameters to queryParams or queryParamsNotRelatedToUrl as appropriate
+   - This will be returned in your scrappableRequest field
+5. **Create Extraction Rules**: Design CSS/XPath selectors to extract the required data
+   - **USE PLACEHOLDERS**: Use `{paramName}` syntax for any dynamic parameters
+   - Example: `{"type": "{searchQuery}"}` in js_scenario for search functionality
+   - See how_to_write_effective_scrapping_bee_extract_rules.md for detailed guidance
+6. **Test with ScrapingBee** (MANDATORY): Use the test_extract_rules tool to validate your rules
+   - **CRITICAL**: Replace placeholders with mock values for testing (e.g., `{searchQuery}` → "test query")
+   - Test the rules with realistic mock data
    - **NEVER** skip this step or return untested rules
-5. **Optimize for Cost**: Test with cheaper configurations to minimize credit usage
-6. **Return Results**: Provide ONLY the tested and validated ScrappingBeeFetchSettings
+7. **Optimize for Cost**: Test with cheaper configurations to minimize credit usage
+   - See cost_optimization.md for the complete optimization strategy
+8. **Return Results**: Choose the appropriate response pattern:
+   - **Only extraction rules modified** → return only scrappingBeeFetchSettings
+   - **Only request structure modified** → return only scrappableRequest
+   - **Both modified** → return both scrappingBeeFetchSettings and scrappableRequest
+   - **IMPORTANT**: Return rules with PLACEHOLDERS intact (not the mock values used for testing)
    - Priority: no proxy > premium_proxy > stealth_proxy (cheapest to most expensive)
    - 95% of sites work without stealth_proxy
    - Only LinkedIn, Meta platforms typically need stealth_proxy
 
 ## Important Notes:
-- **FOCUS ON EXTRACTION RULES ONLY**: Your sole responsibility is creating and optimizing extraction rules. The WebScrapperRequest configuration (URL pattern, query params, path params) is managed separately by the user through a UI dialog.
+- **You can modify both extraction rules AND request structure** as needed
 - **ALWAYS start with premium_proxy=true for testing, then optimize down**
 - Only use stealth_proxy if premium_proxy fails (rare - mainly LinkedIn/Meta)
 - **MANDATORY**: Always validate extraction rules using ScrapingBee MCP's test_extract_rules
@@ -494,6 +691,18 @@ List<PromptContent> editingExistingWebScrapperInitialPrompt({
   final inputBytes = Uint8List.fromList(e.convert(inputJson).codeUnits);
 
   return [
+    // System prompt
+    PromptContent.text(systemPrompt),
+
+    // How to write effective ScrapingBee extract rules
+    PromptContent.text(howToWriteEffectiveScrapingBeeExtractRules),
+
+    // Cost optimization guide
+    PromptContent.text(costOptimization),
+
+    // Scrappable request structure guide
+    PromptContent.text(scrappableRequestStructureGuide),
+
     PromptContent.text('''## Task: Edit Existing Web Scraper
 
 You are editing an existing, working web scraper. The current configuration successfully extracts data, but the user wants to make modifications.
@@ -506,10 +715,23 @@ You are editing an existing, working web scraper. The current configuration succ
 - Your final ScrappingBeeFetchSettings.url should be the URL you actually validated against
 - This means if you test with a new URL, that becomes the url in your response
 
-**Current Configuration (READ-ONLY CONTEXT)**:
+**Current Configuration**:
 The following JSON contains:
-1. **currentRequest**: The current WebScrapperRequest (URL pattern, query params, path params) - This is READ-ONLY context. The user manages this through a separate UI dialog.
-2. **currentFetchSettings**: The current ScrapingBee settings that are successfully extracting data - This is what you can modify and improve.
+1. **currentRequest**: The current WebScrapperRequest (URL pattern, query params, path params) - You can modify this if needed
+2. **currentFetchSettings**: The current ScrapingBee settings that are successfully extracting data - You can modify and improve this
+
+**IMPORTANT - You CAN Modify Both Configurations**:
+- If your changes need additional dynamic parameters (for search, pagination, filters, etc.), you can modify the request structure
+- Add parameters to `queryParams` if they appear in the URL
+- Add parameters to `queryParamsNotRelatedToUrl` for client-side interactions (search boxes, pagination buttons)
+- Use `{parameterName}` placeholders in your extraction rules for any parameters with `null` values
+- Check if the current settings already use placeholders - maintain consistency
+- Check the scrappable_request_structure_guide.md for full details on when to use queryParams vs queryParamsNotRelatedToUrl
+
+**Response Type Selection**:
+- If you only modify extraction rules → return scrappingBeeFetchSettings (only)
+- If you only modify request structure → return scrappableRequest (only)
+- If you modify both → return both scrappingBeeFetchSettings and scrappableRequest
 '''),
     PromptContent.bytes(
       data: inputBytes,
@@ -520,17 +742,27 @@ The following JSON contains:
 ## Your Process:
 
 1. **Understand Current Setup**: The existing rules are working correctly
+   - Check if current rules use placeholders like `{searchQuery}` or `{currentPage}`
+   - Understand which parameters are dynamic (null values in queryParams and queryParamsNotRelatedToUrl)
 2. **Identify Required Changes**: Based on the user's request, determine what needs modification
+   - If adding new interactions, consider using placeholders for dynamic values
+   - Maintain consistency with existing placeholder usage
+   - See how_to_write_effective_scrapping_bee_extract_rules.md for guidance
 3. **Test Modifications** (MANDATORY): Use Playwright and ScrapingBee MCPs to test changes
-   - **CRITICAL**: Test the modified extract_rules with ScrapingBee MCP
+   - **CRITICAL**: Replace placeholders with mock values when testing (e.g., `{searchQuery}` → "test query")
+   - Test the modified extract_rules with ScrapingBee MCP
    - **NEVER** return modified rules without MCP validation
 4. **Preserve What Works**: Don't break existing functionality unless explicitly requested
+   - Keep existing placeholders unless user asks to change them
+   - Don't replace placeholders with hardcoded values
 5. **Optimize if Possible**: If making changes, also check if settings can be optimized
+   - See cost_optimization.md for the complete optimization strategy
 6. **Return Updated Configuration**: Provide ONLY tested and validated settings
+   - **IMPORTANT**: Return rules with PLACEHOLDERS intact (not the mock values used for testing)
 
 ## Important Notes:
 - The current configuration is WORKING - be careful not to break it
-- **FOCUS ON EXTRACTION RULES**: Your responsibility is modifying/improving extraction rules only. URL patterns and parameters are managed by the user through a separate UI.
+- **You can modify both extraction rules AND request structure** as needed
 - **MANDATORY**: Test extraction rule modifications with ScrapingBee MCP before returning
 - **CRITICAL**: Modified extract_rules MUST pass MCP testing
 - If the user's requested change would break functionality, explain why
@@ -541,7 +773,9 @@ The following JSON contains:
 - **Return Patterns:**
   * If user is just asking questions → Use `responseType: "message"`
   * If current setup already meets requirements → Use `responseType: "message"` to explain
-  * If you modified extraction rules → Use `responseType: "data"` with tested scrappingBeeFetchSettings after MCP validation
+  * If you only modified extraction rules → return only scrappingBeeFetchSettings
+  * If you only modified request structure → return only scrappableRequest
+  * If you modified both → return both scrappingBeeFetchSettings and scrappableRequest
   * DON'T return a "data" response if nothing changed
 - Remember: ScrappingBeeFetchSettings.url will be the actual URL you tested with
 - **NEVER** return modified extraction rules without MCP validation

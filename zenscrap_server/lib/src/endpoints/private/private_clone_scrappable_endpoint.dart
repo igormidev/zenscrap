@@ -76,6 +76,7 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
       ScrappableRequest clonedRequest = ScrappableRequest(
         url: sourceScrappable.targetRequest!.url,
         queryParams: sourceScrappable.targetRequest!.queryParams,
+        queryParamsNotRelatedToUrl: sourceScrappable.targetRequest!.queryParamsNotRelatedToUrl,
         pathParams: sourceScrappable.targetRequest!.pathParams,
       );
       clonedRequest = await ScrappableRequest.db.insertRow(

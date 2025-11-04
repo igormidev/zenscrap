@@ -21,7 +21,8 @@ final class WebScrapperChatAIResponseErrorMessage
   String toString() => errorDescription;
 }
 
-final class WebScrapperChatAIResponseWithDataResponse
+/// Response when only extraction rules (fetch settings) were modified
+final class WebScrapperChatAIResponseOnlyExtractRulesModified
     extends WebScrapperChatAIResponse {
   /// A resume from the AI about what it did
   final String resumeActionMessage;
@@ -33,8 +34,50 @@ final class WebScrapperChatAIResponseWithDataResponse
   String toString() =>
       '$resumeActionMessage\nFetch Settings: ${fetchSettings.toString()}';
 
-  const WebScrapperChatAIResponseWithDataResponse({
+  const WebScrapperChatAIResponseOnlyExtractRulesModified({
     required this.fetchSettings,
+    required this.resumeActionMessage,
+  });
+}
+
+/// Response when only the request structure was modified
+final class WebScrapperChatAIResponseOnlyRequestModified
+    extends WebScrapperChatAIResponse {
+  /// A resume from the AI about what it did
+  final String resumeActionMessage;
+
+  /// The modified request structure
+  final WebScrapperRequest scrappableRequest;
+
+  @override
+  String toString() =>
+      '$resumeActionMessage\nRequest: ${scrappableRequest.toString()}';
+
+  const WebScrapperChatAIResponseOnlyRequestModified({
+    required this.scrappableRequest,
+    required this.resumeActionMessage,
+  });
+}
+
+/// Response when both extraction rules and request structure were modified
+final class WebScrapperChatAIResponseBothModified
+    extends WebScrapperChatAIResponse {
+  /// A resume from the AI about what it did
+  final String resumeActionMessage;
+
+  /// The fetch settings that will be used when calling scrapping bee
+  final ScrappingBeeFetchSettings fetchSettings;
+
+  /// The modified request structure
+  final WebScrapperRequest scrappableRequest;
+
+  @override
+  String toString() =>
+      '$resumeActionMessage\nFetch Settings: ${fetchSettings.toString()}\nRequest: ${scrappableRequest.toString()}';
+
+  const WebScrapperChatAIResponseBothModified({
+    required this.fetchSettings,
+    required this.scrappableRequest,
     required this.resumeActionMessage,
   });
 }
@@ -42,14 +85,17 @@ final class WebScrapperChatAIResponseWithDataResponse
 class WebScrapperRequest {
   //  Dynamic path fields are saved as {PATH_PARAM_NAME}. Example: www.mySocialMedia.com/posts/{postId}/comments/{commentsId}
   final String url;
-  // The query parameters that will be requested by the user in his payload, Example: [sort, filter]. The map value will be the default value in case it does not exist in users payload
+  // Query parameters that will be added to the URL. The map value is the default value if not in user payload. Example: {"sort": "asc", "filter": null}
   final Map<String, String?> queryParam;
+  // Dynamic parameters used ONLY in extract_rules/js_scenario placeholders, NOT added to URL. For client-side interactions like search boxes, pagination buttons, filters. Example: {"searchQuery": null, "currentPage": null}
+  final Map<String, String?> queryParamsNotRelatedToUrl;
   // The name of the paths params that will be requested by the user in his payload, Example: [postId, commentsId]
   final List<String> pathParams;
 
   const WebScrapperRequest({
     required this.url,
     required this.queryParam,
+    this.queryParamsNotRelatedToUrl = const {},
     required this.pathParams,
   });
 
@@ -57,13 +103,14 @@ class WebScrapperRequest {
     return <String, dynamic>{
       'url': url,
       'queryParam': queryParam,
+      'queryParamsNotRelatedToUrl': queryParamsNotRelatedToUrl,
       'pathParams': pathParams,
     };
   }
 
   @override
   String toString() =>
-      'WebScrapperRequest(url: $url, queryParam: $queryParam, pathParams: $pathParams)';
+      'WebScrapperRequest(url: $url, queryParam: $queryParam, queryParamsNotRelatedToUrl: $queryParamsNotRelatedToUrl, pathParams: $pathParams)';
 }
 
 class ScrappingBeeFetchSettings {

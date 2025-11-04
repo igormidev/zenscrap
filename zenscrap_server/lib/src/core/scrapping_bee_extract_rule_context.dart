@@ -190,14 +190,6 @@ type: "item" and no matches are found, the API returns null.3 The CLI should che
 
 clean parameter, which is set to true by default and automatically removes unnecessary whitespace and newlines from the extracted text.1 This ensures that the final data is clean and immediately usable without additional client-side processing.
 
-#### **4.3. A Guide to Ethical and Responsible Scraping**
-
-A comprehensive guide on web scraping would be incomplete without a section on ethical and legal considerations. An application that scrapes data should always operate as a responsible citizen of the web. The first rule is to respect the target website's robots.txt file, which contains instructions for web crawlers on which parts of the site can and cannot be accessed.1 Adhering to these rules is a sign of good faith and helps prevent potential legal issues.
-
-Furthermore, a scraper must not put an undue burden on the target website's servers.1 This means limiting the frequency and volume of requests, perhaps by scheduling scraping to run during off-peak hours when traffic is low.17 Websites often use rate limiting to protect against this, and a high volume of requests can result in the scraper's IP address being blocked.18
-
-Finally, the use of scraped data carries legal and copyright responsibilities. While factual data like product prices and names are generally not subject to copyright, republishing large portions of original, copyrighted content like articles or videos is illegal without permission.1 The CLI's developer must be aware of and abide by the terms of service of the websites they scrape and respect data privacy regulations like GDPR.1 This professional approach to scraping ensures that the application is not only technically sound but also ethically compliant.
-
 ### **Conclusions & Recommendations**
 
 This comprehensive manual provides the necessary framework for an AI-powered CLI to generate accurate and resilient data extraction rules for the ScrapingBee API. The central finding is that the AI's current failures on complex data structures are not due to a limitation of the API itself but rather a lack of training on its full capabilities and strategic application.

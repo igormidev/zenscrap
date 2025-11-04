@@ -5,6 +5,7 @@ import 'package:codex_cli_sdk/codex_cli_sdk.dart'
     show Codex, CodexChat, CodexChatOptions;
 import 'package:programming_cli_core_sdk/programming_cli_core_sdk.dart'
     show PromptContent;
+import 'package:web_scrapper_generator/src/documentation/documentation_constants.dart';
 import 'package:web_scrapper_generator/src/prompts.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_generator_interface.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_response.dart';
