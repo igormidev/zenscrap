@@ -45,7 +45,7 @@ abstract class PromptContent {
   }) = BytesContent;
 
   /// Converts the content to a string representation for the CLI
-  String toCliString(String nanoId);
+  String toCliString();
 }
 
 /// Text content to be sent to Codex
@@ -55,7 +55,7 @@ class TextContent extends PromptContent {
   TextContent(this.text);
 
   @override
-  String toCliString(String nanoId) => text;
+  String toCliString() => text;
 }
 
 class FileContent extends PromptContent {
@@ -66,13 +66,12 @@ class FileContent extends PromptContent {
   /// Optional description of what this file contains
   final String? fileDescription;
 
-  String inChatFilePath(String nanoId) =>
-      '${fileName}_id-$nanoId.$fileExtension';
+  String inChatFilePath() => '$fileName.$fileExtension';
 
   FileContent(this.file, {this.fileDescription});
 
   @override
-  String toCliString(String nanoId) =>
+  String toCliString() =>
       // Codex works directly with files in the working directory, no @ prefix - but claude code needs @ for example.
       'File: $filePreffix$inChatFilePath${fileDescription != null ? '\nFile description: $fileDescription' : ''}';
 
@@ -89,8 +88,7 @@ class BytesContent extends PromptContent {
   /// Optional description of what this file contains
   final String? fileDescription;
 
-  String inChatFilePath(String nanoId) =>
-      '${fileName}_id-$nanoId.$fileExtension';
+  String inChatFilePath() => '$fileName.$fileExtension';
 
   BytesContent({
     required this.data,
@@ -100,7 +98,7 @@ class BytesContent extends PromptContent {
   });
 
   @override
-  String toCliString(String nanoId) =>
+  String toCliString() =>
       // Codex works directly with files in the working directory, no @ prefix - but claude code needs @ for example.
-      'File: $filePreffix${inChatFilePath(nanoId)}${fileDescription != null ? '\nFile description: $fileDescription' : ''}';
+      'File: $filePreffix${inChatFilePath()}${fileDescription != null ? '\nFile description: $fileDescription' : ''}';
 }

@@ -108,7 +108,7 @@ class WebScrapperClaudeImpl
     // Update the cwd to the chat-specific directory to scope all file operations
     // Use absolute path to prevent path duplication issues
     final scopedCwd =
-        '${Directory.current.absolute.path}/ai_generated_files/${chat.chatNanoId}';
+        '${Directory.current.absolute.path}/ai_generated_files/${chat.chatId}';
     chat.updateOptions(initialOptions.copyWith(cwd: scopedCwd));
 
     return WebScrapperClaudeImpl._(initialPayload, chat);

@@ -117,7 +117,7 @@ class WebScrapperCodexImpl extends WebScrapperGeneratorController<CodexModel> {
     // Update the cwd to the chat-specific directory to scope all file operations
     // Use absolute path to prevent path duplication issues in Codex
     final scopedCwd =
-        '${Directory.current.absolute.path}/ai_generated_files/${chat.chatNanoId}';
+        '${Directory.current.absolute.path}/ai_generated_files/${chat.chatId}';
     chat.updateOptions(mergedOptions.copyWith(cwd: scopedCwd));
 
     return WebScrapperCodexImpl._(initialPayload, chat);

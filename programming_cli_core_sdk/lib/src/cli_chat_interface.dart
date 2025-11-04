@@ -23,7 +23,7 @@ abstract class CliChatInterface<T extends CliChatOptions> {
   bool get didSendFirstMessage;
 
   final Lock _lock = Lock();
-  final String chatNanoId = nanoid(length: 4);
+  final String chatId = nanoid(length: 4);
   String? get sessionId;
 
   final List<TemporaryFiles> _temporaryFiles = [];
@@ -48,7 +48,7 @@ abstract class CliChatInterface<T extends CliChatOptions> {
       return baseDir;
     }
     // Otherwise, create the scoped directory under baseDir
-    return Directory('${baseDir.path}/ai_generated_files/$chatNanoId');
+    return Directory('${baseDir.path}/ai_generated_files/$chatId');
   }
 
   /// Updates the chat options.
@@ -82,7 +82,7 @@ abstract class CliChatInterface<T extends CliChatOptions> {
   }
 
   Future<({String llmMessage, Map<String, dynamic> structuredSchemaData})>
-  sendMessageWithSchema({
+      sendMessageWithSchema({
     required List<PromptContent> messages,
     required SchemaDefinition schema,
   }) async {
@@ -105,8 +105,7 @@ abstract class CliChatInterface<T extends CliChatOptions> {
   ({
     Stream<String> llmMessage,
     Completer<Map<String, dynamic>> structuredSchemaData,
-  })
-  streamResponseWithSchema({
+  }) streamResponseWithSchema({
     required List<PromptContent> messages,
     required SchemaDefinition schema,
   }) {
@@ -119,35 +118,31 @@ abstract class CliChatInterface<T extends CliChatOptions> {
     );
 
     final completer = Completer<Map<String, dynamic>>();
-    structuredSchemaData.future
-        .then((value) {
-          if (value == null) {
-            completer.completeError(Exception('Schema data is null'));
-          } else {
-            completer.complete(value);
-          }
-        })
-        .catchError((error, stackTrace) {
-          if (!completer.isCompleted) {
-            completer.completeError(error, stackTrace);
-          }
-        });
+    structuredSchemaData.future.then((value) {
+      if (value == null) {
+        completer.completeError(Exception('Schema data is null'));
+      } else {
+        completer.complete(value);
+      }
+    }).catchError((error, stackTrace) {
+      if (!completer.isCompleted) {
+        completer.completeError(error, stackTrace);
+      }
+    });
 
     return (llmMessage: llmMessage, structuredSchemaData: completer);
   }
 
   String get schemaResponseFilePath =>
-      '${aiGeneratedFilesDir.path}/schema_response_id-$chatNanoId.json';
+      '${aiGeneratedFilesDir.path}/schema_response.json';
   String get schemaTestFilePath =>
-      '${aiGeneratedFilesDir.path}/is_schema_correct_in_id-${chatNanoId}_test.dart';
-  String get schemaPubspecFilePath =>
-      '${baseDir.path}/pubspec.yaml';
+      '${aiGeneratedFilesDir.path}/is_schema_correct_test.dart';
+  String get schemaPubspecFilePath => '${baseDir.path}/pubspec.yaml';
 
   ({
     Stream<String> llmMessage,
     Completer<Map<String, dynamic>?> structuredSchemaData,
-  })
-  _handleTemporaryFilesWrapper({
+  }) _handleTemporaryFilesWrapper({
     required List<PromptContent> promptsOfCurrentMessage,
     required SchemaDefinition? schema,
   }) {
@@ -183,7 +178,7 @@ ${options?.systemPrompt}
                     await _generateSchemaPrompt(schema: schema),
                   ),
                 ...promptsOfCurrentMessage,
-              ].getPromptMessage(chatNanoId),
+              ].getPromptMessage(),
             ),
             controller.sink,
           );
@@ -201,8 +196,7 @@ ${options?.systemPrompt}
             // Let's do a recursive call to retry once more
             await _runCli(
               await createProcess(
-                message:
-                    '''❌ SCHEMA VALIDATION FAILED
+                message: '''❌ SCHEMA VALIDATION FAILED
 
 The test failed to validate your JSON output.
 
@@ -392,8 +386,7 @@ Your task is to:
       schemaTestFilePath,
     ).create(recursive: true);
 
-    final String testContent =
-        '''// ignore_for_file: file_names
+    final String testContent = '''// ignore_for_file: file_names
 
 import 'dart:convert';
 import 'dart:io';
@@ -427,9 +420,9 @@ $schemaClassDeclaration
     await schemaTestFolder.writeAsString(testContent);
 
     // Create a minimal pubspec.yaml so dart test can run
-    // Use chatNanoId to ensure unique package name (no spaces or special chars)
+    // Use chatId to ensure unique package name (no spaces or special chars)
     final pubspecFile = File(schemaPubspecFilePath);
-    final pubspecContent = '''name: cli_schema_test_$chatNanoId
+    final pubspecContent = '''name: cli_schema_test_$chatId
 description: Temporary package for schema validation testing
 version: 1.0.0
 publish_to: none
@@ -448,7 +441,7 @@ dependencies:
   Future<void> _removeSchemaFiles() async {
     try {
       print(
-        '[$chatNanoId] _removeSchemaFiles - $schemaResponseFilePath - $schemaTestFilePath - $schemaPubspecFilePath',
+        '[$chatId] _removeSchemaFiles - $schemaResponseFilePath - $schemaTestFilePath - $schemaPubspecFilePath',
       );
       await File(schemaResponseFilePath).delete();
       await File(schemaTestFilePath).delete();
@@ -465,14 +458,14 @@ dependencies:
       if (p is FileContent) {
         _temporaryFiles.add(
           TemporaryFiles(
-            fileName: p.inChatFilePath(chatNanoId),
+            fileName: p.inChatFilePath(),
             fileContent: await p.file.readAsBytes(),
           ),
         );
       } else if (p is BytesContent) {
         _temporaryFiles.add(
           TemporaryFiles(
-            fileName: p.inChatFilePath(chatNanoId),
+            fileName: p.inChatFilePath(),
             fileContent: p.data,
           ),
         );
@@ -498,11 +491,11 @@ dependencies:
     try {
       final chatDir = aiGeneratedFilesDir;
       if (await chatDir.exists()) {
-        print('[$chatNanoId] Deleting directory: ${chatDir.path}');
+        print('[$chatId] Deleting directory: ${chatDir.path}');
         await chatDir.delete(recursive: true);
       }
     } catch (e) {
-      print('[$chatNanoId] Error during cleanup: $e');
+      print('[$chatId] Error during cleanup: $e');
       // Ignore errors during cleanup
     }
   }
@@ -522,11 +515,14 @@ dependencies:
       }
 
       // Now run the actual test
-      final result = await Process.run('dart', [
-        'test',
-        '--chain-stack-traces',
-        schemaTestFilePath,
-      ], workingDirectory: baseDir.path);
+      final result = await Process.run(
+          'dart',
+          [
+            'test',
+            '--chain-stack-traces',
+            schemaTestFilePath,
+          ],
+          workingDirectory: baseDir.path);
 
       if (result.exitCode == 0) {
         print('✅ Tests in $schemaTestFilePath passed!');
