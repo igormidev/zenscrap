@@ -30,33 +30,16 @@ List<PromptContent> creatingFromZeroInitialPrompt({
 
   return [
     // System prompt as MD file
-    PromptContent.bytes(
-      data: Uint8List.fromList(systemPrompt.codeUnits),
-      fileName: 'system_prompt',
-      fileExtension: 'md',
-    ),
+    systemPromptContent,
 
     // How to write effective extraction rules guide as MD file
-    PromptContent.bytes(
-      data: Uint8List.fromList(
-          howToWriteEffectiveScrapingBeeExtractRules.codeUnits),
-      fileName: 'how_to_write_effective_scrapping_bee_extract_rules',
-      fileExtension: 'md',
-    ),
+    extractionRulesContent,
 
     // Cost optimization guide as MD file
-    PromptContent.bytes(
-      data: Uint8List.fromList(costOptimization.codeUnits),
-      fileName: 'cost_optimization',
-      fileExtension: 'md',
-    ),
+    costOptimizationContent,
 
     // Scrappable request structure guide as MD file
-    PromptContent.bytes(
-      data: Uint8List.fromList(scrappableRequestStructureGuide.codeUnits),
-      fileName: 'scrappable_request_structure_guide',
-      fileExtension: 'md',
-    ),
+    scrappableRequestCreationStructureContent,
 
     PromptContent.text('''## Task: Create New Web Scraper
 
@@ -132,33 +115,16 @@ List<PromptContent> editingExistingWebScrapperInitialPrompt({
 
   return [
     // System prompt as MD file
-    PromptContent.bytes(
-      data: Uint8List.fromList(systemPrompt.codeUnits),
-      fileName: 'system_prompt',
-      fileExtension: 'md',
-    ),
+    systemPromptContent,
 
     // How to write effective extraction rules guide as MD file
-    PromptContent.bytes(
-      data: Uint8List.fromList(
-          howToWriteEffectiveScrapingBeeExtractRules.codeUnits),
-      fileName: 'how_to_write_effective_scrapping_bee_extract_rules',
-      fileExtension: 'md',
-    ),
+    extractionRulesContent,
 
     // Cost optimization guide as MD file
-    PromptContent.bytes(
-      data: Uint8List.fromList(costOptimization.codeUnits),
-      fileName: 'cost_optimization',
-      fileExtension: 'md',
-    ),
+    costOptimizationContent,
 
     // Scrappable request structure guide as MD file
-    PromptContent.bytes(
-      data: Uint8List.fromList(scrappableRequestStructureGuide.codeUnits),
-      fileName: 'scrappable_request_structure_guide',
-      fileExtension: 'md',
-    ),
+    scrappableRequestCreationStructureContent,
 
     PromptContent.text('''## Task: Edit Existing Web Scraper
 
@@ -240,3 +206,28 @@ The following JSON contains:
 The user will now describe what modifications they want to make.'''),
   ];
 }
+
+final systemPromptContent = PromptContent.bytes(
+  data: Uint8List.fromList(systemPrompt.codeUnits),
+  fileName: 'system_prompt',
+  fileExtension: 'md',
+);
+
+final extractionRulesContent = PromptContent.bytes(
+  data:
+      Uint8List.fromList(howToWriteEffectiveScrapingBeeExtractRules.codeUnits),
+  fileName: 'how_to_write_effective_scrapping_bee_extract_rules',
+  fileExtension: 'md',
+);
+
+final costOptimizationContent = PromptContent.bytes(
+  data: Uint8List.fromList(costOptimization.codeUnits),
+  fileName: 'cost_optimization',
+  fileExtension: 'md',
+);
+
+final scrappableRequestCreationStructureContent = PromptContent.bytes(
+  data: Uint8List.fromList(scrappableRequestStructureGuide.codeUnits),
+  fileName: 'scrappable_request_structure_guide',
+  fileExtension: 'md',
+);
