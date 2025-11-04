@@ -32,7 +32,8 @@ String replacePlaceholders(String? input, Map<String, dynamic> payload) {
   // Replace all matches
   result = result.replaceAllMapped(placeholderPattern, (match) {
     final fullMatch = match.group(0)!; // e.g., "{searchQuery}"
-    final paramName = fullMatch.substring(1, fullMatch.length - 1); // Remove { and }
+    final paramName =
+        fullMatch.substring(1, fullMatch.length - 1); // Remove { and }
     final value = payload[paramName];
     return value?.toString() ?? '';
   });
@@ -885,6 +886,7 @@ class PeriodicSetRequestsAnalytics extends FutureCall {
       'periodicSetRequestsAnalytics',
       null,
       Duration(minutes: 5), // Adjust interval as needed
+      identifier: 'periodicSetRequestsAnalytics',
     );
   }
 }
@@ -920,6 +922,7 @@ class PeriodicCleanupOldAnalyticsDetails extends FutureCall {
       'periodicCleanupOldAnalyticsDetails',
       null,
       const Duration(hours: 1),
+      identifier: 'periodicCleanupOldAnalyticsDetails',
     );
   }
 }

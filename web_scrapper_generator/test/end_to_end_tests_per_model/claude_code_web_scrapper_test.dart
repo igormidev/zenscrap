@@ -58,7 +58,31 @@ void main() {
         WebScrapperChatAIResponseJustMessage(:final String message) => message,
         WebScrapperChatAIResponseErrorMessage(:final String errorDescription) =>
           errorDescription,
-        WebScrapperChatAIResponseWithDataResponse(
+        WebScrapperChatAIResponseOnlyExtractRulesModified(
+          :final String resumeActionMessage,
+          :final ScrappingBeeFetchSettings fetchSettings,
+        ) =>
+          '''$resumeActionMessage
+
+Fetch settings used:
+{
+  'url': ${fetchSettings.url},
+  'extract_rules': ${fetchSettings.extract_rules},
+  'js_scenario': ${fetchSettings.js_scenario},
+  'render_js': ${fetchSettings.render_js},
+  'wait': ${fetchSettings.wait},
+  'wait_for': ${fetchSettings.wait_for},
+  'wait_browser': ${fetchSettings.wait_browser},
+  'premium_proxy': ${fetchSettings.premium_proxy},
+  'country_code': ${fetchSettings.country_code},
+  'session_id': ${fetchSettings.session_id},
+  'custom_google': ${fetchSettings.custom_google},
+}''',
+        WebScrapperChatAIResponseOnlyRequestModified(
+          :final String resumeActionMessage,
+        ) =>
+          'OnlyRequestModified: $resumeActionMessage',
+        WebScrapperChatAIResponseBothModified(
           :final String resumeActionMessage,
           :final ScrappingBeeFetchSettings fetchSettings,
         ) =>

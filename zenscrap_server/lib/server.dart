@@ -86,15 +86,8 @@ void run(List<String> args) async {
 
   // Ensure npm is installed before initializing Claude (required for Claude CLI)
   // This is critical for cloud deployments where npm might not be pre-installed
-  try {
-    await NpmInstaller.ensureNpmInstalled();
-  } catch (e) {
-    print('⚠️  Warning: Failed to ensure npm is installed: $e');
-    print('   Claude Code CLI may not function properly without npm.');
-    print(
-        '   Consider installing Node.js manually in your deployment environment.');
-    // Continue anyway - the error will be more specific when Claude tries to use npm
-  }
+
+  await NpmInstaller.ensureNpmInstalled();
 
   // Initialize Claude implementation
   await WebScrapperClaudeImpl.initClaude(
@@ -136,22 +129,30 @@ void run(List<String> args) async {
   pod.registerFutureCall(PeriodicCleanupOldAnalyticsDetails(),
       'periodicCleanupOldAnalyticsDetails');
 
+  // Start the server.
+  await pod.start();
+
+  await pod.cancelFutureCall('periodicSetRequestsAnalytics');
+  await pod.cancelFutureCall('periodicCleanupOldAnalyticsDetails');
+
+  // Schedule future calls only if not applying migrations
+  // (when applying migrations, the future call tables may not exist yet)
+  // final isApplyingMigrations = args.contains('--apply-migrations');
+
   // Schedule periodic analytics batching
   await pod.futureCallWithDelay(
     'periodicSetRequestsAnalytics',
     null,
     Duration(minutes: 2),
+    identifier: 'periodicSetRequestsAnalytics',
   );
 
-  // Schedule periodic cleanup of old analytics details (runs every hour)
   await pod.futureCallWithDelay(
     'periodicCleanupOldAnalyticsDetails',
     null,
-    Duration(hours: 1),
+    const Duration(hours: 1),
+    identifier: 'periodicCleanupOldAnalyticsDetails',
   );
-
-  // Start the server.
-  await pod.start();
 }
 
 final ScrapingBee scrappingBee = ScrapingBee();

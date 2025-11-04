@@ -88,11 +88,36 @@ void main() {
           'JustMessage: $message',
         WebScrapperChatAIResponseErrorMessage(:final String errorDescription) =>
           'ErrorMessage: $errorDescription',
-        WebScrapperChatAIResponseWithDataResponse(
+        WebScrapperChatAIResponseOnlyExtractRulesModified(
           :final String resumeActionMessage,
           :final ScrappingBeeFetchSettings fetchSettings,
         ) =>
-          '''WithDataResponse: $resumeActionMessage
+          '''OnlyExtractRulesModified: $resumeActionMessage
+
+Fetch settings used:
+{
+  'url': ${fetchSettings.url},
+  'extract_rules': ${fetchSettings.extract_rules},
+  'js_scenario': ${fetchSettings.js_scenario},
+  'render_js': ${fetchSettings.render_js},
+  'wait': ${fetchSettings.wait},
+  'wait_for': ${fetchSettings.wait_for},
+  'wait_browser': ${fetchSettings.wait_browser},
+  'premium_proxy': ${fetchSettings.premium_proxy},
+  'stealth_proxy': ${fetchSettings.stealth_proxy},
+  'country_code': ${fetchSettings.country_code},
+  'session_id': ${fetchSettings.session_id},
+  'custom_google': ${fetchSettings.custom_google},
+}''',
+        WebScrapperChatAIResponseOnlyRequestModified(
+          :final String resumeActionMessage,
+        ) =>
+          'OnlyRequestModified: $resumeActionMessage',
+        WebScrapperChatAIResponseBothModified(
+          :final String resumeActionMessage,
+          :final ScrappingBeeFetchSettings fetchSettings,
+        ) =>
+          '''BothModified: $resumeActionMessage
 
 Fetch settings used:
 {
@@ -113,7 +138,15 @@ Fetch settings used:
 
       print('\nFinal response type: ${result.runtimeType}');
 
-      expect(result, isA<WebScrapperChatAIResponseWithDataResponse>());
+      // Expect one of the data response types (any modification is acceptable)
+      expect(
+        result,
+        anyOf([
+          isA<WebScrapperChatAIResponseOnlyExtractRulesModified>(),
+          isA<WebScrapperChatAIResponseOnlyRequestModified>(),
+          isA<WebScrapperChatAIResponseBothModified>(),
+        ]),
+      );
 
       // Clean up
       await codexChat.dispose();

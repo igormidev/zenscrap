@@ -113,6 +113,20 @@ void main() async {
         print('✅ Success! Codex modified both extraction rules and request.\n');
         print('📋 Summary: $resumeActionMessage\n');
         print('  - Updated fetch settings and request structure');
+
+        print('\n⚙️ Fetch Settings:');
+        print('  - URL: ${fetchSettings.url}');
+        print('  - Render JS: ${fetchSettings.render_js}');
+        print('  - Premium Proxy: ${fetchSettings.premium_proxy}');
+        print('  - Extract Rules: ${fetchSettings.extract_rules}');
+
+        if (fetchSettings.js_scenario != null) {
+          print('  - JS Scenario: ${fetchSettings.js_scenario}');
+        }
+
+        if (fetchSettings.wait != null) {
+          print('  - Wait: ${fetchSettings.wait}ms');
+        }
         break;
     }
 
