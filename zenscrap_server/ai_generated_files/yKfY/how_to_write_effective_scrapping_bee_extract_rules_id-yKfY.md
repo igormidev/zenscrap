@@ -2,11 +2,11 @@
 
 This guide explains how to write extraction rules for ScrapingBee, including format requirements, placeholder usage, and best practices.
 
-## 🚨 CRITICAL: extract_rules FORMAT REQUIREMENTS 🚨
+## =� CRITICAL: extract_rules FORMAT REQUIREMENTS =�
 
 ScrapingBee has STRICT format requirements. Using the wrong format will cause 500 errors!
 
-### ✅ CORRECT FORMAT (Simple - use for ALL single fields)
+###  CORRECT FORMAT (Simple - use for ALL single fields)
 ```json
 {
   "title": "h1.page-title",
@@ -16,7 +16,7 @@ ScrapingBee has STRICT format requirements. Using the wrong format will cause 50
 }
 ```
 
-### ✅ CORRECT FORMAT (List - use ONLY for arrays)
+###  CORRECT FORMAT (List - use ONLY for arrays)
 ```json
 {
   "products": {
@@ -31,16 +31,16 @@ ScrapingBee has STRICT format requirements. Using the wrong format will cause 50
 }
 ```
 
-### ❌ ABSOLUTELY FORBIDDEN (Verbose - causes 500 errors)
+### L ABSOLUTELY FORBIDDEN (Verbose - causes 500 errors)
 ```json
 {
   "title": {
     "selector": "h1.page-title",
-    "type": "text"  // ❌ DO NOT DO THIS!
+    "type": "text"  // L DO NOT DO THIS!
   },
   "image_url": {
     "selector": "img@src",
-    "type": "attribute"  // ❌ DO NOT DO THIS!
+    "type": "attribute"  // L DO NOT DO THIS!
   }
 }
 ```
@@ -55,7 +55,7 @@ ScrapingBee has STRICT format requirements. Using the wrong format will cause 50
 
 **See:** https://www.scrapingbee.com/documentation/data-extraction/
 
-## 🔧 Dynamic Parameter Placeholders (CRITICAL FEATURE)
+## =' Dynamic Parameter Placeholders (CRITICAL FEATURE)
 
 ### What Are Placeholders?
 
@@ -206,7 +206,7 @@ After successful test, return the ORIGINAL with placeholders:
 
 ## Important Notes
 
-- Placeholders are case-sensitive: `{searchQuery}` ≠ `{searchquery}`
+- Placeholders are case-sensitive: `{searchQuery}` ` `{searchquery}`
 - Use them in js_scenario for maximum power (interactions)
 - Always test with mock values via ScrapingBee MCP
 - Return the placeholder version (not the mock version) in your final response

@@ -2,13 +2,12 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:gemini_cli_sdk/gemini_cli_sdk.dart';
-import 'package:web_scrapper_generator/src/documentation/documentation_constants.dart';
+import 'package:web_scrapper_generator/src/documentation/system_prompt.dart';
+import 'package:web_scrapper_generator/src/documentation/cost_optimization.dart';
+import 'package:web_scrapper_generator/src/documentation/how_to_write_effective_scrapping_bee_extract_rules.dart';
+import 'package:web_scrapper_generator/src/documentation/scrappable_request_structure_guide.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_generator_interface.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_response.dart';
-
-// NOTE: systemPrompt, howToWriteEffectiveScrapingBeeExtractRules, costOptimization,
-// and scrappableRequestStructureGuide are now imported from documentation_constants.dart
-// This provides a single source of truth for all documentation.
 
 List<PromptContent> handleInitialPrompts(InitialPayloadData payload) {
   return switch (payload) {
@@ -27,20 +26,37 @@ List<PromptContent> creatingFromZeroInitialPrompt({
   final WebScrapperRequest webScrapperRequest = payload.webScrapperRequest;
   final e = JsonEncoder.withIndent('  ');
   final requestJson = webScrapperRequest.toMap();
-  final inputBytes = Uint8List.fromList(e.convert(requestJson).codeUnits);
+  final requestBytes = Uint8List.fromList(e.convert(requestJson).codeUnits);
 
   return [
-    // System prompt
-    PromptContent.text(systemPrompt),
+    // System prompt as MD file
+    PromptContent.bytes(
+      data: Uint8List.fromList(systemPrompt.codeUnits),
+      fileName: 'system_prompt',
+      fileExtension: 'md',
+    ),
 
-    // How to write effective extraction rules guide
-    PromptContent.text(howToWriteEffectiveScrapingBeeExtractRules),
+    // How to write effective extraction rules guide as MD file
+    PromptContent.bytes(
+      data: Uint8List.fromList(
+          howToWriteEffectiveScrapingBeeExtractRules.codeUnits),
+      fileName: 'how_to_write_effective_scrapping_bee_extract_rules',
+      fileExtension: 'md',
+    ),
 
-    // Cost optimization guide
-    PromptContent.text(costOptimization),
+    // Cost optimization guide as MD file
+    PromptContent.bytes(
+      data: Uint8List.fromList(costOptimization.codeUnits),
+      fileName: 'cost_optimization',
+      fileExtension: 'md',
+    ),
 
-    // Scrappable request structure guide
-    PromptContent.text(scrappableRequestStructureGuide),
+    // Scrappable request structure guide as MD file
+    PromptContent.bytes(
+      data: Uint8List.fromList(scrappableRequestStructureGuide.codeUnits),
+      fileName: 'scrappable_request_structure_guide',
+      fileExtension: 'md',
+    ),
 
     PromptContent.text('''## Task: Create New Web Scraper
 
@@ -61,7 +77,7 @@ Below is a JSON representation of the WebScrapperRequest that defines the URL pa
 - Parameters in queryParamsNotRelatedToUrl are NEVER added to URL - they're only used for placeholders in extract_rules/js_scenario
 '''),
     PromptContent.bytes(
-      data: inputBytes,
+      data: requestBytes,
       fileName: 'scrapper_request',
       fileExtension: 'json',
     ),
@@ -115,17 +131,34 @@ List<PromptContent> editingExistingWebScrapperInitialPrompt({
   final inputBytes = Uint8List.fromList(e.convert(combinedJson).codeUnits);
 
   return [
-    // System prompt
-    PromptContent.text(systemPrompt),
+    // System prompt as MD file
+    PromptContent.bytes(
+      data: Uint8List.fromList(systemPrompt.codeUnits),
+      fileName: 'system_prompt',
+      fileExtension: 'md',
+    ),
 
-    // How to write effective extraction rules guide
-    PromptContent.text(howToWriteEffectiveScrapingBeeExtractRules),
+    // How to write effective extraction rules guide as MD file
+    PromptContent.bytes(
+      data: Uint8List.fromList(
+          howToWriteEffectiveScrapingBeeExtractRules.codeUnits),
+      fileName: 'how_to_write_effective_scrapping_bee_extract_rules',
+      fileExtension: 'md',
+    ),
 
-    // Cost optimization guide
-    PromptContent.text(costOptimization),
+    // Cost optimization guide as MD file
+    PromptContent.bytes(
+      data: Uint8List.fromList(costOptimization.codeUnits),
+      fileName: 'cost_optimization',
+      fileExtension: 'md',
+    ),
 
-    // Scrappable request structure guide
-    PromptContent.text(scrappableRequestStructureGuide),
+    // Scrappable request structure guide as MD file
+    PromptContent.bytes(
+      data: Uint8List.fromList(scrappableRequestStructureGuide.codeUnits),
+      fileName: 'scrappable_request_structure_guide',
+      fileExtension: 'md',
+    ),
 
     PromptContent.text('''## Task: Edit Existing Web Scraper
 

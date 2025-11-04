@@ -1,4 +1,4 @@
-# Cost Optimization Strategy for ScrapingBee
+const String costOptimization = '''# Cost Optimization Strategy for ScrapingBee
 
 ## Credit Costs
 
@@ -219,3 +219,4 @@ ScrapingBee supports proxies from 195+ countries using ISO 3166-1 alpha-2 codes:
 ❌ **Don't skip testing cheaper alternatives** - you might be wasting credits
 
 Remember: Your goal is to find the CHEAPEST configuration that works reliably!
+''';

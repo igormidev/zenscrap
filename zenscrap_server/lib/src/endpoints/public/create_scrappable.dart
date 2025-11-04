@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:serverpod/serverpod.dart';
-import 'package:web_scrapper_generator/src/documentation/documentation_constants.dart';
+import 'package:web_scrapper_generator/src/documentation/scrappable_request_structure_guide.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class CreateScrappableEndpoint extends Endpoint {

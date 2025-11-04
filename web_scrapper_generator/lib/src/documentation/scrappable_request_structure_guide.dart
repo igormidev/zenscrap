@@ -1,4 +1,4 @@
-# Scrappable Request Structure Guide
+const String scrappableRequestStructureGuide = '''# Scrappable Request Structure Guide
 
 This guide explains the structure of a `ScrappableRequest` and how to properly configure URL patterns, query parameters, and path parameters for web scraping.
 
@@ -249,3 +249,4 @@ An array of parameter names that were replaced in the URL with `{paramName}` pla
 ❌ **Don't** put client-side interaction parameters in `queryParams` if they don't modify the URL
 ❌ **Don't** add the same parameter to both `queryParams` and `queryParamsNotRelatedToUrl`
 ❌ **Don't** forget to list all path placeholder names in `pathParams`
+''';
