@@ -58,22 +58,27 @@ class CreateScrappableEndpoint extends Endpoint {
           jsonDecode(text) as Map<String, dynamic>;
       name = convertedData['name'] as String;
       description = convertedData['description'] as String;
-      url = convertedData['url'] as String;
+
+      // Extract scrappableRequest nested object
+      final Map<String, dynamic> scrappableRequestData =
+          convertedData['scrappableRequest'] as Map<String, dynamic>;
+
+      url = scrappableRequestData['url'] as String;
 
       // Remove the __example__ key if present (it's just for schema validation)
       final Map<String, dynamic> rawQueryParams =
-          Map<String, dynamic>.from(convertedData['queryParams'] as Map? ?? {});
+          Map<String, dynamic>.from(scrappableRequestData['queryParams'] as Map? ?? {});
       rawQueryParams.remove('__example__');
       queryParams = Map<String, String?>.from(rawQueryParams);
 
       // Remove the __example__ key if present (it's just for schema validation)
       final Map<String, dynamic> rawQueryParamsNotRelatedToUrl =
-          Map<String, dynamic>.from(convertedData['queryParamsNotRelatedToUrl'] as Map? ?? {});
+          Map<String, dynamic>.from(scrappableRequestData['queryParamsNotRelatedToUrl'] as Map? ?? {});
       rawQueryParamsNotRelatedToUrl.remove('__example__');
       queryParamsNotRelatedToUrl = Map<String, String?>.from(rawQueryParamsNotRelatedToUrl);
 
       pathParams =
-          List<String>.from(convertedData['pathParams'] as List? ?? []);
+          List<String>.from(scrappableRequestData['pathParams'] as List? ?? []);
 
       // Remove the __example__ key if present (it's just for schema validation)
       final Map<String, dynamic> rawRefLinkParams = Map<String, dynamic>.from(
@@ -168,19 +173,30 @@ class CreateScrappableEndpoint extends Endpoint {
 
 String getPromptToGenerateScrappableTargetRequest(String url,
         {String? userContext}) =>
-    '''I need you to analyze a URL and return a SINGLE flat JSON object with specific fields.
+    '''I need you to analyze a URL and return a structured JSON object representing a scrappable request configuration.
 
 The reference URL to analyze is: "$url"
 
-You must return a JSON object with EXACTLY these fields at the root level:
-- name: A short descriptive name for this URL pattern (max 50 chars)
-- description: A 1-3 sentence description of what this URL represents
-- url: The URL with dynamic parts replaced by {paramName} placeholders
-- queryParams: Query parameters that actually appear in or modify the URL (added via Uri.queryParameters)
-- queryParamsNotRelatedToUrl: Parameters for client-side interactions that do NOT modify the URL (used ONLY as {paramName} placeholders in extract_rules/js_scenario)
-- pathParams: An array of parameter names that were replaced in the URL
-- referenceLinkPathParameters: An object mapping parameter names to their actual values from the reference URL
-- category: The most appropriate category for this URL (see category selection rules below)
+You must return a JSON object with this EXACT structure:
+
+```json
+{
+  "name": "Short descriptive name (max 50 chars)",
+  "description": "1-3 sentence description of what this URL represents",
+  "category": "appropriate_category",
+  "scrappableRequest": {
+    "url": "URL with {paramName} placeholders",
+    "queryParams": {},
+    "queryParamsNotRelatedToUrl": {},
+    "pathParams": []
+  },
+  "referenceLinkPathParameters": {}
+}
+```
+
+## Understanding the Structure
+
+$scrappableRequestStructureGuide
 
 ## CRITICAL: Identifying Dynamic vs Static Parameters
 
@@ -205,8 +221,6 @@ You must return a JSON object with EXACTLY these fields at the root level:
 - API version numbers
 - Fixed limits or counts
 
-$scrappableRequestStructureGuide
-
 EXAMPLE 1 - Social Media with Static Params:
 Input URL: www.mySocialMedia.com/posts/123/comments/3854?sort=asc&filter=all
 
@@ -214,18 +228,20 @@ Output:
 {
   "name": "Social Media Post Comments",
   "description": "Retrieves comments for a specific post on the social media platform, with sorting and filtering options.",
-  "url": "www.mySocialMedia.com/posts/{postId}/comments/{commentId}",
-  "queryParams": {
-    "sort": "asc",
-    "filter": "all"
+  "category": "social_media",
+  "scrappableRequest": {
+    "url": "www.mySocialMedia.com/posts/{postId}/comments/{commentId}",
+    "queryParams": {
+      "sort": "asc",
+      "filter": "all"
+    },
+    "queryParamsNotRelatedToUrl": {},
+    "pathParams": ["postId", "commentId"]
   },
-  "queryParamsNotRelatedToUrl": {},
-  "pathParams": ["postId", "commentId"],
   "referenceLinkPathParameters": {
     "postId": "123",
     "commentId": "3854"
-  },
-  "category": "social_media"
+  }
 }
 
 EXAMPLE 2 - Search with Dynamic Query (URL-based search):
@@ -236,14 +252,16 @@ Output:
 {
   "name": "Transfermarkt Player Search",
   "description": "Searches for football players on Transfermarkt with variable search terms.",
-  "url": "https://www.transfermarkt.pt",
-  "queryParams": {
-    "query": null
+  "category": "sports",
+  "scrappableRequest": {
+    "url": "https://www.transfermarkt.pt",
+    "queryParams": {
+      "query": null
+    },
+    "queryParamsNotRelatedToUrl": {},
+    "pathParams": []
   },
-  "queryParamsNotRelatedToUrl": {},
-  "pathParams": [],
-  "referenceLinkPathParameters": {},
-  "category": "sports"
+  "referenceLinkPathParameters": {}
 }
 
 EXAMPLE 3 - E-commerce with Mixed Dynamic/Static:
@@ -259,18 +277,20 @@ Output:
 {
   "name": "Shop Product Listing",
   "description": "Product listings for an e-commerce site with category filtering and configurable sorting.",
-  "url": "https://shop.com/products/{categoryId}",
-  "queryParams": {
-    "category": null,
-    "sort": null,
-    "limit": "20"
+  "category": "ecommerce",
+  "scrappableRequest": {
+    "url": "https://shop.com/products/{categoryId}",
+    "queryParams": {
+      "category": null,
+      "sort": null,
+      "limit": "20"
+    },
+    "queryParamsNotRelatedToUrl": {},
+    "pathParams": ["categoryId"]
   },
-  "queryParamsNotRelatedToUrl": {},
-  "pathParams": ["categoryId"],
   "referenceLinkPathParameters": {
     "categoryId": "12345"
-  },
-  "category": "ecommerce"
+  }
 }
 
 EXAMPLE 4 - News Article with Slug:
@@ -281,14 +301,16 @@ Output:
 {
   "name": "News Article",
   "description": "Individual news articles identified by date and headline slug.",
-  "url": "https://news.com/articles/{articleSlug}",
-  "queryParams": {},
-  "queryParamsNotRelatedToUrl": {},
-  "pathParams": ["articleSlug"],
+  "category": "news",
+  "scrappableRequest": {
+    "url": "https://news.com/articles/{articleSlug}",
+    "queryParams": {},
+    "queryParamsNotRelatedToUrl": {},
+    "pathParams": ["articleSlug"]
+  },
   "referenceLinkPathParameters": {
     "articleSlug": "2024-01-15/breaking-news-headline-here"
-  },
-  "category": "news"
+  }
 }
 
 EXAMPLE 5 - E-commerce with Client-Side Search (queryParamsNotRelatedToUrl):
@@ -306,15 +328,17 @@ Output:
 {
   "name": "E-commerce Product Search",
   "description": "Search for products on the e-commerce site with pagination support. Uses client-side search and page navigation.",
-  "url": "https://shop.example.com/products",
-  "queryParams": {},
-  "queryParamsNotRelatedToUrl": {
-    "searchQuery": null,
-    "currentPage": null
+  "category": "ecommerce",
+  "scrappableRequest": {
+    "url": "https://shop.example.com/products",
+    "queryParams": {},
+    "queryParamsNotRelatedToUrl": {
+      "searchQuery": null,
+      "currentPage": null
+    },
+    "pathParams": []
   },
-  "pathParams": [],
-  "referenceLinkPathParameters": {},
-  "category": "ecommerce"
+  "referenceLinkPathParameters": {}
 }
 
 Note: The searchQuery and currentPage parameters will be used as {searchQuery} and {currentPage} placeholders in the extraction rules that the AI will create later. They will be replaced at runtime with values from the user's API payload.
@@ -333,30 +357,34 @@ Output:
 {
   "name": "Real Estate Listings",
   "description": "Search real estate listings with dynamic filters for location, price range, and bedrooms.",
-  "url": "https://realestate.com/listings",
-  "queryParams": {},
-  "queryParamsNotRelatedToUrl": {
-    "location": null,
-    "minPrice": null,
-    "maxPrice": null,
-    "bedrooms": null
+  "category": "real_estate",
+  "scrappableRequest": {
+    "url": "https://realestate.com/listings",
+    "queryParams": {},
+    "queryParamsNotRelatedToUrl": {
+      "location": null,
+      "minPrice": null,
+      "maxPrice": null,
+      "bedrooms": null
+    },
+    "pathParams": []
   },
-  "pathParams": [],
-  "referenceLinkPathParameters": {},
-  "category": "real_estate"
+  "referenceLinkPathParameters": {}
 }
 
 IMPORTANT RULES:
-1. Return ONLY a single flat JSON object - no nesting under "scrappable" or "scrappableTargetRequest"
-2. ALL EIGHT fields must be at the root level of the JSON (name, description, url, queryParams, queryParamsNotRelatedToUrl, pathParams, referenceLinkPathParameters, category)
-3. Intelligently identify dynamic URL segments (numbers, IDs, slugs) and replace them with descriptive {paramName} placeholders
-4. **CRITICAL**: Think carefully about queryParams vs queryParamsNotRelatedToUrl:
-   - Does this parameter appear in the URL? → queryParams
-   - Is this for client-side interaction only? → queryParamsNotRelatedToUrl
-5. For dynamic parameters, set their value to null (not the actual value)
-6. The pathParams array must contain the exact same parameter names used in the url placeholders
-7. The referenceLinkPathParameters must map these parameter names to their actual values from the reference URL
-8. Return raw JSON only - no markdown, no code blocks, no extra text
+1. Return a structured JSON object with the nested structure shown above
+2. The top level must have: name, description, category, scrappableRequest, and referenceLinkPathParameters
+3. The scrappableRequest object must contain: url, queryParams, queryParamsNotRelatedToUrl, and pathParams
+4. Intelligently identify dynamic URL segments (numbers, IDs, slugs) and replace them with descriptive {paramName} placeholders
+5. **CRITICAL**: Think carefully about queryParams vs queryParamsNotRelatedToUrl:
+   - Does this parameter appear in the URL? → Put in scrappableRequest.queryParams
+   - Is this for client-side interaction only (URL never changes)? → Put in scrappableRequest.queryParamsNotRelatedToUrl
+   - See the detailed guide above for examples and decision trees
+6. For dynamic parameters, set their value to null (not the actual value)
+7. The pathParams array must contain the exact same parameter names used in the url placeholders
+8. The referenceLinkPathParameters must map these parameter names to their actual values from the reference URL
+9. Return raw JSON only - no markdown, no code blocks, no extra text
 
 CATEGORY SELECTION RULES - EXTREMELY IMPORTANT:
 You MUST carefully analyze the URL content and domain to select the MOST SPECIFIC category. 
@@ -446,9 +474,10 @@ final createScrappableSchema = Schema(
       'This schema enforces the AI to analyze a reference URL and extract: '
       '1) A normalized URL template with path parameters as placeholders (e.g., /posts/{postId}), '
       '2) Query parameters with their default values from the reference URL, '
-      '3) A list of path parameter names that will be dynamically replaced, '
-      '4) The actual values of path parameters from the reference URL for testing purposes, '
-      '5) A human-readable name and description for the scrappable configuration. '
+      '3) Query parameters NOT related to the URL (for client-side interactions), '
+      '4) A list of path parameter names that will be dynamically replaced, '
+      '5) The actual values of path parameters from the reference URL for testing purposes, '
+      '6) A human-readable name, description, and category for the scrappable configuration. '
       'The AI uses intelligent pattern recognition to identify dynamic segments in URLs (like IDs, slugs, usernames) '
       'and converts them into reusable templates that can accept different values while maintaining the same URL structure.',
   nullable: false,
@@ -463,67 +492,6 @@ final createScrappableSchema = Schema(
       SchemaType.string,
       nullable: false,
       description: 'A brief description of what this scrappable is for.',
-    ),
-    'url': Schema(
-      SchemaType.string,
-      nullable: false,
-      description:
-          'The URL with path parameters replaced by placeholders in {param} format.',
-    ),
-    'queryParams': Schema(
-      SchemaType.object,
-      nullable: false,
-      description:
-          'Query parameters that will be added to the URL via Uri(queryParameters:). Use this for parameters that actually modify the URL. This is a dynamic map where keys are parameter names and values are their default values (or null for dynamic values).',
-      properties: {
-        '__example__': Schema(
-          SchemaType.string,
-          nullable: true,
-          description:
-              'This is just an example property to satisfy the schema requirement. The actual properties will be dynamic.',
-        ),
-      },
-    ),
-    'queryParamsNotRelatedToUrl': Schema(
-      SchemaType.object,
-      nullable: false,
-      description:
-          'Dynamic parameters used ONLY in extract_rules/js_scenario placeholders as {paramName}, NOT added to the URL. '
-          'Use this for client-side interactions like search boxes, pagination buttons, filters, form inputs that do NOT modify the URL. '
-          'These parameters will be replaced at runtime when users provide values in their API payload. '
-          'Example: {"searchQuery": null, "currentPage": null} - these will become {searchQuery} and {currentPage} placeholders in js_scenario.',
-      properties: {
-        '__example__': Schema(
-          SchemaType.string,
-          nullable: true,
-          description:
-              'This is just an example property to satisfy the schema requirement. The actual properties will be dynamic.',
-        ),
-      },
-    ),
-    'pathParams': Schema(
-      SchemaType.array,
-      nullable: false,
-      description:
-          'The path parameters that will be requested by the user in his payload.',
-      items: Schema(
-        SchemaType.string,
-        nullable: false,
-      ),
-    ),
-    'referenceLinkPathParameters': Schema(
-      SchemaType.object,
-      nullable: false,
-      description:
-          'A JSON representation of the path parameters extracted of the reference link. This is a dynamic map where keys are parameter names and values are their extracted values from the reference URL.',
-      properties: {
-        '__example__': Schema(
-          SchemaType.string,
-          nullable: true,
-          description:
-              'This is just an example property to satisfy the schema requirement. The actual properties will be dynamic based on the URL path parameters.',
-        ),
-      },
     ),
     'category': Schema(
       SchemaType.string,
@@ -567,6 +535,75 @@ final createScrappableSchema = Schema(
         'videos',
         'other',
       ],
+    ),
+    'scrappableRequest': Schema(
+      SchemaType.object,
+      nullable: false,
+      description:
+          'The scrappable request configuration defining how URLs are constructed and which parameters are available.',
+      properties: {
+        'url': Schema(
+          SchemaType.string,
+          nullable: false,
+          description:
+              'The URL with path parameters replaced by placeholders in {param} format.',
+        ),
+        'queryParams': Schema(
+          SchemaType.object,
+          nullable: false,
+          description:
+              'Query parameters that will be added to the URL via Uri(queryParameters:). Use this for parameters that actually modify the URL. This is a dynamic map where keys are parameter names and values are their default values (or null for dynamic values).',
+          properties: {
+            '__example__': Schema(
+              SchemaType.string,
+              nullable: true,
+              description:
+                  'This is just an example property to satisfy the schema requirement. The actual properties will be dynamic.',
+            ),
+          },
+        ),
+        'queryParamsNotRelatedToUrl': Schema(
+          SchemaType.object,
+          nullable: false,
+          description:
+              'Dynamic parameters used ONLY in extract_rules/js_scenario placeholders as {paramName}, NOT added to the URL. '
+              'Use this for client-side interactions like search boxes, pagination buttons, filters, form inputs that do NOT modify the URL. '
+              'These parameters will be replaced at runtime when users provide values in their API payload. '
+              'Example: {"searchQuery": null, "currentPage": null} - these will become {searchQuery} and {currentPage} placeholders in js_scenario.',
+          properties: {
+            '__example__': Schema(
+              SchemaType.string,
+              nullable: true,
+              description:
+                  'This is just an example property to satisfy the schema requirement. The actual properties will be dynamic.',
+            ),
+          },
+        ),
+        'pathParams': Schema(
+          SchemaType.array,
+          nullable: false,
+          description:
+              'The path parameters that will be requested by the user in their payload.',
+          items: Schema(
+            SchemaType.string,
+            nullable: false,
+          ),
+        ),
+      },
+    ),
+    'referenceLinkPathParameters': Schema(
+      SchemaType.object,
+      nullable: false,
+      description:
+          'A JSON representation of the path parameters extracted from the reference link. This is a dynamic map where keys are parameter names and values are their extracted values from the reference URL.',
+      properties: {
+        '__example__': Schema(
+          SchemaType.string,
+          nullable: true,
+          description:
+              'This is just an example property to satisfy the schema requirement. The actual properties will be dynamic based on the URL path parameters.',
+        ),
+      },
     ),
   },
 );

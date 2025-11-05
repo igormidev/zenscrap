@@ -77,6 +77,34 @@ Use placeholders for parameters that users will provide in their API payload:
 3. **Runtime**: The system replaces `{parameterName}` with actual values from the user's API payload
 4. **Available Parameters**: Check the `WebScrapperRequest` queryParams and queryParamsNotRelatedToUrl to see what's available
 
+### Understanding queryParamsNotRelatedToUrl
+
+**IMPORTANT**: Before using placeholders, you need to understand where they come from!
+
+Placeholders like `{searchQuery}` and `{currentPage}` come from the `queryParamsNotRelatedToUrl` field in the scrappable request. These are parameters that:
+- Do NOT modify the URL
+- Are used ONLY for client-side interactions
+- Are replaced at runtime with user-provided values
+
+**When to Add/Remove queryParamsNotRelatedToUrl:**
+
+✅ **ADD a parameter** if:
+- User needs to search and the search box doesn't update the URL
+- User needs pagination via button clicks (not URL-based)
+- User needs filters that trigger JavaScript without changing URL
+- User needs any form input that doesn't affect the URL
+
+❌ **REMOVE a parameter** if:
+- User says they don't need that functionality
+- The parameter appears in the URL (should be in queryParams instead)
+- It's not actually used in the extraction logic
+
+**Example Decision:**
+- User: "I want to search for products"
+- You check: Does the search update the URL?
+  - NO → Add `searchQuery: null` to queryParamsNotRelatedToUrl
+  - YES → Add `q: null` to queryParams instead
+
 ### Using Placeholders in js_scenario
 
 **CRITICAL**: Placeholders are especially powerful in `js_scenario` for user interactions!
@@ -94,6 +122,7 @@ Use placeholders for parameters that users will provide in their API payload:
 }
 ```
 At runtime: `{searchQuery}` is replaced with the actual search term from the user's payload (e.g., "laptop")
+**Note**: `searchQuery` must exist in `queryParamsNotRelatedToUrl` for this to work!
 
 **Example 2 - Pagination via Button Clicks:**
 ```json
@@ -106,6 +135,7 @@ At runtime: `{searchQuery}` is replaced with the actual search term from the use
 }
 ```
 At runtime: `{currentPage}` is replaced with "2" if user sends `{"currentPage": "2"}`
+**Note**: `currentPage` must exist in `queryParamsNotRelatedToUrl` for this to work!
 
 **Example 3 - Multiple Filters:**
 ```json
@@ -119,6 +149,7 @@ At runtime: `{currentPage}` is replaced with "2" if user sends `{"currentPage": 
   ]
 }
 ```
+**Note**: `category`, `minPrice`, and `maxPrice` must all exist in `queryParamsNotRelatedToUrl` for this to work!
 
 ### Using Placeholders in extract_rules
 

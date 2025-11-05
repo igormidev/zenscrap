@@ -52,12 +52,30 @@ Use the `test_extract_rules` tool to:
 
 const String _parameterManagementSection = '''
 ### Parameter Management (You Have Full Control)
-- ✅ **Add parameters** to `queryParamsNotRelatedToUrl` if user needs new functionality:
-  - Search: add `searchQuery: null`
-  - Pagination (button-based): add `currentPage: null`
-  - Filters (client-side): add `filterName: null`
-  - Form inputs: add appropriate parameter names
-- ✅ **Remove parameters** from `queryParamsNotRelatedToUrl` if user says they're not needed
+
+**CRITICAL**: Understand that `queryParamsNotRelatedToUrl` are for client-side interactions where the URL NEVER changes!
+
+- ✅ **Add parameters** to `queryParamsNotRelatedToUrl` if user needs new functionality where URL doesn't change:
+  - **Client-side search**: add `searchQuery: null` (search box doesn't update URL)
+  - **Button pagination**: add `currentPage: null` (clicking page buttons doesn't update URL)
+  - **JavaScript filters**: add `filterName: null` (dropdown/slider doesn't update URL)
+  - **Form inputs**: add appropriate parameter names (inputs don't update URL)
+  - **ANY interaction where typing/clicking updates page content but URL stays the same**
+
+- ✅ **Remove parameters** from `queryParamsNotRelatedToUrl` if:
+  - User says they don't need that functionality
+  - You discover the parameter DOES appear in the URL (move to queryParams instead)
+  - It's not actually used in your js_scenario or extract_rules
+
+- ✅ **Add parameters** to `queryParams` if they appear in the URL:
+  - URL-based search: ?q=term or ?search=term
+  - URL-based pagination: ?page=2 or ?offset=20
+  - URL-based filters: ?category=electronics
+
+- ✅ **Key Question**: "Does this interaction change the URL?"
+  - YES → Use `queryParams`
+  - NO → Use `queryParamsNotRelatedToUrl`
+
 - ✅ **Modify request structure** based on user requirements
 - ✅ Consult the scrappable request structure guide when making these decisions
 ''';

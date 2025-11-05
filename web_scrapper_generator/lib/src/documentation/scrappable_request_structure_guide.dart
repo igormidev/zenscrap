@@ -1,3 +1,7 @@
+/// Comprehensive documentation for scrappable request structure.
+/// This is the SINGLE SOURCE OF TRUTH used by both:
+/// 1. AI generation prompts (create_scrappable.dart)
+/// 2. Developer/AI understanding (this guide)
 const String scrappableRequestStructureGuide = '''# Scrappable Request Structure Guide
 
 This guide explains the structure of a `ScrappableRequest` and how to properly configure URL patterns, query parameters, and path parameters for web scraping.
@@ -53,18 +57,109 @@ Query parameters that **appear in the URL** or **modify the URL**. These are add
 ### 3. queryParamsNotRelatedToUrl (Map<String, String?>)
 Parameters for **client-side interactions** that do **NOT** modify the URL. These are used **ONLY** as `{paramName}` placeholders in extract_rules and js_scenario for runtime value replacement.
 
+**🎯 THE CORE CONCEPT:**
+Some websites have interactive features (search boxes, pagination buttons, filters) where user actions trigger JavaScript and update the page content, BUT the URL never changes. For these cases, you need queryParamsNotRelatedToUrl.
+
 **CRITICAL DISTINCTION:** These parameters are NEVER added to the URL - they're only used for placeholder replacement in extraction logic.
 
 **When to use queryParamsNotRelatedToUrl:**
-- **Client-side search boxes** that don't update the URL
-- **Pagination via button clicks** (not URL-based)
-- **Dropdown filters** that trigger JavaScript without changing URL
-- **Form inputs** (date pickers, sliders, etc.) that don't affect URL
-- **Any interaction** where users type/click but the URL stays the same
+
+**📦 Common Patterns:**
+
+1. **Client-side search boxes** (URL doesn't change when searching):
+   - User types in search box → Page updates via JavaScript → URL stays same
+   - Example: E-commerce sites with instant search
+   - Parameter: `searchQuery: null`
+   - Used in js_scenario: `{"type": "{searchQuery}"}`
+
+2. **Pagination via button clicks** (not URL-based):
+   - User clicks "Next" or page number button → Content loads → URL stays same
+   - Example: Infinite scroll pages, JavaScript pagination
+   - Parameter: `currentPage: null` or `pageNumber: null`
+   - Used in js_scenario: `{"click": "button[data-page='{currentPage}']"}`
+
+3. **Dropdown filters/selects** (client-side filtering):
+   - User selects from dropdown → JavaScript filters content → URL stays same
+   - Example: Product category filters, location selectors
+   - Parameters: `category: null`, `location: null`, `sortBy: null`
+   - Used in js_scenario: `{"select": {"selector": "select#category", "value": "{category}"}}`
+
+4. **Form inputs and sliders** (interactive filters):
+   - User adjusts price slider or date picker → Page updates → URL stays same
+   - Example: Price range filters, date range selectors
+   - Parameters: `minPrice: null`, `maxPrice: null`, `startDate: null`, `endDate: null`
+   - Used in js_scenario: `{"fill": {"selector": "input#min-price", "value": "{minPrice}"}}`
+
+5. **Any interaction where users type/click but URL stays the same**:
+   - Modal search boxes
+   - Popup filters
+   - Accordion menus with content
+   - Dynamic tabs without URL hash changes
+
+**🔄 How It Works (Step by Step):**
+
+**Step 1 - Request Creation:**
+```json
+{
+  "url": "https://shop.com/products",
+  "queryParams": {},
+  "queryParamsNotRelatedToUrl": {
+    "searchQuery": null,
+    "currentPage": null
+  },
+  "pathParams": []
+}
+```
+
+**Step 2 - AI Creates js_scenario with Placeholders:**
+```json
+{
+  "instructions": [
+    {"click": "input.search-box"},
+    {"type": "{searchQuery}"},
+    {"click": "button.search-submit"},
+    {"wait_for": "div.results"},
+    {"click": "button[data-page='{currentPage}']"},
+    {"wait": 2000}
+  ]
+}
+```
+
+**Step 3 - User Sends API Request:**
+```json
+{
+  "searchQuery": "laptop",
+  "currentPage": "2"
+}
+```
+
+**Step 4 - System Replaces Placeholders (at runtime):**
+```json
+{
+  "instructions": [
+    {"click": "input.search-box"},
+    {"type": "laptop"},           // ← Replaced from payload
+    {"click": "button.search-submit"},
+    {"wait_for": "div.results"},
+    {"click": "button[data-page='2']"},  // ← Replaced from payload
+    {"wait": 2000}
+  ]
+}
+```
+
+**Step 5 - ScrapingBee Executes:**
+- Opens: `https://shop.com/products` (URL never changes!)
+- Clicks search box
+- Types "laptop"
+- Clicks submit
+- Waits for results
+- Clicks page 2 button
+- Extracts data
 
 **Value Guidelines:**
 - Almost always set to `null` (these are dynamic by nature)
 - Use descriptive names: `searchQuery`, `currentPage`, `filterCategory`
+- Match the parameter names that will be used in js_scenario placeholders
 
 **Examples:**
 ```json
@@ -73,15 +168,12 @@ Parameters for **client-side interactions** that do **NOT** modify the URL. Thes
   "currentPage": null,     // For clicking page buttons
   "minPrice": null,        // For price filter slider
   "maxPrice": null,        // For price filter slider
-  "category": null         // For dropdown selection
+  "category": null,        // For dropdown selection
+  "location": null,        // For location filter
+  "sortBy": null,          // For sort dropdown
+  "filterTags": null       // For tag filters
 }
 ```
-
-**How these work at runtime:**
-- User sends API request: `{"searchQuery": "laptop", "currentPage": "2"}`
-- System finds `{searchQuery}` in js_scenario and replaces it with `"laptop"`
-- System finds `{currentPage}` in js_scenario and replaces it with `"2"`
-- These parameters are NOT added to the URL
 
 ### 4. pathParams (List<String>)
 An array of parameter names that were replaced in the URL with `{paramName}` placeholders.
