@@ -31,6 +31,10 @@ abstract class CliChatInterface<T extends CliChatOptions> {
     _temporaryFiles.removeWhere(test);
   }
 
+  void editTemporaryFile(TemporaryFiles tempFile) {
+    _temporaryFiles.add(tempFile);
+  }
+
   Future<void> dispose() async {
     await _cleanupTemporaryFiles();
     await _removeSchemaFiles();

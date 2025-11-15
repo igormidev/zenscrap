@@ -131,12 +131,11 @@ class WebScrapperClaudeImpl
     final isFirstMessage = !_chat.didSendFirstMessage;
     if (isFirstMessage) {
       messages.addAll(_convertInitialPromptsForClaude());
-    } else {
-      final bool isNew = switch (initialPayload) {
-        InitialPayloadDataCreatingFromZero() => false,
-        InitialPayloadDataEditingExistingWebScrapper() => true,
-      };
     }
+    final bool hasAlreadyADataGenerated = switch (initialPayload) {
+      InitialPayloadDataCreatingFromZero() => false,
+      InitialPayloadDataEditingExistingWebScrapper() => true,
+    };
 
     // Add the user's prompt
     messages.add(PromptContent.text(userPrompt));
@@ -196,14 +195,26 @@ class WebScrapperClaudeImpl
       return (
         llmMessage: llmMessage,
         structuredSchemaDataCompleter: Future(() async {
-          return parseStructuredResponse(await structuredSchemaData.future);
+          final res =
+              parseStructuredResponse(await structuredSchemaData.future);
+          switch (res) {
+            case WebScrapperChatAIResponseOnlyExtractRulesModified():
+              currentFetchSettings = res.fetchSettings;
+            case WebScrapperChatAIResponseOnlyRequestModified():
+              currentScrappableRequest = res.scrappableRequest;
+            case WebScrapperChatAIResponseBothModified():
+              currentFetchSettings = res.fetchSettings;
+              currentScrappableRequest = res.scrappableRequest;
+            case _:
+          }
+          return res;
         }),
       );
       // parseStructuredResponse(result.structuredSchemaData);
     } catch (e) {
       // If there's an error, return an error response
       final structuredSchema = WebScrapperChatAIResponseErrorMessage(
-        'Failed to process your request: ${e.toString()}',
+        'Failed to process your request. The error was:\n${e.toString()}',
       );
 
       final controller = StreamController<String>();
@@ -231,4 +242,7 @@ class WebScrapperClaudeImpl
   List<PromptContent> _convertInitialPromptsForClaude() {
     return List<PromptContent>.from(handleInitialPrompts(initialPayload));
   }
+
+  ScrappingBeeFetchSettings? currentFetchSettings;
+  WebScrapperRequest? currentScrappableRequest;
 }

@@ -5,6 +5,7 @@ import 'package:gemini_cli_sdk/gemini_cli_sdk.dart';
 import 'package:web_scrapper_generator/src/documentation/system_prompt.dart';
 import 'package:web_scrapper_generator/src/documentation/cost_optimization.dart';
 import 'package:web_scrapper_generator/src/documentation/how_to_write_effective_scrapping_bee_extract_rules.dart';
+import 'package:web_scrapper_generator/src/documentation/how_to_edit_scrappable_request.dart';
 import 'package:web_scrapper_generator/src/documentation/scrappable_request_structure_guide.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_generator_interface.dart';
 import 'package:web_scrapper_generator/src/web_scrapper_response.dart';
@@ -188,12 +189,19 @@ List<PromptContent> creatingFromZeroInitialPrompt({
   final String currentScrappableRequestCliRef =
       currentScrappableRequest.toCliString();
 
+  // Create dynamic extraction rules content based on current request
+  final extractionRulesContent = createExtractionRulesContent(webScrapperRequest);
+  final extractionRulesCliRef = extractionRulesContent.toCliString();
+
   return [
     // System prompt as MD file
     systemPromptContent,
 
-    // How to write effective extraction rules guide as MD file
+    // How to write effective extraction rules guide as MD file (dynamic)
     extractionRulesContent,
+
+    // How to edit scrappable request guide as MD file
+    howToEditRequestContent,
 
     // Cost optimization guide as MD file
     costOptimizationContent,
@@ -344,12 +352,19 @@ List<PromptContent> editingExistingWebScrapperInitialPrompt({
   final String currentScrappableRequestCliRef =
       currentScrappableRequest.toCliString();
 
+  // Create dynamic extraction rules content based on current request
+  final extractionRulesContent = createExtractionRulesContent(payload.currentRequest);
+  final extractionRulesCliRef = extractionRulesContent.toCliString();
+
   return [
     // System prompt as MD file
     systemPromptContent,
 
-    // How to write effective extraction rules guide as MD file
+    // How to write effective extraction rules guide as MD file (dynamic)
     extractionRulesContent,
+
+    // How to edit scrappable request guide as MD file
+    howToEditRequestContent,
 
     // Cost optimization guide as MD file
     costOptimizationContent,
@@ -544,11 +559,24 @@ final systemPromptContent = PromptContent.bytes(
   fileExtension: 'md',
 );
 
-final extractionRulesCliRef = extractionRulesContent.toCliString();
-final extractionRulesContent = PromptContent.bytes(
-  data:
-      Uint8List.fromList(howToWriteEffectiveScrapingBeeExtractRules.codeUnits),
-  fileName: 'how_to_write_effective_scrapping_bee_extract_rules',
+// Helper function to create extraction rules content dynamically
+PromptContent createExtractionRulesContent(WebScrapperRequest webScrapperRequest) {
+  final content = howToWriteEffectiveScrapingBeeExtractRules(
+    webScrapperRequest,
+    'how_to_edit_scrappable_request.md',
+  );
+  return PromptContent.bytes(
+    data: Uint8List.fromList(content.codeUnits),
+    fileName: 'how_to_write_effective_scrapping_bee_extract_rules',
+    fileExtension: 'md',
+  );
+}
+
+// Helper function to create how to edit request content
+final howToEditRequestCliRef = howToEditRequestContent.toCliString();
+final howToEditRequestContent = PromptContent.bytes(
+  data: Uint8List.fromList(howToEditScrappableRequest.codeUnits),
+  fileName: 'how_to_edit_scrappable_request',
   fileExtension: 'md',
 );
 

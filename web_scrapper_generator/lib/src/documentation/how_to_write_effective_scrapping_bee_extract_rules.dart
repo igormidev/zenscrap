@@ -1,6 +1,128 @@
-const String howToWriteEffectiveScrapingBeeExtractRules = '''# How to Write Effective ScrapingBee Extract Rules
+import 'package:web_scrapper_generator/src/web_scrapper_response.dart';
+
+String howToWriteEffectiveScrapingBeeExtractRules(
+  WebScrapperRequest webScrapperRequest,
+  String mdFileHowToEditRequest,
+) {
+  // Build dynamic parameter lists
+  final queryParamsList = webScrapperRequest.queryParam.entries.map((e) {
+    final hasDefault = e.value != null;
+    return '  - **${e.key}**: ${hasDefault ? '"${e.value}" (default)' : 'null (REQUIRED)'}';
+  }).join('\n');
+
+  final queryParamsNotRelatedToUrlList =
+      webScrapperRequest.queryParamsNotRelatedToUrl.entries.map((e) {
+    final hasDefault = e.value != null;
+    return '  - **${e.key}**: ${hasDefault ? '"${e.value}" (default)' : 'null (REQUIRED)'} → Use as `{${e.key}}` in js_scenario';
+  }).join('\n');
+
+  final hasQueryParams = webScrapperRequest.queryParam.isNotEmpty;
+  final hasQueryParamsNotRelatedToUrl =
+      webScrapperRequest.queryParamsNotRelatedToUrl.isNotEmpty;
+
+  return '''# How to Write Effective ScrapingBee Extract Rules
 
 This guide explains how to write extraction rules for ScrapingBee, including format requirements, placeholder usage, and best practices.
+
+## 🎯 CURRENT SCRAPPABLE REQUEST PARAMETERS
+
+### Available URL Parameters (queryParam)
+${hasQueryParams ? '''
+These parameters are added to the URL. You can use them in your URL construction:
+$queryParamsList
+''' : 'No queryParam parameters defined.'}
+
+### Available Client-Side Parameters (queryParamsNotRelatedToUrl)
+${hasQueryParamsNotRelatedToUrl ? '''
+**CRITICAL**: These parameters are ALREADY DEFINED and available for use as `{paramName}` placeholders in your js_scenario and extract_rules:
+
+$queryParamsNotRelatedToUrlList
+
+**UNDERSTANDING PARAMETERS:**
+
+**Parameters with DEFAULT values** (e.g., "value"):
+- Already have a default, giving you a hint about their purpose
+- Example: `"currentPage": "1"` suggests pagination starting at page 1
+- Example: `"minPrice": "0"` suggests price filtering with \$0 minimum
+- Use the default as a clue, but verify against the actual website behavior
+
+**Parameters that are REQUIRED** (null):
+- User MUST provide these values in their API payload
+- Parameter name is your only clue (e.g., `searchQuery`, `filterCategory`, `location`)
+- You MUST deduce their purpose by:
+  1. Examining the website structure (input fields, buttons, dropdowns)
+  2. Analyzing the user's request and context
+  3. Using Playwright MCP to explore interactive elements
+  4. Checking parameter name patterns (searchQuery → search, currentPage → pagination, etc.)
+
+**CRITICAL DECISION RULES:**
+
+1. **CAN you confidently deduce what a parameter is for?**
+   - YES → Use it appropriately in js_scenario based on your analysis
+   - NO → Return `responseType: "message"` and ASK the user for clarification
+
+2. **Example of asking for clarification:**
+   ```
+   responseType: "message"
+   message: "I found these client-side parameters defined but need clarification:
+   - 'customParam1' (required) - What should this parameter control on the page?
+   - 'customParam2' (required) - What interaction does this represent?
+
+   Please describe what these parameters should do so I can create the correct js_scenario."
+   ```
+
+3. **YOU MUST use ALL defined parameters OR remove unused ones:**
+   - ✅ If you use all parameters in your js_scenario → GOOD
+   - ✅ If you don't need some parameters → Return `responseType: "data"` but include those parameters in the REMOVAL list
+   - ❌ Leaving parameters defined but unused → BAD (confuses users)
+
+**HOW TO USE PARAMETERS IN js_scenario:**
+
+Parameters are placeholders that get replaced at runtime. The syntax is `{parameterName}`:
+
+```json
+{
+  "instructions": [
+    {"click": "selector.for.button"},
+    {"type": "{anyParameterName}"},
+    {"select": {"selector": "select#dropdown", "value": "{anotherParam}"}},
+    {"fill": {"selector": "input.price", "value": "{priceParam}"}}
+  ]
+}
+```
+
+**IMPORTANT**: The example above shows SYNTAX only. DO NOT assume:
+- Which parameter goes with which action
+- What HTML selectors to use
+- What interaction pattern is needed
+
+YOU must determine this by exploring the actual website with Playwright MCP!
+
+**To add/remove/modify parameters**, consult the file: $mdFileHowToEditRequest
+''' : '''
+No queryParamsNotRelatedToUrl parameters defined.
+
+If user needs client-side interactions (search, pagination, filters, form inputs) that don't modify the URL:
+1. You should add them to the request structure
+2. Consult the file: $mdFileHowToEditRequest for instructions
+
+**Example scenarios requiring queryParamsNotRelatedToUrl:**
+- Search box that doesn't update URL when typing
+- "Next Page" button that loads content via JavaScript (URL stays same)
+- Dropdown filters that trigger AJAX requests (URL stays same)
+- Form inputs where submission doesn't change URL
+'''}
+
+### Parameter Value Types (IMPORTANT)
+- **null (REQUIRED)**: User MUST provide this value in their API payload
+  - You must deduce its purpose from context or ask user for clarification
+- **"value" (DEFAULT)**: User CAN override, but if not provided, this default is used
+  - The default value often hints at the parameter's purpose
+  - Example: `"minPrice": "0"` → likely for price range filtering
+  - Example: `"sort": "asc"` → likely for sorting order
+  - Example: `"currentPage": "1"` → likely for pagination
+
+**To modify default values or change required/optional status**, consult the file: $mdFileHowToEditRequest
 
 ## 🚨 CRITICAL: extract_rules FORMAT REQUIREMENTS 🚨
 
@@ -274,3 +396,4 @@ Common actions:
 - [ ] Returned ORIGINAL rules with placeholders intact
 - [ ] Using the EXACT tested configuration in final response
 ''';
+}
