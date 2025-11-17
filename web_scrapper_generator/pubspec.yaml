@@ -2,7 +2,6 @@ name: web_scrapper_generator
 description: A Dart package for generating web scrapers using various AI models - Claude, Gemini, Codex.
 version: 2.0.3
 repository: https://github.com/yourusername/web_scrapper_generator
-resolution: workspace
 
 environment:
   sdk: ^3.6.0

@@ -1,7 +1,6 @@
 name: zenscrap_client
 description: Starting point for a Serverpod client.
 version: 1.0.0
-resolution: workspace
 
 environment:
   sdk: ^3.6.0

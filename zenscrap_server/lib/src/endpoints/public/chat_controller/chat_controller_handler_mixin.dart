@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:serverpod/serverpod.dart';
-import 'package:web_scrapper_generator/web_scrapper_generator.dart';
-import 'package:zenscrap_server/server.dart';
 import 'package:zenscrap_server/src/core/mixins/api_helper_mixin.dart';
+import 'package:zenscrap_server/src/core/scraping_bee.dart';
+import 'package:zenscrap_server/src/endpoints/public/chat_controller/web_scraper_ai_models.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 typedef RetryText = String;
@@ -12,87 +12,6 @@ typedef RetryText = String;
 /// Mixin that provides shared functionality for chat controller implementations
 mixin ChatControllerHandlerMixin {
   int get scrappableId;
-
-  /// Abstract getter for the controller - must be implemented by classes using this mixin
-  WebScrapperGeneratorController get controller;
-
-  /// Abstract getter for the provider name - must be implemented by classes using this mixin
-  String get providerName;
-
-  /// Common implementation of sendMessage with retry logic
-  Future<void> sendMessage({
-    required Session session,
-    required String userPrompt,
-    required ReferenceTestData referenceTestData,
-    required ScrappableRequest scrapperRequest,
-    required ScrappingBeeExtractLogic? scrappingBeeExtractLogic,
-    required StreamController<ChatResponse> chatSeason,
-    required StreamController<String> thinkingStream,
-  }) async {
-    StreamSubscription<String>? sub;
-    try {
-      const int maxAttempts = 3;
-      int attempt = 0;
-      RetryText? retryContent;
-
-      while (attempt < maxAttempts) {
-        attempt++;
-
-        session.log('Starting attempt #$attempt');
-
-        final (
-          :Stream<String> llmMessage,
-          :Future<WebScrapperChatAIResponse> structuredSchemaDataCompleter,
-        ) = controller.streamMessage(userPrompt: userPrompt);
-
-        // final WebScrapperChatAIResponse response = await controller.sendMessage(userPrompt: userPrompt);
-
-        // Stream all llm messages to [thinkingStream]
-        sub = llmMessage.listen(
-          (chunk) => thinkingStream.add(chunk),
-          onError: (error, stackTrace) {
-            session.log(
-                'Error occurred while streaming messages from $providerName',
-                exception: error,
-                stackTrace: stackTrace,
-                level: LogLevel.error);
-          },
-        );
-
-        final List<String> thinkingSentences = await llmMessage.toList();
-        retryContent = await handleSendMessage(
-          session: session,
-          response: await structuredSchemaDataCompleter,
-          referenceTestData: referenceTestData,
-          scrapperRequest: scrapperRequest,
-          scrappingBeeLogic: scrappingBeeExtractLogic,
-          chatSeason: chatSeason,
-          attemptNumber: attempt,
-          thinkingSentences: thinkingSentences,
-        );
-
-        if (retryContent == null) {
-          await sub.cancel();
-          sub = null;
-          // No retry needed, exit the loop
-          return;
-        }
-      }
-    } catch (error, stackTrace) {
-      session.log(
-          'Error occurred while generating extract rules with $providerName',
-          exception: error,
-          stackTrace: stackTrace,
-          level: LogLevel.error);
-      chatSeason.add(ErrorTextResponse(
-        role: PromptRole.system,
-        errorMessage:
-            '[ FATAL ]\nAn internal error occurred while generating extract rules:\n$error',
-      ));
-    } finally {
-      await sub?.cancel();
-    }
-  }
 
   /// Handles the send message response and validates extraction rules
   Future<RetryText?> handleSendMessage({

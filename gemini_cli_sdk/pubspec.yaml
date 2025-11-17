@@ -3,7 +3,6 @@ description: A powerful Dart SDK for interacting with Gemini CLI, providing seam
 version: 4.0.6
 homepage: https://github.com/yourusername/gemini_cli_sdk
 repository: https://github.com/yourusername/gemini_cli_sdk
-resolution: workspace
 
 environment:
   sdk: ^3.6.0

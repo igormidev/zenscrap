@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:serverpod/serverpod.dart';
-import 'package:web_scrapper_generator/web_scrapper_generator.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
+import 'package:zenscrap_server/src/endpoints/public/chat_controller/web_scraper_ai_models.dart';
 
 abstract class IChatController {
   final int scrappableId;
@@ -29,6 +29,7 @@ abstract class IChatController {
       url: scrapperRequest.url,
       pathParams: scrapperRequest.pathParams,
       queryParam: scrapperRequest.queryParams,
+      queryParamsNotRelatedToUrl: scrapperRequest.queryParamsNotRelatedToUrl,
     );
     if (currentFetchSettings != null) {
       return InitialPayloadDataEditingExistingWebScrapper(

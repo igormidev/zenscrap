@@ -16,7 +16,6 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 version: 1.0.0+1
-resolution: workspace
 
 environment:
   sdk: ^3.6.0
@@ -28,7 +27,8 @@ dependencies:
   flutter_native_splash: ^2.4.6
   flutter_web_plugins:
     sdk: flutter
-  zenscrap_client: ^1.0.0
+  zenscrap_client:
+    path: ../zenscrap_client
   dio: ^5.9.0
   collection: ^1.19.1
   dart_debouncer: ^1.1.1

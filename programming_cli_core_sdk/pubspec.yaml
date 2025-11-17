@@ -3,7 +3,6 @@ description: Core abstractions shared across the Zenscrap CLI SDK packages.
 version: 2.1.1
 homepage: https://github.com/yourusername/programming_cli_core_sdk
 repository: https://github.com/yourusername/programming_cli_core_sdk
-resolution: workspace
 
 environment:
   sdk: ^3.6.0

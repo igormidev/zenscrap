@@ -3,7 +3,6 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:result_dart/result_dart.dart';
 import 'package:serverpod/serverpod.dart' hide Result;
-import 'package:zenscrap_server/server.dart';
 import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';
 import 'package:zenscrap_server/src/core/extension/scrapping_bee_extract_logic_extension.dart';
 import 'package:zenscrap_server/src/core/scraping_bee.dart';

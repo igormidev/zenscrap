@@ -1,6 +1,6 @@
 # Zenscrap Server
 
-Serverpod backend server for Zenscrap - the AI-powered web scraping rules generator. This server handles API requests, manages business logic, and integrates with the web scrapper generator package.
+Serverpod backend server for Zenscrap - the AI-powered web scraping rules generator. This server handles API requests, manages business logic, and orchestrates OpenAI + MCP powered scraping rule generation.
 
 ## 🚀 Overview
 
@@ -274,7 +274,6 @@ CREATE TABLE sessions (
 
 ```dart
 // In scraper_service.dart
-import 'package:web_scrapper_generator/web_scrapper_generator.dart';
 
 class ScraperService {
   final _generator = GeminiWebScrapperGenerator(

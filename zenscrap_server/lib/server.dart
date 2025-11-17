@@ -1,10 +1,7 @@
-import 'package:openai_dart/openai_dart.dart';
 import 'package:serverpod/serverpod.dart';
-import 'package:web_scrapper_generator/web_scrapper_generator.dart';
 import 'package:zenscrap_server/src/auth/handlers/on_send_reset_email.dart';
 import 'package:zenscrap_server/src/auth/handlers/on_send_validation_email.dart';
 import 'package:zenscrap_server/src/core/mixins/api_helper_mixin.dart';
-import 'package:zenscrap_server/src/core/npm_installer.dart';
 import 'package:zenscrap_server/src/core/scraping_bee.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_config.dart';
 import 'package:zenscrap_server/src/future_calls/monthly_subscription_credits_future_call.dart';
@@ -59,42 +56,7 @@ void run(List<String> args) async {
   ));
 
   final String? scrapingBeeApiKey = pod.getPassword('scrapingBeeApiKey');
-  final String? openAiApiKey = pod.getPassword('openAiApiKey');
-  openAiClient = OpenAIClient(apiKey: openAiApiKey);
-
-  // Initialize WebScrapper implementations with proper proxy configuration
-  final proxyConfig = ScrappingBeeProxyConfig(
-    apiKey: scrapingBeeApiKey ?? '',
-    stealthProxy: true,
-    renderJs: true,
-    premiumProxy: true,
-    countryCode: 'us',
-  );
-
-  // // Initialize Codex implementation
-  // await WebScrapperCodexImpl.initCodex(
-  //   codexApiKey: pod.getPassword('openAiApiKey') ?? '',
-  //   scrappingBeeApiKey: scrapingBeeApiKey ?? '',
-  //   proxyConfig: proxyConfig,
-  // );
-  // Initialize Gemini implementation
-  // await WebScrapperGeminiImpl.initGemini(
-  //   geminiApiKey: pod.getPassword('geminiApiKey') ?? '',
-  //   scrappingBeeApiKey: scrapingBeeApiKey ?? '',
-  //   proxyConfig: proxyConfig,
-  // );
-
-  // Ensure npm is installed before initializing Claude (required for Claude CLI)
-  // This is critical for cloud deployments where npm might not be pre-installed
-
-  await NpmInstaller.ensureNpmInstalled();
-
-  // Initialize Claude implementation
-  await WebScrapperClaudeImpl.initClaude(
-    claudeApiKey: pod.getPassword('claudeApiKey') ?? '',
-    scrappingBeeApiKey: scrapingBeeApiKey ?? '',
-    proxyConfig: proxyConfig,
-  );
+  scrappingBee = ScrapingBee(apiKey: scrapingBeeApiKey ?? '');
 
   // // Initialize Stripe configuration
   StripeConfig.initialize({
@@ -154,6 +116,3 @@ void run(List<String> args) async {
     identifier: 'periodicCleanupOldAnalyticsDetails',
   );
 }
-
-final ScrapingBee scrappingBee = ScrapingBee();
-late final OpenAIClient openAiClient;

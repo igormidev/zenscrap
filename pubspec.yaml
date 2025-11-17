@@ -2,13 +2,3 @@ name: zenscrap_workspace
 
 environment:
   sdk: ^3.6.0
-
-workspace:
-  - zenscrap_server
-  - zenscrap_client
-  - zenscrap_flutter
-  - programming_cli_core_sdk
-  - claude_code_sdk
-  - codex_cli_sdk
-  - gemini_cli_sdk
-  - web_scrapper_generator

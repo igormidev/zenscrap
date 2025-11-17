@@ -4,7 +4,6 @@ version: 4.1.6
 homepage: https://github.com/yourusername/codex_cli_sdk
 repository: https://github.com/yourusername/codex_cli_sdk
 issue_tracker: https://github.com/yourusername/codex_cli_sdk/issues
-resolution: workspace
 
 environment:
   sdk: ^3.6.0
