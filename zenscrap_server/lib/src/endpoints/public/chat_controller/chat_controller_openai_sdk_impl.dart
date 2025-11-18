@@ -11,9 +11,11 @@ import 'package:zenscrap_server/src/generated/protocol.dart';
 
 const _openAiResponsesUrl = 'https://api.openai.com/v1/responses';
 const _playwrightMcpUrl =
-    'https://mcp-server-7d19c6f0-aab8-410f-916d-e6e0445ef2c3.supermachine.app/';
+    'https://mcp-gzws23kw.mcp-as-a-service.com/mcp';
+const _playwrightMcpAuthToken =
+    'Bearer mnUzM7KEuxtytiOgWvur7MO5rt5HVst6ca-ztJ-bMRg';
 const _scrappingBeeMcpUrl =
-    'https://mcp-server-826137dd-10ff-43d7-aa91-6b02978511f8.supermachine.app/';
+    'https://mcp.llmbase.ai/package/scraping-bee-mcp/sse?SCRAPINGBEE_API_KEY=37N8150Q1JBVN85NS4RUOUIUYZ2AEUFX69QBM0X74VD13M9TLNRVOFWS7HZMKRG1X4SOH4BKJT5EUN6K';
 
 class ChatControllerOpenAiSdkImpl extends IChatController
     with ChatControllerHandlerMixin {
@@ -161,6 +163,9 @@ class ChatControllerOpenAiSdkImpl extends IChatController
           'type': 'mcp',
           'server_label': 'playwright',
           'server_url': _playwrightMcpUrl,
+          'headers': {
+            'Authorization': _playwrightMcpAuthToken,
+          },
           'require_approval': 'never',
         },
         {
