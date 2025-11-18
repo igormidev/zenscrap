@@ -173,9 +173,10 @@ final class InitialPayloadDataEditingExistingWebScrapper
 }
 
 /// JSON schema passed to OpenAI for the structured response.
+/// Note: Using non-strict mode due to complex optional object requirements
 const Map<String, dynamic> webScraperResponseJsonSchema = {
   'name': 'WebScraperResponse',
-  'strict': true,
+  'strict': false,
   'schema': {
     'type': 'object',
     'additionalProperties': false,

@@ -62,9 +62,9 @@ class ChatControllerOpenAiSdkImpl extends IChatController
   static String _mapModel(AiModel aiModel) {
     switch (aiModel) {
       case AiModel.normal:
-        return 'gpt-5.1-mini';
+        return 'gpt-5.1-codex-mini';
       case AiModel.powerful:
-        return 'gpt-5.1';
+        return 'gpt-5.1-codex';
     }
   }
 
@@ -145,6 +145,14 @@ class ChatControllerOpenAiSdkImpl extends IChatController
       OpenAiMessage(role: 'user', content: userPrompt),
     ];
 
+    final schema = webScraperResponseJsonSchema;
+    final responseFormat = {
+      'type': 'json_schema',
+      'name': schema['name'],
+      'schema': schema['schema'],
+      if (schema['strict'] != null) 'strict': schema['strict'],
+    };
+
     final requestBody = {
       'model': _model,
       'stream': true,
@@ -162,9 +170,8 @@ class ChatControllerOpenAiSdkImpl extends IChatController
           'require_approval': 'never',
         }
       ],
-      'response_format': {
-        'type': 'json_schema',
-        'json_schema': webScraperResponseJsonSchema,
+      'text': {
+        'format': responseFormat,
       },
       'input': messages.map((m) => m.toMap()).toList(),
     };
