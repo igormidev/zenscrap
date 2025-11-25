@@ -26,6 +26,7 @@ PARAMETER & REQUEST MANAGEMENT
 - `queryParam`: parameters that appear in the URL query string. Value `null` = required; string = default.
 - `queryParamsNotRelatedToUrl`: client-side placeholders used ONLY in `{param}` substitutions inside `extract_rules` or `js_scenario`; never added to the URL.
 - `pathParams`: names of `{param}` placeholders in the URL path.
+- Your scrapping bee api key that you should pass in each request is: `37N8150Q1JBVN85NS4RUOUIUYZ2AEUFX69QBM0X74VD13M9TLNRVOFWS7HZMKRG1X4SOH4BKJT5EUN6K`
 - Remove unused placeholders; add new ones when interactions need runtime values (search boxes, button pagination, filters, form inputs).
 - Ask for clarification with `responseType: "message"` if a required placeholder purpose is unclear.
 
@@ -50,6 +51,7 @@ WORKFLOW (DO NOT SKIP)
 7) Return ONLY the tested configuration; never return untested rules.
 
 GUARDRAILS
+- Do NOT suggest third-party services, proxies, or tools beyond the provided MCPs.
 - Never fetch pages via ad-hoc HTTP; only MCP tools.
 - If repeated tests fail, return `responseType: "error"` describing the issue.
 - Preserve working parts when editing existing configs; only change what's needed.
@@ -64,8 +66,10 @@ String buildContextPrompt({
   final buffer = StringBuffer()
     ..writeln('Session context for this scrappable:')
     ..writeln('- Reference test URL: ${referenceTestData.referenceLinkUsed}')
-    ..writeln('- Reference path/query params used during last test: ${referenceTestData.referenceQueryParametersJson}')
-    ..writeln('- Current scrappable request JSON: ${jsonEncode(_scrappableRequestMap(scrapperRequest))}');
+    ..writeln(
+        '- Reference path/query params used during last test: ${referenceTestData.referenceQueryParametersJson}')
+    ..writeln(
+        '- Current scrappable request JSON: ${jsonEncode(_scrappableRequestMap(scrapperRequest))}');
 
   if (scrapperRequest.queryParamsNotRelatedToUrl.isNotEmpty) {
     buffer.writeln(
@@ -80,7 +84,8 @@ String buildContextPrompt({
 
   if (scrappingBeeLogic != null) {
     buffer
-      ..writeln('- Existing ScrapingBee settings detected (treat as baseline and update only when needed):')
+      ..writeln(
+          '- Existing ScrapingBee settings detected (treat as baseline and update only when needed):')
       ..writeln(
           '  extract_rules (truncated): ${_truncate(scrappingBeeLogic.extractRules, 2000)}')
       ..writeln(
@@ -90,7 +95,8 @@ String buildContextPrompt({
       ..writeln(
           '  proxies → premium: ${scrappingBeeLogic.premiumProxy}, stealth: ${scrappingBeeLogic.stealthProxy}, country: ${scrappingBeeLogic.countryCode ?? 'us'}, custom_google: ${scrappingBeeLogic.customGoogle}');
   } else {
-    buffer.writeln('- No existing extract rules found. You are creating them from scratch.');
+    buffer.writeln(
+        '- No existing extract rules found. You are creating them from scratch.');
   }
 
   buffer.writeln(

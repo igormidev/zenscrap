@@ -10,12 +10,9 @@ import 'package:zenscrap_server/src/endpoints/public/chat_controller/web_scraper
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 const _openAiResponsesUrl = 'https://api.openai.com/v1/responses';
-const _playwrightMcpUrl =
-    'https://mcp-gzws23kw.mcp-as-a-service.com/mcp';
+const _playwrightMcpUrl = 'https://mcp-gzws23kw.mcp-as-a-service.com/mcp';
 const _playwrightMcpAuthToken =
     'Bearer mnUzM7KEuxtytiOgWvur7MO5rt5HVst6ca-ztJ-bMRg';
-const _scrappingBeeMcpUrl =
-    'https://mcp.llmbase.ai/package/scraping-bee-mcp/sse?SCRAPINGBEE_API_KEY=37N8150Q1JBVN85NS4RUOUIUYZ2AEUFX69QBM0X74VD13M9TLNRVOFWS7HZMKRG1X4SOH4BKJT5EUN6K';
 
 class ChatControllerOpenAiSdkImpl extends IChatController
     with ChatControllerHandlerMixin {
@@ -64,9 +61,9 @@ class ChatControllerOpenAiSdkImpl extends IChatController
   static String _mapModel(AiModel aiModel) {
     switch (aiModel) {
       case AiModel.normal:
-        return 'gpt-5.1-codex-mini';
+        return 'gpt-5';
       case AiModel.powerful:
-        return 'gpt-5.1-codex';
+        return 'gpt-5';
     }
   }
 
@@ -169,10 +166,11 @@ class ChatControllerOpenAiSdkImpl extends IChatController
           'require_approval': 'never',
         },
         {
-          'type': 'mcp',
-          'server_label': 'scrappingBee',
-          'server_url': _scrappingBeeMcpUrl,
-          'require_approval': 'never',
+          "type": "mcp",
+          "server_label": "scraping_bee",
+          "server_url":
+              "https://scraping-bee-mcp-production.up.railway.app/sse",
+          "require_approval": "never"
         }
       ],
       'text': {

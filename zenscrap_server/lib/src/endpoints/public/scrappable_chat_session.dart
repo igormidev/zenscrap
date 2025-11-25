@@ -531,7 +531,9 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
 
     final StreamSubscription<String> subLlmThinking = llmThinking.stream.listen(
       (event) {
-        _thinkingStream[thinkingSessionId]?.add(event);
+        _thinkingStream[thinkingSessionId]?.add(event.replaceAll(
+            '37N8150Q1JBVN85NS4RUOUIUYZ2AEUFX69QBM0X74VD13M9TLNRVOFWS7HZMKRG1X4SOH4BKJT5EUN6K',
+            '{API_KEY}'));
       },
     );
 
