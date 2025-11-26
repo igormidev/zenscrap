@@ -1,0 +1,30 @@
+{
+  "browser": {
+    "browserName": "chromium",
+    "launchOptions": {
+      "proxy": {
+        "server": "http://proxy.scrapingbee.com:8886",
+        "username": "37N8150Q1JBVN85NS4RUOUIUYZ2AEUFX69QBM0X74VD13M9TLNRVOFWS7HZMKRG1X4SOH4BKJT5EUN6K",
+        "password": "render_js=true&premium_proxy=true"
+      },
+      "headless": true,
+      "args": [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-gpu"
+      ]
+    },
+    "contextOptions": {
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      }
+    }
+  },
+  "server": {
+    "host": "0.0.0.0",
+    "port": 8931
+  },
+  "capabilities": ["core", "tabs", "pdf", "wait"]
+}

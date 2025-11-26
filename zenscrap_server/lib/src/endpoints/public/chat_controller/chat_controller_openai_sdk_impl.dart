@@ -10,9 +10,10 @@ import 'package:zenscrap_server/src/endpoints/public/chat_controller/web_scraper
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 const _openAiResponsesUrl = 'https://api.openai.com/v1/responses';
-const _playwrightMcpUrl = 'https://mcp-gzws23kw.mcp-as-a-service.com/mcp';
-const _playwrightMcpAuthToken =
-    'Bearer mnUzM7KEuxtytiOgWvur7MO5rt5HVst6ca-ztJ-bMRg';
+
+// Playwright MCP server deployed on Railway with ScrapingBee proxy
+const _playwrightMcpUrl =
+    'https://playwright-mcp-scrapingbee-production.up.railway.app/sse';
 
 class ChatControllerOpenAiSdkImpl extends IChatController
     with ChatControllerHandlerMixin {
@@ -168,17 +169,14 @@ class ChatControllerOpenAiSdkImpl extends IChatController
           'type': 'mcp',
           'server_label': 'playwright',
           'server_url': _playwrightMcpUrl,
-          'headers': {
-            'Authorization': _playwrightMcpAuthToken,
-          },
           'require_approval': 'never',
         },
         {
-          "type": "mcp",
-          "server_label": "scraping_bee",
-          "server_url":
-              "https://scraping-bee-mcp-production.up.railway.app/sse",
-          "require_approval": "never"
+          'type': 'mcp',
+          'server_label': 'scraping_bee',
+          'server_url':
+              'https://scraping-bee-mcp-production.up.railway.app/sse',
+          'require_approval': 'never'
         }
       ],
       'text': {
