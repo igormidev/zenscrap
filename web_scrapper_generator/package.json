@@ -1,8 +1,0 @@
-{
-  "name": "web-scrapper-generator",
-  "version": "1.0.0",
-  "description": "Web scrapper generator with Playwright support",
-  "dependencies": {
-    "playwright": "^1.55.1"
-  }
-}

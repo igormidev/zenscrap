@@ -1,11 +1,5 @@
 import http from 'http';
 import { chromium } from 'playwright';
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
-import {
-  ListToolsRequestSchema,
-  CallToolRequestSchema,
-} from '@modelcontextprotocol/sdk/types.js';
 
 const PORT = process.env.PORT || 8931;
 
@@ -44,12 +38,22 @@ async function getPage() {
   if (!page || page.isClosed()) {
     const browserInstance = await getBrowser();
     const context = await browserInstance.newContext({
-      viewport: { width: 1280, height: 720 }
+      viewport: { width: 1280, height: 720 },
+      ignoreHTTPSErrors: true  // Required for ScrapingBee proxy
     });
     page = await context.newPage();
   }
   return page;
 }
+
+// MCP Protocol version
+const PROTOCOL_VERSION = '2024-11-05';
+
+// Server info
+const SERVER_INFO = {
+  name: 'playwright-scrapingbee',
+  version: '1.0.0'
+};
 
 // Define MCP tools
 const tools = [
@@ -142,44 +146,43 @@ const tools = [
 
 // Tool handler
 async function handleToolCall(name, args) {
+  console.log(`Tool call: ${name}`, args);
   const currentPage = await getPage();
 
   switch (name) {
     case 'browser_navigate': {
       await currentPage.goto(args.url, { waitUntil: 'domcontentloaded', timeout: 60000 });
       const title = await currentPage.title();
-      return { content: [{ type: 'text', text: `Navigated to ${args.url}. Page title: ${title}` }] };
+      return [{ type: 'text', text: `Navigated to ${args.url}. Page title: ${title}` }];
     }
 
     case 'browser_snapshot': {
       const snapshot = await currentPage.accessibility.snapshot();
-      return { content: [{ type: 'text', text: JSON.stringify(snapshot, null, 2) }] };
+      return [{ type: 'text', text: JSON.stringify(snapshot, null, 2) }];
     }
 
     case 'browser_click': {
       await currentPage.click(args.selector);
-      return { content: [{ type: 'text', text: `Clicked on ${args.selector}` }] };
+      return [{ type: 'text', text: `Clicked on ${args.selector}` }];
     }
 
     case 'browser_type': {
       await currentPage.fill(args.selector, args.text);
-      return { content: [{ type: 'text', text: `Typed "${args.text}" into ${args.selector}` }] };
+      return [{ type: 'text', text: `Typed "${args.text}" into ${args.selector}` }];
     }
 
     case 'browser_screenshot': {
       const buffer = await currentPage.screenshot({ fullPage: args.fullPage || false });
       const base64 = buffer.toString('base64');
-      return {
-        content: [
-          { type: 'text', text: 'Screenshot captured' },
-          { type: 'image', data: base64, mimeType: 'image/png' }
-        ]
-      };
+      return [
+        { type: 'text', text: 'Screenshot captured' },
+        { type: 'image', data: base64, mimeType: 'image/png' }
+      ];
     }
 
     case 'browser_evaluate': {
       const result = await currentPage.evaluate(args.script);
-      return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+      return [{ type: 'text', text: JSON.stringify(result, null, 2) }];
     }
 
     case 'browser_get_html': {
@@ -190,12 +193,12 @@ async function handleToolCall(name, args) {
       } else {
         html = await currentPage.content();
       }
-      return { content: [{ type: 'text', text: html }] };
+      return [{ type: 'text', text: html }];
     }
 
     case 'browser_wait_for': {
       await currentPage.waitForSelector(args.selector, { timeout: args.timeout || 30000 });
-      return { content: [{ type: 'text', text: `Element ${args.selector} is now visible` }] };
+      return [{ type: 'text', text: `Element ${args.selector} is now visible` }];
     }
 
     default:
@@ -203,40 +206,94 @@ async function handleToolCall(name, args) {
   }
 }
 
-// Create MCP server
-function createMcpServer() {
-  const server = new Server(
-    { name: 'playwright-scrapingbee', version: '1.0.0' },
-    { capabilities: { tools: {} } }
-  );
+// Handle JSON-RPC request
+async function handleJsonRpcRequest(request) {
+  const { jsonrpc, id, method, params } = request;
 
-  server.setRequestHandler(ListToolsRequestSchema, async () => {
-    return { tools };
-  });
+  if (jsonrpc !== '2.0') {
+    return { jsonrpc: '2.0', id, error: { code: -32600, message: 'Invalid Request' } };
+  }
 
-  server.setRequestHandler(CallToolRequestSchema, async (request) => {
-    const { name, arguments: args } = request.params;
-    try {
-      return await handleToolCall(name, args || {});
-    } catch (error) {
-      return {
-        content: [{ type: 'text', text: `Error: ${error.message}` }],
-        isError: true
-      };
+  console.log(`MCP method: ${method}`, params);
+
+  try {
+    switch (method) {
+      case 'initialize': {
+        return {
+          jsonrpc: '2.0',
+          id,
+          result: {
+            protocolVersion: PROTOCOL_VERSION,
+            capabilities: {
+              tools: { listChanged: false }
+            },
+            serverInfo: SERVER_INFO
+          }
+        };
+      }
+
+      case 'initialized': {
+        // Notification - no response needed
+        return null;
+      }
+
+      case 'tools/list': {
+        return {
+          jsonrpc: '2.0',
+          id,
+          result: { tools }
+        };
+      }
+
+      case 'tools/call': {
+        const { name, arguments: args } = params;
+        try {
+          const content = await handleToolCall(name, args || {});
+          return {
+            jsonrpc: '2.0',
+            id,
+            result: { content, isError: false }
+          };
+        } catch (error) {
+          return {
+            jsonrpc: '2.0',
+            id,
+            result: {
+              content: [{ type: 'text', text: `Error: ${error.message}` }],
+              isError: true
+            }
+          };
+        }
+      }
+
+      case 'ping': {
+        return { jsonrpc: '2.0', id, result: {} };
+      }
+
+      default: {
+        return {
+          jsonrpc: '2.0',
+          id,
+          error: { code: -32601, message: `Method not found: ${method}` }
+        };
+      }
     }
-  });
-
-  return server;
+  } catch (error) {
+    console.error(`Error handling ${method}:`, error);
+    return {
+      jsonrpc: '2.0',
+      id,
+      error: { code: -32603, message: error.message }
+    };
+  }
 }
 
-// HTTP server for SSE transport
-const transports = new Map();
-
+// HTTP server
 const httpServer = http.createServer(async (req, res) => {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Mcp-Session-Id, Last-Event-ID');
 
   if (req.method === 'OPTIONS') {
     res.writeHead(200);
@@ -245,41 +302,61 @@ const httpServer = http.createServer(async (req, res) => {
   }
 
   // Health check
-  if (req.url === '/health' || req.url === '/') {
+  if ((req.url === '/health' || req.url === '/') && req.method === 'GET') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ status: 'ok', service: 'playwright-mcp-scrapingbee' }));
     return;
   }
 
-  // SSE endpoint
-  if (req.url === '/sse' && req.method === 'GET') {
-    console.log('New SSE connection');
+  // MCP endpoint - Streamable HTTP transport
+  if (req.url === '/mcp' || req.url === '/sse') {
+    if (req.method === 'GET') {
+      // SSE stream for server-to-client messages (optional in Streamable HTTP)
+      res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive'
+      });
+      // Keep connection alive
+      const keepAlive = setInterval(() => {
+        res.write(':keepalive\n\n');
+      }, 30000);
+      req.on('close', () => {
+        clearInterval(keepAlive);
+      });
+      return;
+    }
 
-    const server = createMcpServer();
-    const transport = new SSEServerTransport('/messages', res);
-    const sessionId = Date.now().toString();
+    if (req.method === 'POST') {
+      let body = '';
+      req.on('data', chunk => body += chunk);
+      req.on('end', async () => {
+        try {
+          const request = JSON.parse(body);
+          console.log('Received JSON-RPC request:', JSON.stringify(request).substring(0, 200));
 
-    transports.set(sessionId, { server, transport });
+          const response = await handleJsonRpcRequest(request);
 
-    req.on('close', () => {
-      console.log(`SSE connection closed: ${sessionId}`);
-      transports.delete(sessionId);
-    });
-
-    await server.connect(transport);
-    return;
-  }
-
-  // Messages endpoint for SSE transport
-  if (req.url === '/messages' && req.method === 'POST') {
-    let body = '';
-    req.on('data', chunk => body += chunk);
-    req.on('end', async () => {
-      // SSEServerTransport handles this internally
-      res.writeHead(200);
-      res.end();
-    });
-    return;
+          if (response === null) {
+            // Notification - return 202 Accepted
+            res.writeHead(202);
+            res.end();
+          } else {
+            // Return JSON response
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(response));
+          }
+        } catch (error) {
+          console.error('Error parsing request:', error);
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({
+            jsonrpc: '2.0',
+            error: { code: -32700, message: 'Parse error' }
+          }));
+        }
+      });
+      return;
+    }
   }
 
   // 404
@@ -289,7 +366,7 @@ const httpServer = http.createServer(async (req, res) => {
 
 httpServer.listen(PORT, '0.0.0.0', () => {
   console.log(`Playwright MCP Server with ScrapingBee proxy listening on port ${PORT}`);
-  console.log(`SSE endpoint: http://0.0.0.0:${PORT}/sse`);
+  console.log(`MCP endpoint: http://0.0.0.0:${PORT}/mcp`);
   console.log(`Health check: http://0.0.0.0:${PORT}/health`);
 });
 

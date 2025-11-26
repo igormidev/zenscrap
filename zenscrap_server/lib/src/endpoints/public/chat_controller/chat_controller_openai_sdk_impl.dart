@@ -13,7 +13,7 @@ const _openAiResponsesUrl = 'https://api.openai.com/v1/responses';
 
 // Playwright MCP server deployed on Railway with ScrapingBee proxy
 const _playwrightMcpUrl =
-    'https://playwright-mcp-scrapingbee-production.up.railway.app/sse';
+    'https://playwright-mcp-scrapingbee-production.up.railway.app/mcp';
 
 class ChatControllerOpenAiSdkImpl extends IChatController
     with ChatControllerHandlerMixin {
