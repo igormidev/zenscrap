@@ -330,22 +330,72 @@ Thinking Buffer (${thinkingContent.length} chars): ${thinkingContent.isEmpty ? "
           type == 'response.mcp_list_tools') {
         final serverLabel = event['server_label'] ?? 'unknown';
         return 'Discovering tools from $serverLabel...';
+      } else if (type == 'response.mcp_list_tools.completed') {
+        final serverLabel = event['server_label'] ?? 'unknown';
+        final item = event['item'] as Map<String, dynamic>?;
+        final tools = item?['tools'] as List?;
+        final toolCount = tools?.length ?? 0;
+        return 'Discovered $toolCount tools from $serverLabel';
       } else if (type == 'response.mcp_call.in_progress' ||
           type == 'response.mcp_call') {
         final item = event['item'] as Map<String, dynamic>?;
         final name = item?['name'] ?? event['name'] ?? 'tool';
-        final serverLabel = item?['server_label'] ?? event['server_label'] ?? '';
+        final serverLabel =
+            item?['server_label'] ?? event['server_label'] ?? '';
+        final arguments = item?['arguments'] ?? event['arguments'];
+        if (arguments != null) {
+          final argsStr = arguments.toString();
+          final truncatedArgs = argsStr.length > 200
+              ? '${argsStr.substring(0, 200)}...'
+              : argsStr;
+          return 'Calling $name${serverLabel.isNotEmpty ? " on $serverLabel" : ""} with: $truncatedArgs';
+        }
         return 'Calling $name${serverLabel.isNotEmpty ? " on $serverLabel" : ""}...';
       } else if (type == 'response.mcp_call.completed') {
         final item = event['item'] as Map<String, dynamic>?;
         final name = item?['name'] ?? 'tool';
-        return 'Completed $name';
+        final serverLabel = item?['server_label'] ?? '';
+
+        // Extract the actual output from the MCP call
+        final output = item?['output'] as List?;
+        if (output != null && output.isNotEmpty) {
+          final buffer = StringBuffer();
+          buffer.writeln('✅ $name completed${serverLabel.isNotEmpty ? " ($serverLabel)" : ""}:');
+
+          for (final outputItem in output) {
+            if (outputItem is Map<String, dynamic>) {
+              final outputType = outputItem['type'];
+              if (outputType == 'text') {
+                final text = outputItem['text'] as String? ?? '';
+                // Truncate long outputs but show enough to understand the result
+                final truncatedText =
+                    text.length > 1500 ? '${text.substring(0, 1500)}...[truncated]' : text;
+                buffer.writeln(truncatedText);
+              }
+            }
+          }
+          return buffer.toString();
+        }
+        return '✅ $name completed${serverLabel.isNotEmpty ? " ($serverLabel)" : ""}';
+      } else if (type == 'response.mcp_call.failed') {
+        final item = event['item'] as Map<String, dynamic>?;
+        final name = item?['name'] ?? 'tool';
+        final serverLabel = item?['server_label'] ?? '';
+
+        // Extract error information
+        final error = item?['error'] ?? event['error'];
+        final errorMessage = error is Map
+            ? (error['message'] ?? error.toString())
+            : (error?.toString() ?? 'Unknown error');
+
+        return '❌ $name FAILED${serverLabel.isNotEmpty ? " ($serverLabel)" : ""}: $errorMessage';
       } else if (type.contains('mcp')) {
         // Generic MCP event
         return 'MCP activity: ${type.replaceAll("response.", "").replaceAll("_", " ")}';
       }
     } catch (e) {
-      // Ignore extraction errors
+      // Log extraction errors for debugging
+      return 'MCP event parsing error: $e';
     }
     return '';
   }
