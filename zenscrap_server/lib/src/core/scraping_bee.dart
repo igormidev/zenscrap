@@ -119,7 +119,10 @@ class ScrapingBeeClient {
         final value = entry.value;
 
         if (value is Map<String, dynamic>) {
-          if (value['type'] == 'list') {
+          // Keep complex types as-is: list, output specifiers, nested structures
+          if (value['type'] == 'list' ||
+              value.containsKey('output') ||
+              value.containsKey('all')) {
             corrected[key] = value;
           } else if (value.containsKey('selector')) {
             needsCorrection = true;

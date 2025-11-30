@@ -333,8 +333,9 @@ WebScrapperChatAIResponse parseStructuredResponse(
                 scrappingBeeFetchSettingsData['wait_browser'] as String?,
             country_code:
                 scrappingBeeFetchSettingsData['country_code'] as String?,
+            // session_id can come as int or string from AI, so convert to string
             session_id:
-                scrappingBeeFetchSettingsData['session_id'] as String?,
+                scrappingBeeFetchSettingsData['session_id']?.toString(),
             custom_google:
                 scrappingBeeFetchSettingsData['custom_google'] as bool?,
           );

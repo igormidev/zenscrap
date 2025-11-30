@@ -1,16 +1,16 @@
 # Zenscrap Server
 
-Serverpod backend server for Zenscrap - the AI-powered web scraping rules generator. This server handles API requests, manages business logic, and orchestrates OpenAI + MCP powered scraping rule generation.
+Serverpod backend server for Zenscrap - the AI-powered web scraping rules generator. Users interact with an AI assistant through a chat interface to create, test, and refine ScrapingBee extraction configurations. The AI uses two MCP (Model Context Protocol) servers to browse pages and validate extraction rules.
 
 ## 🚀 Overview
 
 The Zenscrap Server is built with Serverpod and provides:
-- RESTful API endpoints for scraping rule generation
-- User authentication and session management
-- Database persistence for scraping configurations
-- Integration with AI scraping rule generator
-- WebSocket support for real-time updates
-- Caching with Redis
+- **AI Chat System**: OpenAI-powered chat for scraping rule generation
+- **MCP Integration**: Two MCP servers for browser automation and rule testing
+- **Real-time Streaming**: WebSocket streams for AI thinking process and chat responses
+- **User authentication and session management**
+- **Database persistence for scraping configurations**
+- **Subscription and API credit management with Stripe**
 
 ## 🏗️ Architecture
 
@@ -18,29 +18,44 @@ The Zenscrap Server is built with Serverpod and provides:
 zenscrap_server/
 ├── lib/
 │   ├── src/
-│   │   ├── endpoints/          # API endpoint definitions
-│   │   │   ├── scraper_endpoint.dart
-│   │   │   ├── auth_endpoint.dart
-│   │   │   └── history_endpoint.dart
-│   │   ├── services/           # Business logic services
-│   │   │   ├── scraper_service.dart
-│   │   │   ├── auth_service.dart
-│   │   │   └── cache_service.dart
-│   │   ├── models/             # Database models
-│   │   │   └── protocol/       # Serverpod protocol files
-│   │   ├── utils/              # Utility functions
-│   │   └── generated/          # Serverpod generated code
-│   └── server.dart             # Server configuration
-├── bin/
-│   └── main.dart              # Server entry point
-├── config/                    # Configuration files
-│   ├── development.yaml
-│   ├── staging.yaml
-│   └── production.yaml
-├── migrations/                # Database migrations
-├── docker-compose.yaml        # Docker services setup
-└── pubspec.yaml
+│   │   ├── endpoints/
+│   │   │   ├── public/
+│   │   │   │   ├── chat_controller/         # AI Chat System
+│   │   │   │   │   ├── chat_controller_openai_sdk_impl.dart  # OpenAI integration
+│   │   │   │   │   ├── chat_controller_handler_mixin.dart    # Response handling
+│   │   │   │   │   ├── openai_prompt_builder.dart            # Prompt construction
+│   │   │   │   │   ├── web_scraper_ai_models.dart            # Data models
+│   │   │   │   │   └── i_chat_controller.dart                # Interface
+│   │   │   │   ├── scrappable_chat_session.dart  # Session management
+│   │   │   │   ├── create_scrappable.dart        # Scrappable creation
+│   │   │   │   └── ...
+│   │   │   └── private/                      # Authenticated endpoints
+│   │   ├── core/
+│   │   │   ├── scraping_bee.dart             # ScrapingBee API client
+│   │   │   ├── stripe/                       # Stripe integration
+│   │   │   └── ...
+│   │   ├── webhooks/                         # Stripe webhooks
+│   │   └── generated/                        # Serverpod generated code
+│   └── server.dart                           # Server configuration
+├── bin/main.dart                             # Server entry point
+├── config/                                   # Configuration files
+├── migrations/                               # Database migrations
+└── docker-compose.yaml                       # Docker services
 ```
+
+## 🤖 MCP Servers
+
+The AI uses two external MCP servers (hosted on Railway):
+
+### Playwright MCP
+- **URL**: `https://playwright-mcp-scrapingbee-production.up.railway.app/mcp`
+- **Purpose**: Browser automation with ScrapingBee proxy for anti-bot bypass
+- **Tools**: `browser_navigate`, `browser_snapshot`, `browser_click`, `browser_type`, `browser_screenshot`, `browser_evaluate`, `browser_get_html`, `browser_wait_for`
+
+### ScrapingBee MCP
+- **URL**: `https://scraping-bee-mcp-production.up.railway.app/mcp`
+- **Purpose**: Testing extraction rules directly against ScrapingBee API
+- **Tools**: `test_extract_rules`, `get_page_html`, `get_screenshot`
 
 ## 🚀 Quick Start
 

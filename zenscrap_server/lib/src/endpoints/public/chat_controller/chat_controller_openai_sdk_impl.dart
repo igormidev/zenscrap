@@ -175,7 +175,7 @@ class ChatControllerOpenAiSdkImpl extends IChatController
           'type': 'mcp',
           'server_label': 'scraping_bee',
           'server_url':
-              'https://scraping-bee-mcp-production.up.railway.app/sse',
+              'https://scraping-bee-mcp-production.up.railway.app/mcp',
           'require_approval': 'never'
         }
       ],
