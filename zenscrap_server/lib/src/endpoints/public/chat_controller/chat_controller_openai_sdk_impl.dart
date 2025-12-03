@@ -292,8 +292,11 @@ class ChatControllerOpenAiSdkImpl extends IChatController
   static String _mapModel(AiModel aiModel) {
     switch (aiModel) {
       case AiModel.normal:
-        return 'gpt-5.1';
+        // GPT-5.1-mini: mid-tier model optimized for speed and cost
+        // Note: GPT-5.1-nano is not yet released as of December 2025
+        return 'gpt-5.1-mini';
       case AiModel.powerful:
+        // GPT-5.1: flagship model for maximum intelligence
         return 'gpt-5.1';
     }
   }
@@ -433,6 +436,9 @@ class ChatControllerOpenAiSdkImpl extends IChatController
     final requestBody = {
       'model': _model,
       'stream': true,
+      'reasoning': {
+        'effort': 'high', // Maximize reasoning depth for web scraping accuracy
+      },
       'tools': tools,
       'text': {
         'format': responseFormat,
