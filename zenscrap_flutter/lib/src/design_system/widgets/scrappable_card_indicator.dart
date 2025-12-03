@@ -220,7 +220,7 @@ class ScrappableCardIndicator extends ConsumerWidget {
                         const SizedBox(width: 6),
                         Text(
                           isNew
-                              ? 'This endpoint will be active and attached to your account after you sign In'
+                              ? 'This endpoint will be active and attached to your account after you sign/log in'
                               : willHideFromMarketplace
                                   ? 'Not available in marketplace'
                                   : 'Available in marketplace',

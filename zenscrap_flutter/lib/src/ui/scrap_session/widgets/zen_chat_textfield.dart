@@ -6,6 +6,7 @@ import 'package:form_validator/form_validator.dart';
 import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/chat_scroll_controller_provider.dart';
+import 'package:zenscrap_flutter/src/states/chat_session/is_chat_loading_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_state.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/change_ai_model_button.dart';
@@ -28,7 +29,7 @@ class _ZenChatTextfieldState extends ConsumerState<ZenChatTextfield> {
   final TextEditingController _promptEC = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   final _formKey = GlobalKey<FormState>();
-  bool _isLoading = false;
+  bool _isSendingMessage = false;
   Timer? _timer;
 
   @override
@@ -62,13 +63,14 @@ class _ZenChatTextfieldState extends ConsumerState<ZenChatTextfield> {
   }
 
   Future<void> _sendMessage() async {
-    if (!(_formKey.currentState?.validate() ?? false) || _isLoading) return;
+    if (!(_formKey.currentState?.validate() ?? false) || _isSendingMessage)
+      return;
 
     final message = _promptEC.text.trim();
     final analytics = ref.read(analyticsServiceProvider);
 
     setState(() {
-      _isLoading = true;
+      _isSendingMessage = true;
     });
 
     _promptEC.clear();
@@ -78,8 +80,8 @@ class _ZenChatTextfieldState extends ConsumerState<ZenChatTextfield> {
     try {
       // Track message send before sending
       final scrappable = ref.read(scrapChatProvider).mapOrNull(
-        standard: (value) => value.data,
-      );
+            standard: (value) => value.data,
+          );
 
       if (scrappable != null && scrappable.id != null) {
         await analytics.trackScrappableChatMessageSend(
@@ -97,7 +99,7 @@ class _ZenChatTextfieldState extends ConsumerState<ZenChatTextfield> {
       ref.read(chatScrollHelperProvider).scrollToBottom();
     } finally {
       setState(() {
-        _isLoading = false;
+        _isSendingMessage = false;
       });
     }
   }
@@ -125,7 +127,7 @@ class _ZenChatTextfieldState extends ConsumerState<ZenChatTextfield> {
                   hintText: '',
                   minLines: 1,
                   maxLines: 5,
-                  enabled: !isEndpointTimeExpired && !_isLoading,
+                  enabled: !isEndpointTimeExpired && !_isSendingMessage,
                   onSubmitted: (_) => _sendMessage(),
                   validator: ValidationBuilder()
                       .minLength(3, 'Message must be at least 3 characters')
@@ -140,10 +142,14 @@ class _ZenChatTextfieldState extends ConsumerState<ZenChatTextfield> {
                 color: Theme.of(context).colorScheme.primary,
                 child: InkWell(
                   borderRadius: BorderRadius.circular(12),
-                  onTap: _isLoading ? null : _sendMessage,
+                  onTap: _isSendingMessage ||
+                          ref.watch(isChatLoadingProvider) ||
+                          isEndpointTimeExpired
+                      ? null
+                      : _sendMessage,
                   child: Container(
                     padding: const EdgeInsets.all(12),
-                    child: _isLoading
+                    child: _isSendingMessage
                         ? SizedBox(
                             width: 24,
                             height: 24,
