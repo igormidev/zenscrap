@@ -21,6 +21,7 @@ import 'package:zenscrap_flutter/src/ui/marketplace/dialogs/clone_success_dialog
 import 'package:zenscrap_flutter/src/ui/marketplace/dialogs/upgrade_plan_dialog.dart';
 import 'package:zenscrap_flutter/src/ui/marketplace/widgets/api_key_selector_dialog.dart';
 import 'package:zenscrap_flutter/src/ui/marketplace/widgets/scrappable_usage_metrics_widget.dart';
+import 'package:zenscrap_flutter/src/ui/scrap_session/dialogs/test_endpoint_dialog.dart';
 
 class ScrappableInfoDialog extends ConsumerStatefulWidget {
   final Scrappable scrappable;
@@ -258,6 +259,14 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
                 copyCode: copiableCurlCommand,
                 fontSize: 12,
               ),
+              if (widget.scrappable.targetRequest != null) ...[
+                const SizedBox(height: 12),
+                FilledButton.tonalIcon(
+                  onPressed: () => _openTestDialog(context),
+                  icon: const Icon(Icons.science, size: 18),
+                  label: const Text('Test Endpoint'),
+                ),
+              ],
               if (isNewScrappable == false) ...[
                 const SizedBox(height: 24),
                 ScrappableUsageMetricsWidget(
@@ -355,6 +364,23 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
 
   String _formatFullDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
+  }
+
+  void _openTestDialog(BuildContext context) {
+    if (selectedApiKey == null || widget.scrappable.targetRequest == null) {
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => TestEndpointDialog(
+        scrappableId: widget.scrappable.id!,
+        scrappableRequest: widget.scrappable.targetRequest!,
+        testData: widget.scrappable.referenceTestData,
+        isTestMode: false,
+        apiKey: selectedApiKey!.apiKey,
+      ),
+    );
   }
 
   Future<void> _handleClone(BuildContext context) async {

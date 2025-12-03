@@ -16,15 +16,31 @@ class TestEndpointDialog extends ConsumerStatefulWidget {
   final int scrappableId;
   final ScrappableRequest scrappableRequest;
   final ReferenceTestData? testData;
-  final DateTime targetTime;
+
+  /// When true, uses the test endpoint (no API key required, shows expiration timer).
+  /// When false, uses the prod endpoint (requires API key, no expiration timer).
+  final bool isTestMode;
+
+  /// Required when [isTestMode] is true. The session expiration time.
+  final DateTime? targetTime;
+
+  /// Required when [isTestMode] is false. The API key for production calls.
+  final String? apiKey;
 
   const TestEndpointDialog({
     super.key,
     required this.scrappableId,
     required this.scrappableRequest,
     required this.testData,
-    required this.targetTime,
-  });
+    this.isTestMode = true,
+    this.targetTime,
+    this.apiKey,
+  }) : assert(
+          isTestMode ? targetTime != null : apiKey != null,
+          isTestMode
+              ? 'targetTime is required in test mode'
+              : 'apiKey is required in production mode',
+        );
 
   @override
   ConsumerState<TestEndpointDialog> createState() => _TestEndpointDialogState();
@@ -132,16 +148,26 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
       final client = ref.read(clientProvider);
       final baseUrl =
           client.host.replaceAll('localhost:8080/', 'localhost:8082');
-      final endpoint = '$baseUrl/api/scrappable/test';
+      final endpoint = widget.isTestMode
+          ? '$baseUrl/api/scrappable/test'
+          : '$baseUrl/api/scrappable/prod';
 
-      // Make HTTP POST request to the test endpoint
+      // Build request data
+      final requestData = <String, dynamic>{
+        'scrappableId': widget.scrappableId,
+        'payload': payload,
+      };
+
+      // Add API key for production mode
+      if (!widget.isTestMode && widget.apiKey != null) {
+        requestData['apiKey'] = widget.apiKey;
+      }
+
+      // Make HTTP POST request to the endpoint
       final dio = Dio();
       final response = await dio.post(
         endpoint,
-        data: {
-          'scrappableId': widget.scrappableId,
-          'payload': payload,
-        },
+        data: requestData,
         options: Options(
           headers: {
             'Content-Type': 'application/json',
@@ -197,7 +223,10 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _TestDialogHeader(targetTime: widget.targetTime),
+            _TestDialogHeader(
+              targetTime: widget.targetTime,
+              isTestMode: widget.isTestMode,
+            ),
             const SizedBox(height: 16),
             if (_isInfoBannerVisible)
               _TestDialogInfoBanner(onDismiss: _dismissInfoBanner),
@@ -221,9 +250,13 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
 }
 
 class _TestDialogHeader extends StatelessWidget {
-  final DateTime targetTime;
+  final DateTime? targetTime;
+  final bool isTestMode;
 
-  const _TestDialogHeader({required this.targetTime});
+  const _TestDialogHeader({
+    required this.targetTime,
+    required this.isTestMode,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -262,8 +295,10 @@ class _TestDialogHeader extends StatelessWidget {
             ],
           ),
         ),
-        _RemainingTimeChip(targetTime: targetTime),
-        const SizedBox(width: 8),
+        if (isTestMode && targetTime != null) ...[
+          _RemainingTimeChip(targetTime: targetTime!),
+          const SizedBox(width: 8),
+        ],
         IconButton(
           icon: const Icon(Icons.close),
           onPressed: () => Navigator.of(context).pop(),
