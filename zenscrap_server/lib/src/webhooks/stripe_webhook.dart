@@ -262,7 +262,9 @@ class StripeWebhookRoute extends Route {
         // Create credit history item
         final creditHistoryItem = CreditHistoryItem(
           date: DateTime.now(),
+          monthlySubscriptionCreditDepositId: null,
           monthlySubscriptionCreditDeposit: null,
+          creaditPackagePurchaseId: creditPurchase.id,
           creaditPackagePurchase: creditPurchase,
           accountApiUsageId: apiUsage.id!,
         );

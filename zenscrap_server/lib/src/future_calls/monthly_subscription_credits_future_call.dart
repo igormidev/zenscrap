@@ -88,7 +88,9 @@ class MonthlySubscriptionCreditsFutureCall extends FutureCall {
           // Create credit history item
           final creditHistoryItem = CreditHistoryItem(
             date: DateTime.now(),
+            monthlySubscriptionCreditDepositId: monthlyDeposit.id,
             monthlySubscriptionCreditDeposit: monthlyDeposit,
+            creaditPackagePurchaseId: null,
             creaditPackagePurchase: null,
             accountApiUsageId: currentApiUsage.id!,
           );

@@ -135,8 +135,11 @@ class CreditHistoryList extends ConsumerWidget {
     if (isSubscription) {
       icon = Icons.calendar_month;
       final deposit = item.monthlySubscriptionCreditDeposit!;
+      final planName = deposit.planTier == PlanTier.none
+          ? 'Free'
+          : deposit.planTier.name.toUpperCase();
       title = 'Monthly Subscription';
-      subtitle = '${deposit.planTier.name.toUpperCase()} plan • $dateStr';
+      subtitle = '$planName plan • $dateStr';
       color = context.c.primary;
       amount = '+${deposit.creditsAmount}';
     } else if (isPurchase) {

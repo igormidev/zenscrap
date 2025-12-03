@@ -87,7 +87,9 @@ class PrivateAccountEndpoint extends Endpoint {
         // Create credit history item for initial credits
         final creditHistoryItem = CreditHistoryItem(
           date: DateTime.now(),
+          monthlySubscriptionCreditDepositId: initialDeposit.id,
           monthlySubscriptionCreditDeposit: initialDeposit,
+          creaditPackagePurchaseId: null,
           creaditPackagePurchase: null,
           accountApiUsageId: accountApiUsage.id!,
         );
