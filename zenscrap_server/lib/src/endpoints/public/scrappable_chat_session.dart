@@ -297,12 +297,17 @@ class ScrappableChatSession extends Endpoint {
       );
     }
 
+    final scrapingBeeApiKey = session.passwords['scrapingBeeApiKey'] ??
+        session.serverpod.getPassword('scrapingBeeApiKey') ??
+        '';
+
     _chatSessions[sessionUuid] = ChatControllerOpenAiSdkImpl.startChat(
       scrappableId: scrappable.id!,
       scrapperRequest: scrapperRequest,
       referenceTestData: referenceTestData,
       currentFetchSettings: scrappable.scrappingBeeExtractRules,
       openAiApiKey: openAiApiKey,
+      scrapingBeeApiKey: scrapingBeeApiKey,
     );
     _cacheRefTestData[sessionUuid] = referenceTestData;
     _cacheScrappingBeeExtractLogic[sessionUuid] = scrappingBeeExtractLogic;
@@ -452,7 +457,10 @@ Future<void> disposeFromScrappableId(int scrappableId) async {
 Future<void> _disposeSession({
   required RedraftSrappableSessionId sessionId,
 }) async {
-  _chatSessions.remove(sessionId);
+  // Dispose the chat controller to clean up OpenAI files
+  final chatController = _chatSessions.remove(sessionId);
+  await chatController?.dispose();
+
   final subject = _scrapRedraftSessions.remove(sessionId);
   await subject?.close();
   _cacheScrappableIds.remove(sessionId);

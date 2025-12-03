@@ -67,15 +67,18 @@ class _DiscardChangesButtonState extends ConsumerState<DiscardChangesButton> {
                         final analytics = ref.read(analyticsServiceProvider);
 
                         // Get scrappableId for tracking
-                        final scrappableId = ref.read(scrapChatProvider).mapOrNull(
-                          standard: (value) => value.data.id ?? 0,
-                        ) ?? 0;
+                        final scrappableId =
+                            ref.read(scrapChatProvider).mapOrNull(
+                                      standard: (value) => value.data.id ?? 0,
+                                    ) ??
+                                0;
 
                         // Get message count
-                        final messageCount = ref.read(chatMessagesProvider).maybeMap(
-                          data: (data) => data.value.length,
-                          orElse: () => 0,
-                        );
+                        final messageCount =
+                            ref.read(chatMessagesProvider).maybeMap(
+                                  data: (data) => data.value.length,
+                                  orElse: () => 0,
+                                );
 
                         if (hasAtLeastOneMessage) {
                           // Track discard changes
@@ -85,6 +88,7 @@ class _DiscardChangesButtonState extends ConsumerState<DiscardChangesButton> {
                               messageCount: messageCount,
                             );
                           }
+                          if (!context.mounted) return;
                           return context.pop(true);
                         }
 

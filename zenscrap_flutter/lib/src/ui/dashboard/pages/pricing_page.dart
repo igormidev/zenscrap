@@ -142,7 +142,7 @@ class ZenScrapPricingPage extends ConsumerWidget {
           planTier: planTier,
           isYearly: isYearly,
         );
-
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Please sign in to subscribe'),

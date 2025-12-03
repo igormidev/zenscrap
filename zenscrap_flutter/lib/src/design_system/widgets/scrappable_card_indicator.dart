@@ -35,25 +35,28 @@ class ScrappableCardIndicator extends ConsumerWidget {
     return InkWell(
       onTap: () async {
         // Track card click based on source
-        if (source == ScrappableCardSource.userScrappables && scrappable.id != null) {
+        if (source == ScrappableCardSource.userScrappables &&
+            scrappable.id != null) {
           await analytics.trackUserScrappablesCardClick(
             scrappableId: scrappable.id!,
             scrappableName: scrappable.name,
           );
-        } else if (source == ScrappableCardSource.marketplace && scrappable.id != null) {
+        } else if (source == ScrappableCardSource.marketplace &&
+            scrappable.id != null) {
           await analytics.trackMarketplaceCardClick(
             scrappableId: scrappable.id!,
             scrappableName: scrappable.name,
             usageCount: usageCount,
           );
         }
-
-        await showDialog(
-          context: context,
-          builder: (context) => ScrappableDetailsDialog(
-            scrappable: scrappable,
-          ),
-        );
+        if (context.mounted) {
+          await showDialog(
+            context: context,
+            builder: (context) => ScrappableDetailsDialog(
+              scrappable: scrappable,
+            ),
+          );
+        }
       },
       borderRadius: BorderRadius.circular(12),
       child: Container(
@@ -88,13 +91,14 @@ class ScrappableCardIndicator extends ConsumerWidget {
                   InkWell(
                     onTap: () async {
                       // Track edit click (only for user scrappables)
-                      if (source == ScrappableCardSource.userScrappables && scrappable.id != null) {
+                      if (source == ScrappableCardSource.userScrappables &&
+                          scrappable.id != null) {
                         await analytics.trackUserScrappablesEditClick(
                           scrappableId: scrappable.id!,
                           scrappableName: scrappable.name,
                         );
                       }
-
+                      if (!context.mounted) return;
                       await showDialog<bool>(
                         context: context,
                         builder: (dialogContext) => EditScrappableDialog(

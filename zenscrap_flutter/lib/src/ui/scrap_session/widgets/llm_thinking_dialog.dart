@@ -95,6 +95,7 @@ class LLMThinkingDialog extends ConsumerWidget {
                       onPressed: () async {
                         await Clipboard.setData(
                             ClipboardData(text: fullContext));
+                        if (!context.mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('Copied to clipboard')),
                         );

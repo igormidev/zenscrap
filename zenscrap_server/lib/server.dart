@@ -4,6 +4,7 @@ import 'package:zenscrap_server/src/auth/handlers/on_send_validation_email.dart'
 import 'package:zenscrap_server/src/core/mixins/api_helper_mixin.dart';
 import 'package:zenscrap_server/src/core/scraping_bee.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_config.dart';
+import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_openai_sdk_impl.dart';
 import 'package:zenscrap_server/src/future_calls/monthly_subscription_credits_future_call.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as auth;
 import 'package:zenscrap_server/src/endpoints/public/scrappable_chat_session.dart';
@@ -93,6 +94,23 @@ void run(List<String> args) async {
 
   // Start the server.
   await pod.start();
+
+  // Initialize OpenAI file uploads for the chat controller
+  final openAiApiKey = pod.getPassword('openAiApiKey');
+  if (openAiApiKey != null && openAiApiKey.isNotEmpty) {
+    try {
+      await ChatControllerOpenAiSdkImpl.init(openAiApiKey: openAiApiKey);
+      // ignore: avoid_print
+      print('[Zenscrap] OpenAI static files initialized successfully');
+    } catch (e) {
+      // ignore: avoid_print
+      print('[Zenscrap] ERROR: Failed to initialize OpenAI static files: $e');
+    }
+  } else {
+    // ignore: avoid_print
+    print(
+        '[Zenscrap] WARNING: OpenAI API key not configured, skipping file initialization');
+  }
 
   await pod.cancelFutureCall('periodicSetRequestsAnalytics');
   await pod.cancelFutureCall('periodicCleanupOldAnalyticsDetails');

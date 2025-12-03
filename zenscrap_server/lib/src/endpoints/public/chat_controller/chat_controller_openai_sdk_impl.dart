@@ -10,30 +10,117 @@ import 'package:zenscrap_server/src/endpoints/public/chat_controller/web_scraper
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 const _openAiResponsesUrl = 'https://api.openai.com/v1/responses';
+const _openAiFilesUrl = 'https://api.openai.com/v1/files';
 
 // Playwright MCP server deployed on Railway with ScrapingBee proxy
 const _playwrightMcpUrl =
     'https://playwright-mcp-scrapingbee-production.up.railway.app/mcp';
+
+// ScrapingBee MCP server deployed on Railway
+const _scrapingBeeMcpUrl =
+    'https://scraping-bee-mcp-production.up.railway.app/mcp';
 
 class ChatControllerOpenAiSdkImpl extends IChatController
     with ChatControllerHandlerMixin {
   ChatControllerOpenAiSdkImpl._({
     required super.scrappableId,
     required String openAiApiKey,
+    required String scrapingBeeApiKey,
     required String contextPrompt,
+    required String extractionRulesGuide,
     required String model,
   })  : _openAiApiKey = openAiApiKey,
+        _extractionRulesGuide = extractionRulesGuide,
         _model = model {
-    final systemPrompt = buildSystemPrompt();
+    final systemPrompt = buildSystemPrompt(scrapingBeeApiKey: scrapingBeeApiKey);
     _baseMessages.addAll([
       OpenAiMessage(role: 'system', content: systemPrompt),
       OpenAiMessage(role: 'system', content: contextPrompt),
     ]);
   }
 
+  /// Initializes static files by uploading documentation to OpenAI.
+  /// Should be called once at server startup.
+  static Future<void> init({
+    required String openAiApiKey,
+  }) async {
+    if (OpenAiFileManager.areStaticFilesUploaded) {
+      return; // Already initialized
+    }
+
+    final costOptId = await _uploadFile(
+      apiKey: openAiApiKey,
+      filename: 'cost_optimization_guide.md',
+      content: costOptimizationGuide,
+    );
+
+    final editRequestId = await _uploadFile(
+      apiKey: openAiApiKey,
+      filename: 'how_to_edit_scrappable_request.md',
+      content: howToEditScrappableRequest,
+    );
+
+    final structureGuideId = await _uploadFile(
+      apiKey: openAiApiKey,
+      filename: 'scrappable_request_structure_guide.md',
+      content: scrappableRequestStructureGuide,
+    );
+
+    OpenAiFileManager.setStaticFileIds(
+      costOptimization: costOptId,
+      howToEditRequest: editRequestId,
+      requestStructureGuide: structureGuideId,
+    );
+  }
+
+  /// Uploads a file to OpenAI with purpose "user_data"
+  static Future<String> _uploadFile({
+    required String apiKey,
+    required String filename,
+    required String content,
+  }) async {
+    final request = http.MultipartRequest('POST', Uri.parse(_openAiFilesUrl))
+      ..headers['Authorization'] = 'Bearer $apiKey'
+      ..fields['purpose'] = 'user_data'
+      ..files.add(http.MultipartFile.fromString(
+        'file',
+        content,
+        filename: filename,
+      ));
+
+    final response = await request.send();
+    final responseBody = await response.stream.bytesToString();
+
+    if (response.statusCode != 200) {
+      throw Exception(
+          'Failed to upload file $filename: ${response.statusCode} - $responseBody');
+    }
+
+    final json = jsonDecode(responseBody) as Map<String, dynamic>;
+    return json['id'] as String;
+  }
+
+  /// Deletes a file from OpenAI
+  static Future<void> _deleteFile({
+    required String apiKey,
+    required String fileId,
+  }) async {
+    final response = await http.delete(
+      Uri.parse('$_openAiFilesUrl/$fileId'),
+      headers: {'Authorization': 'Bearer $apiKey'},
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 204) {
+      // Log but don't throw - file might already be deleted
+      // ignore: avoid_print
+      print('Warning: Failed to delete file $fileId: ${response.statusCode}');
+    }
+  }
+
   factory ChatControllerOpenAiSdkImpl.startChat({
     required int scrappableId,
     required String openAiApiKey,
+    required String scrapingBeeApiKey,
     required ReferenceTestData referenceTestData,
     required ScrappableRequest scrapperRequest,
     required ScrappingBeeExtractLogic? currentFetchSettings,
@@ -45,16 +132,31 @@ class ChatControllerOpenAiSdkImpl extends IChatController
       scrappingBeeLogic: currentFetchSettings,
     );
 
+    // Build the extraction rules guide specific to this session's parameters
+    final webScrapperRequest = WebScrapperRequest(
+      url: scrapperRequest.url,
+      queryParam: scrapperRequest.queryParams,
+      queryParamsNotRelatedToUrl: scrapperRequest.queryParamsNotRelatedToUrl,
+      pathParams: scrapperRequest.pathParams,
+    );
+    final extractionRulesGuide = buildExtractionRulesGuide(webScrapperRequest);
+
     return ChatControllerOpenAiSdkImpl._(
       scrappableId: scrappableId,
       openAiApiKey: openAiApiKey,
+      scrapingBeeApiKey: scrapingBeeApiKey,
       contextPrompt: contextPrompt,
+      extractionRulesGuide: extractionRulesGuide,
       model: _mapModel(model),
     );
   }
 
   final String _openAiApiKey;
+  final String _extractionRulesGuide;
   String _model;
+
+  /// Session-specific file ID for the extraction rules guide
+  String? _sessionFileId;
 
   final List<OpenAiMessage> _baseMessages = [];
   final List<OpenAiMessage> _history = [];
@@ -74,6 +176,29 @@ class ChatControllerOpenAiSdkImpl extends IChatController
   }
 
   @override
+  Future<void> dispose() async {
+    // Delete session-specific file if it was uploaded
+    if (_sessionFileId != null) {
+      await _deleteFile(apiKey: _openAiApiKey, fileId: _sessionFileId!);
+      OpenAiFileManager.removeSessionExtractionRulesFileId(scrappableId);
+      _sessionFileId = null;
+    }
+  }
+
+  /// Uploads the session-specific extraction rules guide if not already uploaded
+  Future<void> _ensureSessionFileUploaded() async {
+    if (_sessionFileId != null) return;
+
+    _sessionFileId = await _uploadFile(
+      apiKey: _openAiApiKey,
+      filename: 'extraction_rules_guide_session_$scrappableId.md',
+      content: _extractionRulesGuide,
+    );
+    OpenAiFileManager.setSessionExtractionRulesFileId(
+        scrappableId, _sessionFileId!);
+  }
+
+  @override
   Future<void> sendMessage({
     required Session session,
     required String userPrompt,
@@ -83,6 +208,9 @@ class ChatControllerOpenAiSdkImpl extends IChatController
     required StreamController<ChatResponse> chatSeason,
     required StreamController<String> thinkingStream,
   }) async {
+    // Ensure session-specific file is uploaded before first message
+    await _ensureSessionFileUploaded();
+
     var attemptPrompt = userPrompt;
 
     for (var attempt = 1; attempt <= 3; attempt++) {
@@ -161,6 +289,59 @@ class ChatControllerOpenAiSdkImpl extends IChatController
       if (schema['strict'] != null) 'strict': schema['strict'],
     };
 
+    // Build input with file references
+    final input = <Map<String, dynamic>>[];
+
+    // Add system messages
+    for (final msg in messages) {
+      if (msg.role == 'user') {
+        // For user messages, include file references
+        final content = <Map<String, dynamic>>[];
+
+        // Add static documentation files
+        if (OpenAiFileManager.costOptimizationFileId != null) {
+          content.add({
+            'type': 'input_file',
+            'file_id': OpenAiFileManager.costOptimizationFileId,
+          });
+        }
+        if (OpenAiFileManager.howToEditRequestFileId != null) {
+          content.add({
+            'type': 'input_file',
+            'file_id': OpenAiFileManager.howToEditRequestFileId,
+          });
+        }
+        if (OpenAiFileManager.requestStructureGuideFileId != null) {
+          content.add({
+            'type': 'input_file',
+            'file_id': OpenAiFileManager.requestStructureGuideFileId,
+          });
+        }
+
+        // Add session-specific extraction rules file
+        if (_sessionFileId != null) {
+          content.add({
+            'type': 'input_file',
+            'file_id': _sessionFileId,
+          });
+        }
+
+        // Add the user's text message
+        content.add({
+          'type': 'input_text',
+          'text': msg.content,
+        });
+
+        input.add({
+          'role': msg.role,
+          'content': content,
+        });
+      } else {
+        // System and assistant messages are plain text
+        input.add(msg.toMap());
+      }
+    }
+
     final requestBody = {
       'model': _model,
       'stream': true,
@@ -174,15 +355,14 @@ class ChatControllerOpenAiSdkImpl extends IChatController
         {
           'type': 'mcp',
           'server_label': 'scraping_bee',
-          'server_url':
-              'https://scraping-bee-mcp-production.up.railway.app/mcp',
+          'server_url': _scrapingBeeMcpUrl,
           'require_approval': 'never'
         }
       ],
       'text': {
         'format': responseFormat,
       },
-      'input': messages.map((m) => m.toMap()).toList(),
+      'input': input,
     };
 
     final client = http.Client();

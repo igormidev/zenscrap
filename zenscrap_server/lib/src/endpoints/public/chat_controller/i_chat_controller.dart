@@ -20,6 +20,10 @@ abstract class IChatController {
     required StreamController<String> thinkingStream,
   });
 
+  /// Disposes of session-specific resources (e.g., uploaded files).
+  /// Should be called when the chat session ends.
+  Future<void> dispose();
+
   static InitialPayloadData getInitialPayloadDate({
     required ReferenceTestData referenceTestData,
     required ScrappableRequest scrapperRequest,
