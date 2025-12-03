@@ -57,19 +57,19 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
 
     // Track create API key submit
     ref.read(analyticsServiceProvider).trackApiUsageCreateApiKeySubmit(
-      keyName: name,
-    );
+          keyName: name,
+        );
 
     final newKey =
         await ref.read(apiKeysProvider.notifier).createApiKey(context, name);
     if (newKey != null && mounted) {
       // Track successful creation
       ref.read(analyticsServiceProvider).trackApiUsageCreateApiKeySuccess(
-        keyId: newKey.id!,
-        keyName: newKey.name,
-      );
+            keyId: newKey.id!,
+            keyName: newKey.name,
+          );
 
-      Navigator.of(context).pop();
+      // Note: Dialog closes itself via its own context in CreateApiKeyDialog
       // Show the API key in a dialog for copying
       _showApiKeyDialog(newKey);
     }
@@ -111,9 +111,11 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
                     icon: Icon(Icons.copy),
                     onPressed: () {
                       // Track copy API key from dialog
-                      ref.read(analyticsServiceProvider).trackApiUsageCopyApiKeyDialog(
-                        keyId: apiKey.id!,
-                      );
+                      ref
+                          .read(analyticsServiceProvider)
+                          .trackApiUsageCopyApiKeyDialog(
+                            keyId: apiKey.id!,
+                          );
 
                       Clipboard.setData(ClipboardData(text: apiKey.apiKey));
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -139,16 +141,16 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
   Future<void> _deactivateApiKey(int keyId) async {
     // Find the key name for tracking
     final apiKeys = ref.read(apiKeysProvider).maybeWhen(
-      loaded: (keys, _) => keys,
-      orElse: () => <AccountApiKey>[],
-    );
+          loaded: (keys, _) => keys,
+          orElse: () => <AccountApiKey>[],
+        );
     final apiKey = apiKeys.firstWhere((key) => key.id == keyId);
 
     // Track deactivate click
     ref.read(analyticsServiceProvider).trackApiUsageDeactivateApiKeyClick(
-      keyId: keyId,
-      keyName: apiKey.name,
-    );
+          keyId: keyId,
+          keyName: apiKey.name,
+        );
 
     // Show confirmation dialog
     final confirm = await showDialog<bool>(
@@ -161,9 +163,11 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
           TextButton(
             onPressed: () {
               // Track cancel
-              ref.read(analyticsServiceProvider).trackApiUsageDeactivateApiKeyCancel(
-                keyId: keyId,
-              );
+              ref
+                  .read(analyticsServiceProvider)
+                  .trackApiUsageDeactivateApiKeyCancel(
+                    keyId: keyId,
+                  );
               Navigator.of(context).pop(false);
             },
             child: const Text('Cancel'),
@@ -183,9 +187,9 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
 
     // Track confirm
     ref.read(analyticsServiceProvider).trackApiUsageDeactivateApiKeyConfirm(
-      keyId: keyId,
-      keyName: apiKey.name,
-    );
+          keyId: keyId,
+          keyName: apiKey.name,
+        );
 
     if (!mounted) return;
     await ref.read(apiKeysProvider.notifier).deactivateApiKey(context, keyId);
@@ -433,9 +437,9 @@ class MobileLayout extends ConsumerWidget {
         onDestinationSelected: (index) {
           // Track tab selection
           ref.read(analyticsServiceProvider).trackApiUsageMobileTabSelect(
-            tabName: tabNames[index],
-            tabIndex: index,
-          );
+                tabName: tabNames[index],
+                tabIndex: index,
+              );
           onTabSelected(index);
         },
         destinations: const [
@@ -501,7 +505,7 @@ class DesktopLayout extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    'API Usage',
+                    'Api Credits & Keys',
                     style: context.t.displayMedium,
                   ),
                 ),
@@ -514,7 +518,9 @@ class DesktopLayout extends StatelessWidget {
                               ? null
                               : () async {
                                   // Track refresh click
-                                  ref.read(analyticsServiceProvider).trackApiUsageRefreshClick();
+                                  ref
+                                      .read(analyticsServiceProvider)
+                                      .trackApiUsageRefreshClick();
 
                                   isRefreshVN.value = true;
                                   try {

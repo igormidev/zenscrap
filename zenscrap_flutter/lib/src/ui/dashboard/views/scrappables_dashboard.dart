@@ -179,10 +179,10 @@ enum DashboardNavigationType {
     routeOnClick: '/marketplace',
   ),
   usage(
-    label: 'Api usage',
+    label: 'Credits & Keys',
     activeIcon: Icons.language,
     inactiveIcon: Icons.language,
-    routeOnClick: '/api-usage',
+    routeOnClick: '/credits-keys',
   ),
   analytics(
     label: 'Api analytics',
