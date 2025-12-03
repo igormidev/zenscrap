@@ -24,6 +24,7 @@ class CreditHistoryList extends ConsumerWidget {
         child: Padding(
           padding: const EdgeInsets.all(32),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 Icons.history,
