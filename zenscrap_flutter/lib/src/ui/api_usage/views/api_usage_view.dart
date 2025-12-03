@@ -52,8 +52,8 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
     await ref.read(creditHistoryProvider.notifier).loadMoreHistory();
   }
 
-  Future<void> _createApiKey(String name) async {
-    if (!mounted) return;
+  Future<AccountApiKey?> _createApiKey(String name) async {
+    if (!mounted) return null;
 
     // Track create API key submit
     ref.read(analyticsServiceProvider).trackApiUsageCreateApiKeySubmit(
@@ -68,11 +68,8 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
             keyId: newKey.id!,
             keyName: newKey.name,
           );
-
-      // Note: Dialog closes itself via its own context in CreateApiKeyDialog
-      // Show the API key in a dialog for copying
-      _showApiKeyDialog(newKey);
     }
+    return newKey;
   }
 
   void _showApiKeyDialog(AccountApiKey apiKey) {
@@ -195,16 +192,21 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
     await ref.read(apiKeysProvider.notifier).deactivateApiKey(context, keyId);
   }
 
-  void _showCreateApiKeyDialog() {
+  Future<void> _showCreateApiKeyDialog() async {
     // Track create API key button click
     ref.read(analyticsServiceProvider).trackApiUsageCreateApiKeyClick();
 
-    showDialog(
+    final newKey = await showDialog<AccountApiKey?>(
       context: context,
       builder: (context) => CreateApiKeyDialog(
         onCreateApiKey: _createApiKey,
       ),
     );
+
+    // Show the API key dialog AFTER the create dialog is fully closed
+    if (newKey != null && mounted) {
+      _showApiKeyDialog(newKey);
+    }
   }
 
   @override

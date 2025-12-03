@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 
 class CreateApiKeyDialog extends StatefulWidget {
-  final Future<void> Function(String) onCreateApiKey;
+  /// Callback that creates the API key and returns it (or null on failure)
+  final Future<AccountApiKey?> Function(String) onCreateApiKey;
 
   const CreateApiKeyDialog({
     super.key,
@@ -33,7 +35,11 @@ class _CreateApiKeyDialogState extends State<CreateApiKeyDialog> {
 
     try {
       await Future.delayed(const Duration(milliseconds: 800));
-      await widget.onCreateApiKey(_nameController.text.trim());
+      final newKey = await widget.onCreateApiKey(_nameController.text.trim());
+      // Close dialog and return the created key (or null)
+      if (mounted) {
+        Navigator.of(context).pop(newKey);
+      }
     } catch (e) {
       if (mounted) {
         setState(() => _isCreating = false);
@@ -139,14 +145,14 @@ class _CreateApiKeyDialogState extends State<CreateApiKeyDialog> {
                 child: Row(
                   children: [
                     Icon(
-                      Icons.info_outline,
+                      Icons.warning_amber_rounded,
                       color: context.c.tertiary,
-                      size: 20,
+                      size: 26,
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Once created, you\'ll see the full API key only once. Make sure to copy and save it securely.',
+                        'Whoever has access to this API key will have the same permissions as your account. Keep it secure and do not share it publicly.',
                         style: context.t.bodySmall?.copyWith(
                           color: context.c.onSurface.withAlpha(150),
                         ),

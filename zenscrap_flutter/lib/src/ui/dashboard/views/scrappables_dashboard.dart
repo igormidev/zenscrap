@@ -180,8 +180,8 @@ enum DashboardNavigationType {
   ),
   usage(
     label: 'Credits & Keys',
-    activeIcon: Icons.language,
-    inactiveIcon: Icons.language,
+    activeIcon: Icons.key,
+    inactiveIcon: Icons.key_outlined,
     routeOnClick: '/credits-keys',
   ),
   analytics(
