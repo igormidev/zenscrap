@@ -20,6 +20,7 @@ import 'package:zenscrap_flutter/src/ui/marketplace/dialogs/clone_success_dialog
 import 'package:zenscrap_flutter/src/ui/marketplace/dialogs/upgrade_plan_dialog.dart';
 import 'package:zenscrap_flutter/src/ui/marketplace/widgets/api_key_selector_dialog.dart';
 import 'package:zenscrap_flutter/src/ui/marketplace/widgets/scrappable_usage_metrics_widget.dart';
+import 'package:zenscrap_flutter/src/design_system/widgets/scrapping_bee_cost_table.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/dialogs/test_endpoint_dialog.dart';
 
 class ScrappableInfoDialog extends ConsumerStatefulWidget {
@@ -310,6 +311,25 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
                   fontSize: 12,
                 ),
               ),
+              if (widget.scrappable.scrappingBeeExtractRules != null) ...[
+                const SizedBox(height: 24),
+                Padding(
+                  padding: horizontalPadding,
+                  child: Text(
+                    'API Configuration & Costs',
+                    style: context.t.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Padding(
+                  padding: horizontalPadding,
+                  child: ScrappingBeeCostTable(
+                    extractLogic: widget.scrappable.scrappingBeeExtractRules!,
+                  ),
+                ),
+              ],
               if (isNewScrappable == false) ...[
                 const SizedBox(height: 24),
                 Padding(
