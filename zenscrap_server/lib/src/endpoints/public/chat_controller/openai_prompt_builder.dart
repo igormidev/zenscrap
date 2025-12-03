@@ -507,17 +507,46 @@ ScrapingBee has STRICT format requirements. Using the wrong format will cause 50
 
 ## JS Scenario Documentation
 
+**CRITICAL FORMAT REQUIREMENT:**
+js_scenario MUST be a JSON object with an "instructions" array:
+```json
+{"instructions": [{"wait": 1000}, {"click": ".button"}]}
+```
+
+**NEVER pass:**
+- Empty array `[]` - will cause 500 error
+- Array of actions directly `[{"wait": 1000}]` - will cause 500 error
+- Anything other than `{"instructions": [...]}` format
+
+**If no actions are needed, OMIT the js_scenario parameter entirely!**
+
 For complete js_scenario capabilities, see: https://www.scrapingbee.com/documentation/javascript-scenario/
 
-Common actions:
+Common actions (inside the instructions array):
 - `{"wait": milliseconds}` - Wait for a fixed time
 - `{"click": "selector"}` - Click an element
-- `{"type": "text"}` - Type text into active element
-- `{"select": {"selector": "select", "value": "option"}}` - Select dropdown option
 - `{"fill": {"selector": "input", "value": "text"}}` - Fill input field
 - `{"wait_for": "selector"}` - Wait for element to appear
-- `{"scroll_x": pixels}`, `{"scroll_y": pixels}` - Scroll the page
+- `{"scroll_y": pixels}` - Scroll the page vertically
 - `{"infinite_scroll": {"max_count": 10}}` - Trigger infinite scroll
+
+## CSS Selector Limitations
+
+**IMPORTANT: ScrapingBee uses a LIMITED CSS subset!**
+
+**AVOID these pseudo-selectors (will cause errors):**
+- `:nth-of-type()`, `:nth-child()` - NOT supported
+- `:not()`, `:has()` - NOT supported
+- `:first-of-type`, `:last-of-type` - NOT supported
+- Complex combinators and filters
+
+**USE these instead:**
+- Class selectors: `.product-card`, `.item-name`
+- ID selectors: `#main-content`
+- Tag selectors: `h1`, `div`, `span`
+- Attribute selectors: `[data-id]`, `a[href]`
+- Basic descendant/child: `div.container > .item`
+- Multiple classes: `.card.featured`
 
 ## Testing Requirements (ABSOLUTELY CRITICAL)
 
