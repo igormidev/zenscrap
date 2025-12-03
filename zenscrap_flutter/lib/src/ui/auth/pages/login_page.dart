@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:serverpod_auth_email_flutter/serverpod_auth_email_flutter.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 import 'package:zenscrap_flutter/src/states/session/user_model.dart';
@@ -19,6 +20,11 @@ class LoginPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final analytics = ref.read(analyticsServiceProvider);
+
+    // Track view when the login form is visible
+    analytics.trackAuthLoginViewed();
+
     FormBuilderValidators.email().and(FormBuilderValidators.minLength(8));
     return AuthFormTemplate<UserModel>(
       submitText: 'Log In',
@@ -52,16 +58,31 @@ class LoginPage extends ConsumerWidget {
         final String email = items[0];
         final String password = items[1];
 
+        // Track login attempt
+        await analytics.trackAuthLoginAttempt(email: email);
+
         final user = await emailAuth.signIn(email, password);
         final userEmail = user?.email;
         final userName = user?.userName;
         if (userEmail == null || userName == null) {
+          // Track login failure
+          await analytics.trackAuthLoginFailure(
+            email: email,
+            errorMessage: 'Invalid credentials or user not found',
+          );
+
           if (context.mounted) {
             showErrorSnackbar(context);
           }
 
           return null;
         }
+
+        // Track successful login
+        await analytics.trackAuthLoginSuccess(
+          email: email,
+          userName: userName,
+        );
 
         return UserModel(
           email: email,

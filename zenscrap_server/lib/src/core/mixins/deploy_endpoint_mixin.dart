@@ -8,14 +8,9 @@ mixin DeployEndpointMixin {
     required Session session,
     required Transaction transaction,
     required ReferenceTestData testData,
+    required ScrappingBeeExtractLogic scrappingBeeExtractLogic,
+    required ScrappableRequest scrappableRequest,
   }) async {
-    if (testData.scrappableTestResult == null) {
-      throw ZenScrapException(
-        title: 'No test result to deploy',
-        description:
-            'You cannot deploy reference test data that does not have any test result yet',
-      );
-    }
     if (testData.byteData == null) {
       throw ZenScrapException(
         title: 'No byte data to deploy',
@@ -31,9 +26,10 @@ mixin DeployEndpointMixin {
       scrappable = await Scrappable.db.findFirstRow(session,
           where: (t) =>
               t.referenceTestDataId.equals(testData.id) &
-              t.referenceTestData.scrappableTestResult.id
-                  .equals(testData.scrappableTestResult?.id) &
               t.referenceTestData.byteData.id.equals(testData.byteData?.id) &
+              t.scrappingBeeExtractRules.id
+                  .equals(scrappingBeeExtractLogic.id) &
+              t.targetRequest.id.equals(scrappableRequest.id) &
               t.accountId.equals(null),
           transaction: transaction);
     } else {
@@ -45,14 +41,16 @@ mixin DeployEndpointMixin {
       if (accountInfo == null) {
         throw defaultAuthenticationException;
       }
-      scrappable = await Scrappable.db.findFirstRow(session,
-          where: (t) =>
-              t.referenceTestDataId.equals(testData.id) &
-              t.referenceTestData.scrappableTestResult.id
-                  .equals(testData.scrappableTestResult?.id) &
-              t.referenceTestData.byteData.id.equals(testData.byteData?.id) &
-              t.accountId.equals(accountInfo.id),
-          transaction: transaction);
+      scrappable = await Scrappable.db.findFirstRow(
+        session,
+        where: (t) =>
+            t.referenceTestDataId.equals(testData.id) &
+            t.referenceTestData.byteData.id.equals(testData.byteData?.id) &
+            t.scrappingBeeExtractRules.id.equals(scrappingBeeExtractLogic.id) &
+            t.targetRequest.id.equals(scrappableRequest.id) &
+            t.accountId.equals(accountInfo.id),
+        transaction: transaction,
+      );
     }
 
     if (scrappable == null) {
@@ -67,17 +65,15 @@ mixin DeployEndpointMixin {
         session,
         scrappable.copyWith(
           extractRulesUpdatedAt: DateTime.now(),
-          scrappingRules: testData.scrappableTestResult?.testExtractRule,
         ),
         transaction: transaction);
 
-    await ScrappableTestResult.db.updateRow(
-        session, testData.scrappableTestResult!,
-        transaction: transaction);
-
+    await ScrappingBeeExtractLogic.db
+        .updateRow(session, scrappingBeeExtractLogic, transaction: transaction);
+    await ScrappableRequest.db
+        .updateRow(session, scrappableRequest, transaction: transaction);
     await ByteTestData.db
         .updateRow(session, testData.byteData!, transaction: transaction);
-
     await ReferenceTestData.db
         .updateRow(session, testData, transaction: transaction);
 

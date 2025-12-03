@@ -10,6 +10,7 @@ class MarketplaceEndpoint extends Endpoint {
     Session session, {
     int page = 1,
     String? searchQuery,
+    List<ScraperCategory>? categories,
   }) async {
     final now = DateTime.now();
     const int pageSize = 12;
@@ -18,21 +19,40 @@ class MarketplaceEndpoint extends Endpoint {
     page = page < 1 ? 1 : page;
 
     // Build where clause
+    // Start with base filters (non-deleted, non-hidden, has account)
+    Expression baseWhere(ScrappableTable t) =>
+        t.willHideFromMarketplace.equals(false) &
+        t.isDeleted.equals(false) &
+        t.accountId.notEquals(null);
+
     // Add search filter if query is provided
-    // Also filter out deleted scrappables and hidden from marketplace
-    final whereClause = searchQuery != null && searchQuery.isNotEmpty
-        ? (ScrappableTable t) =>
-            t.willHideFromMarketplace.equals(false) &
-            t.isDeleted.equals(false) &
-            t.willHideFromMarketplace.equals(false) &
-            t.accountId.notEquals(null) &
+    Expression whereClause(ScrappableTable t) {
+      Expression where = baseWhere(t);
+
+      // Add search filter
+      if (searchQuery != null && searchQuery.isNotEmpty) {
+        where = where &
             (t.name.ilike('%$searchQuery%') |
-                t.description.ilike('%$searchQuery%'))
-        : (ScrappableTable t) =>
-            t.willHideFromMarketplace.equals(false) &
-            t.isDeleted.equals(false) &
-            t.willHideFromMarketplace.equals(false) &
-            t.accountId.notEquals(null);
+                t.description.ilike('%$searchQuery%'));
+      }
+
+      // Add category filter
+      if (categories != null && categories.isNotEmpty) {
+        // Build OR expression for categories
+        Expression? categoryExpression;
+        for (final category in categories) {
+          final categoryMatch = t.category.equals(category);
+          categoryExpression = categoryExpression == null
+              ? categoryMatch
+              : categoryExpression | categoryMatch;
+        }
+        if (categoryExpression != null) {
+          where = where & categoryExpression;
+        }
+      }
+
+      return where;
+    }
 
     // Get total count for pagination
     final totalCount = await Scrappable.db.count(

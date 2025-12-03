@@ -13,16 +13,24 @@ import '../../protocol.dart' as _i1;
 import 'package:serverpod/serverpod.dart' as _i2;
 import 'prompt_role_enum.dart' as _i3;
 import '../scrappable/scrapping_bee_extract_logic.dart' as _i4;
-import '../scrappable/scrappable_request.dart' as _i5;
-import '../scrappable/reference_test_data.dart' as _i6;
+import '../scrappable/reference_test_data.dart' as _i5;
+import '../scrappable/scrappable_request.dart' as _i6;
 part 'responses/candidate_extract_logic_update.dart';
 part 'responses/error_text_response.dart';
 part 'responses/message_text_response.dart';
 part 'responses/new_extract_rule_response.dart';
+part 'responses/test_endpoint_called_error_response.dart';
+part 'responses/test_endpoint_called_success_response.dart';
+part 'responses/updated_scrappable_request_response.dart';
 
 sealed class ChatResponse
     implements _i2.SerializableModel, _i2.ProtocolSerialization {
-  ChatResponse({required this.role});
+  ChatResponse({
+    required this.role,
+    required this.expectsFollowUp,
+  });
 
   _i3.PromptRole role;
+
+  bool expectsFollowUp;
 }

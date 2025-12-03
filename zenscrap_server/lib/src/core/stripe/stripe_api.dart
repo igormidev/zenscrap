@@ -191,6 +191,44 @@ class StripeApi {
     }
   }
 
+  static Future<Map<String, dynamic>> updateProduct({
+    required String secretKey,
+    required String productId,
+    String? name,
+    String? description,
+  }) async {
+    final client = HttpClient();
+    try {
+      final request = await client.postUrl(Uri.parse('$baseUrl/products/$productId'));
+
+      // Set headers
+      request.headers.set('Authorization', 'Bearer $secretKey');
+      request.headers.set('Content-Type', 'application/x-www-form-urlencoded');
+
+      // Build form data - only include fields that are provided
+      final formData = <String, String>{};
+      if (name != null) formData['name'] = name;
+      if (description != null) formData['description'] = description;
+
+      final body = formData.entries
+          .map((e) => '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+          .join('&');
+
+      request.write(body);
+
+      final response = await request.close();
+      final responseBody = await response.transform(utf8.decoder).join();
+
+      if (response.statusCode == 200) {
+        return jsonDecode(responseBody);
+      } else {
+        throw Exception('Failed to update product: $responseBody');
+      }
+    } finally {
+      client.close();
+    }
+  }
+
   static bool verifyWebhookSignature({
     required String payload,
     required String signature,

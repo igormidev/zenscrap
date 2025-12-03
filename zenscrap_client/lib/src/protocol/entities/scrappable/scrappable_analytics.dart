@@ -12,6 +12,7 @@
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import '../../entities/scrappable/request_status.dart' as _i2;
 import '../../entities/scrappable/scrappable.dart' as _i3;
+import '../../entities/analytics/analytics_request_details.dart' as _i4;
 
 abstract class ScrappableAnalytics implements _i1.SerializableModel {
   ScrappableAnalytics._({
@@ -22,6 +23,8 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
     required this.attachedApiKey,
     required this.scrappableId,
     this.scrappable,
+    this.detailsId,
+    this.details,
   });
 
   factory ScrappableAnalytics({
@@ -32,6 +35,8 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
     required String attachedApiKey,
     required int scrappableId,
     _i3.Scrappable? scrappable,
+    int? detailsId,
+    _i4.AnalyticsRequestDetails? details,
   }) = _ScrappableAnalyticsImpl;
 
   factory ScrappableAnalytics.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -48,6 +53,11 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
           ? null
           : _i3.Scrappable.fromJson(
               (jsonSerialization['scrappable'] as Map<String, dynamic>)),
+      detailsId: jsonSerialization['detailsId'] as int?,
+      details: jsonSerialization['details'] == null
+          ? null
+          : _i4.AnalyticsRequestDetails.fromJson(
+              (jsonSerialization['details'] as Map<String, dynamic>)),
     );
   }
 
@@ -68,6 +78,10 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
 
   _i3.Scrappable? scrappable;
 
+  int? detailsId;
+
+  _i4.AnalyticsRequestDetails? details;
+
   /// Returns a shallow copy of this [ScrappableAnalytics]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
@@ -79,6 +93,8 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
     String? attachedApiKey,
     int? scrappableId,
     _i3.Scrappable? scrappable,
+    int? detailsId,
+    _i4.AnalyticsRequestDetails? details,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -90,6 +106,8 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
       'attachedApiKey': attachedApiKey,
       'scrappableId': scrappableId,
       if (scrappable != null) 'scrappable': scrappable?.toJson(),
+      if (detailsId != null) 'detailsId': detailsId,
+      if (details != null) 'details': details?.toJson(),
     };
   }
 
@@ -110,6 +128,8 @@ class _ScrappableAnalyticsImpl extends ScrappableAnalytics {
     required String attachedApiKey,
     required int scrappableId,
     _i3.Scrappable? scrappable,
+    int? detailsId,
+    _i4.AnalyticsRequestDetails? details,
   }) : super._(
           id: id,
           requestStatus: requestStatus,
@@ -118,6 +138,8 @@ class _ScrappableAnalyticsImpl extends ScrappableAnalytics {
           attachedApiKey: attachedApiKey,
           scrappableId: scrappableId,
           scrappable: scrappable,
+          detailsId: detailsId,
+          details: details,
         );
 
   /// Returns a shallow copy of this [ScrappableAnalytics]
@@ -132,6 +154,8 @@ class _ScrappableAnalyticsImpl extends ScrappableAnalytics {
     String? attachedApiKey,
     int? scrappableId,
     Object? scrappable = _Undefined,
+    Object? detailsId = _Undefined,
+    Object? details = _Undefined,
   }) {
     return ScrappableAnalytics(
       id: id is int? ? id : this.id,
@@ -143,6 +167,10 @@ class _ScrappableAnalyticsImpl extends ScrappableAnalytics {
       scrappable: scrappable is _i3.Scrappable?
           ? scrappable
           : this.scrappable?.copyWith(),
+      detailsId: detailsId is int? ? detailsId : this.detailsId,
+      details: details is _i4.AnalyticsRequestDetails?
+          ? details
+          : this.details?.copyWith(),
     );
   }
 }

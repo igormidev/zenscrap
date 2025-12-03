@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 
-class ContactSupportButton extends StatelessWidget {
+class ContactSupportButton extends ConsumerWidget {
   const ContactSupportButton({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final analytics = ref.read(analyticsServiceProvider);
+
     return TextButton.icon(
-      onPressed: () {
+      onPressed: () async {
+        // Track contact support click
+        await analytics.trackAccountContactSupportClick();
+
         launchUrl(
           Uri.parse('https://wa.me/+5521967103488'),
         );

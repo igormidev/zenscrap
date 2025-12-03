@@ -24,11 +24,14 @@ class MonthlySubscriptionCreditsFutureCall extends FutureCall {
         return;
       }
 
-      // Check if subscription is still active
-      if (accountInfo.subscriptionStatus != 'active' &&
-          accountInfo.subscriptionStatus != 'trialing') {
-        session
-            .log('Subscription not active for account ${object.accountInfoId}');
+      // Check if subscription is still active OR if user is on free tier
+      final isFreeTier = accountInfo.planTier == PlanTier.none;
+      final hasActiveSubscription = accountInfo.subscriptionStatus == 'active' ||
+          accountInfo.subscriptionStatus == 'trialing';
+
+      if (!isFreeTier && !hasActiveSubscription) {
+        session.log(
+            'Subscription not active for account ${object.accountInfoId} and not on free tier');
         return;
       }
 
@@ -85,7 +88,9 @@ class MonthlySubscriptionCreditsFutureCall extends FutureCall {
           // Create credit history item
           final creditHistoryItem = CreditHistoryItem(
             date: DateTime.now(),
+            monthlySubscriptionCreditDepositId: monthlyDeposit.id,
             monthlySubscriptionCreditDeposit: monthlyDeposit,
+            creaditPackagePurchaseId: null,
             creaditPackagePurchase: null,
             accountApiUsageId: currentApiUsage.id!,
           );

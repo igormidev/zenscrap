@@ -51,6 +51,21 @@ extension StreamServerpodToResultExt<T> on Stream<T> {
       await onError(defaultException);
     }
   }
+
+  Future<void> toRawResult(
+    FutureOr<void> Function(Stream<T> item) onStream,
+    FutureOr<void> Function(ZenScrapException error) onError,
+  ) async {
+    try {
+      await onStream(this);
+    } on ZenScrapException catch (e, stackTrace) {
+      talker.handle(e, stackTrace);
+      await onError(e);
+    } catch (e, stackTrace) {
+      talker.handle(e, stackTrace);
+      await onError(defaultException);
+    }
+  }
 }
 
 extension StreamServerpodToResultVoidExt on Stream<void> {

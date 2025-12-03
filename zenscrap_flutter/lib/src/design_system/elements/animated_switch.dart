@@ -68,6 +68,7 @@ class _ZenAnimatedSwitchState extends State<ZenAnimatedSwitch> {
                   child: Text(
                     tab.label,
                     style: context.t.headlineSmall?.copyWith(
+                      fontSize: tab.fontSize,
                       color: isSelected
                           ? context.c.onPrimary
                           : context.c.onSurfaceVariant,
@@ -85,6 +86,7 @@ class _ZenAnimatedSwitchState extends State<ZenAnimatedSwitch> {
 
 class AnimatedSwitchItem {
   final String label;
+  final double? fontSize;
 
-  const AnimatedSwitchItem(this.label);
+  const AnimatedSwitchItem(this.label, {this.fontSize});
 }

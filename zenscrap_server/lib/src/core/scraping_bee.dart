@@ -1,449 +1,487 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:zenscrap_server/src/core/extension/convert_extensions.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
-part 'scraping_bee.freezed.dart';
+/// Field used to capture the full HTML when testing extract rules.
+const String kZenscrapHtmlCaptureField = '__zenscrap_full_html__';
 
+/// Response model for data extraction (without screenshot).
+class ExtractDataByRule {
+  final Map<String, dynamic>? result;
+  final String? errorMessage;
+
+  const ExtractDataByRule.withData({required this.result}) : errorMessage = null;
+
+  const ExtractDataByRule.error({required this.errorMessage}) : result = null;
+
+  bool get hasError => errorMessage != null;
+
+  T when<T>({
+    required T Function(Map<String, dynamic> result) withData,
+    required T Function(String errorMessage) error,
+  }) {
+    if (hasError) {
+      return error(errorMessage!);
+    }
+    return withData(result!);
+  }
+}
+
+/// Response model for full data extraction (with screenshot).
+class ExtractFullDataByRule {
+  final Map<String, dynamic>? result;
+  final String? html;
+  final Uint8List? screenshot;
+  final String? errorMessage;
+
+  const ExtractFullDataByRule.withData({
+    required this.result,
+    required this.html,
+    required this.screenshot,
+  }) : errorMessage = null;
+
+  const ExtractFullDataByRule.error({required this.errorMessage})
+      : result = null,
+        html = null,
+        screenshot = null;
+
+  bool get hasError => errorMessage != null;
+
+  T when<T>({
+    required T Function(
+      Map<String, dynamic> result,
+      String html,
+      Uint8List screenshot,
+    )
+        withData,
+    required T Function(String errorMessage) error,
+  }) {
+    if (hasError) {
+      return error(errorMessage!);
+    }
+    return withData(result!, html!, screenshot!);
+  }
+}
+
+/// Low-level client that wraps the ScrapingBee REST API.
+class ScrapingBeeClient {
+  ScrapingBeeClient({
+    required this.apiKey,
+    Dio? dio,
+  }) : _dio = dio ??
+            Dio(
+              BaseOptions(
+                baseUrl: _baseUrl,
+                connectTimeout: const Duration(seconds: 30),
+                receiveTimeout: const Duration(seconds: 60),
+              ),
+            );
+
+  final String apiKey;
+  final Dio _dio;
+
+  static const String _baseUrl = 'https://app.scrapingbee.com/api/v1/';
+
+  Dio get dio => _dio;
+
+  bool isGoogleDomain(String url) {
+    try {
+      final uri = Uri.parse(url);
+      final host = uri.host.toLowerCase();
+      return host.contains('google.') ||
+          host.contains('googleapis.') ||
+          host.contains('googlevideo.') ||
+          host.contains('googleusercontent.') ||
+          host.contains('gstatic.') ||
+          host.contains('youtube.') ||
+          host.contains('ytimg.');
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Validates and corrects extract_rules format to ensure compatibility with ScrapingBee API.
+  String validateAndCorrectExtractRules(String extractRules) {
+    try {
+      final decoded = jsonDecode(extractRules);
+
+      if (decoded is! Map<String, dynamic>) return extractRules;
+
+      bool needsCorrection = false;
+      final corrected = <String, dynamic>{};
+
+      for (final entry in decoded.entries) {
+        final key = entry.key;
+        final value = entry.value;
+
+        if (value is Map<String, dynamic>) {
+          // Keep complex types as-is: list, output specifiers, nested structures
+          if (value['type'] == 'list' ||
+              value.containsKey('output') ||
+              value.containsKey('all')) {
+            corrected[key] = value;
+          } else if (value.containsKey('selector')) {
+            needsCorrection = true;
+            final selector = value['selector'] as String;
+
+            if (value['type'] == 'attribute' && value.containsKey('attribute')) {
+              final attribute = value['attribute'] as String;
+              corrected[key] = '$selector@$attribute';
+            } else {
+              corrected[key] = selector;
+            }
+          } else {
+            corrected[key] = value;
+          }
+        } else {
+          corrected[key] = value;
+        }
+      }
+
+      if (needsCorrection) {
+        final correctedJson = jsonEncode(corrected);
+        print(
+          '⚠️ Auto-corrected extract_rules format for ScrapingBee. '
+          'Original: $extractRules | Corrected: $correctedJson',
+        );
+        return correctedJson;
+      }
+
+      return extractRules;
+    } catch (_) {
+      return extractRules;
+    }
+  }
+
+  Map<String, String> buildQueryParameters({
+    required String targetUrl,
+    required String extract_rules,
+    required String? js_scenario,
+    required bool render_js,
+    required int? wait,
+    required String? wait_for,
+    required String? wait_browser,
+    required bool premium_proxy,
+    required bool stealth_proxy,
+    required String? country_code,
+    required String? session_id,
+    required bool? custom_google,
+    bool jsonResponse = true,
+    bool includeScreenshot = false,
+  }) {
+    final Map<String, String> queryParams = {
+      'api_key': apiKey,
+      'url': targetUrl,
+      'extract_rules': extract_rules,
+      'json_response': jsonResponse ? 'true' : 'false',
+      'render_js': render_js ? 'true' : 'false',
+    };
+
+    if (includeScreenshot) {
+      queryParams['screenshot'] = 'true';
+      queryParams['screenshot_full_page'] = 'true';
+    }
+
+    if (js_scenario != null && js_scenario.isNotEmpty) {
+      queryParams['js_scenario'] = js_scenario;
+    }
+
+    if (wait != null) queryParams['wait'] = wait.toString();
+    if (wait_for != null && wait_for.isNotEmpty) {
+      queryParams['wait_for'] = wait_for;
+    }
+    if (wait_browser != null && wait_browser.isNotEmpty) {
+      queryParams['wait_browser'] = wait_browser;
+    }
+
+    if (stealth_proxy) {
+      queryParams['stealth_proxy'] = 'true';
+    } else if (premium_proxy) {
+      queryParams['premium_proxy'] = 'true';
+    }
+
+    if (country_code != null && country_code.isNotEmpty) {
+      queryParams['country_code'] = country_code;
+    }
+    if (session_id != null && session_id.isNotEmpty) {
+      queryParams['session_id'] = session_id;
+    }
+
+    final bool isGoogle = isGoogleDomain(targetUrl);
+    if (isGoogle || (custom_google == true)) {
+      queryParams['custom_google'] = 'true';
+    }
+
+    return queryParams;
+  }
+
+  Future<ExtractDataByRule> extractByRules({
+    required String targetUrl,
+    required String extract_rules,
+    required String? js_scenario,
+    required bool render_js,
+    required int? wait,
+    required String? wait_for,
+    required String? wait_browser,
+    required bool premium_proxy,
+    required bool stealth_proxy,
+    required String? country_code,
+    required String? session_id,
+    required bool? custom_google,
+  }) async {
+    final correctedExtractRules = validateAndCorrectExtractRules(extract_rules);
+
+    final queryParams = buildQueryParameters(
+      targetUrl: targetUrl,
+      extract_rules: correctedExtractRules,
+      js_scenario: js_scenario,
+      render_js: render_js,
+      wait: wait,
+      wait_for: wait_for,
+      wait_browser: wait_browser,
+      premium_proxy: premium_proxy,
+      stealth_proxy: stealth_proxy,
+      country_code: country_code,
+      session_id: session_id,
+      custom_google: custom_google,
+      includeScreenshot: false,
+    );
+
+    try {
+      final response = await dio.getUri<dynamic>(
+        Uri.https('app.scrapingbee.com', '/api/v1/', queryParams),
+        options: Options(
+          responseType: ResponseType.json,
+          validateStatus: (status) => status != null && status < 600,
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        try {
+          Map<String, dynamic>? resultData;
+
+          if (response.data is String) {
+            resultData =
+                jsonDecode(response.data as String) as Map<String, dynamic>;
+          } else {
+            resultData = response.data as Map<String, dynamic>;
+          }
+
+          final extractedData = resultData['body'] ?? resultData;
+          return ExtractDataByRule.withData(
+            result: extractedData as Map<String, dynamic>,
+          );
+        } catch (e) {
+          return ExtractDataByRule.error(
+            errorMessage: 'Failed to parse response: $e',
+          );
+        }
+      } else {
+        return _handleErrorResponse<ExtractDataByRule>(
+          response,
+          (message) => ExtractDataByRule.error(errorMessage: message),
+        );
+      }
+    } on DioException catch (e) {
+      return ExtractDataByRule.error(
+        errorMessage: 'ScrapingBee network error: ${e.message}',
+      );
+    }
+  }
+
+  Future<ExtractFullDataByRule> fetchHtmlAndScreenshot({
+    required String targetUrl,
+    required String extract_rules,
+    required String? js_scenario,
+    required bool render_js,
+    required int? wait,
+    required String? wait_for,
+    required String? wait_browser,
+    required bool premium_proxy,
+    required bool stealth_proxy,
+    required String? country_code,
+    required String? session_id,
+    required bool? custom_google,
+  }) async {
+    final correctedExtractRules = validateAndCorrectExtractRules(extract_rules);
+
+    final queryParams = buildQueryParameters(
+      targetUrl: targetUrl,
+      extract_rules: correctedExtractRules,
+      js_scenario: js_scenario,
+      render_js: render_js,
+      wait: wait,
+      wait_for: wait_for,
+      wait_browser: wait_browser,
+      premium_proxy: premium_proxy,
+      stealth_proxy: stealth_proxy,
+      country_code: country_code,
+      session_id: session_id,
+      custom_google: custom_google,
+      includeScreenshot: true,
+    );
+
+    try {
+      final response = await dio.getUri<Map<String, dynamic>>(
+        Uri.https('app.scrapingbee.com', '/api/v1/', queryParams),
+        options: Options(
+          responseType: ResponseType.json,
+          validateStatus: (status) => status != null && status < 600,
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final bodyData = response.data?['body'];
+        final String htmlContent = (response.data?['html'] as String?) ?? '';
+        final String b64Screenshot =
+            (response.data?['screenshot'] as String?) ?? '';
+
+        Map<String, dynamic> extractedData = {};
+
+        if (bodyData != null) {
+          if (bodyData is Map<String, dynamic>) {
+            extractedData = bodyData;
+          } else if (bodyData is String) {
+            try {
+              extractedData = jsonDecode(bodyData) as Map<String, dynamic>;
+            } catch (_) {
+              extractedData = {'raw_html': bodyData};
+            }
+          }
+        }
+
+        String finalHtml = htmlContent;
+        if (finalHtml.isEmpty &&
+            extractedData.containsKey(kZenscrapHtmlCaptureField)) {
+          final capturedHtml = extractedData.remove(kZenscrapHtmlCaptureField);
+          if (capturedHtml is String && capturedHtml.isNotEmpty) {
+            finalHtml = capturedHtml;
+          }
+        }
+
+        if (finalHtml.isEmpty && bodyData is String) {
+          finalHtml = bodyData;
+        }
+
+        return ExtractFullDataByRule.withData(
+          result: extractedData,
+          html: finalHtml,
+          screenshot: base64Decode(b64Screenshot),
+        );
+      } else {
+        return _handleErrorResponse<ExtractFullDataByRule>(
+          response,
+          (message) => ExtractFullDataByRule.error(errorMessage: message),
+        );
+      }
+    } on DioException catch (e) {
+      return ExtractFullDataByRule.error(
+        errorMessage: 'ScrapingBee network error: ${e.message}',
+      );
+    }
+  }
+
+  T _handleErrorResponse<T>(
+    Response<dynamic> response,
+    T Function(String message) onError,
+  ) {
+    try {
+      final data = response.data;
+      if (data is String) {
+        return onError(
+          'ScrapingBee API error: $data (Status: ${response.statusCode})',
+        );
+      }
+      if (data is Map<String, dynamic>) {
+        return onError(
+          'ScrapingBee API error: ${data['message'] ?? data} (Status: ${response.statusCode})',
+        );
+      }
+      return onError(
+        'ScrapingBee API error (Status: ${response.statusCode})',
+      );
+    } catch (_) {
+      return onError(
+        'ScrapingBee API error (Status: ${response.statusCode})',
+      );
+    }
+  }
+}
+
+/// Convenience wrapper used across the server to interact with ScrapingBee.
 class ScrapingBee {
-  ScrapingBee()
-      : _dio = Dio(BaseOptions(baseUrl: 'https://app.scrapingbee.com/api/v1/'));
-  static String _apiKey = '';
-  static void initialize(String apiKey) => _apiKey = apiKey;
+  ScrapingBee({
+    String apiKey = '',
+    Dio? dio,
+  }) : _client = ScrapingBeeClient(apiKey: apiKey, dio: dio);
 
-  final Dio _dio;
+  final ScrapingBeeClient _client;
 
-  Future<(String html, Uint8List screenshot)?> fetchHtmlAndScreenshot({
+  Future<ExtractFullDataByRule> fetchHtmlAndScreenshotWithLogic({
     required String targetUrl,
     required ScrappingBeeExtractLogic scrappingBeeExtractLogic,
   }) async {
-    try {
-      final Map<String, String> queryParameters = {
-        'api_key': _apiKey,
-        'url': targetUrl,
-        'screenshot': 'true',
-        'screenshot_full_page': 'true',
-        'json_response': 'true',
-        'render_js': scrappingBeeExtractLogic.renderJs ? 'true' : 'false',
-      };
+    final String extractRulesWithHtml =
+        _withHtmlCapture(scrappingBeeExtractLogic.extractRules);
 
-      // Add optional JavaScript scenario
-      if (scrappingBeeExtractLogic.jsScenario != null &&
-          scrappingBeeExtractLogic.jsScenario!.isNotEmpty) {
-        queryParameters['js_scenario'] = scrappingBeeExtractLogic.jsScenario!;
-      }
-
-      // Add wait time (0-35000 milliseconds)
-      if (scrappingBeeExtractLogic.wait != null) {
-        queryParameters['wait'] = scrappingBeeExtractLogic.wait.toString();
-      }
-
-      // Add wait for selector (CSS or XPath)
-      if (scrappingBeeExtractLogic.waitFor != null &&
-          scrappingBeeExtractLogic.waitFor!.isNotEmpty) {
-        queryParameters['wait_for'] = scrappingBeeExtractLogic.waitFor!;
-      }
-
-      // Add wait browser event (domcontentloaded, load, networkidle0, networkidle2)
-      if (scrappingBeeExtractLogic.waitBrowser != null &&
-          scrappingBeeExtractLogic.waitBrowser!.isNotEmpty) {
-        queryParameters['wait_browser'] = scrappingBeeExtractLogic.waitBrowser!;
-      }
-
-      // Add premium proxy setting
-      if (scrappingBeeExtractLogic.premiumProxy) {
-        queryParameters['premium_proxy'] = 'true';
-      }
-
-      // Add country code for proxy geolocation
-      if (scrappingBeeExtractLogic.countryCode != null &&
-          scrappingBeeExtractLogic.countryCode!.isNotEmpty) {
-        queryParameters['country_code'] = scrappingBeeExtractLogic.countryCode!;
-      }
-
-      // Add session ID for sticky sessions
-      if (scrappingBeeExtractLogic.sessionId != null &&
-          scrappingBeeExtractLogic.sessionId!.isNotEmpty) {
-        queryParameters['session_id'] = scrappingBeeExtractLogic.sessionId!;
-      }
-
-      // Add custom Google handling
-      if (scrappingBeeExtractLogic.customGoogle != null &&
-          scrappingBeeExtractLogic.customGoogle!) {
-        queryParameters['custom_google'] = 'true';
-      }
-
-      final res = await _dio.getUri<Map<String, dynamic>>(
-        Uri.https('app.scrapingbee.com', '/api/v1/', queryParameters),
-        options: Options(responseType: ResponseType.json),
-      );
-
-      final body = (res.data?['body'] as String?) ?? '';
-      final b64 = (res.data?['screenshot'] as String?) ?? '';
-      return (body, base64Decode(b64));
-    } on DioException catch (_) {
-      // Return null for any Dio errors (including 500 status codes)
-      return null;
-    } catch (_) {
-      // Return null for any other unexpected errors
-      return null;
-    }
+    return _client.fetchHtmlAndScreenshot(
+      targetUrl: targetUrl,
+      extract_rules: extractRulesWithHtml,
+      js_scenario: scrappingBeeExtractLogic.jsScenario,
+      render_js: scrappingBeeExtractLogic.renderJs,
+      wait: scrappingBeeExtractLogic.wait,
+      wait_for: scrappingBeeExtractLogic.waitFor,
+      wait_browser: scrappingBeeExtractLogic.waitBrowser,
+      premium_proxy: scrappingBeeExtractLogic.premiumProxy,
+      stealth_proxy: scrappingBeeExtractLogic.stealthProxy,
+      country_code: scrappingBeeExtractLogic.countryCode,
+      session_id: scrappingBeeExtractLogic.sessionId,
+      custom_google: scrappingBeeExtractLogic.customGoogle,
+    );
   }
 
-  Future<ExtractDataByRule> extractByRules({
+  Future<ExtractDataByRule> extractByRulesWithLogic({
     required String targetUrl,
     required ScrappingBeeExtractLogic scrappingBeeExtractLogic,
   }) async {
-    final Map<String, String> queryParameters = {
-      'api_key': _apiKey,
-      'url': targetUrl,
-      'extract_rules': scrappingBeeExtractLogic.extractRules,
-      'json_response': 'true',
-      'render_js': scrappingBeeExtractLogic.renderJs ? 'true' : 'false',
-    };
+    return _client.extractByRules(
+      targetUrl: targetUrl,
+      extract_rules: scrappingBeeExtractLogic.extractRules,
+      js_scenario: scrappingBeeExtractLogic.jsScenario,
+      render_js: scrappingBeeExtractLogic.renderJs,
+      wait: scrappingBeeExtractLogic.wait,
+      wait_for: scrappingBeeExtractLogic.waitFor,
+      wait_browser: scrappingBeeExtractLogic.waitBrowser,
+      premium_proxy: scrappingBeeExtractLogic.premiumProxy,
+      stealth_proxy: scrappingBeeExtractLogic.stealthProxy,
+      country_code: scrappingBeeExtractLogic.countryCode,
+      session_id: scrappingBeeExtractLogic.sessionId,
+      custom_google: scrappingBeeExtractLogic.customGoogle,
+    );
+  }
 
-    // Add optional JavaScript scenario
-    if (scrappingBeeExtractLogic.jsScenario != null &&
-        scrappingBeeExtractLogic.jsScenario!.isNotEmpty) {
-      queryParameters['js_scenario'] = scrappingBeeExtractLogic.jsScenario!;
-    }
-
-    // Add wait time (0-35000 milliseconds)
-    if (scrappingBeeExtractLogic.wait != null) {
-      queryParameters['wait'] = scrappingBeeExtractLogic.wait.toString();
-    }
-
-    // Add wait for selector (CSS or XPath)
-    if (scrappingBeeExtractLogic.waitFor != null &&
-        scrappingBeeExtractLogic.waitFor!.isNotEmpty) {
-      queryParameters['wait_for'] = scrappingBeeExtractLogic.waitFor!;
-    }
-
-    // Add wait browser event (domcontentloaded, load, networkidle0, networkidle2)
-    if (scrappingBeeExtractLogic.waitBrowser != null &&
-        scrappingBeeExtractLogic.waitBrowser!.isNotEmpty) {
-      queryParameters['wait_browser'] = scrappingBeeExtractLogic.waitBrowser!;
-    }
-
-    // Add premium proxy setting
-    if (scrappingBeeExtractLogic.premiumProxy) {
-      queryParameters['premium_proxy'] = 'true';
-    }
-
-    // Add country code for proxy geolocation
-    if (scrappingBeeExtractLogic.countryCode != null &&
-        scrappingBeeExtractLogic.countryCode!.isNotEmpty) {
-      queryParameters['country_code'] = scrappingBeeExtractLogic.countryCode!;
-    }
-
-    // Add session ID for sticky sessions
-    if (scrappingBeeExtractLogic.sessionId != null &&
-        scrappingBeeExtractLogic.sessionId!.isNotEmpty) {
-      queryParameters['session_id'] = scrappingBeeExtractLogic.sessionId!;
-    }
-
-    // Add custom Google handling
-    if (scrappingBeeExtractLogic.customGoogle != null &&
-        scrappingBeeExtractLogic.customGoogle!) {
-      queryParameters['custom_google'] = 'true';
-    }
-
+  String _withHtmlCapture(String extractRules) {
     try {
-      final Response<dynamic> response = await _dio.getUri(
-        Uri.https('app.scrapingbee.com', '/api/v1/', queryParameters),
-        options: Options(responseType: ResponseType.json),
-      );
-
-      if (response.statusCode == 200) {
-        // Handle different response formats from ScrapingBee
-        try {
-          Map<String, dynamic>? resultData = tryDecode(response.data);
-
-          return ExtractDataByRule.withData(result: resultData?['body'] ?? {});
-        } catch (e) {
-          return ExtractDataByRule.erorr(
-            errorMessage: 'Failed to parse response: $e',
-          );
-        }
-      } else {
-        try {
-          final Map<String, dynamic> errorResponse;
-          if (response.data is String) {
-            try {
-              errorResponse =
-                  jsonDecode(response.data as String) as Map<String, dynamic>;
-            } catch (_) {
-              return ExtractDataByRule.erorr(
-                errorMessage:
-                    'ScrapingBee API error: ${response.data} (Status: ${response.statusCode})',
-              );
-            }
-          } else {
-            errorResponse = response.data as Map<String, dynamic>;
-          }
-          return ExtractDataByRule.erorr(
-            errorMessage:
-                'ScrapingBee API error: ${errorResponse['message'] ?? 'Unknown error'} (Status: ${response.statusCode})',
-          );
-        } catch (e) {
-          return ExtractDataByRule.erorr(
-            errorMessage:
-                'ScrapingBee API error (Status: ${response.statusCode})',
-          );
+      final decoded = jsonDecode(extractRules);
+      if (decoded is Map<String, dynamic>) {
+        if (!decoded.containsKey(kZenscrapHtmlCaptureField)) {
+          decoded[kZenscrapHtmlCaptureField] = {
+            'selector': 'html',
+            'output': 'html',
+          };
+          return jsonEncode(decoded);
         }
       }
-    } on DioException catch (e) {
-      if (e.response != null) {
-        try {
-          final Map<String, dynamic> errorResponse;
-          if (e.response!.data is String) {
-            try {
-              errorResponse = jsonDecode(e.response!.data as String)
-                  as Map<String, dynamic>;
-            } catch (_) {
-              return ExtractDataByRule.erorr(
-                errorMessage:
-                    'ScrapingBee API error: ${e.response!.data} (Status: ${e.response!.statusCode})',
-              );
-            }
-          } else {
-            errorResponse = e.response!.data as Map<String, dynamic>;
-          }
-          return ExtractDataByRule.erorr(
-            errorMessage:
-                'ScrapingBee API error: ${errorResponse['message'] ?? 'Unknown error'} (Status: ${e.response!.statusCode})',
-          );
-        } catch (_) {
-          return ExtractDataByRule.erorr(
-            errorMessage:
-                'ScrapingBee API error (Status: ${e.response!.statusCode})',
-          );
-        }
-      }
-      return ExtractDataByRule.erorr(
-        errorMessage: 'Failed to scrape data: ${e.message}',
-      );
-    } catch (e) {
-      return ExtractDataByRule.erorr(
-        errorMessage: 'Failed to scrape data: $e',
-      );
-    }
-  }
-}
-
-@Deprecated('Use ScrapingBee class instead')
-class ScrapingBeeDeprecated {
-  ScrapingBeeDeprecated()
-      : _dio = Dio(BaseOptions(baseUrl: 'https://app.scrapingbee.com/api/v1/'));
-  static String _apiKey = '';
-  static void initialize(String apiKey) => _apiKey = apiKey;
-
-  final Dio _dio;
-
-  /// Get the (optionally JS-rendered) HTML of a page
-  Future<String> fetchHtml(
-    String targetUrl, {
-    bool renderJs = false,
-    int? waitMs, // 0..35000
-    String? waitForSelector,
-    Map<String, String>? headers,
-  }) async {
-    final query = <String, dynamic>{
-      'api_key': _apiKey,
-      'url': targetUrl,
-      if (renderJs) 'render_js': 'true',
-      if (waitMs != null) 'wait': waitMs,
-      if (waitForSelector != null && waitForSelector.isNotEmpty)
-        'wait_for': waitForSelector,
-    };
-
-    final res = await _dio.getUri<String>(
-      Uri.https('app.scrapingbee.com', '/api/v1/', query),
-      options: Options(
-        responseType: ResponseType.plain,
-        headers: headers == null
-            ? null
-            : {
-                // Forward custom headers to the target site:
-                // Prefix with Spb- per docs.
-                for (final e in headers.entries) 'Spb-${e.key}': e.value,
-              },
-      ),
-    );
-    return res.data ?? '';
-  }
-
-  /// Save a FULL-PAGE screenshot (PNG) to disk
-  Future<File> takeFullPageScreenshot(
-    String targetUrl, {
-    required String savePath,
-    int? windowWidth, // e.g., 1920
-    int? windowHeight, // e.g., 1080
-  }) async {
-    final query = <String, dynamic>{
-      'api_key': _apiKey,
-      'url': targetUrl,
-      'render_js': 'true', // screenshots require JS rendering
-      'screenshot': 'true',
-      'screenshot_full_page': 'true',
-      if (windowWidth != null) 'window_width': windowWidth,
-      if (windowHeight != null) 'window_height': windowHeight,
-    };
-
-    final res = await _dio.getUri<Uint8List>(
-      Uri.https('app.scrapingbee.com', '/api/v1/', query),
-      options: Options(responseType: ResponseType.bytes),
-    );
-
-    final file = File(savePath);
-    await file.writeAsBytes(res.data as List<int>);
-    return file;
-  }
-
-  /// One-call: get HTML + screenshot (base64) together using json_response
-  /// Ps: the image is in png format
-  Future<(String html, Uint8List screenshot)?> fetchHtmlAndScreenshot(
-    String targetUrl,
-  ) async {
-    try {
-      final query = <String, dynamic>{
-        'api_key': _apiKey,
-        'url': targetUrl,
-        'render_js': 'true',
-        'screenshot': 'true',
-        'wait': 4000.toString(),
-        'screenshot_full_page': 'true',
-        'json_response': 'true',
-      };
-
-      final res = await _dio.getUri<Map<String, dynamic>>(
-        Uri.https('app.scrapingbee.com', '/api/v1/', query),
-        options: Options(responseType: ResponseType.json),
-      );
-
-      final body = (res.data?['body'] as String?) ?? '';
-      final b64 = (res.data?['screenshot'] as String?) ?? '';
-      return (body, base64Decode(b64));
-      // return (html: body, screenshot: base64Decode(b64));
-    } on DioException catch (_) {
-      // Return null for any Dio errors (including 500 status codes)
-      return null;
     } catch (_) {
-      // Return null for any other unexpected errors
-      return null;
+      // ignore parsing issues and return the original rules
     }
-  }
 
-  Future<ExtractDataByRule> extractByRules({
-    required String targetUrl,
-    required String extractRules,
-    bool renderJs = true,
-    int waitMs = 4000,
-  }) async {
-    final Map<String, String> queryParameters = {
-      'api_key': _apiKey,
-      'url': targetUrl,
-      'extract_rules': extractRules,
-      'render_js': renderJs ? 'true' : 'false',
-      'json_response': 'true',
-      'wait': waitMs.toString(),
-    };
-
-    try {
-      final Response<dynamic> response = await _dio.getUri(
-        Uri.https('app.scrapingbee.com', '/api/v1/', queryParameters),
-        options: Options(responseType: ResponseType.json),
-      );
-
-      if (response.statusCode == 200) {
-        // Handle different response formats from ScrapingBee
-        try {
-          Map<String, dynamic>? resultData = tryDecode(response.data);
-
-          return ExtractDataByRule.withData(result: resultData?['body'] ?? {});
-        } catch (e) {
-          return ExtractDataByRule.erorr(
-            errorMessage: 'Failed to parse response: $e',
-          );
-        }
-      } else {
-        try {
-          final Map<String, dynamic> errorResponse;
-          if (response.data is String) {
-            try {
-              errorResponse =
-                  jsonDecode(response.data as String) as Map<String, dynamic>;
-            } catch (_) {
-              return ExtractDataByRule.erorr(
-                errorMessage:
-                    'ScrapingBee API error: ${response.data} (Status: ${response.statusCode})',
-              );
-            }
-          } else {
-            errorResponse = response.data as Map<String, dynamic>;
-          }
-          return ExtractDataByRule.erorr(
-            errorMessage:
-                'ScrapingBee API error: ${errorResponse['message'] ?? 'Unknown error'} (Status: ${response.statusCode})',
-          );
-        } catch (e) {
-          return ExtractDataByRule.erorr(
-            errorMessage:
-                'ScrapingBee API error (Status: ${response.statusCode})',
-          );
-        }
-      }
-    } on DioException catch (e) {
-      if (e.response != null) {
-        try {
-          final Map<String, dynamic> errorResponse;
-          if (e.response!.data is String) {
-            try {
-              errorResponse = jsonDecode(e.response!.data as String)
-                  as Map<String, dynamic>;
-            } catch (_) {
-              return ExtractDataByRule.erorr(
-                errorMessage:
-                    'ScrapingBee API error: ${e.response!.data} (Status: ${e.response!.statusCode})',
-              );
-            }
-          } else {
-            errorResponse = e.response!.data as Map<String, dynamic>;
-          }
-          return ExtractDataByRule.erorr(
-            errorMessage:
-                'ScrapingBee API error: ${errorResponse['message'] ?? 'Unknown error'} (Status: ${e.response!.statusCode})',
-          );
-        } catch (_) {
-          return ExtractDataByRule.erorr(
-            errorMessage:
-                'ScrapingBee API error (Status: ${e.response!.statusCode})',
-          );
-        }
-      }
-      return ExtractDataByRule.erorr(
-        errorMessage: 'Failed to scrape data: ${e.message}',
-      );
-    } catch (e) {
-      return ExtractDataByRule.erorr(
-        errorMessage: 'Failed to scrape data: $e',
-      );
-    }
+    return extractRules;
   }
 }
 
-@freezed
-class ExtractDataByRule with _$ExtractDataByRule {
-  const ExtractDataByRule._();
-
-  const factory ExtractDataByRule.withData({
-    required Map<String, dynamic> result,
-  }) = _ExtractDataByRuleWithData;
-
-  const factory ExtractDataByRule.erorr({
-    required String errorMessage,
-  }) = _ExtractDataByRuleWithError;
-}
+ScrapingBee scrappingBee = ScrapingBee(apiKey: '');

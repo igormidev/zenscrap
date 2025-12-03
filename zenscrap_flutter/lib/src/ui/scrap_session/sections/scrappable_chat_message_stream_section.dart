@@ -12,9 +12,14 @@ import 'package:zenscrap_flutter/src/states/chat_session/chat_scroll_controller_
 import 'package:zenscrap_flutter/src/states/chat_session/is_chat_loading_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_messages_provider.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
+import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/llm_thinking_bubble.dart';
 
 class ScrappableChatMessageStreamSection extends ConsumerStatefulWidget {
-  const ScrappableChatMessageStreamSection({super.key});
+  final List<String>? llmThinkingStream;
+  const ScrappableChatMessageStreamSection({
+    super.key,
+    required this.llmThinkingStream,
+  });
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -32,7 +37,14 @@ class _ScrappableChatMessageStreamSectionState
 
     return messagesAsync.when(
       loading: () => const Center(
-        child: CircularProgressIndicator(),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text('Syncing...', textAlign: TextAlign.center),
+          ],
+        ),
       ),
       error: (error, stack) => Center(
         child: Column(
@@ -101,22 +113,21 @@ class _ScrappableChatMessageStreamSectionState
           itemCount: messages.length + (willHideLoading ? 0 : 1),
           itemBuilder: (context, index) {
             final bool isLastIndex = index == messages.length;
-            if (isLastIndex && !willHideLoading) {
-              return Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 36),
-                  child: Transform.scale(
-                    scale: 1.41,
-                    child: Lottie.network(
-                      'https://lottie.host/dfab8b34-c79f-4d84-9e3d-d866b2096c74/zPpMTjtNaK.lottie',
-                      decoder: customDecoder,
-                      width: 60,
-                    ),
-                  ).animate().fadeIn(),
+            if (isLastIndex &&
+                widget.llmThinkingStream != null &&
+                widget.llmThinkingStream!.isNotEmpty) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: LLMThinkingBubble(
+                  thinkingStream: widget.llmThinkingStream!,
                 ),
               );
             }
+
+            if (isLastIndex && !willHideLoading) {
+              return GenericLoadingBubble();
+            }
+
             final message = messages[index];
             return _ChatMessageBubble(
               message: message,
@@ -125,6 +136,30 @@ class _ScrappableChatMessageStreamSectionState
           },
         );
       },
+    );
+  }
+}
+
+class GenericLoadingBubble extends StatelessWidget {
+  const GenericLoadingBubble({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 36),
+        child: Transform.scale(
+          scale: 1.41,
+          child: Lottie.network(
+            'https://lottie.host/dfab8b34-c79f-4d84-9e3d-d866b2096c74/zPpMTjtNaK.lottie',
+            decoder: customDecoder,
+            width: 60,
+          ),
+        ).animate().fadeIn(),
+      ),
     );
   }
 }
@@ -189,7 +224,7 @@ class _ChatMessageBubble extends StatelessWidget {
       messagePadding = const EdgeInsets.only(left: 0, right: 56);
     } else {
       // Model/AI message
-      userName = "AI (GEMINI)";
+      userName = "AI (CHAT GPT 5.1)";
       backgroundColor = colorScheme.surfaceContainerHigh;
       textColor = colorScheme.onSurface;
       roleIcon = Icons.smart_toy;
@@ -233,11 +268,33 @@ class _ChatMessageBubble extends StatelessWidget {
         errorMessage: errorMessage.errorMessage,
         textColor: textColor,
       );
-    } else if (message is MessageTextAndNewExtractRulesResponse) {
-      final extractMessage = message as MessageTextAndNewExtractRulesResponse;
-      messageContent = _ExtractRulesMessage(
+    } else if (message is CandidateExtractLogicUpdate) {
+      final extractMessage = message as CandidateExtractLogicUpdate;
+      messageContent = _JsonDisplayMessage(
         messageText: extractMessage.messageText,
-        extractRules: extractMessage.newExtractRules,
+        jsonData: extractMessage.scrappingBeeExtractLogic.extractRules,
+        jsonTitle: 'Extract Rules',
+        icon: Icons.code_rounded,
+        textColor: textColor,
+        backgroundColor: backgroundColor,
+      );
+    } else if (message is TestEndpointCalledSuccessResponse) {
+      final successMessage = message as TestEndpointCalledSuccessResponse;
+      messageContent = _TestEndpointSuccessMessage(
+        inputPayload: successMessage.inputPayload,
+        responseData: successMessage.responseData,
+        textColor: textColor,
+        backgroundColor: backgroundColor,
+      );
+    } else if (message is TestEndpointCalledErrorResponse) {
+      final errorMessage = message as TestEndpointCalledErrorResponse;
+      // Override bubble color for error
+      backgroundColor = colorScheme.errorContainer;
+      textColor = colorScheme.onErrorContainer;
+      messageContent = _TestEndpointErrorMessage(
+        errorTitle: errorMessage.errorTitle,
+        errorDescription: errorMessage.errorDescription,
+        inputPayload: errorMessage.inputPayload,
         textColor: textColor,
         backgroundColor: backgroundColor,
       );
@@ -246,6 +303,16 @@ class _ChatMessageBubble extends StatelessWidget {
       messageContent = _NewRuleMessage(
         messageText: newRuleMessage.messageText,
         textColor: textColor,
+      );
+    } else if (message is UpdatedScrappableRequestResponse) {
+      final updatedRequest = message as UpdatedScrappableRequestResponse;
+      messageContent = _UpdatedScrappableRequestMessage(
+        messageText: updatedRequest.messageText,
+        url: updatedRequest.url,
+        pathParams: updatedRequest.pathParams,
+        queryParams: updatedRequest.queryParams,
+        textColor: textColor,
+        backgroundColor: backgroundColor,
       );
     }
 
@@ -265,7 +332,9 @@ class _ChatMessageBubble extends StatelessWidget {
           ],
           Flexible(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: isUserMessage
+                  ? CrossAxisAlignment.end
+                  : CrossAxisAlignment.start,
               children: [
                 Align(
                   alignment: isUserMessage
@@ -426,29 +495,34 @@ class _ErrorMessage extends StatelessWidget {
   }
 }
 
-class _ExtractRulesMessage extends StatefulWidget {
-  final String messageText;
-  final String extractRules;
+/// Reusable template widget for displaying JSON data with expandable/collapsible UI
+class _JsonDisplayMessage extends StatefulWidget {
+  final String? messageText;
+  final String jsonData;
+  final String jsonTitle;
+  final IconData icon;
   final Color textColor;
   final Color backgroundColor;
 
-  const _ExtractRulesMessage({
-    required this.messageText,
-    required this.extractRules,
+  const _JsonDisplayMessage({
+    this.messageText,
+    required this.jsonData,
+    required this.jsonTitle,
+    required this.icon,
     required this.textColor,
     required this.backgroundColor,
   });
 
   @override
-  State<_ExtractRulesMessage> createState() => _ExtractRulesMessageState();
+  State<_JsonDisplayMessage> createState() => _JsonDisplayMessageState();
 }
 
-class _ExtractRulesMessageState extends State<_ExtractRulesMessage> {
+class _JsonDisplayMessageState extends State<_JsonDisplayMessage> {
   bool _isExpanded = false;
 
   void _copyToClipboard() {
     // Try to decode the JSON and format it properly
-    final decodedJson = tryDecode(widget.extractRules);
+    final decodedJson = tryDecode(widget.jsonData);
     String textToCopy;
 
     if (decodedJson != null) {
@@ -457,14 +531,14 @@ class _ExtractRulesMessageState extends State<_ExtractRulesMessage> {
       textToCopy = encoder.convert(decodedJson);
     } else {
       // If not valid JSON, copy as-is
-      textToCopy = widget.extractRules;
+      textToCopy = widget.jsonData;
     }
 
     Clipboard.setData(ClipboardData(text: textToCopy));
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Extract rules copied to clipboard'),
-        duration: Duration(seconds: 2),
+      SnackBar(
+        content: Text('${widget.jsonTitle} copied to clipboard'),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -472,21 +546,23 @@ class _ExtractRulesMessageState extends State<_ExtractRulesMessage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final decodedJson = tryDecode(widget.extractRules);
+    final decodedJson = tryDecode(widget.jsonData);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        SelectableText(
-          widget.messageText,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: widget.textColor,
-            height: 1.4,
-            fontSize: 14,
+        if (widget.messageText != null) ...[
+          SelectableText(
+            widget.messageText!,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: widget.textColor,
+              height: 1.4,
+              fontSize: 14,
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
+          const SizedBox(height: 8),
+        ],
         Container(
           decoration: BoxDecoration(
             color: widget.textColor.withValues(alpha: 0.05),
@@ -510,13 +586,13 @@ class _ExtractRulesMessageState extends State<_ExtractRulesMessage> {
                   child: Row(
                     children: [
                       Icon(
-                        Icons.code_rounded,
+                        widget.icon,
                         size: 16,
                         color: widget.textColor.withValues(alpha: 0.8),
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        'Extract Rules',
+                        widget.jsonTitle,
                         style: theme.textTheme.labelMedium?.copyWith(
                           color: widget.textColor.withValues(alpha: 0.9),
                           fontWeight: FontWeight.w500,
@@ -557,18 +633,20 @@ class _ExtractRulesMessageState extends State<_ExtractRulesMessage> {
                   constraints: const BoxConstraints(maxHeight: 300),
                   padding: const EdgeInsets.all(10),
                   child: decodedJson != null
-                      ? Text(
-                          JsonEncoder.withIndent('  ').convert(decodedJson),
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            fontFamily: 'monospace',
-                            color: widget.textColor.withValues(alpha: 0.85),
-                            height: 1.3,
-                            fontSize: 14,
+                      ? SingleChildScrollView(
+                          child: SelectableText(
+                            JsonEncoder.withIndent('  ').convert(decodedJson),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              fontFamily: 'monospace',
+                              color: widget.textColor.withValues(alpha: 0.85),
+                              height: 1.3,
+                              fontSize: 14,
+                            ),
                           ),
                         )
                       : SingleChildScrollView(
                           child: SelectableText(
-                            widget.extractRules,
+                            widget.jsonData,
                             style: theme.textTheme.bodySmall?.copyWith(
                               fontFamily: 'monospace',
                               color: widget.textColor.withValues(alpha: 0.85),
@@ -621,6 +699,286 @@ class _NewRuleMessage extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
           ),
+        ),
+      ],
+    );
+  }
+}
+
+class _UpdatedScrappableRequestMessage extends StatelessWidget {
+  final String messageText;
+  final String url;
+  final List<String> pathParams;
+  final Map<String, String?> queryParams;
+  final Color textColor;
+  final Color backgroundColor;
+
+  const _UpdatedScrappableRequestMessage({
+    required this.messageText,
+    required this.url,
+    required this.pathParams,
+    required this.queryParams,
+    required this.textColor,
+    required this.backgroundColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.edit_rounded,
+              size: 16,
+              color: textColor.withValues(alpha: 0.9),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                messageText,
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: textColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: backgroundColor.withValues(alpha: 0.3),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: textColor.withValues(alpha: 0.2),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _InfoRow(
+                icon: Icons.link,
+                label: 'URL:',
+                value: url,
+                textColor: textColor,
+              ),
+              if (pathParams.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                _InfoRow(
+                  icon: Icons.label_outline,
+                  label: 'Path Parameters:',
+                  value: pathParams.map((p) => '{$p}').join(', '),
+                  textColor: textColor,
+                ),
+              ],
+              if (queryParams.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                _InfoRow(
+                  icon: Icons.tune,
+                  label: 'Query Parameters:',
+                  value: queryParams.entries
+                      .map((e) => '${e.key}=${e.value ?? "dynamic"}')
+                      .join(', '),
+                  textColor: textColor,
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color textColor;
+
+  const _InfoRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.textColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(
+          icon,
+          size: 14,
+          color: textColor.withValues(alpha: 0.7),
+        ),
+        const SizedBox(width: 6),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: textColor.withValues(alpha: 0.8),
+                fontWeight: FontWeight.w600,
+              ),
+        ),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            value,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: textColor,
+                  fontFamily: 'monospace',
+                ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TestEndpointSuccessMessage extends StatelessWidget {
+  final String inputPayload;
+  final String responseData;
+  final Color textColor;
+  final Color backgroundColor;
+
+  const _TestEndpointSuccessMessage({
+    required this.inputPayload,
+    required this.responseData,
+    required this.textColor,
+    required this.backgroundColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.check_circle_rounded,
+              size: 16,
+              color: textColor.withValues(alpha: 0.9),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              'Test Endpoint Called Successfully',
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: textColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        _JsonDisplayMessage(
+          jsonData: inputPayload,
+          jsonTitle: 'Request Payload',
+          icon: Icons.input_rounded,
+          textColor: textColor,
+          backgroundColor: backgroundColor,
+        ),
+        const SizedBox(height: 8),
+        _JsonDisplayMessage(
+          jsonData: responseData,
+          jsonTitle: 'Response Data',
+          icon: Icons.output_rounded,
+          textColor: textColor,
+          backgroundColor: backgroundColor,
+        ),
+      ],
+    );
+  }
+}
+
+class _TestEndpointErrorMessage extends StatelessWidget {
+  final String errorTitle;
+  final String errorDescription;
+  final String inputPayload;
+  final Color textColor;
+  final Color backgroundColor;
+
+  const _TestEndpointErrorMessage({
+    required this.errorTitle,
+    required this.errorDescription,
+    required this.inputPayload,
+    required this.textColor,
+    required this.backgroundColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.error_rounded,
+              size: 16,
+              color: textColor.withValues(alpha: 0.9),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              'Test Endpoint Failed',
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: textColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: textColor.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: textColor.withValues(alpha: 0.15),
+              width: 0.5,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                errorTitle,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      color: textColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+              const SizedBox(height: 4),
+              SelectableText(
+                errorDescription,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: textColor.withValues(alpha: 0.9),
+                      height: 1.4,
+                      fontSize: 14,
+                    ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        _JsonDisplayMessage(
+          jsonData: inputPayload,
+          jsonTitle: 'Request Payload',
+          icon: Icons.input_rounded,
+          textColor: textColor,
+          backgroundColor: backgroundColor,
         ),
       ],
     );

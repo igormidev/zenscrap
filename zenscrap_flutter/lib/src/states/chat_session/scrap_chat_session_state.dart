@@ -12,6 +12,7 @@ abstract class ScrapChatSessionState with _$ScrapChatSessionState {
     required Scrappable data,
     required DateTime testExpirationDate,
     required String sessionUuid,
+    required List<String>? llmThinkingStream,
   }) = _ScrapChatSessionStateStandard;
   factory ScrapChatSessionState.withError({required ZenScrapException error}) =
       _ScrapChatSessionStateWithError;

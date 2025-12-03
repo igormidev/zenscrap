@@ -1,0 +1,8 @@
+{
+  "url": "https://www.transfermarkt.com/-/profil/spieler/{playerId}",
+  "queryParam": {},
+  "queryParamsNotRelatedToUrl": {},
+  "pathParams": [
+    "playerId"
+  ]
+}

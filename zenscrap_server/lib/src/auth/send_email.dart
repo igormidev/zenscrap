@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 
@@ -10,7 +12,7 @@ Future<bool> sendEmail({
   // you have two-factor authentication enabled and created an App password.
   // Search for "gmail app password 2fa"
   // The alternative is to use oauth.
-  
+
   // TODO: Create admin@zenscrap.com email account with Hostinger and update credentials
   // Temporarily using gobabel.io until Zen Scrap email is set up
   String username = 'admin@gobabel.io';
@@ -39,12 +41,12 @@ Future<bool> sendEmail({
 
   try {
     final sendReport = await send(message, smtpServer);
-    print('Message sent: $sendReport');
+    developer.log('Message sent: $sendReport', name: 'sendEmail');
     return true;
   } on MailerException catch (e) {
-    print('Message not sent.\n$e');
+    developer.log('Message not sent.\n$e', name: 'sendEmail');
     for (var p in e.problems) {
-      print('Problem: ${p.code}: ${p.msg}');
+      developer.log('Problem: ${p.code}: ${p.msg}', name: 'sendEmail');
     }
     return false;
   }

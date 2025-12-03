@@ -5,3 +5,4 @@ values:
   - serverError # 5xx
   - insufficientCredits
   - maxConcurrencyExceeded
+  - failedAtScrappingBee

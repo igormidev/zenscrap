@@ -6,6 +6,7 @@ class ZenTextfield extends StatefulWidget {
   final String hintText;
   final int? minLines;
   final int? maxLines;
+  final bool expands;
   final FocusNode? focusNode;
   final bool enabled;
   final ValueChanged<String>? onSubmitted;
@@ -20,6 +21,7 @@ class ZenTextfield extends StatefulWidget {
     required this.hintText,
     this.minLines,
     this.maxLines,
+    this.expands = false,
     this.focusNode,
     this.enabled = true,
     this.onSubmitted,
@@ -78,6 +80,9 @@ class _ZenTextfieldState extends State<ZenTextfield> {
         validator: widget.validator,
         autovalidateMode: widget.autovalidateMode,
         onChanged: widget.onChanged,
+        expands: widget.expands,
+        textAlign: TextAlign.start,
+        textAlignVertical: TextAlignVertical.top,
         decoration: InputDecoration(
           contentPadding: EdgeInsets.only(left: 16, top: 16, bottom: 16),
           label: ValueListenableBuilder(

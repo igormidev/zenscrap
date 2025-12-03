@@ -1,6 +1,7 @@
 import 'dart:async';
-
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:result_dart/result_dart.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/serverpod_to_result.dart';
 import 'package:zenscrap_flutter/src/core/utils/talker.dart';
@@ -17,11 +18,24 @@ final scrapChatProvider =
 class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
   final Ref ref;
   StreamSubscription<ChatResponse>? _chatResponseSubscription;
+  StreamSubscription<String>? _aiCurrentThinkingSubscription;
   ScrapChatSessionNotifier(this.ref) : super(ScrapChatSessionState.blank());
+
+  @override
+  void dispose() {
+    _chatResponseSubscription?.cancel();
+    _aiCurrentThinkingSubscription?.cancel();
+    super.dispose();
+  }
 
   void reset() {
     ref.read(chatMessagesProvider.notifier).state = const AsyncValue.data([]);
     state = ScrapChatSessionState.blank();
+
+    _chatResponseSubscription?.cancel();
+    _aiCurrentThinkingSubscription?.cancel();
+    _chatResponseSubscription = null;
+    _aiCurrentThinkingSubscription = null;
   }
 
   Future<void> createScrappable({
@@ -51,15 +65,41 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
     final sessionUuid = state.mapOrNull(standard: (value) => value.sessionUuid);
     if (sessionUuid == null) return;
 
-    final sessionResult = await ref
+    await ref
         .read(clientProvider)
         .scrappableChatSession
         .sendPromptMessage(sessionId: sessionUuid, userPrompt: userPrompt)
-        .toResult;
-
-    sessionResult.onFailure((failure) {
-      state = ScrapChatSessionState.withError(error: failure);
-    });
+        .toRawResult(
+      (Stream<String> llmThinkingStream) {
+        _aiCurrentThinkingSubscription = llmThinkingStream.listen(
+            (thinking) {
+              state.mapOrNull(standard: (value) {
+                final currentStream = value.llmThinkingStream ?? [];
+                state = value.copyWith(
+                  llmThinkingStream: [...currentStream, thinking],
+                );
+              });
+            },
+            onDone: () {
+              _aiCurrentThinkingSubscription?.cancel();
+              state.mapOrNull(standard: (value) {
+                Clipboard.setData(ClipboardData(
+                    text: value.llmThinkingStream?.join('\n') ?? ''));
+                state = value.copyWith(llmThinkingStream: null);
+              });
+            },
+            cancelOnError: true,
+            onError: (error) {
+              if (error is ZenScrapException) {
+                state = ScrapChatSessionState.withError(error: error);
+              } else {
+                state =
+                    ScrapChatSessionState.withError(error: defaultException);
+              }
+            });
+      },
+      (failure) => state = ScrapChatSessionState.withError(error: failure),
+    );
   }
 
   Future<void> endSession() async {
@@ -70,30 +110,54 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
         .read(clientProvider)
         .scrappableChatSession
         .disposeSession(sessionId: sessionUuid);
-  }
-
-  @override
-  void dispose() {
-    _chatResponseSubscription?.cancel();
-
-    super.dispose();
+    reset();
   }
 
   void onChange(ChatResponse chatResponse) {
+    if (chatResponse is UpdatedScrappableRequestResponse) {
+      state.mapOrNull(
+        standard: (value) {
+          state = value.copyWith(
+            data: value.data.copyWith(
+              targetRequest: value.data.targetRequest?.copyWith(
+                url: chatResponse.url,
+                pathParams: chatResponse.pathParams,
+                queryParams: chatResponse.queryParams,
+              ),
+            ),
+          );
+        },
+      );
+      return;
+    }
+    if (chatResponse is TestEndpointCalledSuccessResponse) {
+      state.mapOrNull(
+        standard: (value) {
+          state = value.copyWith(
+            data: value.data.copyWith(
+              referenceTestData: chatResponse.referenceTestData,
+            ),
+          );
+        },
+      );
+      // Don't return here - we want to add the message to the chat
+    }
     if (chatResponse is NewExtractRuleResponse) {
       state.mapOrNull(
         standard: (value) {
           state = value.copyWith(
-              data: value.data
-                  .copyWith(referenceTestData: chatResponse.referenceTestData));
+            data: value.data.copyWith(
+              referenceTestData: chatResponse.referenceTestData,
+              scrappingBeeExtractRules: chatResponse.scrappingBeeExtractLogic,
+              targetRequest: chatResponse.scrapperRequest,
+            ),
+          );
         },
       );
     }
     ref.read(chatMessagesProvider.notifier).state =
         ref.read(chatMessagesProvider).maybeMap(
-              data: (data) => AsyncValue.data(
-                [...data.value, chatResponse],
-              ),
+              data: (data) => AsyncValue.data([...data.value, chatResponse]),
               orElse: () => AsyncValue.data([chatResponse]),
             );
   }
@@ -157,6 +221,7 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
           data: scrappable,
           sessionUuid: createdSessionResponse.sessionId,
           testExpirationDate: expirationDate,
+          llmThinkingStream: null,
         );
       } catch (error, stackTrace) {
         talker.error(
@@ -169,5 +234,16 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
     },
         (failure) async =>
             state = ScrapChatSessionState.withError(error: failure));
+  }
+
+  Future<ResultDart<void, ZenScrapException>> commitCurrentChanges() async {
+    final sessionUuid = state.mapOrNull(standard: (value) => value.sessionUuid);
+    if (sessionUuid == null) return Failure(defaultException);
+
+    return ref
+        .read(clientProvider)
+        .scrappableChatSession
+        .commitCurrentEditState(sessionUuid: sessionUuid)
+        .toResult;
   }
 }

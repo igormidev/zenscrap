@@ -12,15 +12,15 @@
 import 'package:serverpod/serverpod.dart' as _i1;
 
 enum AiModel implements _i1.SerializableModel {
-  gemini_2_5_flash,
-  gemini_2_5_pro;
+  normal,
+  powerful;
 
   static AiModel fromJson(int index) {
     switch (index) {
       case 0:
-        return AiModel.gemini_2_5_flash;
+        return AiModel.normal;
       case 1:
-        return AiModel.gemini_2_5_pro;
+        return AiModel.powerful;
       default:
         throw ArgumentError('Value "$index" cannot be converted to "AiModel"');
     }
@@ -28,6 +28,7 @@ enum AiModel implements _i1.SerializableModel {
 
   @override
   int toJson() => index;
+
   @override
   String toString() => name;
 }

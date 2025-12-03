@@ -2,6 +2,7 @@ import 'package:dart_debouncer/dart_debouncer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/marketplace/marketplace_provider.dart';
 
 class MarketplaceSearchBar extends ConsumerStatefulWidget {
@@ -25,6 +26,14 @@ class _MarketplaceSearchBarState extends ConsumerState<MarketplaceSearchBar> {
 
   void _onSearchChanged(String value) {
     _debouncer.resetDebounce(() {
+      // Track search start
+      if (value.isNotEmpty) {
+        ref.read(analyticsServiceProvider).trackMarketplaceSearchStart(
+          searchQuery: value,
+          queryLength: value.length,
+        );
+      }
+
       ref.read(marketplaceProvider.notifier).search(value);
     });
   }
@@ -58,6 +67,9 @@ class _MarketplaceSearchBarState extends ConsumerState<MarketplaceSearchBar> {
           suffixIcon: _searchController.text.isNotEmpty
               ? IconButton(
                   onPressed: () {
+                    // Track search clear
+                    ref.read(analyticsServiceProvider).trackMarketplaceSearchClear();
+
                     _searchController.clear();
                     ref.read(marketplaceProvider.notifier).search('');
                   },

@@ -47,6 +47,7 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
       scrappableId,
       include: Scrappable.include(
         targetRequest: ScrappableRequest.include(),
+        scrappingBeeExtractRules: ScrappingBeeExtractLogic.include(),
         referenceTestData: ReferenceTestData.include(
           byteData: ByteTestData.include(),
         ),
@@ -72,12 +73,13 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
     Scrappable? clonedScrappable;
     await session.db.transaction<void>((transaction) async {
       // Clone the ScrappableRequest
-      final clonedRequest = ScrappableRequest(
+      ScrappableRequest clonedRequest = ScrappableRequest(
         url: sourceScrappable.targetRequest!.url,
         queryParams: sourceScrappable.targetRequest!.queryParams,
+        queryParamsNotRelatedToUrl: sourceScrappable.targetRequest!.queryParamsNotRelatedToUrl,
         pathParams: sourceScrappable.targetRequest!.pathParams,
       );
-      await ScrappableRequest.db.insertRow(
+      clonedRequest = await ScrappableRequest.db.insertRow(
         session,
         clonedRequest,
         transaction: transaction,
@@ -117,6 +119,31 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
         transaction: transaction,
       );
 
+      final ScrappingBeeExtractLogic scrappingBeeExtractLogic =
+          await ScrappingBeeExtractLogic.db.insertRow(
+              session,
+              ScrappingBeeExtractLogic(
+                extractRules:
+                    sourceScrappable.scrappingBeeExtractRules!.extractRules,
+                jsScenario:
+                    sourceScrappable.scrappingBeeExtractRules!.jsScenario,
+                renderJs: sourceScrappable.scrappingBeeExtractRules!.renderJs,
+                wait: sourceScrappable.scrappingBeeExtractRules!.wait,
+                waitFor: sourceScrappable.scrappingBeeExtractRules!.waitFor,
+                waitBrowser:
+                    sourceScrappable.scrappingBeeExtractRules!.waitBrowser,
+                premiumProxy:
+                    sourceScrappable.scrappingBeeExtractRules!.premiumProxy,
+                stealthProxy:
+                    sourceScrappable.scrappingBeeExtractRules!.stealthProxy,
+                countryCode:
+                    sourceScrappable.scrappingBeeExtractRules!.countryCode,
+                sessionId: sourceScrappable.scrappingBeeExtractRules!.sessionId,
+                customGoogle:
+                    sourceScrappable.scrappingBeeExtractRules!.customGoogle,
+              ),
+              transaction: transaction);
+
       final now = DateTime.now();
 
       // Create the cloned scrappable
@@ -136,12 +163,22 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
         referenceTestDataId: clonedTestData.id!,
         referenceTestData: clonedTestData,
         category: sourceScrappable.category,
+        scrappingBeeExtractRules: scrappingBeeExtractLogic,
       );
       clonedScrappable = await Scrappable.db.insertRow(
         session,
         clonedScrappable!,
         transaction: transaction,
       );
+      await Scrappable.db.attachRow.targetRequest(
+          session, clonedScrappable!, clonedRequest,
+          transaction: transaction);
+      await Scrappable.db.attachRow.referenceTestData(
+          session, clonedScrappable!, clonedTestData,
+          transaction: transaction);
+      await Scrappable.db.attachRow.scrappingBeeExtractRules(
+          session, clonedScrappable!, scrappingBeeExtractLogic,
+          transaction: transaction);
     });
 
     // Return the cloned scrappable with all relations (after commit)

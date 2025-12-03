@@ -6,4 +6,5 @@ fields:
   serverErrorTotalCount: int
   insufficientCreditsTotalCount: int
   maxConcurrencyExceededTotalCount: int
-  data: List<ScrappableRequestPerHour>
+  failedAtScrappingBeeTotalCount: int
+  data: List<ScrappableRequestPerTimeScope>

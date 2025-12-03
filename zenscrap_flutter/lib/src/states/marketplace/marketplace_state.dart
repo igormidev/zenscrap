@@ -10,6 +10,7 @@ class MarketplaceState with _$MarketplaceState {
   const factory MarketplaceState.loaded({
     required PaginatedScrappableResponse response,
     required String searchQuery,
+    required Set<ScraperCategory> selectedCategories,
   }) = _Loaded;
   const factory MarketplaceState.withError(
     ZenScrapException error,

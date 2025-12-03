@@ -11,7 +11,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../entities/scrappable/scrappable.dart' as _i2;
-import '../../entities/analytics/scraapable_request_per_day.dart' as _i3;
+import '../../entities/analytics/scrappable_request_per_time_scope.dart' as _i3;
 
 abstract class ScrappableRequestsAnalyticsItem
     implements _i1.SerializableModel, _i1.ProtocolSerialization {
@@ -22,6 +22,7 @@ abstract class ScrappableRequestsAnalyticsItem
     required this.serverErrorTotalCount,
     required this.insufficientCreditsTotalCount,
     required this.maxConcurrencyExceededTotalCount,
+    required this.failedAtScrappingBeeTotalCount,
     required this.data,
   });
 
@@ -32,7 +33,8 @@ abstract class ScrappableRequestsAnalyticsItem
     required int serverErrorTotalCount,
     required int insufficientCreditsTotalCount,
     required int maxConcurrencyExceededTotalCount,
-    required List<_i3.ScrappableRequestPerHour> data,
+    required int failedAtScrappingBeeTotalCount,
+    required List<_i3.ScrappableRequestPerTimeScope> data,
   }) = _ScrappableRequestsAnalyticsItemImpl;
 
   factory ScrappableRequestsAnalyticsItem.fromJson(
@@ -47,8 +49,10 @@ abstract class ScrappableRequestsAnalyticsItem
           jsonSerialization['insufficientCreditsTotalCount'] as int,
       maxConcurrencyExceededTotalCount:
           jsonSerialization['maxConcurrencyExceededTotalCount'] as int,
+      failedAtScrappingBeeTotalCount:
+          jsonSerialization['failedAtScrappingBeeTotalCount'] as int,
       data: (jsonSerialization['data'] as List)
-          .map((e) => _i3.ScrappableRequestPerHour.fromJson(
+          .map((e) => _i3.ScrappableRequestPerTimeScope.fromJson(
               (e as Map<String, dynamic>)))
           .toList(),
     );
@@ -66,7 +70,9 @@ abstract class ScrappableRequestsAnalyticsItem
 
   int maxConcurrencyExceededTotalCount;
 
-  List<_i3.ScrappableRequestPerHour> data;
+  int failedAtScrappingBeeTotalCount;
+
+  List<_i3.ScrappableRequestPerTimeScope> data;
 
   /// Returns a shallow copy of this [ScrappableRequestsAnalyticsItem]
   /// with some or all fields replaced by the given arguments.
@@ -78,7 +84,8 @@ abstract class ScrappableRequestsAnalyticsItem
     int? serverErrorTotalCount,
     int? insufficientCreditsTotalCount,
     int? maxConcurrencyExceededTotalCount,
-    List<_i3.ScrappableRequestPerHour>? data,
+    int? failedAtScrappingBeeTotalCount,
+    List<_i3.ScrappableRequestPerTimeScope>? data,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -89,6 +96,7 @@ abstract class ScrappableRequestsAnalyticsItem
       'serverErrorTotalCount': serverErrorTotalCount,
       'insufficientCreditsTotalCount': insufficientCreditsTotalCount,
       'maxConcurrencyExceededTotalCount': maxConcurrencyExceededTotalCount,
+      'failedAtScrappingBeeTotalCount': failedAtScrappingBeeTotalCount,
       'data': data.toJson(valueToJson: (v) => v.toJson()),
     };
   }
@@ -102,6 +110,7 @@ abstract class ScrappableRequestsAnalyticsItem
       'serverErrorTotalCount': serverErrorTotalCount,
       'insufficientCreditsTotalCount': insufficientCreditsTotalCount,
       'maxConcurrencyExceededTotalCount': maxConcurrencyExceededTotalCount,
+      'failedAtScrappingBeeTotalCount': failedAtScrappingBeeTotalCount,
       'data': data.toJson(valueToJson: (v) => v.toJsonForProtocol()),
     };
   }
@@ -121,7 +130,8 @@ class _ScrappableRequestsAnalyticsItemImpl
     required int serverErrorTotalCount,
     required int insufficientCreditsTotalCount,
     required int maxConcurrencyExceededTotalCount,
-    required List<_i3.ScrappableRequestPerHour> data,
+    required int failedAtScrappingBeeTotalCount,
+    required List<_i3.ScrappableRequestPerTimeScope> data,
   }) : super._(
           scrappable: scrappable,
           successTotalCount: successTotalCount,
@@ -129,6 +139,7 @@ class _ScrappableRequestsAnalyticsItemImpl
           serverErrorTotalCount: serverErrorTotalCount,
           insufficientCreditsTotalCount: insufficientCreditsTotalCount,
           maxConcurrencyExceededTotalCount: maxConcurrencyExceededTotalCount,
+          failedAtScrappingBeeTotalCount: failedAtScrappingBeeTotalCount,
           data: data,
         );
 
@@ -143,7 +154,8 @@ class _ScrappableRequestsAnalyticsItemImpl
     int? serverErrorTotalCount,
     int? insufficientCreditsTotalCount,
     int? maxConcurrencyExceededTotalCount,
-    List<_i3.ScrappableRequestPerHour>? data,
+    int? failedAtScrappingBeeTotalCount,
+    List<_i3.ScrappableRequestPerTimeScope>? data,
   }) {
     return ScrappableRequestsAnalyticsItem(
       scrappable: scrappable ?? this.scrappable.copyWith(),
@@ -156,6 +168,8 @@ class _ScrappableRequestsAnalyticsItemImpl
           insufficientCreditsTotalCount ?? this.insufficientCreditsTotalCount,
       maxConcurrencyExceededTotalCount: maxConcurrencyExceededTotalCount ??
           this.maxConcurrencyExceededTotalCount,
+      failedAtScrappingBeeTotalCount:
+          failedAtScrappingBeeTotalCount ?? this.failedAtScrappingBeeTotalCount,
       data: data ?? this.data.map((e0) => e0.copyWith()).toList(),
     );
   }

@@ -12,8 +12,9 @@ privateApiUsage:
 privateCloneScrappable:
   - cloneFromMarketplace:
 privateScrappableAnalytics:
-  - getScrappableAnalyticsOfTheLast12Hours:
+  - getScrappableAnalyticsWithScope:
   - getScrappableAnalytics:
+  - getScrappableUsageMetrics:
 privateSubscription:
   - createCheckoutSession:
   - getSubscriptionStatus:
@@ -22,16 +23,23 @@ privateSubscription:
 privateUserScrappables:
   - call:
   - getScrappableById:
-deleteScrappable:
+createScrappable:
   - call:
-deployScrappable:
+deleteScrappable:
   - call:
 editScrappable:
   - call:
 marketplace:
   - getItems:
+publicScrappable:
+  - getByteTestData:
 publicTier:
   - updatePlayerTier:
-scrappableApi:
-  - prod:
-  - test:
+scrappableChatSession:
+  - commitCurrentEditState:
+  - disposeSession:
+  - updateScrappableRequest:
+  - createSession:
+  - listenToScrappableRedraftSession:
+  - changeChatModel:
+  - sendPromptMessage:

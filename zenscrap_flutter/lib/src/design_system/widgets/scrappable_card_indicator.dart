@@ -1,24 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/date_time_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/category_badge.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/edit_scrappable_dialog.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/ui/marketplace/pages/scrappable_details_dialog.dart';
 
-class ScrappableCardIndicator extends StatelessWidget {
+enum ScrappableCardSource { userScrappables, marketplace }
+
+class ScrappableCardIndicator extends ConsumerWidget {
   final int? accountId;
   final Scrappable scrappable;
   final int? usageCount;
+  final ScrappableCardSource source;
   const ScrappableCardIndicator({
     super.key,
     required this.scrappable,
     required this.accountId,
     this.usageCount,
+    this.source = ScrappableCardSource.userScrappables,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final analytics = ref.read(analyticsServiceProvider);
     final hasUrl = scrappable.targetRequest?.url != null;
     final url = scrappable.targetRequest?.url ?? '';
     final willHideFromMarketplace = scrappable.willHideFromMarketplace;
@@ -27,12 +34,29 @@ class ScrappableCardIndicator extends StatelessWidget {
 
     return InkWell(
       onTap: () async {
-        await showDialog(
-          context: context,
-          builder: (context) => ScrappableDetailsDialog(
-            scrappable: scrappable,
-          ),
-        );
+        // Track card click based on source
+        if (source == ScrappableCardSource.userScrappables &&
+            scrappable.id != null) {
+          await analytics.trackUserScrappablesCardClick(
+            scrappableId: scrappable.id!,
+            scrappableName: scrappable.name,
+          );
+        } else if (source == ScrappableCardSource.marketplace &&
+            scrappable.id != null) {
+          await analytics.trackMarketplaceCardClick(
+            scrappableId: scrappable.id!,
+            scrappableName: scrappable.name,
+            usageCount: usageCount,
+          );
+        }
+        if (context.mounted) {
+          await showDialog(
+            context: context,
+            builder: (context) => ScrappableDetailsDialog(
+              scrappable: scrappable,
+            ),
+          );
+        }
       },
       borderRadius: BorderRadius.circular(12),
       child: Container(
@@ -66,9 +90,20 @@ class ScrappableCardIndicator extends StatelessWidget {
                 if (isMyScrappable) ...[
                   InkWell(
                     onTap: () async {
+                      // Track edit click (only for user scrappables)
+                      if (source == ScrappableCardSource.userScrappables &&
+                          scrappable.id != null) {
+                        await analytics.trackUserScrappablesEditClick(
+                          scrappableId: scrappable.id!,
+                          scrappableName: scrappable.name,
+                        );
+                      }
+                      if (!context.mounted) return;
                       await showDialog<bool>(
                         context: context,
                         builder: (dialogContext) => EditScrappableDialog(
+                          willDisplayHideFromMarketplaceToggle:
+                              !isNew, // Only show toggle if it's not new
                           scrappable: scrappable,
                           willHaveOrOptions: isNew == false,
                         ),
@@ -185,7 +220,7 @@ class ScrappableCardIndicator extends StatelessWidget {
                         const SizedBox(width: 6),
                         Text(
                           isNew
-                              ? 'This endpoint will be active and attached to your account after you sign In'
+                              ? 'This endpoint will be active and attached to your account after you sign/log in'
                               : willHideFromMarketplace
                                   ? 'Not available in marketplace'
                                   : 'Available in marketplace',

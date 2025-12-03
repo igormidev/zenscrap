@@ -1,0 +1,5 @@
+name: "zenscrap_workspace"
+environment:
+  sdk: "^3.6.0"
+workspace:
+  - "zenscrap_server"

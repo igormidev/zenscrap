@@ -25,9 +25,8 @@ class _ScrappableEditVisualizationState
     return Container(
       decoration: BoxDecoration(
         color: context.c.surfaceContainerLowest,
-        border: BoxBorder.all(
+        border: Border.all(
           color: context.c.outline.withAlpha(60),
-          // width: 3,
         ),
         borderRadius: BorderRadius.circular(12),
       ),

@@ -1,0 +1,4 @@
+class: UserPaginatedScrappableResponse
+fields:
+  data: List<Scrappable>
+  pagination: PaginationMetadata

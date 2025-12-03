@@ -1,0 +1,7 @@
+class: UpdatedScrappableRequestResponse
+extends: ChatResponse
+fields:
+  messageText: String
+  url: String
+  queryParams: Map<String, String?>
+  pathParams: List<String>

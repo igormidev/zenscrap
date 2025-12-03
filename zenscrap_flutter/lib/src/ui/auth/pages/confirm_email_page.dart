@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:serverpod_auth_email_flutter/serverpod_auth_email_flutter.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/ui/auth/templates/auth_form_template.dart';
 
 class ConfirmEmailPage extends ConsumerWidget {
@@ -20,6 +21,11 @@ class ConfirmEmailPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final analytics = ref.read(analyticsServiceProvider);
+
+    // Track view when the email confirmation form is visible
+    analytics.trackAuthEmailConfirmationViewed(email: email);
+
     return AuthFormTemplate<bool>(
       submitText: 'Confirm your email',
       items: [
@@ -45,6 +51,9 @@ class ConfirmEmailPage extends ConsumerWidget {
 
           return null;
         }
+
+        // Track successful email confirmation
+        await analytics.trackAuthEmailConfirmationSuccess(email: email);
 
         return true;
       },

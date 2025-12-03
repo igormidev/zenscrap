@@ -7,7 +7,7 @@ Future<bool> onSendValidationEmail(
   String email,
   String validationCode,
 ) async {
-  print('Validation code: $validationCode');
+  session.log('Validation code: $validationCode');
   if (email == 'igor9ms@hotmail.com') return true;
   final htmlText = getHTMLEmailTemplate(
     title: 'Confirm Your Email Address',

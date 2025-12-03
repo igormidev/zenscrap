@@ -1,16 +1,17 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/mixins/curl_builder_mixin.dart';
-import 'package:zenscrap_flutter/src/design_system/elements/scrappable_grid_listage.dart';
+import 'package:zenscrap_flutter/src/design_system/scrappables_listage_ui_template/scrappables_listage_template.dart';
+import 'package:zenscrap_flutter/src/design_system/scrappables_listage_ui_template/pagination_controls.dart';
+import 'package:zenscrap_flutter/src/design_system/scrappables_listage_ui_template/empty_scrappables_state.dart';
+import 'package:zenscrap_flutter/src/design_system/scrappables_listage_ui_template/loading_scrappables_state.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/scrappable_card_indicator.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_state.dart';
 import 'package:zenscrap_flutter/src/states/marketplace/marketplace_provider.dart';
 import 'package:zenscrap_flutter/src/states/marketplace/marketplace_state.dart';
-import 'package:zenscrap_flutter/src/ui/marketplace/pages/empty_marketplace_page.dart';
-import 'package:zenscrap_flutter/src/ui/marketplace/widgets/marketplace_pagination_controls.dart';
 import 'package:zenscrap_flutter/src/ui/marketplace/widgets/marketplace_header.dart';
 
 class MarketplaceView extends ConsumerStatefulWidget {
@@ -33,6 +34,7 @@ class _MarketplaceViewState extends ConsumerState<MarketplaceView>
 
   @override
   Widget build(BuildContext context) {
+    final analytics = ref.read(analyticsServiceProvider);
     final accountId = ref.watch(accountProvider).mapOrNull(
           withData: (value) => value.accountInfo.id,
         );
@@ -44,40 +46,76 @@ class _MarketplaceViewState extends ConsumerState<MarketplaceView>
         SizedBox(height: 16),
         Expanded(
           child: marketplaceState.when(
-            initial: () => const Center(
-              child: Text('Loading marketplace...'),
-            ),
-            loading: () => const SizedBox.shrink(),
-            loaded: (response, searchQuery) {
+            initial: () => const LoadingScrappablesState(),
+            loading: () => const LoadingScrappablesState(),
+            loaded: (response, searchQuery, selectedCategories) {
+              // Track marketplace page view
+              analytics.trackMarketplacePageView(
+                scrappableCount: response.data.length,
+                currentPage: response.pagination.currentPage,
+                hasSearchQuery: searchQuery.isNotEmpty,
+              );
+
               if (response.data.isEmpty) {
-                return EmptyMarketplacePage(
+                return EmptyScrappablesState(
                   isSearchResult: searchQuery.isNotEmpty,
                   searchQuery: searchQuery,
+                  onClearSearch: () {
+                    ref.read(marketplaceProvider.notifier).search('');
+                  },
                 );
               }
 
-              return Column(
-                children: [
-                  Expanded(
-                    child: ScrappableGridListage(
-                      itemCount: response.data.length,
-                      itemBuilder: (context, index) {
-                        final MarketPlacePaginatedItem marketPlaceItem =
-                            response.data[index];
+              // Create a map of scrappable to usage count for quick lookup
+              final usageCountMap = <int, int>{};
+              for (final item in response.data) {
+                if (item.scrappable.id != null) {
+                  usageCountMap[item.scrappable.id!] = item.usageCount;
+                }
+              }
 
-                        return ScrappableCardIndicator(
-                          accountId: accountId,
-                          scrappable: marketPlaceItem.scrappable,
-                          usageCount: marketPlaceItem.usageCount,
-                        );
-                      },
-                    ),
-                  ),
-                  const MarketplacePaginationControls(),
-                ],
+              return ScrappablesListageTemplate(
+                scrappables: response.data.map((e) => e.scrappable).toList(),
+                pagination: response.pagination,
+                accountId: accountId,
+                source: ScrappableCardSource.marketplace,
+                usageCountProvider: (scrappable) {
+                  if (scrappable.id == null) return null;
+                  return usageCountMap[scrappable.id];
+                },
+                paginationControls: PaginationControls(
+                  pagination: response.pagination,
+                  onPageChanged: (page) {
+                    ref.read(marketplaceProvider.notifier).changePage(page);
+                  },
+                  mode: PaginationMode.pageNumbers,
+                  onPreviousPageAnalytics: () {
+                    analytics.trackMarketplacePaginationPrevious(
+                      fromPage: response.pagination.currentPage,
+                      toPage: response.pagination.currentPage - 1,
+                    );
+                  },
+                  onNextPageAnalytics: () {
+                    analytics.trackMarketplacePaginationNext(
+                      fromPage: response.pagination.currentPage,
+                      toPage: response.pagination.currentPage + 1,
+                    );
+                  },
+                  onPageNumberAnalytics: (toPage) {
+                    analytics.trackMarketplacePaginationPage(
+                      fromPage: response.pagination.currentPage,
+                      toPage: toPage,
+                    );
+                  },
+                ),
               );
             },
-            withError: (error) => const SizedBox.shrink(),
+            withError: (error) => EmptyScrappablesState(
+              isSearchResult: false,
+              title: 'Error loading marketplace',
+              description: error.description,
+              icon: Icons.error_outline_rounded,
+            ),
           ),
         ),
       ],

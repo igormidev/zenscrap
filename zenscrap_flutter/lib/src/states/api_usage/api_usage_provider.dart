@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:talker_flutter/talker_flutter.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
-import 'package:zenscrap_flutter/src/core/utils/talker.dart';
+import 'package:zenscrap_flutter/src/core/extensions/serverpod_to_result.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/api_usage/api_usage_state.dart';
 
@@ -17,28 +16,15 @@ class ApiUsageNotifier extends StateNotifier<ApiUsageState> {
   ApiUsageNotifier(this._client) : super(const ApiUsageState.initial());
 
   Future<void> loadApiUsage() async {
-    try {
-      state = const ApiUsageState.loading();
+    state = const ApiUsageState.loading();
 
-      final apiUsage = await _client.privateApiUsage.getApiUsageInfo();
+    final apiUsageResult =
+        await _client.privateApiUsage.getApiUsageInfo().toResult;
 
-      state = ApiUsageState.loaded(apiUsage: apiUsage);
-    } on ZenScrapException catch (e) {
-      state = ApiUsageState.withError(e);
-    } catch (error, stackTrace) {
-      talker.log(
-        'Error loading API usage',
-        exception: error,
-        stackTrace: stackTrace,
-        logLevel: LogLevel.error,
-      );
-      state = ApiUsageState.withError(
-        ZenScrapException(
-          title: 'Error loading API usage',
-          description: 'An unexpected error occurred:\n$error',
-        ),
-      );
-    }
+    state = apiUsageResult.fold(
+      (apiUsage) => ApiUsageState.loaded(apiUsage: apiUsage),
+      (error) => ApiUsageState.withError(error),
+    );
   }
 
   Future<void> refresh() async {

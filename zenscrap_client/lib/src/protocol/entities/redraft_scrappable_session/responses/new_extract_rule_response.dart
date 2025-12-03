@@ -14,6 +14,7 @@ abstract class NewExtractRuleResponse extends _i1.ChatResponse
     implements _i2.SerializableModel {
   NewExtractRuleResponse._({
     required super.role,
+    required super.expectsFollowUp,
     required this.messageText,
     required this.referenceTestData,
     required this.scrappingBeeExtractLogic,
@@ -22,49 +23,53 @@ abstract class NewExtractRuleResponse extends _i1.ChatResponse
 
   factory NewExtractRuleResponse({
     required _i3.PromptRole role,
+    required bool expectsFollowUp,
     required String messageText,
-    required _i6.ReferenceTestData referenceTestData,
+    required _i5.ReferenceTestData referenceTestData,
     required _i4.ScrappingBeeExtractLogic scrappingBeeExtractLogic,
-    required _i5.ScrappableRequest scrapperRequest,
+    required _i6.ScrappableRequest scrapperRequest,
   }) = _NewExtractRuleResponseImpl;
 
   factory NewExtractRuleResponse.fromJson(
       Map<String, dynamic> jsonSerialization) {
     return NewExtractRuleResponse(
       role: _i3.PromptRole.fromJson((jsonSerialization['role'] as String)),
+      expectsFollowUp: jsonSerialization['expectsFollowUp'] as bool,
       messageText: jsonSerialization['messageText'] as String,
-      referenceTestData: _i6.ReferenceTestData.fromJson(
+      referenceTestData: _i5.ReferenceTestData.fromJson(
           (jsonSerialization['referenceTestData'] as Map<String, dynamic>)),
       scrappingBeeExtractLogic: _i4.ScrappingBeeExtractLogic.fromJson(
           (jsonSerialization['scrappingBeeExtractLogic']
               as Map<String, dynamic>)),
-      scrapperRequest: _i5.ScrappableRequest.fromJson(
+      scrapperRequest: _i6.ScrappableRequest.fromJson(
           (jsonSerialization['scrapperRequest'] as Map<String, dynamic>)),
     );
   }
 
   String messageText;
 
-  _i6.ReferenceTestData referenceTestData;
+  _i5.ReferenceTestData referenceTestData;
 
   _i4.ScrappingBeeExtractLogic scrappingBeeExtractLogic;
 
-  _i5.ScrappableRequest scrapperRequest;
+  _i6.ScrappableRequest scrapperRequest;
 
   /// Returns a shallow copy of this [NewExtractRuleResponse]
   /// with some or all fields replaced by the given arguments.
   @_i2.useResult
   NewExtractRuleResponse copyWith({
     _i3.PromptRole? role,
+    bool? expectsFollowUp,
     String? messageText,
-    _i6.ReferenceTestData? referenceTestData,
+    _i5.ReferenceTestData? referenceTestData,
     _i4.ScrappingBeeExtractLogic? scrappingBeeExtractLogic,
-    _i5.ScrappableRequest? scrapperRequest,
+    _i6.ScrappableRequest? scrapperRequest,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
       'role': role.toJson(),
+      'expectsFollowUp': expectsFollowUp,
       'messageText': messageText,
       'referenceTestData': referenceTestData.toJson(),
       'scrappingBeeExtractLogic': scrappingBeeExtractLogic.toJson(),
@@ -81,12 +86,14 @@ abstract class NewExtractRuleResponse extends _i1.ChatResponse
 class _NewExtractRuleResponseImpl extends NewExtractRuleResponse {
   _NewExtractRuleResponseImpl({
     required _i3.PromptRole role,
+    required bool expectsFollowUp,
     required String messageText,
-    required _i6.ReferenceTestData referenceTestData,
+    required _i5.ReferenceTestData referenceTestData,
     required _i4.ScrappingBeeExtractLogic scrappingBeeExtractLogic,
-    required _i5.ScrappableRequest scrapperRequest,
+    required _i6.ScrappableRequest scrapperRequest,
   }) : super._(
           role: role,
+          expectsFollowUp: expectsFollowUp,
           messageText: messageText,
           referenceTestData: referenceTestData,
           scrappingBeeExtractLogic: scrappingBeeExtractLogic,
@@ -99,13 +106,15 @@ class _NewExtractRuleResponseImpl extends NewExtractRuleResponse {
   @override
   NewExtractRuleResponse copyWith({
     _i3.PromptRole? role,
+    bool? expectsFollowUp,
     String? messageText,
-    _i6.ReferenceTestData? referenceTestData,
+    _i5.ReferenceTestData? referenceTestData,
     _i4.ScrappingBeeExtractLogic? scrappingBeeExtractLogic,
-    _i5.ScrappableRequest? scrapperRequest,
+    _i6.ScrappableRequest? scrapperRequest,
   }) {
     return NewExtractRuleResponse(
       role: role ?? this.role,
+      expectsFollowUp: expectsFollowUp ?? this.expectsFollowUp,
       messageText: messageText ?? this.messageText,
       referenceTestData: referenceTestData ?? this.referenceTestData.copyWith(),
       scrappingBeeExtractLogic:

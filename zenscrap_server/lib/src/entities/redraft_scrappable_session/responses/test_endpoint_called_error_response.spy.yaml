@@ -1,0 +1,7 @@
+class: TestEndpointCalledErrorResponse
+extends: ChatResponse
+fields:
+    errorTitle: String
+    errorDescription: String
+    inputPayload: String
+    timestamp: DateTime

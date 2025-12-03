@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/scrappables_listage_ui_template/scrappables_search_bar.dart';
+import 'package:zenscrap_flutter/src/design_system/scrappables_listage_ui_template/category_filter_section.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/marketplace/marketplace_provider.dart';
-import 'package:zenscrap_flutter/src/ui/marketplace/widgets/marketplace_search_bar.dart';
+import 'package:zenscrap_flutter/src/states/marketplace/marketplace_state.dart';
 
 class MarketplaceHeader extends ConsumerWidget {
   const MarketplaceHeader({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final marketplaceState = ref.watch(marketplaceProvider);
+    final selectedCategories = marketplaceState.mapOrNull(
+          loaded: (state) => state.selectedCategories,
+        ) ??
+        {};
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -43,6 +52,11 @@ class MarketplaceHeader extends ConsumerWidget {
             IconButton(
               tooltip: 'Refresh page',
               onPressed: () {
+                // Track refresh click
+                ref
+                    .read(analyticsServiceProvider)
+                    .trackMarketplaceRefreshClick();
+
                 ref.read(marketplaceProvider.notifier).refresh();
               },
               icon: Icon(
@@ -53,9 +67,32 @@ class MarketplaceHeader extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: 16),
-        const SizedBox(
+        SizedBox(
           width: double.infinity,
-          child: MarketplaceSearchBar(),
+          child: ScrappablesSearchBar(
+            hintText: 'Search for scrappables by name or description...',
+            onSearch: (query) {
+              ref.read(marketplaceProvider.notifier).search(query);
+            },
+            onSearchStart: (query) {
+              ref.read(analyticsServiceProvider).trackMarketplaceSearchStart(
+                searchQuery: query,
+                queryLength: query.length,
+              );
+            },
+            onSearchClear: () {
+              ref.read(analyticsServiceProvider).trackMarketplaceSearchClear();
+            },
+          ),
+        ),
+        const SizedBox(height: 16),
+        CategoryFilterSection(
+          selectedCategories: selectedCategories,
+          onCategoriesChanged: (categories) {
+            ref
+                .read(marketplaceProvider.notifier)
+                .filterByCategories(categories);
+          },
         ),
       ],
     );

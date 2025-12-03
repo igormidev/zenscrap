@@ -30,6 +30,7 @@ class _InitialChatViewState extends ConsumerState<InitialChatView> {
     super.initState();
     // WidgetsBinding.instance.addPostFrameCallback((_) async {
     if (widget.scrappableId != null) {
+      unawaited(ref.read(scrapChatProvider.notifier).endSession());
       Future.delayed(const Duration(seconds: 3), () async {
         await ref
             .read(scrapChatProvider.notifier)
@@ -63,11 +64,16 @@ class _InitialChatViewState extends ConsumerState<InitialChatView> {
               withError: ZenErrorTab.new,
               creatingSessionState: () => InitialChatPage(),
               blank: () => InitialChatPage(),
-              standard: (Scrappable scrappable, DateTime testExpirationDate,
-                  String sessionUuid) {
+              standard: (
+                Scrappable scrappable,
+                DateTime testExpirationDate,
+                String sessionUuid,
+                List<String>? llmThinkingStream,
+              ) {
                 return ScrappableEditSessionView(
                   testExpirationDate: testExpirationDate,
                   scrappable: scrappable,
+                  llmThinkingStream: llmThinkingStream,
                 );
               },
             );

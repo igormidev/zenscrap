@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:serverpod_auth_email_flutter/serverpod_auth_email_flutter.dart';
 import 'package:zenscrap_flutter/src/design_system/dialog_message.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/ui/auth/templates/auth_form_template.dart';
 
 class PasswordResetValidateCodePage extends ConsumerWidget {
@@ -19,6 +20,11 @@ class PasswordResetValidateCodePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final analytics = ref.read(analyticsServiceProvider);
+
+    // Track view when the password reset validation form is visible
+    analytics.trackAuthPasswordResetValidationViewed(email: email);
+
     return AuthFormTemplate<bool>(
       items: [
         AuthFormItem(
@@ -62,11 +68,20 @@ class PasswordResetValidateCodePage extends ConsumerWidget {
         );
 
         if (!success) {
+          // Track password reset failure
+          await analytics.trackAuthPasswordResetFailure(
+            email: email,
+            errorMessage: 'Invalid verification code or password reset failed',
+          );
+
           if (context.mounted) {
             showErrorSnackbar(context);
           }
           return null;
         }
+
+        // Track successful password reset completion
+        await analytics.trackAuthPasswordResetComplete(email: email);
 
         if (context.mounted) {
           return true;

@@ -1,0 +1,11 @@
+class: ScrappableRequestPerTimeScope
+fields:
+  start: DateTime
+  end: DateTime
+  successCount: int
+  clientErrorCount: int
+  serverErrorCount: int
+  insufficientCreditsCount: int
+  maxConcurrencyExceededCount: int
+  failedAtScrappingBeeCount: int
+

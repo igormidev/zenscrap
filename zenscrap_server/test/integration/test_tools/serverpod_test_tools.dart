@@ -16,30 +16,42 @@ import 'package:serverpod/serverpod.dart' as _i2;
 import 'dart:async' as _i3;
 import 'package:zenscrap_server/src/generated/entities/account/account.dart'
     as _i4;
-import 'package:zenscrap_server/src/generated/entities/scrappable/scrappable.dart'
-    as _i5;
 import 'package:zenscrap_server/src/generated/entities/account/api_usage/api_credit_history/api_creadit_history_item.dart'
-    as _i6;
+    as _i5;
 import 'package:zenscrap_server/src/generated/entities/account/account_api_key.dart'
-    as _i7;
+    as _i6;
 import 'package:zenscrap_server/src/generated/entities/account/api_usage/account_api_usage.dart'
-    as _i8;
+    as _i7;
 import 'package:zenscrap_server/src/generated/entities/api_key_response.dart'
-    as _i9;
+    as _i8;
 import 'package:zenscrap_server/src/generated/entities/account/credit_purchase_option.dart'
+    as _i9;
+import 'package:zenscrap_server/src/generated/entities/scrappable/scrappable.dart'
     as _i10;
 import 'package:zenscrap_server/src/generated/entities/analytics/paginated_scrappable_requests_analytics.dart'
     as _i11;
-import 'package:zenscrap_server/src/generated/entities/analytics/paginated_scrappable_analytics.dart'
+import 'package:zenscrap_server/src/generated/entities/analytics/analytics_time_scope.dart'
     as _i12;
-import 'package:zenscrap_server/src/generated/entities/scrappable/reference_test_data.dart'
+import 'package:zenscrap_server/src/generated/entities/analytics/paginated_scrappable_analytics.dart'
     as _i13;
-import 'package:zenscrap_server/src/generated/entities/scrappable/scraper_category.dart'
+import 'package:zenscrap_server/src/generated/entities/analytics/scrappable_usage_metrics.dart'
     as _i14;
-import 'package:zenscrap_server/src/generated/entities/marketplace/paginated_scrappable_response.dart'
+import 'package:zenscrap_server/src/generated/entities/user_scrappables/user_paginated_scrappable_response.dart'
     as _i15;
-import 'package:zenscrap_server/src/generated/entities/account/plan_tier.dart'
+import 'package:zenscrap_server/src/generated/entities/scrappable/scraper_category.dart'
     as _i16;
+import 'package:zenscrap_server/src/generated/entities/marketplace/paginated_scrappable_response.dart'
+    as _i17;
+import 'package:zenscrap_server/src/generated/entities/scrappable/byte_test_data.dart'
+    as _i18;
+import 'package:zenscrap_server/src/generated/entities/account/plan_tier.dart'
+    as _i19;
+import 'package:zenscrap_server/src/generated/entities/redraft_scrappable_session/create_session_response.dart'
+    as _i20;
+import 'package:zenscrap_server/src/generated/entities/redraft_scrappable_session/chat_response.dart'
+    as _i21;
+import 'package:zenscrap_server/src/generated/entities/scrappable/ai_model.dart'
+    as _i22;
 import 'package:zenscrap_server/src/generated/protocol.dart';
 import 'package:zenscrap_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -138,17 +150,19 @@ class TestEndpoints {
 
   late final _PrivateUserScrappablesEndpoint privateUserScrappables;
 
-  late final _DeleteScrappableEndpoint deleteScrappable;
+  late final _CreateScrappableEndpoint createScrappable;
 
-  late final _DeployScrappable deployScrappable;
+  late final _DeleteScrappableEndpoint deleteScrappable;
 
   late final _EditScrappableEndpoint editScrappable;
 
   late final _MarketplaceEndpoint marketplace;
 
+  late final _PublicScrappableEndpoint publicScrappable;
+
   late final _PublicTierEndpoint publicTier;
 
-  late final _ScrappableApiEndpoint scrappableApi;
+  late final _ScrappableChatSession scrappableChatSession;
 }
 
 class _InternalTestEndpoints extends TestEndpoints
@@ -182,11 +196,11 @@ class _InternalTestEndpoints extends TestEndpoints
       endpoints,
       serializationManager,
     );
-    deleteScrappable = _DeleteScrappableEndpoint(
+    createScrappable = _CreateScrappableEndpoint(
       endpoints,
       serializationManager,
     );
-    deployScrappable = _DeployScrappable(
+    deleteScrappable = _DeleteScrappableEndpoint(
       endpoints,
       serializationManager,
     );
@@ -198,11 +212,15 @@ class _InternalTestEndpoints extends TestEndpoints
       endpoints,
       serializationManager,
     );
+    publicScrappable = _PublicScrappableEndpoint(
+      endpoints,
+      serializationManager,
+    );
     publicTier = _PublicTierEndpoint(
       endpoints,
       serializationManager,
     );
-    scrappableApi = _ScrappableApiEndpoint(
+    scrappableChatSession = _ScrappableChatSession(
       endpoints,
       serializationManager,
     );
@@ -221,7 +239,7 @@ class _PrivateAccountEndpoint {
 
   _i3.Future<_i4.AccountInfo> getAccountInfo(
     _i1.TestSessionBuilder sessionBuilder, {
-    required _i5.Scrappable? initialScrappableIfNewUser,
+    required int? initialScrappableId,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -234,8 +252,8 @@ class _PrivateAccountEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'privateAccount',
           methodName: 'getAccountInfo',
-          parameters: _i1.testObjectToJson(
-              {'initialScrappableIfNewUser': initialScrappableIfNewUser}),
+          parameters: _i1
+              .testObjectToJson({'initialScrappableId': initialScrappableId}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue = await (_localCallContext.method.call(
@@ -260,7 +278,7 @@ class _PrivateApiUsageEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<List<_i6.CreditHistoryItem>> getCreditHistory(
+  _i3.Future<List<_i5.CreditHistoryItem>> getCreditHistory(
     _i1.TestSessionBuilder sessionBuilder, {
     required int offset,
     required int limit,
@@ -285,7 +303,7 @@ class _PrivateApiUsageEndpoint {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<List<_i6.CreditHistoryItem>>);
+        ) as _i3.Future<List<_i5.CreditHistoryItem>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -293,7 +311,7 @@ class _PrivateApiUsageEndpoint {
     });
   }
 
-  _i3.Future<_i7.AccountApiKey> createApiKey(
+  _i3.Future<_i6.AccountApiKey> createApiKey(
     _i1.TestSessionBuilder sessionBuilder, {
     required String name,
   }) async {
@@ -314,7 +332,7 @@ class _PrivateApiUsageEndpoint {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<_i7.AccountApiKey>);
+        ) as _i3.Future<_i6.AccountApiKey>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -351,7 +369,7 @@ class _PrivateApiUsageEndpoint {
     });
   }
 
-  _i3.Future<List<_i7.AccountApiKey>> getActiveApiKeys(
+  _i3.Future<List<_i6.AccountApiKey>> getActiveApiKeys(
       _i1.TestSessionBuilder sessionBuilder) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -370,7 +388,7 @@ class _PrivateApiUsageEndpoint {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<List<_i7.AccountApiKey>>);
+        ) as _i3.Future<List<_i6.AccountApiKey>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -405,7 +423,7 @@ class _PrivateApiUsageEndpoint {
     });
   }
 
-  _i3.Future<_i8.AccountApiUsage> getApiUsageInfo(
+  _i3.Future<_i7.AccountApiUsage> getApiUsageInfo(
       _i1.TestSessionBuilder sessionBuilder) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -424,7 +442,7 @@ class _PrivateApiUsageEndpoint {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<_i8.AccountApiUsage>);
+        ) as _i3.Future<_i7.AccountApiUsage>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -432,7 +450,7 @@ class _PrivateApiUsageEndpoint {
     });
   }
 
-  _i3.Future<_i9.ApiKeyResponse> getApiKeysWithStats(
+  _i3.Future<_i8.ApiKeyResponse> getApiKeysWithStats(
       _i1.TestSessionBuilder sessionBuilder) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -451,7 +469,7 @@ class _PrivateApiUsageEndpoint {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<_i9.ApiKeyResponse>);
+        ) as _i3.Future<_i8.ApiKeyResponse>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -461,7 +479,7 @@ class _PrivateApiUsageEndpoint {
 
   _i3.Future<String> createCreditPurchaseCheckout(
     _i1.TestSessionBuilder sessionBuilder, {
-    required _i10.CreditPurchaseOption creditPackage,
+    required _i9.CreditPurchaseOption creditPackage,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -499,7 +517,7 @@ class _PrivateCloneScrappableEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i5.Scrappable> cloneFromMarketplace(
+  _i3.Future<_i10.Scrappable> cloneFromMarketplace(
     _i1.TestSessionBuilder sessionBuilder, {
     required int scrappableId,
   }) async {
@@ -520,7 +538,7 @@ class _PrivateCloneScrappableEndpoint {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<_i5.Scrappable>);
+        ) as _i3.Future<_i10.Scrappable>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -540,22 +558,26 @@ class _PrivateScrappableAnalyticsEndpoint {
   final _i2.SerializationManager _serializationManager;
 
   _i3.Future<_i11.PaginatedScrappableRequestsAnalytics>
-      getScrappableAnalyticsOfTheLast12Hours(
+      getScrappableAnalyticsWithScope(
     _i1.TestSessionBuilder sessionBuilder, {
     required int page,
+    required _i12.AnalyticsTimeScope scope,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
         endpoint: 'privateScrappableAnalytics',
-        method: 'getScrappableAnalyticsOfTheLast12Hours',
+        method: 'getScrappableAnalyticsWithScope',
       );
       try {
         var _localCallContext = await _endpointDispatch.getMethodCallContext(
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'privateScrappableAnalytics',
-          methodName: 'getScrappableAnalyticsOfTheLast12Hours',
-          parameters: _i1.testObjectToJson({'page': page}),
+          methodName: 'getScrappableAnalyticsWithScope',
+          parameters: _i1.testObjectToJson({
+            'page': page,
+            'scope': scope,
+          }),
           serializationManager: _serializationManager,
         );
         var _localReturnValue = await (_localCallContext.method.call(
@@ -569,7 +591,7 @@ class _PrivateScrappableAnalyticsEndpoint {
     });
   }
 
-  _i3.Future<_i12.PaginatedScrappableAnalytics> getScrappableAnalytics(
+  _i3.Future<_i13.PaginatedScrappableAnalytics> getScrappableAnalytics(
     _i1.TestSessionBuilder sessionBuilder, {
     required int scrappableId,
     required int page,
@@ -594,7 +616,36 @@ class _PrivateScrappableAnalyticsEndpoint {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<_i12.PaginatedScrappableAnalytics>);
+        ) as _i3.Future<_i13.PaginatedScrappableAnalytics>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i14.ScrappableUsageMetrics> getScrappableUsageMetrics(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required int scrappableId,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'privateScrappableAnalytics',
+        method: 'getScrappableUsageMetrics',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'privateScrappableAnalytics',
+          methodName: 'getScrappableUsageMetrics',
+          parameters: _i1.testObjectToJson({'scrappableId': scrappableId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<_i14.ScrappableUsageMetrics>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -738,8 +789,12 @@ class _PrivateUserScrappablesEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<List<_i5.Scrappable>> call(
-      _i1.TestSessionBuilder sessionBuilder) async {
+  _i3.Future<_i15.UserPaginatedScrappableResponse> call(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required int page,
+    String? searchQuery,
+    List<_i16.ScraperCategory>? categories,
+  }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
@@ -751,13 +806,17 @@ class _PrivateUserScrappablesEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'privateUserScrappables',
           methodName: 'call',
-          parameters: _i1.testObjectToJson({}),
+          parameters: _i1.testObjectToJson({
+            'page': page,
+            'searchQuery': searchQuery,
+            'categories': categories,
+          }),
           serializationManager: _serializationManager,
         );
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<List<_i5.Scrappable>>);
+        ) as _i3.Future<_i15.UserPaginatedScrappableResponse>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -765,7 +824,7 @@ class _PrivateUserScrappablesEndpoint {
     });
   }
 
-  _i3.Future<_i5.Scrappable> getScrappableById(
+  _i3.Future<_i10.Scrappable> getScrappableById(
     _i1.TestSessionBuilder sessionBuilder,
     int scrappableId,
   ) async {
@@ -786,12 +845,55 @@ class _PrivateUserScrappablesEndpoint {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<_i5.Scrappable>);
+        ) as _i3.Future<_i10.Scrappable>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
       }
     });
+  }
+}
+
+class _CreateScrappableEndpoint {
+  _CreateScrappableEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Stream<_i10.Scrappable> call(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required String referenceLink,
+  }) {
+    var _localTestStreamManager = _i1.TestStreamManager<_i10.Scrappable>();
+    _i1.callStreamFunctionAndHandleExceptions(
+      () async {
+        var _localUniqueSession =
+            (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          endpoint: 'createScrappable',
+          method: 'call',
+        );
+        var _localCallContext =
+            await _endpointDispatch.getMethodStreamCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'createScrappable',
+          methodName: 'call',
+          arguments: {'referenceLink': referenceLink},
+          requestedInputStreams: [],
+          serializationManager: _serializationManager,
+        );
+        await _localTestStreamManager.callStreamMethod(
+          _localCallContext,
+          _localUniqueSession,
+          {},
+        );
+      },
+      _localTestStreamManager.outputStreamController,
+    );
+    return _localTestStreamManager.outputStreamController.stream;
   }
 }
 
@@ -835,46 +937,6 @@ class _DeleteScrappableEndpoint {
   }
 }
 
-class _DeployScrappable {
-  _DeployScrappable(
-    this._endpointDispatch,
-    this._serializationManager,
-  );
-
-  final _i2.EndpointDispatch _endpointDispatch;
-
-  final _i2.SerializationManager _serializationManager;
-
-  _i3.Future<void> call(
-    _i1.TestSessionBuilder sessionBuilder, {
-    required _i13.ReferenceTestData testData,
-  }) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
-      var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
-        endpoint: 'deployScrappable',
-        method: 'call',
-      );
-      try {
-        var _localCallContext = await _endpointDispatch.getMethodCallContext(
-          createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'deployScrappable',
-          methodName: 'call',
-          parameters: _i1.testObjectToJson({'testData': testData}),
-          serializationManager: _serializationManager,
-        );
-        var _localReturnValue = await (_localCallContext.method.call(
-          _localUniqueSession,
-          _localCallContext.arguments,
-        ) as _i3.Future<void>);
-        return _localReturnValue;
-      } finally {
-        await _localUniqueSession.close();
-      }
-    });
-  }
-}
-
 class _EditScrappableEndpoint {
   _EditScrappableEndpoint(
     this._endpointDispatch,
@@ -890,7 +952,7 @@ class _EditScrappableEndpoint {
     required int scrappableId,
     required String name,
     required String description,
-    _i14.ScraperCategory? category,
+    _i16.ScraperCategory? category,
     bool? willHideFromMarketplace,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
@@ -935,10 +997,11 @@ class _MarketplaceEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i15.PaginatedScrappableResponse> getItems(
+  _i3.Future<_i17.PaginatedScrappableResponse> getItems(
     _i1.TestSessionBuilder sessionBuilder, {
     required int page,
     String? searchQuery,
+    List<_i16.ScraperCategory>? categories,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -954,13 +1017,54 @@ class _MarketplaceEndpoint {
           parameters: _i1.testObjectToJson({
             'page': page,
             'searchQuery': searchQuery,
+            'categories': categories,
           }),
           serializationManager: _serializationManager,
         );
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<_i15.PaginatedScrappableResponse>);
+        ) as _i3.Future<_i17.PaginatedScrappableResponse>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _PublicScrappableEndpoint {
+  _PublicScrappableEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<_i18.ByteTestData?> getByteTestData(
+    _i1.TestSessionBuilder sessionBuilder,
+    int scrappableId,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'publicScrappable',
+        method: 'getByteTestData',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'publicScrappable',
+          methodName: 'getByteTestData',
+          parameters: _i1.testObjectToJson({'scrappableId': scrappableId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<_i18.ByteTestData?>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -983,7 +1087,7 @@ class _PublicTierEndpoint {
     _i1.TestSessionBuilder sessionBuilder, {
     required String email,
     required String tierManipulationKey,
-    required _i16.PlanTier planTier,
+    required _i19.PlanTier planTier,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1015,8 +1119,8 @@ class _PublicTierEndpoint {
   }
 }
 
-class _ScrappableApiEndpoint {
-  _ScrappableApiEndpoint(
+class _ScrappableChatSession {
+  _ScrappableChatSession(
     this._endpointDispatch,
     this._serializationManager,
   );
@@ -1025,34 +1129,28 @@ class _ScrappableApiEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<Map<String, dynamic>> prod(
+  _i3.Future<void> commitCurrentEditState(
     _i1.TestSessionBuilder sessionBuilder, {
-    required int scrappableId,
-    required String apiKey,
-    required Map<String, dynamic> payload,
+    required String sessionUuid,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
-        endpoint: 'scrappableApi',
-        method: 'prod',
+        endpoint: 'scrappableChatSession',
+        method: 'commitCurrentEditState',
       );
       try {
         var _localCallContext = await _endpointDispatch.getMethodCallContext(
           createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'scrappableApi',
-          methodName: 'prod',
-          parameters: _i1.testObjectToJson({
-            'scrappableId': scrappableId,
-            'apiKey': apiKey,
-            'payload': payload,
-          }),
+          endpointPath: 'scrappableChatSession',
+          methodName: 'commitCurrentEditState',
+          parameters: _i1.testObjectToJson({'sessionUuid': sessionUuid}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<Map<String, dynamic>>);
+        ) as _i3.Future<void>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1060,36 +1158,199 @@ class _ScrappableApiEndpoint {
     });
   }
 
-  _i3.Future<Map<String, dynamic>> test(
+  _i3.Future<void> disposeSession(
     _i1.TestSessionBuilder sessionBuilder, {
-    required int scrappableId,
-    required Map<String, dynamic> payload,
+    required String sessionId,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
-        endpoint: 'scrappableApi',
-        method: 'test',
+        endpoint: 'scrappableChatSession',
+        method: 'disposeSession',
       );
       try {
         var _localCallContext = await _endpointDispatch.getMethodCallContext(
           createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'scrappableApi',
-          methodName: 'test',
+          endpointPath: 'scrappableChatSession',
+          methodName: 'disposeSession',
+          parameters: _i1.testObjectToJson({'sessionId': sessionId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<void> updateScrappableRequest(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required int scrappableId,
+    required String url,
+    required List<String> pathParams,
+    required Map<String, String?> queryParams,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'scrappableChatSession',
+        method: 'updateScrappableRequest',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'scrappableChatSession',
+          methodName: 'updateScrappableRequest',
           parameters: _i1.testObjectToJson({
             'scrappableId': scrappableId,
-            'payload': payload,
+            'url': url,
+            'pathParams': pathParams,
+            'queryParams': queryParams,
           }),
           serializationManager: _serializationManager,
         );
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<Map<String, dynamic>>);
+        ) as _i3.Future<void>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
       }
     });
+  }
+
+  _i3.Future<_i20.CreateSessionResponse> createSession(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required int scrappableId,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'scrappableChatSession',
+        method: 'createSession',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'scrappableChatSession',
+          methodName: 'createSession',
+          parameters: _i1.testObjectToJson({'scrappableId': scrappableId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<_i20.CreateSessionResponse>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Stream<_i21.ChatResponse> listenToScrappableRedraftSession(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required String sessionUuid,
+  }) {
+    var _localTestStreamManager = _i1.TestStreamManager<_i21.ChatResponse>();
+    _i1.callStreamFunctionAndHandleExceptions(
+      () async {
+        var _localUniqueSession =
+            (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          endpoint: 'scrappableChatSession',
+          method: 'listenToScrappableRedraftSession',
+        );
+        var _localCallContext =
+            await _endpointDispatch.getMethodStreamCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'scrappableChatSession',
+          methodName: 'listenToScrappableRedraftSession',
+          arguments: {'sessionUuid': sessionUuid},
+          requestedInputStreams: [],
+          serializationManager: _serializationManager,
+        );
+        await _localTestStreamManager.callStreamMethod(
+          _localCallContext,
+          _localUniqueSession,
+          {},
+        );
+      },
+      _localTestStreamManager.outputStreamController,
+    );
+    return _localTestStreamManager.outputStreamController.stream;
+  }
+
+  _i3.Future<void> changeChatModel(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required String sessionUuid,
+    required _i22.AiModel aiModel,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'scrappableChatSession',
+        method: 'changeChatModel',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'scrappableChatSession',
+          methodName: 'changeChatModel',
+          parameters: _i1.testObjectToJson({
+            'sessionUuid': sessionUuid,
+            'aiModel': aiModel,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Stream<String> sendPromptMessage(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required String sessionId,
+    required String userPrompt,
+  }) {
+    var _localTestStreamManager = _i1.TestStreamManager<String>();
+    _i1.callStreamFunctionAndHandleExceptions(
+      () async {
+        var _localUniqueSession =
+            (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          endpoint: 'scrappableChatSession',
+          method: 'sendPromptMessage',
+        );
+        var _localCallContext =
+            await _endpointDispatch.getMethodStreamCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'scrappableChatSession',
+          methodName: 'sendPromptMessage',
+          arguments: {
+            'sessionId': sessionId,
+            'userPrompt': userPrompt,
+          },
+          requestedInputStreams: [],
+          serializationManager: _serializationManager,
+        );
+        await _localTestStreamManager.callStreamMethod(
+          _localCallContext,
+          _localUniqueSession,
+          {},
+        );
+      },
+      _localTestStreamManager.outputStreamController,
+    );
+    return _localTestStreamManager.outputStreamController.stream;
   }
 }

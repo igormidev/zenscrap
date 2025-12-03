@@ -37,14 +37,5 @@ Future<void> showErrorDialog(
     title: title,
     message: description,
     barrierDismissible: false,
-    // Add an error icon to the dialog
-    builder: (context, child) => Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const Icon(Icons.error, color: Colors.red, size: 48),
-        const SizedBox(height: 16),
-        child,
-      ],
-    ),
   );
 }

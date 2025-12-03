@@ -9,11 +9,12 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
   bool get requireLogin => true;
 
   Future<PaginatedScrappableRequestsAnalytics>
-      getScrappableAnalyticsOfTheLast12Hours(
+      getScrappableAnalyticsWithScope(
     Session session, {
     int page = 1,
+    AnalyticsTimeScope scope = AnalyticsTimeScope.last12Hours,
   }) async {
-    const int pageSize = 4; // Fixed page size
+    const int pageSize = 20; // Fixed page size
     final authenticationInfo = await session.authenticated;
     if (authenticationInfo == null) throw defaultAuthenticationException;
     final userId = authenticationInfo.userId;
@@ -28,26 +29,44 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
       );
     }
     final now = DateTime.now();
-    final targetDate = now.subtract(Duration(hours: 12));
 
-    // Get total count for pagination
+    // Calculate time scopes based on selected scope
+    final List<Duration> timeScopes;
+
+    switch (scope) {
+      case AnalyticsTimeScope.lastHour:
+        // 12 intervals of 5 minutes each
+        timeScopes = List.generate(12, (i) => Duration(minutes: 5 * (i + 1)));
+        break;
+      case AnalyticsTimeScope.last12Hours:
+        // 12 intervals of 1 hour each
+        timeScopes = List.generate(12, (i) => Duration(hours: i + 1));
+        break;
+      case AnalyticsTimeScope.last24Hours:
+        // 24 intervals of 1 hour each
+        timeScopes = List.generate(24, (i) => Duration(hours: i + 1));
+        break;
+      case AnalyticsTimeScope.last7Days:
+        // 7 intervals of 1 day each
+        timeScopes = List.generate(7, (i) => Duration(days: i + 1));
+        break;
+      case AnalyticsTimeScope.last30Days:
+        // 30 intervals of 1 day each
+        timeScopes = List.generate(30, (i) => Duration(days: i + 1));
+        break;
+    }
+
+    // Get total count of ALL scrappables for this account
     final totalCount = await Scrappable.db.count(
       session,
-      where: (t) =>
-          t.accountId.equals(accountInfo.id) &
-          t.scrappableAnalytics.any(
-            (p0) => p0.requestedAt >= targetDate,
-          ),
+      where: (t) => t.accountId.equals(accountInfo.id),
     );
 
     final offset = (page - 1) * pageSize;
+    // Get ALL scrappables, not just those with recent analytics
     final List<Scrappable> scrappables = await Scrappable.db.find(
       session,
-      where: (t) =>
-          t.accountId.equals(accountInfo.id) &
-          t.scrappableAnalytics.any(
-            (p0) => p0.requestedAt >= targetDate,
-          ),
+      where: (t) => t.accountId.equals(accountInfo.id),
       limit: pageSize,
       offset: offset,
       orderBy: (t) => t.id,
@@ -55,19 +74,19 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
     );
 
     final List<ScrappableRequestsAnalyticsItem> items = [];
-    final hoursScope = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
     for (final Scrappable scrappable in scrappables) {
-      final List<ScrappableRequestPerHour> data = [];
+      final List<ScrappableRequestPerTimeScope> data = [];
       int successTotalCount = 0;
       int clientErrorTotalCount = 0;
       int serverErrorTotalCount = 0;
       int insufficientCreditsTotalCount = 0;
       int maxConcurrencyExceededTotalCount = 0;
+      int failedAtScrappingBeeTotalCount = 0;
 
       DateTime end = now;
-      for (final int hour in hoursScope) {
-        final DateTime start = now.subtract(Duration(hours: hour));
+      for (final Duration duration in timeScopes) {
+        final DateTime start = now.subtract(duration);
         // Dwc stands for "Default where clause"
         dWC(ScrappableAnalyticsTable t, RequestStatus status) =>
             t.scrappableId.equals(scrappable.id) &
@@ -86,14 +105,18 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
         final maxConcurrencyExceededCount = await ScrappableAnalytics.db.count(
             session,
             where: (p0) => dWC(p0, RequestStatus.maxConcurrencyExceeded));
+        final failedAtScrappingBeeCount = await ScrappableAnalytics.db.count(
+            session,
+            where: (p0) => dWC(p0, RequestStatus.failedAtScrappingBee));
 
         successTotalCount += successCount;
         clientErrorTotalCount += clientErrorCount;
         serverErrorTotalCount += serverErrorCount;
         insufficientCreditsTotalCount += insufficientCreditsCount;
         maxConcurrencyExceededTotalCount += maxConcurrencyExceededCount;
+        failedAtScrappingBeeTotalCount += failedAtScrappingBeeCount;
 
-        data.add(ScrappableRequestPerHour(
+        data.add(ScrappableRequestPerTimeScope(
           start: start,
           end: end,
           successCount: successCount,
@@ -101,6 +124,7 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
           serverErrorCount: serverErrorCount,
           insufficientCreditsCount: insufficientCreditsCount,
           maxConcurrencyExceededCount: maxConcurrencyExceededCount,
+          failedAtScrappingBeeCount: failedAtScrappingBeeCount,
         ));
 
         end = start;
@@ -113,11 +137,13 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
         serverErrorTotalCount: serverErrorTotalCount,
         insufficientCreditsTotalCount: insufficientCreditsTotalCount,
         maxConcurrencyExceededTotalCount: maxConcurrencyExceededTotalCount,
+        failedAtScrappingBeeTotalCount: failedAtScrappingBeeTotalCount,
         data: data.reversed.toList(),
       ));
     }
 
     return PaginatedScrappableRequestsAnalytics(
+      scope: scope,
       items: items,
       hasNextPage: (offset + pageSize) < totalCount,
       totalCount: totalCount,
@@ -180,6 +206,7 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
       orderDescending: true,
       include: ScrappableAnalytics.include(
         scrappable: Scrappable.include(),
+        details: AnalyticsRequestDetails.include(),
       ),
     );
 
@@ -190,6 +217,62 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
       totalCount: totalCount,
       currentPage: page,
       pageSize: pageSize,
+    );
+  }
+
+  /// Get usage metrics for a scrappable in the last 30 days
+  /// This includes ALL requests from ANY user who called this scrappable
+  Future<ScrappableUsageMetrics> getScrappableUsageMetrics(
+    Session session, {
+    required int scrappableId,
+  }) async {
+    // Verify scrappable exists
+    final scrappable = await Scrappable.db.findById(session, scrappableId);
+    if (scrappable == null) {
+      throw ZenScrapException(
+        title: 'Scrappable Not Found',
+        description: 'The requested scrappable was not found.',
+      );
+    }
+
+    final now = DateTime.now();
+    final thirtyDaysAgo = now.subtract(const Duration(days: 30));
+
+    // Count success requests (from ANY user)
+    final successCount = await ScrappableAnalytics.db.count(
+      session,
+      where: (t) =>
+          t.scrappableId.equals(scrappableId) &
+          t.requestedAt.between(thirtyDaysAgo, now) &
+          t.requestStatus.equals(RequestStatus.success),
+    );
+
+    // Count server error (5xx) requests (from ANY user)
+    final serverErrorCount = await ScrappableAnalytics.db.count(
+      session,
+      where: (t) =>
+          t.scrappableId.equals(scrappableId) &
+          t.requestedAt.between(thirtyDaysAgo, now) &
+          t.requestStatus.equals(RequestStatus.serverError),
+    );
+
+    // Count ScrapingBee error requests (from ANY user)
+    final scrappingBeeErrorCount = await ScrappableAnalytics.db.count(
+      session,
+      where: (t) =>
+          t.scrappableId.equals(scrappableId) &
+          t.requestedAt.between(thirtyDaysAgo, now) &
+          t.requestStatus.equals(RequestStatus.failedAtScrappingBee),
+    );
+
+    // Total error count includes both server errors and ScrapingBee errors
+    final errorCount = serverErrorCount + scrappingBeeErrorCount;
+    final totalCount = successCount + errorCount;
+
+    return ScrappableUsageMetrics(
+      successCount: successCount,
+      errorCount: errorCount,
+      totalCount: totalCount,
     );
   }
 }

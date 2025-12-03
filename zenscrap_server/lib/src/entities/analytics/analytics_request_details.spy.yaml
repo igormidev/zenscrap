@@ -1,0 +1,12 @@
+class: AnalyticsRequestDetails
+table: analytics_request_details
+fields:
+  timeStamp: DateTime, default=now
+  title: String?
+  description: String?
+  errorObjectAsString: String?
+  errorStackTraceAsString: String?
+  stringifiedPayload: String
+indexes:
+  analytics_request_details_timestamp_idx:
+    fields: timeStamp

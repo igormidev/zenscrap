@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 
-class CreditHistoryList extends StatelessWidget {
+class CreditHistoryList extends ConsumerWidget {
   final List<CreditHistoryItem> creditHistory;
   final bool isLoadingMore;
   final VoidCallback onLoadMore;
@@ -16,12 +18,13 @@ class CreditHistoryList extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (creditHistory.isEmpty) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(32),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 Icons.history,
@@ -70,7 +73,16 @@ class CreditHistoryList extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: OutlinedButton(
-              onPressed: isLoadingMore ? null : onLoadMore,
+              onPressed: isLoadingMore
+                  ? null
+                  : () {
+                      // Track load more history click
+                      ref.read(analyticsServiceProvider).trackApiUsageLoadMoreHistoryClick(
+                        currentCount: creditHistory.length,
+                        hasMore: true,
+                      );
+                      onLoadMore();
+                    },
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
@@ -123,8 +135,11 @@ class CreditHistoryList extends StatelessWidget {
     if (isSubscription) {
       icon = Icons.calendar_month;
       final deposit = item.monthlySubscriptionCreditDeposit!;
+      final planName = deposit.planTier == PlanTier.none
+          ? 'Free'
+          : deposit.planTier.name.toUpperCase();
       title = 'Monthly Subscription';
-      subtitle = '${deposit.planTier.name.toUpperCase()} plan • $dateStr';
+      subtitle = '$planName plan • $dateStr';
       color = context.c.primary;
       amount = '+${deposit.creditsAmount}';
     } else if (isPurchase) {

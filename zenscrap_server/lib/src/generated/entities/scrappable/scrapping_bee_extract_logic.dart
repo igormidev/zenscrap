@@ -27,6 +27,7 @@ abstract class ScrappingBeeExtractLogic
     this.waitFor,
     this.waitBrowser,
     required this.premiumProxy,
+    required this.stealthProxy,
     this.countryCode,
     this.sessionId,
     this.customGoogle,
@@ -43,6 +44,7 @@ abstract class ScrappingBeeExtractLogic
     String? waitFor,
     String? waitBrowser,
     required bool premiumProxy,
+    required bool stealthProxy,
     String? countryCode,
     String? sessionId,
     bool? customGoogle,
@@ -64,6 +66,7 @@ abstract class ScrappingBeeExtractLogic
       waitFor: jsonSerialization['waitFor'] as String?,
       waitBrowser: jsonSerialization['waitBrowser'] as String?,
       premiumProxy: jsonSerialization['premiumProxy'] as bool,
+      stealthProxy: jsonSerialization['stealthProxy'] as bool,
       countryCode: jsonSerialization['countryCode'] as String?,
       sessionId: jsonSerialization['sessionId'] as String?,
       customGoogle: jsonSerialization['customGoogle'] as bool?,
@@ -95,6 +98,8 @@ abstract class ScrappingBeeExtractLogic
 
   bool premiumProxy;
 
+  bool stealthProxy;
+
   String? countryCode;
 
   String? sessionId;
@@ -118,6 +123,7 @@ abstract class ScrappingBeeExtractLogic
     String? waitFor,
     String? waitBrowser,
     bool? premiumProxy,
+    bool? stealthProxy,
     String? countryCode,
     String? sessionId,
     bool? customGoogle,
@@ -135,6 +141,7 @@ abstract class ScrappingBeeExtractLogic
       if (waitFor != null) 'waitFor': waitFor,
       if (waitBrowser != null) 'waitBrowser': waitBrowser,
       'premiumProxy': premiumProxy,
+      'stealthProxy': stealthProxy,
       if (countryCode != null) 'countryCode': countryCode,
       if (sessionId != null) 'sessionId': sessionId,
       if (customGoogle != null) 'customGoogle': customGoogle,
@@ -154,6 +161,7 @@ abstract class ScrappingBeeExtractLogic
       if (waitFor != null) 'waitFor': waitFor,
       if (waitBrowser != null) 'waitBrowser': waitBrowser,
       'premiumProxy': premiumProxy,
+      'stealthProxy': stealthProxy,
       if (countryCode != null) 'countryCode': countryCode,
       if (sessionId != null) 'sessionId': sessionId,
       if (customGoogle != null) 'customGoogle': customGoogle,
@@ -205,6 +213,7 @@ class _ScrappingBeeExtractLogicImpl extends ScrappingBeeExtractLogic {
     String? waitFor,
     String? waitBrowser,
     required bool premiumProxy,
+    required bool stealthProxy,
     String? countryCode,
     String? sessionId,
     bool? customGoogle,
@@ -219,6 +228,7 @@ class _ScrappingBeeExtractLogicImpl extends ScrappingBeeExtractLogic {
           waitFor: waitFor,
           waitBrowser: waitBrowser,
           premiumProxy: premiumProxy,
+          stealthProxy: stealthProxy,
           countryCode: countryCode,
           sessionId: sessionId,
           customGoogle: customGoogle,
@@ -239,6 +249,7 @@ class _ScrappingBeeExtractLogicImpl extends ScrappingBeeExtractLogic {
     Object? waitFor = _Undefined,
     Object? waitBrowser = _Undefined,
     bool? premiumProxy,
+    bool? stealthProxy,
     Object? countryCode = _Undefined,
     Object? sessionId = _Undefined,
     Object? customGoogle = _Undefined,
@@ -256,6 +267,7 @@ class _ScrappingBeeExtractLogicImpl extends ScrappingBeeExtractLogic {
       waitFor: waitFor is String? ? waitFor : this.waitFor,
       waitBrowser: waitBrowser is String? ? waitBrowser : this.waitBrowser,
       premiumProxy: premiumProxy ?? this.premiumProxy,
+      stealthProxy: stealthProxy ?? this.stealthProxy,
       countryCode: countryCode is String? ? countryCode : this.countryCode,
       sessionId: sessionId is String? ? sessionId : this.sessionId,
       customGoogle: customGoogle is bool? ? customGoogle : this.customGoogle,
@@ -298,6 +310,10 @@ class ScrappingBeeExtractLogicTable extends _i1.Table<int?> {
       'premiumProxy',
       this,
     );
+    stealthProxy = _i1.ColumnBool(
+      'stealthProxy',
+      this,
+    );
     countryCode = _i1.ColumnString(
       'countryCode',
       this,
@@ -330,6 +346,8 @@ class ScrappingBeeExtractLogicTable extends _i1.Table<int?> {
 
   late final _i1.ColumnBool premiumProxy;
 
+  late final _i1.ColumnBool stealthProxy;
+
   late final _i1.ColumnString countryCode;
 
   late final _i1.ColumnString sessionId;
@@ -360,6 +378,7 @@ class ScrappingBeeExtractLogicTable extends _i1.Table<int?> {
         waitFor,
         waitBrowser,
         premiumProxy,
+        stealthProxy,
         countryCode,
         sessionId,
         customGoogle,

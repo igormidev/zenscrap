@@ -1,0 +1,235 @@
+{
+  "actions": [
+    {
+      "type": "deleteTable",
+      "deleteTable": "scrappable_test_result"
+    },
+    {
+      "type": "alterTable",
+      "alterTable": {
+        "name": "scrappable",
+        "schema": "public",
+        "addColumns": [],
+        "deleteColumns": [
+          "scrappingRules"
+        ],
+        "modifyColumns": [],
+        "addIndexes": [],
+        "deleteIndexes": [],
+        "addForeignKeys": [],
+        "deleteForeignKeys": [],
+        "warnings": [
+          {
+            "type": "tableDropped",
+            "message": "Table \"scrappable_test_result\" will be dropped.",
+            "table": "scrappable_test_result",
+            "columns": [],
+            "destrucive": true
+          },
+          {
+            "type": "columnDropped",
+            "message": "Column \"scrappingRules\" of table \"scrappable\" will be dropped.",
+            "table": "scrappable",
+            "columns": [
+              "scrappingRules"
+            ],
+            "destrucive": true
+          }
+        ]
+      }
+    },
+    {
+      "type": "alterTable",
+      "alterTable": {
+        "name": "scrappable_test_data",
+        "schema": "public",
+        "addColumns": [
+          {
+            "name": "scrapResultJson",
+            "columnType": 0,
+            "isNullable": true,
+            "dartType": "String?"
+          }
+        ],
+        "deleteColumns": [],
+        "modifyColumns": [
+          {
+            "columnName": "byteDataId",
+            "addNullable": true,
+            "removeNullable": false,
+            "changeDefault": false
+          }
+        ],
+        "addIndexes": [],
+        "deleteIndexes": [
+          "reference_test_data_byte_data_id_idx"
+        ],
+        "addForeignKeys": [],
+        "deleteForeignKeys": [],
+        "warnings": [
+          {
+            "type": "tableDropped",
+            "message": "Table \"scrappable_test_result\" will be dropped.",
+            "table": "scrappable_test_result",
+            "columns": [],
+            "destrucive": true
+          },
+          {
+            "type": "columnDropped",
+            "message": "Column \"scrappingRules\" of table \"scrappable\" will be dropped.",
+            "table": "scrappable",
+            "columns": [
+              "scrappingRules"
+            ],
+            "destrucive": true
+          }
+        ]
+      }
+    },
+    {
+      "type": "createTable",
+      "createTable": {
+        "name": "scrapping_bee_extract_logic",
+        "dartName": "ScrappingBeeExtractLogic",
+        "module": "zenscrap",
+        "schema": "public",
+        "columns": [
+          {
+            "name": "id",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "nextval('scrapping_bee_extract_logic_id_seq'::regclass)",
+            "dartType": "int?"
+          },
+          {
+            "name": "scrappableId",
+            "columnType": 6,
+            "isNullable": true,
+            "dartType": "int?"
+          },
+          {
+            "name": "extractRules",
+            "columnType": 0,
+            "isNullable": false,
+            "dartType": "String"
+          },
+          {
+            "name": "jsScenario",
+            "columnType": 0,
+            "isNullable": true,
+            "dartType": "String?"
+          },
+          {
+            "name": "renderJs",
+            "columnType": 1,
+            "isNullable": false,
+            "dartType": "bool"
+          },
+          {
+            "name": "wait",
+            "columnType": 6,
+            "isNullable": true,
+            "dartType": "int?"
+          },
+          {
+            "name": "waitFor",
+            "columnType": 0,
+            "isNullable": true,
+            "dartType": "String?"
+          },
+          {
+            "name": "waitBrowser",
+            "columnType": 0,
+            "isNullable": true,
+            "dartType": "String?"
+          },
+          {
+            "name": "premiumProxy",
+            "columnType": 1,
+            "isNullable": false,
+            "dartType": "bool"
+          },
+          {
+            "name": "countryCode",
+            "columnType": 0,
+            "isNullable": true,
+            "dartType": "String?"
+          },
+          {
+            "name": "sessionId",
+            "columnType": 0,
+            "isNullable": true,
+            "dartType": "String?"
+          },
+          {
+            "name": "customGoogle",
+            "columnType": 1,
+            "isNullable": true,
+            "dartType": "bool?"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "constraintName": "scrapping_bee_extract_logic_fk_0",
+            "columns": [
+              "scrappableId"
+            ],
+            "referenceTable": "scrappable",
+            "referenceTableSchema": "public",
+            "referenceColumns": [
+              "id"
+            ],
+            "onUpdate": 3,
+            "onDelete": 4
+          }
+        ],
+        "indexes": [
+          {
+            "indexName": "scrapping_bee_extract_logic_pkey",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "id"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": true
+          },
+          {
+            "indexName": "scrappable_id_idx",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "scrappableId"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": false
+          }
+        ],
+        "managed": true
+      }
+    }
+  ],
+  "warnings": [
+    {
+      "type": "tableDropped",
+      "message": "Table \"scrappable_test_result\" will be dropped.",
+      "table": "scrappable_test_result",
+      "columns": [],
+      "destrucive": true
+    },
+    {
+      "type": "columnDropped",
+      "message": "Column \"scrappingRules\" of table \"scrappable\" will be dropped.",
+      "table": "scrappable",
+      "columns": [
+        "scrappingRules"
+      ],
+      "destrucive": true
+    }
+  ],
+  "migrationApiVersion": 1
+}

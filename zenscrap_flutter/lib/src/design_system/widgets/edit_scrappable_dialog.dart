@@ -11,19 +11,23 @@ import 'package:zenscrap_flutter/src/core/mixins/edit_scrappable.dart';
 import 'package:zenscrap_flutter/src/design_system/default_error_snackbar.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
+import 'package:zenscrap_flutter/src/design_system/widgets/scrapping_bee_cost_table.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_state.dart';
-import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables.dart';
+import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables_provider.dart';
 import 'package:zenscrap_flutter/src/ui/marketplace/dialogs/upgrade_plan_dialog.dart';
 
 class EditScrappableDialog extends ConsumerStatefulWidget {
+  final bool willDisplayHideFromMarketplaceToggle;
   final bool willHaveOrOptions;
   final Scrappable scrappable;
 
   const EditScrappableDialog({
     super.key,
+    this.willDisplayHideFromMarketplaceToggle = false,
     required this.scrappable,
     required this.willHaveOrOptions,
   });
@@ -39,6 +43,18 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
   final ValueNotifier<bool> _isDeleting = ValueNotifier<bool>(false);
 
   @override
+  void initState() {
+    super.initState();
+    // Track dialog view
+    if (widget.scrappable.id != null) {
+      ref.read(analyticsServiceProvider).trackEditScrappableDialogView(
+        scrappableId: widget.scrappable.id!,
+        scrappableName: widget.scrappable.name,
+      );
+    }
+  }
+
+  @override
   void dispose() {
     _hasChangesVN.dispose();
     _isDeleting.dispose();
@@ -46,6 +62,14 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
   }
 
   Future<void> _handleDelete() async {
+    // Track delete button click
+    if (widget.scrappable.id != null) {
+      ref.read(analyticsServiceProvider).trackEditScrappableDeleteClick(
+        scrappableId: widget.scrappable.id!,
+        scrappableName: widget.scrappable.name,
+      );
+    }
+
     // Show confirmation dialog
     final shouldDelete = await showDialog<bool>(
       context: context,
@@ -55,7 +79,15 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
             'Are you sure you want to delete "${widget.scrappable.name}"? This action cannot be undone.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
+            onPressed: () {
+              // Track delete cancel
+              if (widget.scrappable.id != null) {
+                ref.read(analyticsServiceProvider).trackEditScrappableDeleteCancel(
+                  scrappableId: widget.scrappable.id!,
+                );
+              }
+              Navigator.of(dialogContext).pop(false);
+            },
             child: Text('Cancel'),
           ),
           FilledButton(
@@ -70,6 +102,14 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
     );
 
     if (shouldDelete != true) return;
+
+    // Track delete confirm
+    if (widget.scrappable.id != null) {
+      ref.read(analyticsServiceProvider).trackEditScrappableDeleteConfirm(
+        scrappableId: widget.scrappable.id!,
+        scrappableName: widget.scrappable.name,
+      );
+    }
 
     _isDeleting.value = true;
     try {
@@ -100,8 +140,16 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
 
     return result.fold(
       (success) {
+        // Track delete success
+        if (widget.scrappable.id != null) {
+          ref.read(analyticsServiceProvider).trackEditScrappableDeleteSuccess(
+            scrappableId: widget.scrappable.id!,
+            scrappableName: widget.scrappable.name,
+          );
+        }
+
         // Refresh the scrappables list
-        unawaited(ref.read(userScrappables.notifier).getScrappables());
+        unawaited(ref.read(userScrappablesProvider.notifier).getScrappables());
         if (context.mounted) {
           showSnackbar(
             context,
@@ -111,6 +159,14 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
         return success;
       },
       (error) {
+        // Track delete failure
+        if (widget.scrappable.id != null) {
+          ref.read(analyticsServiceProvider).trackEditScrappableDeleteFailure(
+            scrappableId: widget.scrappable.id!,
+            errorMessage: error.title,
+          );
+        }
+
         if (context.mounted) {
           handleBabelException(context, error);
         }
@@ -124,7 +180,7 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 500),
+        constraints: const BoxConstraints(maxWidth: 500, maxHeight: 650),
         decoration: BoxDecoration(
           color: context.c.surface,
           borderRadius: BorderRadius.circular(28),
@@ -185,7 +241,16 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
                     ),
                   ),
                   IconButton(
-                    onPressed: () => Navigator.of(context).pop(),
+                    onPressed: () {
+                      // Track dialog close
+                      if (widget.scrappable.id != null) {
+                        ref.read(analyticsServiceProvider).trackEditScrappableDialogClose(
+                          scrappableId: widget.scrappable.id!,
+                          hadUnsavedChanges: _hasChangesVN.value,
+                        );
+                      }
+                      Navigator.of(context).pop();
+                    },
                     icon: Icon(
                       Icons.close,
                       color: context.c.onPrimaryContainer.withAlpha(180),
@@ -195,49 +260,57 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
               ),
             ).animate().fadeIn(duration: 200.ms).slideY(begin: -0.1, end: 0),
 
-            ScrappableEditForm(
-              key: ValueKey('edit_form_${widget.scrappable.id}'),
-              scrappable: widget.scrappable,
-              onSave:
-                  (name, description, category, willHideFromMarketplace) async {
-                return onEditScrappable(
-                  widget.scrappable,
-                  name,
-                  description,
-                  category,
-                  willHideFromMarketplace,
-                  () {
-                    unawaited(
-                        ref.read(userScrappables.notifier).getScrappables());
-                    // Update the scrappable in the state provider
-                    ref
-                        .read(scrapChatProvider.notifier)
-                        .updateScrappableDetails(
-                          name: name,
-                          description: description,
-                          category: category,
-                        );
-                  },
-                );
-              },
-              shouldPopOnEnd: true,
-              onHasChangesUpdated: (hasChanges) =>
-                  _hasChangesVN.value = hasChanges,
-              children: [
-                Builder(
-                  builder: (context) {
-                    // Get the form state to access the setWillHideFromMarketplace method
-                    final formState = context
-                        .findAncestorStateOfType<_ScrappableEditFormState>();
-                    if (formState == null) return const SizedBox.shrink();
+            Flexible(
+              child: ScrappableEditForm(
+                shouldPopOnEnd: true,
+                key: ValueKey('edit_form_${widget.scrappable.id}'),
+                scrappable: widget.scrappable,
+                onSave: (name, description, category,
+                    willHideFromMarketplace) async {
+                  return onEditScrappable(
+                    widget.scrappable,
+                    name,
+                    description,
+                    category,
+                    willHideFromMarketplace,
+                    () {
+                      unawaited(ref
+                          .read(userScrappablesProvider.notifier)
+                          .getScrappables());
+                      // Update the scrappable in the state provider
+                      ref
+                          .read(scrapChatProvider.notifier)
+                          .updateScrappableDetails(
+                            name: name,
+                            description: description,
+                            category: category,
+                          );
+                    },
+                  );
+                },
+                onHasChangesUpdated: (hasChanges) =>
+                    _hasChangesVN.value = hasChanges,
+                children: widget.willDisplayHideFromMarketplaceToggle
+                    ? [
+                        Builder(
+                          builder: (context) {
+                            // Get the form state to access the setWillHideFromMarketplace method
+                            final formState = context.findAncestorStateOfType<
+                                _ScrappableEditFormState>();
+                            if (formState == null) {
+                              return const SizedBox.shrink();
+                            }
 
-                    return HideFromMarketplaceToggle(
-                      initialValue: widget.scrappable.willHideFromMarketplace,
-                      onChanged: formState.setWillHideFromMarketplace,
-                    );
-                  },
-                ),
-              ],
+                            return HideFromMarketplaceToggle(
+                              initialValue:
+                                  widget.scrappable.willHideFromMarketplace,
+                              onChanged: formState.setWillHideFromMarketplace,
+                            );
+                          },
+                        ),
+                      ]
+                    : const [],
+              ),
             ),
             if (widget.willHaveOrOptions) ...[
               Transform.translate(
@@ -289,6 +362,14 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
                         onPressed: hasChanges
                             ? null
                             : () async {
+                                // Track edit extract logic click
+                                if (widget.scrappable.id != null) {
+                                  ref.read(analyticsServiceProvider).trackEditScrappableEditExtractLogicClick(
+                                    scrappableId: widget.scrappable.id!,
+                                    scrappableName: widget.scrappable.name,
+                                  );
+                                }
+
                                 ref.read(scrapChatProvider.notifier).reset();
                                 final router = GoRouter.of(context);
                                 final didChange = await router.push(
@@ -297,9 +378,13 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
 
                                 if (didChange == true) {
                                   unawaited(ref
-                                      .read(userScrappables.notifier)
+                                      .read(userScrappablesProvider.notifier)
                                       .getScrappables());
                                 }
+
+                                ref
+                                    .read(scrapChatProvider.notifier)
+                                    .endSession();
                                 if (context.mounted) Navigator.pop(context);
                               },
                         child: Text('Edit scrapper extract logic'),
@@ -403,6 +488,17 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
   Future<void> _handleSave() async {
     if (!_hasChanges || _isLoading) return;
 
+    // Track save click with details about what changed
+    if (widget.scrappable.id != null) {
+      context.findAncestorStateOfType<_EditScrappableDialogState>()?.ref.read(analyticsServiceProvider).trackEditScrappableSaveClick(
+        scrappableId: widget.scrappable.id!,
+        hasNameChange: _nameController.text != _initialName,
+        hasDescriptionChange: _descriptionController.text != _initialDescription,
+        hasCategoryChange: _selectedCategory != _initialCategory,
+        hasMarketplaceVisibilityChange: _willHideFromMarketplace != _initialWillHideFromMarketplace,
+      );
+    }
+
     setState(() {
       _isLoading = true;
     });
@@ -419,6 +515,14 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
       );
 
       if (success && mounted) {
+        // Track save success
+        if (widget.scrappable.id != null) {
+          context.findAncestorStateOfType<_EditScrappableDialogState>()?.ref.read(analyticsServiceProvider).trackEditScrappableSaveSuccess(
+            scrappableId: widget.scrappable.id!,
+            scrappableName: _nameController.text.trim(),
+          );
+        }
+
         if (widget.shouldPopOnEnd) {
           context.pop(true);
         } else {
@@ -427,12 +531,28 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
           });
         }
       } else if (mounted) {
+        // Track save failure
+        if (widget.scrappable.id != null) {
+          context.findAncestorStateOfType<_EditScrappableDialogState>()?.ref.read(analyticsServiceProvider).trackEditScrappableSaveFailure(
+            scrappableId: widget.scrappable.id!,
+            errorMessage: 'Failed to update scrappable',
+          );
+        }
+
         showErrorSnackbar(
           context,
           'Failed to update scrappable',
         );
       }
     } catch (e) {
+      // Track save failure
+      if (widget.scrappable.id != null && mounted) {
+        context.findAncestorStateOfType<_EditScrappableDialogState>()?.ref.read(analyticsServiceProvider).trackEditScrappableSaveFailure(
+          scrappableId: widget.scrappable.id!,
+          errorMessage: e.toString(),
+        );
+      }
+
       if (mounted) {
         showErrorSnackbar(context, 'Error: ${e.toString()}');
       }
@@ -447,248 +567,281 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      shrinkWrap: widget.shouldPopOnEnd ? true : false,
+    final actionButton = FilledButton.icon(
+      onPressed: _hasChanges && !_isLoading ? _handleSave : null,
+      style: FilledButton.styleFrom(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        backgroundColor: context.c.primary,
+        disabledBackgroundColor: context.c.surfaceContainerHighest,
+      ),
+      icon: _isLoading
+          ? SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  context.c.onSurfaceVariant,
+                ),
+              ),
+            )
+          : Icon(
+              Icons.save_rounded,
+              color: _hasChanges
+                  ? context.c.onPrimary
+                  : context.c.onSurfaceVariant,
+            ),
+      label: Text(
+        _isLoading ? 'Saving...' : 'Save Changes',
+        style: context.t.labelLarge?.copyWith(
+          color: _hasChanges ? context.c.onPrimary : context.c.onSurfaceVariant,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.1, end: 0);
+    return Stack(
       children: [
-        // Content
-        Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Name Field
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        ListView(
+          shrinkWrap: widget.shouldPopOnEnd ? true : false,
+          children: [
+            // Content
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    'Name',
-                    style: context.t.labelLarge?.copyWith(
-                      color: context.c.onSurface,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  TextFormField(
-                    controller: _nameController,
-                    enabled: !_isLoading,
-                    maxLines: 1,
-                    maxLength: 50,
-                    buildCounter: (context,
-                        {required currentLength,
-                        required isFocused,
-                        maxLength}) {
-                      return Text(
-                        '$currentLength/$maxLength',
-                        style: context.t.labelSmall?.copyWith(
-                          color: currentLength > maxLength!
-                              ? context.c.error
-                              : context.c.onSurfaceVariant.withAlpha(150),
-                        ),
-                      );
-                    },
-                    decoration: InputDecoration(
-                      hintText: 'Enter scrappable name',
-                      filled: true,
-                      fillColor:
-                          context.c.surfaceContainerHighest.withAlpha(100),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: context.c.outline.withAlpha(50),
+                  // Name Field
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Name',
+                        style: context.t.labelLarge?.copyWith(
+                          color: context.c.onSurface,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: context.c.primary,
-                          width: 2,
-                        ),
-                      ),
-                      prefixIcon: Icon(
-                        Icons.label_outline_rounded,
-                        color: context.c.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
-                ],
-              ).animate().fadeIn(delay: 100.ms).slideX(begin: -0.1, end: 0),
-
-              // Category Field
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Category',
-                    style: context.t.labelLarge?.copyWith(
-                      color: context.c.onSurface,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  InkWell(
-                    onTap: _isLoading
-                        ? null
-                        : () => _showCategorySelectionDialog(),
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: context.c.surfaceContainerHighest.withAlpha(100),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: context.c.outline.withAlpha(50),
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            _selectedCategory?.icon ?? _initialCategory.icon,
-                            color: context.c.onSurfaceVariant,
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: _nameController,
+                        enabled: !_isLoading,
+                        maxLines: 1,
+                        maxLength: 50,
+                        buildCounter: (context,
+                            {required currentLength,
+                            required isFocused,
+                            maxLength}) {
+                          return Text(
+                            '$currentLength/$maxLength',
+                            style: context.t.labelSmall?.copyWith(
+                              color: currentLength > maxLength!
+                                  ? context.c.error
+                                  : context.c.onSurfaceVariant.withAlpha(150),
+                            ),
+                          );
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Enter scrappable name',
+                          filled: true,
+                          fillColor:
+                              context.c.surfaceContainerHighest.withAlpha(100),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              _selectedCategory!.displayName,
-                              style: context.t.bodyLarge?.copyWith(
-                                color: context.c.onSurface,
-                              ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: context.c.outline.withAlpha(50),
                             ),
                           ),
-                          Icon(
-                            Icons.arrow_drop_down_rounded,
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: context.c.primary,
+                              width: 2,
+                            ),
+                          ),
+                          prefixIcon: Icon(
+                            Icons.label_outline_rounded,
                             color: context.c.onSurfaceVariant,
                           ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
-                ],
-              ).animate().fadeIn(delay: 150.ms).slideX(begin: -0.1, end: 0),
+                    ],
+                  ).animate().fadeIn(delay: 100.ms).slideX(begin: -0.1, end: 0),
 
-              const SizedBox(height: 20),
-
-              // Description Field
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Description',
-                    style: context.t.labelLarge?.copyWith(
-                      color: context.c.onSurface,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  TextFormField(
-                    controller: _descriptionController,
-                    enabled: !_isLoading,
-                    maxLines: 4,
-                    maxLength: 220,
-                    buildCounter: (context,
-                        {required currentLength,
-                        required isFocused,
-                        maxLength}) {
-                      return Text(
-                        '$currentLength/$maxLength',
-                        style: context.t.labelSmall?.copyWith(
-                          color: currentLength > maxLength!
-                              ? context.c.error
-                              : context.c.onSurfaceVariant.withAlpha(150),
+                  // Category Field
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Category',
+                        style: context.t.labelLarge?.copyWith(
+                          color: context.c.onSurface,
+                          fontWeight: FontWeight.w500,
                         ),
-                      );
-                    },
-                    decoration: InputDecoration(
-                      hintText: 'Enter scrappable description',
-                      filled: true,
-                      fillColor:
-                          context.c.surfaceContainerHighest.withAlpha(100),
-                      border: OutlineInputBorder(
+                      ),
+                      const SizedBox(height: 8),
+                      InkWell(
+                        onTap: _isLoading
+                            ? null
+                            : () => _showCategorySelectionDialog(),
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: context.c.outline.withAlpha(50),
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: context.c.primary,
-                          width: 2,
-                        ),
-                      ),
-                      prefixIcon: Padding(
-                        padding: const EdgeInsets.only(bottom: 60),
-                        child: Icon(
-                          Icons.description_outlined,
-                          color: context.c.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ).animate().fadeIn(delay: 200.ms).slideX(begin: -0.1, end: 0),
-
-              ...widget.children.map(
-                (child) => child
-                    .animate()
-                    .fadeIn(delay: 200.ms)
-                    .slideX(begin: -0.1, end: 0),
-              ),
-              SizedBox(height: 16),
-              // Action Buttons
-              FilledButton.icon(
-                onPressed: _hasChanges && !_isLoading ? _handleSave : null,
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  backgroundColor: context.c.primary,
-                  disabledBackgroundColor: context.c.surfaceContainerHighest,
-                ),
-                icon: _isLoading
-                    ? SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            context.c.onSurfaceVariant,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
+                          decoration: BoxDecoration(
+                            color: context.c.surfaceContainerHighest
+                                .withAlpha(100),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: context.c.outline.withAlpha(50),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                _selectedCategory?.icon ??
+                                    _initialCategory.icon,
+                                color: context.c.onSurfaceVariant,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  _selectedCategory!.displayName,
+                                  style: context.t.bodyLarge?.copyWith(
+                                    color: context.c.onSurface,
+                                  ),
+                                ),
+                              ),
+                              Icon(
+                                Icons.arrow_drop_down_rounded,
+                                color: context.c.onSurfaceVariant,
+                              ),
+                            ],
                           ),
                         ),
-                      )
-                    : Icon(
-                        Icons.save_rounded,
-                        color: _hasChanges
-                            ? context.c.onPrimary
-                            : context.c.onSurfaceVariant,
                       ),
-                label: Text(
-                  _isLoading ? 'Saving...' : 'Save Changes',
-                  style: context.t.labelLarge?.copyWith(
-                    color: _hasChanges
-                        ? context.c.onPrimary
-                        : context.c.onSurfaceVariant,
-                    fontWeight: FontWeight.w600,
+                    ],
+                  ).animate().fadeIn(delay: 150.ms).slideX(begin: -0.1, end: 0),
+
+                  const SizedBox(height: 20),
+
+                  // Description Field
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Description',
+                        style: context.t.labelLarge?.copyWith(
+                          color: context.c.onSurface,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: _descriptionController,
+                        enabled: !_isLoading,
+                        maxLines: 4,
+                        maxLength: 220,
+                        buildCounter: (context,
+                            {required currentLength,
+                            required isFocused,
+                            maxLength}) {
+                          return Text(
+                            '$currentLength/$maxLength',
+                            style: context.t.labelSmall?.copyWith(
+                              color: currentLength > maxLength!
+                                  ? context.c.error
+                                  : context.c.onSurfaceVariant.withAlpha(150),
+                            ),
+                          );
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Enter scrappable description',
+                          filled: true,
+                          fillColor:
+                              context.c.surfaceContainerHighest.withAlpha(100),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: context.c.outline.withAlpha(50),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: context.c.primary,
+                              width: 2,
+                            ),
+                          ),
+                          prefixIcon: Padding(
+                            padding: const EdgeInsets.only(bottom: 60),
+                            child: Icon(
+                              Icons.description_outlined,
+                              color: context.c.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ).animate().fadeIn(delay: 200.ms).slideX(begin: -0.1, end: 0),
+                  ...widget.children.map(
+                    (child) => child
+                        .animate()
+                        .fadeIn(delay: 200.ms)
+                        .slideX(begin: -0.1, end: 0),
                   ),
-                ),
-              ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.1, end: 0),
-            ],
-          ),
-        )
+                  if (widget.scrappable.scrappingBeeExtractRules != null) ...[
+                    if (widget.children.isNotEmpty) SizedBox(height: 12),
+                    Text(
+                      'API Configuration & Costs',
+                      style: context.t.labelLarge?.copyWith(
+                        color: context.c.onSurface,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    ScrappingBeeCostTable(
+                      extractLogic: widget.scrappable.scrappingBeeExtractRules!,
+                    )
+                        .animate()
+                        .fadeIn(delay: 200.ms)
+                        .slideX(begin: -0.1, end: 0),
+                  ],
+                ],
+              ),
+            ),
+            SizedBox(height: 60),
+          ],
+        ),
+        Positioned(
+          bottom: 20,
+          left: 24,
+          right: 24,
+          child: actionButton,
+        ),
       ],
     );
   }
 
   void _showCategorySelectionDialog() {
+    // Track category dialog open
+    if (widget.scrappable.id != null) {
+      context.findAncestorStateOfType<_EditScrappableDialogState>()?.ref.read(analyticsServiceProvider).trackEditScrappableCategoryDialogOpen(
+        scrappableId: widget.scrappable.id!,
+        currentCategory: _selectedCategory!.name,
+      );
+    }
+
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
@@ -803,6 +956,15 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
                             ),
                           ),
                           onTap: () {
+                            // Track category change
+                            if (widget.scrappable.id != null && _selectedCategory != category) {
+                              context.findAncestorStateOfType<_EditScrappableDialogState>()?.ref.read(analyticsServiceProvider).trackEditScrappableCategoryChange(
+                                scrappableId: widget.scrappable.id!,
+                                fromCategory: _selectedCategory!.name,
+                                toCategory: category.name,
+                              );
+                            }
+
                             setState(() {
                               _selectedCategory = category;
                               _checkForChanges();
@@ -857,7 +1019,29 @@ class _HideFromMarketplaceToggleState
       account = accountState.accountInfo;
     }
 
-    if (newValue && (account == null || account.planTier != PlanTier.ultra)) {
+    final hasPermission = account != null && account.planTier == PlanTier.ultra;
+
+    // Get scrappable ID from parent dialog
+    final dialogState = context.findAncestorStateOfType<_EditScrappableDialogState>();
+    final scrappableId = dialogState?.widget.scrappable.id;
+
+    // Track toggle attempt
+    if (scrappableId != null) {
+      ref.read(analyticsServiceProvider).trackEditScrappableMarketplaceToggle(
+        scrappableId: scrappableId,
+        newValue: newValue,
+        hadPermission: hasPermission,
+      );
+    }
+
+    if (newValue && !hasPermission) {
+      // Track upgrade dialog shown
+      if (scrappableId != null) {
+        ref.read(analyticsServiceProvider).trackEditScrappableUpgradeDialogShown(
+          scrappableId: scrappableId,
+        );
+      }
+
       // Show upgrade dialog
       await showHideFromMarketplaceUpgradeDialog(context);
       return;

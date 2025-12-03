@@ -1,0 +1,78 @@
+{
+  "actions": [
+    {
+      "type": "deleteTable",
+      "deleteTable": "scrappable_target_request"
+    },
+    {
+      "type": "createTable",
+      "createTable": {
+        "name": "scrappable_target_request",
+        "dartName": "ScrappableRequest",
+        "module": "zenscrap",
+        "schema": "public",
+        "columns": [
+          {
+            "name": "id",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "nextval('scrappable_target_request_id_seq'::regclass)",
+            "dartType": "int?"
+          },
+          {
+            "name": "url",
+            "columnType": 0,
+            "isNullable": false,
+            "dartType": "String"
+          },
+          {
+            "name": "queryParams",
+            "columnType": 8,
+            "isNullable": false,
+            "dartType": "Map<String,String?>"
+          },
+          {
+            "name": "queryParamsNotRelatedToUrl",
+            "columnType": 8,
+            "isNullable": false,
+            "dartType": "Map<String,String?>"
+          },
+          {
+            "name": "pathParams",
+            "columnType": 8,
+            "isNullable": false,
+            "dartType": "List<String>"
+          }
+        ],
+        "foreignKeys": [],
+        "indexes": [
+          {
+            "indexName": "scrappable_target_request_pkey",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "id"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": true
+          }
+        ],
+        "managed": true
+      }
+    }
+  ],
+  "warnings": [
+    {
+      "type": "tableDropped",
+      "message": "One or more columns are added to table \"scrappable_target_request\" which cannot be added in a table migration. The complete table will be deleted and recreated.",
+      "table": "scrappable_target_request",
+      "columns": [
+        "queryParamsNotRelatedToUrl"
+      ],
+      "destrucive": true
+    }
+  ],
+  "migrationApiVersion": 1
+}

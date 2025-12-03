@@ -32,10 +32,12 @@ class HistorySection extends StatelessWidget {
             style: context.t.titleLarge,
           ),
           const SizedBox(height: 16),
-          CreditHistoryList(
-            creditHistory: creditHistory,
-            isLoadingMore: isLoadingMoreHistory,
-            onLoadMore: onLoadMoreHistory,
+          Expanded(
+            child: CreditHistoryList(
+              creditHistory: creditHistory,
+              isLoadingMore: isLoadingMoreHistory,
+              onLoadMore: onLoadMoreHistory,
+            ),
           ),
         ],
       ),

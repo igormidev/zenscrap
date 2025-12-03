@@ -12,8 +12,15 @@ final accountProvider =
 });
 
 class AccountStateNotifier extends StateNotifier<AccountState> {
+  int? scrappableIdToBeAttached;
   AccountStateNotifier(this.ref) : super(AccountState.initial());
   final Ref ref;
+
+  @override
+  void dispose() {
+    scrappableIdToBeAttached = null;
+    super.dispose();
+  }
 
   void logOut() async {
     state = AccountState.initial();
@@ -33,16 +40,18 @@ class AccountStateNotifier extends StateNotifier<AccountState> {
     final scrappable = ref.read(scrapChatProvider).mapOrNull(
           standard: (value) => value.data,
         );
+
+    final scrappableId = scrappable?.id ?? scrappableIdToBeAttached;
     final result = await ref
         .read(clientProvider)
         .privateAccount
-        .getAccountInfo(
-          initialScrappableIfNewUser: scrappable,
-        )
+        .getAccountInfo(initialScrappableId: scrappableId)
         .toResult;
 
-    result.fold(
-      (accountInfo) {
+    await result.fold(
+      (accountInfo) async {
+        await ref.read(scrapChatProvider.notifier).endSession();
+        scrappableIdToBeAttached = null;
         state = AccountState.withData(accountInfo: accountInfo);
       },
       (failure) {
@@ -55,7 +64,7 @@ class AccountStateNotifier extends StateNotifier<AccountState> {
     return await ref
         .read(clientProvider)
         .privateAccount
-        .getAccountInfo(initialScrappableIfNewUser: null);
+        .getAccountInfo(initialScrappableId: null);
   }
 
   void setUser(AccountInfo accountInfo) {

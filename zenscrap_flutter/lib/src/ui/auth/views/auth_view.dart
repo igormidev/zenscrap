@@ -106,7 +106,6 @@ class _AuthViewState extends ConsumerState<AuthView>
     final bool isCompactSize = screenWidth < 1060.0;
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      // backgroundColor: Theme.of(context).colorScheme.primaryContainer,
       body: Stack(
         children: [
           SizedBox.expand(

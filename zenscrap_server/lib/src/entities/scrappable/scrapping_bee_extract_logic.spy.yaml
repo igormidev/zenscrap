@@ -11,6 +11,7 @@ fields:
   waitFor: String? # wait for a specific CSS/XPath selector to appear before returning
   waitBrowser: String? # wait for a browser event (e.g., domcontentloaded) before returning
   premiumProxy: bool # will use residencial proxy, for more scrapper-resident sites
+  stealthProxy: bool # use stealth proxy for the hardest-to-scrape sites (most expensive option)
   countryCode: String? # proxy geolocation (e.g., us, de, br)
   sessionId: String? # keep the same IP across multiple requests (sticky sessions).
   customGoogle: bool? # enable Google-specific handling, this should allways be true if the url is from a google domain

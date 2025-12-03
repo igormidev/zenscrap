@@ -2,29 +2,158 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:serverpod/serverpod.dart';
-import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_gemini_sdk_impl.dart';
+import 'package:zenscrap_server/src/core/default_classes.dart';
+import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_openai_sdk_impl.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/i_chat_controller.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 typedef RedraftSrappableSessionId = String;
+typedef ThinkingSessionId = String;
+
 final Map<RedraftSrappableSessionId, ReplaySubject<ChatResponse>>
     _scrapRedraftSessions = {};
+final Map<ThinkingSessionId, StreamController<String>> _thinkingStream = {};
 final Map<RedraftSrappableSessionId, IChatController> _chatSessions = {};
 final Map<int, RedraftSrappableSessionId> _scrappableOpenedSessionsIds = {};
+final Map<RedraftSrappableSessionId, int> _cacheScrappableIds = {};
 final Map<RedraftSrappableSessionId, ReferenceTestData> _cacheRefTestData = {};
-final Map<RedraftSrappableSessionId, ScrappingBeeExtractLogic>
+final Map<RedraftSrappableSessionId, ScrappingBeeExtractLogic?>
     _cacheScrappingBeeExtractLogic = {};
 final Map<RedraftSrappableSessionId, ScrappableRequest>
     _cacheScrappableRequest = {};
 
-String? getTestExtractRules(int scrappableId) {
-  final ReferenceTestData? testData =
-      _cacheRefTestData[_scrappableOpenedSessionsIds[scrappableId]];
-  return testData?.testExtractJsonResult;
+ScrappingBeeExtractLogic? getTestExtractRules(int scrappableId) {
+  return _cacheScrappingBeeExtractLogic[
+      _scrappableOpenedSessionsIds[scrappableId]];
+}
+
+ScrappableRequest? getScrappableRequest(int scrappableId) {
+  return _cacheScrappableRequest[_scrappableOpenedSessionsIds[scrappableId]];
+}
+
+ReferenceTestData? getReferenceTestData(int scrappableId) {
+  return _cacheRefTestData[_scrappableOpenedSessionsIds[scrappableId]];
+}
+
+void updateTestReferenceData(int scrappableId, ReferenceTestData testData) {
+  final sessionId = _scrappableOpenedSessionsIds[scrappableId];
+  if (sessionId != null) {
+    _cacheRefTestData[sessionId] = testData;
+  }
+}
+
+/// Sends a chat response to an active chat session for a given scrappable ID
+/// Returns true if message was sent, false if no active session exists
+bool sendSystemMessageToScrappableSession({
+  required int scrappableId,
+  required ChatResponse response,
+}) {
+  final sessionId = _scrappableOpenedSessionsIds[scrappableId];
+  if (sessionId == null) {
+    return false; // No active session for this scrappable
+  }
+
+  final subject = _scrapRedraftSessions[sessionId];
+  if (subject == null) {
+    return false; // Session exists in map but stream was closed
+  }
+
+  // Add the response to the chat
+  subject.add(response);
+
+  return true;
 }
 
 class ScrappableChatSession extends Endpoint {
   final Uuid uuid = Uuid();
+
+  Future<void> commitCurrentEditState(
+    Session session, {
+    required RedraftSrappableSessionId sessionUuid,
+  }) async {
+    final int? scrappableId = _cacheScrappableIds[sessionUuid];
+    if (scrappableId == null) {
+      throw ZenScrapException(
+        title: 'Cache Scrappable ID Not Found',
+        description: 'No cache scrappable ID found for session $sessionUuid.',
+      );
+    }
+    final int? userId = (await session.authenticated)?.userId;
+    final ReferenceTestData? testData = _cacheRefTestData[sessionUuid];
+    final ScrappingBeeExtractLogic? scrappingBeeExtractLogic =
+        _cacheScrappingBeeExtractLogic[sessionUuid];
+    final ScrappableRequest? scrappableRequest =
+        _cacheScrappableRequest[sessionUuid];
+    if (testData == null ||
+        scrappingBeeExtractLogic == null ||
+        scrappableRequest == null) {
+      throw ZenScrapException(
+        title: 'Cache Test Data Not Found',
+        description: 'No cache test data found for session $sessionUuid.',
+      );
+    }
+    await session.db.transaction((transaction) async {
+      try {
+        final Scrappable? scrappable;
+        if (userId == null) {
+          // If not authenticated, should only be able to modify scrappables that are not attached to any account
+          scrappable = await Scrappable.db.findFirstRow(session,
+              where: (t) =>
+                  t.id.equals(scrappableId) & t.accountId.equals(null),
+              transaction: transaction);
+        } else {
+          final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
+            session,
+            where: (p0) => p0.userInfoId.equals(userId),
+            transaction: transaction,
+          );
+          final accountId = accountInfo?.id;
+
+          scrappable = await Scrappable.db.findFirstRow(session,
+              where: (t) =>
+                  t.id.equals(scrappableId) & t.accountId.equals(accountId),
+              transaction: transaction);
+
+          if (scrappable == null) {
+            throw defaultAuthenticationException;
+          }
+        }
+
+        if (scrappable == null) {
+          throw ZenScrapException(
+            title: 'Scrappable Not Found or Access Denied',
+            description:
+                'Unable to find scrappable with id $scrappableId or you do not have permission to modify it.',
+          );
+        }
+
+        await Scrappable.db.updateRow(
+            session,
+            scrappable.copyWith(
+              extractRulesUpdatedAt: DateTime.now(),
+            ),
+            transaction: transaction);
+
+        await ScrappingBeeExtractLogic.db.updateRow(
+            session, scrappingBeeExtractLogic,
+            transaction: transaction);
+        await ScrappableRequest.db
+            .updateRow(session, scrappableRequest, transaction: transaction);
+        await ByteTestData.db
+            .updateRow(session, testData.byteData!, transaction: transaction);
+        await ReferenceTestData.db
+            .updateRow(session, testData, transaction: transaction);
+      } catch (e, s) {
+        session.log(
+          'Failed to commit changes for session $sessionUuid',
+          exception: e,
+          stackTrace: s,
+          level: LogLevel.error,
+        );
+        rethrow;
+      }
+    });
+  }
 
   Future<void> disposeSession(
     Session session, {
@@ -33,11 +162,55 @@ class ScrappableChatSession extends Endpoint {
     return _disposeSession(sessionId: sessionId);
   }
 
+  Future<void> updateScrappableRequest(
+    Session session, {
+    required int scrappableId,
+    required String url,
+    required List<String> pathParams,
+    required Map<String, String?> queryParams,
+  }) async {
+    final sessionId = _scrappableOpenedSessionsIds[scrappableId];
+    if (sessionId == null) {
+      throw ZenScrapException(
+        title: 'Session Not Found',
+        description: 'No active session found for scrappable $scrappableId.',
+      );
+    }
+
+    final ScrappableRequest? cachedRequest = _cacheScrappableRequest[sessionId];
+    if (cachedRequest == null) {
+      throw ZenScrapException(
+        title: 'Scrappable Request Not Found',
+        description: 'No scrappable request found for session $sessionId.',
+      );
+    }
+
+    // Update the cached scrappable request
+    _cacheScrappableRequest[sessionId] = cachedRequest.copyWith(
+      url: url,
+      pathParams: pathParams,
+      queryParams: queryParams,
+    );
+
+    // Send notification to the chat session
+    sendSystemMessageToScrappableSession(
+      scrappableId: scrappableId,
+      response: UpdatedScrappableRequestResponse(
+        role: PromptRole.system,
+        expectsFollowUp: false, // Configuration update notification, no follow-up
+        messageText: 'Scrappable request configuration updated successfully',
+        url: url,
+        pathParams: pathParams,
+        queryParams: queryParams,
+      ),
+    );
+  }
+
   Future<CreateSessionResponse> createSession(
     Session session, {
     required int scrappableId,
   }) async {
-    AiModel aiModel = AiModel.gemini_2_5_flash;
+    final int? userId = (await session.authenticated)?.userId;
     final Scrappable? scrappable = await Scrappable.db.findById(
       session,
       scrappableId,
@@ -49,6 +222,7 @@ class ScrappableChatSession extends Endpoint {
         ),
       ),
     );
+
     final ReferenceTestData? referenceTestData = scrappable?.referenceTestData;
     final ScrappableRequest? scrapperRequest = scrappable?.targetRequest;
     final ScrappingBeeExtractLogic? scrappingBeeExtractLogic =
@@ -63,6 +237,22 @@ class ScrappableChatSession extends Endpoint {
         description: 'No scrappable found with id $scrappableId.',
       );
     }
+
+    final doesScrappableHasOwner = scrappable.accountId != null;
+    if (doesScrappableHasOwner) {
+      final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
+        session,
+        where: (p0) => p0.userInfoId.equals(userId),
+      );
+      if (accountInfo == null || accountInfo.id != scrappable.accountId) {
+        throw ZenScrapException(
+          title: 'Authentication Required',
+          description:
+              'You must be the owner of this scrappable to create a session for it.',
+        );
+      }
+    }
+
     if (referenceTestData == null) {
       session.log(
         'No reference test data found for scrappable with id ${scrappable.id}.',
@@ -85,17 +275,6 @@ class ScrappableChatSession extends Endpoint {
             'No target request found for scrappable with id ${scrappable.id}.',
       );
     }
-    if (scrappingBeeExtractLogic == null) {
-      session.log(
-        'No scrapping bee extract logic found for scrappable with id ${scrappable.id}.',
-        level: LogLevel.error,
-      );
-      throw ZenScrapException(
-        title: 'Scrapping Bee Extract Logic Not Found',
-        description:
-            'No scrapping bee extract logic found for scrappable with id ${scrappable.id}.',
-      );
-    }
     final bool isAlreadyAnyOpenedSession =
         _scrappableOpenedSessionsIds.containsKey(scrappable.id!);
     if (isAlreadyAnyOpenedSession) {
@@ -109,9 +288,27 @@ class ScrappableChatSession extends Endpoint {
     final RedraftSrappableSessionId sessionUuid = uuid.v4();
     _scrappableOpenedSessionsIds[scrappable.id!] = sessionUuid;
     _scrapRedraftSessions[sessionUuid] = ReplaySubject<ChatResponse>();
-    _chatSessions[sessionUuid] = ChatControllerGeminiSdkImpl.startChat(
+    final openAiApiKey = session.passwords['openAiApiKey'] ??
+        session.serverpod.getPassword('openAiApiKey');
+    if (openAiApiKey == null || openAiApiKey.isEmpty) {
+      throw ZenScrapException(
+        title: 'OpenAI API Key Missing',
+        description:
+            'The server is not configured with an OpenAI API key. Please add it to the password store.',
+      );
+    }
+
+    final scrapingBeeApiKey = session.passwords['scrapingBeeApiKey'] ??
+        session.serverpod.getPassword('scrapingBeeApiKey') ??
+        '';
+
+    _chatSessions[sessionUuid] = ChatControllerOpenAiSdkImpl.startChat(
+      scrappableId: scrappable.id!,
       scrapperRequest: scrapperRequest,
       referenceTestData: referenceTestData,
+      currentFetchSettings: scrappable.scrappingBeeExtractRules,
+      openAiApiKey: openAiApiKey,
+      scrapingBeeApiKey: scrapingBeeApiKey,
     );
     _cacheRefTestData[sessionUuid] = referenceTestData;
     _cacheScrappingBeeExtractLogic[sessionUuid] = scrappingBeeExtractLogic;
@@ -121,15 +318,19 @@ class ScrappableChatSession extends Endpoint {
       expiresIn: duration,
       sessionId: sessionUuid,
     );
+    session.log('Created session $sessionUuid for scrappable ${scrappable.id}');
     await session.serverpod.futureCallWithDelay(
       'dispose_temporary_scrappable',
       response,
       duration + Duration(minutes: 1),
     );
+    session.log('Scheduled dispose for session $sessionUuid');
+    _cacheScrappableIds[sessionUuid] = scrappable.id!;
     await Scrappable.db.updateRow(
         session,
         scrappable.copyWith(
             testEndpointAvailableUntil: DateTime.now().add(duration)));
+    session.log('Updated scrappable ${scrappable.id} expiration');
     return response;
   }
 
@@ -137,6 +338,7 @@ class ScrappableChatSession extends Endpoint {
     Session session, {
     required RedraftSrappableSessionId sessionUuid,
   }) {
+    session.log('Listening to session $sessionUuid');
     session.addWillCloseListener((session) async {
       await _disposeSession(sessionId: sessionUuid);
     });
@@ -165,13 +367,12 @@ class ScrappableChatSession extends Endpoint {
     final scrappableId = _scrappableOpenedSessionsIds.entries
         .firstWhereOrNull((element) => element.value == sessionUuid)
         ?.key;
-    final referenceTestData = _cacheTestData[sessionUuid];
-    if (scrappableId == null || referenceTestData == null) {
+    if (scrappableId == null) {
       throw sessionNotFount;
     }
 
-    // Validate plan for Gemini 2.5 Pro
-    if (aiModel == AiModel.gemini_2_5_pro) {
+    // Validate plan for powerful model
+    if (aiModel == AiModel.powerful) {
       final authenticationInfo = await session.authenticated;
       if (authenticationInfo == null) {
         throw ZenScrapException(
@@ -205,18 +406,15 @@ class ScrappableChatSession extends Endpoint {
     }
 
     _chatSessions.remove(sessionUuid);
-    _chatSessions[sessionUuid] = ChatControllerGeminiSdkImpl.create(
-      scrappableId: scrappableId,
-      referenceTestData: referenceTestData,
-      aiModel: aiModel,
-    );
+    await _chatSessions[sessionUuid]?.changeModel(aiModel);
   }
 
-  Future<void> sendPromptMessage(
+  Stream<String> sendPromptMessage(
     Session session, {
     required RedraftSrappableSessionId sessionId,
     required String userPrompt,
-  }) async {
+  }) async* {
+    session.log('Received message for session $sessionId');
     final chatController = _chatSessions[sessionId];
     if (chatController == null) {
       throw ZenScrapException(
@@ -224,17 +422,18 @@ class ScrappableChatSession extends Endpoint {
         description: 'No active session found for uuid $sessionId.',
       );
     }
-    final testData = _cacheRefTestData[sessionId];
-    final scrapperRequest = _cacheScrappableRequest[sessionId];
-    final scrappingBeeExtractLogic = _cacheScrappingBeeExtractLogic[sessionId];
-    if (testData == null ||
-        scrapperRequest == null ||
-        scrappingBeeExtractLogic == null) {
+
+    if (!_cacheRefTestData.containsKey(sessionId) ||
+        !_cacheScrappableRequest.containsKey(sessionId) ||
+        !_cacheScrappingBeeExtractLogic.containsKey(sessionId)) {
       throw ZenScrapException(
         title: 'Cache Test Data Not Found',
         description: 'No cache test data found for session $sessionId.',
       );
     }
+
+    final ThinkingSessionId thinkingSessionId = uuid.v7();
+    _thinkingStream[thinkingSessionId] = StreamController<ThinkingSessionId>();
 
     // Put future call
     await session.serverpod.futureCallWithDelay(
@@ -242,9 +441,12 @@ class ScrappableChatSession extends Endpoint {
       SessionPrompt(
         sessionId: sessionId,
         userPrompt: userPrompt,
+        thinkingSessionId: thinkingSessionId,
       ),
       const Duration(seconds: 1),
     );
+
+    yield* _thinkingStream[thinkingSessionId]!.stream;
   }
 }
 
@@ -256,9 +458,13 @@ Future<void> disposeFromScrappableId(int scrappableId) async {
 Future<void> _disposeSession({
   required RedraftSrappableSessionId sessionId,
 }) async {
-  _chatSessions.remove(sessionId);
+  // Dispose the chat controller to clean up OpenAI files
+  final chatController = _chatSessions.remove(sessionId);
+  await chatController?.dispose();
+
   final subject = _scrapRedraftSessions.remove(sessionId);
   await subject?.close();
+  _cacheScrappableIds.remove(sessionId);
   _cacheRefTestData.remove(sessionId);
   _cacheScrappingBeeExtractLogic.remove(sessionId);
   _cacheScrappableRequest.remove(sessionId);
@@ -281,7 +487,7 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
   @override
   Future<void> invoke(Session session, SessionPrompt? object) async {
     if (object == null) return;
-
+    final ThinkingSessionId thinkingSessionId = object.thinkingSessionId;
     final String sessionId = object.sessionId;
     final String userPrompt = object.userPrompt;
 
@@ -290,6 +496,7 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
       _scrapRedraftSessions[sessionId]?.add(
         ErrorTextResponse(
           role: PromptRole.system,
+          expectsFollowUp: false, // Terminal error, no follow-up
           errorMessage: 'Session not found or has been closed.',
         ),
       );
@@ -301,20 +508,22 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
     final scrappingBeeExtractLogic = _cacheScrappingBeeExtractLogic[sessionId];
     if (testData == null ||
         scrapperRequest == null ||
-        scrappingBeeExtractLogic == null) {
+        !_cacheScrappingBeeExtractLogic.containsKey(sessionId)) {
       _scrapRedraftSessions[sessionId]?.add(
         ErrorTextResponse(
           role: PromptRole.system,
+          expectsFollowUp: false, // Terminal error, no follow-up
           errorMessage: 'Session test data not found or has been closed.',
         ),
       );
       return;
     }
 
+    final StreamController<String> llmThinking = StreamController<String>();
     final StreamController<ChatResponse> chatSeason =
         StreamController<ChatResponse>();
 
-    final StreamSubscription<ChatResponse> subscription =
+    final StreamSubscription<ChatResponse> subsChatSeason =
         chatSeason.stream.listen((ChatResponse chatResponse) {
       _scrapRedraftSessions[sessionId]?.add(chatResponse);
       if (chatResponse is NewExtractRuleResponse) {
@@ -331,8 +540,17 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
       }
     });
 
+    final StreamSubscription<String> subLlmThinking = llmThinking.stream.listen(
+      (event) {
+        _thinkingStream[thinkingSessionId]?.add(event.replaceAll(
+            '37N8150Q1JBVN85NS4RUOUIUYZ2AEUFX69QBM0X74VD13M9TLNRVOFWS7HZMKRG1X4SOH4BKJT5EUN6K',
+            '{API_KEY}'));
+      },
+    );
+
     chatSeason.add(MessageTextResponse(
       role: PromptRole.user,
+      expectsFollowUp: true, // User message always expects AI response
       messageText: userPrompt,
     ));
 
@@ -344,10 +562,12 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
         referenceTestData: testData,
         scrapperRequest: scrapperRequest,
         scrappingBeeExtractLogic: scrappingBeeExtractLogic,
+        thinkingStream: llmThinking,
       );
     } catch (e, s) {
       chatSeason.add(ErrorTextResponse(
         role: PromptRole.system,
+        expectsFollowUp: false, // Terminal error, no follow-up
         errorMessage: 'An error occurred while sending the message:\n$e',
       ));
       session.log(
@@ -358,11 +578,18 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
       );
       rethrow;
     } finally {
+      await Future.delayed(const Duration(milliseconds: 300));
       if (!chatSeason.isClosed) {
-        await Future.delayed(const Duration(milliseconds: 300));
-        await subscription.cancel();
+        await subsChatSeason.cancel();
         await chatSeason.close();
       }
+      if (!llmThinking.isClosed) {
+        await subLlmThinking.cancel();
+        await llmThinking.close();
+      }
+
+      await _thinkingStream[thinkingSessionId]?.close();
+      _thinkingStream.remove(thinkingSessionId);
     }
   }
 }

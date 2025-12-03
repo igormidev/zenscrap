@@ -9,7 +9,7 @@ import 'package:zenscrap_flutter/src/ui/api_analytics/widgets/scrappable_request
 
 class ScrappablesAnalyticsResumeCardListagePage extends ConsumerStatefulWidget {
   final PaginatedScrappableRequestsAnalytics data;
-  
+
   const ScrappablesAnalyticsResumeCardListagePage({
     super.key,
     required this.data,
@@ -24,26 +24,26 @@ class _ScrappablesAnalyticsResumeCardListagePageState
     extends ConsumerState<ScrappablesAnalyticsResumeCardListagePage> {
   final ScrollController _scrollController = ScrollController();
   Scrappable? _selectedScrappable;
-  
+
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
   }
-  
+
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
   }
-  
+
   void _onScroll() {
     if (_scrollController.position.extentAfter < 200) {
       // User is near the bottom, but don't auto-load
       // We'll show a load more button instead
     }
   }
-  
+
   void _selectScrappable(Scrappable scrappable) {
     setState(() {
       _selectedScrappable = scrappable;
@@ -51,7 +51,7 @@ class _ScrappablesAnalyticsResumeCardListagePageState
     ref.read(selectedScrappableAnalyticsProvider.notifier)
         .selectScrappable(scrappable);
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -66,7 +66,7 @@ class _ScrappablesAnalyticsResumeCardListagePageState
       ),
       child: Column(
         children: [
-          _buildHeader(context),
+          _AnalyticsListHeader(data: widget.data),
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
@@ -74,9 +74,9 @@ class _ScrappablesAnalyticsResumeCardListagePageState
               itemCount: widget.data.items.length + 1,
               itemBuilder: (context, index) {
                 if (index == widget.data.items.length) {
-                  return _buildLoadMoreButton(context);
+                  return _AnalyticsLoadMoreButton(data: widget.data);
                 }
-                
+
                 final item = widget.data.items[index];
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 16),
@@ -93,8 +93,17 @@ class _ScrappablesAnalyticsResumeCardListagePageState
       ),
     );
   }
-  
-  Widget _buildHeader(BuildContext context) {
+}
+
+class _AnalyticsListHeader extends StatelessWidget {
+  final PaginatedScrappableRequestsAnalytics data;
+
+  const _AnalyticsListHeader({
+    required this.data,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -120,7 +129,7 @@ class _ScrappablesAnalyticsResumeCardListagePageState
           ),
           const Spacer(),
           Text(
-            '${widget.data.items.length} of ${widget.data.totalCount}',
+            '${data.items.length} of ${data.totalCount}',
             style: context.t.bodySmall?.copyWith(
               color: context.c.onSurface.withAlpha(150),
             ),
@@ -129,9 +138,18 @@ class _ScrappablesAnalyticsResumeCardListagePageState
       ),
     );
   }
-  
-  Widget _buildLoadMoreButton(BuildContext context) {
-    if (!widget.data.hasNextPage) {
+}
+
+class _AnalyticsLoadMoreButton extends ConsumerWidget {
+  final PaginatedScrappableRequestsAnalytics data;
+
+  const _AnalyticsLoadMoreButton({
+    required this.data,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (!data.hasNextPage) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 16),
         child: Center(
@@ -144,35 +162,31 @@ class _ScrappablesAnalyticsResumeCardListagePageState
         ),
       );
     }
-    
-    return Consumer(
-      builder: (context, ref, child) {
-        final analyticsState = ref.watch(analyticsProvider);
-        bool isLoadingMore = false;
-        analyticsState.when(
-          initial: () => isLoadingMore = false,
-          loading: () => isLoadingMore = false,
-          loadingMore: (_) => isLoadingMore = true,
-          emptyData: () => isLoadingMore = false,
-          withData: (_) => isLoadingMore = false,
-          withError: (_) => isLoadingMore = false,
-        );
-        
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          child: Center(
-            child: isLoadingMore
-                ? const CircularProgressIndicator()
-                : ElevatedButton.icon(
-                    onPressed: () {
-                      ref.read(analyticsProvider.notifier).loadMoreAnalytics();
-                    },
-                    icon: const Icon(Icons.add),
-                    label: const Text('Load More'),
-                  ),
-          ),
-        );
-      },
+
+    final analyticsState = ref.watch(analyticsProvider);
+    bool isLoadingMore = false;
+    analyticsState.when(
+      initial: () => isLoadingMore = false,
+      loading: () => isLoadingMore = false,
+      loadingMore: (_) => isLoadingMore = true,
+      emptyData: () => isLoadingMore = false,
+      withData: (_) => isLoadingMore = false,
+      withError: (_) => isLoadingMore = false,
+    );
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: Center(
+        child: isLoadingMore
+            ? const CircularProgressIndicator()
+            : ElevatedButton.icon(
+                onPressed: () {
+                  ref.read(analyticsProvider.notifier).loadMoreAnalytics();
+                },
+                icon: const Icon(Icons.add),
+                label: const Text('Load More'),
+              ),
+      ),
     );
   }
 }

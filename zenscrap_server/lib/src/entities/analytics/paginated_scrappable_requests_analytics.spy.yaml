@@ -1,5 +1,6 @@
 class: PaginatedScrappableRequestsAnalytics
 fields:
+  scope: AnalyticsTimeScope
   items: List<ScrappableRequestsAnalyticsItem>
   hasNextPage: bool
   totalCount: int

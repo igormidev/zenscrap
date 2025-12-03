@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:serverpod_auth_email_flutter/serverpod_auth_email_flutter.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/ui/auth/templates/auth_form_template.dart';
 
 class SignInPage extends ConsumerWidget {
@@ -16,6 +17,11 @@ class SignInPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final analytics = ref.read(analyticsServiceProvider);
+
+    // Track view when the sign up form is visible
+    analytics.trackAuthSignUpViewed();
+
     return AuthFormTemplate<String>(
       submitText: 'Sign Up',
       items: [
@@ -68,6 +74,12 @@ class SignInPage extends ConsumerWidget {
         final String email = items[1];
         final String password = items[2];
 
+        // Track sign up attempt
+        await analytics.trackAuthSignUpAttempt(
+          email: email,
+          userName: userName,
+        );
+
         final bool success = await emailAuth.createAccountRequest(
           userName,
           email,
@@ -75,11 +87,23 @@ class SignInPage extends ConsumerWidget {
         );
 
         if (!success) {
+          // Track sign up failure
+          await analytics.trackAuthSignUpFailure(
+            email: email,
+            errorMessage: 'Failed to create account',
+          );
+
           if (context.mounted) {
             showErrorSnackbar(context);
           }
           return null;
         }
+
+        // Track successful sign up
+        await analytics.trackAuthSignUpSuccess(
+          email: email,
+          userName: userName,
+        );
 
         return email;
       },

@@ -1,0 +1,5 @@
+class: ScrappableUsageMetrics
+fields:
+  successCount: int
+  errorCount: int
+  totalCount: int

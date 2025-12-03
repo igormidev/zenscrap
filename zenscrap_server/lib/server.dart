@@ -1,13 +1,12 @@
-import 'package:openai_dart/openai_dart.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/auth/handlers/on_send_reset_email.dart';
 import 'package:zenscrap_server/src/auth/handlers/on_send_validation_email.dart';
+import 'package:zenscrap_server/src/core/mixins/api_helper_mixin.dart';
 import 'package:zenscrap_server/src/core/scraping_bee.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_config.dart';
-import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_claude_sdk_impl.dart';
+import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_openai_sdk_impl.dart';
 import 'package:zenscrap_server/src/future_calls/monthly_subscription_credits_future_call.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as auth;
-import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_gemini_api_impl.dart';
 import 'package:zenscrap_server/src/endpoints/public/scrappable_chat_session.dart';
 import 'package:zenscrap_server/src/routes/scrappable_api_route.dart';
 import 'package:zenscrap_server/src/web/routes/route_single_page_app.dart';
@@ -58,20 +57,9 @@ void run(List<String> args) async {
   ));
 
   final String? scrapingBeeApiKey = pod.getPassword('scrapingBeeApiKey');
-  ScrapingBeeDeprecated.initialize(scrapingBeeApiKey ?? '');
-  ScrapingBee.initialize(scrapingBeeApiKey ?? '');
-  final String? openAiApiKey = pod.getPassword('openAiApiKey');
-  openAiClient = OpenAIClient(apiKey: openAiApiKey);
+  scrappingBee = ScrapingBee(apiKey: scrapingBeeApiKey ?? '');
 
-  await ChatControllerClaudeSdkImpl.initialize(
-    claudeApiKey: pod.getPassword('claudeCodeApiKey') ?? '',
-    scrapingBeeApiKey: scrapingBeeApiKey ?? '',
-  );
-  ChatControllerGeminiApiImpl.initialize(
-    geminiApiKey: pod.getPassword('geminiApiKey') ?? '',
-  );
-
-  // Initialize Stripe configuration
+  // // Initialize Stripe configuration
   StripeConfig.initialize({
     'stripe_secret_key': pod.getPassword('stripeSecretKey') ?? '',
     'stripe_webhook_secret': pod.getPassword('stripeWebhookSecret') ?? '',
@@ -93,17 +81,58 @@ void run(List<String> args) async {
         pod.getPassword('stripeCancelUrl') ?? 'https://yourdomain.com/cancel',
   });
 
-  // Register your future calls
+  // // Register your future calls
   pod.registerFutureCall(
       TestScrappableDisposeFutureCall(), 'dispose_temporary_scrappable');
   pod.registerFutureCall(
       MonthlySubscriptionCreditsFutureCall(), 'monthly_subscription_credits');
   pod.registerFutureCall(SessionPromptFutureCall(), 'session_prompt');
+  pod.registerFutureCall(
+      PeriodicSetRequestsAnalytics(), 'periodicSetRequestsAnalytics');
+  pod.registerFutureCall(PeriodicCleanupOldAnalyticsDetails(),
+      'periodicCleanupOldAnalyticsDetails');
 
   // Start the server.
   await pod.start();
-}
 
-final ScrapingBeeDeprecated scrapingBeeDeprecated = ScrapingBeeDeprecated();
-final ScrapingBee scrappingBee = ScrapingBee();
-late final OpenAIClient openAiClient;
+  // Initialize OpenAI Vector Store with documentation files for the chat controller.
+  // This creates a Vector Store containing static .md documentation that the model
+  // can search via the file_search tool (replacing the previous input_file approach
+  // which only supported PDF files).
+  final openAiApiKey = pod.getPassword('openAiApiKey');
+  if (openAiApiKey != null && openAiApiKey.isNotEmpty) {
+    try {
+      await ChatControllerOpenAiSdkImpl.init(openAiApiKey: openAiApiKey);
+      // Success message is printed by init() itself
+    } catch (e) {
+      // ignore: avoid_print
+      print('[Zenscrap] ERROR: Failed to initialize OpenAI Vector Store: $e');
+    }
+  } else {
+    // ignore: avoid_print
+    print(
+        '[Zenscrap] WARNING: OpenAI API key not configured, skipping Vector Store initialization');
+  }
+
+  await pod.cancelFutureCall('periodicSetRequestsAnalytics');
+  await pod.cancelFutureCall('periodicCleanupOldAnalyticsDetails');
+
+  // Schedule future calls only if not applying migrations
+  // (when applying migrations, the future call tables may not exist yet)
+  // final isApplyingMigrations = args.contains('--apply-migrations');
+
+  // Schedule periodic analytics batching
+  await pod.futureCallWithDelay(
+    'periodicSetRequestsAnalytics',
+    null,
+    Duration(minutes: 2),
+    identifier: 'periodicSetRequestsAnalytics',
+  );
+
+  await pod.futureCallWithDelay(
+    'periodicCleanupOldAnalyticsDetails',
+    null,
+    const Duration(hours: 1),
+    identifier: 'periodicCleanupOldAnalyticsDetails',
+  );
+}

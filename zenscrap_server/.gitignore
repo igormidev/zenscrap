@@ -4,6 +4,7 @@
 
 # Conventional directory for build outputs
 build/
+node_modules/
 
 # Directory created by dartdoc
 doc/api/

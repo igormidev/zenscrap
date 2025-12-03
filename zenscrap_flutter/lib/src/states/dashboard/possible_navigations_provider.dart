@@ -9,6 +9,7 @@ final possibleNavigationsProvider =
     DashboardNavigationType.userEndpoints,
     DashboardNavigationType.marketPlace,
     DashboardNavigationType.usage,
+    DashboardNavigationType.analytics,
     DashboardNavigationType.account,
     DashboardNavigationType.logOut,
   ];

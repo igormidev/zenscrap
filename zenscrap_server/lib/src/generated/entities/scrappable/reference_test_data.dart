@@ -21,9 +21,9 @@ abstract class ReferenceTestData
     this.id,
     required this.referenceLinkUsed,
     required this.referenceQueryParametersJson,
-    required this.byteDataId,
+    this.scrapResultJson,
+    this.byteDataId,
     this.byteData,
-    this.testExtractJsonResult,
     this.scrappable,
   });
 
@@ -31,9 +31,9 @@ abstract class ReferenceTestData
     int? id,
     required String referenceLinkUsed,
     required String referenceQueryParametersJson,
-    required int byteDataId,
+    String? scrapResultJson,
+    int? byteDataId,
     _i2.ByteTestData? byteData,
-    String? testExtractJsonResult,
     _i3.Scrappable? scrappable,
   }) = _ReferenceTestDataImpl;
 
@@ -43,13 +43,12 @@ abstract class ReferenceTestData
       referenceLinkUsed: jsonSerialization['referenceLinkUsed'] as String,
       referenceQueryParametersJson:
           jsonSerialization['referenceQueryParametersJson'] as String,
-      byteDataId: jsonSerialization['byteDataId'] as int,
+      scrapResultJson: jsonSerialization['scrapResultJson'] as String?,
+      byteDataId: jsonSerialization['byteDataId'] as int?,
       byteData: jsonSerialization['byteData'] == null
           ? null
           : _i2.ByteTestData.fromJson(
               (jsonSerialization['byteData'] as Map<String, dynamic>)),
-      testExtractJsonResult:
-          jsonSerialization['testExtractJsonResult'] as String?,
       scrappable: jsonSerialization['scrappable'] == null
           ? null
           : _i3.Scrappable.fromJson(
@@ -68,11 +67,11 @@ abstract class ReferenceTestData
 
   String referenceQueryParametersJson;
 
-  int byteDataId;
+  String? scrapResultJson;
+
+  int? byteDataId;
 
   _i2.ByteTestData? byteData;
-
-  String? testExtractJsonResult;
 
   _i3.Scrappable? scrappable;
 
@@ -86,9 +85,9 @@ abstract class ReferenceTestData
     int? id,
     String? referenceLinkUsed,
     String? referenceQueryParametersJson,
+    String? scrapResultJson,
     int? byteDataId,
     _i2.ByteTestData? byteData,
-    String? testExtractJsonResult,
     _i3.Scrappable? scrappable,
   });
   @override
@@ -97,10 +96,9 @@ abstract class ReferenceTestData
       if (id != null) 'id': id,
       'referenceLinkUsed': referenceLinkUsed,
       'referenceQueryParametersJson': referenceQueryParametersJson,
-      'byteDataId': byteDataId,
+      if (scrapResultJson != null) 'scrapResultJson': scrapResultJson,
+      if (byteDataId != null) 'byteDataId': byteDataId,
       if (byteData != null) 'byteData': byteData?.toJson(),
-      if (testExtractJsonResult != null)
-        'testExtractJsonResult': testExtractJsonResult,
       if (scrappable != null) 'scrappable': scrappable?.toJson(),
     };
   }
@@ -111,10 +109,9 @@ abstract class ReferenceTestData
       if (id != null) 'id': id,
       'referenceLinkUsed': referenceLinkUsed,
       'referenceQueryParametersJson': referenceQueryParametersJson,
-      'byteDataId': byteDataId,
+      if (scrapResultJson != null) 'scrapResultJson': scrapResultJson,
+      if (byteDataId != null) 'byteDataId': byteDataId,
       if (byteData != null) 'byteData': byteData?.toJsonForProtocol(),
-      if (testExtractJsonResult != null)
-        'testExtractJsonResult': testExtractJsonResult,
       if (scrappable != null) 'scrappable': scrappable?.toJsonForProtocol(),
     };
   }
@@ -162,17 +159,17 @@ class _ReferenceTestDataImpl extends ReferenceTestData {
     int? id,
     required String referenceLinkUsed,
     required String referenceQueryParametersJson,
-    required int byteDataId,
+    String? scrapResultJson,
+    int? byteDataId,
     _i2.ByteTestData? byteData,
-    String? testExtractJsonResult,
     _i3.Scrappable? scrappable,
   }) : super._(
           id: id,
           referenceLinkUsed: referenceLinkUsed,
           referenceQueryParametersJson: referenceQueryParametersJson,
+          scrapResultJson: scrapResultJson,
           byteDataId: byteDataId,
           byteData: byteData,
-          testExtractJsonResult: testExtractJsonResult,
           scrappable: scrappable,
         );
 
@@ -184,9 +181,9 @@ class _ReferenceTestDataImpl extends ReferenceTestData {
     Object? id = _Undefined,
     String? referenceLinkUsed,
     String? referenceQueryParametersJson,
-    int? byteDataId,
+    Object? scrapResultJson = _Undefined,
+    Object? byteDataId = _Undefined,
     Object? byteData = _Undefined,
-    Object? testExtractJsonResult = _Undefined,
     Object? scrappable = _Undefined,
   }) {
     return ReferenceTestData(
@@ -194,12 +191,11 @@ class _ReferenceTestDataImpl extends ReferenceTestData {
       referenceLinkUsed: referenceLinkUsed ?? this.referenceLinkUsed,
       referenceQueryParametersJson:
           referenceQueryParametersJson ?? this.referenceQueryParametersJson,
-      byteDataId: byteDataId ?? this.byteDataId,
+      scrapResultJson:
+          scrapResultJson is String? ? scrapResultJson : this.scrapResultJson,
+      byteDataId: byteDataId is int? ? byteDataId : this.byteDataId,
       byteData:
           byteData is _i2.ByteTestData? ? byteData : this.byteData?.copyWith(),
-      testExtractJsonResult: testExtractJsonResult is String?
-          ? testExtractJsonResult
-          : this.testExtractJsonResult,
       scrappable: scrappable is _i3.Scrappable?
           ? scrappable
           : this.scrappable?.copyWith(),
@@ -218,12 +214,12 @@ class ReferenceTestDataTable extends _i1.Table<int?> {
       'referenceQueryParametersJson',
       this,
     );
-    byteDataId = _i1.ColumnInt(
-      'byteDataId',
+    scrapResultJson = _i1.ColumnString(
+      'scrapResultJson',
       this,
     );
-    testExtractJsonResult = _i1.ColumnString(
-      'testExtractJsonResult',
+    byteDataId = _i1.ColumnInt(
+      'byteDataId',
       this,
     );
   }
@@ -232,11 +228,11 @@ class ReferenceTestDataTable extends _i1.Table<int?> {
 
   late final _i1.ColumnString referenceQueryParametersJson;
 
+  late final _i1.ColumnString scrapResultJson;
+
   late final _i1.ColumnInt byteDataId;
 
   _i2.ByteTestDataTable? _byteData;
-
-  late final _i1.ColumnString testExtractJsonResult;
 
   _i3.ScrappableTable? _scrappable;
 
@@ -271,8 +267,8 @@ class ReferenceTestDataTable extends _i1.Table<int?> {
         id,
         referenceLinkUsed,
         referenceQueryParametersJson,
+        scrapResultJson,
         byteDataId,
-        testExtractJsonResult,
       ];
 
   @override
@@ -607,6 +603,28 @@ class ReferenceTestDataAttachRowRepository {
 
 class ReferenceTestDataDetachRowRepository {
   const ReferenceTestDataDetachRowRepository._();
+
+  /// Detaches the relation between this [ReferenceTestData] and the [ByteTestData] set in `byteData`
+  /// by setting the [ReferenceTestData]'s foreign key `byteDataId` to `null`.
+  ///
+  /// This removes the association between the two models without deleting
+  /// the related record.
+  Future<void> byteData(
+    _i1.Session session,
+    ReferenceTestData referencetestdata, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (referencetestdata.id == null) {
+      throw ArgumentError.notNull('referencetestdata.id');
+    }
+
+    var $referencetestdata = referencetestdata.copyWith(byteDataId: null);
+    await session.db.updateRow<ReferenceTestData>(
+      $referencetestdata,
+      columns: [ReferenceTestData.t.byteDataId],
+      transaction: transaction,
+    );
+  }
 
   /// Detaches the relation between this [ReferenceTestData] and the [Scrappable] set in `scrappable`
   /// by setting the [ReferenceTestData]'s foreign key `id` to `null`.

@@ -23,7 +23,7 @@ class CodeBlock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final IconButton copyButton = IconButton(
-      icon: const Icon(Icons.copy),
+      icon: const Icon(Icons.copy, size: 18),
       tooltip: copyTooltipMessage,
       onPressed: () async {
         await Clipboard.setData(
@@ -52,10 +52,9 @@ class CodeBlock extends StatelessWidget {
                 if (hasLeading) ...[
                   Expanded(
                     child: Row(
-                      spacing: 8,
                       children: [
-                        copyButton,
                         ...?leadingWidgets,
+                        copyButton,
                       ],
                     ),
                   ),
