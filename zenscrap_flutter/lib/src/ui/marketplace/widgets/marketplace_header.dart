@@ -76,9 +76,9 @@ class MarketplaceHeader extends ConsumerWidget {
             },
             onSearchStart: (query) {
               ref.read(analyticsServiceProvider).trackMarketplaceSearchStart(
-                searchQuery: query,
-                queryLength: query.length,
-              );
+                    searchQuery: query,
+                    queryLength: query.length,
+                  );
             },
             onSearchClear: () {
               ref.read(analyticsServiceProvider).trackMarketplaceSearchClear();

@@ -186,87 +186,87 @@ class _UserScrappablesLayout extends ConsumerWidget {
     final scrappablesState = ref.watch(userScrappablesProvider);
     final totalUserScrappables = scrappablesState.mapOrNull(
           withData: (data) => data.response.pagination.totalUserScrappables,
-          loading: (data) =>
-              data.response?.pagination.totalUserScrappables,
-          withError: (data) =>
-              data.response?.pagination.totalUserScrappables,
+          loading: (data) => data.response?.pagination.totalUserScrappables,
+          withError: (data) => data.response?.pagination.totalUserScrappables,
         ) ??
         0;
 
     final maxAllowed = planTier.maxScrappables;
     final isAtLimit = totalUserScrappables >= maxAllowed;
 
-    return Column(
-      children: [
-        const SizedBox(height: 20),
-        Row(
-          children: [
-            Text(
-              'Your endpoints',
-              style: context.t.displaySmall,
-            ),
-            const Spacer(),
-            FilledButton.tonalIcon(
-              onPressed: () async {
-                // Track create new click
-                await analytics.trackUserScrappablesCreateNewClick();
+    return Padding(
+      padding: const EdgeInsets.only(right: 20),
+      child: Column(
+        children: [
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Text(
+                'Your endpoints',
+                style: context.t.displaySmall,
+              ),
+              const Spacer(),
+              FilledButton.tonalIcon(
+                onPressed: () async {
+                  // Track create new click
+                  await analytics.trackUserScrappablesCreateNewClick();
 
-                // Check if user is at their endpoint limit
-                if (isAtLimit) {
+                  // Check if user is at their endpoint limit
+                  if (isAtLimit) {
+                    if (!context.mounted) return;
+                    await showEndpointLimitUpgradeDialog(
+                      context,
+                      currentCount: totalUserScrappables,
+                      maxAllowed: maxAllowed,
+                      currentPlan: planTier,
+                      nextPlan: planTier.nextTier,
+                    );
+                    return;
+                  }
+
+                  ref.read(scrapChatProvider.notifier).reset();
                   if (!context.mounted) return;
-                  await showEndpointLimitUpgradeDialog(
-                    context,
-                    currentCount: totalUserScrappables,
-                    maxAllowed: maxAllowed,
-                    currentPlan: planTier,
-                    nextPlan: planTier.nextTier,
-                  );
-                  return;
-                }
-
-                ref.read(scrapChatProvider.notifier).reset();
-                if (!context.mounted) return;
-                final result = await context.push('/scrappable-form');
-                if (result == true) {
-                  unawaited(ref
-                      .read(userScrappablesProvider.notifier)
-                      .getScrappables());
-                }
-              },
-              label: const Text('Create new endpoint'),
-              icon: const Icon(Icons.add),
-            ),
-            const SizedBox(width: 20),
-          ],
-        ),
-        const SizedBox(height: 16),
-        ScrappablesSearchBar(
-          hintText: 'Search your endpoints by name or description...',
-          onSearch: (query) {
-            ref.read(userScrappablesProvider.notifier).search(query);
-          },
-          onSearchStart: (query) {
-            analytics.trackUserScrappablesSearchStart(
-              searchQuery: query,
-              queryLength: query.length,
-            );
-          },
-          onSearchClear: () {
-            analytics.trackUserScrappablesSearchClear();
-          },
-        ),
-        const SizedBox(height: 16),
-        CategoryFilterSection(
-          selectedCategories: selectedCategories,
-          onCategoriesChanged: (categories) {
-            ref
-                .read(userScrappablesProvider.notifier)
-                .filterByCategories(categories);
-          },
-        ),
-        const SizedBox(height: 16),
-        Expanded(child: contentWidget),
-      ],
+                  final result = await context.push('/scrappable-form');
+                  if (result == true) {
+                    unawaited(ref
+                        .read(userScrappablesProvider.notifier)
+                        .getScrappables());
+                  }
+                },
+                label: const Text('Create new endpoint'),
+                icon: const Icon(Icons.add),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ScrappablesSearchBar(
+            hintText: 'Search your endpoints by name or description...',
+            onSearch: (query) {
+              ref.read(userScrappablesProvider.notifier).search(query);
+            },
+            onSearchStart: (query) {
+              analytics.trackUserScrappablesSearchStart(
+                searchQuery: query,
+                queryLength: query.length,
+              );
+            },
+            onSearchClear: () {
+              analytics.trackUserScrappablesSearchClear();
+            },
+          ),
+          const SizedBox(height: 16),
+          CategoryFilterSection(
+            selectedCategories: selectedCategories,
+            onCategoriesChanged: (categories) {
+              ref
+                  .read(userScrappablesProvider.notifier)
+                  .filterByCategories(categories);
+            },
+          ),
+          const SizedBox(height: 16),
+          Expanded(child: contentWidget),
+        ],
+      ),
     );
   }
 }
