@@ -47,8 +47,16 @@ class AccountView extends ConsumerWidget {
             const SizedBox(height: 20),
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              decoration: getStandardCardContainerDecoration(context),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: context.c.outline.withAlpha(51),
+                  width: 1,
+                ),
+                color: context.c.surfaceContainerLowest.withAlpha(100),
+                // color: Colors.transparent,
+              ),
               child: Column(
                 children: [
                   const SizedBox(height: 20),
