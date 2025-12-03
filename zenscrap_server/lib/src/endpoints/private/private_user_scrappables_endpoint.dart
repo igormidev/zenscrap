@@ -69,10 +69,16 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
       return where;
     }
 
-    // Get total count for pagination
+    // Get total count for pagination (filtered)
     final totalCount = await Scrappable.db.count(
       session,
       where: whereClause,
+    );
+
+    // Get total user scrappables count (unfiltered) for limit checking
+    final totalUserScrappables = await Scrappable.db.count(
+      session,
+      where: baseWhere,
     );
 
     // Calculate pagination metadata
@@ -107,6 +113,7 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
         totalPages: totalPages,
         hasNextPage: hasNextPage,
         hasPreviousPage: hasPreviousPage,
+        totalUserScrappables: totalUserScrappables,
       ),
     );
   }

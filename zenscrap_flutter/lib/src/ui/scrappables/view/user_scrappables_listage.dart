@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/src/core/extensions/plan_tier_extension.dart';
 import 'package:zenscrap_flutter/src/core/mixins/edit_scrappable.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/scrappables_listage_ui_template/scrappables_listage_template.dart';
@@ -18,6 +19,7 @@ import 'package:zenscrap_flutter/src/states/account/account_state.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables_provider.dart';
 import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables_state.dart';
+import 'package:zenscrap_flutter/src/ui/marketplace/dialogs/upgrade_plan_dialog.dart';
 import 'package:zenscrap_flutter/src/ui/scrappables/pages/empty_scrappable_listage_indicator_page.dart';
 
 class UserScrappablesListage extends ConsumerStatefulWidget {
@@ -173,6 +175,27 @@ class _UserScrappablesLayout extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Get account info for plan tier
+    final accountState = ref.watch(accountProvider);
+    final planTier = accountState.mapOrNull(
+          withData: (data) => data.accountInfo.planTier,
+        ) ??
+        PlanTier.none;
+
+    // Get total user scrappables count from state
+    final scrappablesState = ref.watch(userScrappablesProvider);
+    final totalUserScrappables = scrappablesState.mapOrNull(
+          withData: (data) => data.response.pagination.totalUserScrappables,
+          loading: (data) =>
+              data.response?.pagination.totalUserScrappables,
+          withError: (data) =>
+              data.response?.pagination.totalUserScrappables,
+        ) ??
+        0;
+
+    final maxAllowed = planTier.maxScrappables;
+    final isAtLimit = totalUserScrappables >= maxAllowed;
+
     return Column(
       children: [
         const SizedBox(height: 20),
@@ -187,6 +210,19 @@ class _UserScrappablesLayout extends ConsumerWidget {
               onPressed: () async {
                 // Track create new click
                 await analytics.trackUserScrappablesCreateNewClick();
+
+                // Check if user is at their endpoint limit
+                if (isAtLimit) {
+                  if (!context.mounted) return;
+                  await showEndpointLimitUpgradeDialog(
+                    context,
+                    currentCount: totalUserScrappables,
+                    maxAllowed: maxAllowed,
+                    currentPlan: planTier,
+                    nextPlan: planTier.nextTier,
+                  );
+                  return;
+                }
 
                 ref.read(scrapChatProvider.notifier).reset();
                 if (!context.mounted) return;

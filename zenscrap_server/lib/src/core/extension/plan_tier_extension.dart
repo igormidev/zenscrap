@@ -21,6 +21,16 @@ extension PlanTierExt on PlanTier {
       PlanTier.ultra => 100,
     };
   }
+
+  /// The maximum number of scrappables (endpoints) allowed by the user's current plan.
+  int get maxScrappables {
+    return switch (this) {
+      PlanTier.none => 1,
+      PlanTier.basic => 3,
+      PlanTier.pro => 10,
+      PlanTier.ultra => 100,
+    };
+  }
 }
 
 extension ScraperCategoryExt on ScraperCategory {

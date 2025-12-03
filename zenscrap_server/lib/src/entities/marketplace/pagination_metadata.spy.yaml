@@ -6,3 +6,4 @@ fields:
   totalPages: int
   hasNextPage: bool
   hasPreviousPage: bool
+  totalUserScrappables: int?

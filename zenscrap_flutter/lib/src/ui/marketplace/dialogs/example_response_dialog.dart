@@ -179,7 +179,7 @@ class _ExampleResponseDialogState extends ConsumerState<ExampleResponseDialog>
             width: MediaQuery.sizeOf(context).width * 0.3,
             child: Column(
               children: [
-                const SizedBox(height: 4),
+                const SizedBox(height: 8),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: ReferenceLinkWidget(widget: widget),

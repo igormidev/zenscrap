@@ -18,4 +18,22 @@ extension PlanTierExtension on PlanTier {
       PlanTier.ultra => 'Ultra',
     };
   }
+
+  int get maxScrappables {
+    return switch (this) {
+      PlanTier.none => 1,
+      PlanTier.basic => 3,
+      PlanTier.pro => 10,
+      PlanTier.ultra => 100,
+    };
+  }
+
+  PlanTier get nextTier {
+    return switch (this) {
+      PlanTier.none => PlanTier.basic,
+      PlanTier.basic => PlanTier.pro,
+      PlanTier.pro => PlanTier.ultra,
+      PlanTier.ultra => PlanTier.ultra,
+    };
+  }
 }
