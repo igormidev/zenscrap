@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:babel_text/babel_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -179,30 +180,8 @@ class _ExampleResponseDialogState extends ConsumerState<ExampleResponseDialog>
               children: [
                 const SizedBox(height: 4),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Card(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Reference url used for example:',
-                                style: context.t.titleSmall
-                                    ?.copyWith(color: context.c.primary)),
-                            Text(
-                              (widget.scrappable.referenceTestData
-                                          ?.referenceLinkUsed ??
-                                      '')
-                                  .shortUrl,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: ReferenceLinkWidget(widget: widget),
                 ),
                 const SizedBox(height: 4),
                 Padding(
@@ -362,6 +341,48 @@ class _ExampleResponseDialogState extends ConsumerState<ExampleResponseDialog>
             ),
           ),
       ],
+    );
+  }
+}
+
+class ReferenceLinkWidget extends StatelessWidget {
+  const ReferenceLinkWidget({
+    super.key,
+    required this.widget,
+  });
+
+  final ExampleResponseDialog widget;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: context.c.surfaceContainerHighest.withAlpha(77),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: context.c.outline.withAlpha(51),
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      child: SizedBox(
+        width: double.infinity,
+        child: Stack(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                BabelSelectableText('Reference url used for example:',
+                    style: context.t.titleSmall
+                        ?.copyWith(color: context.c.primary)),
+                BabelSelectableText(
+                  (widget.scrappable.referenceTestData?.referenceLinkUsed ?? '')
+                      .shortUrl,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
