@@ -2,6 +2,7 @@ import 'package:nanoid2/nanoid2.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart';
 import 'package:zenscrap_server/src/core/default_classes.dart';
+import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class PrivateAccountEndpoint extends Endpoint {
@@ -193,6 +194,8 @@ class PrivateAccountEndpoint extends Endpoint {
     );
     final existsScrappableWithTargetId = existingScrappable != null;
     final scrappableAccountId = existingScrappable?.accountId;
+    final isAlreadyAttachedToThisAccount =
+        scrappableAccountId == accountInfo.id;
     final isAccountAlreadyAttachedToOtherUser =
         scrappableAccountId != null && scrappableAccountId != accountInfo.id;
 
@@ -209,6 +212,30 @@ class PrivateAccountEndpoint extends Endpoint {
         title: 'Scrappable Already Attached',
         description:
             'The scrappable you are trying to attach is already linked to another account.',
+      );
+    }
+
+    // If already attached to this account, no need to check limits or re-attach
+    if (isAlreadyAttachedToThisAccount) {
+      return;
+    }
+
+    // Validate endpoint limit before attaching
+    final currentScrappablesCount = await Scrappable.db.count(
+      session,
+      where: (t) =>
+          t.accountId.equals(accountInfo.id) & t.isDeleted.equals(false),
+      transaction: transaction,
+    );
+
+    final maxAllowed = accountInfo.planTier.maxScrappables;
+
+    if (currentScrappablesCount >= maxAllowed) {
+      throw ZenScrapException(
+        title: 'Endpoint Limit Reached',
+        description:
+            'You have reached the maximum number of endpoints ($maxAllowed) for your ${accountInfo.planTier.name} plan. '
+            'Please upgrade your plan to attach more endpoints.',
       );
     }
 
