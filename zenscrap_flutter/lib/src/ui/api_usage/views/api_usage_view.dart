@@ -52,6 +52,24 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
     await ref.read(creditHistoryProvider.notifier).loadMoreHistory();
   }
 
+  Future<void> _handleRefresh() async {
+    // Track refresh click
+    ref.read(analyticsServiceProvider).trackApiUsageRefreshClick();
+
+    _isRefreshVN.value = true;
+    try {
+      await Future.delayed(const Duration(milliseconds: 800));
+      if (!mounted) return;
+      await ref.globalLoadingSetter(() async {
+        await ref.read(apiUsageProvider.notifier).loadApiUsage();
+        await ref.read(apiKeysProvider.notifier).loadApiKeys();
+        await ref.read(creditHistoryProvider.notifier).loadCreditHistory();
+      });
+    } finally {
+      _isRefreshVN.value = false;
+    }
+  }
+
   Future<AccountApiKey?> _createApiKey(String name) async {
     if (!mounted) return null;
 
@@ -368,6 +386,7 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
               onLoadMoreHistory: _loadMoreHistory,
               onShowCreateApiKeyDialog: _showCreateApiKeyDialog,
               onDeactivateApiKey: _deactivateApiKey,
+              onRefresh: _handleRefresh,
             );
           }
         },
@@ -478,6 +497,7 @@ class DesktopLayout extends StatelessWidget {
   final VoidCallback onShowCreateApiKeyDialog;
   final Function(int) onDeactivateApiKey;
   final ValueNotifier<bool> isRefreshVN;
+  final VoidCallback onRefresh;
 
   const DesktopLayout({
     super.key,
@@ -492,13 +512,14 @@ class DesktopLayout extends StatelessWidget {
     required this.onShowCreateApiKeyDialog,
     required this.onDeactivateApiKey,
     required this.isRefreshVN,
+    required this.onRefresh,
   });
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 1200),
+        constraints: const BoxConstraints(maxWidth: 1210),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -508,47 +529,19 @@ class DesktopLayout extends StatelessWidget {
                 Expanded(
                   child: Text(
                     'Api Credits & Keys',
-                    style: context.t.displayMedium,
+                    style: context.t.displaySmall,
                   ),
                 ),
                 ValueListenableBuilder(
                     valueListenable: isRefreshVN,
                     builder: (context, isRefresh, _) {
-                      return Consumer(builder: (context, ref, child) {
-                        return FilledButton.tonalIcon(
-                          onPressed: isRefresh
-                              ? null
-                              : () async {
-                                  // Track refresh click
-                                  ref
-                                      .read(analyticsServiceProvider)
-                                      .trackApiUsageRefreshClick();
-
-                                  isRefreshVN.value = true;
-                                  try {
-                                    await Future.delayed(
-                                        const Duration(milliseconds: 800));
-                                    await ref.globalLoadingSetter(() async {
-                                      await ref
-                                          .read(apiUsageProvider.notifier)
-                                          .loadApiUsage();
-                                      await ref
-                                          .read(apiKeysProvider.notifier)
-                                          .loadApiKeys();
-                                      await ref
-                                          .read(creditHistoryProvider.notifier)
-                                          .loadCreditHistory();
-                                    });
-                                  } finally {
-                                    isRefreshVN.value = false;
-                                  }
-                                },
-                          label: Text('Refresh'),
-                          icon: isRefresh
-                              ? CupertinoActivityIndicator()
-                              : Icon(Icons.refresh),
-                        );
-                      });
+                      return FilledButton.tonalIcon(
+                        onPressed: isRefresh ? null : onRefresh,
+                        label: Text('Refresh'),
+                        icon: isRefresh
+                            ? CupertinoActivityIndicator()
+                            : Icon(Icons.refresh),
+                      );
                     }),
               ],
             ),
