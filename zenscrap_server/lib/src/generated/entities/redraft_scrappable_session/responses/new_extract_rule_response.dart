@@ -14,6 +14,7 @@ abstract class NewExtractRuleResponse extends _i1.ChatResponse
     implements _i2.SerializableModel, _i2.ProtocolSerialization {
   NewExtractRuleResponse._({
     required super.role,
+    required super.expectsFollowUp,
     required this.messageText,
     required this.referenceTestData,
     required this.scrappingBeeExtractLogic,
@@ -22,6 +23,7 @@ abstract class NewExtractRuleResponse extends _i1.ChatResponse
 
   factory NewExtractRuleResponse({
     required _i3.PromptRole role,
+    required bool expectsFollowUp,
     required String messageText,
     required _i5.ReferenceTestData referenceTestData,
     required _i4.ScrappingBeeExtractLogic scrappingBeeExtractLogic,
@@ -32,6 +34,7 @@ abstract class NewExtractRuleResponse extends _i1.ChatResponse
       Map<String, dynamic> jsonSerialization) {
     return NewExtractRuleResponse(
       role: _i3.PromptRole.fromJson((jsonSerialization['role'] as String)),
+      expectsFollowUp: jsonSerialization['expectsFollowUp'] as bool,
       messageText: jsonSerialization['messageText'] as String,
       referenceTestData: _i5.ReferenceTestData.fromJson(
           (jsonSerialization['referenceTestData'] as Map<String, dynamic>)),
@@ -56,6 +59,7 @@ abstract class NewExtractRuleResponse extends _i1.ChatResponse
   @_i2.useResult
   NewExtractRuleResponse copyWith({
     _i3.PromptRole? role,
+    bool? expectsFollowUp,
     String? messageText,
     _i5.ReferenceTestData? referenceTestData,
     _i4.ScrappingBeeExtractLogic? scrappingBeeExtractLogic,
@@ -65,6 +69,7 @@ abstract class NewExtractRuleResponse extends _i1.ChatResponse
   Map<String, dynamic> toJson() {
     return {
       'role': role.toJson(),
+      'expectsFollowUp': expectsFollowUp,
       'messageText': messageText,
       'referenceTestData': referenceTestData.toJson(),
       'scrappingBeeExtractLogic': scrappingBeeExtractLogic.toJson(),
@@ -76,6 +81,7 @@ abstract class NewExtractRuleResponse extends _i1.ChatResponse
   Map<String, dynamic> toJsonForProtocol() {
     return {
       'role': role.toJson(),
+      'expectsFollowUp': expectsFollowUp,
       'messageText': messageText,
       'referenceTestData': referenceTestData.toJsonForProtocol(),
       'scrappingBeeExtractLogic': scrappingBeeExtractLogic.toJsonForProtocol(),
@@ -92,12 +98,14 @@ abstract class NewExtractRuleResponse extends _i1.ChatResponse
 class _NewExtractRuleResponseImpl extends NewExtractRuleResponse {
   _NewExtractRuleResponseImpl({
     required _i3.PromptRole role,
+    required bool expectsFollowUp,
     required String messageText,
     required _i5.ReferenceTestData referenceTestData,
     required _i4.ScrappingBeeExtractLogic scrappingBeeExtractLogic,
     required _i6.ScrappableRequest scrapperRequest,
   }) : super._(
           role: role,
+          expectsFollowUp: expectsFollowUp,
           messageText: messageText,
           referenceTestData: referenceTestData,
           scrappingBeeExtractLogic: scrappingBeeExtractLogic,
@@ -110,6 +118,7 @@ class _NewExtractRuleResponseImpl extends NewExtractRuleResponse {
   @override
   NewExtractRuleResponse copyWith({
     _i3.PromptRole? role,
+    bool? expectsFollowUp,
     String? messageText,
     _i5.ReferenceTestData? referenceTestData,
     _i4.ScrappingBeeExtractLogic? scrappingBeeExtractLogic,
@@ -117,6 +126,7 @@ class _NewExtractRuleResponseImpl extends NewExtractRuleResponse {
   }) {
     return NewExtractRuleResponse(
       role: role ?? this.role,
+      expectsFollowUp: expectsFollowUp ?? this.expectsFollowUp,
       messageText: messageText ?? this.messageText,
       referenceTestData: referenceTestData ?? this.referenceTestData.copyWith(),
       scrappingBeeExtractLogic:

@@ -32,7 +32,8 @@ class ChatControllerOpenAiSdkImpl extends IChatController
     required String model,
   })  : _openAiApiKey = openAiApiKey,
         _model = model {
-    final systemPrompt = buildSystemPrompt(scrapingBeeApiKey: scrapingBeeApiKey);
+    final systemPrompt =
+        buildSystemPrompt(scrapingBeeApiKey: scrapingBeeApiKey);
     _baseMessages.addAll([
       OpenAiMessage(role: 'system', content: systemPrompt),
       OpenAiMessage(role: 'system', content: contextPrompt),
@@ -294,10 +295,24 @@ class ChatControllerOpenAiSdkImpl extends IChatController
       case AiModel.normal:
         // GPT-5.1-mini: mid-tier model optimized for speed and cost
         // Note: GPT-5.1-nano is not yet released as of December 2025
-        return 'gpt-5.1-mini';
+        return 'gpt-5-mini';
       case AiModel.powerful:
         // GPT-5.1: flagship model for maximum intelligence
         return 'gpt-5.1';
+    }
+  }
+
+  /// Returns max_output_tokens limit for the current model.
+  /// Mini models have a 128k limit; full models have higher limits.
+  int? get _maxOutputTokens {
+    switch (_model) {
+      case 'gpt-5-mini':
+        // GPT-5-mini supports up to 128,000 output tokens
+        // Setting this explicitly prevents truncation issues
+        return 128000;
+      default:
+        // Full models have higher limits, let the API use defaults
+        return null;
     }
   }
 
@@ -368,6 +383,7 @@ class ChatControllerOpenAiSdkImpl extends IChatController
         chatSeason.add(
           ErrorTextResponse(
             role: PromptRole.system,
+            expectsFollowUp: false, // Terminal error, no follow-up
             errorMessage: errorMessage,
           ),
         );
@@ -433,6 +449,14 @@ class ChatControllerOpenAiSdkImpl extends IChatController
       });
     }
 
+    // Add web_search tool to allow the model to search the web for documentation
+    // This is especially useful when the model is unsure about ScrapingBee API details
+    // or needs to verify extract_rules syntax from official documentation
+    tools.add({
+      'type': 'web_search',
+      'search_context_size': 'medium', // Balance between quality and cost
+    });
+
     final requestBody = {
       'model': _model,
       'stream': true,
@@ -444,6 +468,8 @@ class ChatControllerOpenAiSdkImpl extends IChatController
         'format': responseFormat,
       },
       'input': input,
+      // Set max_output_tokens for mini models to prevent truncation
+      if (_maxOutputTokens != null) 'max_output_tokens': _maxOutputTokens,
     };
 
     final client = http.Client();
@@ -512,7 +538,8 @@ class ChatControllerOpenAiSdkImpl extends IChatController
         }
       } else if (type == 'error' || type == 'response.failed') {
         final errorData = event['error'] ?? event['message'] ?? event;
-        session.log('OpenAI API error event: $errorData', level: LogLevel.error);
+        session.log('OpenAI API error event: $errorData',
+            level: LogLevel.error);
         throw Exception(
           'OpenAI streaming error: $errorData',
         );
@@ -534,6 +561,13 @@ class ChatControllerOpenAiSdkImpl extends IChatController
         // Reasoning summary completed
         thinkingStream.add('\n');
         thinkingBuffer.writeln();
+      } else if (type != null && type.contains('web_search')) {
+        // Handle web_search events - stream them as thinking progress
+        final webSearchInfo = _extractWebSearchEventInfo(event, type);
+        if (webSearchInfo.isNotEmpty) {
+          thinkingStream.add('\n[Web Search] $webSearchInfo\n');
+          thinkingBuffer.writeln('[Web Search] $webSearchInfo');
+        }
       }
     }
 
@@ -584,6 +618,36 @@ Thinking Buffer (${thinkingContent.length} chars): ${thinkingContent.isEmpty ? "
     );
   }
 
+  /// Extracts human-readable info from web_search events for streaming
+  String _extractWebSearchEventInfo(Map<String, dynamic> event, String type) {
+    try {
+      if (type == 'response.web_search_call.in_progress' ||
+          type == 'response.web_search_call') {
+        return '🔍 Searching the web...';
+      } else if (type == 'response.web_search_call.searching') {
+        final item = event['item'] as Map<String, dynamic>?;
+        final query = item?['query'] ?? event['query'];
+        if (query != null) {
+          return '🔍 Searching for: "$query"';
+        }
+        return '🔍 Searching...';
+      } else if (type == 'response.web_search_call.completed') {
+        final item = event['item'] as Map<String, dynamic>?;
+        final status = item?['status'] ?? 'completed';
+        return '✅ Web search $status';
+      } else if (type == 'response.web_search_call.failed') {
+        final item = event['item'] as Map<String, dynamic>?;
+        final error = item?['error'] ?? event['error'] ?? 'Unknown error';
+        return '❌ Web search failed: $error';
+      } else if (type.contains('web_search')) {
+        return 'Web search activity: ${type.replaceAll("response.", "").replaceAll("_", " ")}';
+      }
+    } catch (e) {
+      return 'Web search event parsing error: $e';
+    }
+    return '';
+  }
+
   /// Extracts human-readable info from MCP events for streaming
   String _extractMcpEventInfo(Map<String, dynamic> event, String type) {
     try {
@@ -621,7 +685,8 @@ Thinking Buffer (${thinkingContent.length} chars): ${thinkingContent.isEmpty ? "
         final output = item?['output'] as List?;
         if (output != null && output.isNotEmpty) {
           final buffer = StringBuffer();
-          buffer.writeln('✅ $name completed${serverLabel.isNotEmpty ? " ($serverLabel)" : ""}:');
+          buffer.writeln(
+              '✅ $name completed${serverLabel.isNotEmpty ? " ($serverLabel)" : ""}:');
 
           for (final outputItem in output) {
             if (outputItem is Map<String, dynamic>) {
@@ -629,8 +694,9 @@ Thinking Buffer (${thinkingContent.length} chars): ${thinkingContent.isEmpty ? "
               if (outputType == 'text') {
                 final text = outputItem['text'] as String? ?? '';
                 // Truncate long outputs but show enough to understand the result
-                final truncatedText =
-                    text.length > 1500 ? '${text.substring(0, 1500)}...[truncated]' : text;
+                final truncatedText = text.length > 1500
+                    ? '${text.substring(0, 1500)}...[truncated]'
+                    : text;
                 buffer.writeln(truncatedText);
               }
             }
@@ -697,8 +763,7 @@ Thinking Buffer (${thinkingContent.length} chars): ${thinkingContent.isEmpty ? "
     Session session,
   ) {
     // Log the response structure for debugging
-    session.log(
-        'Extracting parsed response from: ${response.keys.join(", ")}',
+    session.log('Extracting parsed response from: ${response.keys.join(", ")}',
         level: LogLevel.debug);
 
     // Try multiple extraction paths
@@ -743,7 +808,8 @@ Thinking Buffer (${thinkingContent.length} chars): ${thinkingContent.isEmpty ? "
             if (itemText is String && itemText.isNotEmpty) {
               final decoded = _tryExtractJsonFromText(itemText);
               if (decoded != null) {
-                session.log('Found JSON in content.text', level: LogLevel.debug);
+                session.log('Found JSON in content.text',
+                    level: LogLevel.debug);
                 return decoded;
               }
             }

@@ -14,17 +14,20 @@ abstract class ErrorTextResponse extends _i1.ChatResponse
     implements _i2.SerializableModel {
   ErrorTextResponse._({
     required super.role,
+    required super.expectsFollowUp,
     required this.errorMessage,
   });
 
   factory ErrorTextResponse({
     required _i3.PromptRole role,
+    required bool expectsFollowUp,
     required String errorMessage,
   }) = _ErrorTextResponseImpl;
 
   factory ErrorTextResponse.fromJson(Map<String, dynamic> jsonSerialization) {
     return ErrorTextResponse(
       role: _i3.PromptRole.fromJson((jsonSerialization['role'] as String)),
+      expectsFollowUp: jsonSerialization['expectsFollowUp'] as bool,
       errorMessage: jsonSerialization['errorMessage'] as String,
     );
   }
@@ -36,12 +39,14 @@ abstract class ErrorTextResponse extends _i1.ChatResponse
   @_i2.useResult
   ErrorTextResponse copyWith({
     _i3.PromptRole? role,
+    bool? expectsFollowUp,
     String? errorMessage,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
       'role': role.toJson(),
+      'expectsFollowUp': expectsFollowUp,
       'errorMessage': errorMessage,
     };
   }
@@ -55,9 +60,11 @@ abstract class ErrorTextResponse extends _i1.ChatResponse
 class _ErrorTextResponseImpl extends ErrorTextResponse {
   _ErrorTextResponseImpl({
     required _i3.PromptRole role,
+    required bool expectsFollowUp,
     required String errorMessage,
   }) : super._(
           role: role,
+          expectsFollowUp: expectsFollowUp,
           errorMessage: errorMessage,
         );
 
@@ -67,10 +74,12 @@ class _ErrorTextResponseImpl extends ErrorTextResponse {
   @override
   ErrorTextResponse copyWith({
     _i3.PromptRole? role,
+    bool? expectsFollowUp,
     String? errorMessage,
   }) {
     return ErrorTextResponse(
       role: role ?? this.role,
+      expectsFollowUp: expectsFollowUp ?? this.expectsFollowUp,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }

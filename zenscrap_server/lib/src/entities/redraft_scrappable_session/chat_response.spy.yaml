@@ -2,3 +2,4 @@ class: ChatResponse
 sealed: true
 fields:
     role: PromptRole
+    expectsFollowUp: bool

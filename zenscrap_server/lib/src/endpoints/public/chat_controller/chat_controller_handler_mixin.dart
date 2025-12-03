@@ -49,6 +49,7 @@ mixin ChatControllerHandlerMixin {
 
     chatSeason.add(MessageTextResponse(
       role: PromptRole.system,
+      expectsFollowUp: true, // Validation will follow
       messageText:
           'Great, I will now test the extract rules you created to see if it works in the reference link we are using for testing.\n'
           'Please wait a moment...',
@@ -110,6 +111,7 @@ mixin ChatControllerHandlerMixin {
       withData: (result, html, pageFullscreenScreenshot) async {
         chatSeason.add(MessageTextResponse(
           role: PromptRole.system,
+          expectsFollowUp: true, // NewExtractRuleResponse will follow
           messageText:
               'New rules were tested and did not present any errors! I\'ll update the test endpoint...',
         ));
@@ -173,6 +175,7 @@ mixin ChatControllerHandlerMixin {
 
         chatSeason.add(NewExtractRuleResponse(
             role: PromptRole.system,
+            expectsFollowUp: false, // Final success, no follow-up
             messageText: 'New rules were tested and did not present any errors',
             scrapperRequest: scrapperRequest,
             referenceTestData: newReferenceTestData,
@@ -184,6 +187,7 @@ mixin ChatControllerHandlerMixin {
             level: LogLevel.warning);
         chatSeason.add(ErrorTextResponse(
           role: PromptRole.system,
+          expectsFollowUp: true, // Retry will follow
           errorMessage:
               'The extraction rules failed in my quality-assurance test validation. I will ask the AI to fix the selectors and try again.',
         ));
@@ -252,6 +256,7 @@ extension WebScrapperChatAIResponseMapExt on WebScrapperChatAIResponse {
       WebScrapperChatAIResponseJustMessage(:final String message) => (
           MessageTextResponse(
             role: PromptRole.model,
+            expectsFollowUp: false, // Final AI message, no follow-up
             messageText: message,
           ),
           null,
@@ -260,6 +265,7 @@ extension WebScrapperChatAIResponseMapExt on WebScrapperChatAIResponse {
       WebScrapperChatAIResponseErrorMessage(:final String errorDescription) => (
           ErrorTextResponse(
             role: PromptRole.model,
+            expectsFollowUp: false, // AI error, no follow-up
             errorMessage: errorDescription,
           ),
           null,
@@ -303,6 +309,7 @@ extension WebScrapperChatAIResponseMapExt on WebScrapperChatAIResponse {
             CandidateExtractLogicUpdate(
               thinkingSentences: thinkingSentences,
               role: PromptRole.model,
+              expectsFollowUp: true, // Validation will follow
               referenceTestData: referenceTestData,
               messageText: resumeActionMessage,
               scrappingBeeExtractLogic: updatedExtractLogic,
@@ -318,6 +325,7 @@ extension WebScrapperChatAIResponseMapExt on WebScrapperChatAIResponse {
         (
           MessageTextResponse(
             role: PromptRole.model,
+            expectsFollowUp: false, // Request modification only, no follow-up
             messageText:
                 '$resumeActionMessage\n\n**Note:** The request structure has been modified. The updated queryParams and queryParamsNotRelatedToUrl will be applied.',
           ),
@@ -368,6 +376,7 @@ extension WebScrapperChatAIResponseMapExt on WebScrapperChatAIResponse {
             CandidateExtractLogicUpdate(
               thinkingSentences: thinkingSentences,
               role: PromptRole.model,
+              expectsFollowUp: true, // Validation will follow
               referenceTestData: referenceTestData,
               messageText: resumeActionMessage,
               scrappingBeeExtractLogic: updatedExtractLogic,

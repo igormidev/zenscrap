@@ -197,6 +197,7 @@ class ScrappableChatSession extends Endpoint {
       scrappableId: scrappableId,
       response: UpdatedScrappableRequestResponse(
         role: PromptRole.system,
+        expectsFollowUp: false, // Configuration update notification, no follow-up
         messageText: 'Scrappable request configuration updated successfully',
         url: url,
         pathParams: pathParams,
@@ -495,6 +496,7 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
       _scrapRedraftSessions[sessionId]?.add(
         ErrorTextResponse(
           role: PromptRole.system,
+          expectsFollowUp: false, // Terminal error, no follow-up
           errorMessage: 'Session not found or has been closed.',
         ),
       );
@@ -510,6 +512,7 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
       _scrapRedraftSessions[sessionId]?.add(
         ErrorTextResponse(
           role: PromptRole.system,
+          expectsFollowUp: false, // Terminal error, no follow-up
           errorMessage: 'Session test data not found or has been closed.',
         ),
       );
@@ -547,6 +550,7 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
 
     chatSeason.add(MessageTextResponse(
       role: PromptRole.user,
+      expectsFollowUp: true, // User message always expects AI response
       messageText: userPrompt,
     ));
 
@@ -563,6 +567,7 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
     } catch (e, s) {
       chatSeason.add(ErrorTextResponse(
         role: PromptRole.system,
+        expectsFollowUp: false, // Terminal error, no follow-up
         errorMessage: 'An error occurred while sending the message:\n$e',
       ));
       session.log(

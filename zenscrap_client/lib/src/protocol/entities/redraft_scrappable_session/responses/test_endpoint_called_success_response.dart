@@ -14,6 +14,7 @@ abstract class TestEndpointCalledSuccessResponse extends _i1.ChatResponse
     implements _i2.SerializableModel {
   TestEndpointCalledSuccessResponse._({
     required super.role,
+    required super.expectsFollowUp,
     required this.inputPayload,
     required this.responseData,
     required this.timestamp,
@@ -22,6 +23,7 @@ abstract class TestEndpointCalledSuccessResponse extends _i1.ChatResponse
 
   factory TestEndpointCalledSuccessResponse({
     required _i3.PromptRole role,
+    required bool expectsFollowUp,
     required String inputPayload,
     required String responseData,
     required DateTime timestamp,
@@ -32,6 +34,7 @@ abstract class TestEndpointCalledSuccessResponse extends _i1.ChatResponse
       Map<String, dynamic> jsonSerialization) {
     return TestEndpointCalledSuccessResponse(
       role: _i3.PromptRole.fromJson((jsonSerialization['role'] as String)),
+      expectsFollowUp: jsonSerialization['expectsFollowUp'] as bool,
       inputPayload: jsonSerialization['inputPayload'] as String,
       responseData: jsonSerialization['responseData'] as String,
       timestamp:
@@ -54,6 +57,7 @@ abstract class TestEndpointCalledSuccessResponse extends _i1.ChatResponse
   @_i2.useResult
   TestEndpointCalledSuccessResponse copyWith({
     _i3.PromptRole? role,
+    bool? expectsFollowUp,
     String? inputPayload,
     String? responseData,
     DateTime? timestamp,
@@ -63,6 +67,7 @@ abstract class TestEndpointCalledSuccessResponse extends _i1.ChatResponse
   Map<String, dynamic> toJson() {
     return {
       'role': role.toJson(),
+      'expectsFollowUp': expectsFollowUp,
       'inputPayload': inputPayload,
       'responseData': responseData,
       'timestamp': timestamp.toJson(),
@@ -80,12 +85,14 @@ class _TestEndpointCalledSuccessResponseImpl
     extends TestEndpointCalledSuccessResponse {
   _TestEndpointCalledSuccessResponseImpl({
     required _i3.PromptRole role,
+    required bool expectsFollowUp,
     required String inputPayload,
     required String responseData,
     required DateTime timestamp,
     required _i5.ReferenceTestData referenceTestData,
   }) : super._(
           role: role,
+          expectsFollowUp: expectsFollowUp,
           inputPayload: inputPayload,
           responseData: responseData,
           timestamp: timestamp,
@@ -98,6 +105,7 @@ class _TestEndpointCalledSuccessResponseImpl
   @override
   TestEndpointCalledSuccessResponse copyWith({
     _i3.PromptRole? role,
+    bool? expectsFollowUp,
     String? inputPayload,
     String? responseData,
     DateTime? timestamp,
@@ -105,6 +113,7 @@ class _TestEndpointCalledSuccessResponseImpl
   }) {
     return TestEndpointCalledSuccessResponse(
       role: role ?? this.role,
+      expectsFollowUp: expectsFollowUp ?? this.expectsFollowUp,
       inputPayload: inputPayload ?? this.inputPayload,
       responseData: responseData ?? this.responseData,
       timestamp: timestamp ?? this.timestamp,

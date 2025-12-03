@@ -14,6 +14,7 @@ abstract class TestEndpointCalledErrorResponse extends _i1.ChatResponse
     implements _i2.SerializableModel, _i2.ProtocolSerialization {
   TestEndpointCalledErrorResponse._({
     required super.role,
+    required super.expectsFollowUp,
     required this.errorTitle,
     required this.errorDescription,
     required this.inputPayload,
@@ -22,6 +23,7 @@ abstract class TestEndpointCalledErrorResponse extends _i1.ChatResponse
 
   factory TestEndpointCalledErrorResponse({
     required _i3.PromptRole role,
+    required bool expectsFollowUp,
     required String errorTitle,
     required String errorDescription,
     required String inputPayload,
@@ -32,6 +34,7 @@ abstract class TestEndpointCalledErrorResponse extends _i1.ChatResponse
       Map<String, dynamic> jsonSerialization) {
     return TestEndpointCalledErrorResponse(
       role: _i3.PromptRole.fromJson((jsonSerialization['role'] as String)),
+      expectsFollowUp: jsonSerialization['expectsFollowUp'] as bool,
       errorTitle: jsonSerialization['errorTitle'] as String,
       errorDescription: jsonSerialization['errorDescription'] as String,
       inputPayload: jsonSerialization['inputPayload'] as String,
@@ -53,6 +56,7 @@ abstract class TestEndpointCalledErrorResponse extends _i1.ChatResponse
   @_i2.useResult
   TestEndpointCalledErrorResponse copyWith({
     _i3.PromptRole? role,
+    bool? expectsFollowUp,
     String? errorTitle,
     String? errorDescription,
     String? inputPayload,
@@ -62,6 +66,7 @@ abstract class TestEndpointCalledErrorResponse extends _i1.ChatResponse
   Map<String, dynamic> toJson() {
     return {
       'role': role.toJson(),
+      'expectsFollowUp': expectsFollowUp,
       'errorTitle': errorTitle,
       'errorDescription': errorDescription,
       'inputPayload': inputPayload,
@@ -73,6 +78,7 @@ abstract class TestEndpointCalledErrorResponse extends _i1.ChatResponse
   Map<String, dynamic> toJsonForProtocol() {
     return {
       'role': role.toJson(),
+      'expectsFollowUp': expectsFollowUp,
       'errorTitle': errorTitle,
       'errorDescription': errorDescription,
       'inputPayload': inputPayload,
@@ -90,12 +96,14 @@ class _TestEndpointCalledErrorResponseImpl
     extends TestEndpointCalledErrorResponse {
   _TestEndpointCalledErrorResponseImpl({
     required _i3.PromptRole role,
+    required bool expectsFollowUp,
     required String errorTitle,
     required String errorDescription,
     required String inputPayload,
     required DateTime timestamp,
   }) : super._(
           role: role,
+          expectsFollowUp: expectsFollowUp,
           errorTitle: errorTitle,
           errorDescription: errorDescription,
           inputPayload: inputPayload,
@@ -108,6 +116,7 @@ class _TestEndpointCalledErrorResponseImpl
   @override
   TestEndpointCalledErrorResponse copyWith({
     _i3.PromptRole? role,
+    bool? expectsFollowUp,
     String? errorTitle,
     String? errorDescription,
     String? inputPayload,
@@ -115,6 +124,7 @@ class _TestEndpointCalledErrorResponseImpl
   }) {
     return TestEndpointCalledErrorResponse(
       role: role ?? this.role,
+      expectsFollowUp: expectsFollowUp ?? this.expectsFollowUp,
       errorTitle: errorTitle ?? this.errorTitle,
       errorDescription: errorDescription ?? this.errorDescription,
       inputPayload: inputPayload ?? this.inputPayload,

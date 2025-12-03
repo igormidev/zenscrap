@@ -25,7 +25,12 @@ part 'responses/updated_scrappable_request_response.dart';
 
 sealed class ChatResponse
     implements _i2.SerializableModel, _i2.ProtocolSerialization {
-  ChatResponse({required this.role});
+  ChatResponse({
+    required this.role,
+    required this.expectsFollowUp,
+  });
 
   _i3.PromptRole role;
+
+  bool expectsFollowUp;
 }

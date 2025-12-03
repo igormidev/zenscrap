@@ -14,6 +14,7 @@ abstract class UpdatedScrappableRequestResponse extends _i1.ChatResponse
     implements _i2.SerializableModel {
   UpdatedScrappableRequestResponse._({
     required super.role,
+    required super.expectsFollowUp,
     required this.messageText,
     required this.url,
     required this.queryParams,
@@ -22,6 +23,7 @@ abstract class UpdatedScrappableRequestResponse extends _i1.ChatResponse
 
   factory UpdatedScrappableRequestResponse({
     required _i3.PromptRole role,
+    required bool expectsFollowUp,
     required String messageText,
     required String url,
     required Map<String, String?> queryParams,
@@ -32,6 +34,7 @@ abstract class UpdatedScrappableRequestResponse extends _i1.ChatResponse
       Map<String, dynamic> jsonSerialization) {
     return UpdatedScrappableRequestResponse(
       role: _i3.PromptRole.fromJson((jsonSerialization['role'] as String)),
+      expectsFollowUp: jsonSerialization['expectsFollowUp'] as bool,
       messageText: jsonSerialization['messageText'] as String,
       url: jsonSerialization['url'] as String,
       queryParams:
@@ -58,6 +61,7 @@ abstract class UpdatedScrappableRequestResponse extends _i1.ChatResponse
   @_i2.useResult
   UpdatedScrappableRequestResponse copyWith({
     _i3.PromptRole? role,
+    bool? expectsFollowUp,
     String? messageText,
     String? url,
     Map<String, String?>? queryParams,
@@ -67,6 +71,7 @@ abstract class UpdatedScrappableRequestResponse extends _i1.ChatResponse
   Map<String, dynamic> toJson() {
     return {
       'role': role.toJson(),
+      'expectsFollowUp': expectsFollowUp,
       'messageText': messageText,
       'url': url,
       'queryParams': queryParams.toJson(),
@@ -84,12 +89,14 @@ class _UpdatedScrappableRequestResponseImpl
     extends UpdatedScrappableRequestResponse {
   _UpdatedScrappableRequestResponseImpl({
     required _i3.PromptRole role,
+    required bool expectsFollowUp,
     required String messageText,
     required String url,
     required Map<String, String?> queryParams,
     required List<String> pathParams,
   }) : super._(
           role: role,
+          expectsFollowUp: expectsFollowUp,
           messageText: messageText,
           url: url,
           queryParams: queryParams,
@@ -102,6 +109,7 @@ class _UpdatedScrappableRequestResponseImpl
   @override
   UpdatedScrappableRequestResponse copyWith({
     _i3.PromptRole? role,
+    bool? expectsFollowUp,
     String? messageText,
     String? url,
     Map<String, String?>? queryParams,
@@ -109,6 +117,7 @@ class _UpdatedScrappableRequestResponseImpl
   }) {
     return UpdatedScrappableRequestResponse(
       role: role ?? this.role,
+      expectsFollowUp: expectsFollowUp ?? this.expectsFollowUp,
       messageText: messageText ?? this.messageText,
       url: url ?? this.url,
       queryParams: queryParams ??

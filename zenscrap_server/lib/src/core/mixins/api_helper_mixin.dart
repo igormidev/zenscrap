@@ -603,6 +603,7 @@ mixin ApiHelperMixin {
               scrappableId: scrappable.id!,
               response: TestEndpointCalledSuccessResponse(
                 role: PromptRole.system,
+                expectsFollowUp: false, // Test result notification, no follow-up
                 inputPayload: stringifiedPayload,
                 responseData: jsonEncode(scrapedData),
                 timestamp: DateTime.now(),
@@ -636,6 +637,7 @@ mixin ApiHelperMixin {
               scrappableId: scrappable.id!,
               response: TestEndpointCalledErrorResponse(
                 role: PromptRole.system,
+                expectsFollowUp: false, // Test error notification, no follow-up
                 errorTitle: 'Scraping Error',
                 errorDescription: errorMessage,
                 inputPayload: stringifiedPayload,

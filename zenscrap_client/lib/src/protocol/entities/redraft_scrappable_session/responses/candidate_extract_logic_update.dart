@@ -14,6 +14,7 @@ abstract class CandidateExtractLogicUpdate extends _i1.ChatResponse
     implements _i2.SerializableModel {
   CandidateExtractLogicUpdate._({
     required super.role,
+    required super.expectsFollowUp,
     required this.messageText,
     required this.thinkingSentences,
     required this.scrappingBeeExtractLogic,
@@ -22,6 +23,7 @@ abstract class CandidateExtractLogicUpdate extends _i1.ChatResponse
 
   factory CandidateExtractLogicUpdate({
     required _i3.PromptRole role,
+    required bool expectsFollowUp,
     required String messageText,
     required List<String> thinkingSentences,
     required _i4.ScrappingBeeExtractLogic scrappingBeeExtractLogic,
@@ -32,6 +34,7 @@ abstract class CandidateExtractLogicUpdate extends _i1.ChatResponse
       Map<String, dynamic> jsonSerialization) {
     return CandidateExtractLogicUpdate(
       role: _i3.PromptRole.fromJson((jsonSerialization['role'] as String)),
+      expectsFollowUp: jsonSerialization['expectsFollowUp'] as bool,
       messageText: jsonSerialization['messageText'] as String,
       thinkingSentences: (jsonSerialization['thinkingSentences'] as List)
           .map((e) => e as String)
@@ -57,6 +60,7 @@ abstract class CandidateExtractLogicUpdate extends _i1.ChatResponse
   @_i2.useResult
   CandidateExtractLogicUpdate copyWith({
     _i3.PromptRole? role,
+    bool? expectsFollowUp,
     String? messageText,
     List<String>? thinkingSentences,
     _i4.ScrappingBeeExtractLogic? scrappingBeeExtractLogic,
@@ -66,6 +70,7 @@ abstract class CandidateExtractLogicUpdate extends _i1.ChatResponse
   Map<String, dynamic> toJson() {
     return {
       'role': role.toJson(),
+      'expectsFollowUp': expectsFollowUp,
       'messageText': messageText,
       'thinkingSentences': thinkingSentences.toJson(),
       'scrappingBeeExtractLogic': scrappingBeeExtractLogic.toJson(),
@@ -82,12 +87,14 @@ abstract class CandidateExtractLogicUpdate extends _i1.ChatResponse
 class _CandidateExtractLogicUpdateImpl extends CandidateExtractLogicUpdate {
   _CandidateExtractLogicUpdateImpl({
     required _i3.PromptRole role,
+    required bool expectsFollowUp,
     required String messageText,
     required List<String> thinkingSentences,
     required _i4.ScrappingBeeExtractLogic scrappingBeeExtractLogic,
     required _i5.ReferenceTestData referenceTestData,
   }) : super._(
           role: role,
+          expectsFollowUp: expectsFollowUp,
           messageText: messageText,
           thinkingSentences: thinkingSentences,
           scrappingBeeExtractLogic: scrappingBeeExtractLogic,
@@ -100,6 +107,7 @@ class _CandidateExtractLogicUpdateImpl extends CandidateExtractLogicUpdate {
   @override
   CandidateExtractLogicUpdate copyWith({
     _i3.PromptRole? role,
+    bool? expectsFollowUp,
     String? messageText,
     List<String>? thinkingSentences,
     _i4.ScrappingBeeExtractLogic? scrappingBeeExtractLogic,
@@ -107,6 +115,7 @@ class _CandidateExtractLogicUpdateImpl extends CandidateExtractLogicUpdate {
   }) {
     return CandidateExtractLogicUpdate(
       role: role ?? this.role,
+      expectsFollowUp: expectsFollowUp ?? this.expectsFollowUp,
       messageText: messageText ?? this.messageText,
       thinkingSentences:
           thinkingSentences ?? this.thinkingSentences.map((e0) => e0).toList(),

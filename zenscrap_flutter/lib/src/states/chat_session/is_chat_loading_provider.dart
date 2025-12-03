@@ -14,21 +14,13 @@ extension MessagesExt on List<ChatResponse> {
     return !willShowLoading;
   }
 
+  /// Returns true if loading indicator should be shown.
+  ///
+  /// The logic is simple: the server explicitly tells us via [expectsFollowUp]
+  /// whether more messages are expected. This eliminates brittle heuristics
+  /// based on message types and roles.
   bool get willShowLoading {
     if (isEmpty) return false;
-
-    final ChatResponse lastItem = last;
-
-    if (lastItem.role == PromptRole.user) {
-      return true;
-    } else if (lastItem.role == PromptRole.model) {
-      if (lastItem is MessageTextResponse) return false;
-      if (lastItem is ErrorTextResponse) return false;
-      return true;
-    } else {
-      if (lastItem is NewExtractRuleResponse) return false;
-      if (lastItem is ErrorTextResponse) return false;
-      return true;
-    }
+    return last.expectsFollowUp;
   }
 }

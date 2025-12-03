@@ -14,17 +14,20 @@ abstract class MessageTextResponse extends _i1.ChatResponse
     implements _i2.SerializableModel {
   MessageTextResponse._({
     required super.role,
+    required super.expectsFollowUp,
     required this.messageText,
   });
 
   factory MessageTextResponse({
     required _i3.PromptRole role,
+    required bool expectsFollowUp,
     required String messageText,
   }) = _MessageTextResponseImpl;
 
   factory MessageTextResponse.fromJson(Map<String, dynamic> jsonSerialization) {
     return MessageTextResponse(
       role: _i3.PromptRole.fromJson((jsonSerialization['role'] as String)),
+      expectsFollowUp: jsonSerialization['expectsFollowUp'] as bool,
       messageText: jsonSerialization['messageText'] as String,
     );
   }
@@ -36,12 +39,14 @@ abstract class MessageTextResponse extends _i1.ChatResponse
   @_i2.useResult
   MessageTextResponse copyWith({
     _i3.PromptRole? role,
+    bool? expectsFollowUp,
     String? messageText,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
       'role': role.toJson(),
+      'expectsFollowUp': expectsFollowUp,
       'messageText': messageText,
     };
   }
@@ -55,9 +60,11 @@ abstract class MessageTextResponse extends _i1.ChatResponse
 class _MessageTextResponseImpl extends MessageTextResponse {
   _MessageTextResponseImpl({
     required _i3.PromptRole role,
+    required bool expectsFollowUp,
     required String messageText,
   }) : super._(
           role: role,
+          expectsFollowUp: expectsFollowUp,
           messageText: messageText,
         );
 
@@ -67,10 +74,12 @@ class _MessageTextResponseImpl extends MessageTextResponse {
   @override
   MessageTextResponse copyWith({
     _i3.PromptRole? role,
+    bool? expectsFollowUp,
     String? messageText,
   }) {
     return MessageTextResponse(
       role: role ?? this.role,
+      expectsFollowUp: expectsFollowUp ?? this.expectsFollowUp,
       messageText: messageText ?? this.messageText,
     );
   }
