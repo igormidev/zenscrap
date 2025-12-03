@@ -4,7 +4,6 @@ import 'package:babel_text/babel_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/convert_extensions.dart';
 import 'package:zenscrap_flutter/src/core/extensions/date_time_extension.dart';
@@ -263,7 +262,7 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
                   ],
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               Padding(
                 padding: horizontalPadding,
                 child: Row(
