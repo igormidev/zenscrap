@@ -194,13 +194,12 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: context.c.surface,
-      surfaceTintColor: Colors.transparent,
+    return AlertDialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
-      child: Container(
+      contentPadding: EdgeInsets.zero,
+      content: Container(
         width: MediaQuery.of(context).size.width * 0.7,
         height: MediaQuery.of(context).size.height * 0.8,
         padding: const EdgeInsets.all(24),
