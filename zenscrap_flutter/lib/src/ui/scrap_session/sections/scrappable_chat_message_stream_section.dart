@@ -125,21 +125,9 @@ class _ScrappableChatMessageStreamSectionState
             }
 
             if (isLastIndex && !willHideLoading) {
-              return Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 36),
-                  child: Transform.scale(
-                    scale: 1.41,
-                    child: Lottie.network(
-                      'https://lottie.host/dfab8b34-c79f-4d84-9e3d-d866b2096c74/zPpMTjtNaK.lottie',
-                      decoder: customDecoder,
-                      width: 60,
-                    ),
-                  ).animate().fadeIn(),
-                ),
-              );
+              return GenericLoadingBubble();
             }
+
             final message = messages[index];
             return _ChatMessageBubble(
               message: message,
@@ -148,6 +136,30 @@ class _ScrappableChatMessageStreamSectionState
           },
         );
       },
+    );
+  }
+}
+
+class GenericLoadingBubble extends StatelessWidget {
+  const GenericLoadingBubble({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 36),
+        child: Transform.scale(
+          scale: 1.41,
+          child: Lottie.network(
+            'https://lottie.host/dfab8b34-c79f-4d84-9e3d-d866b2096c74/zPpMTjtNaK.lottie',
+            decoder: customDecoder,
+            width: 60,
+          ),
+        ).animate().fadeIn(),
+      ),
     );
   }
 }
