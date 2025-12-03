@@ -707,3 +707,119 @@ Future<void> showHideFromMarketplaceUpgradeDialog(BuildContext context) async {
     );
   }
 }
+
+/// Shows upgrade dialog for endpoint limit reached
+Future<void> showEndpointLimitUpgradeDialog(
+  BuildContext context, {
+  required int currentCount,
+  required int maxAllowed,
+  required PlanTier currentPlan,
+  required PlanTier nextPlan,
+}) async {
+  final result = await showDialog<bool>(
+    context: context,
+    barrierDismissible: false,
+    builder: (dialogContext) => AlertDialog(
+      icon: Icon(
+        Icons.data_usage_rounded,
+        size: 48,
+        color: context.c.primary,
+      ),
+      title: const Text('Endpoint Limit Reached'),
+      content: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 400),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'You have reached the maximum number of endpoints for your ${currentPlan.name} plan.',
+              style: context.t.bodyMedium,
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: context.c.errorContainer.withAlpha(51),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: context.c.error.withAlpha(77),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.warning_amber_rounded,
+                    color: context.c.error,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      '$currentCount / $maxAllowed endpoints used',
+                      style: context.t.bodySmall?.copyWith(
+                        color: context.c.error,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: context.c.primaryContainer.withAlpha(51),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: context.c.primary.withAlpha(77),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.upgrade_rounded,
+                    color: context.c.primary,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Upgrade to ${nextPlan.name} for more endpoints',
+                      style: context.t.bodySmall?.copyWith(
+                        color: context.c.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(dialogContext).pop(false),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(dialogContext).pop(true),
+          child: const Text('Upgrade Plan'),
+        ),
+      ],
+    ),
+  );
+
+  if (result == true && context.mounted) {
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => _UpgradePlanDialog(
+        mainCTAText:
+            'Unlock more endpoints to create additional web scraping configurations for your projects.',
+        targetPlan: nextPlan,
+      ),
+    );
+  }
+}

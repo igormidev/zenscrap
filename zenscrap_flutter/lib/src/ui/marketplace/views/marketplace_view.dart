@@ -40,85 +40,88 @@ class _MarketplaceViewState extends ConsumerState<MarketplaceView>
         );
     final marketplaceState = ref.watch(marketplaceProvider);
 
-    return Column(
-      children: [
-        const MarketplaceHeader(),
-        SizedBox(height: 16),
-        Expanded(
-          child: marketplaceState.when(
-            initial: () => const LoadingScrappablesState(),
-            loading: () => const LoadingScrappablesState(),
-            loaded: (response, searchQuery, selectedCategories) {
-              // Track marketplace page view
-              analytics.trackMarketplacePageView(
-                scrappableCount: response.data.length,
-                currentPage: response.pagination.currentPage,
-                hasSearchQuery: searchQuery.isNotEmpty,
-              );
-
-              if (response.data.isEmpty) {
-                return EmptyScrappablesState(
-                  isSearchResult: searchQuery.isNotEmpty,
-                  searchQuery: searchQuery,
-                  onClearSearch: () {
-                    ref.read(marketplaceProvider.notifier).search('');
-                  },
+    return Padding(
+      padding: const EdgeInsets.only(right: 20),
+      child: Column(
+        children: [
+          const MarketplaceHeader(),
+          SizedBox(height: 16),
+          Expanded(
+            child: marketplaceState.when(
+              initial: () => const LoadingScrappablesState(),
+              loading: () => const LoadingScrappablesState(),
+              loaded: (response, searchQuery, selectedCategories) {
+                // Track marketplace page view
+                analytics.trackMarketplacePageView(
+                  scrappableCount: response.data.length,
+                  currentPage: response.pagination.currentPage,
+                  hasSearchQuery: searchQuery.isNotEmpty,
                 );
-              }
 
-              // Create a map of scrappable to usage count for quick lookup
-              final usageCountMap = <int, int>{};
-              for (final item in response.data) {
-                if (item.scrappable.id != null) {
-                  usageCountMap[item.scrappable.id!] = item.usageCount;
+                if (response.data.isEmpty) {
+                  return EmptyScrappablesState(
+                    isSearchResult: searchQuery.isNotEmpty,
+                    searchQuery: searchQuery,
+                    onClearSearch: () {
+                      ref.read(marketplaceProvider.notifier).search('');
+                    },
+                  );
                 }
-              }
 
-              return ScrappablesListageTemplate(
-                scrappables: response.data.map((e) => e.scrappable).toList(),
-                pagination: response.pagination,
-                accountId: accountId,
-                source: ScrappableCardSource.marketplace,
-                usageCountProvider: (scrappable) {
-                  if (scrappable.id == null) return null;
-                  return usageCountMap[scrappable.id];
-                },
-                paginationControls: PaginationControls(
+                // Create a map of scrappable to usage count for quick lookup
+                final usageCountMap = <int, int>{};
+                for (final item in response.data) {
+                  if (item.scrappable.id != null) {
+                    usageCountMap[item.scrappable.id!] = item.usageCount;
+                  }
+                }
+
+                return ScrappablesListageTemplate(
+                  scrappables: response.data.map((e) => e.scrappable).toList(),
                   pagination: response.pagination,
-                  onPageChanged: (page) {
-                    ref.read(marketplaceProvider.notifier).changePage(page);
+                  accountId: accountId,
+                  source: ScrappableCardSource.marketplace,
+                  usageCountProvider: (scrappable) {
+                    if (scrappable.id == null) return null;
+                    return usageCountMap[scrappable.id];
                   },
-                  mode: PaginationMode.pageNumbers,
-                  onPreviousPageAnalytics: () {
-                    analytics.trackMarketplacePaginationPrevious(
-                      fromPage: response.pagination.currentPage,
-                      toPage: response.pagination.currentPage - 1,
-                    );
-                  },
-                  onNextPageAnalytics: () {
-                    analytics.trackMarketplacePaginationNext(
-                      fromPage: response.pagination.currentPage,
-                      toPage: response.pagination.currentPage + 1,
-                    );
-                  },
-                  onPageNumberAnalytics: (toPage) {
-                    analytics.trackMarketplacePaginationPage(
-                      fromPage: response.pagination.currentPage,
-                      toPage: toPage,
-                    );
-                  },
-                ),
-              );
-            },
-            withError: (error) => EmptyScrappablesState(
-              isSearchResult: false,
-              title: 'Error loading marketplace',
-              description: error.description,
-              icon: Icons.error_outline_rounded,
+                  paginationControls: PaginationControls(
+                    pagination: response.pagination,
+                    onPageChanged: (page) {
+                      ref.read(marketplaceProvider.notifier).changePage(page);
+                    },
+                    mode: PaginationMode.pageNumbers,
+                    onPreviousPageAnalytics: () {
+                      analytics.trackMarketplacePaginationPrevious(
+                        fromPage: response.pagination.currentPage,
+                        toPage: response.pagination.currentPage - 1,
+                      );
+                    },
+                    onNextPageAnalytics: () {
+                      analytics.trackMarketplacePaginationNext(
+                        fromPage: response.pagination.currentPage,
+                        toPage: response.pagination.currentPage + 1,
+                      );
+                    },
+                    onPageNumberAnalytics: (toPage) {
+                      analytics.trackMarketplacePaginationPage(
+                        fromPage: response.pagination.currentPage,
+                        toPage: toPage,
+                      );
+                    },
+                  ),
+                );
+              },
+              withError: (error) => EmptyScrappablesState(
+                isSearchResult: false,
+                title: 'Error loading marketplace',
+                description: error.description,
+                icon: Icons.error_outline_rounded,
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

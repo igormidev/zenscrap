@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/core/docs/scrappable_request_structure_guide.dart';
+import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class CreateScrappableEndpoint extends Endpoint {
@@ -10,6 +11,33 @@ class CreateScrappableEndpoint extends Endpoint {
     required String referenceLink,
   }) async* {
     final userId = (await session.authenticated)?.userId;
+
+    // Validate scrappable limit for authenticated users
+    if (userId != null) {
+      final accountInfo = await AccountInfo.db.findFirstRow(
+        session,
+        where: (p0) => p0.userInfoId.equals(userId),
+      );
+
+      if (accountInfo != null) {
+        final currentScrappablesCount = await Scrappable.db.count(
+          session,
+          where: (t) =>
+              t.accountId.equals(accountInfo.id) & t.isDeleted.equals(false),
+        );
+
+        final maxAllowed = accountInfo.planTier.maxScrappables;
+
+        if (currentScrappablesCount >= maxAllowed) {
+          throw ZenScrapException(
+            title: 'Endpoint Limit Reached',
+            description:
+                'You have reached the maximum number of endpoints ($maxAllowed) for your ${accountInfo.planTier.name} plan. '
+                'Please upgrade your plan to create more endpoints.',
+          );
+        }
+      }
+    }
 
     final GenerativeModel geminiModel = GenerativeModel(
       model: 'gemini-2.5-pro',

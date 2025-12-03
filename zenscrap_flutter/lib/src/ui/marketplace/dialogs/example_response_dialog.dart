@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:babel_text/babel_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -13,6 +14,7 @@ import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.d
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/providers/shared_preferences_provider.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 enum ResponseTab { result, html, screenshot }
 
@@ -177,32 +179,10 @@ class _ExampleResponseDialogState extends ConsumerState<ExampleResponseDialog>
             width: MediaQuery.sizeOf(context).width * 0.3,
             child: Column(
               children: [
-                const SizedBox(height: 4),
+                const SizedBox(height: 8),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Card(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Reference url used for example:',
-                                style: context.t.titleSmall
-                                    ?.copyWith(color: context.c.primary)),
-                            Text(
-                              (widget.scrappable.referenceTestData
-                                          ?.referenceLinkUsed ??
-                                      '')
-                                  .shortUrl,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: ReferenceLinkWidget(widget: widget),
                 ),
                 const SizedBox(height: 4),
                 Padding(
@@ -362,6 +342,115 @@ class _ExampleResponseDialogState extends ConsumerState<ExampleResponseDialog>
             ),
           ),
       ],
+    );
+  }
+}
+
+class ReferenceLinkWidget extends StatefulWidget {
+  const ReferenceLinkWidget({
+    super.key,
+    required this.widget,
+  });
+
+  final ExampleResponseDialog widget;
+
+  @override
+  State<ReferenceLinkWidget> createState() => _ReferenceLinkWidgetState();
+}
+
+class _ReferenceLinkWidgetState extends State<ReferenceLinkWidget> {
+  bool _isHovered = false;
+
+  String get _url =>
+      widget.widget.scrappable.referenceTestData?.referenceLinkUsed ?? '';
+
+  void _copyToClipboard() {
+    if (_url.isNotEmpty) {
+      Clipboard.setData(ClipboardData(text: _url));
+    }
+  }
+
+  void _openUrl() {
+    if (_url.isNotEmpty) {
+      launchUrlString(_url);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: Container(
+        decoration: BoxDecoration(
+          color: context.c.surfaceContainerHighest.withAlpha(77),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: context.c.outline.withAlpha(51),
+          ),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: SizedBox(
+          width: double.infinity,
+          child: Stack(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  BabelSelectableText(
+                    'Reference url used for example:',
+                    style: context.t.titleSmall
+                        ?.copyWith(color: context.c.primary),
+                  ),
+                  BabelSelectableText(
+                    _url.shortUrl,
+                    // underline
+                    style: context.t.bodyMedium?.copyWith(
+                      color: context.c.outline,
+                    ),
+                  ),
+                ],
+              ),
+              if (_isHovered)
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 4, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: context.c.surface.withAlpha(230),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.open_in_new, size: 16),
+                            onPressed: _openUrl,
+                            tooltip: 'Open URL',
+                            padding: const EdgeInsets.all(4),
+                            constraints: const BoxConstraints(),
+                          ),
+                          const SizedBox(width: 4),
+                          IconButton(
+                            icon: const Icon(Icons.copy, size: 16),
+                            onPressed: _copyToClipboard,
+                            tooltip: 'Copy URL',
+                            padding: const EdgeInsets.all(4),
+                            constraints: const BoxConstraints(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ).animate().fadeIn(duration: 150.ms),
+                ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

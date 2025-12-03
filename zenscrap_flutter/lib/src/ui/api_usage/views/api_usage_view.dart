@@ -52,27 +52,42 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
     await ref.read(creditHistoryProvider.notifier).loadMoreHistory();
   }
 
-  Future<void> _createApiKey(String name) async {
-    if (!mounted) return;
+  Future<void> _handleRefresh() async {
+    // Track refresh click
+    ref.read(analyticsServiceProvider).trackApiUsageRefreshClick();
+
+    _isRefreshVN.value = true;
+    try {
+      await Future.delayed(const Duration(milliseconds: 800));
+      if (!mounted) return;
+      await ref.globalLoadingSetter(() async {
+        await ref.read(apiUsageProvider.notifier).loadApiUsage();
+        await ref.read(apiKeysProvider.notifier).loadApiKeys();
+        await ref.read(creditHistoryProvider.notifier).loadCreditHistory();
+      });
+    } finally {
+      _isRefreshVN.value = false;
+    }
+  }
+
+  Future<AccountApiKey?> _createApiKey(String name) async {
+    if (!mounted) return null;
 
     // Track create API key submit
     ref.read(analyticsServiceProvider).trackApiUsageCreateApiKeySubmit(
-      keyName: name,
-    );
+          keyName: name,
+        );
 
     final newKey =
         await ref.read(apiKeysProvider.notifier).createApiKey(context, name);
     if (newKey != null && mounted) {
       // Track successful creation
       ref.read(analyticsServiceProvider).trackApiUsageCreateApiKeySuccess(
-        keyId: newKey.id!,
-        keyName: newKey.name,
-      );
-
-      Navigator.of(context).pop();
-      // Show the API key in a dialog for copying
-      _showApiKeyDialog(newKey);
+            keyId: newKey.id!,
+            keyName: newKey.name,
+          );
     }
+    return newKey;
   }
 
   void _showApiKeyDialog(AccountApiKey apiKey) {
@@ -111,9 +126,11 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
                     icon: Icon(Icons.copy),
                     onPressed: () {
                       // Track copy API key from dialog
-                      ref.read(analyticsServiceProvider).trackApiUsageCopyApiKeyDialog(
-                        keyId: apiKey.id!,
-                      );
+                      ref
+                          .read(analyticsServiceProvider)
+                          .trackApiUsageCopyApiKeyDialog(
+                            keyId: apiKey.id!,
+                          );
 
                       Clipboard.setData(ClipboardData(text: apiKey.apiKey));
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -139,16 +156,16 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
   Future<void> _deactivateApiKey(int keyId) async {
     // Find the key name for tracking
     final apiKeys = ref.read(apiKeysProvider).maybeWhen(
-      loaded: (keys, _) => keys,
-      orElse: () => <AccountApiKey>[],
-    );
+          loaded: (keys, _) => keys,
+          orElse: () => <AccountApiKey>[],
+        );
     final apiKey = apiKeys.firstWhere((key) => key.id == keyId);
 
     // Track deactivate click
     ref.read(analyticsServiceProvider).trackApiUsageDeactivateApiKeyClick(
-      keyId: keyId,
-      keyName: apiKey.name,
-    );
+          keyId: keyId,
+          keyName: apiKey.name,
+        );
 
     // Show confirmation dialog
     final confirm = await showDialog<bool>(
@@ -161,9 +178,11 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
           TextButton(
             onPressed: () {
               // Track cancel
-              ref.read(analyticsServiceProvider).trackApiUsageDeactivateApiKeyCancel(
-                keyId: keyId,
-              );
+              ref
+                  .read(analyticsServiceProvider)
+                  .trackApiUsageDeactivateApiKeyCancel(
+                    keyId: keyId,
+                  );
               Navigator.of(context).pop(false);
             },
             child: const Text('Cancel'),
@@ -183,24 +202,29 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
 
     // Track confirm
     ref.read(analyticsServiceProvider).trackApiUsageDeactivateApiKeyConfirm(
-      keyId: keyId,
-      keyName: apiKey.name,
-    );
+          keyId: keyId,
+          keyName: apiKey.name,
+        );
 
     if (!mounted) return;
     await ref.read(apiKeysProvider.notifier).deactivateApiKey(context, keyId);
   }
 
-  void _showCreateApiKeyDialog() {
+  Future<void> _showCreateApiKeyDialog() async {
     // Track create API key button click
     ref.read(analyticsServiceProvider).trackApiUsageCreateApiKeyClick();
 
-    showDialog(
+    final newKey = await showDialog<AccountApiKey?>(
       context: context,
       builder: (context) => CreateApiKeyDialog(
         onCreateApiKey: _createApiKey,
       ),
     );
+
+    // Show the API key dialog AFTER the create dialog is fully closed
+    if (newKey != null && mounted) {
+      _showApiKeyDialog(newKey);
+    }
   }
 
   @override
@@ -297,6 +321,11 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
       orElse: () => false,
     );
 
+    final hasMoreHistory = creditHistoryState.maybeWhen(
+      loaded: (creditHistory, hasMore, isLoadingMore) => hasMore,
+      orElse: () => false,
+    );
+
     if (apiUsage == null) {
       return const Center(
         child: CircularProgressIndicator(),
@@ -339,6 +368,7 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
               apiKeyUsageStats: apiKeyUsageStats,
               creditHistory: creditHistory,
               isLoadingMoreHistory: isLoadingMoreHistory,
+              hasMoreHistory: hasMoreHistory,
               onLoadMoreHistory: _loadMoreHistory,
               onShowCreateApiKeyDialog: _showCreateApiKeyDialog,
               onDeactivateApiKey: _deactivateApiKey,
@@ -352,9 +382,11 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
               creditHistory: creditHistory,
               planTier: planTier,
               isLoadingMoreHistory: isLoadingMoreHistory,
+              hasMoreHistory: hasMoreHistory,
               onLoadMoreHistory: _loadMoreHistory,
               onShowCreateApiKeyDialog: _showCreateApiKeyDialog,
               onDeactivateApiKey: _deactivateApiKey,
+              onRefresh: _handleRefresh,
             );
           }
         },
@@ -372,6 +404,7 @@ class MobileLayout extends ConsumerWidget {
   final Map<int, int> apiKeyUsageStats;
   final List<CreditHistoryItem> creditHistory;
   final bool isLoadingMoreHistory;
+  final bool hasMoreHistory;
   final VoidCallback onLoadMoreHistory;
   final VoidCallback onShowCreateApiKeyDialog;
   final Function(int) onDeactivateApiKey;
@@ -386,6 +419,7 @@ class MobileLayout extends ConsumerWidget {
     required this.apiKeyUsageStats,
     required this.creditHistory,
     required this.isLoadingMoreHistory,
+    required this.hasMoreHistory,
     required this.onLoadMoreHistory,
     required this.onShowCreateApiKeyDialog,
     required this.onDeactivateApiKey,
@@ -407,6 +441,7 @@ class MobileLayout extends ConsumerWidget {
       HistoryTab(
         creditHistory: creditHistory,
         isLoadingMoreHistory: isLoadingMoreHistory,
+        hasMoreHistory: hasMoreHistory,
         onLoadMoreHistory: onLoadMoreHistory,
       ),
     ];
@@ -423,9 +458,9 @@ class MobileLayout extends ConsumerWidget {
         onDestinationSelected: (index) {
           // Track tab selection
           ref.read(analyticsServiceProvider).trackApiUsageMobileTabSelect(
-            tabName: tabNames[index],
-            tabIndex: index,
-          );
+                tabName: tabNames[index],
+                tabIndex: index,
+              );
           onTabSelected(index);
         },
         destinations: const [
@@ -457,10 +492,12 @@ class DesktopLayout extends StatelessWidget {
   final Map<int, int> apiKeyUsageStats;
   final List<CreditHistoryItem> creditHistory;
   final bool isLoadingMoreHistory;
+  final bool hasMoreHistory;
   final VoidCallback onLoadMoreHistory;
   final VoidCallback onShowCreateApiKeyDialog;
   final Function(int) onDeactivateApiKey;
   final ValueNotifier<bool> isRefreshVN;
+  final VoidCallback onRefresh;
 
   const DesktopLayout({
     super.key,
@@ -470,17 +507,19 @@ class DesktopLayout extends StatelessWidget {
     required this.apiKeyUsageStats,
     required this.creditHistory,
     required this.isLoadingMoreHistory,
+    required this.hasMoreHistory,
     required this.onLoadMoreHistory,
     required this.onShowCreateApiKeyDialog,
     required this.onDeactivateApiKey,
     required this.isRefreshVN,
+    required this.onRefresh,
   });
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 1200),
+        constraints: const BoxConstraints(maxWidth: 1210),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -489,46 +528,20 @@ class DesktopLayout extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    'API Usage',
-                    style: context.t.displayMedium,
+                    'Api Credits & Keys',
+                    style: context.t.displaySmall,
                   ),
                 ),
                 ValueListenableBuilder(
                     valueListenable: isRefreshVN,
                     builder: (context, isRefresh, _) {
-                      return Consumer(builder: (context, ref, child) {
-                        return FilledButton.tonalIcon(
-                          onPressed: isRefresh
-                              ? null
-                              : () async {
-                                  // Track refresh click
-                                  ref.read(analyticsServiceProvider).trackApiUsageRefreshClick();
-
-                                  isRefreshVN.value = true;
-                                  try {
-                                    await Future.delayed(
-                                        const Duration(milliseconds: 800));
-                                    await ref.globalLoadingSetter(() async {
-                                      await ref
-                                          .read(apiUsageProvider.notifier)
-                                          .loadApiUsage();
-                                      await ref
-                                          .read(apiKeysProvider.notifier)
-                                          .loadApiKeys();
-                                      await ref
-                                          .read(creditHistoryProvider.notifier)
-                                          .loadCreditHistory();
-                                    });
-                                  } finally {
-                                    isRefreshVN.value = false;
-                                  }
-                                },
-                          label: Text('Refresh'),
-                          icon: isRefresh
-                              ? CupertinoActivityIndicator()
-                              : Icon(Icons.refresh),
-                        );
-                      });
+                      return FilledButton.tonalIcon(
+                        onPressed: isRefresh ? null : onRefresh,
+                        label: Text('Refresh'),
+                        icon: isRefresh
+                            ? CupertinoActivityIndicator()
+                            : Icon(Icons.refresh),
+                      );
                     }),
               ],
             ),
@@ -569,6 +582,7 @@ class DesktopLayout extends StatelessWidget {
                     child: HistorySection(
                       creditHistory: creditHistory,
                       isLoadingMoreHistory: isLoadingMoreHistory,
+                      hasMoreHistory: hasMoreHistory,
                       onLoadMoreHistory: onLoadMoreHistory,
                     ),
                   ),
@@ -654,12 +668,14 @@ class ApiKeysTab extends StatelessWidget {
 class HistoryTab extends StatelessWidget {
   final List<CreditHistoryItem> creditHistory;
   final bool isLoadingMoreHistory;
+  final bool hasMoreHistory;
   final VoidCallback onLoadMoreHistory;
 
   const HistoryTab({
     super.key,
     required this.creditHistory,
     required this.isLoadingMoreHistory,
+    required this.hasMoreHistory,
     required this.onLoadMoreHistory,
   });
 
@@ -678,6 +694,7 @@ class HistoryTab extends StatelessWidget {
           HistorySection(
             creditHistory: creditHistory,
             isLoadingMoreHistory: isLoadingMoreHistory,
+            hasMoreHistory: hasMoreHistory,
             onLoadMoreHistory: onLoadMoreHistory,
           ),
         ],

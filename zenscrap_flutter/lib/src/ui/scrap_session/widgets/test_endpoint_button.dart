@@ -7,14 +7,25 @@ class TestEndpointButton extends StatelessWidget {
   final int scrappableId;
   final ScrappableRequest? scrappableRequest;
   final ReferenceTestData? testData;
-  final DateTime targetTime;
+
+  /// Required when [isTestMode] is true. The session expiration time.
+  final DateTime? targetTime;
+
+  /// When true, uses the test endpoint. When false, uses the prod endpoint.
+  /// Defaults to true for backward compatibility.
+  final bool isTestMode;
+
+  /// Required when [isTestMode] is false. The API key for production calls.
+  final String? apiKey;
 
   const TestEndpointButton({
     super.key,
     required this.scrappableId,
     required this.scrappableRequest,
     required this.testData,
-    required this.targetTime,
+    this.targetTime,
+    this.isTestMode = true,
+    this.apiKey,
   });
 
   @override
@@ -37,7 +48,9 @@ class TestEndpointButton extends StatelessWidget {
             scrappableId: scrappableId,
             scrappableRequest: scrappableRequest!,
             testData: testData,
+            isTestMode: isTestMode,
             targetTime: targetTime,
+            apiKey: apiKey,
           ),
         );
       },

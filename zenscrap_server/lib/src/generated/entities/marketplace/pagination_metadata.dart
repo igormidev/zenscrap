@@ -20,6 +20,7 @@ abstract class PaginationMetadata
     required this.totalPages,
     required this.hasNextPage,
     required this.hasPreviousPage,
+    this.totalUserScrappables,
   });
 
   factory PaginationMetadata({
@@ -29,6 +30,7 @@ abstract class PaginationMetadata
     required int totalPages,
     required bool hasNextPage,
     required bool hasPreviousPage,
+    int? totalUserScrappables,
   }) = _PaginationMetadataImpl;
 
   factory PaginationMetadata.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -39,6 +41,7 @@ abstract class PaginationMetadata
       totalPages: jsonSerialization['totalPages'] as int,
       hasNextPage: jsonSerialization['hasNextPage'] as bool,
       hasPreviousPage: jsonSerialization['hasPreviousPage'] as bool,
+      totalUserScrappables: jsonSerialization['totalUserScrappables'] as int?,
     );
   }
 
@@ -54,6 +57,8 @@ abstract class PaginationMetadata
 
   bool hasPreviousPage;
 
+  int? totalUserScrappables;
+
   /// Returns a shallow copy of this [PaginationMetadata]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
@@ -64,6 +69,7 @@ abstract class PaginationMetadata
     int? totalPages,
     bool? hasNextPage,
     bool? hasPreviousPage,
+    int? totalUserScrappables,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -74,6 +80,8 @@ abstract class PaginationMetadata
       'totalPages': totalPages,
       'hasNextPage': hasNextPage,
       'hasPreviousPage': hasPreviousPage,
+      if (totalUserScrappables != null)
+        'totalUserScrappables': totalUserScrappables,
     };
   }
 
@@ -86,6 +94,8 @@ abstract class PaginationMetadata
       'totalPages': totalPages,
       'hasNextPage': hasNextPage,
       'hasPreviousPage': hasPreviousPage,
+      if (totalUserScrappables != null)
+        'totalUserScrappables': totalUserScrappables,
     };
   }
 
@@ -95,6 +105,8 @@ abstract class PaginationMetadata
   }
 }
 
+class _Undefined {}
+
 class _PaginationMetadataImpl extends PaginationMetadata {
   _PaginationMetadataImpl({
     required int currentPage,
@@ -103,6 +115,7 @@ class _PaginationMetadataImpl extends PaginationMetadata {
     required int totalPages,
     required bool hasNextPage,
     required bool hasPreviousPage,
+    int? totalUserScrappables,
   }) : super._(
           currentPage: currentPage,
           pageSize: pageSize,
@@ -110,6 +123,7 @@ class _PaginationMetadataImpl extends PaginationMetadata {
           totalPages: totalPages,
           hasNextPage: hasNextPage,
           hasPreviousPage: hasPreviousPage,
+          totalUserScrappables: totalUserScrappables,
         );
 
   /// Returns a shallow copy of this [PaginationMetadata]
@@ -123,6 +137,7 @@ class _PaginationMetadataImpl extends PaginationMetadata {
     int? totalPages,
     bool? hasNextPage,
     bool? hasPreviousPage,
+    Object? totalUserScrappables = _Undefined,
   }) {
     return PaginationMetadata(
       currentPage: currentPage ?? this.currentPage,
@@ -131,6 +146,9 @@ class _PaginationMetadataImpl extends PaginationMetadata {
       totalPages: totalPages ?? this.totalPages,
       hasNextPage: hasNextPage ?? this.hasNextPage,
       hasPreviousPage: hasPreviousPage ?? this.hasPreviousPage,
+      totalUserScrappables: totalUserScrappables is int?
+          ? totalUserScrappables
+          : this.totalUserScrappables,
     );
   }
 }

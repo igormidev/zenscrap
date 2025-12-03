@@ -8,12 +8,14 @@ import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 class CreditHistoryList extends ConsumerWidget {
   final List<CreditHistoryItem> creditHistory;
   final bool isLoadingMore;
+  final bool hasMore;
   final VoidCallback onLoadMore;
 
   const CreditHistoryList({
     super.key,
     required this.creditHistory,
     required this.isLoadingMore,
+    required this.hasMore,
     required this.onLoadMore,
   });
 
@@ -68,7 +70,7 @@ class CreditHistoryList extends ConsumerWidget {
             },
           ),
         ),
-        if (creditHistory.isNotEmpty) ...[
+        if (hasMore) ...[
           const SizedBox(height: 16),
           SizedBox(
             width: double.infinity,
@@ -79,7 +81,7 @@ class CreditHistoryList extends ConsumerWidget {
                       // Track load more history click
                       ref.read(analyticsServiceProvider).trackApiUsageLoadMoreHistoryClick(
                         currentCount: creditHistory.length,
-                        hasMore: true,
+                        hasMore: hasMore,
                       );
                       onLoadMore();
                     },

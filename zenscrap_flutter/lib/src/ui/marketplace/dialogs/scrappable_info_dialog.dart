@@ -4,7 +4,6 @@ import 'package:babel_text/babel_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/convert_extensions.dart';
 import 'package:zenscrap_flutter/src/core/extensions/date_time_extension.dart';
@@ -21,6 +20,8 @@ import 'package:zenscrap_flutter/src/ui/marketplace/dialogs/clone_success_dialog
 import 'package:zenscrap_flutter/src/ui/marketplace/dialogs/upgrade_plan_dialog.dart';
 import 'package:zenscrap_flutter/src/ui/marketplace/widgets/api_key_selector_dialog.dart';
 import 'package:zenscrap_flutter/src/ui/marketplace/widgets/scrappable_usage_metrics_widget.dart';
+import 'package:zenscrap_flutter/src/design_system/widgets/scrapping_bee_cost_table.dart';
+import 'package:zenscrap_flutter/src/ui/scrap_session/dialogs/test_endpoint_dialog.dart';
 
 class ScrappableInfoDialog extends ConsumerStatefulWidget {
   final Scrappable scrappable;
@@ -140,16 +141,18 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
       orElse: () => false,
     );
     final isNewScrappable = widget.scrappable.accountId == null;
+    final horizontalPadding = const EdgeInsets.only(left: 24, right: 24);
 
     return AlertDialog(
       insetPadding: const EdgeInsets.symmetric(vertical: 20),
       titlePadding: const EdgeInsets.only(left: 24, right: 24, top: 24),
-      contentPadding: const EdgeInsets.only(left: 24, right: 24),
+      // contentPadding: const EdgeInsets.only(left: 24, right: 24),
+      contentPadding: EdgeInsets.zero,
       title: SizedBox(
         width: MediaQuery.sizeOf(context).width * 0.3,
         child: Row(
           children: [
-            Expanded(child: Text(widget.scrappable.name)),
+            Expanded(child: BabelSelectableText(widget.scrappable.name)),
             const SizedBox(width: 8),
             InkWell(
               onTap: context.pop,
@@ -165,41 +168,57 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
         height: MediaQuery.sizeOf(context).height * 0.7,
         width: MediaQuery.sizeOf(context).width * 0.3,
         child: ListView(
-          // padding: const EdgeInsets.only(bottom: 20, top: 6),
+          padding: const EdgeInsets.only(bottom: 20, top: 6),
           children: [
-            Text(
-              widget.scrappable.description,
-              style: context.t.bodyMedium,
+            Padding(
+              padding: horizontalPadding,
+              child: BabelSelectableText(
+                widget.scrappable.description,
+                style: context.t.bodyMedium,
+              ),
             ),
             const SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: CategoryBadge(
-                scrappable: widget.scrappable,
+            Padding(
+              padding: horizontalPadding,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: CategoryBadge(
+                  scrappable: widget.scrappable,
+                ),
               ),
             ),
             if (widget.scrappable.targetRequest?.url != null) ...[
               const SizedBox(height: 16),
-              Text(
-                'Target URL:',
-                style: context.t.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+              Padding(
+                padding: horizontalPadding,
+                child: Text(
+                  'Target URL:',
+                  style: context.t.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-              BabelText(
-                '<onTap><u><pC>${widget.scrappable.targetRequest!.url.shortUrl}<pC><u><onTap>',
+              BabelSelectableText(
+                '<pC>${widget.scrappable.targetRequest!.url.shortUrl}<pC>'
+                    // There are a lot of {var}
+                    .replaceAllMapped(RegExp(r'\{[^}]+\}'),
+                        (match) => '<code>${match[0]}<code>'),
                 style: context.t.bodyMedium?.copyWith(),
-                onTapMapping: {
-                  '<onTap>': (context) {
-                    launchUrlString(
-                        widget.scrappable.targetRequest!.url.shortUrl);
-                  }
+                padding: horizontalPadding,
+                styleMapping: {
+                  '<code>': (_, style) => style.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.tertiary,
+                        backgroundColor:
+                            context.c.surfaceContainerHighest.withAlpha(26),
+                      ),
                 },
               ),
             ],
             if (selectedApiKey != null) ...[
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
               Container(
+                margin: horizontalPadding,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
                   vertical: 8,
@@ -244,29 +263,86 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
                   ],
                 ),
               ),
-              const SizedBox(height: 8),
-              Text(
-                'Curl Command',
-                style: context.t.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+              const SizedBox(height: 12),
+              Padding(
+                padding: horizontalPadding,
+                child: Row(
+                  children: [
+                    Text(
+                      'Curl Command',
+                      style: context.t.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Spacer(),
+                    if (widget.scrappable.targetRequest != null)
+                      SizedBox(
+                        height: 28,
+                        child: FilledButton.icon(
+                          style: FilledButton.styleFrom(
+                            iconAlignment: IconAlignment.end,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 0,
+                            ),
+                          ),
+                          onPressed: () => _openTestDialog(context),
+                          icon: const Icon(Icons.science, size: 15),
+                          label: Padding(
+                            padding: const EdgeInsets.only(bottom: 2),
+                            child: const Text(
+                              'Test Endpoint',
+                              style: TextStyle(
+                                  fontSize: 14, fontWeight: FontWeight.w400),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 12),
-              CodeBlock(
-                copyTooltipMessage: 'Copy the test cURL command',
-                code: displayCurlCommand,
-                copyCode: copiableCurlCommand,
-                fontSize: 12,
+              const SizedBox(height: 8),
+              Padding(
+                padding: horizontalPadding,
+                child: CodeBlock(
+                  copyTooltipMessage: 'Copy the test cURL command',
+                  code: displayCurlCommand,
+                  copyCode: copiableCurlCommand,
+                  fontSize: 12,
+                ),
               ),
+              if (widget.scrappable.scrappingBeeExtractRules != null) ...[
+                const SizedBox(height: 24),
+                Padding(
+                  padding: horizontalPadding,
+                  child: Text(
+                    'API Configuration & Costs',
+                    style: context.t.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Padding(
+                  padding: horizontalPadding,
+                  child: ScrappingBeeCostTable(
+                    extractLogic: widget.scrappable.scrappingBeeExtractRules!,
+                  ),
+                ),
+              ],
               if (isNewScrappable == false) ...[
                 const SizedBox(height: 24),
-                ScrappableUsageMetricsWidget(
-                  scrappableId: widget.scrappable.id!,
+                Padding(
+                  padding: horizontalPadding,
+                  child: ScrappableUsageMetricsWidget(
+                    scrappableId: widget.scrappable.id!,
+                  ),
                 ),
               ],
             ] else if (!isLoggedIn) ...[
               const SizedBox(height: 24),
               Container(
+                margin: horizontalPadding,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: context.c.primaryContainer.withAlpha(51),
@@ -296,6 +372,7 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
             ] else if (apiKeys.isEmpty) ...[
               const SizedBox(height: 24),
               Container(
+                margin: horizontalPadding,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: context.c.errorContainer.withAlpha(26),
@@ -324,25 +401,34 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
               ),
             ],
             const SizedBox(height: 16),
-            Text(
-              'Created: ${_formatFullDate(widget.scrappable.createdAt)}',
-              style: context.t.bodySmall?.copyWith(
-                color: context.c.onSurfaceVariant,
+            Padding(
+              padding: horizontalPadding,
+              child: Text(
+                'Created: ${_formatFullDate(widget.scrappable.createdAt)}',
+                style: context.t.bodySmall?.copyWith(
+                  color: context.c.onSurfaceVariant,
+                ),
               ),
             ),
             const SizedBox(height: 8),
-            Text(
-              'Last logic modification: ${widget.scrappable.extractRulesUpdatedAt.formatToDisplay}',
-              style: context.t.bodySmall?.copyWith(
-                color: context.c.onSurfaceVariant,
+            Padding(
+              padding: horizontalPadding,
+              child: Text(
+                'Last logic modification: ${widget.scrappable.extractRulesUpdatedAt.formatToDisplay}',
+                style: context.t.bodySmall?.copyWith(
+                  color: context.c.onSurfaceVariant,
+                ),
               ),
             ),
             const SizedBox(height: 16),
             if (isMyScrappable == false)
-              FilledButton.icon(
-                onPressed: () => _handleClone(context),
-                icon: const Icon(Icons.copy_rounded),
-                label: const Text('Clone to My Endpoints'),
+              Padding(
+                padding: horizontalPadding,
+                child: FilledButton.icon(
+                  onPressed: () => _handleClone(context),
+                  icon: const Icon(Icons.copy_rounded),
+                  label: const Text('Clone to My Endpoints'),
+                ),
               ),
             if (isMyScrappable != false) const SizedBox(height: 42)
           ],
@@ -355,6 +441,23 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
 
   String _formatFullDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
+  }
+
+  void _openTestDialog(BuildContext context) {
+    if (selectedApiKey == null || widget.scrappable.targetRequest == null) {
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => TestEndpointDialog(
+        scrappableId: widget.scrappable.id!,
+        scrappableRequest: widget.scrappable.targetRequest!,
+        testData: widget.scrappable.referenceTestData,
+        isTestMode: false,
+        apiKey: selectedApiKey!.apiKey,
+      ),
+    );
   }
 
   Future<void> _handleClone(BuildContext context) async {

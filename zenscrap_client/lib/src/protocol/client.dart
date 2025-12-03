@@ -13,7 +13,7 @@ import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import 'dart:async' as _i2;
 import 'package:zenscrap_client/src/protocol/entities/account/account.dart'
     as _i3;
-import 'package:zenscrap_client/src/protocol/entities/account/api_usage/api_credit_history/api_creadit_history_item.dart'
+import 'package:zenscrap_client/src/protocol/entities/account/api_usage/api_credit_history/paginated_credit_history_response.dart'
     as _i4;
 import 'package:zenscrap_client/src/protocol/entities/account/account_api_key.dart'
     as _i5;
@@ -75,17 +75,12 @@ class EndpointPrivateApiUsage extends _i1.EndpointRef {
   @override
   String get name => 'privateApiUsage';
 
-  _i2.Future<List<_i4.CreditHistoryItem>> getCreditHistory({
-    required int offset,
-    required int limit,
-  }) =>
-      caller.callServerEndpoint<List<_i4.CreditHistoryItem>>(
+  _i2.Future<_i4.PaginatedCreditHistoryResponse> getCreditHistory(
+          {required int page}) =>
+      caller.callServerEndpoint<_i4.PaginatedCreditHistoryResponse>(
         'privateApiUsage',
         'getCreditHistory',
-        {
-          'offset': offset,
-          'limit': limit,
-        },
+        {'page': page},
       );
 
   _i2.Future<_i5.AccountApiKey> createApiKey({required String name}) =>
