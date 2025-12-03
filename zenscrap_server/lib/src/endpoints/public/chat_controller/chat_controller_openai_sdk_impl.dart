@@ -293,8 +293,7 @@ class ChatControllerOpenAiSdkImpl extends IChatController
   static String _mapModel(AiModel aiModel) {
     switch (aiModel) {
       case AiModel.normal:
-        // GPT-5.1-mini: mid-tier model optimized for speed and cost
-        // Note: GPT-5.1-nano is not yet released as of December 2025
+        // GPT-5.1-mini: mid-tier model optimized for speed and
         return 'gpt-5-mini';
       case AiModel.powerful:
         // GPT-5.1: flagship model for maximum intelligence
