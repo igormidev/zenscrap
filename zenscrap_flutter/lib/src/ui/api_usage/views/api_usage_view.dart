@@ -297,6 +297,11 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
       orElse: () => false,
     );
 
+    final hasMoreHistory = creditHistoryState.maybeWhen(
+      loaded: (creditHistory, hasMore, isLoadingMore) => hasMore,
+      orElse: () => false,
+    );
+
     if (apiUsage == null) {
       return const Center(
         child: CircularProgressIndicator(),
@@ -339,6 +344,7 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
               apiKeyUsageStats: apiKeyUsageStats,
               creditHistory: creditHistory,
               isLoadingMoreHistory: isLoadingMoreHistory,
+              hasMoreHistory: hasMoreHistory,
               onLoadMoreHistory: _loadMoreHistory,
               onShowCreateApiKeyDialog: _showCreateApiKeyDialog,
               onDeactivateApiKey: _deactivateApiKey,
@@ -352,6 +358,7 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
               creditHistory: creditHistory,
               planTier: planTier,
               isLoadingMoreHistory: isLoadingMoreHistory,
+              hasMoreHistory: hasMoreHistory,
               onLoadMoreHistory: _loadMoreHistory,
               onShowCreateApiKeyDialog: _showCreateApiKeyDialog,
               onDeactivateApiKey: _deactivateApiKey,
@@ -372,6 +379,7 @@ class MobileLayout extends ConsumerWidget {
   final Map<int, int> apiKeyUsageStats;
   final List<CreditHistoryItem> creditHistory;
   final bool isLoadingMoreHistory;
+  final bool hasMoreHistory;
   final VoidCallback onLoadMoreHistory;
   final VoidCallback onShowCreateApiKeyDialog;
   final Function(int) onDeactivateApiKey;
@@ -386,6 +394,7 @@ class MobileLayout extends ConsumerWidget {
     required this.apiKeyUsageStats,
     required this.creditHistory,
     required this.isLoadingMoreHistory,
+    required this.hasMoreHistory,
     required this.onLoadMoreHistory,
     required this.onShowCreateApiKeyDialog,
     required this.onDeactivateApiKey,
@@ -407,6 +416,7 @@ class MobileLayout extends ConsumerWidget {
       HistoryTab(
         creditHistory: creditHistory,
         isLoadingMoreHistory: isLoadingMoreHistory,
+        hasMoreHistory: hasMoreHistory,
         onLoadMoreHistory: onLoadMoreHistory,
       ),
     ];
@@ -457,6 +467,7 @@ class DesktopLayout extends StatelessWidget {
   final Map<int, int> apiKeyUsageStats;
   final List<CreditHistoryItem> creditHistory;
   final bool isLoadingMoreHistory;
+  final bool hasMoreHistory;
   final VoidCallback onLoadMoreHistory;
   final VoidCallback onShowCreateApiKeyDialog;
   final Function(int) onDeactivateApiKey;
@@ -470,6 +481,7 @@ class DesktopLayout extends StatelessWidget {
     required this.apiKeyUsageStats,
     required this.creditHistory,
     required this.isLoadingMoreHistory,
+    required this.hasMoreHistory,
     required this.onLoadMoreHistory,
     required this.onShowCreateApiKeyDialog,
     required this.onDeactivateApiKey,
@@ -569,6 +581,7 @@ class DesktopLayout extends StatelessWidget {
                     child: HistorySection(
                       creditHistory: creditHistory,
                       isLoadingMoreHistory: isLoadingMoreHistory,
+                      hasMoreHistory: hasMoreHistory,
                       onLoadMoreHistory: onLoadMoreHistory,
                     ),
                   ),
@@ -654,12 +667,14 @@ class ApiKeysTab extends StatelessWidget {
 class HistoryTab extends StatelessWidget {
   final List<CreditHistoryItem> creditHistory;
   final bool isLoadingMoreHistory;
+  final bool hasMoreHistory;
   final VoidCallback onLoadMoreHistory;
 
   const HistoryTab({
     super.key,
     required this.creditHistory,
     required this.isLoadingMoreHistory,
+    required this.hasMoreHistory,
     required this.onLoadMoreHistory,
   });
 
@@ -678,6 +693,7 @@ class HistoryTab extends StatelessWidget {
           HistorySection(
             creditHistory: creditHistory,
             isLoadingMoreHistory: isLoadingMoreHistory,
+            hasMoreHistory: hasMoreHistory,
             onLoadMoreHistory: onLoadMoreHistory,
           ),
         ],

@@ -11,10 +11,9 @@ class PrivateApiUsageEndpoint extends Endpoint {
   @override
   bool get requireLogin => true;
 
-  Future<List<CreditHistoryItem>> getCreditHistory(
+  Future<PaginatedCreditHistoryResponse> getCreditHistory(
     Session session, {
-    required int offset,
-    required int limit,
+    int page = 1,
   }) async {
     final authenticationInfo = await session.authenticated;
     if (authenticationInfo == null) {
@@ -35,10 +34,29 @@ class PrivateApiUsageEndpoint extends Endpoint {
       );
     }
 
+    const int pageSize = 6;
+
+    // Ensure page is at least 1
+    page = page < 1 ? 1 : page;
+
+    // Get total count for pagination
+    final totalCount = await CreditHistoryItem.db.count(
+      session,
+      where: (p0) => p0.accountApiUsageId.equals(accountInfo.accountApiUsageId),
+    );
+
+    // Calculate pagination metadata
+    final totalPages = totalCount == 0 ? 1 : (totalCount / pageSize).ceil();
+    final hasNextPage = page < totalPages;
+    final hasPreviousPage = page > 1;
+
+    // Calculate offset
+    final offset = (page - 1) * pageSize;
+
     final creditHistory = await CreditHistoryItem.db.find(
       session,
       where: (p0) => p0.accountApiUsageId.equals(accountInfo.accountApiUsageId),
-      limit: limit,
+      limit: pageSize,
       offset: offset,
       orderBy: (p0) => p0.id,
       orderDescending: true,
@@ -49,7 +67,17 @@ class PrivateApiUsageEndpoint extends Endpoint {
       ),
     );
 
-    return creditHistory;
+    return PaginatedCreditHistoryResponse(
+      data: creditHistory,
+      pagination: PaginationMetadata(
+        currentPage: page,
+        pageSize: pageSize,
+        totalCount: totalCount,
+        totalPages: totalPages,
+        hasNextPage: hasNextPage,
+        hasPreviousPage: hasPreviousPage,
+      ),
+    );
   }
 
   Future<AccountApiKey> createApiKey(

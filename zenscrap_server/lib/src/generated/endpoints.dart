@@ -150,16 +150,11 @@ class Endpoints extends _i1.EndpointDispatch {
         'getCreditHistory': _i1.MethodConnector(
           name: 'getCreditHistory',
           params: {
-            'offset': _i1.ParameterDescription(
-              name: 'offset',
+            'page': _i1.ParameterDescription(
+              name: 'page',
               type: _i1.getType<int>(),
               nullable: false,
-            ),
-            'limit': _i1.ParameterDescription(
-              name: 'limit',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
+            )
           },
           call: (
             _i1.Session session,
@@ -168,8 +163,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (endpoints['privateApiUsage'] as _i3.PrivateApiUsageEndpoint)
                   .getCreditHistory(
             session,
-            offset: params['offset'],
-            limit: params['limit'],
+            page: params['page'],
           ),
         ),
         'createApiKey': _i1.MethodConnector(

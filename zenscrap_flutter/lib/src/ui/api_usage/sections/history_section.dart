@@ -6,12 +6,14 @@ import 'package:zenscrap_flutter/src/ui/api_usage/widgets/credit_history_list.da
 class HistorySection extends StatelessWidget {
   final List<CreditHistoryItem> creditHistory;
   final bool isLoadingMoreHistory;
+  final bool hasMoreHistory;
   final VoidCallback onLoadMoreHistory;
 
   const HistorySection({
     super.key,
     required this.creditHistory,
     required this.isLoadingMoreHistory,
+    required this.hasMoreHistory,
     required this.onLoadMoreHistory,
   });
 
@@ -36,6 +38,7 @@ class HistorySection extends StatelessWidget {
             child: CreditHistoryList(
               creditHistory: creditHistory,
               isLoadingMore: isLoadingMoreHistory,
+              hasMore: hasMoreHistory,
               onLoadMore: onLoadMoreHistory,
             ),
           ),

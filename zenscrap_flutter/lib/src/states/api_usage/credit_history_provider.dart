@@ -13,8 +13,7 @@ final creditHistoryProvider =
 
 class CreditHistoryNotifier extends StateNotifier<CreditHistoryState> {
   final Client _client;
-  static const int _historyLimit = 20;
-  int _historyOffset = 0;
+  int _currentPage = 1;
   List<CreditHistoryItem> _allHistory = [];
 
   CreditHistoryNotifier(this._client)
@@ -23,20 +22,18 @@ class CreditHistoryNotifier extends StateNotifier<CreditHistoryState> {
   Future<void> loadCreditHistory() async {
     try {
       state = const CreditHistoryState.loading();
-      _historyOffset = 0;
+      _currentPage = 1;
       _allHistory = [];
 
-      final creditHistory = await _client.privateApiUsage.getCreditHistory(
-        offset: 0,
-        limit: _historyLimit,
+      final response = await _client.privateApiUsage.getCreditHistory(
+        page: 1,
       );
 
-      _allHistory = creditHistory;
-      _historyOffset = _historyLimit;
+      _allHistory = response.data;
 
       state = CreditHistoryState.loaded(
-        creditHistory: creditHistory,
-        hasMore: creditHistory.length == _historyLimit,
+        creditHistory: response.data,
+        hasMore: response.pagination.hasNextPage,
       );
     } on ZenScrapException catch (e) {
       state = CreditHistoryState.withError(e);
@@ -59,7 +56,7 @@ class CreditHistoryNotifier extends StateNotifier<CreditHistoryState> {
   Future<void> loadMoreHistory() async {
     // Use pattern matching to check if state is loaded
     final canLoadMore = state.maybeWhen(
-      loaded: (creditHistory, hasMore, isLoadingMore) => 
+      loaded: (creditHistory, hasMore, isLoadingMore) =>
         !isLoadingMore && hasMore,
       orElse: () => false,
     );
@@ -79,21 +76,21 @@ class CreditHistoryNotifier extends StateNotifier<CreditHistoryState> {
         orElse: () {},
       );
 
-      final moreHistory = await _client.privateApiUsage.getCreditHistory(
-        offset: _historyOffset,
-        limit: _historyLimit,
+      _currentPage++;
+      final response = await _client.privateApiUsage.getCreditHistory(
+        page: _currentPage,
       );
 
-      _allHistory.addAll(moreHistory);
-      _historyOffset += _historyLimit;
+      _allHistory.addAll(response.data);
 
       state = CreditHistoryState.loaded(
         creditHistory: _allHistory,
-        hasMore: moreHistory.length == _historyLimit,
+        hasMore: response.pagination.hasNextPage,
         isLoadingMore: false,
       );
     } on ZenScrapException catch (e) {
-      // Reset loading state on error
+      // Reset loading state and page on error
+      _currentPage--;
       state.maybeWhen(
         loaded: (creditHistory, hasMore, _) {
           state = CreditHistoryState.loaded(
@@ -110,7 +107,8 @@ class CreditHistoryNotifier extends StateNotifier<CreditHistoryState> {
         logLevel: LogLevel.error,
       );
     } catch (error, stackTrace) {
-      // Reset loading state on error
+      // Reset loading state and page on error
+      _currentPage--;
       state.maybeWhen(
         loaded: (creditHistory, hasMore, _) {
           state = CreditHistoryState.loaded(

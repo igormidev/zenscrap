@@ -16,7 +16,7 @@ import 'package:serverpod/serverpod.dart' as _i2;
 import 'dart:async' as _i3;
 import 'package:zenscrap_server/src/generated/entities/account/account.dart'
     as _i4;
-import 'package:zenscrap_server/src/generated/entities/account/api_usage/api_credit_history/api_creadit_history_item.dart'
+import 'package:zenscrap_server/src/generated/entities/account/api_usage/api_credit_history/paginated_credit_history_response.dart'
     as _i5;
 import 'package:zenscrap_server/src/generated/entities/account/account_api_key.dart'
     as _i6;
@@ -278,10 +278,9 @@ class _PrivateApiUsageEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<List<_i5.CreditHistoryItem>> getCreditHistory(
+  _i3.Future<_i5.PaginatedCreditHistoryResponse> getCreditHistory(
     _i1.TestSessionBuilder sessionBuilder, {
-    required int offset,
-    required int limit,
+    required int page,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -294,16 +293,13 @@ class _PrivateApiUsageEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'privateApiUsage',
           methodName: 'getCreditHistory',
-          parameters: _i1.testObjectToJson({
-            'offset': offset,
-            'limit': limit,
-          }),
+          parameters: _i1.testObjectToJson({'page': page}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<List<_i5.CreditHistoryItem>>);
+        ) as _i3.Future<_i5.PaginatedCreditHistoryResponse>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
