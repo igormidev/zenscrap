@@ -11,6 +11,7 @@ import 'package:zenscrap_server/src/generated/protocol.dart';
 
 const _openAiResponsesUrl = 'https://api.openai.com/v1/responses';
 const _openAiFilesUrl = 'https://api.openai.com/v1/files';
+const _openAiVectorStoresUrl = 'https://api.openai.com/v1/vector_stores';
 
 // Playwright MCP server deployed on Railway with ScrapingBee proxy
 const _playwrightMcpUrl =
@@ -30,58 +31,98 @@ class ChatControllerOpenAiSdkImpl extends IChatController
     required String extractionRulesGuide,
     required String model,
   })  : _openAiApiKey = openAiApiKey,
-        _extractionRulesGuide = extractionRulesGuide,
         _model = model {
     final systemPrompt = buildSystemPrompt(scrapingBeeApiKey: scrapingBeeApiKey);
     _baseMessages.addAll([
       OpenAiMessage(role: 'system', content: systemPrompt),
       OpenAiMessage(role: 'system', content: contextPrompt),
+      // Session-specific extraction rules guide is included as inline system message
+      // instead of a file upload, since the Responses API's input_file only supports PDFs.
+      // The file_search tool will be used to search the static documentation in the Vector Store.
+      OpenAiMessage(role: 'system', content: extractionRulesGuide),
     ]);
   }
 
-  /// Initializes static files by uploading documentation to OpenAI.
+  /// Initializes the Vector Store with static documentation files.
   /// Should be called once at server startup.
+  ///
+  /// This creates a global Vector Store containing:
+  /// - cost_optimization_guide.md
+  /// - how_to_edit_scrappable_request.md
+  /// - scrappable_request_structure_guide.md
+  ///
+  /// The file_search tool will be used to search these documents during chat sessions.
   static Future<void> init({
     required String openAiApiKey,
   }) async {
-    if (OpenAiFileManager.areStaticFilesUploaded) {
+    if (OpenAiFileManager.isInitialized) {
       return; // Already initialized
     }
 
-    final costOptId = await _uploadFile(
+    // Step 1: Upload files with purpose "assistants" (required for Vector Store)
+    final costOptId = await _uploadFileForVectorStore(
       apiKey: openAiApiKey,
       filename: 'cost_optimization_guide.md',
       content: costOptimizationGuide,
     );
 
-    final editRequestId = await _uploadFile(
+    final editRequestId = await _uploadFileForVectorStore(
       apiKey: openAiApiKey,
       filename: 'how_to_edit_scrappable_request.md',
       content: howToEditScrappableRequest,
     );
 
-    final structureGuideId = await _uploadFile(
+    final structureGuideId = await _uploadFileForVectorStore(
       apiKey: openAiApiKey,
       filename: 'scrappable_request_structure_guide.md',
       content: scrappableRequestStructureGuide,
     );
 
-    OpenAiFileManager.setStaticFileIds(
-      costOptimization: costOptId,
-      howToEditRequest: editRequestId,
-      requestStructureGuide: structureGuideId,
+    // Step 2: Create Vector Store
+    final vectorStoreId = await _createVectorStore(
+      apiKey: openAiApiKey,
+      name: 'zenscrap-static-docs',
     );
+
+    // Step 3: Add files to Vector Store
+    final fileIds = [costOptId, editRequestId, structureGuideId];
+    for (final fileId in fileIds) {
+      await _addFileToVectorStore(
+        apiKey: openAiApiKey,
+        vectorStoreId: vectorStoreId,
+        fileId: fileId,
+      );
+    }
+
+    // Step 4: Wait for all files to be processed
+    await _waitForVectorStoreFilesReady(
+      apiKey: openAiApiKey,
+      vectorStoreId: vectorStoreId,
+      expectedFileCount: fileIds.length,
+    );
+
+    // Store IDs for use in chat sessions
+    OpenAiFileManager.setVectorStoreData(
+      vectorStoreId: vectorStoreId,
+      costOptimizationFileId: costOptId,
+      howToEditRequestFileId: editRequestId,
+      requestStructureGuideFileId: structureGuideId,
+    );
+
+    // ignore: avoid_print
+    print('[Zenscrap] OpenAI Vector Store initialized successfully');
   }
 
-  /// Uploads a file to OpenAI with purpose "user_data"
-  static Future<String> _uploadFile({
+  /// Uploads a file to OpenAI with purpose "assistants" for Vector Store use.
+  /// This enables .md, .txt, .json and other text files to be used with file_search.
+  static Future<String> _uploadFileForVectorStore({
     required String apiKey,
     required String filename,
     required String content,
   }) async {
     final request = http.MultipartRequest('POST', Uri.parse(_openAiFilesUrl))
       ..headers['Authorization'] = 'Bearer $apiKey'
-      ..fields['purpose'] = 'user_data'
+      ..fields['purpose'] = 'assistants' // Required for Vector Store
       ..files.add(http.MultipartFile.fromString(
         'file',
         content,
@@ -100,21 +141,112 @@ class ChatControllerOpenAiSdkImpl extends IChatController
     return json['id'] as String;
   }
 
-  /// Deletes a file from OpenAI
-  static Future<void> _deleteFile({
+  /// Creates a new Vector Store.
+  static Future<String> _createVectorStore({
     required String apiKey,
-    required String fileId,
+    required String name,
   }) async {
-    final response = await http.delete(
-      Uri.parse('$_openAiFilesUrl/$fileId'),
-      headers: {'Authorization': 'Bearer $apiKey'},
+    final response = await http.post(
+      Uri.parse(_openAiVectorStoresUrl),
+      headers: {
+        'Authorization': 'Bearer $apiKey',
+        'Content-Type': 'application/json',
+        'OpenAI-Beta': 'assistants=v2',
+      },
+      body: jsonEncode({'name': name}),
     );
 
-    if (response.statusCode != 200 && response.statusCode != 204) {
-      // Log but don't throw - file might already be deleted
-      // ignore: avoid_print
-      print('Warning: Failed to delete file $fileId: ${response.statusCode}');
+    if (response.statusCode != 200) {
+      throw Exception(
+          'Failed to create Vector Store: ${response.statusCode} - ${response.body}');
     }
+
+    final json = jsonDecode(response.body) as Map<String, dynamic>;
+    return json['id'] as String;
+  }
+
+  /// Adds a file to a Vector Store.
+  static Future<void> _addFileToVectorStore({
+    required String apiKey,
+    required String vectorStoreId,
+    required String fileId,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$_openAiVectorStoresUrl/$vectorStoreId/files'),
+      headers: {
+        'Authorization': 'Bearer $apiKey',
+        'Content-Type': 'application/json',
+        'OpenAI-Beta': 'assistants=v2',
+      },
+      body: jsonEncode({'file_id': fileId}),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(
+          'Failed to add file $fileId to Vector Store: ${response.statusCode} - ${response.body}');
+    }
+  }
+
+  /// Waits for all files in the Vector Store to be processed.
+  /// Files need to be chunked and embedded before they can be searched.
+  static Future<void> _waitForVectorStoreFilesReady({
+    required String apiKey,
+    required String vectorStoreId,
+    required int expectedFileCount,
+    int maxAttempts = 30,
+    Duration pollInterval = const Duration(seconds: 2),
+  }) async {
+    for (var attempt = 0; attempt < maxAttempts; attempt++) {
+      final response = await http.get(
+        Uri.parse('$_openAiVectorStoresUrl/$vectorStoreId/files'),
+        headers: {
+          'Authorization': 'Bearer $apiKey',
+          'OpenAI-Beta': 'assistants=v2',
+        },
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception(
+            'Failed to check Vector Store files: ${response.statusCode} - ${response.body}');
+      }
+
+      final json = jsonDecode(response.body) as Map<String, dynamic>;
+      final data = json['data'] as List<dynamic>? ?? [];
+
+      // Count files by status
+      var completedCount = 0;
+      var failedCount = 0;
+
+      for (final file in data) {
+        final status = (file as Map<String, dynamic>)['status'] as String?;
+        switch (status) {
+          case 'completed':
+            completedCount++;
+            break;
+          case 'failed':
+          case 'cancelled':
+            failedCount++;
+            break;
+          // 'in_progress' and other statuses are ignored - we just wait
+        }
+      }
+
+      // Check if all files are ready
+      if (completedCount >= expectedFileCount) {
+        return; // All files processed successfully
+      }
+
+      if (failedCount > 0) {
+        throw Exception(
+            'Some files failed to process in Vector Store: $failedCount failed');
+      }
+
+      // Still processing, wait and retry
+      await Future<void>.delayed(pollInterval);
+    }
+
+    throw Exception(
+        'Timeout waiting for Vector Store files to be ready after $maxAttempts attempts');
   }
 
   factory ChatControllerOpenAiSdkImpl.startChat({
@@ -152,11 +284,7 @@ class ChatControllerOpenAiSdkImpl extends IChatController
   }
 
   final String _openAiApiKey;
-  final String _extractionRulesGuide;
   String _model;
-
-  /// Session-specific file ID for the extraction rules guide
-  String? _sessionFileId;
 
   final List<OpenAiMessage> _baseMessages = [];
   final List<OpenAiMessage> _history = [];
@@ -177,25 +305,9 @@ class ChatControllerOpenAiSdkImpl extends IChatController
 
   @override
   Future<void> dispose() async {
-    // Delete session-specific file if it was uploaded
-    if (_sessionFileId != null) {
-      await _deleteFile(apiKey: _openAiApiKey, fileId: _sessionFileId!);
-      OpenAiFileManager.removeSessionExtractionRulesFileId(scrappableId);
-      _sessionFileId = null;
-    }
-  }
-
-  /// Uploads the session-specific extraction rules guide if not already uploaded
-  Future<void> _ensureSessionFileUploaded() async {
-    if (_sessionFileId != null) return;
-
-    _sessionFileId = await _uploadFile(
-      apiKey: _openAiApiKey,
-      filename: 'extraction_rules_guide_session_$scrappableId.md',
-      content: _extractionRulesGuide,
-    );
-    OpenAiFileManager.setSessionExtractionRulesFileId(
-        scrappableId, _sessionFileId!);
+    // No session-specific cleanup needed.
+    // The extraction rules guide is now included as an inline system message,
+    // and the Vector Store with static docs is shared across all sessions.
   }
 
   @override
@@ -208,9 +320,6 @@ class ChatControllerOpenAiSdkImpl extends IChatController
     required StreamController<ChatResponse> chatSeason,
     required StreamController<String> thinkingStream,
   }) async {
-    // Ensure session-specific file is uploaded before first message
-    await _ensureSessionFileUploaded();
-
     var attemptPrompt = userPrompt;
 
     for (var attempt = 1; attempt <= 3; attempt++) {
@@ -289,76 +398,42 @@ class ChatControllerOpenAiSdkImpl extends IChatController
       if (schema['strict'] != null) 'strict': schema['strict'],
     };
 
-    // Build input with file references
-    final input = <Map<String, dynamic>>[];
+    // Build input messages (no more input_file - using file_search instead)
+    final input = messages.map((msg) => msg.toMap()).toList();
 
-    // Add system messages
-    for (final msg in messages) {
-      if (msg.role == 'user') {
-        // For user messages, include file references
-        final content = <Map<String, dynamic>>[];
+    // Build tools array with file_search for Vector Store documentation
+    final tools = <Map<String, dynamic>>[
+      // MCP tools for web scraping
+      {
+        'type': 'mcp',
+        'server_label': 'playwright',
+        'server_url': _playwrightMcpUrl,
+        'require_approval': 'never',
+      },
+      {
+        'type': 'mcp',
+        'server_label': 'scraping_bee',
+        'server_url': _scrapingBeeMcpUrl,
+        'require_approval': 'never',
+      },
+    ];
 
-        // Add static documentation files
-        if (OpenAiFileManager.costOptimizationFileId != null) {
-          content.add({
-            'type': 'input_file',
-            'file_id': OpenAiFileManager.costOptimizationFileId,
-          });
-        }
-        if (OpenAiFileManager.howToEditRequestFileId != null) {
-          content.add({
-            'type': 'input_file',
-            'file_id': OpenAiFileManager.howToEditRequestFileId,
-          });
-        }
-        if (OpenAiFileManager.requestStructureGuideFileId != null) {
-          content.add({
-            'type': 'input_file',
-            'file_id': OpenAiFileManager.requestStructureGuideFileId,
-          });
-        }
-
-        // Add session-specific extraction rules file
-        if (_sessionFileId != null) {
-          content.add({
-            'type': 'input_file',
-            'file_id': _sessionFileId,
-          });
-        }
-
-        // Add the user's text message
-        content.add({
-          'type': 'input_text',
-          'text': msg.content,
-        });
-
-        input.add({
-          'role': msg.role,
-          'content': content,
-        });
-      } else {
-        // System and assistant messages are plain text
-        input.add(msg.toMap());
-      }
+    // Add file_search tool if Vector Store is initialized
+    // This allows the model to search the static documentation files
+    // (.md files that couldn't be used with input_file)
+    final vectorStoreId = OpenAiFileManager.vectorStoreId;
+    if (vectorStoreId != null) {
+      tools.add({
+        'type': 'file_search',
+        'vector_store_ids': [vectorStoreId],
+        'max_num_results': 10,
+      });
     }
 
     final requestBody = {
       'model': _model,
       'stream': true,
-      'tools': [
-        {
-          'type': 'mcp',
-          'server_label': 'playwright',
-          'server_url': _playwrightMcpUrl,
-          'require_approval': 'never',
-        },
-        {
-          'type': 'mcp',
-          'server_label': 'scraping_bee',
-          'server_url': _scrapingBeeMcpUrl,
-          'require_approval': 'never'
-        }
-      ],
+      'tools': tools,
       'text': {
         'format': responseFormat,
       },

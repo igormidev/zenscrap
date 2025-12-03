@@ -212,7 +212,7 @@ class _ChatMessageBubble extends StatelessWidget {
       messagePadding = const EdgeInsets.only(left: 0, right: 56);
     } else {
       // Model/AI message
-      userName = "AI (GEMINI)";
+      userName = "AI (CHAT GPT 5.1)";
       backgroundColor = colorScheme.surfaceContainerHigh;
       textColor = colorScheme.onSurface;
       roleIcon = Icons.smart_toy;
@@ -770,8 +770,7 @@ class _UpdatedScrappableRequestMessage extends StatelessWidget {
                   icon: Icons.tune,
                   label: 'Query Parameters:',
                   value: queryParams.entries
-                      .map((e) =>
-                          '${e.key}=${e.value ?? "dynamic"}')
+                      .map((e) => '${e.key}=${e.value ?? "dynamic"}')
                       .join(', '),
                   textColor: textColor,
                 ),

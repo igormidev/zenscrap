@@ -4,49 +4,57 @@ import 'package:zenscrap_server/src/endpoints/public/chat_controller/web_scraper
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 // ============================================================================
-// OpenAI Files API Management
+// OpenAI Files & Vector Store Management
 // ============================================================================
 
-/// Stores file IDs for static documentation files uploaded to OpenAI.
-/// These are uploaded once at server startup and reused across all sessions.
+/// Manages OpenAI Vector Store for static documentation files.
+/// Uses file_search tool instead of input_file to support .md files.
+///
+/// Architecture:
+/// - Static docs (cost optimization, edit request, structure guide) are uploaded
+///   once at server startup to a global Vector Store.
+/// - Session-specific extraction rules guide is sent as inline system message
+///   (not as a file) to avoid per-session Vector Store complexity.
+/// - The file_search tool is added to requests to search the global Vector Store.
 class OpenAiFileManager {
+  /// Global Vector Store ID containing all static documentation
+  static String? _vectorStoreId;
+
+  /// File IDs for static documentation files (needed for reference)
   static String? _costOptimizationFileId;
   static String? _howToEditRequestFileId;
   static String? _requestStructureGuideFileId;
 
-  /// IDs for session-specific files (keyed by scrappableId)
-  static final Map<int, String> _sessionExtractionRulesFileIds = {};
+  /// Returns true if the Vector Store has been created and all files uploaded
+  static bool get isInitialized => _vectorStoreId != null;
 
-  /// Returns true if all static files have been uploaded
-  static bool get areStaticFilesUploaded =>
-      _costOptimizationFileId != null &&
-      _howToEditRequestFileId != null &&
-      _requestStructureGuideFileId != null;
+  /// The global Vector Store ID for use in file_search tool
+  static String? get vectorStoreId => _vectorStoreId;
 
+  /// File IDs (primarily for reference/debugging)
   static String? get costOptimizationFileId => _costOptimizationFileId;
   static String? get howToEditRequestFileId => _howToEditRequestFileId;
   static String? get requestStructureGuideFileId => _requestStructureGuideFileId;
 
-  static void setStaticFileIds({
-    required String costOptimization,
-    required String howToEditRequest,
-    required String requestStructureGuide,
+  /// Sets the Vector Store ID and file IDs after initialization
+  static void setVectorStoreData({
+    required String vectorStoreId,
+    required String costOptimizationFileId,
+    required String howToEditRequestFileId,
+    required String requestStructureGuideFileId,
   }) {
-    _costOptimizationFileId = costOptimization;
-    _howToEditRequestFileId = howToEditRequest;
-    _requestStructureGuideFileId = requestStructureGuide;
+    _vectorStoreId = vectorStoreId;
+    _costOptimizationFileId = costOptimizationFileId;
+    _howToEditRequestFileId = howToEditRequestFileId;
+    _requestStructureGuideFileId = requestStructureGuideFileId;
   }
 
-  static void setSessionExtractionRulesFileId(int scrappableId, String fileId) {
-    _sessionExtractionRulesFileIds[scrappableId] = fileId;
-  }
-
-  static String? getSessionExtractionRulesFileId(int scrappableId) {
-    return _sessionExtractionRulesFileIds[scrappableId];
-  }
-
-  static void removeSessionExtractionRulesFileId(int scrappableId) {
-    _sessionExtractionRulesFileIds.remove(scrappableId);
+  /// Clears all stored IDs (for testing or reset purposes)
+  static void reset() {
+    _vectorStoreId = null;
+    _costOptimizationFileId = null;
+    _howToEditRequestFileId = null;
+    _requestStructureGuideFileId = null;
   }
 }
 
@@ -674,10 +682,14 @@ Names of `{param}` placeholders in the URL path (e.g., `{productId}` in `/produc
 
 ## DOCUMENTATION FILES
 
-You have access to documentation files that have been uploaded. READ THEM when needed:
+You have access to documentation via the file_search tool (Vector Store) and inline system messages:
+
+**Vector Store (searchable via file_search):**
 - **Cost Optimization Guide**: Contains detailed credit costs and optimization workflow
 - **How to Edit Request Guide**: Explains how to add/remove parameters
 - **Request Structure Guide**: Explains queryParams vs queryParamsNotRelatedToUrl
+
+**Inline System Message (always available in context):**
 - **Extraction Rules Guide**: Contains format requirements and placeholder usage for THIS session's parameters
 
 ## QUALITY CHECKLIST (SELF-VERIFY BEFORE RESPONDING)

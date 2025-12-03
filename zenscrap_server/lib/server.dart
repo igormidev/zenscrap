@@ -95,21 +95,23 @@ void run(List<String> args) async {
   // Start the server.
   await pod.start();
 
-  // Initialize OpenAI file uploads for the chat controller
+  // Initialize OpenAI Vector Store with documentation files for the chat controller.
+  // This creates a Vector Store containing static .md documentation that the model
+  // can search via the file_search tool (replacing the previous input_file approach
+  // which only supported PDF files).
   final openAiApiKey = pod.getPassword('openAiApiKey');
   if (openAiApiKey != null && openAiApiKey.isNotEmpty) {
     try {
       await ChatControllerOpenAiSdkImpl.init(openAiApiKey: openAiApiKey);
-      // ignore: avoid_print
-      print('[Zenscrap] OpenAI static files initialized successfully');
+      // Success message is printed by init() itself
     } catch (e) {
       // ignore: avoid_print
-      print('[Zenscrap] ERROR: Failed to initialize OpenAI static files: $e');
+      print('[Zenscrap] ERROR: Failed to initialize OpenAI Vector Store: $e');
     }
   } else {
     // ignore: avoid_print
     print(
-        '[Zenscrap] WARNING: OpenAI API key not configured, skipping file initialization');
+        '[Zenscrap] WARNING: OpenAI API key not configured, skipping Vector Store initialization');
   }
 
   await pod.cancelFutureCall('periodicSetRequestsAnalytics');
