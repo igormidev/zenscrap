@@ -246,27 +246,47 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
                 ),
               ),
               const SizedBox(height: 8),
-              Text(
-                'Curl Command',
-                style: context.t.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+              Row(
+                children: [
+                  Text(
+                    'Curl Command',
+                    style: context.t.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Spacer(),
+                  if (widget.scrappable.targetRequest != null)
+                    SizedBox(
+                      height: 28,
+                      child: FilledButton.icon(
+                        style: FilledButton.styleFrom(
+                          iconAlignment: IconAlignment.end,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 0,
+                          ),
+                        ),
+                        onPressed: () => _openTestDialog(context),
+                        icon: const Icon(Icons.science, size: 15),
+                        label: Padding(
+                          padding: const EdgeInsets.only(bottom: 2),
+                          child: const Text(
+                            'Test Endpoint',
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.w400),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               CodeBlock(
                 copyTooltipMessage: 'Copy the test cURL command',
                 code: displayCurlCommand,
                 copyCode: copiableCurlCommand,
                 fontSize: 12,
               ),
-              if (widget.scrappable.targetRequest != null) ...[
-                const SizedBox(height: 12),
-                FilledButton.tonalIcon(
-                  onPressed: () => _openTestDialog(context),
-                  icon: const Icon(Icons.science, size: 18),
-                  label: const Text('Test Endpoint'),
-                ),
-              ],
               if (isNewScrappable == false) ...[
                 const SizedBox(height: 24),
                 ScrappableUsageMetricsWidget(
