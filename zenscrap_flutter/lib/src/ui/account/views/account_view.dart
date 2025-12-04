@@ -11,6 +11,10 @@ import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_state.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
+import 'package:zenscrap_flutter/src/states/theme/theme_provider.dart';
+import 'package:zenscrap_flutter/src/states/theme/theme_state.dart';
+import 'package:zenscrap_flutter/src/ui/account/widgets/brightness_picker.dart';
+import 'package:zenscrap_flutter/src/ui/account/widgets/color_option.dart';
 import 'package:zenscrap_flutter/src/ui/account/widgets/user_editable_profile_image.dart';
 
 class AccountView extends ConsumerWidget {
@@ -39,66 +43,70 @@ class AccountView extends ConsumerWidget {
 
     return Center(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 550, maxHeight: 805),
-        child: ListView(
-          shrinkWrap: true,
+        constraints: const BoxConstraints(maxWidth: 1100, maxHeight: 900),
+        child: Row(
           children: [
-            Text('Account', style: Theme.of(context).textTheme.displayMedium),
-            const SizedBox(height: 20),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: context.c.outline.withAlpha(51),
-                  width: 1,
-                ),
-                color: context.c.surfaceContainerLowest.withAlpha(100),
-                // color: Colors.transparent,
-              ),
-              child: Column(
+            Expanded(
+              child: ListView(
                 children: [
-                  const SizedBox(height: 20),
-                  UserEditableProfileImage(user: user),
-                  const SizedBox(height: 20),
-                  Text(
-                    'Account information',
-                    style: Theme.of(context).textTheme.titleLarge,
+                  const SizedBox(height: 60),
+                  Text('Account',
+                      style: Theme.of(context).textTheme.displayMedium),
+                  const SizedBox(height: 24),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 16),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: context.c.outline.withAlpha(51),
+                        width: 1,
+                      ),
+                      color: context.c.surfaceContainerLowest.withAlpha(100),
+                    ),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 20),
+                        UserEditableProfileImage(user: user),
+                        const SizedBox(height: 20),
+                        Text(
+                          'Account information',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        const SizedBox(height: 16),
+                        AccountDisplayTime(
+                          title: 'User name',
+                          content: session.user.userName,
+                          analytics: analytics,
+                        ),
+                        const SizedBox(height: 16),
+                        AccountDisplayTime(
+                          title: 'Email',
+                          content: session.user.email,
+                          analytics: analytics,
+                        ),
+                        const SizedBox(height: 16),
+                        AccountDisplayTime(
+                          title: 'Your subscription plan',
+                          content: accountInfo.planTier.displayName,
+                          analytics: analytics,
+                        ),
+                        const SizedBox(height: 20),
+                        const Align(
+                          alignment: Alignment.centerRight,
+                          child: ContactSupportButton(),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 16),
-                  AccountDisplayTime(
-                    title: 'User name',
-                    content: session.user.userName,
-                    analytics: analytics,
-                  ),
-                  const SizedBox(height: 16),
-                  AccountDisplayTime(
-                    title: 'Email',
-                    content: session.user.email,
-                    analytics: analytics,
-                  ),
-                  const SizedBox(height: 16),
-                  AccountDisplayTime(
-                    title: 'Your subscription plan',
-                    content: accountInfo.planTier.displayName,
-                    analytics: analytics,
-                    // content: accountInfo.accountApiKey?.apiKey ?? '',
-                  ),
-                  // AccountDisplayTime(
-                  //   title: 'Your account <b>nano id<b>',
-                  //   content: accountInfo.planTier.displayName,
-                  //   // content: accountInfo.accountApiKey?.apiKey ?? '',
-                  // ),
-                  const SizedBox(height: 20),
-                  const Align(
-                    alignment: Alignment.centerRight,
-                    child: ContactSupportButton(),
-                  ),
-                  const SizedBox(height: 16),
                 ],
               ),
-              // child: const CircularUserImage(),
+            ),
+            const SizedBox(width: 24),
+            // Theme Customization Column
+            Expanded(
+              child: _ThemeCustomizationSection(),
             ),
           ],
         ),
@@ -190,4 +198,159 @@ BoxDecoration getStandardCardContainerDecoration(BuildContext context) {
       ),
     ],
   );
+}
+
+class _ThemeCustomizationSection extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeState = ref.watch(themeProvider);
+    final themeNotifier = ref.read(themeProvider.notifier);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 60),
+        Text(
+          'Appearance',
+          style: Theme.of(context).textTheme.displayMedium,
+        ),
+        const SizedBox(height: 24),
+        // Brightness Card
+        _ThemeCard(
+          icon: Icons.brightness_6_rounded,
+          title: 'Display Mode',
+          subtitle: 'Choose between light and dark theme',
+          child: BrightnessPicker(
+            brightness: themeState.brightness,
+            onBrightnessChanged: themeNotifier.selectBrightness,
+          ),
+        ),
+        const SizedBox(height: 27),
+        // Color Card
+        _ThemeCard(
+          icon: Icons.palette_rounded,
+          title: 'Accent Color',
+          subtitle: 'Personalize the app with your favorite color',
+          child: _ColorPaletteGrid(
+            selectedColor: themeState.seedColor,
+            onColorSelected: themeNotifier.selectColor,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ThemeCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Widget child;
+
+  const _ThemeCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: context.c.outline.withAlpha(51),
+          width: 1,
+        ),
+        color: context.c.surfaceContainerLowest.withAlpha(100),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: context.c.primaryContainer,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  icon,
+                  color: context.c.primary,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: context.c.onSurfaceVariant,
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          child,
+        ],
+      ),
+    );
+  }
+}
+
+bool _removeBlackAndWhite(Color color) =>
+    color != Colors.black && color != Colors.white;
+
+class _ColorPaletteGrid extends StatelessWidget {
+  final Color selectedColor;
+  final ValueChanged<Color> onColorSelected;
+
+  const _ColorPaletteGrid({
+    required this.selectedColor,
+    required this.onColorSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = const <Color>[Colors.black, Colors.white]
+        .followedBy(Colors.primaries.reversed)
+        .followedBy(Colors.accents)
+        .where(_removeBlackAndWhite)
+        .toList(growable: false);
+
+    return GridView.extent(
+      shrinkWrap: true,
+      maxCrossAxisExtent: 50,
+      mainAxisSpacing: 10,
+      crossAxisSpacing: 10,
+      padding: EdgeInsets.zero,
+      physics: const NeverScrollableScrollPhysics(),
+      children: colors.map((color) {
+        // ignore: deprecated_member_use
+        final isSelected = color.value == selectedColor.value;
+        return ColorOption(
+          color: color,
+          isSelected: isSelected,
+          onTap: () => onColorSelected(color),
+        );
+      }).toList(growable: false),
+    );
+  }
 }
