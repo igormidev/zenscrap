@@ -40,8 +40,7 @@ class CreateScrappableEndpoint extends Endpoint {
     }
 
     final GenerativeModel geminiModel = GenerativeModel(
-      model: 'gemini-2.5-pro',
-      // model: 'gemini-2.5-flash-lite-preview-09-2025',
+      model: 'gemini-3-pro',
       apiKey: session.passwords['geminiApiKey']!,
       systemInstruction: Content.system(
           'You are a helpful assistant that analyzes URLs and converts them into structured data for API request handling. '
@@ -94,16 +93,19 @@ class CreateScrappableEndpoint extends Endpoint {
       url = scrappableRequestData['url'] as String;
 
       // Remove the __example__ key if present (it's just for schema validation)
-      final Map<String, dynamic> rawQueryParams =
-          Map<String, dynamic>.from(scrappableRequestData['queryParams'] as Map? ?? {});
+      final Map<String, dynamic> rawQueryParams = Map<String, dynamic>.from(
+          scrappableRequestData['queryParams'] as Map? ?? {});
       rawQueryParams.remove('__example__');
       queryParams = Map<String, String?>.from(rawQueryParams);
 
       // Remove the __example__ key if present (it's just for schema validation)
       final Map<String, dynamic> rawQueryParamsNotRelatedToUrl =
-          Map<String, dynamic>.from(scrappableRequestData['queryParamsNotRelatedToUrl'] as Map? ?? {});
+          Map<String, dynamic>.from(
+              scrappableRequestData['queryParamsNotRelatedToUrl'] as Map? ??
+                  {});
       rawQueryParamsNotRelatedToUrl.remove('__example__');
-      queryParamsNotRelatedToUrl = Map<String, String?>.from(rawQueryParamsNotRelatedToUrl);
+      queryParamsNotRelatedToUrl =
+          Map<String, String?>.from(rawQueryParamsNotRelatedToUrl);
 
       pathParams =
           List<String>.from(scrappableRequestData['pathParams'] as List? ?? []);
