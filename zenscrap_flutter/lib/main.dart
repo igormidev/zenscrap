@@ -19,6 +19,8 @@ import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/providers/shared_preferences_provider.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
+import 'package:zenscrap_flutter/src/core/theme/app_theme.dart';
+import 'package:zenscrap_flutter/src/states/theme/theme_provider.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
 
 late final Client client;
@@ -165,6 +167,8 @@ class _MyAppState extends ConsumerState<MyApp> {
       });
     });
     final router = ref.watch(routerProvider);
+    final themeState = ref.watch(themeProvider);
+    final seedColor = Color(themeState.colorValue);
 
     return MaterialApp.router(
       title: 'Zen Scrap',
@@ -177,26 +181,15 @@ class _MyAppState extends ConsumerState<MyApp> {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        cupertinoOverrideTheme: const CupertinoThemeData(
-          textTheme: CupertinoTextThemeData(),
-        ),
-        useMaterial3: true,
-        filledButtonTheme: FilledButtonThemeData(
-          style: FilledButton.styleFrom(
-            minimumSize: const Size(20, 50),
-            maximumSize: const Size(double.infinity, 50),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            textStyle: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
+      theme: buildAppTheme(
+        seedColor: seedColor,
+        brightness: Brightness.light,
       ),
+      darkTheme: buildAppTheme(
+        seedColor: seedColor,
+        brightness: Brightness.dark,
+      ),
+      themeMode: themeModeFromBrightness(themeState.brightness),
       builder: (context, child) {
         return Consumer(
           child: child,

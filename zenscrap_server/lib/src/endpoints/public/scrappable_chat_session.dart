@@ -432,6 +432,14 @@ class ScrappableChatSession extends Endpoint {
       );
     }
 
+    // Add user message to chat stream IMMEDIATELY for instant UI feedback
+    // This ensures the user sees their message right away, before the AI starts processing
+    _scrapRedraftSessions[sessionId]?.add(MessageTextResponse(
+      role: PromptRole.user,
+      expectsFollowUp: true, // User message always expects AI response
+      messageText: userPrompt,
+    ));
+
     final ThinkingSessionId thinkingSessionId = uuid.v7();
     _thinkingStream[thinkingSessionId] = StreamController<ThinkingSessionId>();
 
@@ -548,11 +556,8 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
       },
     );
 
-    chatSeason.add(MessageTextResponse(
-      role: PromptRole.user,
-      expectsFollowUp: true, // User message always expects AI response
-      messageText: userPrompt,
-    ));
+    // Note: User message is already added to the chat stream in sendPromptMessage()
+    // for immediate UI feedback. Do NOT add it again here to avoid duplicates.
 
     try {
       await chatController.sendMessage(
