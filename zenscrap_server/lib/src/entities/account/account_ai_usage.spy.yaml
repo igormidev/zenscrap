@@ -1,0 +1,6 @@
+class: AccountAIUsage
+table: account_ai_usage
+fields:
+  userOpenAiApiKey: String?
+  totalDollarsSpentFromTotalInUSD: double # Example: total is 15 dolars, so if I spent 4 dollars it will display 15-4=11
+  accountInfo: AccountInfo?, relation(name=user_account_ai_usage)

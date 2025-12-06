@@ -16,6 +16,7 @@ import '../../entities/scrappable/scrappable.dart' as _i2;
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i3;
 import '../../entities/account/api_usage/account_api_usage.dart' as _i4;
 import '../../entities/account/plan_tier.dart' as _i5;
+import '../../entities/account/account_ai_usage.dart' as _i6;
 
 abstract class AccountInfo
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -31,6 +32,8 @@ abstract class AccountInfo
     this.stripeSubscriptionId,
     this.subscriptionStatus,
     this.subscriptionEndDate,
+    required this.accountAIUsageId,
+    this.accountAIUsage,
   });
 
   factory AccountInfo({
@@ -45,6 +48,8 @@ abstract class AccountInfo
     String? stripeSubscriptionId,
     String? subscriptionStatus,
     DateTime? subscriptionEndDate,
+    required int accountAIUsageId,
+    _i6.AccountAIUsage? accountAIUsage,
   }) = _AccountInfoImpl;
 
   factory AccountInfo.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -72,6 +77,11 @@ abstract class AccountInfo
           ? null
           : _i1.DateTimeJsonExtension.fromJson(
               jsonSerialization['subscriptionEndDate']),
+      accountAIUsageId: jsonSerialization['accountAIUsageId'] as int,
+      accountAIUsage: jsonSerialization['accountAIUsage'] == null
+          ? null
+          : _i6.AccountAIUsage.fromJson(
+              (jsonSerialization['accountAIUsage'] as Map<String, dynamic>)),
     );
   }
 
@@ -102,6 +112,10 @@ abstract class AccountInfo
 
   DateTime? subscriptionEndDate;
 
+  int accountAIUsageId;
+
+  _i6.AccountAIUsage? accountAIUsage;
+
   @override
   _i1.Table<int?> get table => t;
 
@@ -120,6 +134,8 @@ abstract class AccountInfo
     String? stripeSubscriptionId,
     String? subscriptionStatus,
     DateTime? subscriptionEndDate,
+    int? accountAIUsageId,
+    _i6.AccountAIUsage? accountAIUsage,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -138,6 +154,8 @@ abstract class AccountInfo
       if (subscriptionStatus != null) 'subscriptionStatus': subscriptionStatus,
       if (subscriptionEndDate != null)
         'subscriptionEndDate': subscriptionEndDate?.toJson(),
+      'accountAIUsageId': accountAIUsageId,
+      if (accountAIUsage != null) 'accountAIUsage': accountAIUsage?.toJson(),
     };
   }
 
@@ -160,6 +178,9 @@ abstract class AccountInfo
       if (subscriptionStatus != null) 'subscriptionStatus': subscriptionStatus,
       if (subscriptionEndDate != null)
         'subscriptionEndDate': subscriptionEndDate?.toJson(),
+      'accountAIUsageId': accountAIUsageId,
+      if (accountAIUsage != null)
+        'accountAIUsage': accountAIUsage?.toJsonForProtocol(),
     };
   }
 
@@ -167,11 +188,13 @@ abstract class AccountInfo
     _i2.ScrappableIncludeList? scrappables,
     _i3.UserInfoInclude? userInfo,
     _i4.AccountApiUsageInclude? accountApiUsage,
+    _i6.AccountAIUsageInclude? accountAIUsage,
   }) {
     return AccountInfoInclude._(
       scrappables: scrappables,
       userInfo: userInfo,
       accountApiUsage: accountApiUsage,
+      accountAIUsage: accountAIUsage,
     );
   }
 
@@ -216,6 +239,8 @@ class _AccountInfoImpl extends AccountInfo {
     String? stripeSubscriptionId,
     String? subscriptionStatus,
     DateTime? subscriptionEndDate,
+    required int accountAIUsageId,
+    _i6.AccountAIUsage? accountAIUsage,
   }) : super._(
           id: id,
           scrappables: scrappables,
@@ -228,6 +253,8 @@ class _AccountInfoImpl extends AccountInfo {
           stripeSubscriptionId: stripeSubscriptionId,
           subscriptionStatus: subscriptionStatus,
           subscriptionEndDate: subscriptionEndDate,
+          accountAIUsageId: accountAIUsageId,
+          accountAIUsage: accountAIUsage,
         );
 
   /// Returns a shallow copy of this [AccountInfo]
@@ -246,6 +273,8 @@ class _AccountInfoImpl extends AccountInfo {
     Object? stripeSubscriptionId = _Undefined,
     Object? subscriptionStatus = _Undefined,
     Object? subscriptionEndDate = _Undefined,
+    int? accountAIUsageId,
+    Object? accountAIUsage = _Undefined,
   }) {
     return AccountInfo(
       id: id is int? ? id : this.id,
@@ -272,6 +301,10 @@ class _AccountInfoImpl extends AccountInfo {
       subscriptionEndDate: subscriptionEndDate is DateTime?
           ? subscriptionEndDate
           : this.subscriptionEndDate,
+      accountAIUsageId: accountAIUsageId ?? this.accountAIUsageId,
+      accountAIUsage: accountAIUsage is _i6.AccountAIUsage?
+          ? accountAIUsage
+          : this.accountAIUsage?.copyWith(),
     );
   }
 }
@@ -307,6 +340,10 @@ class AccountInfoTable extends _i1.Table<int?> {
       'subscriptionEndDate',
       this,
     );
+    accountAIUsageId = _i1.ColumnInt(
+      'accountAIUsageId',
+      this,
+    );
   }
 
   _i2.ScrappableTable? ___scrappables;
@@ -330,6 +367,10 @@ class AccountInfoTable extends _i1.Table<int?> {
   late final _i1.ColumnString subscriptionStatus;
 
   late final _i1.ColumnDateTime subscriptionEndDate;
+
+  late final _i1.ColumnInt accountAIUsageId;
+
+  _i6.AccountAIUsageTable? _accountAIUsage;
 
   _i2.ScrappableTable get __scrappables {
     if (___scrappables != null) return ___scrappables!;
@@ -370,6 +411,19 @@ class AccountInfoTable extends _i1.Table<int?> {
     return _accountApiUsage!;
   }
 
+  _i6.AccountAIUsageTable get accountAIUsage {
+    if (_accountAIUsage != null) return _accountAIUsage!;
+    _accountAIUsage = _i1.createRelationTable(
+      relationFieldName: 'accountAIUsage',
+      field: AccountInfo.t.accountAIUsageId,
+      foreignField: _i6.AccountAIUsage.t.id,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _i6.AccountAIUsageTable(tableRelation: foreignTableRelation),
+    );
+    return _accountAIUsage!;
+  }
+
   _i1.ManyRelation<_i2.ScrappableTable> get scrappables {
     if (_scrappables != null) return _scrappables!;
     var relationTable = _i1.createRelationTable(
@@ -398,6 +452,7 @@ class AccountInfoTable extends _i1.Table<int?> {
         stripeSubscriptionId,
         subscriptionStatus,
         subscriptionEndDate,
+        accountAIUsageId,
       ];
 
   @override
@@ -411,6 +466,9 @@ class AccountInfoTable extends _i1.Table<int?> {
     if (relationField == 'accountApiUsage') {
       return accountApiUsage;
     }
+    if (relationField == 'accountAIUsage') {
+      return accountAIUsage;
+    }
     return null;
   }
 }
@@ -420,10 +478,12 @@ class AccountInfoInclude extends _i1.IncludeObject {
     _i2.ScrappableIncludeList? scrappables,
     _i3.UserInfoInclude? userInfo,
     _i4.AccountApiUsageInclude? accountApiUsage,
+    _i6.AccountAIUsageInclude? accountAIUsage,
   }) {
     _scrappables = scrappables;
     _userInfo = userInfo;
     _accountApiUsage = accountApiUsage;
+    _accountAIUsage = accountAIUsage;
   }
 
   _i2.ScrappableIncludeList? _scrappables;
@@ -432,11 +492,14 @@ class AccountInfoInclude extends _i1.IncludeObject {
 
   _i4.AccountApiUsageInclude? _accountApiUsage;
 
+  _i6.AccountAIUsageInclude? _accountAIUsage;
+
   @override
   Map<String, _i1.Include?> get includes => {
         'scrappables': _scrappables,
         'userInfo': _userInfo,
         'accountApiUsage': _accountApiUsage,
+        'accountAIUsage': _accountAIUsage,
       };
 
   @override
@@ -764,6 +827,30 @@ class AccountInfoAttachRowRepository {
     await session.db.updateRow<AccountInfo>(
       $accountInfo,
       columns: [AccountInfo.t.accountApiUsageId],
+      transaction: transaction,
+    );
+  }
+
+  /// Creates a relation between the given [AccountInfo] and [AccountAIUsage]
+  /// by setting the [AccountInfo]'s foreign key `accountAIUsageId` to refer to the [AccountAIUsage].
+  Future<void> accountAIUsage(
+    _i1.Session session,
+    AccountInfo accountInfo,
+    _i6.AccountAIUsage accountAIUsage, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (accountInfo.id == null) {
+      throw ArgumentError.notNull('accountInfo.id');
+    }
+    if (accountAIUsage.id == null) {
+      throw ArgumentError.notNull('accountAIUsage.id');
+    }
+
+    var $accountInfo =
+        accountInfo.copyWith(accountAIUsageId: accountAIUsage.id);
+    await session.db.updateRow<AccountInfo>(
+      $accountInfo,
+      columns: [AccountInfo.t.accountAIUsageId],
       transaction: transaction,
     );
   }
