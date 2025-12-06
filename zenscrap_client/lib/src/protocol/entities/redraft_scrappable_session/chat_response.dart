@@ -16,6 +16,7 @@ import '../scrappable/scrapping_bee_extract_logic.dart' as _i4;
 import '../scrappable/reference_test_data.dart' as _i5;
 import '../scrappable/scrappable_request.dart' as _i6;
 part 'responses/candidate_extract_logic_update.dart';
+part 'responses/credit_limit_reached_response.dart';
 part 'responses/error_text_response.dart';
 part 'responses/message_text_response.dart';
 part 'responses/new_extract_rule_response.dart';

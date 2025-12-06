@@ -1,0 +1,7 @@
+class: CreditLimitReachedResponse
+extends: ChatResponse
+fields:
+    messageText: String
+    creditsSpent: double
+    creditsLimit: double
+    canUseOwnApiKey: bool

@@ -13,36 +13,37 @@ import 'package:serverpod/serverpod.dart' as _i1;
 import 'package:serverpod/protocol.dart' as _i2;
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i3;
 import 'entities/redraft_scrappable_session/chat_response.dart' as _i4;
-import 'entities/analytics/paginated_scrappable_requests_analytics.dart' as _i5;
-import 'entities/account/api_usage/credit_usage.dart' as _i6;
-import 'entities/account/credit_purchase_option.dart' as _i7;
-import 'entities/account/plan_tier.dart' as _i8;
-import 'entities/analytics/analytics_request_details.dart' as _i9;
-import 'entities/analytics/analytics_time_scope.dart' as _i10;
-import 'entities/analytics/paginated_scrappable_analytics.dart' as _i11;
+import 'entities/analytics/scrappable_request_per_time_scope.dart' as _i5;
+import 'entities/account/credit_purchase_option.dart' as _i6;
+import 'entities/account/plan_tier.dart' as _i7;
+import 'entities/analytics/analytics_request_details.dart' as _i8;
+import 'entities/analytics/analytics_time_scope.dart' as _i9;
+import 'entities/analytics/paginated_scrappable_analytics.dart' as _i10;
+import 'entities/analytics/paginated_scrappable_requests_analytics.dart'
+    as _i11;
 import 'entities/account/account.dart' as _i12;
-import 'entities/analytics/scrappable_request_per_time_scope.dart' as _i13;
-import 'entities/analytics/scrappable_requests_analytics_item.dart' as _i14;
-import 'entities/analytics/scrappable_usage_metrics.dart' as _i15;
-import 'entities/api_key_response.dart' as _i16;
-import 'entities/future_calls/session_prompt.dart' as _i17;
-import 'entities/marketplace/marketplace_paginated_item.dart' as _i18;
-import 'entities/marketplace/paginated_scrappable_response.dart' as _i19;
-import 'entities/marketplace/pagination_metadata.dart' as _i20;
-import 'entities/monthly_credits_data.dart' as _i21;
+import 'entities/analytics/scrappable_requests_analytics_item.dart' as _i13;
+import 'entities/analytics/scrappable_usage_metrics.dart' as _i14;
+import 'entities/api_key_response.dart' as _i15;
+import 'entities/future_calls/session_prompt.dart' as _i16;
+import 'entities/marketplace/marketplace_paginated_item.dart' as _i17;
+import 'entities/marketplace/paginated_scrappable_response.dart' as _i18;
+import 'entities/marketplace/pagination_metadata.dart' as _i19;
+import 'entities/monthly_credits_data.dart' as _i20;
 import 'entities/redraft_scrappable_session/create_session_response.dart'
-    as _i22;
-import 'entities/redraft_scrappable_session/prompt_role_enum.dart' as _i23;
-import 'entities/account/account_api_key.dart' as _i24;
-import 'entities/account/api_usage/account_api_usage.dart' as _i25;
-import 'entities/zenscrap_exception.dart' as _i26;
+    as _i21;
+import 'entities/redraft_scrappable_session/prompt_role_enum.dart' as _i22;
+import 'entities/account/account_api_key.dart' as _i23;
+import 'entities/account/api_usage/account_api_usage.dart' as _i24;
 import 'entities/account/api_usage/api_credit_history/api_creadit_history_item.dart'
-    as _i27;
+    as _i25;
+import 'entities/zenscrap_exception.dart' as _i26;
 import 'entities/account/api_usage/api_credit_history/credit_package_purchase.dart'
-    as _i28;
+    as _i27;
 import 'entities/account/api_usage/api_credit_history/monthly_subscription_credit_deposit.dart'
-    as _i29;
-import 'entities/account/account_ai_usage.dart' as _i30;
+    as _i28;
+import 'entities/account/account_ai_usage.dart' as _i29;
+import 'entities/account/api_usage/credit_usage.dart' as _i30;
 import 'entities/scrappable/ai_model.dart' as _i31;
 import 'entities/scrappable/byte_test_data.dart' as _i32;
 import 'entities/scrappable/reference_test_data.dart' as _i33;
@@ -1358,6 +1359,9 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i4.CandidateExtractLogicUpdate) {
       return _i4.CandidateExtractLogicUpdate.fromJson(data) as T;
     }
+    if (t == _i4.CreditLimitReachedResponse) {
+      return _i4.CreditLimitReachedResponse.fromJson(data) as T;
+    }
     if (t == _i4.ErrorTextResponse) {
       return _i4.ErrorTextResponse.fromJson(data) as T;
     }
@@ -1370,83 +1374,83 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i4.TestEndpointCalledSuccessResponse) {
       return _i4.TestEndpointCalledSuccessResponse.fromJson(data) as T;
     }
-    if (t == _i5.PaginatedScrappableRequestsAnalytics) {
-      return _i5.PaginatedScrappableRequestsAnalytics.fromJson(data) as T;
+    if (t == _i5.ScrappableRequestPerTimeScope) {
+      return _i5.ScrappableRequestPerTimeScope.fromJson(data) as T;
     }
-    if (t == _i6.CreditUsage) {
-      return _i6.CreditUsage.fromJson(data) as T;
+    if (t == _i6.CreditPurchaseOption) {
+      return _i6.CreditPurchaseOption.fromJson(data) as T;
     }
-    if (t == _i7.CreditPurchaseOption) {
-      return _i7.CreditPurchaseOption.fromJson(data) as T;
+    if (t == _i7.PlanTier) {
+      return _i7.PlanTier.fromJson(data) as T;
     }
-    if (t == _i8.PlanTier) {
-      return _i8.PlanTier.fromJson(data) as T;
+    if (t == _i8.AnalyticsRequestDetails) {
+      return _i8.AnalyticsRequestDetails.fromJson(data) as T;
     }
-    if (t == _i9.AnalyticsRequestDetails) {
-      return _i9.AnalyticsRequestDetails.fromJson(data) as T;
+    if (t == _i9.AnalyticsTimeScope) {
+      return _i9.AnalyticsTimeScope.fromJson(data) as T;
     }
-    if (t == _i10.AnalyticsTimeScope) {
-      return _i10.AnalyticsTimeScope.fromJson(data) as T;
+    if (t == _i10.PaginatedScrappableAnalytics) {
+      return _i10.PaginatedScrappableAnalytics.fromJson(data) as T;
     }
-    if (t == _i11.PaginatedScrappableAnalytics) {
-      return _i11.PaginatedScrappableAnalytics.fromJson(data) as T;
+    if (t == _i11.PaginatedScrappableRequestsAnalytics) {
+      return _i11.PaginatedScrappableRequestsAnalytics.fromJson(data) as T;
     }
     if (t == _i12.AccountInfo) {
       return _i12.AccountInfo.fromJson(data) as T;
     }
-    if (t == _i13.ScrappableRequestPerTimeScope) {
-      return _i13.ScrappableRequestPerTimeScope.fromJson(data) as T;
+    if (t == _i13.ScrappableRequestsAnalyticsItem) {
+      return _i13.ScrappableRequestsAnalyticsItem.fromJson(data) as T;
     }
-    if (t == _i14.ScrappableRequestsAnalyticsItem) {
-      return _i14.ScrappableRequestsAnalyticsItem.fromJson(data) as T;
+    if (t == _i14.ScrappableUsageMetrics) {
+      return _i14.ScrappableUsageMetrics.fromJson(data) as T;
     }
-    if (t == _i15.ScrappableUsageMetrics) {
-      return _i15.ScrappableUsageMetrics.fromJson(data) as T;
+    if (t == _i15.ApiKeyResponse) {
+      return _i15.ApiKeyResponse.fromJson(data) as T;
     }
-    if (t == _i16.ApiKeyResponse) {
-      return _i16.ApiKeyResponse.fromJson(data) as T;
+    if (t == _i16.SessionPrompt) {
+      return _i16.SessionPrompt.fromJson(data) as T;
     }
-    if (t == _i17.SessionPrompt) {
-      return _i17.SessionPrompt.fromJson(data) as T;
+    if (t == _i17.MarketPlacePaginatedItem) {
+      return _i17.MarketPlacePaginatedItem.fromJson(data) as T;
     }
-    if (t == _i18.MarketPlacePaginatedItem) {
-      return _i18.MarketPlacePaginatedItem.fromJson(data) as T;
+    if (t == _i18.PaginatedScrappableResponse) {
+      return _i18.PaginatedScrappableResponse.fromJson(data) as T;
     }
-    if (t == _i19.PaginatedScrappableResponse) {
-      return _i19.PaginatedScrappableResponse.fromJson(data) as T;
+    if (t == _i19.PaginationMetadata) {
+      return _i19.PaginationMetadata.fromJson(data) as T;
     }
-    if (t == _i20.PaginationMetadata) {
-      return _i20.PaginationMetadata.fromJson(data) as T;
+    if (t == _i20.MonthlyCreditsData) {
+      return _i20.MonthlyCreditsData.fromJson(data) as T;
     }
-    if (t == _i21.MonthlyCreditsData) {
-      return _i21.MonthlyCreditsData.fromJson(data) as T;
+    if (t == _i21.CreateSessionResponse) {
+      return _i21.CreateSessionResponse.fromJson(data) as T;
     }
-    if (t == _i22.CreateSessionResponse) {
-      return _i22.CreateSessionResponse.fromJson(data) as T;
+    if (t == _i22.PromptRole) {
+      return _i22.PromptRole.fromJson(data) as T;
     }
-    if (t == _i23.PromptRole) {
-      return _i23.PromptRole.fromJson(data) as T;
+    if (t == _i23.AccountApiKey) {
+      return _i23.AccountApiKey.fromJson(data) as T;
     }
-    if (t == _i24.AccountApiKey) {
-      return _i24.AccountApiKey.fromJson(data) as T;
+    if (t == _i24.AccountApiUsage) {
+      return _i24.AccountApiUsage.fromJson(data) as T;
     }
-    if (t == _i25.AccountApiUsage) {
-      return _i25.AccountApiUsage.fromJson(data) as T;
+    if (t == _i25.CreditHistoryItem) {
+      return _i25.CreditHistoryItem.fromJson(data) as T;
     }
     if (t == _i26.ZenScrapException) {
       return _i26.ZenScrapException.fromJson(data) as T;
     }
-    if (t == _i27.CreditHistoryItem) {
-      return _i27.CreditHistoryItem.fromJson(data) as T;
+    if (t == _i27.CreditPackagePurchase) {
+      return _i27.CreditPackagePurchase.fromJson(data) as T;
     }
-    if (t == _i28.CreditPackagePurchase) {
-      return _i28.CreditPackagePurchase.fromJson(data) as T;
+    if (t == _i28.MonthlySubscriptionCreditDeposit) {
+      return _i28.MonthlySubscriptionCreditDeposit.fromJson(data) as T;
     }
-    if (t == _i29.MonthlySubscriptionCreditDeposit) {
-      return _i29.MonthlySubscriptionCreditDeposit.fromJson(data) as T;
+    if (t == _i29.AccountAIUsage) {
+      return _i29.AccountAIUsage.fromJson(data) as T;
     }
-    if (t == _i30.AccountAIUsage) {
-      return _i30.AccountAIUsage.fromJson(data) as T;
+    if (t == _i30.CreditUsage) {
+      return _i30.CreditUsage.fromJson(data) as T;
     }
     if (t == _i31.AiModel) {
       return _i31.AiModel.fromJson(data) as T;
@@ -1495,6 +1499,11 @@ class Protocol extends _i1.SerializationManagerServer {
           ? _i4.CandidateExtractLogicUpdate.fromJson(data)
           : null) as T;
     }
+    if (t == _i1.getType<_i4.CreditLimitReachedResponse?>()) {
+      return (data != null
+          ? _i4.CreditLimitReachedResponse.fromJson(data)
+          : null) as T;
+    }
     if (t == _i1.getType<_i4.ErrorTextResponse?>()) {
       return (data != null ? _i4.ErrorTextResponse.fromJson(data) : null) as T;
     }
@@ -1512,105 +1521,104 @@ class Protocol extends _i1.SerializationManagerServer {
           ? _i4.TestEndpointCalledSuccessResponse.fromJson(data)
           : null) as T;
     }
-    if (t == _i1.getType<_i5.PaginatedScrappableRequestsAnalytics?>()) {
+    if (t == _i1.getType<_i5.ScrappableRequestPerTimeScope?>()) {
       return (data != null
-          ? _i5.PaginatedScrappableRequestsAnalytics.fromJson(data)
+          ? _i5.ScrappableRequestPerTimeScope.fromJson(data)
           : null) as T;
     }
-    if (t == _i1.getType<_i6.CreditUsage?>()) {
-      return (data != null ? _i6.CreditUsage.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i7.CreditPurchaseOption?>()) {
-      return (data != null ? _i7.CreditPurchaseOption.fromJson(data) : null)
+    if (t == _i1.getType<_i6.CreditPurchaseOption?>()) {
+      return (data != null ? _i6.CreditPurchaseOption.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i8.PlanTier?>()) {
-      return (data != null ? _i8.PlanTier.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i7.PlanTier?>()) {
+      return (data != null ? _i7.PlanTier.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i9.AnalyticsRequestDetails?>()) {
-      return (data != null ? _i9.AnalyticsRequestDetails.fromJson(data) : null)
+    if (t == _i1.getType<_i8.AnalyticsRequestDetails?>()) {
+      return (data != null ? _i8.AnalyticsRequestDetails.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i10.AnalyticsTimeScope?>()) {
-      return (data != null ? _i10.AnalyticsTimeScope.fromJson(data) : null)
-          as T;
+    if (t == _i1.getType<_i9.AnalyticsTimeScope?>()) {
+      return (data != null ? _i9.AnalyticsTimeScope.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i11.PaginatedScrappableAnalytics?>()) {
+    if (t == _i1.getType<_i10.PaginatedScrappableAnalytics?>()) {
       return (data != null
-          ? _i11.PaginatedScrappableAnalytics.fromJson(data)
+          ? _i10.PaginatedScrappableAnalytics.fromJson(data)
+          : null) as T;
+    }
+    if (t == _i1.getType<_i11.PaginatedScrappableRequestsAnalytics?>()) {
+      return (data != null
+          ? _i11.PaginatedScrappableRequestsAnalytics.fromJson(data)
           : null) as T;
     }
     if (t == _i1.getType<_i12.AccountInfo?>()) {
       return (data != null ? _i12.AccountInfo.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i13.ScrappableRequestPerTimeScope?>()) {
+    if (t == _i1.getType<_i13.ScrappableRequestsAnalyticsItem?>()) {
       return (data != null
-          ? _i13.ScrappableRequestPerTimeScope.fromJson(data)
+          ? _i13.ScrappableRequestsAnalyticsItem.fromJson(data)
           : null) as T;
     }
-    if (t == _i1.getType<_i14.ScrappableRequestsAnalyticsItem?>()) {
+    if (t == _i1.getType<_i14.ScrappableUsageMetrics?>()) {
+      return (data != null ? _i14.ScrappableUsageMetrics.fromJson(data) : null)
+          as T;
+    }
+    if (t == _i1.getType<_i15.ApiKeyResponse?>()) {
+      return (data != null ? _i15.ApiKeyResponse.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i16.SessionPrompt?>()) {
+      return (data != null ? _i16.SessionPrompt.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i17.MarketPlacePaginatedItem?>()) {
       return (data != null
-          ? _i14.ScrappableRequestsAnalyticsItem.fromJson(data)
+          ? _i17.MarketPlacePaginatedItem.fromJson(data)
           : null) as T;
     }
-    if (t == _i1.getType<_i15.ScrappableUsageMetrics?>()) {
-      return (data != null ? _i15.ScrappableUsageMetrics.fromJson(data) : null)
-          as T;
-    }
-    if (t == _i1.getType<_i16.ApiKeyResponse?>()) {
-      return (data != null ? _i16.ApiKeyResponse.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i17.SessionPrompt?>()) {
-      return (data != null ? _i17.SessionPrompt.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i18.MarketPlacePaginatedItem?>()) {
+    if (t == _i1.getType<_i18.PaginatedScrappableResponse?>()) {
       return (data != null
-          ? _i18.MarketPlacePaginatedItem.fromJson(data)
+          ? _i18.PaginatedScrappableResponse.fromJson(data)
           : null) as T;
     }
-    if (t == _i1.getType<_i19.PaginatedScrappableResponse?>()) {
-      return (data != null
-          ? _i19.PaginatedScrappableResponse.fromJson(data)
-          : null) as T;
-    }
-    if (t == _i1.getType<_i20.PaginationMetadata?>()) {
-      return (data != null ? _i20.PaginationMetadata.fromJson(data) : null)
+    if (t == _i1.getType<_i19.PaginationMetadata?>()) {
+      return (data != null ? _i19.PaginationMetadata.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i21.MonthlyCreditsData?>()) {
-      return (data != null ? _i21.MonthlyCreditsData.fromJson(data) : null)
+    if (t == _i1.getType<_i20.MonthlyCreditsData?>()) {
+      return (data != null ? _i20.MonthlyCreditsData.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i22.CreateSessionResponse?>()) {
-      return (data != null ? _i22.CreateSessionResponse.fromJson(data) : null)
+    if (t == _i1.getType<_i21.CreateSessionResponse?>()) {
+      return (data != null ? _i21.CreateSessionResponse.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i23.PromptRole?>()) {
-      return (data != null ? _i23.PromptRole.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i22.PromptRole?>()) {
+      return (data != null ? _i22.PromptRole.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i24.AccountApiKey?>()) {
-      return (data != null ? _i24.AccountApiKey.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i23.AccountApiKey?>()) {
+      return (data != null ? _i23.AccountApiKey.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i25.AccountApiUsage?>()) {
-      return (data != null ? _i25.AccountApiUsage.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i24.AccountApiUsage?>()) {
+      return (data != null ? _i24.AccountApiUsage.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i25.CreditHistoryItem?>()) {
+      return (data != null ? _i25.CreditHistoryItem.fromJson(data) : null) as T;
     }
     if (t == _i1.getType<_i26.ZenScrapException?>()) {
       return (data != null ? _i26.ZenScrapException.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i27.CreditHistoryItem?>()) {
-      return (data != null ? _i27.CreditHistoryItem.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i28.CreditPackagePurchase?>()) {
-      return (data != null ? _i28.CreditPackagePurchase.fromJson(data) : null)
+    if (t == _i1.getType<_i27.CreditPackagePurchase?>()) {
+      return (data != null ? _i27.CreditPackagePurchase.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i29.MonthlySubscriptionCreditDeposit?>()) {
+    if (t == _i1.getType<_i28.MonthlySubscriptionCreditDeposit?>()) {
       return (data != null
-          ? _i29.MonthlySubscriptionCreditDeposit.fromJson(data)
+          ? _i28.MonthlySubscriptionCreditDeposit.fromJson(data)
           : null) as T;
     }
-    if (t == _i1.getType<_i30.AccountAIUsage?>()) {
-      return (data != null ? _i30.AccountAIUsage.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i29.AccountAIUsage?>()) {
+      return (data != null ? _i29.AccountAIUsage.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i30.CreditUsage?>()) {
+      return (data != null ? _i30.CreditUsage.fromJson(data) : null) as T;
     }
     if (t == _i1.getType<_i31.AiModel?>()) {
       return (data != null ? _i31.AiModel.fromJson(data) : null) as T;
@@ -1659,14 +1667,14 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == List<String>) {
       return (data as List).map((e) => deserialize<String>(e)).toList() as T;
     }
-    if (t == List<_i14.ScrappableRequestsAnalyticsItem>) {
-      return (data as List)
-          .map((e) => deserialize<_i14.ScrappableRequestsAnalyticsItem>(e))
-          .toList() as T;
-    }
     if (t == List<_i37.ScrappableAnalytics>) {
       return (data as List)
           .map((e) => deserialize<_i37.ScrappableAnalytics>(e))
+          .toList() as T;
+    }
+    if (t == List<_i13.ScrappableRequestsAnalyticsItem>) {
+      return (data as List)
+          .map((e) => deserialize<_i13.ScrappableRequestsAnalyticsItem>(e))
           .toList() as T;
     }
     if (t == _i1.getType<List<_i36.Scrappable>?>()) {
@@ -1674,36 +1682,36 @@ class Protocol extends _i1.SerializationManagerServer {
           ? (data as List).map((e) => deserialize<_i36.Scrappable>(e)).toList()
           : null) as T;
     }
-    if (t == List<_i13.ScrappableRequestPerTimeScope>) {
+    if (t == List<_i5.ScrappableRequestPerTimeScope>) {
       return (data as List)
-          .map((e) => deserialize<_i13.ScrappableRequestPerTimeScope>(e))
+          .map((e) => deserialize<_i5.ScrappableRequestPerTimeScope>(e))
           .toList() as T;
     }
-    if (t == List<_i24.AccountApiKey>) {
+    if (t == List<_i23.AccountApiKey>) {
       return (data as List)
-          .map((e) => deserialize<_i24.AccountApiKey>(e))
+          .map((e) => deserialize<_i23.AccountApiKey>(e))
           .toList() as T;
     }
     if (t == Map<int, int>) {
       return Map.fromEntries((data as List).map((e) =>
           MapEntry(deserialize<int>(e['k']), deserialize<int>(e['v'])))) as T;
     }
-    if (t == List<_i18.MarketPlacePaginatedItem>) {
+    if (t == List<_i17.MarketPlacePaginatedItem>) {
       return (data as List)
-          .map((e) => deserialize<_i18.MarketPlacePaginatedItem>(e))
+          .map((e) => deserialize<_i17.MarketPlacePaginatedItem>(e))
           .toList() as T;
     }
-    if (t == _i1.getType<List<_i27.CreditHistoryItem>?>()) {
+    if (t == _i1.getType<List<_i25.CreditHistoryItem>?>()) {
       return (data != null
           ? (data as List)
-              .map((e) => deserialize<_i27.CreditHistoryItem>(e))
+              .map((e) => deserialize<_i25.CreditHistoryItem>(e))
               .toList()
           : null) as T;
     }
-    if (t == _i1.getType<List<_i24.AccountApiKey>?>()) {
+    if (t == _i1.getType<List<_i23.AccountApiKey>?>()) {
       return (data != null
           ? (data as List)
-              .map((e) => deserialize<_i24.AccountApiKey>(e))
+              .map((e) => deserialize<_i23.AccountApiKey>(e))
               .toList()
           : null) as T;
     }
@@ -1718,9 +1726,9 @@ class Protocol extends _i1.SerializationManagerServer {
       return (data as List).map((e) => deserialize<_i36.Scrappable>(e)).toList()
           as T;
     }
-    if (t == List<_i27.CreditHistoryItem>) {
+    if (t == List<_i25.CreditHistoryItem>) {
       return (data as List)
-          .map((e) => deserialize<_i27.CreditHistoryItem>(e))
+          .map((e) => deserialize<_i25.CreditHistoryItem>(e))
           .toList() as T;
     }
     if (t == List<_i42.AccountApiKey>) {
@@ -1772,6 +1780,9 @@ class Protocol extends _i1.SerializationManagerServer {
     if (data is _i4.CandidateExtractLogicUpdate) {
       return 'CandidateExtractLogicUpdate';
     }
+    if (data is _i4.CreditLimitReachedResponse) {
+      return 'CreditLimitReachedResponse';
+    }
     if (data is _i4.ErrorTextResponse) {
       return 'ErrorTextResponse';
     }
@@ -1784,83 +1795,83 @@ class Protocol extends _i1.SerializationManagerServer {
     if (data is _i4.TestEndpointCalledSuccessResponse) {
       return 'TestEndpointCalledSuccessResponse';
     }
-    if (data is _i5.PaginatedScrappableRequestsAnalytics) {
-      return 'PaginatedScrappableRequestsAnalytics';
+    if (data is _i5.ScrappableRequestPerTimeScope) {
+      return 'ScrappableRequestPerTimeScope';
     }
-    if (data is _i6.CreditUsage) {
-      return 'CreditUsage';
-    }
-    if (data is _i7.CreditPurchaseOption) {
+    if (data is _i6.CreditPurchaseOption) {
       return 'CreditPurchaseOption';
     }
-    if (data is _i8.PlanTier) {
+    if (data is _i7.PlanTier) {
       return 'PlanTier';
     }
-    if (data is _i9.AnalyticsRequestDetails) {
+    if (data is _i8.AnalyticsRequestDetails) {
       return 'AnalyticsRequestDetails';
     }
-    if (data is _i10.AnalyticsTimeScope) {
+    if (data is _i9.AnalyticsTimeScope) {
       return 'AnalyticsTimeScope';
     }
-    if (data is _i11.PaginatedScrappableAnalytics) {
+    if (data is _i10.PaginatedScrappableAnalytics) {
       return 'PaginatedScrappableAnalytics';
+    }
+    if (data is _i11.PaginatedScrappableRequestsAnalytics) {
+      return 'PaginatedScrappableRequestsAnalytics';
     }
     if (data is _i12.AccountInfo) {
       return 'AccountInfo';
     }
-    if (data is _i13.ScrappableRequestPerTimeScope) {
-      return 'ScrappableRequestPerTimeScope';
-    }
-    if (data is _i14.ScrappableRequestsAnalyticsItem) {
+    if (data is _i13.ScrappableRequestsAnalyticsItem) {
       return 'ScrappableRequestsAnalyticsItem';
     }
-    if (data is _i15.ScrappableUsageMetrics) {
+    if (data is _i14.ScrappableUsageMetrics) {
       return 'ScrappableUsageMetrics';
     }
-    if (data is _i16.ApiKeyResponse) {
+    if (data is _i15.ApiKeyResponse) {
       return 'ApiKeyResponse';
     }
-    if (data is _i17.SessionPrompt) {
+    if (data is _i16.SessionPrompt) {
       return 'SessionPrompt';
     }
-    if (data is _i18.MarketPlacePaginatedItem) {
+    if (data is _i17.MarketPlacePaginatedItem) {
       return 'MarketPlacePaginatedItem';
     }
-    if (data is _i19.PaginatedScrappableResponse) {
+    if (data is _i18.PaginatedScrappableResponse) {
       return 'PaginatedScrappableResponse';
     }
-    if (data is _i20.PaginationMetadata) {
+    if (data is _i19.PaginationMetadata) {
       return 'PaginationMetadata';
     }
-    if (data is _i21.MonthlyCreditsData) {
+    if (data is _i20.MonthlyCreditsData) {
       return 'MonthlyCreditsData';
     }
-    if (data is _i22.CreateSessionResponse) {
+    if (data is _i21.CreateSessionResponse) {
       return 'CreateSessionResponse';
     }
-    if (data is _i23.PromptRole) {
+    if (data is _i22.PromptRole) {
       return 'PromptRole';
     }
-    if (data is _i24.AccountApiKey) {
+    if (data is _i23.AccountApiKey) {
       return 'AccountApiKey';
     }
-    if (data is _i25.AccountApiUsage) {
+    if (data is _i24.AccountApiUsage) {
       return 'AccountApiUsage';
+    }
+    if (data is _i25.CreditHistoryItem) {
+      return 'CreditHistoryItem';
     }
     if (data is _i26.ZenScrapException) {
       return 'ZenScrapException';
     }
-    if (data is _i27.CreditHistoryItem) {
-      return 'CreditHistoryItem';
-    }
-    if (data is _i28.CreditPackagePurchase) {
+    if (data is _i27.CreditPackagePurchase) {
       return 'CreditPackagePurchase';
     }
-    if (data is _i29.MonthlySubscriptionCreditDeposit) {
+    if (data is _i28.MonthlySubscriptionCreditDeposit) {
       return 'MonthlySubscriptionCreditDeposit';
     }
-    if (data is _i30.AccountAIUsage) {
+    if (data is _i29.AccountAIUsage) {
       return 'AccountAIUsage';
+    }
+    if (data is _i30.CreditUsage) {
+      return 'CreditUsage';
     }
     if (data is _i31.AiModel) {
       return 'AiModel';
@@ -1921,6 +1932,9 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName == 'CandidateExtractLogicUpdate') {
       return deserialize<_i4.CandidateExtractLogicUpdate>(data['data']);
     }
+    if (dataClassName == 'CreditLimitReachedResponse') {
+      return deserialize<_i4.CreditLimitReachedResponse>(data['data']);
+    }
     if (dataClassName == 'ErrorTextResponse') {
       return deserialize<_i4.ErrorTextResponse>(data['data']);
     }
@@ -1933,84 +1947,84 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName == 'TestEndpointCalledSuccessResponse') {
       return deserialize<_i4.TestEndpointCalledSuccessResponse>(data['data']);
     }
-    if (dataClassName == 'PaginatedScrappableRequestsAnalytics') {
-      return deserialize<_i5.PaginatedScrappableRequestsAnalytics>(
-          data['data']);
-    }
-    if (dataClassName == 'CreditUsage') {
-      return deserialize<_i6.CreditUsage>(data['data']);
+    if (dataClassName == 'ScrappableRequestPerTimeScope') {
+      return deserialize<_i5.ScrappableRequestPerTimeScope>(data['data']);
     }
     if (dataClassName == 'CreditPurchaseOption') {
-      return deserialize<_i7.CreditPurchaseOption>(data['data']);
+      return deserialize<_i6.CreditPurchaseOption>(data['data']);
     }
     if (dataClassName == 'PlanTier') {
-      return deserialize<_i8.PlanTier>(data['data']);
+      return deserialize<_i7.PlanTier>(data['data']);
     }
     if (dataClassName == 'AnalyticsRequestDetails') {
-      return deserialize<_i9.AnalyticsRequestDetails>(data['data']);
+      return deserialize<_i8.AnalyticsRequestDetails>(data['data']);
     }
     if (dataClassName == 'AnalyticsTimeScope') {
-      return deserialize<_i10.AnalyticsTimeScope>(data['data']);
+      return deserialize<_i9.AnalyticsTimeScope>(data['data']);
     }
     if (dataClassName == 'PaginatedScrappableAnalytics') {
-      return deserialize<_i11.PaginatedScrappableAnalytics>(data['data']);
+      return deserialize<_i10.PaginatedScrappableAnalytics>(data['data']);
+    }
+    if (dataClassName == 'PaginatedScrappableRequestsAnalytics') {
+      return deserialize<_i11.PaginatedScrappableRequestsAnalytics>(
+          data['data']);
     }
     if (dataClassName == 'AccountInfo') {
       return deserialize<_i12.AccountInfo>(data['data']);
     }
-    if (dataClassName == 'ScrappableRequestPerTimeScope') {
-      return deserialize<_i13.ScrappableRequestPerTimeScope>(data['data']);
-    }
     if (dataClassName == 'ScrappableRequestsAnalyticsItem') {
-      return deserialize<_i14.ScrappableRequestsAnalyticsItem>(data['data']);
+      return deserialize<_i13.ScrappableRequestsAnalyticsItem>(data['data']);
     }
     if (dataClassName == 'ScrappableUsageMetrics') {
-      return deserialize<_i15.ScrappableUsageMetrics>(data['data']);
+      return deserialize<_i14.ScrappableUsageMetrics>(data['data']);
     }
     if (dataClassName == 'ApiKeyResponse') {
-      return deserialize<_i16.ApiKeyResponse>(data['data']);
+      return deserialize<_i15.ApiKeyResponse>(data['data']);
     }
     if (dataClassName == 'SessionPrompt') {
-      return deserialize<_i17.SessionPrompt>(data['data']);
+      return deserialize<_i16.SessionPrompt>(data['data']);
     }
     if (dataClassName == 'MarketPlacePaginatedItem') {
-      return deserialize<_i18.MarketPlacePaginatedItem>(data['data']);
+      return deserialize<_i17.MarketPlacePaginatedItem>(data['data']);
     }
     if (dataClassName == 'PaginatedScrappableResponse') {
-      return deserialize<_i19.PaginatedScrappableResponse>(data['data']);
+      return deserialize<_i18.PaginatedScrappableResponse>(data['data']);
     }
     if (dataClassName == 'PaginationMetadata') {
-      return deserialize<_i20.PaginationMetadata>(data['data']);
+      return deserialize<_i19.PaginationMetadata>(data['data']);
     }
     if (dataClassName == 'MonthlyCreditsData') {
-      return deserialize<_i21.MonthlyCreditsData>(data['data']);
+      return deserialize<_i20.MonthlyCreditsData>(data['data']);
     }
     if (dataClassName == 'CreateSessionResponse') {
-      return deserialize<_i22.CreateSessionResponse>(data['data']);
+      return deserialize<_i21.CreateSessionResponse>(data['data']);
     }
     if (dataClassName == 'PromptRole') {
-      return deserialize<_i23.PromptRole>(data['data']);
+      return deserialize<_i22.PromptRole>(data['data']);
     }
     if (dataClassName == 'AccountApiKey') {
-      return deserialize<_i24.AccountApiKey>(data['data']);
+      return deserialize<_i23.AccountApiKey>(data['data']);
     }
     if (dataClassName == 'AccountApiUsage') {
-      return deserialize<_i25.AccountApiUsage>(data['data']);
+      return deserialize<_i24.AccountApiUsage>(data['data']);
+    }
+    if (dataClassName == 'CreditHistoryItem') {
+      return deserialize<_i25.CreditHistoryItem>(data['data']);
     }
     if (dataClassName == 'ZenScrapException') {
       return deserialize<_i26.ZenScrapException>(data['data']);
     }
-    if (dataClassName == 'CreditHistoryItem') {
-      return deserialize<_i27.CreditHistoryItem>(data['data']);
-    }
     if (dataClassName == 'CreditPackagePurchase') {
-      return deserialize<_i28.CreditPackagePurchase>(data['data']);
+      return deserialize<_i27.CreditPackagePurchase>(data['data']);
     }
     if (dataClassName == 'MonthlySubscriptionCreditDeposit') {
-      return deserialize<_i29.MonthlySubscriptionCreditDeposit>(data['data']);
+      return deserialize<_i28.MonthlySubscriptionCreditDeposit>(data['data']);
     }
     if (dataClassName == 'AccountAIUsage') {
-      return deserialize<_i30.AccountAIUsage>(data['data']);
+      return deserialize<_i29.AccountAIUsage>(data['data']);
+    }
+    if (dataClassName == 'CreditUsage') {
+      return deserialize<_i30.CreditUsage>(data['data']);
     }
     if (dataClassName == 'AiModel') {
       return deserialize<_i31.AiModel>(data['data']);
@@ -2073,22 +2087,22 @@ class Protocol extends _i1.SerializationManagerServer {
     switch (t) {
       case _i12.AccountInfo:
         return _i12.AccountInfo.t;
-      case _i30.AccountAIUsage:
-        return _i30.AccountAIUsage.t;
-      case _i24.AccountApiKey:
-        return _i24.AccountApiKey.t;
-      case _i25.AccountApiUsage:
-        return _i25.AccountApiUsage.t;
-      case _i27.CreditHistoryItem:
-        return _i27.CreditHistoryItem.t;
-      case _i28.CreditPackagePurchase:
-        return _i28.CreditPackagePurchase.t;
-      case _i29.MonthlySubscriptionCreditDeposit:
-        return _i29.MonthlySubscriptionCreditDeposit.t;
-      case _i6.CreditUsage:
-        return _i6.CreditUsage.t;
-      case _i9.AnalyticsRequestDetails:
-        return _i9.AnalyticsRequestDetails.t;
+      case _i29.AccountAIUsage:
+        return _i29.AccountAIUsage.t;
+      case _i23.AccountApiKey:
+        return _i23.AccountApiKey.t;
+      case _i24.AccountApiUsage:
+        return _i24.AccountApiUsage.t;
+      case _i25.CreditHistoryItem:
+        return _i25.CreditHistoryItem.t;
+      case _i27.CreditPackagePurchase:
+        return _i27.CreditPackagePurchase.t;
+      case _i28.MonthlySubscriptionCreditDeposit:
+        return _i28.MonthlySubscriptionCreditDeposit.t;
+      case _i30.CreditUsage:
+        return _i30.CreditUsage.t;
+      case _i8.AnalyticsRequestDetails:
+        return _i8.AnalyticsRequestDetails.t;
       case _i32.ByteTestData:
         return _i32.ByteTestData.t;
       case _i33.ReferenceTestData:

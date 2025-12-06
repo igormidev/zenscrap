@@ -102,21 +102,34 @@ class MonthlySubscriptionCreditsFutureCall extends FutureCall {
           );
 
           // Reset AI credits to default monthly amount
+          // If the user has a negative balance (they overspent), subtract that from the new credits
           final aiUsage = await AccountAIUsage.db.findById(
             session,
             accountInfo.accountAIUsageId,
             transaction: transaction,
           );
           if (aiUsage != null) {
-            aiUsage.totalDollarsSpentFromTotalInUSD =
-                kDefaultMonthlyAICreditsInDollars;
+            final currentBalance = aiUsage.totalDollarsSpentFromTotalInUSD;
+            double newCredits = kDefaultMonthlyAICreditsInDollars;
+
+            // If balance is negative (user overspent), carry over the debt
+            if (currentBalance < 0) {
+              // newCredits = default - abs(negative) = default + negative
+              newCredits = kDefaultMonthlyAICreditsInDollars + currentBalance;
+              session.log(
+                'User had negative balance of \$$currentBalance. '
+                'Carrying over debt to new month.',
+              );
+            }
+
+            aiUsage.totalDollarsSpentFromTotalInUSD = newCredits;
             await AccountAIUsage.db.updateRow(
               session,
               aiUsage,
               transaction: transaction,
             );
             session.log(
-                'Reset AI credits to \$$kDefaultMonthlyAICreditsInDollars for account ${accountInfo.id}');
+                'Reset AI credits to \$${newCredits.toStringAsFixed(4)} for account ${accountInfo.id}');
           }
 
           // Update the cached values in ApiHelperMixin (after transaction)
