@@ -1,4 +1,5 @@
 import 'package:serverpod/serverpod.dart';
+import 'package:zenscrap_server/src/core/consts.dart';
 import 'package:zenscrap_server/src/core/mixins/api_helper_mixin.dart';
 import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
@@ -99,6 +100,24 @@ class MonthlySubscriptionCreditsFutureCall extends FutureCall {
             creditHistoryItem,
             transaction: transaction,
           );
+
+          // Reset AI credits to default monthly amount
+          final aiUsage = await AccountAIUsage.db.findById(
+            session,
+            accountInfo.accountAIUsageId,
+            transaction: transaction,
+          );
+          if (aiUsage != null) {
+            aiUsage.totalDollarsSpentFromTotalInUSD =
+                kDefaultMonthlyAICreditsInDollars;
+            await AccountAIUsage.db.updateRow(
+              session,
+              aiUsage,
+              transaction: transaction,
+            );
+            session.log(
+                'Reset AI credits to \$$kDefaultMonthlyAICreditsInDollars for account ${accountInfo.id}');
+          }
 
           // Update the cached values in ApiHelperMixin (after transaction)
           ApiHelperMixin.resetNanoId(currentApiUsage.nanoId);

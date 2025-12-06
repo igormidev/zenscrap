@@ -1,6 +1,7 @@
 import 'package:nanoid2/nanoid2.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart';
+import 'package:zenscrap_server/src/core/consts.dart';
 import 'package:zenscrap_server/src/core/default_classes.dart';
 import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
@@ -74,6 +75,16 @@ class PrivateAccountEndpoint extends Endpoint {
           transaction: transaction,
         );
 
+        // Create AccountAIUsage with default credits
+        final accountAIUsage = await AccountAIUsage.db.insertRow(
+          session,
+          AccountAIUsage(
+            userOpenAiApiKey: null,
+            totalDollarsSpentFromTotalInUSD: kDefaultMonthlyAICreditsInDollars,
+          ),
+          transaction: transaction,
+        );
+
         // Create monthly subscription credit deposit record for initial credits
         final initialDeposit = MonthlySubscriptionCreditDeposit(
           creditsAmount: 100, // Initial free tier credits
@@ -122,6 +133,8 @@ class PrivateAccountEndpoint extends Endpoint {
           accountApiUsageId: accountApiUsage.id!,
           accountApiUsage: accountApiUsage,
           planTier: PlanTier.none,
+          accountAIUsageId: accountAIUsage.id!,
+          accountAIUsage: accountAIUsage,
         );
 
         accountInfo = await AccountInfo.db
