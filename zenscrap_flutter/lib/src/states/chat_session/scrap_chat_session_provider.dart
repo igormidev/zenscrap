@@ -246,4 +246,16 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
         .commitCurrentEditState(sessionUuid: sessionUuid)
         .toResult;
   }
+
+  /// Updates the user's OpenAI API key for the current session.
+  /// This allows users to bypass platform credit limits by using their own key.
+  Future<void> updateUserApiKey(String apiKey) async {
+    final sessionUuid = state.mapOrNull(standard: (value) => value.sessionUuid);
+    if (sessionUuid == null) return;
+
+    await ref
+        .read(clientProvider)
+        .scrappableChatSession
+        .updateUserApiKey(sessionId: sessionUuid, openAiApiKey: apiKey);
+  }
 }

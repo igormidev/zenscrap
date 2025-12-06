@@ -180,6 +180,120 @@ class ScrappableChatSession extends Endpoint {
     return _disposeSession(sessionId: sessionId, dbSession: session);
   }
 
+  /// Updates the user's OpenAI API key for the current session.
+  ///
+  /// This endpoint is called when a user wants to add their own API key
+  /// after receiving a [CreditLimitReachedResponse] (platform credits exhausted).
+  ///
+  /// The API key is:
+  /// 1. Stored in the in-memory [_sessionAccountAIUsage] map
+  /// 2. Persisted to the database when the session ends
+  /// 3. Used for subsequent API calls in this session (no credits deducted)
+  ///
+  /// Returns success and sends an [ApiKeyUpdatedResponse] to the chat stream.
+  Future<void> updateUserApiKey(
+    Session session, {
+    required RedraftSrappableSessionId sessionId,
+    required String openAiApiKey,
+  }) async {
+    // Validate session exists
+    if (!_scrapRedraftSessions.containsKey(sessionId)) {
+      throw ZenScrapException(
+        title: 'Session Not Found',
+        description: 'No active session found with ID $sessionId.',
+      );
+    }
+
+    // Validate user is authenticated
+    final int? userId = (await session.authenticated)?.userId;
+    if (userId == null) {
+      throw ZenScrapException(
+        title: 'Authentication Required',
+        description: 'You must be logged in to add an API key.',
+      );
+    }
+
+    // Validate API key format (basic check)
+    if (openAiApiKey.trim().isEmpty) {
+      throw ZenScrapException(
+        title: 'Invalid API Key',
+        description: 'Please provide a valid OpenAI API key.',
+      );
+    }
+
+    // Get or create AccountAIUsage for this session
+    AccountAIUsage? accountAIUsage = _sessionAccountAIUsage[sessionId];
+
+    if (accountAIUsage == null) {
+      // Load from database if not in cache
+      final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
+        session,
+        where: (p0) => p0.userInfoId.equals(userId),
+        include: AccountInfo.include(
+          accountAIUsage: AccountAIUsage.include(),
+        ),
+      );
+
+      if (accountInfo == null) {
+        throw ZenScrapException(
+          title: 'Account Not Found',
+          description: 'Could not find your account information.',
+        );
+      }
+
+      accountAIUsage = accountInfo.accountAIUsage;
+      if (accountAIUsage == null) {
+        accountAIUsage = await AccountAIUsage.db.findById(
+          session,
+          accountInfo.accountAIUsageId,
+        );
+      }
+
+      if (accountAIUsage == null) {
+        throw ZenScrapException(
+          title: 'AI Usage Record Not Found',
+          description: 'Could not find your AI usage record.',
+        );
+      }
+    }
+
+    // Update the API key
+    accountAIUsage.userOpenAiApiKey = openAiApiKey.trim();
+    _sessionAccountAIUsage[sessionId] = accountAIUsage;
+    _sessionUsesOwnApiKey[sessionId] = true;
+
+    // Persist to database immediately
+    try {
+      await AccountAIUsage.db.updateRow(session, accountAIUsage);
+      session.log(
+        'Updated user API key for session $sessionId (user $userId)',
+      );
+    } catch (e, s) {
+      session.log(
+        'Failed to persist API key update',
+        exception: e,
+        stackTrace: s,
+        level: LogLevel.error,
+      );
+      throw ZenScrapException(
+        title: 'Failed to Save API Key',
+        description: 'Could not save your API key. Please try again.',
+      );
+    }
+
+    // Send success response to chat stream
+    _scrapRedraftSessions[sessionId]?.add(
+      ApiKeyUpdatedResponse(
+        role: PromptRole.system,
+        expectsFollowUp: false,
+        messageText:
+            'Your OpenAI API key has been successfully configured. '
+            'You can now continue chatting without using platform credits. '
+            'Your API key is securely stored and will be used for all future messages.',
+      ),
+    );
+  }
+
   Future<void> updateScrappableRequest(
     Session session, {
     required int scrappableId,

@@ -733,6 +733,31 @@ class Endpoints extends _i1.EndpointDispatch {
             sessionId: params['sessionId'],
           ),
         ),
+        'updateUserApiKey': _i1.MethodConnector(
+          name: 'updateUserApiKey',
+          params: {
+            'sessionId': _i1.ParameterDescription(
+              name: 'sessionId',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'openAiApiKey': _i1.ParameterDescription(
+              name: 'openAiApiKey',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['scrappableChatSession'] as _i14.ScrappableChatSession)
+                  .updateUserApiKey(
+            session,
+            sessionId: params['sessionId'],
+            openAiApiKey: params['openAiApiKey'],
+          ),
+        ),
         'updateScrappableRequest': _i1.MethodConnector(
           name: 'updateScrappableRequest',
           params: {

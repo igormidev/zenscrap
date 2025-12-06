@@ -38,6 +38,7 @@ publicTier:
 scrappableChatSession:
   - commitCurrentEditState:
   - disposeSession:
+  - updateUserApiKey:
   - updateScrappableRequest:
   - createSession:
   - listenToScrappableRedraftSession:

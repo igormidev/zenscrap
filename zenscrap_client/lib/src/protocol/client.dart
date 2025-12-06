@@ -409,6 +409,30 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
         {'sessionId': sessionId},
       );
 
+  /// Updates the user's OpenAI API key for the current session.
+  ///
+  /// This endpoint is called when a user wants to add their own API key
+  /// after receiving a [CreditLimitReachedResponse] (platform credits exhausted).
+  ///
+  /// The API key is:
+  /// 1. Stored in the in-memory [_sessionAccountAIUsage] map
+  /// 2. Persisted to the database when the session ends
+  /// 3. Used for subsequent API calls in this session (no credits deducted)
+  ///
+  /// Returns success and sends an [ApiKeyUpdatedResponse] to the chat stream.
+  _i2.Future<void> updateUserApiKey({
+    required String sessionId,
+    required String openAiApiKey,
+  }) =>
+      caller.callServerEndpoint<void>(
+        'scrappableChatSession',
+        'updateUserApiKey',
+        {
+          'sessionId': sessionId,
+          'openAiApiKey': openAiApiKey,
+        },
+      );
+
   _i2.Future<void> updateScrappableRequest({
     required int scrappableId,
     required String url,
