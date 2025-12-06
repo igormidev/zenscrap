@@ -14,6 +14,37 @@ const _openAiResponsesUrl = 'https://api.openai.com/v1/responses';
 const _openAiFilesUrl = 'https://api.openai.com/v1/files';
 const _openAiVectorStoresUrl = 'https://api.openai.com/v1/vector_stores';
 
+/// Exception thrown when the OpenAI API returns an `insufficient_quota` error.
+/// This means the API key being used has run out of credits on OpenAI's side.
+///
+/// OpenAI error response:
+/// ```json
+/// {
+///   "error": {
+///     "message": "You exceeded your current quota, please check your plan and billing details.",
+///     "type": "insufficient_quota",
+///     "param": null,
+///     "code": "insufficient_quota"
+///   }
+/// }
+/// ```
+class OpenAiQuotaExceededException implements Exception {
+  /// The original error message from OpenAI
+  final String openAiErrorMessage;
+
+  /// The HTTP status code (typically 429)
+  final int statusCode;
+
+  const OpenAiQuotaExceededException({
+    required this.openAiErrorMessage,
+    required this.statusCode,
+  });
+
+  @override
+  String toString() =>
+      'OpenAiQuotaExceededException: $openAiErrorMessage (HTTP $statusCode)';
+}
+
 // Playwright MCP server deployed on Railway with ScrapingBee proxy
 const _playwrightMcpUrl =
     'https://playwright-mcp-scrapingbee-production.up.railway.app/mcp';
@@ -551,6 +582,35 @@ class ChatControllerOpenAiSdkImpl extends IChatController
     final streamedResponse = await client.send(request);
     if (streamedResponse.statusCode != 200) {
       final body = await streamedResponse.stream.bytesToString();
+
+      // Check for insufficient_quota error (HTTP 429 with specific error code)
+      if (streamedResponse.statusCode == 429) {
+        try {
+          final errorJson = jsonDecode(body) as Map<String, dynamic>;
+          final error = errorJson['error'] as Map<String, dynamic>?;
+          final errorCode = error?['code'] as String?;
+          final errorMessage =
+              error?['message'] as String? ?? 'Unknown quota error';
+
+          if (errorCode == 'insufficient_quota') {
+            throw OpenAiQuotaExceededException(
+              openAiErrorMessage: errorMessage,
+              statusCode: streamedResponse.statusCode,
+            );
+          }
+        } catch (e) {
+          if (e is OpenAiQuotaExceededException) rethrow;
+          // If parsing fails, check for quota-related keywords in the body
+          if (body.contains('insufficient_quota') ||
+              body.contains('exceeded your current quota')) {
+            throw OpenAiQuotaExceededException(
+              openAiErrorMessage: body,
+              statusCode: streamedResponse.statusCode,
+            );
+          }
+        }
+      }
+
       throw Exception(
         'OpenAI error ${streamedResponse.statusCode}: $body',
       );
@@ -613,6 +673,26 @@ class ChatControllerOpenAiSdkImpl extends IChatController
         final errorData = event['error'] ?? event['message'] ?? event;
         session.log('OpenAI API error event: $errorData',
             level: LogLevel.error);
+
+        // Check for insufficient_quota error in streaming events
+        if (errorData is Map<String, dynamic>) {
+          final errorCode = errorData['code'] as String?;
+          final errorMessage =
+              errorData['message'] as String? ?? 'Unknown quota error';
+          if (errorCode == 'insufficient_quota') {
+            throw OpenAiQuotaExceededException(
+              openAiErrorMessage: errorMessage,
+              statusCode: 429,
+            );
+          }
+        } else if (errorData.toString().contains('insufficient_quota') ||
+            errorData.toString().contains('exceeded your current quota')) {
+          throw OpenAiQuotaExceededException(
+            openAiErrorMessage: errorData.toString(),
+            statusCode: 429,
+          );
+        }
+
         throw Exception(
           'OpenAI streaming error: $errorData',
         );

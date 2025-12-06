@@ -23,6 +23,7 @@ part 'responses/new_extract_rule_response.dart';
 part 'responses/test_endpoint_called_error_response.dart';
 part 'responses/test_endpoint_called_success_response.dart';
 part 'responses/updated_scrappable_request_response.dart';
+part 'responses/user_api_key_quota_exceeded_response.dart';
 
 sealed class ChatResponse
     implements _i2.SerializableModel, _i2.ProtocolSerialization {
@@ -35,3 +36,5 @@ sealed class ChatResponse
 
   bool expectsFollowUp;
 }
+
+class _Undefined {}

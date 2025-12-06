@@ -1,0 +1,31 @@
+# UserApiKeyQuotaExceededResponse
+#
+# This response is sent when the user is using their OWN OpenAI API key and that
+# key has run out of credits on OpenAI's billing system.
+#
+# This happens DURING the API call when OpenAI returns the `insufficient_quota`
+# error (HTTP 429 with error.code = "insufficient_quota").
+#
+# OpenAI error response structure:
+# {
+#   "error": {
+#     "message": "You exceeded your current quota, please check your plan and billing details.",
+#     "type": "insufficient_quota",
+#     "param": null,
+#     "code": "insufficient_quota"
+#   }
+# }
+#
+# This is distinct from CreditLimitReachedResponse which is about PLATFORM credits.
+# This response is specifically about the user's PERSONAL OpenAI account running
+# out of credits.
+#
+# The user can resolve this by:
+# - Adding credits to their OpenAI account at platform.openai.com
+# - Checking their billing settings on OpenAI
+# - Removing their API key to use platform credits instead (if they have any remaining)
+class: UserApiKeyQuotaExceededResponse
+extends: ChatResponse
+fields:
+    messageText: String
+    openAiErrorMessage: String?

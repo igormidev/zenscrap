@@ -807,6 +807,36 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
       } else if (usesOwnApiKey) {
         session.log('User using own API key - no credits deducted');
       }
+    } on OpenAiQuotaExceededException catch (e) {
+      // User's own API key has run out of credits on OpenAI's side
+      session.log(
+        'User API key quota exceeded: ${e.openAiErrorMessage}',
+        level: LogLevel.warning,
+      );
+
+      // Determine the appropriate message based on whether the user is using their own key
+      final String messageText;
+      if (usesOwnApiKey) {
+        messageText =
+            'Your OpenAI API key has run out of credits. '
+            'Please add credits to your OpenAI account at platform.openai.com, '
+            'or remove your API key from account settings to use platform credits instead.';
+      } else {
+        // This shouldn't happen normally, but handle it gracefully
+        messageText =
+            'The OpenAI API returned a quota error. '
+            'Please try again later or contact support if the issue persists.';
+      }
+
+      _scrapRedraftSessions[sessionId]?.add(
+        UserApiKeyQuotaExceededResponse(
+          role: PromptRole.system,
+          expectsFollowUp: false,
+          messageText: messageText,
+          openAiErrorMessage: e.openAiErrorMessage,
+        ),
+      );
+      // Don't rethrow - we've handled the error gracefully
     } catch (e, s) {
       chatSeason.add(ErrorTextResponse(
         role: PromptRole.system,
