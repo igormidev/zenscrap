@@ -19,22 +19,10 @@ fields:
   scrappableAnalytics: List<ScrappableAnalytics>?, relation(name=scrappable_analytics)
   category: ScraperCategory
   isDeleted: bool
-  ### Auto-Fix Configuration ###
-  # Whether auto-fix is enabled for this scrappable (user can toggle)
-  autoFixEnabled: bool, default=true
-  # Number of consecutive errors required before triggering auto-fix (configurable by user)
-  consecutiveErrorThreshold: int, default=100
-  # Current count of consecutive errors (denormalized for query efficiency)
-  # Reset to 0 on success, incremented on error
-  currentConsecutiveErrors: int, default=0
-  # Timestamp of last auto-fix attempt (for cooldown period - 1 hour minimum between attempts)
-  lastAutoFixAttemptAt: DateTime?
-  # Flag to prevent concurrent auto-fix attempts on the same scrappable
-  autoFixInProgress: bool, default=false
-  # Number of failed auto-fix attempts (for exponential backoff)
-  # Reset to 0 on successful fix, incremented on each failed attempt
-  # After 5 failed attempts, auto-fix is disabled until manual reset
-  autoFixAttemptCount: int, default=0
+  # Auto-fix configuration (1:1 relationship - stored in separate table for smaller update footprint)
+  autoFixConfig: AutoFixConfig?, relation(name=scrappable_auto_fix_config)
+  # Auto-fix session history (1:n relationship - multiple repair sessions over time)
+  autoFixSessions: List<AutoFixSession>?, relation(name=scrappable_auto_fix_sessions)
 indexes:
   scrappable_target_request_unique_idx:
     fields: targetRequestId
@@ -42,6 +30,3 @@ indexes:
   scrappable_reference_test_data_unique_idx:
     fields: referenceTestDataId
     unique: true
-  # Index for efficient auto-fix candidate queries
-  scrappable_auto_fix_candidates_idx:
-    fields: autoFixEnabled, autoFixInProgress, currentConsecutiveErrors

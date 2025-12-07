@@ -125,7 +125,7 @@ Include a detailed `errorMessage` explaining why automatic fix is not possible.
 ''';
 }
 
-/// Builds the context prompt with scrappable details and error history
+/// Builds the context prompt with scrappable details, error history, and timeline context
 String buildAutoFixContextPrompt({
   required Scrappable scrappable,
   required ScrappableRequest scrappableRequest,
@@ -138,7 +138,6 @@ String buildAutoFixContextPrompt({
     ..writeln('')
     ..writeln('**Name**: ${scrappable.name}')
     ..writeln('**Description**: ${scrappable.description}')
-    ..writeln('**Consecutive Errors**: ${scrappable.currentConsecutiveErrors}')
     ..writeln('')
     ..writeln('### Reference URL')
     ..writeln('```')
@@ -198,27 +197,112 @@ String buildAutoFixContextPrompt({
       ..writeln('```');
   }
 
-  // Add recent error information
+  // Add timeline context and error analysis
   if (recentAnalytics.isNotEmpty) {
     buffer
       ..writeln('')
       ..writeln('---')
       ..writeln('')
-      ..writeln('## RECENT ERROR HISTORY')
-      ..writeln('')
-      ..writeln(
-          'The following are the most recent errors (up to 10) that triggered this auto-fix:')
+      ..writeln('## ERROR TIMELINE & ANALYSIS')
       ..writeln('');
 
-    final errors = recentAnalytics
+    // Separate successes and failures
+    final successes = recentAnalytics
+        .where((a) => a.requestStatus == RequestStatus.success)
+        .toList();
+    final failures = recentAnalytics
         .where((a) => a.requestStatus != RequestStatus.success)
-        .take(10)
         .toList();
 
-    for (var i = 0; i < errors.length; i++) {
-      final error = errors[i];
+    // Build timeline context
+    if (successes.isNotEmpty && failures.isNotEmpty) {
+      // Sort to find timeline boundaries
+      final sortedSuccesses = List<ScrappableAnalytics>.from(successes)
+        ..sort((a, b) => b.requestedAt.compareTo(a.requestedAt));
+      final sortedFailures = List<ScrappableAnalytics>.from(failures)
+        ..sort((a, b) => b.requestedAt.compareTo(a.requestedAt));
+
+      final lastSuccess = sortedSuccesses.first;
+      final firstFailureAfterSuccess = sortedFailures.lastWhere(
+        (f) => f.requestedAt.isAfter(lastSuccess.requestedAt),
+        orElse: () => sortedFailures.first,
+      );
+
       buffer
-        ..writeln('### Error ${i + 1} (${error.requestedAt.toIso8601String()})')
+        ..writeln('### Failure Timeline')
+        ..writeln('')
+        ..writeln('⚠️ **IMPORTANT CONTEXT:**')
+        ..writeln(
+            '- **Last successful request**: ${_formatDateTime(lastSuccess.requestedAt)}')
+        ..writeln(
+            '- **First error after that**: ${_formatDateTime(firstFailureAfterSuccess.requestedAt)}')
+        ..writeln('')
+        ..writeln(
+            'The scrappable **worked correctly until ${_formatDateTime(lastSuccess.requestedAt)}** but started failing around ${_formatDateTime(firstFailureAfterSuccess.requestedAt)}.')
+        ..writeln('')
+        ..writeln(
+            'This suggests something changed on the website between these two dates.')
+        ..writeln('');
+
+      // Add last successful payload/response example if available
+      if (lastSuccess.details?.stringifiedPayload != null ||
+          lastSuccess.details?.stringifiedResponse != null) {
+        buffer
+          ..writeln('---')
+          ..writeln('')
+          ..writeln('## LAST SUCCESSFUL REQUEST/RESPONSE')
+          ..writeln('')
+          ..writeln(
+              'This is what a **working** request looked like. Use this as reference for what the output should be:')
+          ..writeln('');
+
+        final successPayload = lastSuccess.details?.stringifiedPayload;
+        if (successPayload != null) {
+          final truncatedPayload = successPayload.length > 2000
+              ? '${successPayload.substring(0, 2000)}... [truncated]'
+              : successPayload;
+          buffer
+            ..writeln('### Successful Request Payload')
+            ..writeln('```json')
+            ..writeln(truncatedPayload)
+            ..writeln('```')
+            ..writeln('');
+        }
+
+        if (lastSuccess.details?.stringifiedResponse != null) {
+          final response = lastSuccess.details!.stringifiedResponse!;
+          final truncatedResponse = response.length > 3000
+              ? '${response.substring(0, 3000)}... [truncated]'
+              : response;
+          buffer
+            ..writeln('### Successful Response (Expected Output)')
+            ..writeln('')
+            ..writeln(
+                'Your fix should produce data with the same structure as this:')
+            ..writeln('```json')
+            ..writeln(truncatedResponse)
+            ..writeln('```')
+            ..writeln('');
+        }
+      }
+    }
+
+    // Add recent error details
+    buffer
+      ..writeln('---')
+      ..writeln('')
+      ..writeln('## RECENT ERRORS')
+      ..writeln('')
+      ..writeln(
+          'The following errors triggered this auto-fix (most recent first):')
+      ..writeln('');
+
+    final recentErrors = failures.take(5).toList();
+    for (var i = 0; i < recentErrors.length; i++) {
+      final error = recentErrors[i];
+      buffer
+        ..writeln(
+            '### Error ${i + 1} (${_formatDateTime(error.requestedAt)})')
         ..writeln('- **Status**: ${error.requestStatus.name}');
 
       if (error.details != null) {
@@ -228,12 +312,24 @@ String buildAutoFixContextPrompt({
         if (error.details!.description != null) {
           buffer.writeln('- **Description**: ${error.details!.description}');
         }
+        // Include failed payload if available
+        final errorPayload = error.details?.stringifiedPayload;
+        if (errorPayload != null) {
+          final truncated = errorPayload.length > 500
+              ? '${errorPayload.substring(0, 500)}... [truncated]'
+              : errorPayload;
+          buffer
+            ..writeln('- **Request Payload**:')
+            ..writeln('  ```json')
+            ..writeln('  $truncated')
+            ..writeln('  ```');
+        }
       }
       buffer.writeln('');
     }
   }
 
-  // Add last known good result if available
+  // Add last known good result if available (fallback if no analytics)
   final lastGoodResult = referenceTestData.scrapResultJson;
   if (lastGoodResult != null && lastGoodResult.isNotEmpty) {
     final truncated = lastGoodResult.length > 1000
@@ -242,10 +338,10 @@ String buildAutoFixContextPrompt({
     buffer
       ..writeln('---')
       ..writeln('')
-      ..writeln('## LAST KNOWN GOOD OUTPUT')
+      ..writeln('## REFERENCE OUTPUT STRUCTURE')
       ..writeln('')
       ..writeln(
-          'This is the expected output structure. Your fix should produce similar data:')
+          'This is the expected output structure from reference test data:')
       ..writeln('```json')
       ..writeln(truncated)
       ..writeln('```');
@@ -270,6 +366,12 @@ String buildAutoFixContextPrompt({
         '**IMPORTANT**: Keep the same field names in the output. Users depend on the existing API response structure.');
 
   return buffer.toString();
+}
+
+/// Formats DateTime for display in prompts
+String _formatDateTime(DateTime dt) {
+  return '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')} '
+      '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')} UTC';
 }
 
 /// Builds the initial user prompt that triggers the auto-fix process

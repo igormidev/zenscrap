@@ -1,0 +1,8 @@
+# Status of an individual AutoFixAttempt
+enum: AutoFixAttemptStatus
+values:
+  - in_progress        # AI is currently processing
+  - validation_failed  # AI returned rules but they failed ScrapingBee validation
+  - ai_error           # AI returned an error response or couldn't generate rules
+  - api_error          # OpenAI API or MCP server error
+  - success            # Rules validated and successfully applied

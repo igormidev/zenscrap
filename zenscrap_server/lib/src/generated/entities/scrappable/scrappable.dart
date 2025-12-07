@@ -17,6 +17,8 @@ import '../../entities/scrappable/scrappable_request.dart' as _i3;
 import '../../entities/scrappable/reference_test_data.dart' as _i4;
 import '../../entities/scrappable/scrappable_analytics.dart' as _i5;
 import '../../entities/scrappable/scraper_category.dart' as _i6;
+import '../../entities/scrappable/auto_fix/auto_fix_config.dart' as _i7;
+import '../../entities/scrappable/auto_fix/auto_fix_session.dart' as _i8;
 
 abstract class Scrappable
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -39,17 +41,9 @@ abstract class Scrappable
     this.scrappableAnalytics,
     required this.category,
     required this.isDeleted,
-    bool? autoFixEnabled,
-    int? consecutiveErrorThreshold,
-    int? currentConsecutiveErrors,
-    this.lastAutoFixAttemptAt,
-    bool? autoFixInProgress,
-    int? autoFixAttemptCount,
-  })  : autoFixEnabled = autoFixEnabled ?? true,
-        consecutiveErrorThreshold = consecutiveErrorThreshold ?? 100,
-        currentConsecutiveErrors = currentConsecutiveErrors ?? 0,
-        autoFixInProgress = autoFixInProgress ?? false,
-        autoFixAttemptCount = autoFixAttemptCount ?? 0;
+    this.autoFixConfig,
+    this.autoFixSessions,
+  });
 
   factory Scrappable({
     int? id,
@@ -70,12 +64,8 @@ abstract class Scrappable
     List<_i5.ScrappableAnalytics>? scrappableAnalytics,
     required _i6.ScraperCategory category,
     required bool isDeleted,
-    bool? autoFixEnabled,
-    int? consecutiveErrorThreshold,
-    int? currentConsecutiveErrors,
-    DateTime? lastAutoFixAttemptAt,
-    bool? autoFixInProgress,
-    int? autoFixAttemptCount,
+    _i7.AutoFixConfig? autoFixConfig,
+    List<_i8.AutoFixSession>? autoFixSessions,
   }) = _ScrappableImpl;
 
   factory Scrappable.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -121,17 +111,13 @@ abstract class Scrappable
       category:
           _i6.ScraperCategory.fromJson((jsonSerialization['category'] as int)),
       isDeleted: jsonSerialization['isDeleted'] as bool,
-      autoFixEnabled: jsonSerialization['autoFixEnabled'] as bool,
-      consecutiveErrorThreshold:
-          jsonSerialization['consecutiveErrorThreshold'] as int,
-      currentConsecutiveErrors:
-          jsonSerialization['currentConsecutiveErrors'] as int,
-      lastAutoFixAttemptAt: jsonSerialization['lastAutoFixAttemptAt'] == null
+      autoFixConfig: jsonSerialization['autoFixConfig'] == null
           ? null
-          : _i1.DateTimeJsonExtension.fromJson(
-              jsonSerialization['lastAutoFixAttemptAt']),
-      autoFixInProgress: jsonSerialization['autoFixInProgress'] as bool,
-      autoFixAttemptCount: jsonSerialization['autoFixAttemptCount'] as int,
+          : _i7.AutoFixConfig.fromJson(
+              (jsonSerialization['autoFixConfig'] as Map<String, dynamic>)),
+      autoFixSessions: (jsonSerialization['autoFixSessions'] as List?)
+          ?.map((e) => _i8.AutoFixSession.fromJson((e as Map<String, dynamic>)))
+          .toList(),
     );
   }
 
@@ -176,18 +162,9 @@ abstract class Scrappable
 
   bool isDeleted;
 
-  /// Auto-Fix Configuration ###
-  bool autoFixEnabled;
+  _i7.AutoFixConfig? autoFixConfig;
 
-  int consecutiveErrorThreshold;
-
-  int currentConsecutiveErrors;
-
-  DateTime? lastAutoFixAttemptAt;
-
-  bool autoFixInProgress;
-
-  int autoFixAttemptCount;
+  List<_i8.AutoFixSession>? autoFixSessions;
 
   @override
   _i1.Table<int?> get table => t;
@@ -214,12 +191,8 @@ abstract class Scrappable
     List<_i5.ScrappableAnalytics>? scrappableAnalytics,
     _i6.ScraperCategory? category,
     bool? isDeleted,
-    bool? autoFixEnabled,
-    int? consecutiveErrorThreshold,
-    int? currentConsecutiveErrors,
-    DateTime? lastAutoFixAttemptAt,
-    bool? autoFixInProgress,
-    int? autoFixAttemptCount,
+    _i7.AutoFixConfig? autoFixConfig,
+    List<_i8.AutoFixSession>? autoFixSessions,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -248,13 +221,10 @@ abstract class Scrappable
             scrappableAnalytics?.toJson(valueToJson: (v) => v.toJson()),
       'category': category.toJson(),
       'isDeleted': isDeleted,
-      'autoFixEnabled': autoFixEnabled,
-      'consecutiveErrorThreshold': consecutiveErrorThreshold,
-      'currentConsecutiveErrors': currentConsecutiveErrors,
-      if (lastAutoFixAttemptAt != null)
-        'lastAutoFixAttemptAt': lastAutoFixAttemptAt?.toJson(),
-      'autoFixInProgress': autoFixInProgress,
-      'autoFixAttemptCount': autoFixAttemptCount,
+      if (autoFixConfig != null) 'autoFixConfig': autoFixConfig?.toJson(),
+      if (autoFixSessions != null)
+        'autoFixSessions':
+            autoFixSessions?.toJson(valueToJson: (v) => v.toJson()),
     };
   }
 
@@ -285,13 +255,11 @@ abstract class Scrappable
             valueToJson: (v) => v.toJsonForProtocol()),
       'category': category.toJson(),
       'isDeleted': isDeleted,
-      'autoFixEnabled': autoFixEnabled,
-      'consecutiveErrorThreshold': consecutiveErrorThreshold,
-      'currentConsecutiveErrors': currentConsecutiveErrors,
-      if (lastAutoFixAttemptAt != null)
-        'lastAutoFixAttemptAt': lastAutoFixAttemptAt?.toJson(),
-      'autoFixInProgress': autoFixInProgress,
-      'autoFixAttemptCount': autoFixAttemptCount,
+      if (autoFixConfig != null)
+        'autoFixConfig': autoFixConfig?.toJsonForProtocol(),
+      if (autoFixSessions != null)
+        'autoFixSessions':
+            autoFixSessions?.toJson(valueToJson: (v) => v.toJsonForProtocol()),
     };
   }
 
@@ -300,12 +268,16 @@ abstract class Scrappable
     _i3.ScrappableRequestInclude? targetRequest,
     _i4.ReferenceTestDataInclude? referenceTestData,
     _i5.ScrappableAnalyticsIncludeList? scrappableAnalytics,
+    _i7.AutoFixConfigInclude? autoFixConfig,
+    _i8.AutoFixSessionIncludeList? autoFixSessions,
   }) {
     return ScrappableInclude._(
       scrappingBeeExtractRules: scrappingBeeExtractRules,
       targetRequest: targetRequest,
       referenceTestData: referenceTestData,
       scrappableAnalytics: scrappableAnalytics,
+      autoFixConfig: autoFixConfig,
+      autoFixSessions: autoFixSessions,
     );
   }
 
@@ -357,12 +329,8 @@ class _ScrappableImpl extends Scrappable {
     List<_i5.ScrappableAnalytics>? scrappableAnalytics,
     required _i6.ScraperCategory category,
     required bool isDeleted,
-    bool? autoFixEnabled,
-    int? consecutiveErrorThreshold,
-    int? currentConsecutiveErrors,
-    DateTime? lastAutoFixAttemptAt,
-    bool? autoFixInProgress,
-    int? autoFixAttemptCount,
+    _i7.AutoFixConfig? autoFixConfig,
+    List<_i8.AutoFixSession>? autoFixSessions,
   }) : super._(
           id: id,
           accountId: accountId,
@@ -382,12 +350,8 @@ class _ScrappableImpl extends Scrappable {
           scrappableAnalytics: scrappableAnalytics,
           category: category,
           isDeleted: isDeleted,
-          autoFixEnabled: autoFixEnabled,
-          consecutiveErrorThreshold: consecutiveErrorThreshold,
-          currentConsecutiveErrors: currentConsecutiveErrors,
-          lastAutoFixAttemptAt: lastAutoFixAttemptAt,
-          autoFixInProgress: autoFixInProgress,
-          autoFixAttemptCount: autoFixAttemptCount,
+          autoFixConfig: autoFixConfig,
+          autoFixSessions: autoFixSessions,
         );
 
   /// Returns a shallow copy of this [Scrappable]
@@ -413,12 +377,8 @@ class _ScrappableImpl extends Scrappable {
     Object? scrappableAnalytics = _Undefined,
     _i6.ScraperCategory? category,
     bool? isDeleted,
-    bool? autoFixEnabled,
-    int? consecutiveErrorThreshold,
-    int? currentConsecutiveErrors,
-    Object? lastAutoFixAttemptAt = _Undefined,
-    bool? autoFixInProgress,
-    int? autoFixAttemptCount,
+    Object? autoFixConfig = _Undefined,
+    Object? autoFixSessions = _Undefined,
   }) {
     return Scrappable(
       id: id is int? ? id : this.id,
@@ -455,16 +415,12 @@ class _ScrappableImpl extends Scrappable {
           : this.scrappableAnalytics?.map((e0) => e0.copyWith()).toList(),
       category: category ?? this.category,
       isDeleted: isDeleted ?? this.isDeleted,
-      autoFixEnabled: autoFixEnabled ?? this.autoFixEnabled,
-      consecutiveErrorThreshold:
-          consecutiveErrorThreshold ?? this.consecutiveErrorThreshold,
-      currentConsecutiveErrors:
-          currentConsecutiveErrors ?? this.currentConsecutiveErrors,
-      lastAutoFixAttemptAt: lastAutoFixAttemptAt is DateTime?
-          ? lastAutoFixAttemptAt
-          : this.lastAutoFixAttemptAt,
-      autoFixInProgress: autoFixInProgress ?? this.autoFixInProgress,
-      autoFixAttemptCount: autoFixAttemptCount ?? this.autoFixAttemptCount,
+      autoFixConfig: autoFixConfig is _i7.AutoFixConfig?
+          ? autoFixConfig
+          : this.autoFixConfig?.copyWith(),
+      autoFixSessions: autoFixSessions is List<_i8.AutoFixSession>?
+          ? autoFixSessions
+          : this.autoFixSessions?.map((e0) => e0.copyWith()).toList(),
     );
   }
 }
@@ -524,35 +480,6 @@ class ScrappableTable extends _i1.Table<int?> {
       'isDeleted',
       this,
     );
-    autoFixEnabled = _i1.ColumnBool(
-      'autoFixEnabled',
-      this,
-      hasDefault: true,
-    );
-    consecutiveErrorThreshold = _i1.ColumnInt(
-      'consecutiveErrorThreshold',
-      this,
-      hasDefault: true,
-    );
-    currentConsecutiveErrors = _i1.ColumnInt(
-      'currentConsecutiveErrors',
-      this,
-      hasDefault: true,
-    );
-    lastAutoFixAttemptAt = _i1.ColumnDateTime(
-      'lastAutoFixAttemptAt',
-      this,
-    );
-    autoFixInProgress = _i1.ColumnBool(
-      'autoFixInProgress',
-      this,
-      hasDefault: true,
-    );
-    autoFixAttemptCount = _i1.ColumnInt(
-      'autoFixAttemptCount',
-      this,
-      hasDefault: true,
-    );
   }
 
   late final _i1.ColumnInt accountId;
@@ -591,18 +518,11 @@ class ScrappableTable extends _i1.Table<int?> {
 
   late final _i1.ColumnBool isDeleted;
 
-  /// Auto-Fix Configuration ###
-  late final _i1.ColumnBool autoFixEnabled;
+  _i7.AutoFixConfigTable? _autoFixConfig;
 
-  late final _i1.ColumnInt consecutiveErrorThreshold;
+  _i8.AutoFixSessionTable? ___autoFixSessions;
 
-  late final _i1.ColumnInt currentConsecutiveErrors;
-
-  late final _i1.ColumnDateTime lastAutoFixAttemptAt;
-
-  late final _i1.ColumnBool autoFixInProgress;
-
-  late final _i1.ColumnInt autoFixAttemptCount;
+  _i1.ManyRelation<_i8.AutoFixSessionTable>? _autoFixSessions;
 
   _i2.ScrappingBeeExtractLogicTable get scrappingBeeExtractRules {
     if (_scrappingBeeExtractRules != null) return _scrappingBeeExtractRules!;
@@ -656,6 +576,32 @@ class ScrappableTable extends _i1.Table<int?> {
     return ___scrappableAnalytics!;
   }
 
+  _i7.AutoFixConfigTable get autoFixConfig {
+    if (_autoFixConfig != null) return _autoFixConfig!;
+    _autoFixConfig = _i1.createRelationTable(
+      relationFieldName: 'autoFixConfig',
+      field: Scrappable.t.id,
+      foreignField: _i7.AutoFixConfig.t.scrappableId,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _i7.AutoFixConfigTable(tableRelation: foreignTableRelation),
+    );
+    return _autoFixConfig!;
+  }
+
+  _i8.AutoFixSessionTable get __autoFixSessions {
+    if (___autoFixSessions != null) return ___autoFixSessions!;
+    ___autoFixSessions = _i1.createRelationTable(
+      relationFieldName: '__autoFixSessions',
+      field: Scrappable.t.id,
+      foreignField: _i8.AutoFixSession.t.scrappableId,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _i8.AutoFixSessionTable(tableRelation: foreignTableRelation),
+    );
+    return ___autoFixSessions!;
+  }
+
   _i1.ManyRelation<_i5.ScrappableAnalyticsTable> get scrappableAnalytics {
     if (_scrappableAnalytics != null) return _scrappableAnalytics!;
     var relationTable = _i1.createRelationTable(
@@ -674,6 +620,24 @@ class ScrappableTable extends _i1.Table<int?> {
     return _scrappableAnalytics!;
   }
 
+  _i1.ManyRelation<_i8.AutoFixSessionTable> get autoFixSessions {
+    if (_autoFixSessions != null) return _autoFixSessions!;
+    var relationTable = _i1.createRelationTable(
+      relationFieldName: 'autoFixSessions',
+      field: Scrappable.t.id,
+      foreignField: _i8.AutoFixSession.t.scrappableId,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _i8.AutoFixSessionTable(tableRelation: foreignTableRelation),
+    );
+    _autoFixSessions = _i1.ManyRelation<_i8.AutoFixSessionTable>(
+      tableWithRelations: relationTable,
+      table: _i8.AutoFixSessionTable(
+          tableRelation: relationTable.tableRelation!.lastRelation),
+    );
+    return _autoFixSessions!;
+  }
+
   @override
   List<_i1.Column> get columns => [
         id,
@@ -690,12 +654,6 @@ class ScrappableTable extends _i1.Table<int?> {
         referenceTestDataId,
         category,
         isDeleted,
-        autoFixEnabled,
-        consecutiveErrorThreshold,
-        currentConsecutiveErrors,
-        lastAutoFixAttemptAt,
-        autoFixInProgress,
-        autoFixAttemptCount,
       ];
 
   @override
@@ -712,6 +670,12 @@ class ScrappableTable extends _i1.Table<int?> {
     if (relationField == 'scrappableAnalytics') {
       return __scrappableAnalytics;
     }
+    if (relationField == 'autoFixConfig') {
+      return autoFixConfig;
+    }
+    if (relationField == 'autoFixSessions') {
+      return __autoFixSessions;
+    }
     return null;
   }
 }
@@ -722,11 +686,15 @@ class ScrappableInclude extends _i1.IncludeObject {
     _i3.ScrappableRequestInclude? targetRequest,
     _i4.ReferenceTestDataInclude? referenceTestData,
     _i5.ScrappableAnalyticsIncludeList? scrappableAnalytics,
+    _i7.AutoFixConfigInclude? autoFixConfig,
+    _i8.AutoFixSessionIncludeList? autoFixSessions,
   }) {
     _scrappingBeeExtractRules = scrappingBeeExtractRules;
     _targetRequest = targetRequest;
     _referenceTestData = referenceTestData;
     _scrappableAnalytics = scrappableAnalytics;
+    _autoFixConfig = autoFixConfig;
+    _autoFixSessions = autoFixSessions;
   }
 
   _i2.ScrappingBeeExtractLogicInclude? _scrappingBeeExtractRules;
@@ -737,12 +705,18 @@ class ScrappableInclude extends _i1.IncludeObject {
 
   _i5.ScrappableAnalyticsIncludeList? _scrappableAnalytics;
 
+  _i7.AutoFixConfigInclude? _autoFixConfig;
+
+  _i8.AutoFixSessionIncludeList? _autoFixSessions;
+
   @override
   Map<String, _i1.Include?> get includes => {
         'scrappingBeeExtractRules': _scrappingBeeExtractRules,
         'targetRequest': _targetRequest,
         'referenceTestData': _referenceTestData,
         'scrappableAnalytics': _scrappableAnalytics,
+        'autoFixConfig': _autoFixConfig,
+        'autoFixSessions': _autoFixSessions,
       };
 
   @override
@@ -1023,6 +997,31 @@ class ScrappableAttachRepository {
       transaction: transaction,
     );
   }
+
+  /// Creates a relation between this [Scrappable] and the given [AutoFixSession]s
+  /// by setting each [AutoFixSession]'s foreign key `scrappableId` to refer to this [Scrappable].
+  Future<void> autoFixSessions(
+    _i1.Session session,
+    Scrappable scrappable,
+    List<_i8.AutoFixSession> autoFixSession, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (autoFixSession.any((e) => e.id == null)) {
+      throw ArgumentError.notNull('autoFixSession.id');
+    }
+    if (scrappable.id == null) {
+      throw ArgumentError.notNull('scrappable.id');
+    }
+
+    var $autoFixSession = autoFixSession
+        .map((e) => e.copyWith(scrappableId: scrappable.id))
+        .toList();
+    await session.db.update<_i8.AutoFixSession>(
+      $autoFixSession,
+      columns: [_i8.AutoFixSession.t.scrappableId],
+      transaction: transaction,
+    );
+  }
 }
 
 class ScrappableAttachRowRepository {
@@ -1099,6 +1098,29 @@ class ScrappableAttachRowRepository {
     );
   }
 
+  /// Creates a relation between the given [Scrappable] and [AutoFixConfig]
+  /// by setting the [Scrappable]'s foreign key `id` to refer to the [AutoFixConfig].
+  Future<void> autoFixConfig(
+    _i1.Session session,
+    Scrappable scrappable,
+    _i7.AutoFixConfig autoFixConfig, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (autoFixConfig.id == null) {
+      throw ArgumentError.notNull('autoFixConfig.id');
+    }
+    if (scrappable.id == null) {
+      throw ArgumentError.notNull('scrappable.id');
+    }
+
+    var $autoFixConfig = autoFixConfig.copyWith(scrappableId: scrappable.id);
+    await session.db.updateRow<_i7.AutoFixConfig>(
+      $autoFixConfig,
+      columns: [_i7.AutoFixConfig.t.scrappableId],
+      transaction: transaction,
+    );
+  }
+
   /// Creates a relation between this [Scrappable] and the given [ScrappableAnalytics]
   /// by setting the [ScrappableAnalytics]'s foreign key `scrappableId` to refer to this [Scrappable].
   Future<void> scrappableAnalytics(
@@ -1119,6 +1141,29 @@ class ScrappableAttachRowRepository {
     await session.db.updateRow<_i5.ScrappableAnalytics>(
       $scrappableAnalytics,
       columns: [_i5.ScrappableAnalytics.t.scrappableId],
+      transaction: transaction,
+    );
+  }
+
+  /// Creates a relation between this [Scrappable] and the given [AutoFixSession]
+  /// by setting the [AutoFixSession]'s foreign key `scrappableId` to refer to this [Scrappable].
+  Future<void> autoFixSessions(
+    _i1.Session session,
+    Scrappable scrappable,
+    _i8.AutoFixSession autoFixSession, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (autoFixSession.id == null) {
+      throw ArgumentError.notNull('autoFixSession.id');
+    }
+    if (scrappable.id == null) {
+      throw ArgumentError.notNull('scrappable.id');
+    }
+
+    var $autoFixSession = autoFixSession.copyWith(scrappableId: scrappable.id);
+    await session.db.updateRow<_i8.AutoFixSession>(
+      $autoFixSession,
+      columns: [_i8.AutoFixSession.t.scrappableId],
       transaction: transaction,
     );
   }

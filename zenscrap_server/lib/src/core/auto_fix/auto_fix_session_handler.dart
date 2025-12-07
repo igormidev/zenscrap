@@ -38,6 +38,14 @@ class AutoFixFailure extends AutoFixResult {
   const AutoFixFailure({required this.errorMessage});
 }
 
+/// Maps AiModel enum to OpenAI model name
+String _getModelName(AiModel model) {
+  return switch (model) {
+    AiModel.normal => 'gpt-5-mini',
+    AiModel.powerful => 'gpt-5.1',
+  };
+}
+
 /// Handles automated AI-powered fix attempts for broken scrappables.
 ///
 /// This is a non-interactive, single-shot AI session designed to:
@@ -45,6 +53,8 @@ class AutoFixFailure extends AutoFixResult {
 /// 2. Explore the target site to identify what changed
 /// 3. Generate fixed extraction rules
 /// 4. Validate the fix with ScrapingBee
+///
+/// All attempts are logged to AutoFixAttempt for auditing.
 class AutoFixSessionHandler {
   final Session _session;
   final String _openAiApiKey;
@@ -54,6 +64,8 @@ class AutoFixSessionHandler {
   final ScrappingBeeExtractLogic _extractLogic;
   final ReferenceTestData _referenceTestData;
   final List<ScrappableAnalytics> _recentAnalytics;
+  final AiModel _aiModel;
+  final int _autoFixSessionId;
 
   AutoFixSessionHandler({
     required Session session,
@@ -64,6 +76,8 @@ class AutoFixSessionHandler {
     required ScrappingBeeExtractLogic extractLogic,
     required ReferenceTestData referenceTestData,
     required List<ScrappableAnalytics> recentAnalytics,
+    required AiModel aiModel,
+    required int autoFixSessionId,
   })  : _session = session,
         _openAiApiKey = openAiApiKey,
         _scrapingBeeApiKey = scrapingBeeApiKey,
@@ -71,15 +85,31 @@ class AutoFixSessionHandler {
         _scrappableRequest = scrappableRequest,
         _extractLogic = extractLogic,
         _referenceTestData = referenceTestData,
-        _recentAnalytics = recentAnalytics;
+        _recentAnalytics = recentAnalytics,
+        _aiModel = aiModel,
+        _autoFixSessionId = autoFixSessionId;
 
   /// Attempts to automatically fix the broken scrappable using AI.
   ///
   /// Returns [AutoFixSuccess] if the fix worked, [AutoFixFailure] otherwise.
   Future<AutoFixResult> attemptFix() async {
+    final now = DateTime.now();
+
+    // Create AutoFixAttempt record
+    final attempt = await AutoFixAttempt.db.insertRow(
+      _session,
+      AutoFixAttempt(
+        startedAt: now,
+        attemptNumber: 1, // Currently single attempt per session
+        status: AutoFixAttemptStatus.in_progress,
+        sessionId: _autoFixSessionId,
+      ),
+    );
+
     try {
       _session.log(
-        'Starting auto-fix attempt for scrappable ${_scrappable.id} (${_scrappable.name})',
+        'Starting auto-fix attempt for scrappable ${_scrappable.id} (${_scrappable.name}) '
+        'using model ${_getModelName(_aiModel)}',
         level: LogLevel.info,
       );
 
@@ -108,7 +138,8 @@ class AutoFixSessionHandler {
           buildExtractionRulesGuide(webScrapperRequest);
 
       // Call OpenAI with the auto-fix prompts
-      final result = await _callOpenAI(
+      final (result, thinkingLog, inputTokens, outputTokens, reasoningTokens) =
+          await _callOpenAI(
         systemPrompt: systemPrompt,
         contextPrompt: contextPrompt,
         extractionRulesGuide: extractionRulesGuide,
@@ -116,6 +147,15 @@ class AutoFixSessionHandler {
       );
 
       if (result == null) {
+        await _updateAttemptFailed(
+          attempt: attempt,
+          status: AutoFixAttemptStatus.api_error,
+          errorMessage: 'Failed to get response from AI',
+          thinkingLog: thinkingLog,
+          inputTokens: inputTokens,
+          outputTokens: outputTokens,
+          reasoningTokens: reasoningTokens,
+        );
         return const AutoFixFailure(
           errorMessage: 'Failed to get response from AI',
         );
@@ -125,27 +165,59 @@ class AutoFixSessionHandler {
       final parsedResponse = parseStructuredResponse(result);
 
       return switch (parsedResponse) {
-        WebScrapperChatAIResponseJustMessage(:final message) => AutoFixFailure(
+        WebScrapperChatAIResponseJustMessage(:final message) =>
+          await _handleAiError(
+            attempt: attempt,
             errorMessage: 'AI returned message instead of fix: $message',
+            thinkingLog: thinkingLog,
+            inputTokens: inputTokens,
+            outputTokens: outputTokens,
+            reasoningTokens: reasoningTokens,
           ),
         WebScrapperChatAIResponseErrorMessage(:final errorDescription) =>
-          AutoFixFailure(
+          await _handleAiError(
+            attempt: attempt,
             errorMessage: 'AI could not fix: $errorDescription',
+            thinkingLog: thinkingLog,
+            inputTokens: inputTokens,
+            outputTokens: outputTokens,
+            reasoningTokens: reasoningTokens,
           ),
         WebScrapperChatAIResponseOnlyExtractRulesModified(
           :final resumeActionMessage,
           :final fetchSettings,
         ) =>
-          await _validateAndCreateFix(fetchSettings, resumeActionMessage),
-        WebScrapperChatAIResponseOnlyRequestModified() => const AutoFixFailure(
+          await _validateAndCreateFix(
+            attempt: attempt,
+            fetchSettings: fetchSettings,
+            resumeMessage: resumeActionMessage,
+            thinkingLog: thinkingLog,
+            inputTokens: inputTokens,
+            outputTokens: outputTokens,
+            reasoningTokens: reasoningTokens,
+          ),
+        WebScrapperChatAIResponseOnlyRequestModified() => await _handleAiError(
+            attempt: attempt,
             errorMessage:
                 'AI modified request structure but not extract rules - cannot auto-fix',
+            thinkingLog: thinkingLog,
+            inputTokens: inputTokens,
+            outputTokens: outputTokens,
+            reasoningTokens: reasoningTokens,
           ),
         WebScrapperChatAIResponseBothModified(
           :final resumeActionMessage,
           :final fetchSettings,
         ) =>
-          await _validateAndCreateFix(fetchSettings, resumeActionMessage),
+          await _validateAndCreateFix(
+            attempt: attempt,
+            fetchSettings: fetchSettings,
+            resumeMessage: resumeActionMessage,
+            thinkingLog: thinkingLog,
+            inputTokens: inputTokens,
+            outputTokens: outputTokens,
+            reasoningTokens: reasoningTokens,
+          ),
       };
     } catch (e, stackTrace) {
       _session.log(
@@ -154,15 +226,79 @@ class AutoFixSessionHandler {
         stackTrace: stackTrace,
         level: LogLevel.error,
       );
+      await _updateAttemptFailed(
+        attempt: attempt,
+        status: AutoFixAttemptStatus.api_error,
+        errorMessage: 'Exception during auto-fix: $e',
+      );
       return AutoFixFailure(errorMessage: 'Exception during auto-fix: $e');
     }
   }
 
+  /// Handles AI error responses
+  Future<AutoFixResult> _handleAiError({
+    required AutoFixAttempt attempt,
+    required String errorMessage,
+    String? thinkingLog,
+    int inputTokens = 0,
+    int outputTokens = 0,
+    int reasoningTokens = 0,
+  }) async {
+    await _updateAttemptFailed(
+      attempt: attempt,
+      status: AutoFixAttemptStatus.ai_error,
+      errorMessage: errorMessage,
+      thinkingLog: thinkingLog,
+      inputTokens: inputTokens,
+      outputTokens: outputTokens,
+      reasoningTokens: reasoningTokens,
+    );
+    return AutoFixFailure(errorMessage: errorMessage);
+  }
+
+  /// Updates attempt record as failed
+  Future<void> _updateAttemptFailed({
+    required AutoFixAttempt attempt,
+    required AutoFixAttemptStatus status,
+    required String errorMessage,
+    String? thinkingLog,
+    int inputTokens = 0,
+    int outputTokens = 0,
+    int reasoningTokens = 0,
+  }) async {
+    await AutoFixAttempt.db.updateRow(
+      _session,
+      attempt.copyWith(
+        completedAt: DateTime.now(),
+        status: status,
+        errorMessage: errorMessage,
+        aiThinkingLog: thinkingLog,
+        inputTokens: inputTokens,
+        outputTokens: outputTokens,
+        reasoningTokens: reasoningTokens,
+      ),
+      columns: (t) => [
+        t.completedAt,
+        t.status,
+        t.errorMessage,
+        t.aiThinkingLog,
+        t.inputTokens,
+        t.outputTokens,
+        t.reasoningTokens,
+      ],
+    );
+  }
+
   /// Validates the AI-generated fix by testing with ScrapingBee
-  Future<AutoFixResult> _validateAndCreateFix(
-    ScrappingBeeFetchSettings fetchSettings,
-    String resumeMessage,
-  ) async {
+  Future<AutoFixResult> _validateAndCreateFix({
+    required AutoFixAttempt attempt,
+    required ScrappingBeeFetchSettings fetchSettings,
+    required String resumeMessage,
+    String? thinkingLog,
+    int inputTokens = 0,
+    int outputTokens = 0,
+    int reasoningTokens = 0,
+  }) async {
     _session.log(
       'Validating auto-fix with ScrapingBee...',
       level: LogLevel.info,
@@ -183,6 +319,27 @@ class AutoFixSessionHandler {
       customGoogle: fetchSettings.custom_google,
     );
 
+    // Update attempt with generated rules
+    await AutoFixAttempt.db.updateRow(
+      _session,
+      attempt.copyWith(
+        generatedExtractRules: fetchSettings.extract_rules,
+        generatedJsScenario: fetchSettings.js_scenario,
+        aiThinkingLog: thinkingLog,
+        inputTokens: inputTokens,
+        outputTokens: outputTokens,
+        reasoningTokens: reasoningTokens,
+      ),
+      columns: (t) => [
+        t.generatedExtractRules,
+        t.generatedJsScenario,
+        t.aiThinkingLog,
+        t.inputTokens,
+        t.outputTokens,
+        t.reasoningTokens,
+      ],
+    );
+
     // Test the fix with ScrapingBee
     final ExtractDataByRule extractResult =
         await scrappingBee.extractByRulesWithLogic(
@@ -191,9 +348,14 @@ class AutoFixSessionHandler {
     );
 
     return extractResult.when(
-      withData: (scrapedData) {
+      withData: (scrapedData) async {
         // Verify we got actual data
         if (scrapedData.isEmpty) {
+          await _updateAttemptFailed(
+            attempt: attempt,
+            status: AutoFixAttemptStatus.validation_failed,
+            errorMessage: 'ScrapingBee returned empty data',
+          );
           return const AutoFixFailure(
             errorMessage:
                 'Fix validation failed: ScrapingBee returned empty data',
@@ -205,16 +367,50 @@ class AutoFixSessionHandler {
           level: LogLevel.info,
         );
 
+        // Mark attempt as successful
+        await AutoFixAttempt.db.updateRow(
+          _session,
+          attempt.copyWith(
+            completedAt: DateTime.now(),
+            succeeded: true,
+            status: AutoFixAttemptStatus.success,
+            validationPassed: true,
+          ),
+          columns: (t) => [
+            t.completedAt,
+            t.succeeded,
+            t.status,
+            t.validationPassed,
+          ],
+        );
+
         return AutoFixSuccess(
           fixedExtractLogic: fixedExtractLogic,
           resumeMessage: resumeMessage,
         );
       },
-      error: (errorMessage) {
+      error: (errorMessage) async {
         _session.log(
           'Auto-fix validation failed: $errorMessage',
           level: LogLevel.warning,
         );
+
+        await AutoFixAttempt.db.updateRow(
+          _session,
+          attempt.copyWith(
+            completedAt: DateTime.now(),
+            status: AutoFixAttemptStatus.validation_failed,
+            validationPassed: false,
+            validationError: errorMessage,
+          ),
+          columns: (t) => [
+            t.completedAt,
+            t.status,
+            t.validationPassed,
+            t.validationError,
+          ],
+        );
+
         return AutoFixFailure(
           errorMessage: 'Fix validation failed: $errorMessage',
         );
@@ -223,7 +419,16 @@ class AutoFixSessionHandler {
   }
 
   /// Calls OpenAI API with the auto-fix prompts
-  Future<Map<String, dynamic>?> _callOpenAI({
+  ///
+  /// Returns a tuple of (result, thinkingLog, inputTokens, outputTokens, reasoningTokens)
+  Future<
+      (
+        Map<String, dynamic>?,
+        String?,
+        int,
+        int,
+        int,
+      )> _callOpenAI({
     required String systemPrompt,
     required String contextPrompt,
     required String extractionRulesGuide,
@@ -275,11 +480,14 @@ class AutoFixSessionHandler {
       'search_context_size': 'medium',
     });
 
+    // Use the resolved AI model
+    final modelName = _getModelName(_aiModel);
+
     final requestBody = {
-      'model': 'gpt-5-mini', // Use mini model for cost efficiency in auto-fix
+      'model': modelName,
       'stream': true,
       'reasoning': {
-        'effort': 'medium', // Medium reasoning for auto-fix (balance speed/quality)
+        'effort': 'high', // Always use high thinking effort for auto-fix
       },
       'tools': tools,
       'text': {
@@ -290,6 +498,11 @@ class AutoFixSessionHandler {
     };
 
     final client = http.Client();
+    final thinkingBuffer = StringBuffer();
+    int inputTokens = 0;
+    int outputTokens = 0;
+    int reasoningTokens = 0;
+
     try {
       final request = http.Request(
         'POST',
@@ -308,7 +521,7 @@ class AutoFixSessionHandler {
           'OpenAI API error ${streamedResponse.statusCode}: $body',
           level: LogLevel.error,
         );
-        return null;
+        return (null, null, 0, 0, 0);
       }
 
       // Process streaming response
@@ -333,7 +546,13 @@ class AutoFixSessionHandler {
 
         final type = event['type'] as String?;
 
-        if (type == 'response.output_json.delta') {
+        if (type == 'response.output_text.delta') {
+          // Capture thinking/reasoning content
+          final delta = event['delta'];
+          if (delta is String) {
+            thinkingBuffer.write(delta);
+          }
+        } else if (type == 'response.output_json.delta') {
           final delta = event['delta'];
           if (delta is String) {
             jsonBuffer.write(delta);
@@ -342,6 +561,19 @@ class AutoFixSessionHandler {
           final response = event['response'];
           if (response is Map<String, dynamic>) {
             parsedFromCompletion = _extractParsedResponse(response);
+
+            // Extract token usage
+            final usage = response['usage'];
+            if (usage is Map<String, dynamic>) {
+              inputTokens = (usage['input_tokens'] as num?)?.toInt() ?? 0;
+              outputTokens = (usage['output_tokens'] as num?)?.toInt() ?? 0;
+              // Reasoning tokens might be in output_tokens_details
+              final outputDetails = usage['output_tokens_details'];
+              if (outputDetails is Map<String, dynamic>) {
+                reasoningTokens =
+                    (outputDetails['reasoning_tokens'] as num?)?.toInt() ?? 0;
+              }
+            }
           }
         } else if (type == 'error' || type == 'response.failed') {
           final errorData = event['error'] ?? event['message'] ?? event;
@@ -349,7 +581,13 @@ class AutoFixSessionHandler {
             'OpenAI API error event: $errorData',
             level: LogLevel.error,
           );
-          return null;
+          return (
+            null,
+            thinkingBuffer.isNotEmpty ? thinkingBuffer.toString() : null,
+            inputTokens,
+            outputTokens,
+            reasoningTokens
+          );
         }
       }
 
@@ -359,7 +597,13 @@ class AutoFixSessionHandler {
         result = _tryDecodeJson(jsonBuffer.toString());
       }
 
-      return result;
+      return (
+        result,
+        thinkingBuffer.isNotEmpty ? thinkingBuffer.toString() : null,
+        inputTokens,
+        outputTokens,
+        reasoningTokens
+      );
     } finally {
       client.close();
     }
@@ -405,89 +649,4 @@ class AutoFixSessionHandler {
     }
     return null;
   }
-}
-
-/// Applies a successful auto-fix to the database
-Future<void> applyAutoFix({
-  required Session session,
-  required Scrappable scrappable,
-  required ScrappingBeeExtractLogic fixedExtractLogic,
-  required String resumeMessage,
-}) async {
-  await session.db.transaction((transaction) async {
-    // Update the extraction rules
-    final updatedExtractLogic = fixedExtractLogic.copyWith(
-      scrappableId: scrappable.id,
-    );
-    await ScrappingBeeExtractLogic.db.updateRow(
-      session,
-      updatedExtractLogic,
-      transaction: transaction,
-    );
-
-    // Reset consecutive errors, attempt count, and update timestamps
-    final updatedScrappable = scrappable.copyWith(
-      currentConsecutiveErrors: 0,
-      autoFixAttemptCount: 0, // Reset attempt count on success
-      lastAutoFixAttemptAt: DateTime.now(),
-      autoFixInProgress: false,
-      extractRulesUpdatedAt: DateTime.now(),
-    );
-
-    await Scrappable.db.updateRow(
-      session,
-      updatedScrappable,
-      columns: (t) => [
-        t.currentConsecutiveErrors,
-        t.autoFixAttemptCount,
-        t.lastAutoFixAttemptAt,
-        t.autoFixInProgress,
-        t.extractRulesUpdatedAt,
-      ],
-      transaction: transaction,
-    );
-
-    session.log(
-      'Auto-fix applied successfully for scrappable ${scrappable.id}: $resumeMessage',
-      level: LogLevel.info,
-    );
-  });
-}
-
-/// Marks an auto-fix attempt as failed
-Future<void> markAutoFixFailed({
-  required Session session,
-  required Scrappable scrappable,
-  required String errorMessage,
-}) async {
-  final newAttemptCount = scrappable.autoFixAttemptCount + 1;
-
-  final updatedScrappable = scrappable.copyWith(
-    lastAutoFixAttemptAt: DateTime.now(),
-    autoFixInProgress: false,
-    autoFixAttemptCount: newAttemptCount, // Increment attempt count on failure
-  );
-
-  await Scrappable.db.updateRow(
-    session,
-    updatedScrappable,
-    columns: (t) => [
-      t.lastAutoFixAttemptAt,
-      t.autoFixInProgress,
-      t.autoFixAttemptCount,
-    ],
-  );
-
-  // Calculate next retry time for logging
-  final nextCooldown =
-      Duration(hours: 1) * (1 << newAttemptCount); // Exponential backoff
-  final maxCooldown = const Duration(hours: 24);
-  final effectiveCooldown =
-      nextCooldown > maxCooldown ? maxCooldown : nextCooldown;
-
-  session.log(
-    'Auto-fix failed for scrappable ${scrappable.id} (attempt $newAttemptCount/5): $errorMessage. '
-    'Next retry in ${effectiveCooldown.inHours}h',
-    level: LogLevel.warning,
-  );
 }

@@ -3,7 +3,7 @@ import 'package:zenscrap_server/src/core/auto_fix/auto_fix_session_handler.dart'
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 /// Configuration constants for auto-fix
-class AutoFixConfig {
+class AutoFixConstants {
   /// How often the periodic check runs
   static const checkInterval = Duration(minutes: 5);
 
@@ -38,15 +38,16 @@ class AutoFixConfig {
 ///
 /// Architecture:
 /// - Runs every 5 minutes
-/// - Queries for scrappables that meet auto-fix criteria
+/// - Queries AutoFixConfig for scrappables that meet auto-fix criteria
 /// - Processes up to N scrappables per run (configurable)
 /// - Uses AI to analyze and fix broken extraction rules
 /// - Validates fixes with ScrapingBee before applying
+/// - Logs all sessions and attempts for auditing
 ///
 /// Scalability considerations:
 /// - Uses denormalized `currentConsecutiveErrors` counter for efficient queries
-/// - Composite index on (autoFixEnabled, autoFixInProgress, currentConsecutiveErrors)
-/// - `autoFixInProgress` flag prevents concurrent fixes on same scrappable
+/// - Composite index on (enabled, inProgress, currentConsecutiveErrors)
+/// - `inProgress` flag prevents concurrent fixes on same scrappable
 /// - Cooldown period prevents spam-fixing
 /// - Batch limit prevents overloading the system
 class PeriodicAutoFixBrokenScrappables extends FutureCall {
@@ -58,20 +59,19 @@ class PeriodicAutoFixBrokenScrappables extends FutureCall {
         level: LogLevel.info,
       );
 
-      // Get API keys from server passwords
-      final openAiApiKey = session.passwords['openAiApiKey'];
+      // Get server's default ScrapingBee API key
       final scrapingBeeApiKey = session.passwords['scrapingBeeApiKey'];
 
-      if (openAiApiKey == null || scrapingBeeApiKey == null) {
+      if (scrapingBeeApiKey == null) {
         session.log(
-          'Auto-fix skipped: Missing API keys (openAiApiKey or scrapingBeeApiKey)',
+          'Auto-fix skipped: Missing scrapingBeeApiKey in server passwords',
           level: LogLevel.warning,
         );
         await _scheduleNextRun(session);
         return;
       }
 
-      // Find scrappables that need auto-fix
+      // Find scrappables that need auto-fix via AutoFixConfig
       final candidates = await _findAutoFixCandidates(session);
 
       if (candidates.isEmpty) {
@@ -89,11 +89,11 @@ class PeriodicAutoFixBrokenScrappables extends FutureCall {
       );
 
       // Process each candidate
-      for (final scrappable in candidates) {
+      for (final entry in candidates) {
         await _processAutoFix(
           session: session,
-          scrappable: scrappable,
-          openAiApiKey: openAiApiKey,
+          autoFixConfig: entry.autoFixConfig,
+          scrappable: entry.scrappable,
           scrapingBeeApiKey: scrapingBeeApiKey,
         );
       }
@@ -110,82 +110,148 @@ class PeriodicAutoFixBrokenScrappables extends FutureCall {
     await _scheduleNextRun(session);
   }
 
-  /// Finds scrappables that are candidates for auto-fix.
+  /// Finds scrappables that are candidates for auto-fix via their AutoFixConfig.
   ///
   /// Criteria:
-  /// - autoFixEnabled = true
-  /// - autoFixInProgress = false
+  /// - enabled = true
+  /// - inProgress = false
   /// - currentConsecutiveErrors >= consecutiveErrorThreshold
-  /// - autoFixAttemptCount < maxAutoFixAttempts (haven't exhausted retries)
-  /// - lastAutoFixAttemptAt is null OR older than exponential cooldown period
-  /// - Has extract rules (can't fix what doesn't exist)
+  /// - attemptCount < maxAutoFixAttempts (haven't exhausted retries)
+  /// - lastAttemptAt is null OR older than exponential cooldown period
+  /// - Has required relations (extractRules, targetRequest, referenceTestData)
   /// - Not deleted
-  Future<List<Scrappable>> _findAutoFixCandidates(Session session) async {
-    return await Scrappable.db.find(
+  Future<List<_AutoFixCandidate>> _findAutoFixCandidates(
+      Session session) async {
+    final now = DateTime.now();
+
+    // Query AutoFixConfig entries that are enabled, not in progress, with errors
+    final configs = await AutoFixConfig.db.find(
       session,
       where: (t) =>
-          t.autoFixEnabled.equals(true) &
-          t.autoFixInProgress.equals(false) &
-          t.isDeleted.equals(false) &
-          // Filter out scrappables that have exhausted auto-fix attempts
-          (t.autoFixAttemptCount < AutoFixConfig.maxAutoFixAttempts) &
-          // Check consecutive errors > 0 (threshold check done in post-processing)
-          // We use a subquery pattern here - for each row, check if its
-          // currentConsecutiveErrors >= its consecutiveErrorThreshold
-          // Since we can't directly compare two columns in Serverpod ORM,
-          // we'll handle this in post-processing
+          t.enabled.equals(true) &
+          t.inProgress.equals(false) &
+          (t.attemptCount < AutoFixConstants.maxAutoFixAttempts) &
           (t.currentConsecutiveErrors > 0),
-          // NOTE: Cooldown check is done in post-processing to support
-          // exponential backoff (different cooldowns per scrappable)
+      limit: AutoFixConstants.maxScrappablesPerRun * 3, // Fetch extra for filtering
+      orderBy: (t) => t.currentConsecutiveErrors,
+      orderDescending: true, // Process most broken first
+    );
+
+    if (configs.isEmpty) return [];
+
+    // Get scrappable IDs for batch fetch
+    final scrappableIds = configs.map((c) => c.scrappableId).toList();
+
+    // Batch fetch scrappables with required relations
+    final scrappables = await Scrappable.db.find(
+      session,
+      where: (t) =>
+          t.id.inSet(scrappableIds.toSet()) & t.isDeleted.equals(false),
       include: Scrappable.include(
         scrappingBeeExtractRules: ScrappingBeeExtractLogic.include(),
         targetRequest: ScrappableRequest.include(),
         referenceTestData: ReferenceTestData.include(),
       ),
-      limit: AutoFixConfig.maxScrappablesPerRun * 3, // Fetch extra for filtering
-      orderBy: (t) => t.currentConsecutiveErrors,
-      orderDescending: true, // Process most broken first
-    ).then((scrappables) {
-      final now = DateTime.now();
+    );
 
-      // Post-filter: check consecutiveErrorThreshold and exponential cooldown
-      // (Serverpod ORM doesn't support column-to-column comparison directly)
-      return scrappables
-          .where((s) {
-            // Must meet error threshold
-            if (s.currentConsecutiveErrors < s.consecutiveErrorThreshold) {
-              return false;
-            }
+    // Create a map for quick lookup
+    final scrappableMap = {for (var s in scrappables) s.id!: s};
 
-            // Must have required relations
-            if (s.scrappingBeeExtractRules == null ||
-                s.targetRequest == null ||
-                s.referenceTestData == null) {
-              return false;
-            }
+    // Filter and pair configs with scrappables
+    final candidates = <_AutoFixCandidate>[];
+    for (final config in configs) {
+      // Check threshold requirement
+      if (config.currentConsecutiveErrors < config.consecutiveErrorThreshold) {
+        continue;
+      }
 
-            // Check exponential cooldown based on attempt count
-            if (s.lastAutoFixAttemptAt != null) {
-              final cooldown =
-                  AutoFixConfig.calculateCooldown(s.autoFixAttemptCount);
-              final cooldownCutoff = now.subtract(cooldown);
-              if (s.lastAutoFixAttemptAt!.isAfter(cooldownCutoff)) {
-                return false; // Still in cooldown
-              }
-            }
+      // Check exponential cooldown
+      if (config.lastAttemptAt != null) {
+        final cooldown =
+            AutoFixConstants.calculateCooldown(config.attemptCount);
+        final cooldownCutoff = now.subtract(cooldown);
+        if (config.lastAttemptAt!.isAfter(cooldownCutoff)) {
+          continue; // Still in cooldown
+        }
+      }
 
-            return true;
-          })
-          .take(AutoFixConfig.maxScrappablesPerRun)
-          .toList();
-    });
+      // Get corresponding scrappable
+      final scrappable = scrappableMap[config.scrappableId];
+      if (scrappable == null) continue;
+
+      // Ensure required relations exist
+      if (scrappable.scrappingBeeExtractRules == null ||
+          scrappable.targetRequest == null ||
+          scrappable.referenceTestData == null) {
+        continue;
+      }
+
+      candidates.add(_AutoFixCandidate(
+        autoFixConfig: config,
+        scrappable: scrappable,
+      ));
+
+      // Stop once we have enough candidates
+      if (candidates.length >= AutoFixConstants.maxScrappablesPerRun) {
+        break;
+      }
+    }
+
+    return candidates;
+  }
+
+  /// Resolves which AiModel to use based on config and user API key availability.
+  ///
+  /// Logic:
+  /// - If preferredAiModel is set (not null), use that model
+  /// - If preferredAiModel is null (auto mode):
+  ///   - Use AiModel.powerful if user has their own API key
+  ///   - Use AiModel.normal if using platform's API key
+  AiModel _resolveAiModel({
+    required AutoFixConfig config,
+    required bool hasUserApiKey,
+  }) {
+    if (config.preferredAiModel != null) {
+      return config.preferredAiModel!;
+    }
+    // Auto mode: powerful if user pays, normal if platform pays
+    return hasUserApiKey ? AiModel.powerful : AiModel.normal;
+  }
+
+  /// Gets the user's OpenAI API key if available, otherwise falls back to server key.
+  ///
+  /// Returns a tuple of (apiKey, isUserKey).
+  Future<(String?, bool)> _getOpenAiApiKey(
+    Session session,
+    Scrappable scrappable,
+  ) async {
+    // Server's default API key
+    final serverApiKey = session.passwords['openAiApiKey'];
+
+    // Try to get user's own API key via account
+    if (scrappable.accountId != null) {
+      final accountInfo = await AccountInfo.db.findById(
+        session,
+        scrappable.accountId!,
+        include: AccountInfo.include(
+          accountAIUsage: AccountAIUsage.include(),
+        ),
+      );
+
+      final userApiKey = accountInfo?.accountAIUsage?.userOpenAiApiKey;
+      if (userApiKey != null && userApiKey.isNotEmpty) {
+        return (userApiKey, true);
+      }
+    }
+
+    return (serverApiKey, false);
   }
 
   /// Processes auto-fix for a single scrappable
   Future<void> _processAutoFix({
     required Session session,
+    required AutoFixConfig autoFixConfig,
     required Scrappable scrappable,
-    required String openAiApiKey,
     required String scrapingBeeApiKey,
   }) async {
     session.log(
@@ -193,12 +259,12 @@ class PeriodicAutoFixBrokenScrappables extends FutureCall {
       level: LogLevel.info,
     );
 
-    // Mark as in progress to prevent concurrent attempts
+    // Mark config as in progress
     try {
-      await Scrappable.db.updateRow(
+      await AutoFixConfig.db.updateRow(
         session,
-        scrappable.copyWith(autoFixInProgress: true),
-        columns: (t) => [t.autoFixInProgress],
+        autoFixConfig.copyWith(inProgress: true),
+        columns: (t) => [t.inProgress],
       );
     } catch (e) {
       session.log(
@@ -209,15 +275,51 @@ class PeriodicAutoFixBrokenScrappables extends FutureCall {
     }
 
     try {
+      // Get OpenAI API key (user's or server's)
+      final (openAiApiKey, isUserApiKey) = await _getOpenAiApiKey(
+        session,
+        scrappable,
+      );
+
+      if (openAiApiKey == null) {
+        session.log(
+          'Auto-fix skipped for ${scrappable.id}: No OpenAI API key available',
+          level: LogLevel.warning,
+        );
+        await _resetInProgress(session, autoFixConfig);
+        return;
+      }
+
+      // Resolve which AI model to use
+      final aiModel = _resolveAiModel(
+        config: autoFixConfig,
+        hasUserApiKey: isUserApiKey,
+      );
+
       // Fetch recent analytics for context
       final recentAnalytics = await ScrappableAnalytics.db.find(
         session,
         where: (t) => t.scrappableId.equals(scrappable.id),
         orderBy: (t) => t.requestedAt,
         orderDescending: true,
-        limit: AutoFixConfig.recentAnalyticsCount,
+        limit: AutoFixConstants.recentAnalyticsCount,
         include: ScrappableAnalytics.include(
           details: AnalyticsRequestDetails.include(),
+        ),
+      );
+
+      // Create AutoFixSession for logging
+      final now = DateTime.now();
+      final autoFixSession = await AutoFixSession.db.insertRow(
+        session,
+        AutoFixSession(
+          createdAt: now,
+          status: AutoFixSessionStatus.in_progress,
+          triggeredAtErrorCount: autoFixConfig.currentConsecutiveErrors,
+          configuredThreshold: autoFixConfig.consecutiveErrorThreshold,
+          usedAiModel: aiModel,
+          usedUserApiKey: isUserApiKey,
+          scrappableId: scrappable.id!,
         ),
       );
 
@@ -231,6 +333,8 @@ class PeriodicAutoFixBrokenScrappables extends FutureCall {
         extractLogic: scrappable.scrappingBeeExtractRules!,
         referenceTestData: scrappable.referenceTestData!,
         recentAnalytics: recentAnalytics,
+        aiModel: aiModel,
+        autoFixSessionId: autoFixSession.id!,
       );
 
       // Attempt the fix
@@ -239,8 +343,10 @@ class PeriodicAutoFixBrokenScrappables extends FutureCall {
       // Handle the result
       switch (result) {
         case AutoFixSuccess(:final fixedExtractLogic, :final resumeMessage):
-          await applyAutoFix(
+          await _applyAutoFixSuccess(
             session: session,
+            autoFixConfig: autoFixConfig,
+            autoFixSession: autoFixSession,
             scrappable: scrappable,
             fixedExtractLogic: fixedExtractLogic,
             resumeMessage: resumeMessage,
@@ -251,9 +357,10 @@ class PeriodicAutoFixBrokenScrappables extends FutureCall {
           );
 
         case AutoFixFailure(:final errorMessage):
-          await markAutoFixFailed(
+          await _markAutoFixFailed(
             session: session,
-            scrappable: scrappable,
+            autoFixConfig: autoFixConfig,
+            autoFixSession: autoFixSession,
             errorMessage: errorMessage,
           );
           session.log(
@@ -269,11 +376,132 @@ class PeriodicAutoFixBrokenScrappables extends FutureCall {
         level: LogLevel.error,
       );
 
-      // Ensure we reset the in-progress flag even on exception
-      await markAutoFixFailed(
-        session: session,
-        scrappable: scrappable,
-        errorMessage: 'Exception: $e',
+      // Reset in-progress flag on exception
+      await _resetInProgress(session, autoFixConfig);
+    }
+  }
+
+  /// Applies a successful auto-fix
+  Future<void> _applyAutoFixSuccess({
+    required Session session,
+    required AutoFixConfig autoFixConfig,
+    required AutoFixSession autoFixSession,
+    required Scrappable scrappable,
+    required ScrappingBeeExtractLogic fixedExtractLogic,
+    required String resumeMessage,
+  }) async {
+    final now = DateTime.now();
+
+    await session.db.transaction((transaction) async {
+      // Update the extraction rules
+      final updatedExtractLogic = fixedExtractLogic.copyWith(
+        scrappableId: scrappable.id,
+      );
+      await ScrappingBeeExtractLogic.db.updateRow(
+        session,
+        updatedExtractLogic,
+        transaction: transaction,
+      );
+
+      // Update scrappable timestamp
+      await Scrappable.db.updateRow(
+        session,
+        scrappable.copyWith(extractRulesUpdatedAt: now),
+        columns: (t) => [t.extractRulesUpdatedAt],
+        transaction: transaction,
+      );
+
+      // Reset AutoFixConfig on success
+      await AutoFixConfig.db.updateRow(
+        session,
+        autoFixConfig.copyWith(
+          currentConsecutiveErrors: 0,
+          attemptCount: 0, // Reset on success
+          lastAttemptAt: now,
+          inProgress: false,
+        ),
+        columns: (t) => [
+          t.currentConsecutiveErrors,
+          t.attemptCount,
+          t.lastAttemptAt,
+          t.inProgress,
+        ],
+        transaction: transaction,
+      );
+
+      // Update session status to success
+      await AutoFixSession.db.updateRow(
+        session,
+        autoFixSession.copyWith(
+          completedAt: now,
+          status: AutoFixSessionStatus.success,
+          successSummary: resumeMessage,
+        ),
+        columns: (t) => [t.completedAt, t.status, t.successSummary],
+        transaction: transaction,
+      );
+    });
+  }
+
+  /// Marks an auto-fix attempt as failed
+  Future<void> _markAutoFixFailed({
+    required Session session,
+    required AutoFixConfig autoFixConfig,
+    required AutoFixSession autoFixSession,
+    required String errorMessage,
+  }) async {
+    final now = DateTime.now();
+    final newAttemptCount = autoFixConfig.attemptCount + 1;
+
+    // Update AutoFixConfig
+    await AutoFixConfig.db.updateRow(
+      session,
+      autoFixConfig.copyWith(
+        lastAttemptAt: now,
+        inProgress: false,
+        attemptCount: newAttemptCount,
+      ),
+      columns: (t) => [t.lastAttemptAt, t.inProgress, t.attemptCount],
+    );
+
+    // Determine final session status
+    final sessionStatus = newAttemptCount >= AutoFixConstants.maxAutoFixAttempts
+        ? AutoFixSessionStatus.exhausted
+        : AutoFixSessionStatus.failed;
+
+    // Update session status
+    await AutoFixSession.db.updateRow(
+      session,
+      autoFixSession.copyWith(
+        completedAt: now,
+        status: sessionStatus,
+        failureReason: errorMessage,
+      ),
+      columns: (t) => [t.completedAt, t.status, t.failureReason],
+    );
+
+    // Log next retry info
+    final nextCooldown = AutoFixConstants.calculateCooldown(newAttemptCount);
+    session.log(
+      'Auto-fix failed (attempt $newAttemptCount/${AutoFixConstants.maxAutoFixAttempts}). '
+      'Next retry in ${nextCooldown.inHours}h',
+      level: LogLevel.warning,
+    );
+  }
+
+  /// Resets the inProgress flag when auto-fix couldn't proceed
+  Future<void> _resetInProgress(
+      Session session, AutoFixConfig autoFixConfig) async {
+    try {
+      await AutoFixConfig.db.updateRow(
+        session,
+        autoFixConfig.copyWith(inProgress: false),
+        columns: (t) => [t.inProgress],
+      );
+    } catch (e) {
+      session.log(
+        'Failed to reset inProgress flag: $e',
+        level: LogLevel.error,
       );
     }
   }
@@ -283,10 +511,21 @@ class PeriodicAutoFixBrokenScrappables extends FutureCall {
     await session.serverpod.futureCallWithDelay(
       'periodicAutoFixBrokenScrappables',
       null,
-      AutoFixConfig.checkInterval,
+      AutoFixConstants.checkInterval,
       identifier: 'periodicAutoFixBrokenScrappables',
     );
   }
+}
+
+/// Internal class to pair AutoFixConfig with its Scrappable
+class _AutoFixCandidate {
+  final AutoFixConfig autoFixConfig;
+  final Scrappable scrappable;
+
+  _AutoFixCandidate({
+    required this.autoFixConfig,
+    required this.scrappable,
+  });
 }
 
 /// Starts the periodic auto-fix check.

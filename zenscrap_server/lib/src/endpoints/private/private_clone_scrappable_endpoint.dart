@@ -164,12 +164,6 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
         referenceTestData: clonedTestData,
         category: sourceScrappable.category,
         scrappingBeeExtractRules: scrappingBeeExtractLogic,
-        // Auto-fix configuration (default values)
-        autoFixEnabled: true,
-        consecutiveErrorThreshold: 100,
-        currentConsecutiveErrors: 0,
-        autoFixInProgress: false,
-        autoFixAttemptCount: 0,
       );
       clonedScrappable = await Scrappable.db.insertRow(
         session,
@@ -184,6 +178,24 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
           transaction: transaction);
       await Scrappable.db.attachRow.scrappingBeeExtractRules(
           session, clonedScrappable!, scrappingBeeExtractLogic,
+          transaction: transaction);
+
+      // Create default AutoFixConfig for the cloned scrappable
+      final autoFixConfig = await AutoFixConfig.db.insertRow(
+        session,
+        AutoFixConfig(
+          scrappableId: clonedScrappable!.id!,
+          enabled: true,
+          consecutiveErrorThreshold: 100,
+          currentConsecutiveErrors: 0,
+          inProgress: false,
+          attemptCount: 0,
+          preferredAiModel: null, // Auto mode
+        ),
+        transaction: transaction,
+      );
+      await Scrappable.db.attachRow.autoFixConfig(
+          session, clonedScrappable!, autoFixConfig,
           transaction: transaction);
     });
 

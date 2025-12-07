@@ -1,0 +1,610 @@
+{
+  "actions": [
+    {
+      "type": "createTable",
+      "createTable": {
+        "name": "auto_fix_attempt",
+        "dartName": "AutoFixAttempt",
+        "module": "zenscrap",
+        "schema": "public",
+        "columns": [
+          {
+            "name": "id",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "nextval('auto_fix_attempt_id_seq'::regclass)",
+            "dartType": "int?"
+          },
+          {
+            "name": "startedAt",
+            "columnType": 4,
+            "isNullable": false,
+            "dartType": "DateTime"
+          },
+          {
+            "name": "completedAt",
+            "columnType": 4,
+            "isNullable": true,
+            "dartType": "DateTime?"
+          },
+          {
+            "name": "attemptNumber",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "int"
+          },
+          {
+            "name": "succeeded",
+            "columnType": 1,
+            "isNullable": false,
+            "columnDefault": "false",
+            "dartType": "bool"
+          },
+          {
+            "name": "status",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "0",
+            "dartType": "protocol:AutoFixAttemptStatus"
+          },
+          {
+            "name": "errorMessage",
+            "columnType": 0,
+            "isNullable": true,
+            "dartType": "String?"
+          },
+          {
+            "name": "aiThinkingLog",
+            "columnType": 0,
+            "isNullable": true,
+            "dartType": "String?"
+          },
+          {
+            "name": "generatedExtractRules",
+            "columnType": 0,
+            "isNullable": true,
+            "dartType": "String?"
+          },
+          {
+            "name": "generatedJsScenario",
+            "columnType": 0,
+            "isNullable": true,
+            "dartType": "String?"
+          },
+          {
+            "name": "validationPassed",
+            "columnType": 1,
+            "isNullable": true,
+            "dartType": "bool?"
+          },
+          {
+            "name": "validationError",
+            "columnType": 0,
+            "isNullable": true,
+            "dartType": "String?"
+          },
+          {
+            "name": "costUsd",
+            "columnType": 3,
+            "isNullable": false,
+            "columnDefault": "0.0",
+            "dartType": "double"
+          },
+          {
+            "name": "inputTokens",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "0",
+            "dartType": "int"
+          },
+          {
+            "name": "outputTokens",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "0",
+            "dartType": "int"
+          },
+          {
+            "name": "reasoningTokens",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "0",
+            "dartType": "int"
+          },
+          {
+            "name": "sessionId",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "int"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "constraintName": "auto_fix_attempt_fk_0",
+            "columns": [
+              "sessionId"
+            ],
+            "referenceTable": "auto_fix_session",
+            "referenceTableSchema": "public",
+            "referenceColumns": [
+              "id"
+            ],
+            "onUpdate": 3,
+            "onDelete": 4
+          }
+        ],
+        "indexes": [
+          {
+            "indexName": "auto_fix_attempt_pkey",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "id"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": true
+          },
+          {
+            "indexName": "auto_fix_attempt_session_idx",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "sessionId"
+              }
+            ],
+            "type": "btree",
+            "isUnique": false,
+            "isPrimary": false
+          },
+          {
+            "indexName": "auto_fix_attempt_status_idx",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "status"
+              },
+              {
+                "type": 0,
+                "definition": "startedAt"
+              }
+            ],
+            "type": "btree",
+            "isUnique": false,
+            "isPrimary": false
+          }
+        ],
+        "managed": true
+      }
+    },
+    {
+      "type": "createTable",
+      "createTable": {
+        "name": "auto_fix_config",
+        "dartName": "AutoFixConfig",
+        "module": "zenscrap",
+        "schema": "public",
+        "columns": [
+          {
+            "name": "id",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "nextval('auto_fix_config_id_seq'::regclass)",
+            "dartType": "int?"
+          },
+          {
+            "name": "enabled",
+            "columnType": 1,
+            "isNullable": false,
+            "columnDefault": "true",
+            "dartType": "bool"
+          },
+          {
+            "name": "consecutiveErrorThreshold",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "100",
+            "dartType": "int"
+          },
+          {
+            "name": "currentConsecutiveErrors",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "0",
+            "dartType": "int"
+          },
+          {
+            "name": "lastAttemptAt",
+            "columnType": 4,
+            "isNullable": true,
+            "dartType": "DateTime?"
+          },
+          {
+            "name": "inProgress",
+            "columnType": 1,
+            "isNullable": false,
+            "columnDefault": "false",
+            "dartType": "bool"
+          },
+          {
+            "name": "attemptCount",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "0",
+            "dartType": "int"
+          },
+          {
+            "name": "preferredAiModel",
+            "columnType": 6,
+            "isNullable": true,
+            "dartType": "protocol:AiModel?"
+          },
+          {
+            "name": "scrappableId",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "int"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "constraintName": "auto_fix_config_fk_0",
+            "columns": [
+              "scrappableId"
+            ],
+            "referenceTable": "scrappable",
+            "referenceTableSchema": "public",
+            "referenceColumns": [
+              "id"
+            ],
+            "onUpdate": 3,
+            "onDelete": 4
+          }
+        ],
+        "indexes": [
+          {
+            "indexName": "auto_fix_config_pkey",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "id"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": true
+          },
+          {
+            "indexName": "auto_fix_config_scrappable_unique_idx",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "scrappableId"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": false
+          },
+          {
+            "indexName": "auto_fix_config_candidates_idx",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "enabled"
+              },
+              {
+                "type": 0,
+                "definition": "inProgress"
+              },
+              {
+                "type": 0,
+                "definition": "currentConsecutiveErrors"
+              }
+            ],
+            "type": "btree",
+            "isUnique": false,
+            "isPrimary": false
+          }
+        ],
+        "managed": true
+      }
+    },
+    {
+      "type": "createTable",
+      "createTable": {
+        "name": "auto_fix_session",
+        "dartName": "AutoFixSession",
+        "module": "zenscrap",
+        "schema": "public",
+        "columns": [
+          {
+            "name": "id",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "nextval('auto_fix_session_id_seq'::regclass)",
+            "dartType": "int?"
+          },
+          {
+            "name": "createdAt",
+            "columnType": 4,
+            "isNullable": false,
+            "dartType": "DateTime"
+          },
+          {
+            "name": "completedAt",
+            "columnType": 4,
+            "isNullable": true,
+            "dartType": "DateTime?"
+          },
+          {
+            "name": "status",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "0",
+            "dartType": "protocol:AutoFixSessionStatus"
+          },
+          {
+            "name": "triggeredAtErrorCount",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "int"
+          },
+          {
+            "name": "configuredThreshold",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "int"
+          },
+          {
+            "name": "usedAiModel",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "protocol:AiModel"
+          },
+          {
+            "name": "usedUserApiKey",
+            "columnType": 1,
+            "isNullable": false,
+            "columnDefault": "false",
+            "dartType": "bool"
+          },
+          {
+            "name": "successSummary",
+            "columnType": 0,
+            "isNullable": true,
+            "dartType": "String?"
+          },
+          {
+            "name": "failureReason",
+            "columnType": 0,
+            "isNullable": true,
+            "dartType": "String?"
+          },
+          {
+            "name": "totalCostUsd",
+            "columnType": 3,
+            "isNullable": false,
+            "columnDefault": "0.0",
+            "dartType": "double"
+          },
+          {
+            "name": "totalInputTokens",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "0",
+            "dartType": "int"
+          },
+          {
+            "name": "totalOutputTokens",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "0",
+            "dartType": "int"
+          },
+          {
+            "name": "scrappableId",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "int"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "constraintName": "auto_fix_session_fk_0",
+            "columns": [
+              "scrappableId"
+            ],
+            "referenceTable": "scrappable",
+            "referenceTableSchema": "public",
+            "referenceColumns": [
+              "id"
+            ],
+            "onUpdate": 3,
+            "onDelete": 3
+          }
+        ],
+        "indexes": [
+          {
+            "indexName": "auto_fix_session_pkey",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "id"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": true
+          },
+          {
+            "indexName": "auto_fix_session_scrappable_idx",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "scrappableId"
+              }
+            ],
+            "type": "btree",
+            "isUnique": false,
+            "isPrimary": false
+          },
+          {
+            "indexName": "auto_fix_session_status_idx",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "status"
+              },
+              {
+                "type": 0,
+                "definition": "createdAt"
+              }
+            ],
+            "type": "btree",
+            "isUnique": false,
+            "isPrimary": false
+          }
+        ],
+        "managed": true
+      }
+    },
+    {
+      "type": "alterTable",
+      "alterTable": {
+        "name": "scrappable",
+        "schema": "public",
+        "addColumns": [],
+        "deleteColumns": [
+          "autoFixEnabled",
+          "consecutiveErrorThreshold",
+          "currentConsecutiveErrors",
+          "lastAutoFixAttemptAt",
+          "autoFixInProgress",
+          "autoFixAttemptCount"
+        ],
+        "modifyColumns": [],
+        "addIndexes": [],
+        "deleteIndexes": [
+          "scrappable_auto_fix_candidates_idx"
+        ],
+        "addForeignKeys": [],
+        "deleteForeignKeys": [],
+        "warnings": [
+          {
+            "type": "columnDropped",
+            "message": "Column \"autoFixEnabled\" of table \"scrappable\" will be dropped.",
+            "table": "scrappable",
+            "columns": [
+              "autoFixEnabled"
+            ],
+            "destrucive": true
+          },
+          {
+            "type": "columnDropped",
+            "message": "Column \"consecutiveErrorThreshold\" of table \"scrappable\" will be dropped.",
+            "table": "scrappable",
+            "columns": [
+              "consecutiveErrorThreshold"
+            ],
+            "destrucive": true
+          },
+          {
+            "type": "columnDropped",
+            "message": "Column \"currentConsecutiveErrors\" of table \"scrappable\" will be dropped.",
+            "table": "scrappable",
+            "columns": [
+              "currentConsecutiveErrors"
+            ],
+            "destrucive": true
+          },
+          {
+            "type": "columnDropped",
+            "message": "Column \"lastAutoFixAttemptAt\" of table \"scrappable\" will be dropped.",
+            "table": "scrappable",
+            "columns": [
+              "lastAutoFixAttemptAt"
+            ],
+            "destrucive": true
+          },
+          {
+            "type": "columnDropped",
+            "message": "Column \"autoFixInProgress\" of table \"scrappable\" will be dropped.",
+            "table": "scrappable",
+            "columns": [
+              "autoFixInProgress"
+            ],
+            "destrucive": true
+          },
+          {
+            "type": "columnDropped",
+            "message": "Column \"autoFixAttemptCount\" of table \"scrappable\" will be dropped.",
+            "table": "scrappable",
+            "columns": [
+              "autoFixAttemptCount"
+            ],
+            "destrucive": true
+          }
+        ]
+      }
+    }
+  ],
+  "warnings": [
+    {
+      "type": "columnDropped",
+      "message": "Column \"autoFixEnabled\" of table \"scrappable\" will be dropped.",
+      "table": "scrappable",
+      "columns": [
+        "autoFixEnabled"
+      ],
+      "destrucive": true
+    },
+    {
+      "type": "columnDropped",
+      "message": "Column \"consecutiveErrorThreshold\" of table \"scrappable\" will be dropped.",
+      "table": "scrappable",
+      "columns": [
+        "consecutiveErrorThreshold"
+      ],
+      "destrucive": true
+    },
+    {
+      "type": "columnDropped",
+      "message": "Column \"currentConsecutiveErrors\" of table \"scrappable\" will be dropped.",
+      "table": "scrappable",
+      "columns": [
+        "currentConsecutiveErrors"
+      ],
+      "destrucive": true
+    },
+    {
+      "type": "columnDropped",
+      "message": "Column \"lastAutoFixAttemptAt\" of table \"scrappable\" will be dropped.",
+      "table": "scrappable",
+      "columns": [
+        "lastAutoFixAttemptAt"
+      ],
+      "destrucive": true
+    },
+    {
+      "type": "columnDropped",
+      "message": "Column \"autoFixInProgress\" of table \"scrappable\" will be dropped.",
+      "table": "scrappable",
+      "columns": [
+        "autoFixInProgress"
+      ],
+      "destrucive": true
+    },
+    {
+      "type": "columnDropped",
+      "message": "Column \"autoFixAttemptCount\" of table \"scrappable\" will be dropped.",
+      "table": "scrappable",
+      "columns": [
+        "autoFixAttemptCount"
+      ],
+      "destrucive": true
+    }
+  ],
+  "migrationApiVersion": 1
+}

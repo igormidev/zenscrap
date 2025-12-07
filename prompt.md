@@ -1,60 +1,23 @@
-I want to add theme editing options for the user.
-I have a reference for a other project that I have - use it for reference to build the color picker widget and the state. Note that the example uses bloc/cubit to manage state but you should convert this to riverpod since this is what we are using...
+This is a great starting point - now let's start iterating on top of it.
 
-```dart
+First thing, to give more context to the ai how the scrappable was behaving before it stoped working you can give get the last AnalyticsPayload with success that has a example of the payload and the response ( See hoe @zenscrap_server/lib/src/core/mixins/api_helper_mixin.dart sets this data so you can have a better understanding ). So this way we will ensure the example is the most fresh as possible: the last 2 requests that went well. Also put some details like "It worked until {last success} but stoped working after {firstError} and all the last {consecutiveErrorThreshold} requests with that extract rule had error since then...". This will enhance quality of prompt.
 
-// The state
+Second thing; dont put those variables in the root of the scrappable model... put them in a new ".spy.yaml" model that will have a serverpod relationshio with the scrappable. This is good as well because you can update this model that have much less variables then a big scrappable model.
 
-class ThemeCubit extends Cubit<ThemeState> {
-  ThemeCubit()
-      : super(ThemeState.normal(
-          colorValue: Colors.blueGrey.value,
-          brightness: Brightness.light,
-        ));
+Third thing: Make a configuration if the user wants the fixes to be perfomed by a weeker model or a better model - use for this the `AiModel` enum at @zenscrap_server/lib/src/entities/scrappable/ai_model.spy.yaml
+Use as reference the implementation in @zenscrap_server/lib/src/endpoints/public/chat_controller/chat_controller_openai_sdk_impl.dart that also uses the AiModel enum to select the model to use. Save a AiModel variable in that new ".spy.yaml" you will create from the instructions I passed in second thing (Make default as `AiModel.normal` for users without api key)This is a great starting point - now let's start iterating on top of it.
 
-  void selectColor(Color color) {
-    final newState = state.copyWith(
-      colorValue: color.value,
-    );
-    emit(newState);
-  }
+First thing, to give more context to the ai how the scrappable was behaving before it stoped working you can give get the last AnalyticsPayload with success that has a example of the payload and the response ( See hoe @zenscrap_server/lib/src/core/mixins/api_helper_mixin.dart sets this data so you can have a better understanding ). So this way we will ensure the example is the most fresh as possible: the last 2 requests that went well. Also put some details like "It worked until {last success} but stoped working after {firstError} and all the last {consecutiveErrorThreshold} requests with that extract rule had error since then...". This will enhance quality of prompt.
 
-  void selectBrightness(Brightness brightness) {
-    final newState = state.copyWith(
-      brightness: brightness,
-    );
-    emit(newState);
-  }
-}
+Second thing; dont put those variables in the root of the scrappable model... put them in a new ".spy.yaml" model that will have a serverpod relationshio with the scrappable. This is good as well because you can update this model that have much less variables then a big scrappable model.
 
+Third thing: Make a configuration if the user wants the fixes to be perfomed by a weeker model or a better model - use for this the `AiModel` enum at @zenscrap_server/lib/src/entities/scrappable/ai_model.spy.yaml
+Use as reference the implementation in @zenscrap_server/lib/src/endpoints/public/chat_controller/chat_controller_openai_sdk_impl.dart that also uses the AiModel enum to select the model to use. Save a AiModel variable in that new ".spy.yaml" you will create from the instructions I passed in second thing (Make default as null - null will mean "auto" and I will explain the logix of auto pick later)
 
-// Theme selector
+Forth point: Are you using the api key of the user if it exists? See in @zenscrap_server/lib/src/endpoints/public/scrappable_chat_session.dart that it uses the api key of the user for the request if the user added one - I did not check if you are doing this but in the case you are not I just want to point that it should be done that way
 
-GridView.extent(
-  shrinkWrap: true,
-  maxCrossAxisExtent: 50,
-  mainAxisSpacing: 8,
-  crossAxisSpacing: 8,
-  padding: EdgeInsets.zero,
-  physics: const NeverScrollableScrollPhysics(),
-  children: const <Color>[Colors.black, Colors.white]
-      .followedBy(Colors.primaries.reversed)
-      .followedBy(Colors.accents)
-      .where(_removeBlackAndWhite)
-      .map(ColorOption.fromColor)
-      .toList(growable: false),
-)
+Fifth point: If the preference model is null (without user selecting one) it will go to auto mode and the logic of auto mode is: Use `AiModel.normal` if the user did not set a api key yet - and set to `AiModel.powerful` if the user did set an api key. Please make a comment in the ".spy.yaml" model you will create that explains why the AiModel can be null and what is the auto mode
 
-// Remove black colors
+Point number 6: The think effort should be high allways
 
-bool _removeBlackAndWhite(Color color) =>
-    color != Colors.black && color != Colors.white;
-
-```
-
-Ps: The `ColorOption` is a widget to displaya color.
-It has a constructor that receives the color; `ColorOption.fromColor`. Make the color in a cute way
-
-Lets focus in awesome UI here.
-
-Also create a beutiful ui for picking the bright as well - lets give support for dark mode. Please put a warning indicator in some part that will indicate that dark mode is still in beta and that in some places some colors might not be 100% good
+Point seven: I want to document everything - So you will create 2 analytics ".spy.yaml" log models. First will be "father" model that will have general things and the other will be "attempts" model that will be info about the attempts that happend in spaced time. That father model will have a relation with scrappable and a scrappable will have a relation with multiple of those models as well - so it will be a relationship 1:n that you should ask serverpod how does that relationship works to implement it correctly (mandatory). And the father model will also have a 1:n relationship with the children models (the tru-fix attempt models).

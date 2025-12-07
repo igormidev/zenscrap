@@ -1,0 +1,76 @@
+# AutoFixAttempt - A single attempt to fix a scrappable within an AutoFixSession
+#
+# This is the "child" model that logs individual fix attempts.
+# Each attempt represents one AI interaction trying to diagnose and fix the problem.
+# Multiple attempts may occur due to:
+# - AI returning invalid extract rules that fail validation
+# - Exponential backoff retries after failures
+# - Different approaches tried by the AI
+#
+# Relationship: n:1 with AutoFixSession (a session can have multiple attempts)
+class: AutoFixAttempt
+table: auto_fix_attempt
+fields:
+  # When this attempt started
+  startedAt: DateTime
+
+  # When this attempt completed
+  completedAt: DateTime?
+
+  # Attempt number within the session (1, 2, 3, etc.)
+  attemptNumber: int
+
+  # Whether this attempt succeeded
+  # true = extract rules were validated and applied
+  # false = attempt failed (AI error, validation failure, etc.)
+  succeeded: bool, default=false
+
+  # Status of this specific attempt
+  # - in_progress: AI is processing
+  # - validation_failed: AI returned rules but they failed ScrapingBee validation
+  # - ai_error: AI returned an error response or couldn't generate rules
+  # - api_error: OpenAI API or MCP server error
+  # - success: Rules validated and applied
+  status: AutoFixAttemptStatus, default=in_progress
+
+  # Error message if attempt failed
+  # Contains detailed error for debugging
+  errorMessage: String?
+
+  # The thinking/reasoning output from the AI
+  # Useful for debugging why the AI made certain decisions
+  # Can be long, so we store as text
+  aiThinkingLog: String?
+
+  # The extract rules the AI generated (before validation)
+  # Stored as JSON string for debugging
+  generatedExtractRules: String?
+
+  # The JS scenario the AI generated (if any)
+  generatedJsScenario: String?
+
+  # Whether the generated rules passed ScrapingBee validation
+  validationPassed: bool?
+
+  # Validation error message if rules failed
+  validationError: String?
+
+  # Cost in USD for this attempt
+  # Only tracked if using platform API key
+  costUsd: double, default=0.0
+
+  # Token usage for this attempt
+  inputTokens: int, default=0
+  outputTokens: int, default=0
+  reasoningTokens: int, default=0
+
+  # Reference to the parent AutoFixSession
+  sessionId: int, relation(name=session_attempts, parent=auto_fix_session, onDelete=Cascade)
+
+indexes:
+  # Index for finding attempts by session
+  auto_fix_attempt_session_idx:
+    fields: sessionId
+  # Index for finding attempts by status
+  auto_fix_attempt_status_idx:
+    fields: status, startedAt
