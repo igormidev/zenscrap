@@ -35,7 +35,17 @@ abstract class Scrappable implements _i1.SerializableModel {
     this.scrappableAnalytics,
     required this.category,
     required this.isDeleted,
-  });
+    bool? autoFixEnabled,
+    int? consecutiveErrorThreshold,
+    int? currentConsecutiveErrors,
+    this.lastAutoFixAttemptAt,
+    bool? autoFixInProgress,
+    int? autoFixAttemptCount,
+  })  : autoFixEnabled = autoFixEnabled ?? true,
+        consecutiveErrorThreshold = consecutiveErrorThreshold ?? 100,
+        currentConsecutiveErrors = currentConsecutiveErrors ?? 0,
+        autoFixInProgress = autoFixInProgress ?? false,
+        autoFixAttemptCount = autoFixAttemptCount ?? 0;
 
   factory Scrappable({
     int? id,
@@ -55,6 +65,12 @@ abstract class Scrappable implements _i1.SerializableModel {
     List<_i5.ScrappableAnalytics>? scrappableAnalytics,
     required _i6.ScraperCategory category,
     required bool isDeleted,
+    bool? autoFixEnabled,
+    int? consecutiveErrorThreshold,
+    int? currentConsecutiveErrors,
+    DateTime? lastAutoFixAttemptAt,
+    bool? autoFixInProgress,
+    int? autoFixAttemptCount,
   }) = _ScrappableImpl;
 
   factory Scrappable.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -99,6 +115,17 @@ abstract class Scrappable implements _i1.SerializableModel {
       category:
           _i6.ScraperCategory.fromJson((jsonSerialization['category'] as int)),
       isDeleted: jsonSerialization['isDeleted'] as bool,
+      autoFixEnabled: jsonSerialization['autoFixEnabled'] as bool,
+      consecutiveErrorThreshold:
+          jsonSerialization['consecutiveErrorThreshold'] as int,
+      currentConsecutiveErrors:
+          jsonSerialization['currentConsecutiveErrors'] as int,
+      lastAutoFixAttemptAt: jsonSerialization['lastAutoFixAttemptAt'] == null
+          ? null
+          : _i1.DateTimeJsonExtension.fromJson(
+              jsonSerialization['lastAutoFixAttemptAt']),
+      autoFixInProgress: jsonSerialization['autoFixInProgress'] as bool,
+      autoFixAttemptCount: jsonSerialization['autoFixAttemptCount'] as int,
     );
   }
 
@@ -139,6 +166,19 @@ abstract class Scrappable implements _i1.SerializableModel {
 
   bool isDeleted;
 
+  /// Auto-Fix Configuration ###
+  bool autoFixEnabled;
+
+  int consecutiveErrorThreshold;
+
+  int currentConsecutiveErrors;
+
+  DateTime? lastAutoFixAttemptAt;
+
+  bool autoFixInProgress;
+
+  int autoFixAttemptCount;
+
   /// Returns a shallow copy of this [Scrappable]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
@@ -160,6 +200,12 @@ abstract class Scrappable implements _i1.SerializableModel {
     List<_i5.ScrappableAnalytics>? scrappableAnalytics,
     _i6.ScraperCategory? category,
     bool? isDeleted,
+    bool? autoFixEnabled,
+    int? consecutiveErrorThreshold,
+    int? currentConsecutiveErrors,
+    DateTime? lastAutoFixAttemptAt,
+    bool? autoFixInProgress,
+    int? autoFixAttemptCount,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -186,6 +232,13 @@ abstract class Scrappable implements _i1.SerializableModel {
             scrappableAnalytics?.toJson(valueToJson: (v) => v.toJson()),
       'category': category.toJson(),
       'isDeleted': isDeleted,
+      'autoFixEnabled': autoFixEnabled,
+      'consecutiveErrorThreshold': consecutiveErrorThreshold,
+      'currentConsecutiveErrors': currentConsecutiveErrors,
+      if (lastAutoFixAttemptAt != null)
+        'lastAutoFixAttemptAt': lastAutoFixAttemptAt?.toJson(),
+      'autoFixInProgress': autoFixInProgress,
+      'autoFixAttemptCount': autoFixAttemptCount,
     };
   }
 
@@ -216,6 +269,12 @@ class _ScrappableImpl extends Scrappable {
     List<_i5.ScrappableAnalytics>? scrappableAnalytics,
     required _i6.ScraperCategory category,
     required bool isDeleted,
+    bool? autoFixEnabled,
+    int? consecutiveErrorThreshold,
+    int? currentConsecutiveErrors,
+    DateTime? lastAutoFixAttemptAt,
+    bool? autoFixInProgress,
+    int? autoFixAttemptCount,
   }) : super._(
           id: id,
           accountId: accountId,
@@ -234,6 +293,12 @@ class _ScrappableImpl extends Scrappable {
           scrappableAnalytics: scrappableAnalytics,
           category: category,
           isDeleted: isDeleted,
+          autoFixEnabled: autoFixEnabled,
+          consecutiveErrorThreshold: consecutiveErrorThreshold,
+          currentConsecutiveErrors: currentConsecutiveErrors,
+          lastAutoFixAttemptAt: lastAutoFixAttemptAt,
+          autoFixInProgress: autoFixInProgress,
+          autoFixAttemptCount: autoFixAttemptCount,
         );
 
   /// Returns a shallow copy of this [Scrappable]
@@ -258,6 +323,12 @@ class _ScrappableImpl extends Scrappable {
     Object? scrappableAnalytics = _Undefined,
     _i6.ScraperCategory? category,
     bool? isDeleted,
+    bool? autoFixEnabled,
+    int? consecutiveErrorThreshold,
+    int? currentConsecutiveErrors,
+    Object? lastAutoFixAttemptAt = _Undefined,
+    bool? autoFixInProgress,
+    int? autoFixAttemptCount,
   }) {
     return Scrappable(
       id: id is int? ? id : this.id,
@@ -291,6 +362,16 @@ class _ScrappableImpl extends Scrappable {
           : this.scrappableAnalytics?.map((e0) => e0.copyWith()).toList(),
       category: category ?? this.category,
       isDeleted: isDeleted ?? this.isDeleted,
+      autoFixEnabled: autoFixEnabled ?? this.autoFixEnabled,
+      consecutiveErrorThreshold:
+          consecutiveErrorThreshold ?? this.consecutiveErrorThreshold,
+      currentConsecutiveErrors:
+          currentConsecutiveErrors ?? this.currentConsecutiveErrors,
+      lastAutoFixAttemptAt: lastAutoFixAttemptAt is DateTime?
+          ? lastAutoFixAttemptAt
+          : this.lastAutoFixAttemptAt,
+      autoFixInProgress: autoFixInProgress ?? this.autoFixInProgress,
+      autoFixAttemptCount: autoFixAttemptCount ?? this.autoFixAttemptCount,
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/auth/handlers/on_send_reset_email.dart';
 import 'package:zenscrap_server/src/auth/handlers/on_send_validation_email.dart';
+import 'package:zenscrap_server/src/core/auto_fix/periodic_auto_fix_scrappables.dart';
 import 'package:zenscrap_server/src/core/mixins/api_helper_mixin.dart';
 import 'package:zenscrap_server/src/core/scraping_bee.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_config.dart';
@@ -91,6 +92,8 @@ void run(List<String> args) async {
       PeriodicSetRequestsAnalytics(), 'periodicSetRequestsAnalytics');
   pod.registerFutureCall(PeriodicCleanupOldAnalyticsDetails(),
       'periodicCleanupOldAnalyticsDetails');
+  pod.registerFutureCall(
+      PeriodicAutoFixBrokenScrappables(), 'periodicAutoFixBrokenScrappables');
 
   // Start the server.
   await pod.start();
@@ -116,6 +119,7 @@ void run(List<String> args) async {
 
   await pod.cancelFutureCall('periodicSetRequestsAnalytics');
   await pod.cancelFutureCall('periodicCleanupOldAnalyticsDetails');
+  await pod.cancelFutureCall('periodicAutoFixBrokenScrappables');
 
   // Schedule future calls only if not applying migrations
   // (when applying migrations, the future call tables may not exist yet)
@@ -134,5 +138,14 @@ void run(List<String> args) async {
     null,
     const Duration(hours: 1),
     identifier: 'periodicCleanupOldAnalyticsDetails',
+  );
+
+  // Schedule periodic auto-fix for broken scrappables
+  // Runs every 5 minutes to detect and fix scrappables with consecutive errors
+  await pod.futureCallWithDelay(
+    'periodicAutoFixBrokenScrappables',
+    null,
+    const Duration(seconds: 30), // Initial delay to let server fully initialize
+    identifier: 'periodicAutoFixBrokenScrappables',
   );
 }

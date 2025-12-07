@@ -164,6 +164,12 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
         referenceTestData: clonedTestData,
         category: sourceScrappable.category,
         scrappingBeeExtractRules: scrappingBeeExtractLogic,
+        // Auto-fix configuration (default values)
+        autoFixEnabled: true,
+        consecutiveErrorThreshold: 100,
+        currentConsecutiveErrors: 0,
+        autoFixInProgress: false,
+        autoFixAttemptCount: 0,
       );
       clonedScrappable = await Scrappable.db.insertRow(
         session,

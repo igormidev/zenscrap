@@ -1001,6 +1001,35 @@ Future<void> _setScrappableAnalytics(
         analytics,
         transaction: transaction,
       );
+
+      // Update consecutive error counter for auto-fix feature
+      // Sort items by timestamp to process in chronological order
+      final sortedItems = List<AnalyticsPayload>.from(items)
+        ..sort((a, b) => a.time.compareTo(b.time));
+
+      // Calculate new consecutive error count
+      // Start with current count from the scrappable
+      int newConsecutiveErrors = scrappable.currentConsecutiveErrors;
+
+      for (final item in sortedItems) {
+        if (item.status == RequestStatus.success) {
+          // Success resets the counter
+          newConsecutiveErrors = 0;
+        } else {
+          // Any error increments the counter
+          newConsecutiveErrors++;
+        }
+      }
+
+      // Only update if the counter changed
+      if (newConsecutiveErrors != scrappable.currentConsecutiveErrors) {
+        await Scrappable.db.updateRow(
+          session,
+          scrappable.copyWith(currentConsecutiveErrors: newConsecutiveErrors),
+          columns: (t) => [t.currentConsecutiveErrors],
+          transaction: transaction,
+        );
+      }
     });
   }
 }

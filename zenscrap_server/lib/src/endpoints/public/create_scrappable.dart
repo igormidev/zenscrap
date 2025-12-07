@@ -185,6 +185,12 @@ class CreateScrappableEndpoint extends Endpoint {
           referenceTestData: referenceTestData,
           targetRequest: targetRequest,
           category: category,
+          // Auto-fix configuration (default values)
+          autoFixEnabled: true,
+          consecutiveErrorThreshold: 100,
+          currentConsecutiveErrors: 0,
+          autoFixInProgress: false,
+          autoFixAttemptCount: 0,
         ),
         transaction: transaction,
       );
