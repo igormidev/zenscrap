@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'credit_history_state.dart';
+part of 'api_credit_history_state.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -17,7 +17,7 @@ mixin _$CreditHistoryState {
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is CreditHistoryState);
+        (other.runtimeType == runtimeType && other is ApiCreditHistoryState);
   }
 
   @override
@@ -32,11 +32,11 @@ mixin _$CreditHistoryState {
 /// @nodoc
 class $CreditHistoryStateCopyWith<$Res> {
   $CreditHistoryStateCopyWith(
-      CreditHistoryState _, $Res Function(CreditHistoryState) __);
+      ApiCreditHistoryState _, $Res Function(ApiCreditHistoryState) __);
 }
 
-/// Adds pattern-matching-related methods to [CreditHistoryState].
-extension CreditHistoryStatePatterns on CreditHistoryState {
+/// Adds pattern-matching-related methods to [ApiCreditHistoryState].
+extension CreditHistoryStatePatterns on ApiCreditHistoryState {
   /// A variant of `map` that fallback to returning `orElse`.
   ///
   /// It is equivalent to doing:
@@ -254,7 +254,7 @@ extension CreditHistoryStatePatterns on CreditHistoryState {
 
 /// @nodoc
 
-class _Initial implements CreditHistoryState {
+class _Initial implements ApiCreditHistoryState {
   const _Initial();
 
   @override
@@ -274,7 +274,7 @@ class _Initial implements CreditHistoryState {
 
 /// @nodoc
 
-class _Loading implements CreditHistoryState {
+class _Loading implements ApiCreditHistoryState {
   const _Loading();
 
   @override
@@ -294,7 +294,7 @@ class _Loading implements CreditHistoryState {
 
 /// @nodoc
 
-class _Loaded implements CreditHistoryState {
+class _Loaded implements ApiCreditHistoryState {
   const _Loaded(
       {required final List<ApiCreditHistoryItem> creditHistory,
       required this.hasMore,
@@ -390,7 +390,7 @@ class __$LoadedCopyWithImpl<$Res> implements _$LoadedCopyWith<$Res> {
 
 /// @nodoc
 
-class _WithError implements CreditHistoryState {
+class _WithError implements ApiCreditHistoryState {
   const _WithError(this.error);
 
   final ZenScrapException error;
