@@ -1,7 +1,0 @@
-class: CreditHistoryItem
-table: credit_history_item
-fields:
-  date: DateTime
-  monthlySubscriptionCreditDeposit: MonthlySubscriptionCreditDeposit?, relation(optional)
-  creaditPackagePurchase: CreditPackagePurchase?, relation(optional)
-  accountApiUsage: AccountApiUsage?, relation(name=api_usage_history)

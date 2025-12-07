@@ -12,7 +12,7 @@
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import '../../../entities/account/api_usage/credit_usage.dart' as _i2;
 import '../../../entities/account/account.dart' as _i3;
-import '../../../entities/account/api_usage/api_credit_history/api_creadit_history_item.dart'
+import '../../../entities/account/api_usage/api_credit_history/api_credit_history_item.dart'
     as _i4;
 import '../../../entities/account/account_api_key.dart' as _i5;
 
@@ -33,7 +33,7 @@ abstract class AccountApiUsage implements _i1.SerializableModel {
     required int creditUsageId,
     _i2.CreditUsage? creditUsage,
     _i3.AccountInfo? accountInfo,
-    List<_i4.CreditHistoryItem>? history,
+    List<_i4.ApiCreditHistoryItem>? history,
     List<_i5.AccountApiKey>? apiKeys,
   }) = _AccountApiUsageImpl;
 
@@ -52,7 +52,7 @@ abstract class AccountApiUsage implements _i1.SerializableModel {
               (jsonSerialization['accountInfo'] as Map<String, dynamic>)),
       history: (jsonSerialization['history'] as List?)
           ?.map((e) =>
-              _i4.CreditHistoryItem.fromJson((e as Map<String, dynamic>)))
+              _i4.ApiCreditHistoryItem.fromJson((e as Map<String, dynamic>)))
           .toList(),
       apiKeys: (jsonSerialization['apiKeys'] as List?)
           ?.map((e) => _i5.AccountApiKey.fromJson((e as Map<String, dynamic>)))
@@ -73,7 +73,7 @@ abstract class AccountApiUsage implements _i1.SerializableModel {
 
   _i3.AccountInfo? accountInfo;
 
-  List<_i4.CreditHistoryItem>? history;
+  List<_i4.ApiCreditHistoryItem>? history;
 
   List<_i5.AccountApiKey>? apiKeys;
 
@@ -86,7 +86,7 @@ abstract class AccountApiUsage implements _i1.SerializableModel {
     int? creditUsageId,
     _i2.CreditUsage? creditUsage,
     _i3.AccountInfo? accountInfo,
-    List<_i4.CreditHistoryItem>? history,
+    List<_i4.ApiCreditHistoryItem>? history,
     List<_i5.AccountApiKey>? apiKeys,
   });
   @override
@@ -119,7 +119,7 @@ class _AccountApiUsageImpl extends AccountApiUsage {
     required int creditUsageId,
     _i2.CreditUsage? creditUsage,
     _i3.AccountInfo? accountInfo,
-    List<_i4.CreditHistoryItem>? history,
+    List<_i4.ApiCreditHistoryItem>? history,
     List<_i5.AccountApiKey>? apiKeys,
   }) : super._(
           id: id,
@@ -154,7 +154,7 @@ class _AccountApiUsageImpl extends AccountApiUsage {
       accountInfo: accountInfo is _i3.AccountInfo?
           ? accountInfo
           : this.accountInfo?.copyWith(),
-      history: history is List<_i4.CreditHistoryItem>?
+      history: history is List<_i4.ApiCreditHistoryItem>?
           ? history
           : this.history?.map((e0) => e0.copyWith()).toList(),
       apiKeys: apiKeys is List<_i5.AccountApiKey>?

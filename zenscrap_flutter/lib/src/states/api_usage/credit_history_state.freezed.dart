@@ -157,7 +157,7 @@ extension CreditHistoryStatePatterns on CreditHistoryState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(List<CreditHistoryItem> creditHistory, bool hasMore,
+    TResult Function(List<ApiCreditHistoryItem> creditHistory, bool hasMore,
             bool isLoadingMore)?
         loaded,
     TResult Function(ZenScrapException error)? withError,
@@ -195,7 +195,7 @@ extension CreditHistoryStatePatterns on CreditHistoryState {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(List<CreditHistoryItem> creditHistory,
+    required TResult Function(List<ApiCreditHistoryItem> creditHistory,
             bool hasMore, bool isLoadingMore)
         loaded,
     required TResult Function(ZenScrapException error) withError,
@@ -231,7 +231,7 @@ extension CreditHistoryStatePatterns on CreditHistoryState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(List<CreditHistoryItem> creditHistory, bool hasMore,
+    TResult? Function(List<ApiCreditHistoryItem> creditHistory, bool hasMore,
             bool isLoadingMore)?
         loaded,
     TResult? Function(ZenScrapException error)? withError,
@@ -296,13 +296,13 @@ class _Loading implements CreditHistoryState {
 
 class _Loaded implements CreditHistoryState {
   const _Loaded(
-      {required final List<CreditHistoryItem> creditHistory,
+      {required final List<ApiCreditHistoryItem> creditHistory,
       required this.hasMore,
       this.isLoadingMore = false})
       : _creditHistory = creditHistory;
 
-  final List<CreditHistoryItem> _creditHistory;
-  List<CreditHistoryItem> get creditHistory {
+  final List<ApiCreditHistoryItem> _creditHistory;
+  List<ApiCreditHistoryItem> get creditHistory {
     if (_creditHistory is EqualUnmodifiableListView) return _creditHistory;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_creditHistory);
@@ -351,7 +351,7 @@ abstract mixin class _$LoadedCopyWith<$Res>
       __$LoadedCopyWithImpl;
   @useResult
   $Res call(
-      {List<CreditHistoryItem> creditHistory,
+      {List<ApiCreditHistoryItem> creditHistory,
       bool hasMore,
       bool isLoadingMore});
 }
@@ -375,7 +375,7 @@ class __$LoadedCopyWithImpl<$Res> implements _$LoadedCopyWith<$Res> {
       creditHistory: null == creditHistory
           ? _self._creditHistory
           : creditHistory // ignore: cast_nullable_to_non_nullable
-              as List<CreditHistoryItem>,
+              as List<ApiCreditHistoryItem>,
       hasMore: null == hasMore
           ? _self.hasMore
           : hasMore // ignore: cast_nullable_to_non_nullable

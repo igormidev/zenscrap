@@ -10,7 +10,9 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
-import '../../entities/account/account.dart' as _i2;
+import '../../../entities/account/account.dart' as _i2;
+import '../../../entities/account/ai_usage/ai_credit_history/ai_usage_history_item.dart'
+    as _i3;
 
 abstract class AccountAIUsage implements _i1.SerializableModel {
   AccountAIUsage._({
@@ -18,6 +20,7 @@ abstract class AccountAIUsage implements _i1.SerializableModel {
     this.userOpenAiApiKey,
     required this.totalDollarsSpentFromTotalInUSD,
     this.accountInfo,
+    this.history,
   });
 
   factory AccountAIUsage({
@@ -25,6 +28,7 @@ abstract class AccountAIUsage implements _i1.SerializableModel {
     String? userOpenAiApiKey,
     required double totalDollarsSpentFromTotalInUSD,
     _i2.AccountInfo? accountInfo,
+    List<_i3.AICreditHistoryItem>? history,
   }) = _AccountAIUsageImpl;
 
   factory AccountAIUsage.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -38,6 +42,10 @@ abstract class AccountAIUsage implements _i1.SerializableModel {
           ? null
           : _i2.AccountInfo.fromJson(
               (jsonSerialization['accountInfo'] as Map<String, dynamic>)),
+      history: (jsonSerialization['history'] as List?)
+          ?.map((e) =>
+              _i3.AICreditHistoryItem.fromJson((e as Map<String, dynamic>)))
+          .toList(),
     );
   }
 
@@ -52,6 +60,8 @@ abstract class AccountAIUsage implements _i1.SerializableModel {
 
   _i2.AccountInfo? accountInfo;
 
+  List<_i3.AICreditHistoryItem>? history;
+
   /// Returns a shallow copy of this [AccountAIUsage]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
@@ -60,6 +70,7 @@ abstract class AccountAIUsage implements _i1.SerializableModel {
     String? userOpenAiApiKey,
     double? totalDollarsSpentFromTotalInUSD,
     _i2.AccountInfo? accountInfo,
+    List<_i3.AICreditHistoryItem>? history,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -68,6 +79,8 @@ abstract class AccountAIUsage implements _i1.SerializableModel {
       if (userOpenAiApiKey != null) 'userOpenAiApiKey': userOpenAiApiKey,
       'totalDollarsSpentFromTotalInUSD': totalDollarsSpentFromTotalInUSD,
       if (accountInfo != null) 'accountInfo': accountInfo?.toJson(),
+      if (history != null)
+        'history': history?.toJson(valueToJson: (v) => v.toJson()),
     };
   }
 
@@ -85,11 +98,13 @@ class _AccountAIUsageImpl extends AccountAIUsage {
     String? userOpenAiApiKey,
     required double totalDollarsSpentFromTotalInUSD,
     _i2.AccountInfo? accountInfo,
+    List<_i3.AICreditHistoryItem>? history,
   }) : super._(
           id: id,
           userOpenAiApiKey: userOpenAiApiKey,
           totalDollarsSpentFromTotalInUSD: totalDollarsSpentFromTotalInUSD,
           accountInfo: accountInfo,
+          history: history,
         );
 
   /// Returns a shallow copy of this [AccountAIUsage]
@@ -101,6 +116,7 @@ class _AccountAIUsageImpl extends AccountAIUsage {
     Object? userOpenAiApiKey = _Undefined,
     double? totalDollarsSpentFromTotalInUSD,
     Object? accountInfo = _Undefined,
+    Object? history = _Undefined,
   }) {
     return AccountAIUsage(
       id: id is int? ? id : this.id,
@@ -112,6 +128,9 @@ class _AccountAIUsageImpl extends AccountAIUsage {
       accountInfo: accountInfo is _i2.AccountInfo?
           ? accountInfo
           : this.accountInfo?.copyWith(),
+      history: history is List<_i3.AICreditHistoryItem>?
+          ? history
+          : this.history?.map((e0) => e0.copyWith()).toList(),
     );
   }
 }

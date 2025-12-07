@@ -12,7 +12,9 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
-import '../../entities/account/account.dart' as _i2;
+import '../../../entities/account/account.dart' as _i2;
+import '../../../entities/account/ai_usage/ai_credit_history/ai_usage_history_item.dart'
+    as _i3;
 
 abstract class AccountAIUsage
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -21,6 +23,7 @@ abstract class AccountAIUsage
     this.userOpenAiApiKey,
     required this.totalDollarsSpentFromTotalInUSD,
     this.accountInfo,
+    this.history,
   });
 
   factory AccountAIUsage({
@@ -28,6 +31,7 @@ abstract class AccountAIUsage
     String? userOpenAiApiKey,
     required double totalDollarsSpentFromTotalInUSD,
     _i2.AccountInfo? accountInfo,
+    List<_i3.AICreditHistoryItem>? history,
   }) = _AccountAIUsageImpl;
 
   factory AccountAIUsage.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -41,6 +45,10 @@ abstract class AccountAIUsage
           ? null
           : _i2.AccountInfo.fromJson(
               (jsonSerialization['accountInfo'] as Map<String, dynamic>)),
+      history: (jsonSerialization['history'] as List?)
+          ?.map((e) =>
+              _i3.AICreditHistoryItem.fromJson((e as Map<String, dynamic>)))
+          .toList(),
     );
   }
 
@@ -57,6 +65,8 @@ abstract class AccountAIUsage
 
   _i2.AccountInfo? accountInfo;
 
+  List<_i3.AICreditHistoryItem>? history;
+
   @override
   _i1.Table<int?> get table => t;
 
@@ -68,6 +78,7 @@ abstract class AccountAIUsage
     String? userOpenAiApiKey,
     double? totalDollarsSpentFromTotalInUSD,
     _i2.AccountInfo? accountInfo,
+    List<_i3.AICreditHistoryItem>? history,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -76,6 +87,8 @@ abstract class AccountAIUsage
       if (userOpenAiApiKey != null) 'userOpenAiApiKey': userOpenAiApiKey,
       'totalDollarsSpentFromTotalInUSD': totalDollarsSpentFromTotalInUSD,
       if (accountInfo != null) 'accountInfo': accountInfo?.toJson(),
+      if (history != null)
+        'history': history?.toJson(valueToJson: (v) => v.toJson()),
     };
   }
 
@@ -86,11 +99,19 @@ abstract class AccountAIUsage
       if (userOpenAiApiKey != null) 'userOpenAiApiKey': userOpenAiApiKey,
       'totalDollarsSpentFromTotalInUSD': totalDollarsSpentFromTotalInUSD,
       if (accountInfo != null) 'accountInfo': accountInfo?.toJsonForProtocol(),
+      if (history != null)
+        'history': history?.toJson(valueToJson: (v) => v.toJsonForProtocol()),
     };
   }
 
-  static AccountAIUsageInclude include({_i2.AccountInfoInclude? accountInfo}) {
-    return AccountAIUsageInclude._(accountInfo: accountInfo);
+  static AccountAIUsageInclude include({
+    _i2.AccountInfoInclude? accountInfo,
+    _i3.AICreditHistoryItemIncludeList? history,
+  }) {
+    return AccountAIUsageInclude._(
+      accountInfo: accountInfo,
+      history: history,
+    );
   }
 
   static AccountAIUsageIncludeList includeList({
@@ -127,11 +148,13 @@ class _AccountAIUsageImpl extends AccountAIUsage {
     String? userOpenAiApiKey,
     required double totalDollarsSpentFromTotalInUSD,
     _i2.AccountInfo? accountInfo,
+    List<_i3.AICreditHistoryItem>? history,
   }) : super._(
           id: id,
           userOpenAiApiKey: userOpenAiApiKey,
           totalDollarsSpentFromTotalInUSD: totalDollarsSpentFromTotalInUSD,
           accountInfo: accountInfo,
+          history: history,
         );
 
   /// Returns a shallow copy of this [AccountAIUsage]
@@ -143,6 +166,7 @@ class _AccountAIUsageImpl extends AccountAIUsage {
     Object? userOpenAiApiKey = _Undefined,
     double? totalDollarsSpentFromTotalInUSD,
     Object? accountInfo = _Undefined,
+    Object? history = _Undefined,
   }) {
     return AccountAIUsage(
       id: id is int? ? id : this.id,
@@ -154,6 +178,9 @@ class _AccountAIUsageImpl extends AccountAIUsage {
       accountInfo: accountInfo is _i2.AccountInfo?
           ? accountInfo
           : this.accountInfo?.copyWith(),
+      history: history is List<_i3.AICreditHistoryItem>?
+          ? history
+          : this.history?.map((e0) => e0.copyWith()).toList(),
     );
   }
 }
@@ -177,6 +204,10 @@ class AccountAIUsageTable extends _i1.Table<int?> {
 
   _i2.AccountInfoTable? _accountInfo;
 
+  _i3.AICreditHistoryItemTable? ___history;
+
+  _i1.ManyRelation<_i3.AICreditHistoryItemTable>? _history;
+
   _i2.AccountInfoTable get accountInfo {
     if (_accountInfo != null) return _accountInfo!;
     _accountInfo = _i1.createRelationTable(
@@ -188,6 +219,37 @@ class AccountAIUsageTable extends _i1.Table<int?> {
           _i2.AccountInfoTable(tableRelation: foreignTableRelation),
     );
     return _accountInfo!;
+  }
+
+  _i3.AICreditHistoryItemTable get __history {
+    if (___history != null) return ___history!;
+    ___history = _i1.createRelationTable(
+      relationFieldName: '__history',
+      field: AccountAIUsage.t.id,
+      foreignField: _i3.AICreditHistoryItem.t.accountAIUsageId,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _i3.AICreditHistoryItemTable(tableRelation: foreignTableRelation),
+    );
+    return ___history!;
+  }
+
+  _i1.ManyRelation<_i3.AICreditHistoryItemTable> get history {
+    if (_history != null) return _history!;
+    var relationTable = _i1.createRelationTable(
+      relationFieldName: 'history',
+      field: AccountAIUsage.t.id,
+      foreignField: _i3.AICreditHistoryItem.t.accountAIUsageId,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _i3.AICreditHistoryItemTable(tableRelation: foreignTableRelation),
+    );
+    _history = _i1.ManyRelation<_i3.AICreditHistoryItemTable>(
+      tableWithRelations: relationTable,
+      table: _i3.AICreditHistoryItemTable(
+          tableRelation: relationTable.tableRelation!.lastRelation),
+    );
+    return _history!;
   }
 
   @override
@@ -202,19 +264,31 @@ class AccountAIUsageTable extends _i1.Table<int?> {
     if (relationField == 'accountInfo') {
       return accountInfo;
     }
+    if (relationField == 'history') {
+      return __history;
+    }
     return null;
   }
 }
 
 class AccountAIUsageInclude extends _i1.IncludeObject {
-  AccountAIUsageInclude._({_i2.AccountInfoInclude? accountInfo}) {
+  AccountAIUsageInclude._({
+    _i2.AccountInfoInclude? accountInfo,
+    _i3.AICreditHistoryItemIncludeList? history,
+  }) {
     _accountInfo = accountInfo;
+    _history = history;
   }
 
   _i2.AccountInfoInclude? _accountInfo;
 
+  _i3.AICreditHistoryItemIncludeList? _history;
+
   @override
-  Map<String, _i1.Include?> get includes => {'accountInfo': _accountInfo};
+  Map<String, _i1.Include?> get includes => {
+        'accountInfo': _accountInfo,
+        'history': _history,
+      };
 
   @override
   _i1.Table<int?> get table => AccountAIUsage.t;
@@ -243,7 +317,13 @@ class AccountAIUsageIncludeList extends _i1.IncludeList {
 class AccountAIUsageRepository {
   const AccountAIUsageRepository._();
 
+  final attach = const AccountAIUsageAttachRepository._();
+
   final attachRow = const AccountAIUsageAttachRowRepository._();
+
+  final detach = const AccountAIUsageDetachRepository._();
+
+  final detachRow = const AccountAIUsageDetachRowRepository._();
 
   /// Returns a list of [AccountAIUsage]s matching the given query parameters.
   ///
@@ -461,6 +541,35 @@ class AccountAIUsageRepository {
   }
 }
 
+class AccountAIUsageAttachRepository {
+  const AccountAIUsageAttachRepository._();
+
+  /// Creates a relation between this [AccountAIUsage] and the given [AICreditHistoryItem]s
+  /// by setting each [AICreditHistoryItem]'s foreign key `accountAIUsageId` to refer to this [AccountAIUsage].
+  Future<void> history(
+    _i1.Session session,
+    AccountAIUsage accountAIUsage,
+    List<_i3.AICreditHistoryItem> aICreditHistoryItem, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (aICreditHistoryItem.any((e) => e.id == null)) {
+      throw ArgumentError.notNull('aICreditHistoryItem.id');
+    }
+    if (accountAIUsage.id == null) {
+      throw ArgumentError.notNull('accountAIUsage.id');
+    }
+
+    var $aICreditHistoryItem = aICreditHistoryItem
+        .map((e) => e.copyWith(accountAIUsageId: accountAIUsage.id))
+        .toList();
+    await session.db.update<_i3.AICreditHistoryItem>(
+      $aICreditHistoryItem,
+      columns: [_i3.AICreditHistoryItem.t.accountAIUsageId],
+      transaction: transaction,
+    );
+  }
+}
+
 class AccountAIUsageAttachRowRepository {
   const AccountAIUsageAttachRowRepository._();
 
@@ -484,6 +593,85 @@ class AccountAIUsageAttachRowRepository {
     await session.db.updateRow<_i2.AccountInfo>(
       $accountInfo,
       columns: [_i2.AccountInfo.t.accountAIUsageId],
+      transaction: transaction,
+    );
+  }
+
+  /// Creates a relation between this [AccountAIUsage] and the given [AICreditHistoryItem]
+  /// by setting the [AICreditHistoryItem]'s foreign key `accountAIUsageId` to refer to this [AccountAIUsage].
+  Future<void> history(
+    _i1.Session session,
+    AccountAIUsage accountAIUsage,
+    _i3.AICreditHistoryItem aICreditHistoryItem, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (aICreditHistoryItem.id == null) {
+      throw ArgumentError.notNull('aICreditHistoryItem.id');
+    }
+    if (accountAIUsage.id == null) {
+      throw ArgumentError.notNull('accountAIUsage.id');
+    }
+
+    var $aICreditHistoryItem =
+        aICreditHistoryItem.copyWith(accountAIUsageId: accountAIUsage.id);
+    await session.db.updateRow<_i3.AICreditHistoryItem>(
+      $aICreditHistoryItem,
+      columns: [_i3.AICreditHistoryItem.t.accountAIUsageId],
+      transaction: transaction,
+    );
+  }
+}
+
+class AccountAIUsageDetachRepository {
+  const AccountAIUsageDetachRepository._();
+
+  /// Detaches the relation between this [AccountAIUsage] and the given [AICreditHistoryItem]
+  /// by setting the [AICreditHistoryItem]'s foreign key `accountAIUsageId` to `null`.
+  ///
+  /// This removes the association between the two models without deleting
+  /// the related record.
+  Future<void> history(
+    _i1.Session session,
+    List<_i3.AICreditHistoryItem> aICreditHistoryItem, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (aICreditHistoryItem.any((e) => e.id == null)) {
+      throw ArgumentError.notNull('aICreditHistoryItem.id');
+    }
+
+    var $aICreditHistoryItem = aICreditHistoryItem
+        .map((e) => e.copyWith(accountAIUsageId: null))
+        .toList();
+    await session.db.update<_i3.AICreditHistoryItem>(
+      $aICreditHistoryItem,
+      columns: [_i3.AICreditHistoryItem.t.accountAIUsageId],
+      transaction: transaction,
+    );
+  }
+}
+
+class AccountAIUsageDetachRowRepository {
+  const AccountAIUsageDetachRowRepository._();
+
+  /// Detaches the relation between this [AccountAIUsage] and the given [AICreditHistoryItem]
+  /// by setting the [AICreditHistoryItem]'s foreign key `accountAIUsageId` to `null`.
+  ///
+  /// This removes the association between the two models without deleting
+  /// the related record.
+  Future<void> history(
+    _i1.Session session,
+    _i3.AICreditHistoryItem aICreditHistoryItem, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (aICreditHistoryItem.id == null) {
+      throw ArgumentError.notNull('aICreditHistoryItem.id');
+    }
+
+    var $aICreditHistoryItem =
+        aICreditHistoryItem.copyWith(accountAIUsageId: null);
+    await session.db.updateRow<_i3.AICreditHistoryItem>(
+      $aICreditHistoryItem,
+      columns: [_i3.AICreditHistoryItem.t.accountAIUsageId],
       transaction: transaction,
     );
   }

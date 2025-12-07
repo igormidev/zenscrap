@@ -313,7 +313,7 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
 
     final creditHistory = creditHistoryState.maybeWhen(
       loaded: (creditHistory, hasMore, isLoadingMore) => creditHistory,
-      orElse: () => <CreditHistoryItem>[],
+      orElse: () => <ApiCreditHistoryItem>[],
     );
 
     final isLoadingMoreHistory = creditHistoryState.maybeWhen(
@@ -402,7 +402,7 @@ class MobileLayout extends ConsumerWidget {
   final AccountApiUsage apiUsage;
   final List<AccountApiKey> apiKeys;
   final Map<int, int> apiKeyUsageStats;
-  final List<CreditHistoryItem> creditHistory;
+  final List<ApiCreditHistoryItem> creditHistory;
   final bool isLoadingMoreHistory;
   final bool hasMoreHistory;
   final VoidCallback onLoadMoreHistory;
@@ -490,7 +490,7 @@ class DesktopLayout extends StatelessWidget {
   final AccountApiUsage apiUsage;
   final List<AccountApiKey> apiKeys;
   final Map<int, int> apiKeyUsageStats;
-  final List<CreditHistoryItem> creditHistory;
+  final List<ApiCreditHistoryItem> creditHistory;
   final bool isLoadingMoreHistory;
   final bool hasMoreHistory;
   final VoidCallback onLoadMoreHistory;
@@ -666,7 +666,7 @@ class ApiKeysTab extends StatelessWidget {
 }
 
 class HistoryTab extends StatelessWidget {
-  final List<CreditHistoryItem> creditHistory;
+  final List<ApiCreditHistoryItem> creditHistory;
   final bool isLoadingMoreHistory;
   final bool hasMoreHistory;
   final VoidCallback onLoadMoreHistory;

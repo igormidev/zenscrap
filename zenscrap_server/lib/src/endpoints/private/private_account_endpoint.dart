@@ -85,29 +85,53 @@ class PrivateAccountEndpoint extends Endpoint {
           transaction: transaction,
         );
 
-        // Create monthly subscription credit deposit record for initial credits
-        final initialDeposit = MonthlySubscriptionCreditDeposit(
+        // Create monthly subscription API credit deposit record for initial credits
+        final initialApiDeposit = MonthlySubscriptionApiCreditDeposit(
           creditsAmount: 100, // Initial free tier credits
           planTier: PlanTier.none, // Free tier
         );
-        await MonthlySubscriptionCreditDeposit.db.insertRow(
+        await MonthlySubscriptionApiCreditDeposit.db.insertRow(
           session,
-          initialDeposit,
+          initialApiDeposit,
           transaction: transaction,
         );
 
-        // Create credit history item for initial credits
-        final creditHistoryItem = CreditHistoryItem(
+        // Create API credit history item for initial credits
+        final apiCreditHistoryItem = ApiCreditHistoryItem(
           date: DateTime.now(),
-          monthlySubscriptionCreditDepositId: initialDeposit.id,
-          monthlySubscriptionCreditDeposit: initialDeposit,
-          creaditPackagePurchaseId: null,
-          creaditPackagePurchase: null,
+          monthlySubscriptionApiCreditDepositId: initialApiDeposit.id,
+          monthlySubscriptionApiCreditDeposit: initialApiDeposit,
+          apiCreditPackagePurchaseId: null,
+          apiCreditPackagePurchase: null,
           accountApiUsageId: accountApiUsage.id!,
         );
-        await CreditHistoryItem.db.insertRow(
+        await ApiCreditHistoryItem.db.insertRow(
           session,
-          creditHistoryItem,
+          apiCreditHistoryItem,
+          transaction: transaction,
+        );
+
+        // Create monthly subscription AI credit deposit record for initial credits
+        final initialAiDeposit = MonthlySubscriptionAICreditDeposit(
+          creditsAmountInDollars: kDefaultMonthlyAICreditsInDollars,
+          planTier: PlanTier.none, // Free tier
+        );
+        await MonthlySubscriptionAICreditDeposit.db.insertRow(
+          session,
+          initialAiDeposit,
+          transaction: transaction,
+        );
+
+        // Create AI credit history item for initial credits
+        final aiCreditHistoryItem = AICreditHistoryItem(
+          date: DateTime.now(),
+          monthlySubscriptionAICreditDepositId: initialAiDeposit.id,
+          monthlySubscriptionAICreditDeposit: initialAiDeposit,
+          accountAIUsageId: accountAIUsage.id!,
+        );
+        await AICreditHistoryItem.db.insertRow(
+          session,
+          aiCreditHistoryItem,
           transaction: transaction,
         );
         final apiKey = await AccountApiKey.db.insertRow(

@@ -14,7 +14,7 @@ final creditHistoryProvider =
 class CreditHistoryNotifier extends StateNotifier<CreditHistoryState> {
   final Client _client;
   int _currentPage = 1;
-  List<CreditHistoryItem> _allHistory = [];
+  List<ApiCreditHistoryItem> _allHistory = [];
 
   CreditHistoryNotifier(this._client)
       : super(const CreditHistoryState.initial());
@@ -25,7 +25,7 @@ class CreditHistoryNotifier extends StateNotifier<CreditHistoryState> {
       _currentPage = 1;
       _allHistory = [];
 
-      final response = await _client.privateApiUsage.getCreditHistory(
+      final response = await _client.privateApiUsage.getApiCreditHistory(
         page: 1,
       );
 
@@ -77,7 +77,7 @@ class CreditHistoryNotifier extends StateNotifier<CreditHistoryState> {
       );
 
       _currentPage++;
-      final response = await _client.privateApiUsage.getCreditHistory(
+      final response = await _client.privateApiUsage.getApiCreditHistory(
         page: _currentPage,
       );
 

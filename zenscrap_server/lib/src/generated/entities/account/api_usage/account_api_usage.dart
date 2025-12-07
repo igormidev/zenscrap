@@ -14,7 +14,7 @@
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../../entities/account/api_usage/credit_usage.dart' as _i2;
 import '../../../entities/account/account.dart' as _i3;
-import '../../../entities/account/api_usage/api_credit_history/api_creadit_history_item.dart'
+import '../../../entities/account/api_usage/api_credit_history/api_credit_history_item.dart'
     as _i4;
 import '../../../entities/account/account_api_key.dart' as _i5;
 
@@ -36,7 +36,7 @@ abstract class AccountApiUsage
     required int creditUsageId,
     _i2.CreditUsage? creditUsage,
     _i3.AccountInfo? accountInfo,
-    List<_i4.CreditHistoryItem>? history,
+    List<_i4.ApiCreditHistoryItem>? history,
     List<_i5.AccountApiKey>? apiKeys,
   }) = _AccountApiUsageImpl;
 
@@ -55,7 +55,7 @@ abstract class AccountApiUsage
               (jsonSerialization['accountInfo'] as Map<String, dynamic>)),
       history: (jsonSerialization['history'] as List?)
           ?.map((e) =>
-              _i4.CreditHistoryItem.fromJson((e as Map<String, dynamic>)))
+              _i4.ApiCreditHistoryItem.fromJson((e as Map<String, dynamic>)))
           .toList(),
       apiKeys: (jsonSerialization['apiKeys'] as List?)
           ?.map((e) => _i5.AccountApiKey.fromJson((e as Map<String, dynamic>)))
@@ -78,7 +78,7 @@ abstract class AccountApiUsage
 
   _i3.AccountInfo? accountInfo;
 
-  List<_i4.CreditHistoryItem>? history;
+  List<_i4.ApiCreditHistoryItem>? history;
 
   List<_i5.AccountApiKey>? apiKeys;
 
@@ -94,7 +94,7 @@ abstract class AccountApiUsage
     int? creditUsageId,
     _i2.CreditUsage? creditUsage,
     _i3.AccountInfo? accountInfo,
-    List<_i4.CreditHistoryItem>? history,
+    List<_i4.ApiCreditHistoryItem>? history,
     List<_i5.AccountApiKey>? apiKeys,
   });
   @override
@@ -130,7 +130,7 @@ abstract class AccountApiUsage
   static AccountApiUsageInclude include({
     _i2.CreditUsageInclude? creditUsage,
     _i3.AccountInfoInclude? accountInfo,
-    _i4.CreditHistoryItemIncludeList? history,
+    _i4.ApiCreditHistoryItemIncludeList? history,
     _i5.AccountApiKeyIncludeList? apiKeys,
   }) {
     return AccountApiUsageInclude._(
@@ -176,7 +176,7 @@ class _AccountApiUsageImpl extends AccountApiUsage {
     required int creditUsageId,
     _i2.CreditUsage? creditUsage,
     _i3.AccountInfo? accountInfo,
-    List<_i4.CreditHistoryItem>? history,
+    List<_i4.ApiCreditHistoryItem>? history,
     List<_i5.AccountApiKey>? apiKeys,
   }) : super._(
           id: id,
@@ -211,7 +211,7 @@ class _AccountApiUsageImpl extends AccountApiUsage {
       accountInfo: accountInfo is _i3.AccountInfo?
           ? accountInfo
           : this.accountInfo?.copyWith(),
-      history: history is List<_i4.CreditHistoryItem>?
+      history: history is List<_i4.ApiCreditHistoryItem>?
           ? history
           : this.history?.map((e0) => e0.copyWith()).toList(),
       apiKeys: apiKeys is List<_i5.AccountApiKey>?
@@ -242,9 +242,9 @@ class AccountApiUsageTable extends _i1.Table<int?> {
 
   _i3.AccountInfoTable? _accountInfo;
 
-  _i4.CreditHistoryItemTable? ___history;
+  _i4.ApiCreditHistoryItemTable? ___history;
 
-  _i1.ManyRelation<_i4.CreditHistoryItemTable>? _history;
+  _i1.ManyRelation<_i4.ApiCreditHistoryItemTable>? _history;
 
   _i5.AccountApiKeyTable? ___apiKeys;
 
@@ -276,15 +276,15 @@ class AccountApiUsageTable extends _i1.Table<int?> {
     return _accountInfo!;
   }
 
-  _i4.CreditHistoryItemTable get __history {
+  _i4.ApiCreditHistoryItemTable get __history {
     if (___history != null) return ___history!;
     ___history = _i1.createRelationTable(
       relationFieldName: '__history',
       field: AccountApiUsage.t.id,
-      foreignField: _i4.CreditHistoryItem.t.accountApiUsageId,
+      foreignField: _i4.ApiCreditHistoryItem.t.accountApiUsageId,
       tableRelation: tableRelation,
       createTable: (foreignTableRelation) =>
-          _i4.CreditHistoryItemTable(tableRelation: foreignTableRelation),
+          _i4.ApiCreditHistoryItemTable(tableRelation: foreignTableRelation),
     );
     return ___history!;
   }
@@ -302,19 +302,19 @@ class AccountApiUsageTable extends _i1.Table<int?> {
     return ___apiKeys!;
   }
 
-  _i1.ManyRelation<_i4.CreditHistoryItemTable> get history {
+  _i1.ManyRelation<_i4.ApiCreditHistoryItemTable> get history {
     if (_history != null) return _history!;
     var relationTable = _i1.createRelationTable(
       relationFieldName: 'history',
       field: AccountApiUsage.t.id,
-      foreignField: _i4.CreditHistoryItem.t.accountApiUsageId,
+      foreignField: _i4.ApiCreditHistoryItem.t.accountApiUsageId,
       tableRelation: tableRelation,
       createTable: (foreignTableRelation) =>
-          _i4.CreditHistoryItemTable(tableRelation: foreignTableRelation),
+          _i4.ApiCreditHistoryItemTable(tableRelation: foreignTableRelation),
     );
-    _history = _i1.ManyRelation<_i4.CreditHistoryItemTable>(
+    _history = _i1.ManyRelation<_i4.ApiCreditHistoryItemTable>(
       tableWithRelations: relationTable,
-      table: _i4.CreditHistoryItemTable(
+      table: _i4.ApiCreditHistoryItemTable(
           tableRelation: relationTable.tableRelation!.lastRelation),
     );
     return _history!;
@@ -367,7 +367,7 @@ class AccountApiUsageInclude extends _i1.IncludeObject {
   AccountApiUsageInclude._({
     _i2.CreditUsageInclude? creditUsage,
     _i3.AccountInfoInclude? accountInfo,
-    _i4.CreditHistoryItemIncludeList? history,
+    _i4.ApiCreditHistoryItemIncludeList? history,
     _i5.AccountApiKeyIncludeList? apiKeys,
   }) {
     _creditUsage = creditUsage;
@@ -380,7 +380,7 @@ class AccountApiUsageInclude extends _i1.IncludeObject {
 
   _i3.AccountInfoInclude? _accountInfo;
 
-  _i4.CreditHistoryItemIncludeList? _history;
+  _i4.ApiCreditHistoryItemIncludeList? _history;
 
   _i5.AccountApiKeyIncludeList? _apiKeys;
 
@@ -646,27 +646,27 @@ class AccountApiUsageRepository {
 class AccountApiUsageAttachRepository {
   const AccountApiUsageAttachRepository._();
 
-  /// Creates a relation between this [AccountApiUsage] and the given [CreditHistoryItem]s
-  /// by setting each [CreditHistoryItem]'s foreign key `accountApiUsageId` to refer to this [AccountApiUsage].
+  /// Creates a relation between this [AccountApiUsage] and the given [ApiCreditHistoryItem]s
+  /// by setting each [ApiCreditHistoryItem]'s foreign key `accountApiUsageId` to refer to this [AccountApiUsage].
   Future<void> history(
     _i1.Session session,
     AccountApiUsage accountApiUsage,
-    List<_i4.CreditHistoryItem> creditHistoryItem, {
+    List<_i4.ApiCreditHistoryItem> apiCreditHistoryItem, {
     _i1.Transaction? transaction,
   }) async {
-    if (creditHistoryItem.any((e) => e.id == null)) {
-      throw ArgumentError.notNull('creditHistoryItem.id');
+    if (apiCreditHistoryItem.any((e) => e.id == null)) {
+      throw ArgumentError.notNull('apiCreditHistoryItem.id');
     }
     if (accountApiUsage.id == null) {
       throw ArgumentError.notNull('accountApiUsage.id');
     }
 
-    var $creditHistoryItem = creditHistoryItem
+    var $apiCreditHistoryItem = apiCreditHistoryItem
         .map((e) => e.copyWith(accountApiUsageId: accountApiUsage.id))
         .toList();
-    await session.db.update<_i4.CreditHistoryItem>(
-      $creditHistoryItem,
-      columns: [_i4.CreditHistoryItem.t.accountApiUsageId],
+    await session.db.update<_i4.ApiCreditHistoryItem>(
+      $apiCreditHistoryItem,
+      columns: [_i4.ApiCreditHistoryItem.t.accountApiUsageId],
       transaction: transaction,
     );
   }
@@ -748,26 +748,26 @@ class AccountApiUsageAttachRowRepository {
     );
   }
 
-  /// Creates a relation between this [AccountApiUsage] and the given [CreditHistoryItem]
-  /// by setting the [CreditHistoryItem]'s foreign key `accountApiUsageId` to refer to this [AccountApiUsage].
+  /// Creates a relation between this [AccountApiUsage] and the given [ApiCreditHistoryItem]
+  /// by setting the [ApiCreditHistoryItem]'s foreign key `accountApiUsageId` to refer to this [AccountApiUsage].
   Future<void> history(
     _i1.Session session,
     AccountApiUsage accountApiUsage,
-    _i4.CreditHistoryItem creditHistoryItem, {
+    _i4.ApiCreditHistoryItem apiCreditHistoryItem, {
     _i1.Transaction? transaction,
   }) async {
-    if (creditHistoryItem.id == null) {
-      throw ArgumentError.notNull('creditHistoryItem.id');
+    if (apiCreditHistoryItem.id == null) {
+      throw ArgumentError.notNull('apiCreditHistoryItem.id');
     }
     if (accountApiUsage.id == null) {
       throw ArgumentError.notNull('accountApiUsage.id');
     }
 
-    var $creditHistoryItem =
-        creditHistoryItem.copyWith(accountApiUsageId: accountApiUsage.id);
-    await session.db.updateRow<_i4.CreditHistoryItem>(
-      $creditHistoryItem,
-      columns: [_i4.CreditHistoryItem.t.accountApiUsageId],
+    var $apiCreditHistoryItem =
+        apiCreditHistoryItem.copyWith(accountApiUsageId: accountApiUsage.id);
+    await session.db.updateRow<_i4.ApiCreditHistoryItem>(
+      $apiCreditHistoryItem,
+      columns: [_i4.ApiCreditHistoryItem.t.accountApiUsageId],
       transaction: transaction,
     );
   }
@@ -800,26 +800,26 @@ class AccountApiUsageAttachRowRepository {
 class AccountApiUsageDetachRepository {
   const AccountApiUsageDetachRepository._();
 
-  /// Detaches the relation between this [AccountApiUsage] and the given [CreditHistoryItem]
-  /// by setting the [CreditHistoryItem]'s foreign key `accountApiUsageId` to `null`.
+  /// Detaches the relation between this [AccountApiUsage] and the given [ApiCreditHistoryItem]
+  /// by setting the [ApiCreditHistoryItem]'s foreign key `accountApiUsageId` to `null`.
   ///
   /// This removes the association between the two models without deleting
   /// the related record.
   Future<void> history(
     _i1.Session session,
-    List<_i4.CreditHistoryItem> creditHistoryItem, {
+    List<_i4.ApiCreditHistoryItem> apiCreditHistoryItem, {
     _i1.Transaction? transaction,
   }) async {
-    if (creditHistoryItem.any((e) => e.id == null)) {
-      throw ArgumentError.notNull('creditHistoryItem.id');
+    if (apiCreditHistoryItem.any((e) => e.id == null)) {
+      throw ArgumentError.notNull('apiCreditHistoryItem.id');
     }
 
-    var $creditHistoryItem = creditHistoryItem
+    var $apiCreditHistoryItem = apiCreditHistoryItem
         .map((e) => e.copyWith(accountApiUsageId: null))
         .toList();
-    await session.db.update<_i4.CreditHistoryItem>(
-      $creditHistoryItem,
-      columns: [_i4.CreditHistoryItem.t.accountApiUsageId],
+    await session.db.update<_i4.ApiCreditHistoryItem>(
+      $apiCreditHistoryItem,
+      columns: [_i4.ApiCreditHistoryItem.t.accountApiUsageId],
       transaction: transaction,
     );
   }
@@ -828,25 +828,25 @@ class AccountApiUsageDetachRepository {
 class AccountApiUsageDetachRowRepository {
   const AccountApiUsageDetachRowRepository._();
 
-  /// Detaches the relation between this [AccountApiUsage] and the given [CreditHistoryItem]
-  /// by setting the [CreditHistoryItem]'s foreign key `accountApiUsageId` to `null`.
+  /// Detaches the relation between this [AccountApiUsage] and the given [ApiCreditHistoryItem]
+  /// by setting the [ApiCreditHistoryItem]'s foreign key `accountApiUsageId` to `null`.
   ///
   /// This removes the association between the two models without deleting
   /// the related record.
   Future<void> history(
     _i1.Session session,
-    _i4.CreditHistoryItem creditHistoryItem, {
+    _i4.ApiCreditHistoryItem apiCreditHistoryItem, {
     _i1.Transaction? transaction,
   }) async {
-    if (creditHistoryItem.id == null) {
-      throw ArgumentError.notNull('creditHistoryItem.id');
+    if (apiCreditHistoryItem.id == null) {
+      throw ArgumentError.notNull('apiCreditHistoryItem.id');
     }
 
-    var $creditHistoryItem =
-        creditHistoryItem.copyWith(accountApiUsageId: null);
-    await session.db.updateRow<_i4.CreditHistoryItem>(
-      $creditHistoryItem,
-      columns: [_i4.CreditHistoryItem.t.accountApiUsageId],
+    var $apiCreditHistoryItem =
+        apiCreditHistoryItem.copyWith(accountApiUsageId: null);
+    await session.db.updateRow<_i4.ApiCreditHistoryItem>(
+      $apiCreditHistoryItem,
+      columns: [_i4.ApiCreditHistoryItem.t.accountApiUsageId],
       transaction: transaction,
     );
   }

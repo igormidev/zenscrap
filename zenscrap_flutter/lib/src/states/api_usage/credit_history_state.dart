@@ -8,7 +8,7 @@ class CreditHistoryState with _$CreditHistoryState {
   const factory CreditHistoryState.initial() = _Initial;
   const factory CreditHistoryState.loading() = _Loading;
   const factory CreditHistoryState.loaded({
-    required List<CreditHistoryItem> creditHistory,
+    required List<ApiCreditHistoryItem> creditHistory,
     required bool hasMore,
     @Default(false) bool isLoadingMore,
   }) = _Loaded;

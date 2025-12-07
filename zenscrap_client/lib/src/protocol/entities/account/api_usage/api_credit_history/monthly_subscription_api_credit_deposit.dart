@@ -12,23 +12,23 @@
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import '../../../../entities/account/plan_tier.dart' as _i2;
 
-abstract class MonthlySubscriptionCreditDeposit
+abstract class MonthlySubscriptionApiCreditDeposit
     implements _i1.SerializableModel {
-  MonthlySubscriptionCreditDeposit._({
+  MonthlySubscriptionApiCreditDeposit._({
     this.id,
     required this.creditsAmount,
     required this.planTier,
   });
 
-  factory MonthlySubscriptionCreditDeposit({
+  factory MonthlySubscriptionApiCreditDeposit({
     int? id,
     required int creditsAmount,
     required _i2.PlanTier planTier,
-  }) = _MonthlySubscriptionCreditDepositImpl;
+  }) = _MonthlySubscriptionApiCreditDepositImpl;
 
-  factory MonthlySubscriptionCreditDeposit.fromJson(
+  factory MonthlySubscriptionApiCreditDeposit.fromJson(
       Map<String, dynamic> jsonSerialization) {
-    return MonthlySubscriptionCreditDeposit(
+    return MonthlySubscriptionApiCreditDeposit(
       id: jsonSerialization['id'] as int?,
       creditsAmount: jsonSerialization['creditsAmount'] as int,
       planTier: _i2.PlanTier.fromJson((jsonSerialization['planTier'] as int)),
@@ -44,10 +44,10 @@ abstract class MonthlySubscriptionCreditDeposit
 
   _i2.PlanTier planTier;
 
-  /// Returns a shallow copy of this [MonthlySubscriptionCreditDeposit]
+  /// Returns a shallow copy of this [MonthlySubscriptionApiCreditDeposit]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
-  MonthlySubscriptionCreditDeposit copyWith({
+  MonthlySubscriptionApiCreditDeposit copyWith({
     int? id,
     int? creditsAmount,
     _i2.PlanTier? planTier,
@@ -69,9 +69,9 @@ abstract class MonthlySubscriptionCreditDeposit
 
 class _Undefined {}
 
-class _MonthlySubscriptionCreditDepositImpl
-    extends MonthlySubscriptionCreditDeposit {
-  _MonthlySubscriptionCreditDepositImpl({
+class _MonthlySubscriptionApiCreditDepositImpl
+    extends MonthlySubscriptionApiCreditDeposit {
+  _MonthlySubscriptionApiCreditDepositImpl({
     int? id,
     required int creditsAmount,
     required _i2.PlanTier planTier,
@@ -81,16 +81,16 @@ class _MonthlySubscriptionCreditDepositImpl
           planTier: planTier,
         );
 
-  /// Returns a shallow copy of this [MonthlySubscriptionCreditDeposit]
+  /// Returns a shallow copy of this [MonthlySubscriptionApiCreditDeposit]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   @override
-  MonthlySubscriptionCreditDeposit copyWith({
+  MonthlySubscriptionApiCreditDeposit copyWith({
     Object? id = _Undefined,
     int? creditsAmount,
     _i2.PlanTier? planTier,
   }) {
-    return MonthlySubscriptionCreditDeposit(
+    return MonthlySubscriptionApiCreditDeposit(
       id: id is int? ? id : this.id,
       creditsAmount: creditsAmount ?? this.creditsAmount,
       planTier: planTier ?? this.planTier,

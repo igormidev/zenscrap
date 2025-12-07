@@ -12,32 +12,32 @@
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../../../entities/account/plan_tier.dart' as _i2;
 
-abstract class MonthlySubscriptionCreditDeposit
+abstract class MonthlySubscriptionApiCreditDeposit
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
-  MonthlySubscriptionCreditDeposit._({
+  MonthlySubscriptionApiCreditDeposit._({
     this.id,
     required this.creditsAmount,
     required this.planTier,
   });
 
-  factory MonthlySubscriptionCreditDeposit({
+  factory MonthlySubscriptionApiCreditDeposit({
     int? id,
     required int creditsAmount,
     required _i2.PlanTier planTier,
-  }) = _MonthlySubscriptionCreditDepositImpl;
+  }) = _MonthlySubscriptionApiCreditDepositImpl;
 
-  factory MonthlySubscriptionCreditDeposit.fromJson(
+  factory MonthlySubscriptionApiCreditDeposit.fromJson(
       Map<String, dynamic> jsonSerialization) {
-    return MonthlySubscriptionCreditDeposit(
+    return MonthlySubscriptionApiCreditDeposit(
       id: jsonSerialization['id'] as int?,
       creditsAmount: jsonSerialization['creditsAmount'] as int,
       planTier: _i2.PlanTier.fromJson((jsonSerialization['planTier'] as int)),
     );
   }
 
-  static final t = MonthlySubscriptionCreditDepositTable();
+  static final t = MonthlySubscriptionApiCreditDepositTable();
 
-  static const db = MonthlySubscriptionCreditDepositRepository._();
+  static const db = MonthlySubscriptionApiCreditDepositRepository._();
 
   @override
   int? id;
@@ -49,10 +49,10 @@ abstract class MonthlySubscriptionCreditDeposit
   @override
   _i1.Table<int?> get table => t;
 
-  /// Returns a shallow copy of this [MonthlySubscriptionCreditDeposit]
+  /// Returns a shallow copy of this [MonthlySubscriptionApiCreditDeposit]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
-  MonthlySubscriptionCreditDeposit copyWith({
+  MonthlySubscriptionApiCreditDeposit copyWith({
     int? id,
     int? creditsAmount,
     _i2.PlanTier? planTier,
@@ -75,26 +75,27 @@ abstract class MonthlySubscriptionCreditDeposit
     };
   }
 
-  static MonthlySubscriptionCreditDepositInclude include() {
-    return MonthlySubscriptionCreditDepositInclude._();
+  static MonthlySubscriptionApiCreditDepositInclude include() {
+    return MonthlySubscriptionApiCreditDepositInclude._();
   }
 
-  static MonthlySubscriptionCreditDepositIncludeList includeList({
-    _i1.WhereExpressionBuilder<MonthlySubscriptionCreditDepositTable>? where,
+  static MonthlySubscriptionApiCreditDepositIncludeList includeList({
+    _i1.WhereExpressionBuilder<MonthlySubscriptionApiCreditDepositTable>? where,
     int? limit,
     int? offset,
-    _i1.OrderByBuilder<MonthlySubscriptionCreditDepositTable>? orderBy,
+    _i1.OrderByBuilder<MonthlySubscriptionApiCreditDepositTable>? orderBy,
     bool orderDescending = false,
-    _i1.OrderByListBuilder<MonthlySubscriptionCreditDepositTable>? orderByList,
-    MonthlySubscriptionCreditDepositInclude? include,
+    _i1.OrderByListBuilder<MonthlySubscriptionApiCreditDepositTable>?
+        orderByList,
+    MonthlySubscriptionApiCreditDepositInclude? include,
   }) {
-    return MonthlySubscriptionCreditDepositIncludeList._(
+    return MonthlySubscriptionApiCreditDepositIncludeList._(
       where: where,
       limit: limit,
       offset: offset,
-      orderBy: orderBy?.call(MonthlySubscriptionCreditDeposit.t),
+      orderBy: orderBy?.call(MonthlySubscriptionApiCreditDeposit.t),
       orderDescending: orderDescending,
-      orderByList: orderByList?.call(MonthlySubscriptionCreditDeposit.t),
+      orderByList: orderByList?.call(MonthlySubscriptionApiCreditDeposit.t),
       include: include,
     );
   }
@@ -107,9 +108,9 @@ abstract class MonthlySubscriptionCreditDeposit
 
 class _Undefined {}
 
-class _MonthlySubscriptionCreditDepositImpl
-    extends MonthlySubscriptionCreditDeposit {
-  _MonthlySubscriptionCreditDepositImpl({
+class _MonthlySubscriptionApiCreditDepositImpl
+    extends MonthlySubscriptionApiCreditDeposit {
+  _MonthlySubscriptionApiCreditDepositImpl({
     int? id,
     required int creditsAmount,
     required _i2.PlanTier planTier,
@@ -119,16 +120,16 @@ class _MonthlySubscriptionCreditDepositImpl
           planTier: planTier,
         );
 
-  /// Returns a shallow copy of this [MonthlySubscriptionCreditDeposit]
+  /// Returns a shallow copy of this [MonthlySubscriptionApiCreditDeposit]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   @override
-  MonthlySubscriptionCreditDeposit copyWith({
+  MonthlySubscriptionApiCreditDeposit copyWith({
     Object? id = _Undefined,
     int? creditsAmount,
     _i2.PlanTier? planTier,
   }) {
-    return MonthlySubscriptionCreditDeposit(
+    return MonthlySubscriptionApiCreditDeposit(
       id: id is int? ? id : this.id,
       creditsAmount: creditsAmount ?? this.creditsAmount,
       planTier: planTier ?? this.planTier,
@@ -136,9 +137,9 @@ class _MonthlySubscriptionCreditDepositImpl
   }
 }
 
-class MonthlySubscriptionCreditDepositTable extends _i1.Table<int?> {
-  MonthlySubscriptionCreditDepositTable({super.tableRelation})
-      : super(tableName: 'monthly_subscription_credit_deposit') {
+class MonthlySubscriptionApiCreditDepositTable extends _i1.Table<int?> {
+  MonthlySubscriptionApiCreditDepositTable({super.tableRelation})
+      : super(tableName: 'monthly_subscription_api_credit_deposit') {
     creditsAmount = _i1.ColumnInt(
       'creditsAmount',
       this,
@@ -162,19 +163,19 @@ class MonthlySubscriptionCreditDepositTable extends _i1.Table<int?> {
       ];
 }
 
-class MonthlySubscriptionCreditDepositInclude extends _i1.IncludeObject {
-  MonthlySubscriptionCreditDepositInclude._();
+class MonthlySubscriptionApiCreditDepositInclude extends _i1.IncludeObject {
+  MonthlySubscriptionApiCreditDepositInclude._();
 
   @override
   Map<String, _i1.Include?> get includes => {};
 
   @override
-  _i1.Table<int?> get table => MonthlySubscriptionCreditDeposit.t;
+  _i1.Table<int?> get table => MonthlySubscriptionApiCreditDeposit.t;
 }
 
-class MonthlySubscriptionCreditDepositIncludeList extends _i1.IncludeList {
-  MonthlySubscriptionCreditDepositIncludeList._({
-    _i1.WhereExpressionBuilder<MonthlySubscriptionCreditDepositTable>? where,
+class MonthlySubscriptionApiCreditDepositIncludeList extends _i1.IncludeList {
+  MonthlySubscriptionApiCreditDepositIncludeList._({
+    _i1.WhereExpressionBuilder<MonthlySubscriptionApiCreditDepositTable>? where,
     super.limit,
     super.offset,
     super.orderBy,
@@ -182,20 +183,20 @@ class MonthlySubscriptionCreditDepositIncludeList extends _i1.IncludeList {
     super.orderByList,
     super.include,
   }) {
-    super.where = where?.call(MonthlySubscriptionCreditDeposit.t);
+    super.where = where?.call(MonthlySubscriptionApiCreditDeposit.t);
   }
 
   @override
   Map<String, _i1.Include?> get includes => include?.includes ?? {};
 
   @override
-  _i1.Table<int?> get table => MonthlySubscriptionCreditDeposit.t;
+  _i1.Table<int?> get table => MonthlySubscriptionApiCreditDeposit.t;
 }
 
-class MonthlySubscriptionCreditDepositRepository {
-  const MonthlySubscriptionCreditDepositRepository._();
+class MonthlySubscriptionApiCreditDepositRepository {
+  const MonthlySubscriptionApiCreditDepositRepository._();
 
-  /// Returns a list of [MonthlySubscriptionCreditDeposit]s matching the given query parameters.
+  /// Returns a list of [MonthlySubscriptionApiCreditDeposit]s matching the given query parameters.
   ///
   /// Use [where] to specify which items to include in the return value.
   /// If none is specified, all items will be returned.
@@ -217,20 +218,21 @@ class MonthlySubscriptionCreditDepositRepository {
   ///   limit: 100,
   /// );
   /// ```
-  Future<List<MonthlySubscriptionCreditDeposit>> find(
+  Future<List<MonthlySubscriptionApiCreditDeposit>> find(
     _i1.Session session, {
-    _i1.WhereExpressionBuilder<MonthlySubscriptionCreditDepositTable>? where,
+    _i1.WhereExpressionBuilder<MonthlySubscriptionApiCreditDepositTable>? where,
     int? limit,
     int? offset,
-    _i1.OrderByBuilder<MonthlySubscriptionCreditDepositTable>? orderBy,
+    _i1.OrderByBuilder<MonthlySubscriptionApiCreditDepositTable>? orderBy,
     bool orderDescending = false,
-    _i1.OrderByListBuilder<MonthlySubscriptionCreditDepositTable>? orderByList,
+    _i1.OrderByListBuilder<MonthlySubscriptionApiCreditDepositTable>?
+        orderByList,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.find<MonthlySubscriptionCreditDeposit>(
-      where: where?.call(MonthlySubscriptionCreditDeposit.t),
-      orderBy: orderBy?.call(MonthlySubscriptionCreditDeposit.t),
-      orderByList: orderByList?.call(MonthlySubscriptionCreditDeposit.t),
+    return session.db.find<MonthlySubscriptionApiCreditDeposit>(
+      where: where?.call(MonthlySubscriptionApiCreditDeposit.t),
+      orderBy: orderBy?.call(MonthlySubscriptionApiCreditDeposit.t),
+      orderByList: orderByList?.call(MonthlySubscriptionApiCreditDeposit.t),
       orderDescending: orderDescending,
       limit: limit,
       offset: offset,
@@ -238,7 +240,7 @@ class MonthlySubscriptionCreditDepositRepository {
     );
   }
 
-  /// Returns the first matching [MonthlySubscriptionCreditDeposit] matching the given query parameters.
+  /// Returns the first matching [MonthlySubscriptionApiCreditDeposit] matching the given query parameters.
   ///
   /// Use [where] to specify which items to include in the return value.
   /// If none is specified, all items will be returned.
@@ -255,137 +257,139 @@ class MonthlySubscriptionCreditDepositRepository {
   ///   orderBy: (t) => t.age,
   /// );
   /// ```
-  Future<MonthlySubscriptionCreditDeposit?> findFirstRow(
+  Future<MonthlySubscriptionApiCreditDeposit?> findFirstRow(
     _i1.Session session, {
-    _i1.WhereExpressionBuilder<MonthlySubscriptionCreditDepositTable>? where,
+    _i1.WhereExpressionBuilder<MonthlySubscriptionApiCreditDepositTable>? where,
     int? offset,
-    _i1.OrderByBuilder<MonthlySubscriptionCreditDepositTable>? orderBy,
+    _i1.OrderByBuilder<MonthlySubscriptionApiCreditDepositTable>? orderBy,
     bool orderDescending = false,
-    _i1.OrderByListBuilder<MonthlySubscriptionCreditDepositTable>? orderByList,
+    _i1.OrderByListBuilder<MonthlySubscriptionApiCreditDepositTable>?
+        orderByList,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.findFirstRow<MonthlySubscriptionCreditDeposit>(
-      where: where?.call(MonthlySubscriptionCreditDeposit.t),
-      orderBy: orderBy?.call(MonthlySubscriptionCreditDeposit.t),
-      orderByList: orderByList?.call(MonthlySubscriptionCreditDeposit.t),
+    return session.db.findFirstRow<MonthlySubscriptionApiCreditDeposit>(
+      where: where?.call(MonthlySubscriptionApiCreditDeposit.t),
+      orderBy: orderBy?.call(MonthlySubscriptionApiCreditDeposit.t),
+      orderByList: orderByList?.call(MonthlySubscriptionApiCreditDeposit.t),
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
     );
   }
 
-  /// Finds a single [MonthlySubscriptionCreditDeposit] by its [id] or null if no such row exists.
-  Future<MonthlySubscriptionCreditDeposit?> findById(
+  /// Finds a single [MonthlySubscriptionApiCreditDeposit] by its [id] or null if no such row exists.
+  Future<MonthlySubscriptionApiCreditDeposit?> findById(
     _i1.Session session,
     int id, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.findById<MonthlySubscriptionCreditDeposit>(
+    return session.db.findById<MonthlySubscriptionApiCreditDeposit>(
       id,
       transaction: transaction,
     );
   }
 
-  /// Inserts all [MonthlySubscriptionCreditDeposit]s in the list and returns the inserted rows.
+  /// Inserts all [MonthlySubscriptionApiCreditDeposit]s in the list and returns the inserted rows.
   ///
-  /// The returned [MonthlySubscriptionCreditDeposit]s will have their `id` fields set.
+  /// The returned [MonthlySubscriptionApiCreditDeposit]s will have their `id` fields set.
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
-  Future<List<MonthlySubscriptionCreditDeposit>> insert(
+  Future<List<MonthlySubscriptionApiCreditDeposit>> insert(
     _i1.Session session,
-    List<MonthlySubscriptionCreditDeposit> rows, {
+    List<MonthlySubscriptionApiCreditDeposit> rows, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.insert<MonthlySubscriptionCreditDeposit>(
+    return session.db.insert<MonthlySubscriptionApiCreditDeposit>(
       rows,
       transaction: transaction,
     );
   }
 
-  /// Inserts a single [MonthlySubscriptionCreditDeposit] and returns the inserted row.
+  /// Inserts a single [MonthlySubscriptionApiCreditDeposit] and returns the inserted row.
   ///
-  /// The returned [MonthlySubscriptionCreditDeposit] will have its `id` field set.
-  Future<MonthlySubscriptionCreditDeposit> insertRow(
+  /// The returned [MonthlySubscriptionApiCreditDeposit] will have its `id` field set.
+  Future<MonthlySubscriptionApiCreditDeposit> insertRow(
     _i1.Session session,
-    MonthlySubscriptionCreditDeposit row, {
+    MonthlySubscriptionApiCreditDeposit row, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.insertRow<MonthlySubscriptionCreditDeposit>(
+    return session.db.insertRow<MonthlySubscriptionApiCreditDeposit>(
       row,
       transaction: transaction,
     );
   }
 
-  /// Updates all [MonthlySubscriptionCreditDeposit]s in the list and returns the updated rows. If
+  /// Updates all [MonthlySubscriptionApiCreditDeposit]s in the list and returns the updated rows. If
   /// [columns] is provided, only those columns will be updated. Defaults to
   /// all columns.
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
-  Future<List<MonthlySubscriptionCreditDeposit>> update(
+  Future<List<MonthlySubscriptionApiCreditDeposit>> update(
     _i1.Session session,
-    List<MonthlySubscriptionCreditDeposit> rows, {
-    _i1.ColumnSelections<MonthlySubscriptionCreditDepositTable>? columns,
+    List<MonthlySubscriptionApiCreditDeposit> rows, {
+    _i1.ColumnSelections<MonthlySubscriptionApiCreditDepositTable>? columns,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.update<MonthlySubscriptionCreditDeposit>(
+    return session.db.update<MonthlySubscriptionApiCreditDeposit>(
       rows,
-      columns: columns?.call(MonthlySubscriptionCreditDeposit.t),
+      columns: columns?.call(MonthlySubscriptionApiCreditDeposit.t),
       transaction: transaction,
     );
   }
 
-  /// Updates a single [MonthlySubscriptionCreditDeposit]. The row needs to have its id set.
+  /// Updates a single [MonthlySubscriptionApiCreditDeposit]. The row needs to have its id set.
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
-  Future<MonthlySubscriptionCreditDeposit> updateRow(
+  Future<MonthlySubscriptionApiCreditDeposit> updateRow(
     _i1.Session session,
-    MonthlySubscriptionCreditDeposit row, {
-    _i1.ColumnSelections<MonthlySubscriptionCreditDepositTable>? columns,
+    MonthlySubscriptionApiCreditDeposit row, {
+    _i1.ColumnSelections<MonthlySubscriptionApiCreditDepositTable>? columns,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.updateRow<MonthlySubscriptionCreditDeposit>(
+    return session.db.updateRow<MonthlySubscriptionApiCreditDeposit>(
       row,
-      columns: columns?.call(MonthlySubscriptionCreditDeposit.t),
+      columns: columns?.call(MonthlySubscriptionApiCreditDeposit.t),
       transaction: transaction,
     );
   }
 
-  /// Deletes all [MonthlySubscriptionCreditDeposit]s in the list and returns the deleted rows.
+  /// Deletes all [MonthlySubscriptionApiCreditDeposit]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
-  Future<List<MonthlySubscriptionCreditDeposit>> delete(
+  Future<List<MonthlySubscriptionApiCreditDeposit>> delete(
     _i1.Session session,
-    List<MonthlySubscriptionCreditDeposit> rows, {
+    List<MonthlySubscriptionApiCreditDeposit> rows, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.delete<MonthlySubscriptionCreditDeposit>(
+    return session.db.delete<MonthlySubscriptionApiCreditDeposit>(
       rows,
       transaction: transaction,
     );
   }
 
-  /// Deletes a single [MonthlySubscriptionCreditDeposit].
-  Future<MonthlySubscriptionCreditDeposit> deleteRow(
+  /// Deletes a single [MonthlySubscriptionApiCreditDeposit].
+  Future<MonthlySubscriptionApiCreditDeposit> deleteRow(
     _i1.Session session,
-    MonthlySubscriptionCreditDeposit row, {
+    MonthlySubscriptionApiCreditDeposit row, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.deleteRow<MonthlySubscriptionCreditDeposit>(
+    return session.db.deleteRow<MonthlySubscriptionApiCreditDeposit>(
       row,
       transaction: transaction,
     );
   }
 
   /// Deletes all rows matching the [where] expression.
-  Future<List<MonthlySubscriptionCreditDeposit>> deleteWhere(
+  Future<List<MonthlySubscriptionApiCreditDeposit>> deleteWhere(
     _i1.Session session, {
-    required _i1.WhereExpressionBuilder<MonthlySubscriptionCreditDepositTable>
+    required _i1
+        .WhereExpressionBuilder<MonthlySubscriptionApiCreditDepositTable>
         where,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.deleteWhere<MonthlySubscriptionCreditDeposit>(
-      where: where(MonthlySubscriptionCreditDeposit.t),
+    return session.db.deleteWhere<MonthlySubscriptionApiCreditDeposit>(
+      where: where(MonthlySubscriptionApiCreditDeposit.t),
       transaction: transaction,
     );
   }
@@ -394,12 +398,12 @@ class MonthlySubscriptionCreditDepositRepository {
   /// will return the count of all rows in the table.
   Future<int> count(
     _i1.Session session, {
-    _i1.WhereExpressionBuilder<MonthlySubscriptionCreditDepositTable>? where,
+    _i1.WhereExpressionBuilder<MonthlySubscriptionApiCreditDepositTable>? where,
     int? limit,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.count<MonthlySubscriptionCreditDeposit>(
-      where: where?.call(MonthlySubscriptionCreditDeposit.t),
+    return session.db.count<MonthlySubscriptionApiCreditDeposit>(
+      where: where?.call(MonthlySubscriptionApiCreditDeposit.t),
       limit: limit,
       transaction: transaction,
     );

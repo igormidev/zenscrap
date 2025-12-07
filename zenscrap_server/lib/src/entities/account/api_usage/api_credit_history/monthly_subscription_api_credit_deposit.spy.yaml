@@ -1,0 +1,5 @@
+class: MonthlySubscriptionApiCreditDeposit
+table: monthly_subscription_api_credit_deposit
+fields:
+  creditsAmount: int
+  planTier: PlanTier

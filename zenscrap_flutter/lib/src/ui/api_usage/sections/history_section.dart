@@ -4,7 +4,7 @@ import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.d
 import 'package:zenscrap_flutter/src/ui/api_usage/widgets/credit_history_list.dart';
 
 class HistorySection extends StatelessWidget {
-  final List<CreditHistoryItem> creditHistory;
+  final List<ApiCreditHistoryItem> creditHistory;
   final bool isLoadingMoreHistory;
   final bool hasMoreHistory;
   final VoidCallback onLoadMoreHistory;

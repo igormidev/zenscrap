@@ -147,8 +147,8 @@ class Endpoints extends _i1.EndpointDispatch {
       name: 'privateApiUsage',
       endpoint: endpoints['privateApiUsage']!,
       methodConnectors: {
-        'getCreditHistory': _i1.MethodConnector(
-          name: 'getCreditHistory',
+        'getApiCreditHistory': _i1.MethodConnector(
+          name: 'getApiCreditHistory',
           params: {
             'page': _i1.ParameterDescription(
               name: 'page',
@@ -161,7 +161,7 @@ class Endpoints extends _i1.EndpointDispatch {
             Map<String, dynamic> params,
           ) async =>
               (endpoints['privateApiUsage'] as _i3.PrivateApiUsageEndpoint)
-                  .getCreditHistory(
+                  .getApiCreditHistory(
             session,
             page: params['page'],
           ),

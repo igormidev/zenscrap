@@ -16,7 +16,7 @@ import '../../entities/scrappable/scrappable.dart' as _i2;
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i3;
 import '../../entities/account/api_usage/account_api_usage.dart' as _i4;
 import '../../entities/account/plan_tier.dart' as _i5;
-import '../../entities/account/account_ai_usage.dart' as _i6;
+import '../../entities/account/ai_usage/account_ai_usage.dart' as _i6;
 
 abstract class AccountInfo
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {

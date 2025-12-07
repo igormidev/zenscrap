@@ -1,7 +1,7 @@
 privateAccount:
   - getAccountInfo:
 privateApiUsage:
-  - getCreditHistory:
+  - getApiCreditHistory:
   - createApiKey:
   - deactivateApiKey:
   - getActiveApiKeys:

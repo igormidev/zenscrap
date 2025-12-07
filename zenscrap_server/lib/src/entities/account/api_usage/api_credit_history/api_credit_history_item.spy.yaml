@@ -1,0 +1,7 @@
+class: ApiCreditHistoryItem
+table: api_credit_history_item
+fields:
+  date: DateTime
+  monthlySubscriptionApiCreditDeposit: MonthlySubscriptionApiCreditDeposit?, relation(optional)
+  apiCreditPackagePurchase: ApiCreditPackagePurchase?, relation(optional)
+  accountApiUsage: AccountApiUsage?, relation(name=api_usage_history)
