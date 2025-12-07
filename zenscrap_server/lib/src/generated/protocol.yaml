@@ -1,5 +1,8 @@
 privateAccount:
   - getAccountInfo:
+privateAiUsage:
+  - getAiCreditHistory:
+  - getAiUsageInfo:
 privateApiUsage:
   - getApiCreditHistory:
   - createApiKey:

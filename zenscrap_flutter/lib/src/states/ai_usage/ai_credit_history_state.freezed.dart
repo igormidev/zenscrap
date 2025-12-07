@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'api_credit_history_state.dart';
+part of 'ai_credit_history_state.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -13,11 +13,11 @@ part of 'api_credit_history_state.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
-mixin _$ApiCreditHistoryState {
+mixin _$AICreditHistoryState {
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is ApiCreditHistoryState);
+        (other.runtimeType == runtimeType && other is AICreditHistoryState);
   }
 
   @override
@@ -25,18 +25,18 @@ mixin _$ApiCreditHistoryState {
 
   @override
   String toString() {
-    return 'ApiCreditHistoryState()';
+    return 'AICreditHistoryState()';
   }
 }
 
 /// @nodoc
-class $ApiCreditHistoryStateCopyWith<$Res> {
-  $ApiCreditHistoryStateCopyWith(
-      ApiCreditHistoryState _, $Res Function(ApiCreditHistoryState) __);
+class $AICreditHistoryStateCopyWith<$Res> {
+  $AICreditHistoryStateCopyWith(
+      AICreditHistoryState _, $Res Function(AICreditHistoryState) __);
 }
 
-/// Adds pattern-matching-related methods to [ApiCreditHistoryState].
-extension ApiCreditHistoryStatePatterns on ApiCreditHistoryState {
+/// Adds pattern-matching-related methods to [AICreditHistoryState].
+extension AICreditHistoryStatePatterns on AICreditHistoryState {
   /// A variant of `map` that fallback to returning `orElse`.
   ///
   /// It is equivalent to doing:
@@ -157,7 +157,7 @@ extension ApiCreditHistoryStatePatterns on ApiCreditHistoryState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(List<ApiCreditHistoryItem> creditHistory, bool hasMore,
+    TResult Function(List<AICreditHistoryItem> creditHistory, bool hasMore,
             bool isLoadingMore)?
         loaded,
     TResult Function(ZenScrapException error)? withError,
@@ -195,7 +195,7 @@ extension ApiCreditHistoryStatePatterns on ApiCreditHistoryState {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(List<ApiCreditHistoryItem> creditHistory,
+    required TResult Function(List<AICreditHistoryItem> creditHistory,
             bool hasMore, bool isLoadingMore)
         loaded,
     required TResult Function(ZenScrapException error) withError,
@@ -231,7 +231,7 @@ extension ApiCreditHistoryStatePatterns on ApiCreditHistoryState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(List<ApiCreditHistoryItem> creditHistory, bool hasMore,
+    TResult? Function(List<AICreditHistoryItem> creditHistory, bool hasMore,
             bool isLoadingMore)?
         loaded,
     TResult? Function(ZenScrapException error)? withError,
@@ -254,7 +254,7 @@ extension ApiCreditHistoryStatePatterns on ApiCreditHistoryState {
 
 /// @nodoc
 
-class _Initial implements ApiCreditHistoryState {
+class _Initial implements AICreditHistoryState {
   const _Initial();
 
   @override
@@ -268,13 +268,13 @@ class _Initial implements ApiCreditHistoryState {
 
   @override
   String toString() {
-    return 'ApiCreditHistoryState.initial()';
+    return 'AICreditHistoryState.initial()';
   }
 }
 
 /// @nodoc
 
-class _Loading implements ApiCreditHistoryState {
+class _Loading implements AICreditHistoryState {
   const _Loading();
 
   @override
@@ -288,21 +288,21 @@ class _Loading implements ApiCreditHistoryState {
 
   @override
   String toString() {
-    return 'ApiCreditHistoryState.loading()';
+    return 'AICreditHistoryState.loading()';
   }
 }
 
 /// @nodoc
 
-class _Loaded implements ApiCreditHistoryState {
+class _Loaded implements AICreditHistoryState {
   const _Loaded(
-      {required final List<ApiCreditHistoryItem> creditHistory,
+      {required final List<AICreditHistoryItem> creditHistory,
       required this.hasMore,
       this.isLoadingMore = false})
       : _creditHistory = creditHistory;
 
-  final List<ApiCreditHistoryItem> _creditHistory;
-  List<ApiCreditHistoryItem> get creditHistory {
+  final List<AICreditHistoryItem> _creditHistory;
+  List<AICreditHistoryItem> get creditHistory {
     if (_creditHistory is EqualUnmodifiableListView) return _creditHistory;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_creditHistory);
@@ -312,7 +312,7 @@ class _Loaded implements ApiCreditHistoryState {
   @JsonKey()
   final bool isLoadingMore;
 
-  /// Create a copy of ApiCreditHistoryState
+  /// Create a copy of AICreditHistoryState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
@@ -340,18 +340,18 @@ class _Loaded implements ApiCreditHistoryState {
 
   @override
   String toString() {
-    return 'ApiCreditHistoryState.loaded(creditHistory: $creditHistory, hasMore: $hasMore, isLoadingMore: $isLoadingMore)';
+    return 'AICreditHistoryState.loaded(creditHistory: $creditHistory, hasMore: $hasMore, isLoadingMore: $isLoadingMore)';
   }
 }
 
 /// @nodoc
 abstract mixin class _$LoadedCopyWith<$Res>
-    implements $ApiCreditHistoryStateCopyWith<$Res> {
+    implements $AICreditHistoryStateCopyWith<$Res> {
   factory _$LoadedCopyWith(_Loaded value, $Res Function(_Loaded) _then) =
       __$LoadedCopyWithImpl;
   @useResult
   $Res call(
-      {List<ApiCreditHistoryItem> creditHistory,
+      {List<AICreditHistoryItem> creditHistory,
       bool hasMore,
       bool isLoadingMore});
 }
@@ -363,7 +363,7 @@ class __$LoadedCopyWithImpl<$Res> implements _$LoadedCopyWith<$Res> {
   final _Loaded _self;
   final $Res Function(_Loaded) _then;
 
-  /// Create a copy of ApiCreditHistoryState
+  /// Create a copy of AICreditHistoryState
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   $Res call({
@@ -375,7 +375,7 @@ class __$LoadedCopyWithImpl<$Res> implements _$LoadedCopyWith<$Res> {
       creditHistory: null == creditHistory
           ? _self._creditHistory
           : creditHistory // ignore: cast_nullable_to_non_nullable
-              as List<ApiCreditHistoryItem>,
+              as List<AICreditHistoryItem>,
       hasMore: null == hasMore
           ? _self.hasMore
           : hasMore // ignore: cast_nullable_to_non_nullable
@@ -390,12 +390,12 @@ class __$LoadedCopyWithImpl<$Res> implements _$LoadedCopyWith<$Res> {
 
 /// @nodoc
 
-class _WithError implements ApiCreditHistoryState {
+class _WithError implements AICreditHistoryState {
   const _WithError(this.error);
 
   final ZenScrapException error;
 
-  /// Create a copy of ApiCreditHistoryState
+  /// Create a copy of AICreditHistoryState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
@@ -415,13 +415,13 @@ class _WithError implements ApiCreditHistoryState {
 
   @override
   String toString() {
-    return 'ApiCreditHistoryState.withError(error: $error)';
+    return 'AICreditHistoryState.withError(error: $error)';
   }
 }
 
 /// @nodoc
 abstract mixin class _$WithErrorCopyWith<$Res>
-    implements $ApiCreditHistoryStateCopyWith<$Res> {
+    implements $AICreditHistoryStateCopyWith<$Res> {
   factory _$WithErrorCopyWith(
           _WithError value, $Res Function(_WithError) _then) =
       __$WithErrorCopyWithImpl;
@@ -436,7 +436,7 @@ class __$WithErrorCopyWithImpl<$Res> implements _$WithErrorCopyWith<$Res> {
   final _WithError _self;
   final $Res Function(_WithError) _then;
 
-  /// Create a copy of ApiCreditHistoryState
+  /// Create a copy of AICreditHistoryState
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   $Res call({

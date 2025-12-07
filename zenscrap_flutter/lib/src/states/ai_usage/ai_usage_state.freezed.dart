@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'api_credit_history_state.dart';
+part of 'ai_usage_state.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -13,11 +13,11 @@ part of 'api_credit_history_state.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
-mixin _$ApiCreditHistoryState {
+mixin _$AIUsageState {
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is ApiCreditHistoryState);
+        (other.runtimeType == runtimeType && other is AIUsageState);
   }
 
   @override
@@ -25,18 +25,17 @@ mixin _$ApiCreditHistoryState {
 
   @override
   String toString() {
-    return 'ApiCreditHistoryState()';
+    return 'AIUsageState()';
   }
 }
 
 /// @nodoc
-class $ApiCreditHistoryStateCopyWith<$Res> {
-  $ApiCreditHistoryStateCopyWith(
-      ApiCreditHistoryState _, $Res Function(ApiCreditHistoryState) __);
+class $AIUsageStateCopyWith<$Res> {
+  $AIUsageStateCopyWith(AIUsageState _, $Res Function(AIUsageState) __);
 }
 
-/// Adds pattern-matching-related methods to [ApiCreditHistoryState].
-extension ApiCreditHistoryStatePatterns on ApiCreditHistoryState {
+/// Adds pattern-matching-related methods to [AIUsageState].
+extension AIUsageStatePatterns on AIUsageState {
   /// A variant of `map` that fallback to returning `orElse`.
   ///
   /// It is equivalent to doing:
@@ -157,9 +156,7 @@ extension ApiCreditHistoryStatePatterns on ApiCreditHistoryState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(List<ApiCreditHistoryItem> creditHistory, bool hasMore,
-            bool isLoadingMore)?
-        loaded,
+    TResult Function(AccountAIUsage aiUsage)? loaded,
     TResult Function(ZenScrapException error)? withError,
     required TResult orElse(),
   }) {
@@ -170,7 +167,7 @@ extension ApiCreditHistoryStatePatterns on ApiCreditHistoryState {
       case _Loading() when loading != null:
         return loading();
       case _Loaded() when loaded != null:
-        return loaded(_that.creditHistory, _that.hasMore, _that.isLoadingMore);
+        return loaded(_that.aiUsage);
       case _WithError() when withError != null:
         return withError(_that.error);
       case _:
@@ -195,9 +192,7 @@ extension ApiCreditHistoryStatePatterns on ApiCreditHistoryState {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(List<ApiCreditHistoryItem> creditHistory,
-            bool hasMore, bool isLoadingMore)
-        loaded,
+    required TResult Function(AccountAIUsage aiUsage) loaded,
     required TResult Function(ZenScrapException error) withError,
   }) {
     final _that = this;
@@ -207,7 +202,7 @@ extension ApiCreditHistoryStatePatterns on ApiCreditHistoryState {
       case _Loading():
         return loading();
       case _Loaded():
-        return loaded(_that.creditHistory, _that.hasMore, _that.isLoadingMore);
+        return loaded(_that.aiUsage);
       case _WithError():
         return withError(_that.error);
       case _:
@@ -231,9 +226,7 @@ extension ApiCreditHistoryStatePatterns on ApiCreditHistoryState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(List<ApiCreditHistoryItem> creditHistory, bool hasMore,
-            bool isLoadingMore)?
-        loaded,
+    TResult? Function(AccountAIUsage aiUsage)? loaded,
     TResult? Function(ZenScrapException error)? withError,
   }) {
     final _that = this;
@@ -243,7 +236,7 @@ extension ApiCreditHistoryStatePatterns on ApiCreditHistoryState {
       case _Loading() when loading != null:
         return loading();
       case _Loaded() when loaded != null:
-        return loaded(_that.creditHistory, _that.hasMore, _that.isLoadingMore);
+        return loaded(_that.aiUsage);
       case _WithError() when withError != null:
         return withError(_that.error);
       case _:
@@ -254,7 +247,7 @@ extension ApiCreditHistoryStatePatterns on ApiCreditHistoryState {
 
 /// @nodoc
 
-class _Initial implements ApiCreditHistoryState {
+class _Initial implements AIUsageState {
   const _Initial();
 
   @override
@@ -268,13 +261,13 @@ class _Initial implements ApiCreditHistoryState {
 
   @override
   String toString() {
-    return 'ApiCreditHistoryState.initial()';
+    return 'AIUsageState.initial()';
   }
 }
 
 /// @nodoc
 
-class _Loading implements ApiCreditHistoryState {
+class _Loading implements AIUsageState {
   const _Loading();
 
   @override
@@ -288,31 +281,18 @@ class _Loading implements ApiCreditHistoryState {
 
   @override
   String toString() {
-    return 'ApiCreditHistoryState.loading()';
+    return 'AIUsageState.loading()';
   }
 }
 
 /// @nodoc
 
-class _Loaded implements ApiCreditHistoryState {
-  const _Loaded(
-      {required final List<ApiCreditHistoryItem> creditHistory,
-      required this.hasMore,
-      this.isLoadingMore = false})
-      : _creditHistory = creditHistory;
+class _Loaded implements AIUsageState {
+  const _Loaded({required this.aiUsage});
 
-  final List<ApiCreditHistoryItem> _creditHistory;
-  List<ApiCreditHistoryItem> get creditHistory {
-    if (_creditHistory is EqualUnmodifiableListView) return _creditHistory;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_creditHistory);
-  }
+  final AccountAIUsage aiUsage;
 
-  final bool hasMore;
-  @JsonKey()
-  final bool isLoadingMore;
-
-  /// Create a copy of ApiCreditHistoryState
+  /// Create a copy of AIUsageState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
@@ -324,36 +304,25 @@ class _Loaded implements ApiCreditHistoryState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _Loaded &&
-            const DeepCollectionEquality()
-                .equals(other._creditHistory, _creditHistory) &&
-            (identical(other.hasMore, hasMore) || other.hasMore == hasMore) &&
-            (identical(other.isLoadingMore, isLoadingMore) ||
-                other.isLoadingMore == isLoadingMore));
+            (identical(other.aiUsage, aiUsage) || other.aiUsage == aiUsage));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      const DeepCollectionEquality().hash(_creditHistory),
-      hasMore,
-      isLoadingMore);
+  int get hashCode => Object.hash(runtimeType, aiUsage);
 
   @override
   String toString() {
-    return 'ApiCreditHistoryState.loaded(creditHistory: $creditHistory, hasMore: $hasMore, isLoadingMore: $isLoadingMore)';
+    return 'AIUsageState.loaded(aiUsage: $aiUsage)';
   }
 }
 
 /// @nodoc
 abstract mixin class _$LoadedCopyWith<$Res>
-    implements $ApiCreditHistoryStateCopyWith<$Res> {
+    implements $AIUsageStateCopyWith<$Res> {
   factory _$LoadedCopyWith(_Loaded value, $Res Function(_Loaded) _then) =
       __$LoadedCopyWithImpl;
   @useResult
-  $Res call(
-      {List<ApiCreditHistoryItem> creditHistory,
-      bool hasMore,
-      bool isLoadingMore});
+  $Res call({AccountAIUsage aiUsage});
 }
 
 /// @nodoc
@@ -363,39 +332,29 @@ class __$LoadedCopyWithImpl<$Res> implements _$LoadedCopyWith<$Res> {
   final _Loaded _self;
   final $Res Function(_Loaded) _then;
 
-  /// Create a copy of ApiCreditHistoryState
+  /// Create a copy of AIUsageState
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? creditHistory = null,
-    Object? hasMore = null,
-    Object? isLoadingMore = null,
+    Object? aiUsage = null,
   }) {
     return _then(_Loaded(
-      creditHistory: null == creditHistory
-          ? _self._creditHistory
-          : creditHistory // ignore: cast_nullable_to_non_nullable
-              as List<ApiCreditHistoryItem>,
-      hasMore: null == hasMore
-          ? _self.hasMore
-          : hasMore // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isLoadingMore: null == isLoadingMore
-          ? _self.isLoadingMore
-          : isLoadingMore // ignore: cast_nullable_to_non_nullable
-              as bool,
+      aiUsage: null == aiUsage
+          ? _self.aiUsage
+          : aiUsage // ignore: cast_nullable_to_non_nullable
+              as AccountAIUsage,
     ));
   }
 }
 
 /// @nodoc
 
-class _WithError implements ApiCreditHistoryState {
+class _WithError implements AIUsageState {
   const _WithError(this.error);
 
   final ZenScrapException error;
 
-  /// Create a copy of ApiCreditHistoryState
+  /// Create a copy of AIUsageState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
@@ -415,13 +374,13 @@ class _WithError implements ApiCreditHistoryState {
 
   @override
   String toString() {
-    return 'ApiCreditHistoryState.withError(error: $error)';
+    return 'AIUsageState.withError(error: $error)';
   }
 }
 
 /// @nodoc
 abstract mixin class _$WithErrorCopyWith<$Res>
-    implements $ApiCreditHistoryStateCopyWith<$Res> {
+    implements $AIUsageStateCopyWith<$Res> {
   factory _$WithErrorCopyWith(
           _WithError value, $Res Function(_WithError) _then) =
       __$WithErrorCopyWithImpl;
@@ -436,7 +395,7 @@ class __$WithErrorCopyWithImpl<$Res> implements _$WithErrorCopyWith<$Res> {
   final _WithError _self;
   final $Res Function(_WithError) _then;
 
-  /// Create a copy of ApiCreditHistoryState
+  /// Create a copy of AIUsageState
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   $Res call({

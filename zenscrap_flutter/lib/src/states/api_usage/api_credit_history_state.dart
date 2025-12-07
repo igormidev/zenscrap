@@ -4,7 +4,7 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 part 'api_credit_history_state.freezed.dart';
 
 @freezed
-class ApiCreditHistoryState with _$CreditHistoryState {
+class ApiCreditHistoryState with _$ApiCreditHistoryState {
   const factory ApiCreditHistoryState.initial() = _Initial;
   const factory ApiCreditHistoryState.loading() = _Loading;
   const factory ApiCreditHistoryState.loaded({
