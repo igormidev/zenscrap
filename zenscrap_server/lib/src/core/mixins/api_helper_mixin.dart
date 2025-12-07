@@ -561,6 +561,7 @@ mixin ApiHelperMixin {
 
           return extractResponse.when(
               withData: (scrapedData, html, pageFullscreenScreenshot) async {
+            final responseJson = jsonEncode(scrapedData);
             // Track success analytics
             if (_pendingAnalytics[scrappableId]?[nanoId]?.containsKey(apiKey) ==
                 true) {
@@ -569,6 +570,7 @@ mixin ApiHelperMixin {
                   time: DateTime.now(),
                   status: RequestStatus.success,
                   stringifiedPayload: stringifiedPayload,
+                  stringifiedResponse: responseJson,
                 ),
               );
             }
@@ -665,6 +667,7 @@ mixin ApiHelperMixin {
           );
 
           return extractResponse.when(withData: (scrapedData) {
+            final responseJson = jsonEncode(scrapedData);
             // Track success analytics
             if (_pendingAnalytics[scrappableId]?[nanoId]?.containsKey(apiKey) ==
                 true) {
@@ -673,6 +676,7 @@ mixin ApiHelperMixin {
                   time: DateTime.now(),
                   status: RequestStatus.success,
                   stringifiedPayload: stringifiedPayload,
+                  stringifiedResponse: responseJson,
                 ),
               );
             }
@@ -843,6 +847,9 @@ class AnalyticsPayload {
   final String? errorStackTraceAsString;
   final String stringifiedPayload;
 
+  /// The JSON-encoded response data (only present on successful requests)
+  final String? stringifiedResponse;
+
   const AnalyticsPayload({
     required this.time,
     required this.status,
@@ -851,6 +858,7 @@ class AnalyticsPayload {
     this.description,
     this.errorObjectAsString,
     this.errorStackTraceAsString,
+    this.stringifiedResponse,
   });
 }
 
@@ -965,6 +973,7 @@ Future<void> _setScrappableAnalytics(
             errorObjectAsString: e.errorObjectAsString,
             errorStackTraceAsString: e.errorStackTraceAsString,
             stringifiedPayload: e.stringifiedPayload,
+            stringifiedResponse: e.stringifiedResponse,
           );
         }).toList(),
         transaction: transaction,

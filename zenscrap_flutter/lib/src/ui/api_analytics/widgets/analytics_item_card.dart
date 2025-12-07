@@ -255,10 +255,24 @@ class _DetailsSection extends StatelessWidget {
           ],
 
           // Payload (always present)
-          _PayloadField(
-            payload: details.stringifiedPayload,
+          _JsonField(
+            label: 'Request Payload',
+            icon: Icons.upload_outlined,
+            json: details.stringifiedPayload,
             statusColor: statusColor,
           ),
+
+          // Response (only for successful requests)
+          if (details.stringifiedResponse != null) ...[
+            const SizedBox(height: 16),
+            _JsonField(
+              label: 'Response Data',
+              icon: Icons.download_outlined,
+              json: details.stringifiedResponse!,
+              statusColor: statusColor,
+              isSuccess: true,
+            ),
+          ],
 
           const SizedBox(height: 22),
         ],
@@ -347,29 +361,44 @@ class _DetailField extends StatelessWidget {
   }
 }
 
-class _PayloadField extends StatelessWidget {
-  final String payload;
+class _JsonField extends StatefulWidget {
+  final String label;
+  final IconData icon;
+  final String json;
   final Color statusColor;
+  final bool isSuccess;
 
-  const _PayloadField({
-    required this.payload,
+  const _JsonField({
+    required this.label,
+    required this.icon,
+    required this.json,
     required this.statusColor,
+    this.isSuccess = false,
   });
 
-  String _formatPayload() {
-    final decoded = tryDecode(payload);
+  @override
+  State<_JsonField> createState() => _JsonFieldState();
+}
+
+class _JsonFieldState extends State<_JsonField> {
+  bool _isExpanded = false;
+
+  String _formatJson() {
+    final decoded = tryDecode(widget.json);
     if (decoded != null) {
-      // Successfully decoded as JSON, format with indentation
       const encoder = JsonEncoder.withIndent('  ');
       return encoder.convert(decoded);
     }
-    // Not valid JSON, return as is
-    return payload;
+    return widget.json;
   }
 
   @override
   Widget build(BuildContext context) {
-    final formattedPayload = _formatPayload();
+    final formattedJson = _formatJson();
+    final lineCount = formattedJson.split('\n').length;
+    final shouldCollapse = lineCount > 10;
+    final displayColor =
+        widget.isSuccess ? Colors.green : widget.statusColor;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -377,53 +406,131 @@ class _PayloadField extends StatelessWidget {
         Row(
           children: [
             Icon(
-              Icons.code,
+              widget.icon,
               size: 16,
-              color: statusColor,
+              color: displayColor,
             ),
             const SizedBox(width: 8),
             Text(
-              'Request Payload',
+              widget.label,
               style: context.t.labelLarge?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: statusColor,
+                color: displayColor,
               ),
             ),
+            if (widget.isSuccess) ...[
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.green.withAlpha(30),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  'SUCCESS',
+                  style: context.t.labelSmall?.copyWith(
+                    color: Colors.green,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 10,
+                  ),
+                ),
+              ),
+            ],
             const Spacer(),
+            if (shouldCollapse)
+              IconButton(
+                icon: Icon(
+                  _isExpanded ? Icons.unfold_less : Icons.unfold_more,
+                  size: 18,
+                ),
+                onPressed: () => setState(() => _isExpanded = !_isExpanded),
+                tooltip: _isExpanded ? 'Collapse' : 'Expand',
+              ),
             IconButton(
               icon: const Icon(Icons.copy, size: 18),
               onPressed: () {
-                Clipboard.setData(ClipboardData(text: formattedPayload));
+                Clipboard.setData(ClipboardData(text: formattedJson));
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: const Text('Payload copied to clipboard'),
+                    content: Text('${widget.label} copied to clipboard'),
                     duration: const Duration(seconds: 2),
                     behavior: SnackBarBehavior.floating,
-                    backgroundColor: statusColor,
+                    backgroundColor: displayColor,
                   ),
                 );
               },
-              tooltip: 'Copy payload',
+              tooltip: 'Copy ${widget.label.toLowerCase()}',
             ),
           ],
         ),
         const SizedBox(height: 8),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(12),
+          constraints: BoxConstraints(
+            maxHeight:
+                shouldCollapse && !_isExpanded ? 200 : double.infinity,
+          ),
           decoration: BoxDecoration(
-            color: context.c.surfaceContainerHighest.withAlpha(77),
+            color: widget.isSuccess
+                ? Colors.green.withAlpha(15)
+                : context.c.surfaceContainerHighest.withAlpha(77),
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: context.c.outline.withAlpha(51),
+              color: widget.isSuccess
+                  ? Colors.green.withAlpha(51)
+                  : context.c.outline.withAlpha(51),
             ),
           ),
-          child: SelectableText(
-            formattedPayload,
-            style: context.t.bodySmall?.copyWith(
-              fontFamily: 'monospace',
-              color: context.c.onSurface,
-            ),
+          child: Stack(
+            children: [
+              SingleChildScrollView(
+                padding: const EdgeInsets.all(12),
+                child: SelectableText(
+                  formattedJson,
+                  style: context.t.bodySmall?.copyWith(
+                    fontFamily: 'monospace',
+                    color: context.c.onSurface,
+                  ),
+                ),
+              ),
+              if (shouldCollapse && !_isExpanded)
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    height: 40,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          (widget.isSuccess
+                                  ? Colors.green.withAlpha(15)
+                                  : context.c.surfaceContainerHighest
+                                      .withAlpha(77))
+                              .withAlpha(0),
+                          widget.isSuccess
+                              ? Colors.green.withAlpha(15)
+                              : context.c.surfaceContainerHighest.withAlpha(77),
+                        ],
+                      ),
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(8),
+                        bottomRight: Radius.circular(8),
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Click expand to see ${lineCount - 10}+ more lines',
+                        style: context.t.labelSmall?.copyWith(
+                          color: context.c.onSurface.withAlpha(150),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
       ],
