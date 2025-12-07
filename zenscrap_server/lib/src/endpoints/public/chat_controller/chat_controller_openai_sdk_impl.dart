@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:serverpod/serverpod.dart';
+import 'package:zenscrap_server/src/core/consts.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_handler_mixin.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/i_chat_controller.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/openai_prompt_builder.dart';
@@ -12,6 +13,37 @@ import 'package:zenscrap_server/src/generated/protocol.dart';
 const _openAiResponsesUrl = 'https://api.openai.com/v1/responses';
 const _openAiFilesUrl = 'https://api.openai.com/v1/files';
 const _openAiVectorStoresUrl = 'https://api.openai.com/v1/vector_stores';
+
+/// Exception thrown when the OpenAI API returns an `insufficient_quota` error.
+/// This means the API key being used has run out of credits on OpenAI's side.
+///
+/// OpenAI error response:
+/// ```json
+/// {
+///   "error": {
+///     "message": "You exceeded your current quota, please check your plan and billing details.",
+///     "type": "insufficient_quota",
+///     "param": null,
+///     "code": "insufficient_quota"
+///   }
+/// }
+/// ```
+class OpenAiQuotaExceededException implements Exception {
+  /// The original error message from OpenAI
+  final String openAiErrorMessage;
+
+  /// The HTTP status code (typically 429)
+  final int statusCode;
+
+  const OpenAiQuotaExceededException({
+    required this.openAiErrorMessage,
+    required this.statusCode,
+  });
+
+  @override
+  String toString() =>
+      'OpenAiQuotaExceededException: $openAiErrorMessage (HTTP $statusCode)';
+}
 
 // Playwright MCP server deployed on Railway with ScrapingBee proxy
 const _playwrightMcpUrl =
@@ -328,7 +360,7 @@ class ChatControllerOpenAiSdkImpl extends IChatController
   }
 
   @override
-  Future<void> sendMessage({
+  Future<SendMessageResult> sendMessage({
     required Session session,
     required String userPrompt,
     required ReferenceTestData referenceTestData,
@@ -339,6 +371,12 @@ class ChatControllerOpenAiSdkImpl extends IChatController
   }) async {
     var attemptPrompt = userPrompt;
 
+    // Track total cost across all retry attempts
+    var totalInputTokens = 0;
+    var totalOutputTokens = 0;
+    var totalReasoningTokens = 0;
+    var totalCostUsd = 0.0;
+
     for (var attempt = 1; attempt <= 3; attempt++) {
       try {
         final result = await _streamOpenAiResponse(
@@ -346,6 +384,12 @@ class ChatControllerOpenAiSdkImpl extends IChatController
           userPrompt: attemptPrompt,
           thinkingStream: thinkingStream,
         );
+
+        // Accumulate token usage from this attempt
+        totalInputTokens += result.usage.inputTokens;
+        totalOutputTokens += result.usage.outputTokens;
+        totalReasoningTokens += result.usage.reasoningTokens;
+        totalCostUsd += _calculateCostUsd(result.usage);
 
         _history.add(OpenAiMessage(role: 'user', content: attemptPrompt));
         final rawJson = result.rawJson ?? _serializeStructured(result.response);
@@ -365,7 +409,17 @@ class ChatControllerOpenAiSdkImpl extends IChatController
         );
 
         if (retryContent == null) {
-          return;
+          // Success - return accumulated cost
+          session.log(
+            'Message completed. Total cost: \$$totalCostUsd (input: $totalInputTokens, output: $totalOutputTokens, reasoning: $totalReasoningTokens)',
+            level: LogLevel.info,
+          );
+          return SendMessageResult(
+            costInUsd: totalCostUsd,
+            inputTokens: totalInputTokens,
+            outputTokens: totalOutputTokens,
+            reasoningTokens: totalReasoningTokens,
+          );
         }
 
         attemptPrompt = retryContent;
@@ -391,10 +445,53 @@ class ChatControllerOpenAiSdkImpl extends IChatController
         thinkingStream.add('\n\n[Error] $error\n');
 
         // Don't rethrow - the error has been communicated to the user
-        // The caller will handle cleanup
-        return;
+        // Return accumulated cost even on error
+        return SendMessageResult(
+          costInUsd: totalCostUsd,
+          inputTokens: totalInputTokens,
+          outputTokens: totalOutputTokens,
+          reasoningTokens: totalReasoningTokens,
+        );
       }
     }
+
+    // Exhausted all retries, return accumulated cost
+    return SendMessageResult(
+      costInUsd: totalCostUsd,
+      inputTokens: totalInputTokens,
+      outputTokens: totalOutputTokens,
+      reasoningTokens: totalReasoningTokens,
+    );
+  }
+
+  /// Calculates the cost in USD for a given token usage based on the current model
+  double _calculateCostUsd(_TokenUsage usage) {
+    final double inputPricePerMillion;
+    final double outputPricePerMillion;
+
+    // Get pricing based on model
+    switch (_model) {
+      case 'gpt-5-mini':
+        inputPricePerMillion = kGpt5MiniInputPricePerMillionTokens;
+        outputPricePerMillion = kGpt5MiniOutputPricePerMillionTokens;
+        break;
+      case 'gpt-5.1':
+        inputPricePerMillion = kGpt51InputPricePerMillionTokens;
+        outputPricePerMillion = kGpt51OutputPricePerMillionTokens;
+        break;
+      case 'gpt-5':
+      default:
+        // Default to GPT-5 pricing (same as GPT-5.1)
+        inputPricePerMillion = kGpt5InputPricePerMillionTokens;
+        outputPricePerMillion = kGpt5OutputPricePerMillionTokens;
+        break;
+    }
+
+    // Calculate cost: (tokens / 1,000,000) * price_per_million
+    final inputCost = (usage.inputTokens / 1000000.0) * inputPricePerMillion;
+    final outputCost = (usage.outputTokens / 1000000.0) * outputPricePerMillion;
+
+    return inputCost + outputCost;
   }
 
   Future<_OpenAiStreamResult> _streamOpenAiResponse({
@@ -485,6 +582,35 @@ class ChatControllerOpenAiSdkImpl extends IChatController
     final streamedResponse = await client.send(request);
     if (streamedResponse.statusCode != 200) {
       final body = await streamedResponse.stream.bytesToString();
+
+      // Check for insufficient_quota error (HTTP 429 with specific error code)
+      if (streamedResponse.statusCode == 429) {
+        try {
+          final errorJson = jsonDecode(body) as Map<String, dynamic>;
+          final error = errorJson['error'] as Map<String, dynamic>?;
+          final errorCode = error?['code'] as String?;
+          final errorMessage =
+              error?['message'] as String? ?? 'Unknown quota error';
+
+          if (errorCode == 'insufficient_quota') {
+            throw OpenAiQuotaExceededException(
+              openAiErrorMessage: errorMessage,
+              statusCode: streamedResponse.statusCode,
+            );
+          }
+        } catch (e) {
+          if (e is OpenAiQuotaExceededException) rethrow;
+          // If parsing fails, check for quota-related keywords in the body
+          if (body.contains('insufficient_quota') ||
+              body.contains('exceeded your current quota')) {
+            throw OpenAiQuotaExceededException(
+              openAiErrorMessage: body,
+              statusCode: streamedResponse.statusCode,
+            );
+          }
+        }
+      }
+
       throw Exception(
         'OpenAI error ${streamedResponse.statusCode}: $body',
       );
@@ -497,6 +623,7 @@ class ChatControllerOpenAiSdkImpl extends IChatController
     final jsonBuffer = StringBuffer();
     final thinkingBuffer = StringBuffer();
     Map<String, dynamic>? parsedFromCompletion;
+    _TokenUsage tokenUsage = _TokenUsage.zero;
     final List<String> receivedEventTypes = [];
 
     await for (final line in lines) {
@@ -534,11 +661,38 @@ class ChatControllerOpenAiSdkImpl extends IChatController
         final response = event['response'];
         if (response is Map<String, dynamic>) {
           parsedFromCompletion = _extractParsedResponse(response, session);
+          // Extract usage information from the completed response
+          final usage = response['usage'] as Map<String, dynamic>?;
+          tokenUsage = _TokenUsage.fromJson(usage);
+          session.log(
+            'Token usage - input: ${tokenUsage.inputTokens}, output: ${tokenUsage.outputTokens}, reasoning: ${tokenUsage.reasoningTokens}',
+            level: LogLevel.info,
+          );
         }
       } else if (type == 'error' || type == 'response.failed') {
         final errorData = event['error'] ?? event['message'] ?? event;
         session.log('OpenAI API error event: $errorData',
             level: LogLevel.error);
+
+        // Check for insufficient_quota error in streaming events
+        if (errorData is Map<String, dynamic>) {
+          final errorCode = errorData['code'] as String?;
+          final errorMessage =
+              errorData['message'] as String? ?? 'Unknown quota error';
+          if (errorCode == 'insufficient_quota') {
+            throw OpenAiQuotaExceededException(
+              openAiErrorMessage: errorMessage,
+              statusCode: 429,
+            );
+          }
+        } else if (errorData.toString().contains('insufficient_quota') ||
+            errorData.toString().contains('exceeded your current quota')) {
+          throw OpenAiQuotaExceededException(
+            openAiErrorMessage: errorData.toString(),
+            statusCode: 429,
+          );
+        }
+
         throw Exception(
           'OpenAI streaming error: $errorData',
         );
@@ -614,6 +768,7 @@ Thinking Buffer (${thinkingContent.length} chars): ${thinkingContent.isEmpty ? "
       response: structured,
       rawJson: parsedJson,
       thinkingSentences: thinkingSentences,
+      usage: tokenUsage,
     );
   }
 
@@ -963,9 +1118,55 @@ class _OpenAiStreamResult {
   final Map<String, dynamic>? rawJson;
   final List<String> thinkingSentences;
 
+  /// Token usage from the API response
+  final _TokenUsage usage;
+
   _OpenAiStreamResult({
     required this.response,
     required this.rawJson,
     required this.thinkingSentences,
+    required this.usage,
   });
+}
+
+/// Token usage information from OpenAI API response
+class _TokenUsage {
+  final int inputTokens;
+  final int outputTokens;
+  final int reasoningTokens;
+  final int totalTokens;
+
+  const _TokenUsage({
+    required this.inputTokens,
+    required this.outputTokens,
+    this.reasoningTokens = 0,
+    required this.totalTokens,
+  });
+
+  /// Zero usage (used when usage info is not available)
+  static const zero = _TokenUsage(
+    inputTokens: 0,
+    outputTokens: 0,
+    totalTokens: 0,
+  );
+
+  /// Parses the usage object from OpenAI API response
+  factory _TokenUsage.fromJson(Map<String, dynamic>? json) {
+    if (json == null) return zero;
+
+    final inputTokens = json['input_tokens'] as int? ?? 0;
+    final outputTokens = json['output_tokens'] as int? ?? 0;
+    final totalTokens = json['total_tokens'] as int? ?? (inputTokens + outputTokens);
+
+    // Extract reasoning tokens from output_tokens_details
+    final outputDetails = json['output_tokens_details'] as Map<String, dynamic>?;
+    final reasoningTokens = outputDetails?['reasoning_tokens'] as int? ?? 0;
+
+    return _TokenUsage(
+      inputTokens: inputTokens,
+      outputTokens: outputTokens,
+      reasoningTokens: reasoningTokens,
+      totalTokens: totalTokens,
+    );
+  }
 }

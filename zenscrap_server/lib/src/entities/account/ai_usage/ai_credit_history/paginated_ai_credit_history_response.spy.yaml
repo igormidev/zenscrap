@@ -1,0 +1,4 @@
+class: PaginatedAICreditHistoryResponse
+fields:
+  data: List<AICreditHistoryItem>
+  pagination: PaginationMetadata

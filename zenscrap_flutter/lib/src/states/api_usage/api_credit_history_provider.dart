@@ -3,40 +3,41 @@ import 'package:talker_flutter/talker_flutter.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
-import 'package:zenscrap_flutter/src/states/api_usage/credit_history_state.dart';
+import 'package:zenscrap_flutter/src/states/api_usage/api_credit_history_state.dart';
 
-final creditHistoryProvider =
-    StateNotifierProvider<CreditHistoryNotifier, CreditHistoryState>((ref) {
+final apiCreditHistoryProvider =
+    StateNotifierProvider<ApiCreditHistoryNotifier, ApiCreditHistoryState>(
+        (ref) {
   final client = ref.watch(clientProvider);
-  return CreditHistoryNotifier(client);
+  return ApiCreditHistoryNotifier(client);
 });
 
-class CreditHistoryNotifier extends StateNotifier<CreditHistoryState> {
+class ApiCreditHistoryNotifier extends StateNotifier<ApiCreditHistoryState> {
   final Client _client;
   int _currentPage = 1;
-  List<CreditHistoryItem> _allHistory = [];
+  List<ApiCreditHistoryItem> _allHistory = [];
 
-  CreditHistoryNotifier(this._client)
-      : super(const CreditHistoryState.initial());
+  ApiCreditHistoryNotifier(this._client)
+      : super(const ApiCreditHistoryState.initial());
 
   Future<void> loadCreditHistory() async {
     try {
-      state = const CreditHistoryState.loading();
+      state = const ApiCreditHistoryState.loading();
       _currentPage = 1;
       _allHistory = [];
 
-      final response = await _client.privateApiUsage.getCreditHistory(
+      final response = await _client.privateApiUsage.getApiCreditHistory(
         page: 1,
       );
 
       _allHistory = response.data;
 
-      state = CreditHistoryState.loaded(
+      state = ApiCreditHistoryState.loaded(
         creditHistory: response.data,
         hasMore: response.pagination.hasNextPage,
       );
     } on ZenScrapException catch (e) {
-      state = CreditHistoryState.withError(e);
+      state = ApiCreditHistoryState.withError(e);
     } catch (error, stackTrace) {
       talker.log(
         'Error loading credit history',
@@ -44,7 +45,7 @@ class CreditHistoryNotifier extends StateNotifier<CreditHistoryState> {
         stackTrace: stackTrace,
         logLevel: LogLevel.error,
       );
-      state = CreditHistoryState.withError(
+      state = ApiCreditHistoryState.withError(
         ZenScrapException(
           title: 'Error loading credit history',
           description: 'An unexpected error occurred:\n$error',
@@ -57,7 +58,7 @@ class CreditHistoryNotifier extends StateNotifier<CreditHistoryState> {
     // Use pattern matching to check if state is loaded
     final canLoadMore = state.maybeWhen(
       loaded: (creditHistory, hasMore, isLoadingMore) =>
-        !isLoadingMore && hasMore,
+          !isLoadingMore && hasMore,
       orElse: () => false,
     );
 
@@ -67,7 +68,7 @@ class CreditHistoryNotifier extends StateNotifier<CreditHistoryState> {
       // Update state to show loading more
       state.maybeWhen(
         loaded: (creditHistory, hasMore, _) {
-          state = CreditHistoryState.loaded(
+          state = ApiCreditHistoryState.loaded(
             creditHistory: creditHistory,
             hasMore: hasMore,
             isLoadingMore: true,
@@ -77,13 +78,13 @@ class CreditHistoryNotifier extends StateNotifier<CreditHistoryState> {
       );
 
       _currentPage++;
-      final response = await _client.privateApiUsage.getCreditHistory(
+      final response = await _client.privateApiUsage.getApiCreditHistory(
         page: _currentPage,
       );
 
       _allHistory.addAll(response.data);
 
-      state = CreditHistoryState.loaded(
+      state = ApiCreditHistoryState.loaded(
         creditHistory: _allHistory,
         hasMore: response.pagination.hasNextPage,
         isLoadingMore: false,
@@ -93,7 +94,7 @@ class CreditHistoryNotifier extends StateNotifier<CreditHistoryState> {
       _currentPage--;
       state.maybeWhen(
         loaded: (creditHistory, hasMore, _) {
-          state = CreditHistoryState.loaded(
+          state = ApiCreditHistoryState.loaded(
             creditHistory: creditHistory,
             hasMore: hasMore,
             isLoadingMore: false,
@@ -111,7 +112,7 @@ class CreditHistoryNotifier extends StateNotifier<CreditHistoryState> {
       _currentPage--;
       state.maybeWhen(
         loaded: (creditHistory, hasMore, _) {
-          state = CreditHistoryState.loaded(
+          state = ApiCreditHistoryState.loaded(
             creditHistory: creditHistory,
             hasMore: hasMore,
             isLoadingMore: false,

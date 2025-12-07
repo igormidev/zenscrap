@@ -1,7 +1,10 @@
 privateAccount:
   - getAccountInfo:
+privateAiUsage:
+  - getAiCreditHistory:
+  - getAiUsageInfo:
 privateApiUsage:
-  - getCreditHistory:
+  - getApiCreditHistory:
   - createApiKey:
   - deactivateApiKey:
   - getActiveApiKeys:
@@ -38,6 +41,7 @@ publicTier:
 scrappableChatSession:
   - commitCurrentEditState:
   - disposeSession:
+  - updateUserApiKey:
   - updateScrappableRequest:
   - createSession:
   - listenToScrappableRedraftSession:

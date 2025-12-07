@@ -1,4 +1,5 @@
 import 'package:serverpod/serverpod.dart';
+import 'package:zenscrap_server/src/core/consts.dart';
 import 'package:zenscrap_server/src/core/mixins/api_helper_mixin.dart';
 import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
@@ -74,31 +75,87 @@ class MonthlySubscriptionCreditsFutureCall extends FutureCall {
             transaction: transaction,
           );
 
-          // Create monthly subscription credit deposit record
-          final monthlyDeposit = MonthlySubscriptionCreditDeposit(
+          // Create monthly subscription API credit deposit record
+          final monthlyApiDeposit = MonthlySubscriptionApiCreditDeposit(
             creditsAmount: creditsToAdd,
             planTier: accountInfo.planTier,
           );
-          await MonthlySubscriptionCreditDeposit.db.insertRow(
+          await MonthlySubscriptionApiCreditDeposit.db.insertRow(
             session,
-            monthlyDeposit,
+            monthlyApiDeposit,
             transaction: transaction,
           );
 
-          // Create credit history item
-          final creditHistoryItem = CreditHistoryItem(
+          // Create API credit history item
+          final apiCreditHistoryItem = ApiCreditHistoryItem(
             date: DateTime.now(),
-            monthlySubscriptionCreditDepositId: monthlyDeposit.id,
-            monthlySubscriptionCreditDeposit: monthlyDeposit,
-            creaditPackagePurchaseId: null,
-            creaditPackagePurchase: null,
+            monthlySubscriptionApiCreditDepositId: monthlyApiDeposit.id,
+            monthlySubscriptionApiCreditDeposit: monthlyApiDeposit,
+            apiCreditPackagePurchaseId: null,
+            apiCreditPackagePurchase: null,
             accountApiUsageId: currentApiUsage.id!,
           );
-          await CreditHistoryItem.db.insertRow(
+          await ApiCreditHistoryItem.db.insertRow(
             session,
-            creditHistoryItem,
+            apiCreditHistoryItem,
             transaction: transaction,
           );
+
+          // Reset AI credits to default monthly amount
+          // If the user has a negative balance (they overspent), subtract that from the new credits
+          final aiUsage = await AccountAIUsage.db.findById(
+            session,
+            accountInfo.accountAIUsageId,
+            transaction: transaction,
+          );
+          if (aiUsage != null) {
+            final currentBalance = aiUsage.totalDollarsSpentFromTotalInUSD;
+            double newCredits = kDefaultMonthlyAICreditsInDollars;
+
+            // If balance is negative (user overspent), carry over the debt
+            if (currentBalance < 0) {
+              // newCredits = default - abs(negative) = default + negative
+              newCredits = kDefaultMonthlyAICreditsInDollars + currentBalance;
+              session.log(
+                'User had negative balance of \$$currentBalance. '
+                'Carrying over debt to new month.',
+              );
+            }
+
+            aiUsage.totalDollarsSpentFromTotalInUSD = newCredits;
+            await AccountAIUsage.db.updateRow(
+              session,
+              aiUsage,
+              transaction: transaction,
+            );
+
+            // Create monthly subscription AI credit deposit record
+            final monthlyAiDeposit = MonthlySubscriptionAICreditDeposit(
+              creditsAmountInDollars: kDefaultMonthlyAICreditsInDollars,
+              planTier: accountInfo.planTier,
+            );
+            await MonthlySubscriptionAICreditDeposit.db.insertRow(
+              session,
+              monthlyAiDeposit,
+              transaction: transaction,
+            );
+
+            // Create AI credit history item
+            final aiCreditHistoryItem = AICreditHistoryItem(
+              date: DateTime.now(),
+              monthlySubscriptionAICreditDepositId: monthlyAiDeposit.id,
+              monthlySubscriptionAICreditDeposit: monthlyAiDeposit,
+              accountAIUsageId: aiUsage.id!,
+            );
+            await AICreditHistoryItem.db.insertRow(
+              session,
+              aiCreditHistoryItem,
+              transaction: transaction,
+            );
+
+            session.log(
+                'Reset AI credits to \$${newCredits.toStringAsFixed(4)} for account ${accountInfo.id}');
+          }
 
           // Update the cached values in ApiHelperMixin (after transaction)
           ApiHelperMixin.resetNanoId(currentApiUsage.nanoId);

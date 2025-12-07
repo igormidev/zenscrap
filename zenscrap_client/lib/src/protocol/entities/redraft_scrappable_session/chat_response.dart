@@ -15,13 +15,16 @@ import 'prompt_role_enum.dart' as _i3;
 import '../scrappable/scrapping_bee_extract_logic.dart' as _i4;
 import '../scrappable/reference_test_data.dart' as _i5;
 import '../scrappable/scrappable_request.dart' as _i6;
+part 'responses/api_key_updated_response.dart';
 part 'responses/candidate_extract_logic_update.dart';
+part 'responses/credit_limit_reached_response.dart';
 part 'responses/error_text_response.dart';
 part 'responses/message_text_response.dart';
 part 'responses/new_extract_rule_response.dart';
 part 'responses/test_endpoint_called_error_response.dart';
 part 'responses/test_endpoint_called_success_response.dart';
 part 'responses/updated_scrappable_request_response.dart';
+part 'responses/user_api_key_quota_exceeded_response.dart';
 
 sealed class ChatResponse implements _i2.SerializableModel {
   ChatResponse({
@@ -33,3 +36,5 @@ sealed class ChatResponse implements _i2.SerializableModel {
 
   bool expectsFollowUp;
 }
+
+class _Undefined {}

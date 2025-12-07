@@ -6,7 +6,7 @@ import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.d
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 
 class CreditHistoryList extends ConsumerWidget {
-  final List<CreditHistoryItem> creditHistory;
+  final List<ApiCreditHistoryItem> creditHistory;
   final bool isLoadingMore;
   final bool hasMore;
   final VoidCallback onLoadMore;
@@ -120,10 +120,10 @@ class CreditHistoryList extends ConsumerWidget {
     );
   }
 
-  Widget _buildHistoryItem(BuildContext context, CreditHistoryItem item) {
-    final isSubscription = item.monthlySubscriptionCreditDeposit != null;
-    final isPurchase = item.creaditPackagePurchase != null;
-    
+  Widget _buildHistoryItem(BuildContext context, ApiCreditHistoryItem item) {
+    final isSubscription = item.monthlySubscriptionApiCreditDeposit != null;
+    final isPurchase = item.apiCreditPackagePurchase != null;
+
     // Format date
     final dateFormatter = DateFormat('MMM d, y h:mm a');
     final dateStr = dateFormatter.format(item.date);
@@ -136,7 +136,7 @@ class CreditHistoryList extends ConsumerWidget {
 
     if (isSubscription) {
       icon = Icons.calendar_month;
-      final deposit = item.monthlySubscriptionCreditDeposit!;
+      final deposit = item.monthlySubscriptionApiCreditDeposit!;
       final planName = deposit.planTier == PlanTier.none
           ? 'Free'
           : deposit.planTier.name.toUpperCase();
@@ -149,7 +149,7 @@ class CreditHistoryList extends ConsumerWidget {
       title = 'Credit Purchase';
       subtitle = dateStr;
       color = context.c.secondary;
-      amount = '+${item.creaditPackagePurchase!.value.toInt()}';
+      amount = '+${item.apiCreditPackagePurchase!.value.toInt()}';
     } else {
       icon = Icons.help_outline;
       title = 'Unknown Transaction';

@@ -1,6 +1,7 @@
 import 'package:nanoid2/nanoid2.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart';
+import 'package:zenscrap_server/src/core/consts.dart';
 import 'package:zenscrap_server/src/core/default_classes.dart';
 import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
@@ -74,29 +75,63 @@ class PrivateAccountEndpoint extends Endpoint {
           transaction: transaction,
         );
 
-        // Create monthly subscription credit deposit record for initial credits
-        final initialDeposit = MonthlySubscriptionCreditDeposit(
-          creditsAmount: 100, // Initial free tier credits
-          planTier: PlanTier.none, // Free tier
-        );
-        await MonthlySubscriptionCreditDeposit.db.insertRow(
+        // Create AccountAIUsage with default credits
+        final accountAIUsage = await AccountAIUsage.db.insertRow(
           session,
-          initialDeposit,
+          AccountAIUsage(
+            userOpenAiApiKey: null,
+            totalDollarsSpentFromTotalInUSD: kDefaultMonthlyAICreditsInDollars,
+          ),
           transaction: transaction,
         );
 
-        // Create credit history item for initial credits
-        final creditHistoryItem = CreditHistoryItem(
+        // Create monthly subscription API credit deposit record for initial credits
+        final initialApiDeposit = MonthlySubscriptionApiCreditDeposit(
+          creditsAmount: 100, // Initial free tier credits
+          planTier: PlanTier.none, // Free tier
+        );
+        await MonthlySubscriptionApiCreditDeposit.db.insertRow(
+          session,
+          initialApiDeposit,
+          transaction: transaction,
+        );
+
+        // Create API credit history item for initial credits
+        final apiCreditHistoryItem = ApiCreditHistoryItem(
           date: DateTime.now(),
-          monthlySubscriptionCreditDepositId: initialDeposit.id,
-          monthlySubscriptionCreditDeposit: initialDeposit,
-          creaditPackagePurchaseId: null,
-          creaditPackagePurchase: null,
+          monthlySubscriptionApiCreditDepositId: initialApiDeposit.id,
+          monthlySubscriptionApiCreditDeposit: initialApiDeposit,
+          apiCreditPackagePurchaseId: null,
+          apiCreditPackagePurchase: null,
           accountApiUsageId: accountApiUsage.id!,
         );
-        await CreditHistoryItem.db.insertRow(
+        await ApiCreditHistoryItem.db.insertRow(
           session,
-          creditHistoryItem,
+          apiCreditHistoryItem,
+          transaction: transaction,
+        );
+
+        // Create monthly subscription AI credit deposit record for initial credits
+        final initialAiDeposit = MonthlySubscriptionAICreditDeposit(
+          creditsAmountInDollars: kDefaultMonthlyAICreditsInDollars,
+          planTier: PlanTier.none, // Free tier
+        );
+        await MonthlySubscriptionAICreditDeposit.db.insertRow(
+          session,
+          initialAiDeposit,
+          transaction: transaction,
+        );
+
+        // Create AI credit history item for initial credits
+        final aiCreditHistoryItem = AICreditHistoryItem(
+          date: DateTime.now(),
+          monthlySubscriptionAICreditDepositId: initialAiDeposit.id,
+          monthlySubscriptionAICreditDeposit: initialAiDeposit,
+          accountAIUsageId: accountAIUsage.id!,
+        );
+        await AICreditHistoryItem.db.insertRow(
+          session,
+          aiCreditHistoryItem,
           transaction: transaction,
         );
         final apiKey = await AccountApiKey.db.insertRow(
@@ -122,6 +157,8 @@ class PrivateAccountEndpoint extends Endpoint {
           accountApiUsageId: accountApiUsage.id!,
           accountApiUsage: accountApiUsage,
           planTier: PlanTier.none,
+          accountAIUsageId: accountAIUsage.id!,
+          accountAIUsage: accountAIUsage,
         );
 
         accountInfo = await AccountInfo.db

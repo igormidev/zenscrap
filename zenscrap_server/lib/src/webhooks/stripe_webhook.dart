@@ -248,29 +248,29 @@ class StripeWebhookRoute extends Route {
           transaction: transaction,
         );
 
-        // Create credit package purchase record
-        final creditPurchase = CreditPackagePurchase(
+        // Create API credit package purchase record
+        final apiCreditPurchase = ApiCreditPackagePurchase(
           value: creditAmount.toDouble(),
           stripePurchaseId: paymentIntentId,
         );
-        await CreditPackagePurchase.db.insertRow(
+        await ApiCreditPackagePurchase.db.insertRow(
           session,
-          creditPurchase,
+          apiCreditPurchase,
           transaction: transaction,
         );
 
-        // Create credit history item
-        final creditHistoryItem = CreditHistoryItem(
+        // Create API credit history item
+        final apiCreditHistoryItem = ApiCreditHistoryItem(
           date: DateTime.now(),
-          monthlySubscriptionCreditDepositId: null,
-          monthlySubscriptionCreditDeposit: null,
-          creaditPackagePurchaseId: creditPurchase.id,
-          creaditPackagePurchase: creditPurchase,
+          monthlySubscriptionApiCreditDepositId: null,
+          monthlySubscriptionApiCreditDeposit: null,
+          apiCreditPackagePurchaseId: apiCreditPurchase.id,
+          apiCreditPackagePurchase: apiCreditPurchase,
           accountApiUsageId: apiUsage.id!,
         );
-        await CreditHistoryItem.db.insertRow(
+        await ApiCreditHistoryItem.db.insertRow(
           session,
-          creditHistoryItem,
+          apiCreditHistoryItem,
           transaction: transaction,
         );
 

@@ -10,10 +10,15 @@ fields:
   stripeSubscriptionId: String?
   subscriptionStatus: String?
   subscriptionEndDate: DateTime?
+  accountAIUsageId: int
+  accountAIUsage: AccountAIUsage?, relation(name=user_account_ai_usage, field=accountAIUsageId)
 indexes:
-  user_info_id_unique_idx:  
-    fields: userInfoId  
+  user_info_id_unique_idx:
+    fields: userInfoId
     unique: true
   account_api_usage_id_unique_idx:
     fields: accountApiUsageId
+    unique: true
+  user_account_ai_usage_id_unique_idx:
+    fields: accountAIUsageId
     unique: true

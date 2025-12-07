@@ -1,0 +1,26 @@
+# CreditLimitReachedResponse
+#
+# This response is sent when the user attempts to send a message but has exhausted
+# their platform-provided monthly AI credits ($10 default limit).
+#
+# This is a PRE-CHECK that happens BEFORE the AI API is called. The message is
+# blocked and this response is returned instead.
+#
+# Scenarios when this is returned:
+# 1. Logged-in user has used all their monthly credits (totalDollarsSpentFromTotalInUSD <= 0)
+# 2. Anonymous user has exceeded the per-session spending limit ($10)
+#
+# The user can resolve this by:
+# - Waiting for the monthly credit reset (logged-in users)
+# - Adding their own OpenAI API key in account settings (logged-in users)
+# - Creating an account to get monthly credits (anonymous users)
+#
+# Note: This is NOT returned when the user's own API key runs out of credits.
+# For that case, see UserApiKeyQuotaExceededResponse.
+class: CreditLimitReachedResponse
+extends: ChatResponse
+fields:
+    messageText: String
+    creditsSpent: double
+    creditsLimit: double
+    canUseOwnApiKey: bool

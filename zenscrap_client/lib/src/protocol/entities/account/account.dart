@@ -14,6 +14,7 @@ import '../../entities/scrappable/scrappable.dart' as _i2;
 import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i3;
 import '../../entities/account/api_usage/account_api_usage.dart' as _i4;
 import '../../entities/account/plan_tier.dart' as _i5;
+import '../../entities/account/ai_usage/account_ai_usage.dart' as _i6;
 
 abstract class AccountInfo implements _i1.SerializableModel {
   AccountInfo._({
@@ -28,6 +29,8 @@ abstract class AccountInfo implements _i1.SerializableModel {
     this.stripeSubscriptionId,
     this.subscriptionStatus,
     this.subscriptionEndDate,
+    required this.accountAIUsageId,
+    this.accountAIUsage,
   });
 
   factory AccountInfo({
@@ -42,6 +45,8 @@ abstract class AccountInfo implements _i1.SerializableModel {
     String? stripeSubscriptionId,
     String? subscriptionStatus,
     DateTime? subscriptionEndDate,
+    required int accountAIUsageId,
+    _i6.AccountAIUsage? accountAIUsage,
   }) = _AccountInfoImpl;
 
   factory AccountInfo.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -69,6 +74,11 @@ abstract class AccountInfo implements _i1.SerializableModel {
           ? null
           : _i1.DateTimeJsonExtension.fromJson(
               jsonSerialization['subscriptionEndDate']),
+      accountAIUsageId: jsonSerialization['accountAIUsageId'] as int,
+      accountAIUsage: jsonSerialization['accountAIUsage'] == null
+          ? null
+          : _i6.AccountAIUsage.fromJson(
+              (jsonSerialization['accountAIUsage'] as Map<String, dynamic>)),
     );
   }
 
@@ -97,6 +107,10 @@ abstract class AccountInfo implements _i1.SerializableModel {
 
   DateTime? subscriptionEndDate;
 
+  int accountAIUsageId;
+
+  _i6.AccountAIUsage? accountAIUsage;
+
   /// Returns a shallow copy of this [AccountInfo]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
@@ -112,6 +126,8 @@ abstract class AccountInfo implements _i1.SerializableModel {
     String? stripeSubscriptionId,
     String? subscriptionStatus,
     DateTime? subscriptionEndDate,
+    int? accountAIUsageId,
+    _i6.AccountAIUsage? accountAIUsage,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -130,6 +146,8 @@ abstract class AccountInfo implements _i1.SerializableModel {
       if (subscriptionStatus != null) 'subscriptionStatus': subscriptionStatus,
       if (subscriptionEndDate != null)
         'subscriptionEndDate': subscriptionEndDate?.toJson(),
+      'accountAIUsageId': accountAIUsageId,
+      if (accountAIUsage != null) 'accountAIUsage': accountAIUsage?.toJson(),
     };
   }
 
@@ -154,6 +172,8 @@ class _AccountInfoImpl extends AccountInfo {
     String? stripeSubscriptionId,
     String? subscriptionStatus,
     DateTime? subscriptionEndDate,
+    required int accountAIUsageId,
+    _i6.AccountAIUsage? accountAIUsage,
   }) : super._(
           id: id,
           scrappables: scrappables,
@@ -166,6 +186,8 @@ class _AccountInfoImpl extends AccountInfo {
           stripeSubscriptionId: stripeSubscriptionId,
           subscriptionStatus: subscriptionStatus,
           subscriptionEndDate: subscriptionEndDate,
+          accountAIUsageId: accountAIUsageId,
+          accountAIUsage: accountAIUsage,
         );
 
   /// Returns a shallow copy of this [AccountInfo]
@@ -184,6 +206,8 @@ class _AccountInfoImpl extends AccountInfo {
     Object? stripeSubscriptionId = _Undefined,
     Object? subscriptionStatus = _Undefined,
     Object? subscriptionEndDate = _Undefined,
+    int? accountAIUsageId,
+    Object? accountAIUsage = _Undefined,
   }) {
     return AccountInfo(
       id: id is int? ? id : this.id,
@@ -210,6 +234,10 @@ class _AccountInfoImpl extends AccountInfo {
       subscriptionEndDate: subscriptionEndDate is DateTime?
           ? subscriptionEndDate
           : this.subscriptionEndDate,
+      accountAIUsageId: accountAIUsageId ?? this.accountAIUsageId,
+      accountAIUsage: accountAIUsage is _i6.AccountAIUsage?
+          ? accountAIUsage
+          : this.accountAIUsage?.copyWith(),
     );
   }
 }

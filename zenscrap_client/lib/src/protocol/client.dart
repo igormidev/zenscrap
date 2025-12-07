@@ -13,44 +13,48 @@ import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import 'dart:async' as _i2;
 import 'package:zenscrap_client/src/protocol/entities/account/account.dart'
     as _i3;
-import 'package:zenscrap_client/src/protocol/entities/account/api_usage/api_credit_history/paginated_credit_history_response.dart'
+import 'package:zenscrap_client/src/protocol/entities/account/ai_usage/ai_credit_history/paginated_ai_credit_history_response.dart'
     as _i4;
-import 'package:zenscrap_client/src/protocol/entities/account/account_api_key.dart'
+import 'package:zenscrap_client/src/protocol/entities/account/ai_usage/account_ai_usage.dart'
     as _i5;
-import 'package:zenscrap_client/src/protocol/entities/account/api_usage/account_api_usage.dart'
+import 'package:zenscrap_client/src/protocol/entities/account/api_usage/api_credit_history/paginated_api_credit_history_response.dart'
     as _i6;
-import 'package:zenscrap_client/src/protocol/entities/api_key_response.dart'
+import 'package:zenscrap_client/src/protocol/entities/account/account_api_key.dart'
     as _i7;
-import 'package:zenscrap_client/src/protocol/entities/account/credit_purchase_option.dart'
+import 'package:zenscrap_client/src/protocol/entities/account/api_usage/account_api_usage.dart'
     as _i8;
-import 'package:zenscrap_client/src/protocol/entities/scrappable/scrappable.dart'
+import 'package:zenscrap_client/src/protocol/entities/api_key_response.dart'
     as _i9;
-import 'package:zenscrap_client/src/protocol/entities/analytics/paginated_scrappable_requests_analytics.dart'
+import 'package:zenscrap_client/src/protocol/entities/account/credit_purchase_option.dart'
     as _i10;
-import 'package:zenscrap_client/src/protocol/entities/analytics/analytics_time_scope.dart'
+import 'package:zenscrap_client/src/protocol/entities/scrappable/scrappable.dart'
     as _i11;
-import 'package:zenscrap_client/src/protocol/entities/analytics/paginated_scrappable_analytics.dart'
+import 'package:zenscrap_client/src/protocol/entities/analytics/paginated_scrappable_requests_analytics.dart'
     as _i12;
-import 'package:zenscrap_client/src/protocol/entities/analytics/scrappable_usage_metrics.dart'
+import 'package:zenscrap_client/src/protocol/entities/analytics/analytics_time_scope.dart'
     as _i13;
-import 'package:zenscrap_client/src/protocol/entities/user_scrappables/user_paginated_scrappable_response.dart'
+import 'package:zenscrap_client/src/protocol/entities/analytics/paginated_scrappable_analytics.dart'
     as _i14;
-import 'package:zenscrap_client/src/protocol/entities/scrappable/scraper_category.dart'
+import 'package:zenscrap_client/src/protocol/entities/analytics/scrappable_usage_metrics.dart'
     as _i15;
-import 'package:zenscrap_client/src/protocol/entities/marketplace/paginated_scrappable_response.dart'
+import 'package:zenscrap_client/src/protocol/entities/user_scrappables/user_paginated_scrappable_response.dart'
     as _i16;
-import 'package:zenscrap_client/src/protocol/entities/scrappable/byte_test_data.dart'
+import 'package:zenscrap_client/src/protocol/entities/scrappable/scraper_category.dart'
     as _i17;
-import 'package:zenscrap_client/src/protocol/entities/account/plan_tier.dart'
+import 'package:zenscrap_client/src/protocol/entities/marketplace/paginated_scrappable_response.dart'
     as _i18;
-import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/create_session_response.dart'
+import 'package:zenscrap_client/src/protocol/entities/scrappable/byte_test_data.dart'
     as _i19;
-import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/chat_response.dart'
+import 'package:zenscrap_client/src/protocol/entities/account/plan_tier.dart'
     as _i20;
-import 'package:zenscrap_client/src/protocol/entities/scrappable/ai_model.dart'
+import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/create_session_response.dart'
     as _i21;
-import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i22;
-import 'protocol.dart' as _i23;
+import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/chat_response.dart'
+    as _i22;
+import 'package:zenscrap_client/src/protocol/entities/scrappable/ai_model.dart'
+    as _i23;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i24;
+import 'protocol.dart' as _i25;
 
 /// {@category Endpoint}
 class EndpointPrivateAccount extends _i1.EndpointRef {
@@ -69,22 +73,47 @@ class EndpointPrivateAccount extends _i1.EndpointRef {
 }
 
 /// {@category Endpoint}
+class EndpointPrivateAiUsage extends _i1.EndpointRef {
+  EndpointPrivateAiUsage(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'privateAiUsage';
+
+  /// Returns paginated AI credit history for the authenticated user.
+  _i2.Future<_i4.PaginatedAICreditHistoryResponse> getAiCreditHistory(
+          {required int page}) =>
+      caller.callServerEndpoint<_i4.PaginatedAICreditHistoryResponse>(
+        'privateAiUsage',
+        'getAiCreditHistory',
+        {'page': page},
+      );
+
+  /// Returns the AI usage info for the authenticated user.
+  _i2.Future<_i5.AccountAIUsage> getAiUsageInfo() =>
+      caller.callServerEndpoint<_i5.AccountAIUsage>(
+        'privateAiUsage',
+        'getAiUsageInfo',
+        {},
+      );
+}
+
+/// {@category Endpoint}
 class EndpointPrivateApiUsage extends _i1.EndpointRef {
   EndpointPrivateApiUsage(_i1.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'privateApiUsage';
 
-  _i2.Future<_i4.PaginatedCreditHistoryResponse> getCreditHistory(
+  _i2.Future<_i6.PaginatedApiCreditHistoryResponse> getApiCreditHistory(
           {required int page}) =>
-      caller.callServerEndpoint<_i4.PaginatedCreditHistoryResponse>(
+      caller.callServerEndpoint<_i6.PaginatedApiCreditHistoryResponse>(
         'privateApiUsage',
-        'getCreditHistory',
+        'getApiCreditHistory',
         {'page': page},
       );
 
-  _i2.Future<_i5.AccountApiKey> createApiKey({required String name}) =>
-      caller.callServerEndpoint<_i5.AccountApiKey>(
+  _i2.Future<_i7.AccountApiKey> createApiKey({required String name}) =>
+      caller.callServerEndpoint<_i7.AccountApiKey>(
         'privateApiUsage',
         'createApiKey',
         {'name': name},
@@ -97,8 +126,8 @@ class EndpointPrivateApiUsage extends _i1.EndpointRef {
         {'apiKeyId': apiKeyId},
       );
 
-  _i2.Future<List<_i5.AccountApiKey>> getActiveApiKeys() =>
-      caller.callServerEndpoint<List<_i5.AccountApiKey>>(
+  _i2.Future<List<_i7.AccountApiKey>> getActiveApiKeys() =>
+      caller.callServerEndpoint<List<_i7.AccountApiKey>>(
         'privateApiUsage',
         'getActiveApiKeys',
         {},
@@ -111,22 +140,22 @@ class EndpointPrivateApiUsage extends _i1.EndpointRef {
         {},
       );
 
-  _i2.Future<_i6.AccountApiUsage> getApiUsageInfo() =>
-      caller.callServerEndpoint<_i6.AccountApiUsage>(
+  _i2.Future<_i8.AccountApiUsage> getApiUsageInfo() =>
+      caller.callServerEndpoint<_i8.AccountApiUsage>(
         'privateApiUsage',
         'getApiUsageInfo',
         {},
       );
 
-  _i2.Future<_i7.ApiKeyResponse> getApiKeysWithStats() =>
-      caller.callServerEndpoint<_i7.ApiKeyResponse>(
+  _i2.Future<_i9.ApiKeyResponse> getApiKeysWithStats() =>
+      caller.callServerEndpoint<_i9.ApiKeyResponse>(
         'privateApiUsage',
         'getApiKeysWithStats',
         {},
       );
 
   _i2.Future<String> createCreditPurchaseCheckout(
-          {required _i8.CreditPurchaseOption creditPackage}) =>
+          {required _i10.CreditPurchaseOption creditPackage}) =>
       caller.callServerEndpoint<String>(
         'privateApiUsage',
         'createCreditPurchaseCheckout',
@@ -141,9 +170,9 @@ class EndpointPrivateCloneScrappable extends _i1.EndpointRef {
   @override
   String get name => 'privateCloneScrappable';
 
-  _i2.Future<_i9.Scrappable> cloneFromMarketplace(
+  _i2.Future<_i11.Scrappable> cloneFromMarketplace(
           {required int scrappableId}) =>
-      caller.callServerEndpoint<_i9.Scrappable>(
+      caller.callServerEndpoint<_i11.Scrappable>(
         'privateCloneScrappable',
         'cloneFromMarketplace',
         {'scrappableId': scrappableId},
@@ -157,12 +186,12 @@ class EndpointPrivateScrappableAnalytics extends _i1.EndpointRef {
   @override
   String get name => 'privateScrappableAnalytics';
 
-  _i2.Future<_i10.PaginatedScrappableRequestsAnalytics>
+  _i2.Future<_i12.PaginatedScrappableRequestsAnalytics>
       getScrappableAnalyticsWithScope({
     required int page,
-    required _i11.AnalyticsTimeScope scope,
+    required _i13.AnalyticsTimeScope scope,
   }) =>
-          caller.callServerEndpoint<_i10.PaginatedScrappableRequestsAnalytics>(
+          caller.callServerEndpoint<_i12.PaginatedScrappableRequestsAnalytics>(
             'privateScrappableAnalytics',
             'getScrappableAnalyticsWithScope',
             {
@@ -171,11 +200,11 @@ class EndpointPrivateScrappableAnalytics extends _i1.EndpointRef {
             },
           );
 
-  _i2.Future<_i12.PaginatedScrappableAnalytics> getScrappableAnalytics({
+  _i2.Future<_i14.PaginatedScrappableAnalytics> getScrappableAnalytics({
     required int scrappableId,
     required int page,
   }) =>
-      caller.callServerEndpoint<_i12.PaginatedScrappableAnalytics>(
+      caller.callServerEndpoint<_i14.PaginatedScrappableAnalytics>(
         'privateScrappableAnalytics',
         'getScrappableAnalytics',
         {
@@ -186,9 +215,9 @@ class EndpointPrivateScrappableAnalytics extends _i1.EndpointRef {
 
   /// Get usage metrics for a scrappable in the last 30 days
   /// This includes ALL requests from ANY user who called this scrappable
-  _i2.Future<_i13.ScrappableUsageMetrics> getScrappableUsageMetrics(
+  _i2.Future<_i15.ScrappableUsageMetrics> getScrappableUsageMetrics(
           {required int scrappableId}) =>
-      caller.callServerEndpoint<_i13.ScrappableUsageMetrics>(
+      caller.callServerEndpoint<_i15.ScrappableUsageMetrics>(
         'privateScrappableAnalytics',
         'getScrappableUsageMetrics',
         {'scrappableId': scrappableId},
@@ -243,12 +272,12 @@ class EndpointPrivateUserScrappables extends _i1.EndpointRef {
   @override
   String get name => 'privateUserScrappables';
 
-  _i2.Future<_i14.UserPaginatedScrappableResponse> call({
+  _i2.Future<_i16.UserPaginatedScrappableResponse> call({
     required int page,
     String? searchQuery,
-    List<_i15.ScraperCategory>? categories,
+    List<_i17.ScraperCategory>? categories,
   }) =>
-      caller.callServerEndpoint<_i14.UserPaginatedScrappableResponse>(
+      caller.callServerEndpoint<_i16.UserPaginatedScrappableResponse>(
         'privateUserScrappables',
         'call',
         {
@@ -258,8 +287,8 @@ class EndpointPrivateUserScrappables extends _i1.EndpointRef {
         },
       );
 
-  _i2.Future<_i9.Scrappable> getScrappableById(int scrappableId) =>
-      caller.callServerEndpoint<_i9.Scrappable>(
+  _i2.Future<_i11.Scrappable> getScrappableById(int scrappableId) =>
+      caller.callServerEndpoint<_i11.Scrappable>(
         'privateUserScrappables',
         'getScrappableById',
         {'scrappableId': scrappableId},
@@ -273,9 +302,9 @@ class EndpointCreateScrappable extends _i1.EndpointRef {
   @override
   String get name => 'createScrappable';
 
-  _i2.Stream<_i9.Scrappable> call({required String referenceLink}) =>
-      caller.callStreamingServerEndpoint<_i2.Stream<_i9.Scrappable>,
-          _i9.Scrappable>(
+  _i2.Stream<_i11.Scrappable> call({required String referenceLink}) =>
+      caller.callStreamingServerEndpoint<_i2.Stream<_i11.Scrappable>,
+          _i11.Scrappable>(
         'createScrappable',
         'call',
         {'referenceLink': referenceLink},
@@ -309,7 +338,7 @@ class EndpointEditScrappable extends _i1.EndpointRef {
     required int scrappableId,
     required String name,
     required String description,
-    _i15.ScraperCategory? category,
+    _i17.ScraperCategory? category,
     bool? willHideFromMarketplace,
   }) =>
       caller.callServerEndpoint<bool>(
@@ -332,12 +361,12 @@ class EndpointMarketplace extends _i1.EndpointRef {
   @override
   String get name => 'marketplace';
 
-  _i2.Future<_i16.PaginatedScrappableResponse> getItems({
+  _i2.Future<_i18.PaginatedScrappableResponse> getItems({
     required int page,
     String? searchQuery,
-    List<_i15.ScraperCategory>? categories,
+    List<_i17.ScraperCategory>? categories,
   }) =>
-      caller.callServerEndpoint<_i16.PaginatedScrappableResponse>(
+      caller.callServerEndpoint<_i18.PaginatedScrappableResponse>(
         'marketplace',
         'getItems',
         {
@@ -357,8 +386,8 @@ class EndpointPublicScrappable extends _i1.EndpointRef {
 
   /// Retrieves ByteTestData for a scrappable
   /// This is a public endpoint to allow viewing test data in the marketplace
-  _i2.Future<_i17.ByteTestData?> getByteTestData(int scrappableId) =>
-      caller.callServerEndpoint<_i17.ByteTestData?>(
+  _i2.Future<_i19.ByteTestData?> getByteTestData(int scrappableId) =>
+      caller.callServerEndpoint<_i19.ByteTestData?>(
         'publicScrappable',
         'getByteTestData',
         {'scrappableId': scrappableId},
@@ -375,7 +404,7 @@ class EndpointPublicTier extends _i1.EndpointRef {
   _i2.Future<void> updatePlayerTier({
     required String email,
     required String tierManipulationKey,
-    required _i18.PlanTier planTier,
+    required _i20.PlanTier planTier,
   }) =>
       caller.callServerEndpoint<void>(
         'publicTier',
@@ -409,6 +438,30 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
         {'sessionId': sessionId},
       );
 
+  /// Updates the user's OpenAI API key for the current session.
+  ///
+  /// This endpoint is called when a user wants to add their own API key
+  /// after receiving a [CreditLimitReachedResponse] (platform credits exhausted).
+  ///
+  /// The API key is:
+  /// 1. Stored in the in-memory [_sessionAccountAIUsage] map
+  /// 2. Persisted to the database when the session ends
+  /// 3. Used for subsequent API calls in this session (no credits deducted)
+  ///
+  /// Returns success and sends an [ApiKeyUpdatedResponse] to the chat stream.
+  _i2.Future<void> updateUserApiKey({
+    required String sessionId,
+    required String openAiApiKey,
+  }) =>
+      caller.callServerEndpoint<void>(
+        'scrappableChatSession',
+        'updateUserApiKey',
+        {
+          'sessionId': sessionId,
+          'openAiApiKey': openAiApiKey,
+        },
+      );
+
   _i2.Future<void> updateScrappableRequest({
     required int scrappableId,
     required String url,
@@ -426,18 +479,18 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
         },
       );
 
-  _i2.Future<_i19.CreateSessionResponse> createSession(
+  _i2.Future<_i21.CreateSessionResponse> createSession(
           {required int scrappableId}) =>
-      caller.callServerEndpoint<_i19.CreateSessionResponse>(
+      caller.callServerEndpoint<_i21.CreateSessionResponse>(
         'scrappableChatSession',
         'createSession',
         {'scrappableId': scrappableId},
       );
 
-  _i2.Stream<_i20.ChatResponse> listenToScrappableRedraftSession(
+  _i2.Stream<_i22.ChatResponse> listenToScrappableRedraftSession(
           {required String sessionUuid}) =>
-      caller.callStreamingServerEndpoint<_i2.Stream<_i20.ChatResponse>,
-          _i20.ChatResponse>(
+      caller.callStreamingServerEndpoint<_i2.Stream<_i22.ChatResponse>,
+          _i22.ChatResponse>(
         'scrappableChatSession',
         'listenToScrappableRedraftSession',
         {'sessionUuid': sessionUuid},
@@ -446,7 +499,7 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
 
   _i2.Future<void> changeChatModel({
     required String sessionUuid,
-    required _i21.AiModel aiModel,
+    required _i23.AiModel aiModel,
   }) =>
       caller.callServerEndpoint<void>(
         'scrappableChatSession',
@@ -474,10 +527,10 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
 
 class Modules {
   Modules(Client client) {
-    auth = _i22.Caller(client);
+    auth = _i24.Caller(client);
   }
 
-  late final _i22.Caller auth;
+  late final _i24.Caller auth;
 }
 
 class Client extends _i1.ServerpodClientShared {
@@ -496,7 +549,7 @@ class Client extends _i1.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
           host,
-          _i23.Protocol(),
+          _i25.Protocol(),
           securityContext: securityContext,
           authenticationKeyManager: authenticationKeyManager,
           streamingConnectionTimeout: streamingConnectionTimeout,
@@ -507,6 +560,7 @@ class Client extends _i1.ServerpodClientShared {
               disconnectStreamsOnLostInternetConnection,
         ) {
     privateAccount = EndpointPrivateAccount(this);
+    privateAiUsage = EndpointPrivateAiUsage(this);
     privateApiUsage = EndpointPrivateApiUsage(this);
     privateCloneScrappable = EndpointPrivateCloneScrappable(this);
     privateScrappableAnalytics = EndpointPrivateScrappableAnalytics(this);
@@ -523,6 +577,8 @@ class Client extends _i1.ServerpodClientShared {
   }
 
   late final EndpointPrivateAccount privateAccount;
+
+  late final EndpointPrivateAiUsage privateAiUsage;
 
   late final EndpointPrivateApiUsage privateApiUsage;
 
@@ -553,6 +609,7 @@ class Client extends _i1.ServerpodClientShared {
   @override
   Map<String, _i1.EndpointRef> get endpointRefLookup => {
         'privateAccount': privateAccount,
+        'privateAiUsage': privateAiUsage,
         'privateApiUsage': privateApiUsage,
         'privateCloneScrappable': privateCloneScrappable,
         'privateScrappableAnalytics': privateScrappableAnalytics,

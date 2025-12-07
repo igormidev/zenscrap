@@ -12,8 +12,8 @@ import 'package:zenscrap_flutter/src/states/api_usage/api_usage_provider.dart';
 import 'package:zenscrap_flutter/src/states/api_usage/api_usage_state.dart';
 import 'package:zenscrap_flutter/src/states/api_usage/api_keys_provider.dart';
 import 'package:zenscrap_flutter/src/states/api_usage/api_keys_state.dart';
-import 'package:zenscrap_flutter/src/states/api_usage/credit_history_provider.dart';
-import 'package:zenscrap_flutter/src/states/api_usage/credit_history_state.dart';
+import 'package:zenscrap_flutter/src/states/api_usage/api_credit_history_provider.dart';
+import 'package:zenscrap_flutter/src/states/api_usage/api_credit_history_state.dart';
 import 'package:zenscrap_flutter/src/ui/api_usage/sections/api_keys_section.dart';
 import 'package:zenscrap_flutter/src/ui/api_usage/sections/history_section.dart';
 import 'package:zenscrap_flutter/src/ui/api_usage/sections/overview_section.dart';
@@ -38,7 +38,7 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
     // Load data for all providers
     Future.microtask(() {
       ref.read(apiKeysProvider.notifier).loadApiKeys();
-      ref.read(creditHistoryProvider.notifier).loadCreditHistory();
+      ref.read(apiCreditHistoryProvider.notifier).loadCreditHistory();
     });
   }
 
@@ -49,7 +49,7 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
   }
 
   Future<void> _loadMoreHistory() async {
-    await ref.read(creditHistoryProvider.notifier).loadMoreHistory();
+    await ref.read(apiCreditHistoryProvider.notifier).loadMoreHistory();
   }
 
   Future<void> _handleRefresh() async {
@@ -63,7 +63,7 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
       await ref.globalLoadingSetter(() async {
         await ref.read(apiUsageProvider.notifier).loadApiUsage();
         await ref.read(apiKeysProvider.notifier).loadApiKeys();
-        await ref.read(creditHistoryProvider.notifier).loadCreditHistory();
+        await ref.read(apiCreditHistoryProvider.notifier).loadCreditHistory();
       });
     } finally {
       _isRefreshVN.value = false;
@@ -236,7 +236,7 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
         );
     final apiUsageState = ref.watch(apiUsageProvider);
     final apiKeysState = ref.watch(apiKeysProvider);
-    final creditHistoryState = ref.watch(creditHistoryProvider);
+    final creditHistoryState = ref.watch(apiCreditHistoryProvider);
 
     // Check if any provider is loading
     final isLoading = apiUsageState.maybeWhen(
@@ -286,7 +286,7 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
               onPressed: () {
                 ref.read(apiUsageProvider.notifier).refresh();
                 ref.read(apiKeysProvider.notifier).refresh();
-                ref.read(creditHistoryProvider.notifier).refresh();
+                ref.read(apiCreditHistoryProvider.notifier).refresh();
               },
               child: const Text('Retry'),
             ),
@@ -313,7 +313,7 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
 
     final creditHistory = creditHistoryState.maybeWhen(
       loaded: (creditHistory, hasMore, isLoadingMore) => creditHistory,
-      orElse: () => <CreditHistoryItem>[],
+      orElse: () => <ApiCreditHistoryItem>[],
     );
 
     final isLoadingMoreHistory = creditHistoryState.maybeWhen(
@@ -402,7 +402,7 @@ class MobileLayout extends ConsumerWidget {
   final AccountApiUsage apiUsage;
   final List<AccountApiKey> apiKeys;
   final Map<int, int> apiKeyUsageStats;
-  final List<CreditHistoryItem> creditHistory;
+  final List<ApiCreditHistoryItem> creditHistory;
   final bool isLoadingMoreHistory;
   final bool hasMoreHistory;
   final VoidCallback onLoadMoreHistory;
@@ -490,7 +490,7 @@ class DesktopLayout extends StatelessWidget {
   final AccountApiUsage apiUsage;
   final List<AccountApiKey> apiKeys;
   final Map<int, int> apiKeyUsageStats;
-  final List<CreditHistoryItem> creditHistory;
+  final List<ApiCreditHistoryItem> creditHistory;
   final bool isLoadingMoreHistory;
   final bool hasMoreHistory;
   final VoidCallback onLoadMoreHistory;
@@ -666,7 +666,7 @@ class ApiKeysTab extends StatelessWidget {
 }
 
 class HistoryTab extends StatelessWidget {
-  final List<CreditHistoryItem> creditHistory;
+  final List<ApiCreditHistoryItem> creditHistory;
   final bool isLoadingMoreHistory;
   final bool hasMoreHistory;
   final VoidCallback onLoadMoreHistory;

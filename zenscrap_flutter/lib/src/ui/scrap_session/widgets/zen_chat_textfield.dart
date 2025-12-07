@@ -3,10 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_validator/form_validator.dart';
+import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/chat_scroll_controller_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/is_chat_loading_provider.dart';
+import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_messages_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_state.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/change_ai_model_button.dart';
@@ -104,9 +106,62 @@ class _ZenChatTextfieldState extends ConsumerState<ZenChatTextfield> {
     }
   }
 
+  /// Checks if credits are exhausted and not yet resolved.
+  /// Returns true if:
+  /// - CreditLimitReachedResponse exists without a subsequent ApiKeyUpdatedResponse
+  /// - UserApiKeyQuotaExceededResponse exists (user must add credits on OpenAI)
+  bool _areCreditsExhausted(List<ChatResponse> messages) {
+    if (messages.isEmpty) return false;
+
+    // Find the last credit-related response
+    CreditLimitReachedResponse? lastCreditLimitReached;
+    ApiKeyUpdatedResponse? lastApiKeyUpdated;
+    UserApiKeyQuotaExceededResponse? lastQuotaExceeded;
+
+    for (final message in messages) {
+      if (message is CreditLimitReachedResponse) {
+        lastCreditLimitReached = message;
+      } else if (message is ApiKeyUpdatedResponse) {
+        lastApiKeyUpdated = message;
+      } else if (message is UserApiKeyQuotaExceededResponse) {
+        lastQuotaExceeded = message;
+      }
+    }
+
+    // If user's own API key ran out of credits, they need to add credits on OpenAI
+    if (lastQuotaExceeded != null) {
+      // Check if this happened after an API key update (meaning user tried and failed)
+      // For now, we don't block sending as user may have added credits on OpenAI
+      // They'll just get the error again if they haven't
+      return false;
+    }
+
+    // If platform credits ran out, check if user added their API key to resolve
+    if (lastCreditLimitReached != null) {
+      // If ApiKeyUpdatedResponse came after CreditLimitReachedResponse, it's resolved
+      final creditLimitIndex = messages.indexOf(lastCreditLimitReached);
+      final apiKeyIndex = lastApiKeyUpdated != null
+          ? messages.indexOf(lastApiKeyUpdated)
+          : -1;
+
+      // Not resolved if no API key update OR if credit limit reached after API key update
+      return apiKeyIndex < creditLimitIndex;
+    }
+
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
-    // final isEndpointTimeExpired = widget.targetTime.isBefore(DateTime.now());
+    // Watch chat messages to check for credit exhaustion
+    final messages = ref.watch(chatMessagesProvider).valueOrNull ?? [];
+    final isCreditsExhausted = _areCreditsExhausted(messages);
+
+    final isDisabled = isEndpointTimeExpired ||
+        _isSendingMessage ||
+        ref.watch(isChatLoadingProvider) ||
+        isCreditsExhausted;
+
     return Form(
       key: _formKey,
       child: Column(
@@ -123,11 +178,13 @@ class _ZenChatTextfieldState extends ConsumerState<ZenChatTextfield> {
                 child: ZenTextfield(
                   controller: _promptEC,
                   focusNode: _focusNode,
-                  labelText: 'Ask for any modification...',
+                  labelText: isCreditsExhausted
+                      ? 'Add API key to continue...'
+                      : 'Ask for any modification...',
                   hintText: '',
                   minLines: 1,
                   maxLines: 5,
-                  enabled: !isEndpointTimeExpired && !_isSendingMessage,
+                  enabled: !isDisabled,
                   onSubmitted: (_) => _sendMessage(),
                   validator: ValidationBuilder()
                       .minLength(3, 'Message must be at least 3 characters')
@@ -139,14 +196,12 @@ class _ZenChatTextfieldState extends ConsumerState<ZenChatTextfield> {
               const SizedBox(width: 8),
               Material(
                 borderRadius: BorderRadius.circular(12),
-                color: Theme.of(context).colorScheme.primary,
+                color: isDisabled
+                    ? Theme.of(context).colorScheme.surfaceContainerHighest
+                    : Theme.of(context).colorScheme.primary,
                 child: InkWell(
                   borderRadius: BorderRadius.circular(12),
-                  onTap: _isSendingMessage ||
-                          ref.watch(isChatLoadingProvider) ||
-                          isEndpointTimeExpired
-                      ? null
-                      : _sendMessage,
+                  onTap: isDisabled ? null : _sendMessage,
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     child: _isSendingMessage
@@ -162,7 +217,9 @@ class _ZenChatTextfieldState extends ConsumerState<ZenChatTextfield> {
                           )
                         : Icon(
                             Icons.send_rounded,
-                            color: Theme.of(context).colorScheme.onPrimary,
+                            color: isDisabled
+                                ? Theme.of(context).colorScheme.onSurfaceVariant
+                                : Theme.of(context).colorScheme.onPrimary,
                             size: 24,
                           ),
                   ),

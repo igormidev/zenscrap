@@ -5,12 +5,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/convert_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/chat_scroll_controller_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/is_chat_loading_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_messages_provider.dart';
+import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/llm_thinking_bubble.dart';
 
@@ -313,6 +315,39 @@ class _ChatMessageBubble extends StatelessWidget {
         queryParams: updatedRequest.queryParams,
         textColor: textColor,
         backgroundColor: backgroundColor,
+      );
+    } else if (message is CreditLimitReachedResponse) {
+      final creditMsg = message as CreditLimitReachedResponse;
+      // Override to warning colors
+      backgroundColor = colorScheme.errorContainer;
+      textColor = colorScheme.onErrorContainer;
+      messageContent = _CreditLimitReachedMessage(
+        messageText: creditMsg.messageText,
+        creditsSpent: creditMsg.creditsSpent,
+        creditsLimit: creditMsg.creditsLimit,
+        canUseOwnApiKey: creditMsg.canUseOwnApiKey,
+        textColor: textColor,
+        backgroundColor: backgroundColor,
+      );
+    } else if (message is UserApiKeyQuotaExceededResponse) {
+      final quotaMsg = message as UserApiKeyQuotaExceededResponse;
+      // Override to warning colors
+      backgroundColor = colorScheme.errorContainer;
+      textColor = colorScheme.onErrorContainer;
+      messageContent = _UserApiKeyQuotaExceededMessage(
+        messageText: quotaMsg.messageText,
+        openAiErrorMessage: quotaMsg.openAiErrorMessage,
+        textColor: textColor,
+        backgroundColor: backgroundColor,
+      );
+    } else if (message is ApiKeyUpdatedResponse) {
+      final keyUpdatedMsg = message as ApiKeyUpdatedResponse;
+      // Override to success colors
+      backgroundColor = const Color.fromARGB(255, 211, 245, 188);
+      textColor = Colors.green[800]!;
+      messageContent = _ApiKeyUpdatedMessage(
+        messageText: keyUpdatedMsg.messageText,
+        textColor: textColor,
       );
     }
 
@@ -979,6 +1014,487 @@ class _TestEndpointErrorMessage extends StatelessWidget {
           icon: Icons.input_rounded,
           textColor: textColor,
           backgroundColor: backgroundColor,
+        ),
+      ],
+    );
+  }
+}
+
+/// Material 3 styled message widget for when platform credits are exhausted.
+/// Shows a prominent CTA for users to add their own OpenAI API key.
+class _CreditLimitReachedMessage extends ConsumerWidget {
+  final String messageText;
+  final double creditsSpent;
+  final double creditsLimit;
+  final bool canUseOwnApiKey;
+  final Color textColor;
+  final Color backgroundColor;
+
+  const _CreditLimitReachedMessage({
+    required this.messageText,
+    required this.creditsSpent,
+    required this.creditsLimit,
+    required this.canUseOwnApiKey,
+    required this.textColor,
+    required this.backgroundColor,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    // Check if API key has already been added (resolve state)
+    final messages = ref.watch(chatMessagesProvider).valueOrNull ?? [];
+    final hasApiKeyUpdated =
+        messages.any((m) => m is ApiKeyUpdatedResponse);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Header with warning icon
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: colorScheme.error.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                Icons.account_balance_wallet_outlined,
+                size: 18,
+                color: colorScheme.error,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              'Credit Limit Reached',
+              style: theme.textTheme.titleSmall?.copyWith(
+                color: textColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+
+        // Credit usage progress bar
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: textColor.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: textColor.withValues(alpha: 0.15),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Credits Used',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: textColor.withValues(alpha: 0.8),
+                    ),
+                  ),
+                  Text(
+                    '\$${creditsSpent.toStringAsFixed(2)} / \$${creditsLimit.toStringAsFixed(2)}',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: textColor,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'monospace',
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: (creditsSpent / creditsLimit).clamp(0.0, 1.0),
+                  backgroundColor: textColor.withValues(alpha: 0.1),
+                  valueColor: AlwaysStoppedAnimation<Color>(colorScheme.error),
+                  minHeight: 6,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        // Message text
+        SelectableText(
+          messageText,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: textColor.withValues(alpha: 0.9),
+            height: 1.5,
+          ),
+        ),
+
+        // CTA Button - only show if user can use own API key and hasn't added one yet
+        if (canUseOwnApiKey && !hasApiKeyUpdated) ...[
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: () => _showApiKeyDialog(context, ref),
+              icon: const Icon(Icons.key_rounded, size: 18),
+              label: const Text('Add Your OpenAI API Key'),
+              style: FilledButton.styleFrom(
+                backgroundColor: colorScheme.primary,
+                foregroundColor: colorScheme.onPrimary,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 14,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Use your own API key to continue without limits',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: textColor.withValues(alpha: 0.6),
+              fontStyle: FontStyle.italic,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+
+        // Show resolved state if API key was added
+        if (hasApiKeyUpdated) ...[
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.green.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.check_circle, size: 16, color: Colors.green[700]),
+                const SizedBox(width: 8),
+                Text(
+                  'Resolved - API key added',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: Colors.green[700],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Future<void> _showApiKeyDialog(BuildContext context, WidgetRef ref) async {
+    final apiKeyController = TextEditingController();
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.key_rounded, color: colorScheme.primary),
+            const SizedBox(width: 12),
+            const Expanded(child: Text('Add OpenAI API Key')),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Enter your OpenAI API key to continue chatting without using platform credits.',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: apiKeyController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'API Key',
+                  hintText: 'sk-...',
+                  prefixIcon: const Icon(Icons.vpn_key),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  helperText: 'Your key is stored securely',
+                ),
+              ),
+              const SizedBox(height: 12),
+              InkWell(
+                onTap: () => launchUrl(
+                  Uri.parse('https://platform.openai.com/api-keys'),
+                ),
+                borderRadius: BorderRadius.circular(8),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.open_in_new,
+                        size: 16,
+                        color: colorScheme.primary,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Get an API key from OpenAI',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.primary,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              final key = apiKeyController.text.trim();
+              if (key.isNotEmpty) {
+                Navigator.of(context).pop(key);
+              }
+            },
+            child: const Text('Save API Key'),
+          ),
+        ],
+      ),
+    );
+
+    if (result != null && result.isNotEmpty && context.mounted) {
+      try {
+        await ref.read(scrapChatProvider.notifier).updateUserApiKey(result);
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('API key saved successfully!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to save API key: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
+  }
+}
+
+/// Material 3 styled message widget for when the user's own OpenAI API key
+/// has run out of credits.
+class _UserApiKeyQuotaExceededMessage extends StatelessWidget {
+  final String messageText;
+  final String? openAiErrorMessage;
+  final Color textColor;
+  final Color backgroundColor;
+
+  const _UserApiKeyQuotaExceededMessage({
+    required this.messageText,
+    this.openAiErrorMessage,
+    required this.textColor,
+    required this.backgroundColor,
+  });
+
+  static const _openAiBillingUrl = 'https://platform.openai.com/settings/organization/billing/overview';
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Header
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: colorScheme.error.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                Icons.credit_card_off_rounded,
+                size: 18,
+                color: colorScheme.error,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                'OpenAI API Credits Exhausted',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: textColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+
+        // Message text
+        SelectableText(
+          messageText,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: textColor.withValues(alpha: 0.9),
+            height: 1.5,
+          ),
+        ),
+
+        // OpenAI error details (collapsible)
+        if (openAiErrorMessage != null && openAiErrorMessage!.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: textColor.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: textColor.withValues(alpha: 0.15),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.info_outline,
+                      size: 14,
+                      color: textColor.withValues(alpha: 0.7),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      'OpenAI Error Details',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: textColor.withValues(alpha: 0.8),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                SelectableText(
+                  openAiErrorMessage!,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: textColor.withValues(alpha: 0.7),
+                    fontFamily: 'monospace',
+                    fontSize: 11,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+
+        // CTA Button to add credits to OpenAI
+        const SizedBox(height: 16),
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton.icon(
+            onPressed: () => launchUrl(Uri.parse(_openAiBillingUrl)),
+            icon: const Icon(Icons.open_in_new, size: 18),
+            label: const Text('Add Credits on OpenAI'),
+            style: FilledButton.styleFrom(
+              backgroundColor: colorScheme.primary,
+              foregroundColor: colorScheme.onPrimary,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 14,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'After adding credits, try sending your message again',
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: textColor.withValues(alpha: 0.6),
+            fontStyle: FontStyle.italic,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+}
+
+/// Simple success message for when API key is updated
+class _ApiKeyUpdatedMessage extends StatelessWidget {
+  final String messageText;
+  final Color textColor;
+
+  const _ApiKeyUpdatedMessage({
+    required this.messageText,
+    required this.textColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 2),
+          child: Icon(
+            Icons.check_circle_rounded,
+            size: 16,
+            color: textColor.withValues(alpha: 0.9),
+          ),
+        ),
+        const SizedBox(width: 6),
+        Expanded(
+          child: SelectableText(
+            messageText,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: textColor,
+                  height: 1.4,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+          ),
         ),
       ],
     );

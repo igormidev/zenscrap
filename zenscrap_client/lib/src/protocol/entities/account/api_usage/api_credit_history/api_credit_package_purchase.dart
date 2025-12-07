@@ -11,22 +11,22 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 
-abstract class CreditPackagePurchase implements _i1.SerializableModel {
-  CreditPackagePurchase._({
+abstract class ApiCreditPackagePurchase implements _i1.SerializableModel {
+  ApiCreditPackagePurchase._({
     this.id,
     required this.value,
     this.stripePurchaseId,
   });
 
-  factory CreditPackagePurchase({
+  factory ApiCreditPackagePurchase({
     int? id,
     required double value,
     String? stripePurchaseId,
-  }) = _CreditPackagePurchaseImpl;
+  }) = _ApiCreditPackagePurchaseImpl;
 
-  factory CreditPackagePurchase.fromJson(
+  factory ApiCreditPackagePurchase.fromJson(
       Map<String, dynamic> jsonSerialization) {
-    return CreditPackagePurchase(
+    return ApiCreditPackagePurchase(
       id: jsonSerialization['id'] as int?,
       value: (jsonSerialization['value'] as num).toDouble(),
       stripePurchaseId: jsonSerialization['stripePurchaseId'] as String?,
@@ -42,10 +42,10 @@ abstract class CreditPackagePurchase implements _i1.SerializableModel {
 
   String? stripePurchaseId;
 
-  /// Returns a shallow copy of this [CreditPackagePurchase]
+  /// Returns a shallow copy of this [ApiCreditPackagePurchase]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
-  CreditPackagePurchase copyWith({
+  ApiCreditPackagePurchase copyWith({
     int? id,
     double? value,
     String? stripePurchaseId,
@@ -67,8 +67,8 @@ abstract class CreditPackagePurchase implements _i1.SerializableModel {
 
 class _Undefined {}
 
-class _CreditPackagePurchaseImpl extends CreditPackagePurchase {
-  _CreditPackagePurchaseImpl({
+class _ApiCreditPackagePurchaseImpl extends ApiCreditPackagePurchase {
+  _ApiCreditPackagePurchaseImpl({
     int? id,
     required double value,
     String? stripePurchaseId,
@@ -78,16 +78,16 @@ class _CreditPackagePurchaseImpl extends CreditPackagePurchase {
           stripePurchaseId: stripePurchaseId,
         );
 
-  /// Returns a shallow copy of this [CreditPackagePurchase]
+  /// Returns a shallow copy of this [ApiCreditPackagePurchase]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   @override
-  CreditPackagePurchase copyWith({
+  ApiCreditPackagePurchase copyWith({
     Object? id = _Undefined,
     double? value,
     Object? stripePurchaseId = _Undefined,
   }) {
-    return CreditPackagePurchase(
+    return ApiCreditPackagePurchase(
       id: id is int? ? id : this.id,
       value: value ?? this.value,
       stripePurchaseId: stripePurchaseId is String?

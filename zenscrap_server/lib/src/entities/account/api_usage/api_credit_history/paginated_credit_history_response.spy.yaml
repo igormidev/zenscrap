@@ -1,4 +1,0 @@
-class: PaginatedCreditHistoryResponse
-fields:
-  data: List<CreditHistoryItem>
-  pagination: PaginationMetadata

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:serverpod/serverpod.dart';
+import 'package:zenscrap_server/src/core/consts.dart';
 import 'package:zenscrap_server/src/core/default_classes.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_openai_sdk_impl.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/i_chat_controller.dart';
@@ -21,6 +22,23 @@ final Map<RedraftSrappableSessionId, ScrappingBeeExtractLogic?>
     _cacheScrappingBeeExtractLogic = {};
 final Map<RedraftSrappableSessionId, ScrappableRequest>
     _cacheScrappableRequest = {};
+
+// =============================================================================
+// AI Usage Credit Tracking
+// =============================================================================
+
+/// Tracks AccountAIUsage for logged-in users per session.
+/// This is used to deduct credits after each message and update the DB on session dispose.
+final Map<RedraftSrappableSessionId, AccountAIUsage> _sessionAccountAIUsage =
+    {};
+
+/// Tracks spending for anonymous sessions (not logged in users).
+/// Each session has a spending limit of kAnonymousSessionSpendingLimitInDollars.
+final Map<RedraftSrappableSessionId, double> _anonymousSessionSpending = {};
+
+/// Tracks whether the user is using their own API key (no cost to platform).
+/// If true, we don't deduct any credits from the user.
+final Map<RedraftSrappableSessionId, bool> _sessionUsesOwnApiKey = {};
 
 ScrappingBeeExtractLogic? getTestExtractRules(int scrappableId) {
   return _cacheScrappingBeeExtractLogic[
@@ -159,7 +177,121 @@ class ScrappableChatSession extends Endpoint {
     Session session, {
     required RedraftSrappableSessionId sessionId,
   }) {
-    return _disposeSession(sessionId: sessionId);
+    return _disposeSession(sessionId: sessionId, dbSession: session);
+  }
+
+  /// Updates the user's OpenAI API key for the current session.
+  ///
+  /// This endpoint is called when a user wants to add their own API key
+  /// after receiving a [CreditLimitReachedResponse] (platform credits exhausted).
+  ///
+  /// The API key is:
+  /// 1. Stored in the in-memory [_sessionAccountAIUsage] map
+  /// 2. Persisted to the database when the session ends
+  /// 3. Used for subsequent API calls in this session (no credits deducted)
+  ///
+  /// Returns success and sends an [ApiKeyUpdatedResponse] to the chat stream.
+  Future<void> updateUserApiKey(
+    Session session, {
+    required RedraftSrappableSessionId sessionId,
+    required String openAiApiKey,
+  }) async {
+    // Validate session exists
+    if (!_scrapRedraftSessions.containsKey(sessionId)) {
+      throw ZenScrapException(
+        title: 'Session Not Found',
+        description: 'No active session found with ID $sessionId.',
+      );
+    }
+
+    // Validate user is authenticated
+    final int? userId = (await session.authenticated)?.userId;
+    if (userId == null) {
+      throw ZenScrapException(
+        title: 'Authentication Required',
+        description: 'You must be logged in to add an API key.',
+      );
+    }
+
+    // Validate API key format (basic check)
+    if (openAiApiKey.trim().isEmpty) {
+      throw ZenScrapException(
+        title: 'Invalid API Key',
+        description: 'Please provide a valid OpenAI API key.',
+      );
+    }
+
+    // Get or create AccountAIUsage for this session
+    AccountAIUsage? accountAIUsage = _sessionAccountAIUsage[sessionId];
+
+    if (accountAIUsage == null) {
+      // Load from database if not in cache
+      final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
+        session,
+        where: (p0) => p0.userInfoId.equals(userId),
+        include: AccountInfo.include(
+          accountAIUsage: AccountAIUsage.include(),
+        ),
+      );
+
+      if (accountInfo == null) {
+        throw ZenScrapException(
+          title: 'Account Not Found',
+          description: 'Could not find your account information.',
+        );
+      }
+
+      accountAIUsage = accountInfo.accountAIUsage;
+      if (accountAIUsage == null) {
+        accountAIUsage = await AccountAIUsage.db.findById(
+          session,
+          accountInfo.accountAIUsageId,
+        );
+      }
+
+      if (accountAIUsage == null) {
+        throw ZenScrapException(
+          title: 'AI Usage Record Not Found',
+          description: 'Could not find your AI usage record.',
+        );
+      }
+    }
+
+    // Update the API key
+    accountAIUsage.userOpenAiApiKey = openAiApiKey.trim();
+    _sessionAccountAIUsage[sessionId] = accountAIUsage;
+    _sessionUsesOwnApiKey[sessionId] = true;
+
+    // Persist to database immediately
+    try {
+      await AccountAIUsage.db.updateRow(session, accountAIUsage);
+      session.log(
+        'Updated user API key for session $sessionId (user $userId)',
+      );
+    } catch (e, s) {
+      session.log(
+        'Failed to persist API key update',
+        exception: e,
+        stackTrace: s,
+        level: LogLevel.error,
+      );
+      throw ZenScrapException(
+        title: 'Failed to Save API Key',
+        description: 'Could not save your API key. Please try again.',
+      );
+    }
+
+    // Send success response to chat stream
+    _scrapRedraftSessions[sessionId]?.add(
+      ApiKeyUpdatedResponse(
+        role: PromptRole.system,
+        expectsFollowUp: false,
+        messageText:
+            'Your OpenAI API key has been successfully configured. '
+            'You can now continue chatting without using platform credits. '
+            'Your API key is securely stored and will be used for all future messages.',
+      ),
+    );
   }
 
   Future<void> updateScrappableRequest(
@@ -197,7 +329,8 @@ class ScrappableChatSession extends Endpoint {
       scrappableId: scrappableId,
       response: UpdatedScrappableRequestResponse(
         role: PromptRole.system,
-        expectsFollowUp: false, // Configuration update notification, no follow-up
+        expectsFollowUp:
+            false, // Configuration update notification, no follow-up
         messageText: 'Scrappable request configuration updated successfully',
         url: url,
         pathParams: pathParams,
@@ -211,6 +344,8 @@ class ScrappableChatSession extends Endpoint {
     required int scrappableId,
   }) async {
     final int? userId = (await session.authenticated)?.userId;
+    final bool isLoggedIn = userId != null;
+
     final Scrappable? scrappable = await Scrappable.db.findById(
       session,
       scrappableId,
@@ -238,11 +373,18 @@ class ScrappableChatSession extends Endpoint {
       );
     }
 
+    // Variables for AI usage tracking
+    AccountAIUsage? accountAIUsage;
+    bool usesOwnApiKey = false;
+
     final doesScrappableHasOwner = scrappable.accountId != null;
     if (doesScrappableHasOwner) {
       final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
         session,
         where: (p0) => p0.userInfoId.equals(userId),
+        include: AccountInfo.include(
+          accountAIUsage: AccountAIUsage.include(),
+        ),
       );
       if (accountInfo == null || accountInfo.id != scrappable.accountId) {
         throw ZenScrapException(
@@ -251,7 +393,68 @@ class ScrappableChatSession extends Endpoint {
               'You must be the owner of this scrappable to create a session for it.',
         );
       }
+
+      // Get AI usage for logged-in user
+      accountAIUsage = accountInfo.accountAIUsage;
+      // Load it separately if not included
+      accountAIUsage ??= await AccountAIUsage.db.findById(
+        session,
+        accountInfo.accountAIUsageId,
+      );
+
+      // Check if user has their own API key
+      usesOwnApiKey =
+          accountAIUsage?.userOpenAiApiKey != null &&
+          accountAIUsage!.userOpenAiApiKey!.isNotEmpty;
+
+      // Check if user has credits (only if not using their own API key)
+      if (!usesOwnApiKey && accountAIUsage != null) {
+        final remainingCredits = accountAIUsage.totalDollarsSpentFromTotalInUSD;
+        if (remainingCredits <= 0) {
+          throw ZenScrapException(
+            title: 'AI Credits Exhausted',
+            description:
+                'You have used all your AI credits for this month (\$${kDefaultMonthlyAICreditsInDollars.toStringAsFixed(2)} limit). '
+                'Credits will reset next month, or you can add your own OpenAI API key in account settings to continue without limits.',
+          );
+        }
+      }
+    } else if (isLoggedIn) {
+      // User is logged in but scrappable has no owner - get their AI usage anyway
+      final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
+        session,
+        where: (p0) => p0.userInfoId.equals(userId),
+        include: AccountInfo.include(
+          accountAIUsage: AccountAIUsage.include(),
+        ),
+      );
+
+      if (accountInfo != null) {
+        accountAIUsage = accountInfo.accountAIUsage;
+        accountAIUsage ??= await AccountAIUsage.db.findById(
+          session,
+          accountInfo.accountAIUsageId,
+        );
+
+        usesOwnApiKey =
+            accountAIUsage?.userOpenAiApiKey != null &&
+            accountAIUsage!.userOpenAiApiKey!.isNotEmpty;
+
+        if (!usesOwnApiKey && accountAIUsage != null) {
+          final remainingCredits =
+              accountAIUsage.totalDollarsSpentFromTotalInUSD;
+          if (remainingCredits <= 0) {
+            throw ZenScrapException(
+              title: 'AI Credits Exhausted',
+              description:
+                  'You have used all your AI credits for this month (\$${kDefaultMonthlyAICreditsInDollars.toStringAsFixed(2)} limit). '
+                  'Credits will reset next month, or you can add your own OpenAI API key in account settings to continue without limits.',
+            );
+          }
+        }
+      }
     }
+    // For anonymous users (not logged in), we track spending per session
 
     if (referenceTestData == null) {
       session.log(
@@ -288,14 +491,25 @@ class ScrappableChatSession extends Endpoint {
     final RedraftSrappableSessionId sessionUuid = uuid.v4();
     _scrappableOpenedSessionsIds[scrappable.id!] = sessionUuid;
     _scrapRedraftSessions[sessionUuid] = ReplaySubject<ChatResponse>();
-    final openAiApiKey = session.passwords['openAiApiKey'] ??
-        session.serverpod.getPassword('openAiApiKey');
-    if (openAiApiKey == null || openAiApiKey.isEmpty) {
-      throw ZenScrapException(
-        title: 'OpenAI API Key Missing',
-        description:
-            'The server is not configured with an OpenAI API key. Please add it to the password store.',
-      );
+
+    // Determine which OpenAI API key to use
+    // Priority: User's own key > Server configured key
+    String openAiApiKey;
+    if (usesOwnApiKey && accountAIUsage?.userOpenAiApiKey != null) {
+      openAiApiKey = accountAIUsage!.userOpenAiApiKey!;
+      session.log(
+          'Using user\'s own OpenAI API key for session $sessionUuid');
+    } else {
+      openAiApiKey = session.passwords['openAiApiKey'] ??
+          session.serverpod.getPassword('openAiApiKey') ??
+          '';
+      if (openAiApiKey.isEmpty) {
+        throw ZenScrapException(
+          title: 'OpenAI API Key Missing',
+          description:
+              'The server is not configured with an OpenAI API key. Please add it to the password store.',
+        );
+      }
     }
 
     final scrapingBeeApiKey = session.passwords['scrapingBeeApiKey'] ??
@@ -313,6 +527,22 @@ class ScrappableChatSession extends Endpoint {
     _cacheRefTestData[sessionUuid] = referenceTestData;
     _cacheScrappingBeeExtractLogic[sessionUuid] = scrappingBeeExtractLogic;
     _cacheScrappableRequest[sessionUuid] = scrapperRequest;
+
+    // Initialize AI usage tracking for this session
+    _sessionUsesOwnApiKey[sessionUuid] = usesOwnApiKey;
+    if (accountAIUsage != null) {
+      _sessionAccountAIUsage[sessionUuid] = accountAIUsage;
+      session.log(
+        'Session $sessionUuid: User has \$${accountAIUsage.totalDollarsSpentFromTotalInUSD.toStringAsFixed(4)} remaining credits, usesOwnApiKey: $usesOwnApiKey',
+      );
+    } else if (!isLoggedIn) {
+      // Anonymous user - initialize session spending tracker
+      _anonymousSessionSpending[sessionUuid] = 0.0;
+      session.log(
+        'Session $sessionUuid: Anonymous user, spending limit: \$${kAnonymousSessionSpendingLimitInDollars.toStringAsFixed(2)}',
+      );
+    }
+
     final duration = const Duration(hours: 1);
     final response = CreateSessionResponse(
       expiresIn: duration,
@@ -465,7 +695,33 @@ Future<void> disposeFromScrappableId(int scrappableId) async {
 
 Future<void> _disposeSession({
   required RedraftSrappableSessionId sessionId,
+  Session? dbSession,
 }) async {
+  // Save AccountAIUsage to database if we have a session and tracked usage
+  if (dbSession != null) {
+    final accountAIUsage = _sessionAccountAIUsage[sessionId];
+    if (accountAIUsage != null && accountAIUsage.id != null) {
+      try {
+        await AccountAIUsage.db.updateRow(dbSession, accountAIUsage);
+        dbSession.log(
+          'Saved AccountAIUsage for session $sessionId: \$${accountAIUsage.totalDollarsSpentFromTotalInUSD.toStringAsFixed(4)} remaining',
+        );
+      } catch (e, s) {
+        dbSession.log(
+          'Failed to save AccountAIUsage for session $sessionId',
+          exception: e,
+          stackTrace: s,
+          level: LogLevel.error,
+        );
+      }
+    }
+  }
+
+  // Clean up AI usage tracking maps
+  _sessionAccountAIUsage.remove(sessionId);
+  _anonymousSessionSpending.remove(sessionId);
+  _sessionUsesOwnApiKey.remove(sessionId);
+
   // Dispose the chat controller to clean up OpenAI files
   final chatController = _chatSessions.remove(sessionId);
   await chatController?.dispose();
@@ -487,7 +743,7 @@ class TestScrappableDisposeFutureCall
     CreateSessionResponse? object,
   ) async {
     if (object == null) return;
-    await _disposeSession(sessionId: object.sessionId);
+    await _disposeSession(sessionId: object.sessionId, dbSession: session);
   }
 }
 
@@ -509,6 +765,58 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
         ),
       );
       return;
+    }
+
+    // =========================================================================
+    // AI Credits Check - Before sending message
+    // =========================================================================
+    final bool usesOwnApiKey = _sessionUsesOwnApiKey[sessionId] ?? false;
+
+    // Only check credits if NOT using own API key
+    if (!usesOwnApiKey) {
+      final accountAIUsage = _sessionAccountAIUsage[sessionId];
+      final anonymousSpending = _anonymousSessionSpending[sessionId];
+
+      if (accountAIUsage != null) {
+        // Logged-in user - check remaining credits
+        final remainingCredits = accountAIUsage.totalDollarsSpentFromTotalInUSD;
+        if (remainingCredits <= 0) {
+          _scrapRedraftSessions[sessionId]?.add(
+            CreditLimitReachedResponse(
+              role: PromptRole.system,
+              expectsFollowUp: false,
+              messageText:
+                  'You have exhausted your AI credits for this month. '
+                  'Your credits will reset at the beginning of next month, or you can add your own OpenAI API key in account settings to continue without limits.',
+              creditsSpent: kDefaultMonthlyAICreditsInDollars - remainingCredits,
+              creditsLimit: kDefaultMonthlyAICreditsInDollars,
+              canUseOwnApiKey: true,
+            ),
+          );
+          await _thinkingStream[thinkingSessionId]?.close();
+          _thinkingStream.remove(thinkingSessionId);
+          return;
+        }
+      } else if (anonymousSpending != null) {
+        // Anonymous user - check session spending limit
+        if (anonymousSpending >= kAnonymousSessionSpendingLimitInDollars) {
+          _scrapRedraftSessions[sessionId]?.add(
+            CreditLimitReachedResponse(
+              role: PromptRole.system,
+              expectsFollowUp: false,
+              messageText:
+                  'You have reached the spending limit for this anonymous session (\$${kAnonymousSessionSpendingLimitInDollars.toStringAsFixed(2)}). '
+                  'Please create an account to continue using the AI assistant with monthly credits.',
+              creditsSpent: anonymousSpending,
+              creditsLimit: kAnonymousSessionSpendingLimitInDollars,
+              canUseOwnApiKey: false, // Must sign up first
+            ),
+          );
+          await _thinkingStream[thinkingSessionId]?.close();
+          _thinkingStream.remove(thinkingSessionId);
+          return;
+        }
+      }
     }
 
     final testData = _cacheRefTestData[sessionId];
@@ -559,8 +867,9 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
     // Note: User message is already added to the chat stream in sendPromptMessage()
     // for immediate UI feedback. Do NOT add it again here to avoid duplicates.
 
+    SendMessageResult messageResult = SendMessageResult.zero;
     try {
-      await chatController.sendMessage(
+      messageResult = await chatController.sendMessage(
         session: session,
         chatSeason: chatSeason,
         userPrompt: userPrompt,
@@ -569,6 +878,79 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
         scrappingBeeExtractLogic: scrappingBeeExtractLogic,
         thinkingStream: llmThinking,
       );
+
+      // =========================================================================
+      // AI Credits Deduction - After message completes
+      // =========================================================================
+      // Only deduct if NOT using own API key and there was actual cost
+      if (!usesOwnApiKey && messageResult.costInUsd > 0) {
+        final accountAIUsage = _sessionAccountAIUsage[sessionId];
+        if (accountAIUsage != null) {
+          // Deduct from logged-in user's credits
+          // totalDollarsSpentFromTotalInUSD represents REMAINING credits (not spent)
+          accountAIUsage.totalDollarsSpentFromTotalInUSD -= messageResult.costInUsd;
+          session.log(
+            'Deducted \$${messageResult.costInUsd.toStringAsFixed(6)} from user credits. '
+            'Remaining: \$${accountAIUsage.totalDollarsSpentFromTotalInUSD.toStringAsFixed(4)}',
+          );
+
+          // Note: Credits can go negative. This allows the current message to complete
+          // even if it exceeds the limit. The negative amount will be "owed" and
+          // subtracted from next month's reset.
+
+          // Save to DB immediately after each message for data safety
+          try {
+            await AccountAIUsage.db.updateRow(session, accountAIUsage);
+          } catch (e, s) {
+            session.log(
+              'Warning: Failed to save AI usage after message',
+              exception: e,
+              stackTrace: s,
+              level: LogLevel.warning,
+            );
+          }
+        } else if (_anonymousSessionSpending.containsKey(sessionId)) {
+          // Track anonymous session spending
+          _anonymousSessionSpending[sessionId] =
+              (_anonymousSessionSpending[sessionId] ?? 0.0) + messageResult.costInUsd;
+          session.log(
+            'Anonymous session $sessionId spent \$${messageResult.costInUsd.toStringAsFixed(6)}. '
+            'Total session spending: \$${_anonymousSessionSpending[sessionId]!.toStringAsFixed(4)}',
+          );
+        }
+      } else if (usesOwnApiKey) {
+        session.log('User using own API key - no credits deducted');
+      }
+    } on OpenAiQuotaExceededException catch (e) {
+      // User's own API key has run out of credits on OpenAI's side
+      session.log(
+        'User API key quota exceeded: ${e.openAiErrorMessage}',
+        level: LogLevel.warning,
+      );
+
+      // Determine the appropriate message based on whether the user is using their own key
+      final String messageText;
+      if (usesOwnApiKey) {
+        messageText =
+            'Your OpenAI API key has run out of credits. '
+            'Please add credits to your OpenAI account at platform.openai.com, '
+            'or remove your API key from account settings to use platform credits instead.';
+      } else {
+        // This shouldn't happen normally, but handle it gracefully
+        messageText =
+            'The OpenAI API returned a quota error. '
+            'Please try again later or contact support if the issue persists.';
+      }
+
+      _scrapRedraftSessions[sessionId]?.add(
+        UserApiKeyQuotaExceededResponse(
+          role: PromptRole.system,
+          expectsFollowUp: false,
+          messageText: messageText,
+          openAiErrorMessage: e.openAiErrorMessage,
+        ),
+      );
+      // Don't rethrow - we've handled the error gracefully
     } catch (e, s) {
       chatSeason.add(ErrorTextResponse(
         role: PromptRole.system,

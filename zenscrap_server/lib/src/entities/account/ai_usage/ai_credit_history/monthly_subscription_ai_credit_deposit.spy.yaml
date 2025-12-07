@@ -1,0 +1,14 @@
+# MonthlySubscriptionAICreditDeposit
+#
+# Records when AI credits are deposited into a user's account as part of their
+# monthly subscription. This happens when:
+# 1. A new subscription is created and the user receives their initial AI credits
+# 2. The monthly subscription renewal adds credits to the user's account
+#
+# The creditsAmount represents the dollar value of AI credits added (e.g., $10.00)
+# The planTier indicates which subscription tier triggered this deposit
+class: MonthlySubscriptionAICreditDeposit
+table: monthly_subscription_ai_credit_deposit
+fields:
+  creditsAmountInDollars: double
+  planTier: PlanTier

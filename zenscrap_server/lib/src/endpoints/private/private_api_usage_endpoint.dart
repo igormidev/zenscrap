@@ -11,7 +11,7 @@ class PrivateApiUsageEndpoint extends Endpoint {
   @override
   bool get requireLogin => true;
 
-  Future<PaginatedCreditHistoryResponse> getCreditHistory(
+  Future<PaginatedApiCreditHistoryResponse> getApiCreditHistory(
     Session session, {
     int page = 1,
   }) async {
@@ -40,7 +40,7 @@ class PrivateApiUsageEndpoint extends Endpoint {
     page = page < 1 ? 1 : page;
 
     // Get total count for pagination
-    final totalCount = await CreditHistoryItem.db.count(
+    final totalCount = await ApiCreditHistoryItem.db.count(
       session,
       where: (p0) => p0.accountApiUsageId.equals(accountInfo.accountApiUsageId),
     );
@@ -53,21 +53,21 @@ class PrivateApiUsageEndpoint extends Endpoint {
     // Calculate offset
     final offset = (page - 1) * pageSize;
 
-    final creditHistory = await CreditHistoryItem.db.find(
+    final creditHistory = await ApiCreditHistoryItem.db.find(
       session,
       where: (p0) => p0.accountApiUsageId.equals(accountInfo.accountApiUsageId),
       limit: pageSize,
       offset: offset,
       orderBy: (p0) => p0.id,
       orderDescending: true,
-      include: CreditHistoryItem.include(
-        monthlySubscriptionCreditDeposit:
-            MonthlySubscriptionCreditDeposit.include(),
-        creaditPackagePurchase: CreditPackagePurchase.include(),
+      include: ApiCreditHistoryItem.include(
+        monthlySubscriptionApiCreditDeposit:
+            MonthlySubscriptionApiCreditDeposit.include(),
+        apiCreditPackagePurchase: ApiCreditPackagePurchase.include(),
       ),
     );
 
-    return PaginatedCreditHistoryResponse(
+    return PaginatedApiCreditHistoryResponse(
       data: creditHistory,
       pagination: PaginationMetadata(
         currentPage: page,
