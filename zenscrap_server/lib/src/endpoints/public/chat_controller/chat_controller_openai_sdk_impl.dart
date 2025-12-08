@@ -58,14 +58,14 @@ class ChatControllerOpenAiSdkImpl extends IChatController
   ChatControllerOpenAiSdkImpl._({
     required super.scrappableId,
     required String openAiApiKey,
-    required String scrapingBeeApiKey,
     required String contextPrompt,
     required String extractionRulesGuide,
     required String model,
   })  : _openAiApiKey = openAiApiKey,
         _model = model {
-    final systemPrompt =
-        buildSystemPrompt(scrapingBeeApiKey: scrapingBeeApiKey);
+    // ScrapingBee API key is now configured server-side in the MCP,
+    // so we don't need to pass it in the prompt anymore
+    final systemPrompt = buildSystemPrompt();
     _baseMessages.addAll([
       OpenAiMessage(role: 'system', content: systemPrompt),
       OpenAiMessage(role: 'system', content: contextPrompt),
@@ -285,7 +285,6 @@ class ChatControllerOpenAiSdkImpl extends IChatController
   factory ChatControllerOpenAiSdkImpl.startChat({
     required int scrappableId,
     required String openAiApiKey,
-    required String scrapingBeeApiKey,
     required ReferenceTestData referenceTestData,
     required ScrappableRequest scrapperRequest,
     required ScrappingBeeExtractLogic? currentFetchSettings,
@@ -309,7 +308,6 @@ class ChatControllerOpenAiSdkImpl extends IChatController
     return ChatControllerOpenAiSdkImpl._(
       scrappableId: scrappableId,
       openAiApiKey: openAiApiKey,
-      scrapingBeeApiKey: scrapingBeeApiKey,
       contextPrompt: contextPrompt,
       extractionRulesGuide: extractionRulesGuide,
       model: _mapModel(model),
