@@ -7,16 +7,13 @@ import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.d
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/api_usage/api_keys_state.dart';
 
-final apiKeysProvider =
-    StateNotifierProvider<ApiKeysNotifier, ApiKeysState>((ref) {
-  final client = ref.watch(clientProvider);
-  return ApiKeysNotifier(client);
-});
+/// Notifier for managing API keys state.
+/// Migrated from StateNotifierProvider to NotifierProvider for Riverpod 3.0.
+class ApiKeysNotifier extends Notifier<ApiKeysState> {
+  @override
+  ApiKeysState build() => const ApiKeysState.initial();
 
-class ApiKeysNotifier extends StateNotifier<ApiKeysState> {
-  final Client _client;
-
-  ApiKeysNotifier(this._client) : super(const ApiKeysState.initial());
+  Client get _client => ref.read(clientProvider);
 
   Future<void> loadApiKeys() async {
     try {
@@ -137,3 +134,6 @@ class ApiKeysNotifier extends StateNotifier<ApiKeysState> {
     await loadApiKeys();
   }
 }
+
+final apiKeysProvider =
+    NotifierProvider<ApiKeysNotifier, ApiKeysState>(ApiKeysNotifier.new);

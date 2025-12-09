@@ -5,19 +5,16 @@ import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/ai_usage/auto_fix_sessions_state.dart';
 
-final autoFixSessionsProvider =
-    StateNotifierProvider<AutoFixSessionsNotifier, AutoFixSessionsState>((ref) {
-  final client = ref.watch(clientProvider);
-  return AutoFixSessionsNotifier(client);
-});
-
-class AutoFixSessionsNotifier extends StateNotifier<AutoFixSessionsState> {
-  final Client _client;
+/// Notifier for managing auto-fix sessions state.
+/// Migrated from StateNotifierProvider to NotifierProvider for Riverpod 3.0.
+class AutoFixSessionsNotifier extends Notifier<AutoFixSessionsState> {
   int _currentPage = 1;
   List<AutoFixSession> _allSessions = [];
 
-  AutoFixSessionsNotifier(this._client)
-      : super(const AutoFixSessionsState.initial());
+  @override
+  AutoFixSessionsState build() => const AutoFixSessionsState.initial();
+
+  Client get _client => ref.read(clientProvider);
 
   Future<void> loadSessions() async {
     try {
@@ -131,3 +128,7 @@ class AutoFixSessionsNotifier extends StateNotifier<AutoFixSessionsState> {
     await loadSessions();
   }
 }
+
+final autoFixSessionsProvider =
+    NotifierProvider<AutoFixSessionsNotifier, AutoFixSessionsState>(
+        AutoFixSessionsNotifier.new);

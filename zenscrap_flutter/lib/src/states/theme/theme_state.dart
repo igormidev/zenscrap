@@ -10,9 +10,8 @@ abstract class ThemeState with _$ThemeState {
     required Brightness brightness,
   }) = _ThemeState;
 
-  // ignore: deprecated_member_use
   factory ThemeState.initial() => ThemeState(
-        colorValue: Colors.blue.value,
+        colorValue: Colors.blue.toARGB32(),
         brightness: Brightness.light,
       );
 }

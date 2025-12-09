@@ -1059,7 +1059,7 @@ class _CreditLimitReachedMessage extends ConsumerWidget {
     final colorScheme = theme.colorScheme;
 
     // Check if API key has already been added (resolve state)
-    final messages = ref.watch(chatMessagesProvider).valueOrNull ?? [];
+    final messages = ref.watch(chatMessagesProvider).value ?? [];
     final hasApiKeyUpdated =
         messages.any((m) => m is ApiKeyUpdatedResponse);
 

@@ -6,21 +6,13 @@ import 'package:zenscrap_flutter/src/states/account/account_state.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_state.dart';
 
-final accountProvider =
-    StateNotifierProvider<AccountStateNotifier, AccountState>((ref) {
-  return AccountStateNotifier(ref);
-});
-
-class AccountStateNotifier extends StateNotifier<AccountState> {
+/// Notifier for managing account state.
+/// Migrated from StateNotifierProvider to NotifierProvider for Riverpod 3.0.
+class AccountStateNotifier extends Notifier<AccountState> {
   int? scrappableIdToBeAttached;
-  AccountStateNotifier(this.ref) : super(AccountState.initial());
-  final Ref ref;
 
   @override
-  void dispose() {
-    scrappableIdToBeAttached = null;
-    super.dispose();
-  }
+  AccountState build() => AccountState.initial();
 
   void logOut() async {
     state = AccountState.initial();
@@ -37,8 +29,9 @@ class AccountStateNotifier extends StateNotifier<AccountState> {
 
     state = AccountState.loading();
 
-    final scrappable = ref.read(scrapChatProvider).mapOrNull(
+    final scrappable = ref.read(scrapChatProvider).maybeMap(
           standard: (value) => value.data,
+          orElse: () => null,
         );
 
     final scrappableId = scrappable?.id ?? scrappableIdToBeAttached;
@@ -71,3 +64,6 @@ class AccountStateNotifier extends StateNotifier<AccountState> {
     state = AccountState.withData(accountInfo: accountInfo);
   }
 }
+
+final accountProvider =
+    NotifierProvider<AccountStateNotifier, AccountState>(AccountStateNotifier.new);

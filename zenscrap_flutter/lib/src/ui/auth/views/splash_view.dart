@@ -25,23 +25,23 @@ class _SplashViewState extends ConsumerState<SplashView> {
     final sessionManager = ref.read(sessionManagerProvider);
     final signedInUser = sessionManager.signedInUser;
     if (signedInUser == null) {
-      ref.read(sessionProvider.notifier).state = SessionState.notSignedIn();
+      ref.read(sessionProvider.notifier).setState(SessionState.notSignedIn());
     } else {
       final email = signedInUser.email;
       final userName = signedInUser.userName;
       if (email == null || userName == null) {
         await sessionManager.signOutAllDevices();
-        ref.read(sessionProvider.notifier).state = SessionState.notSignedIn();
+        ref.read(sessionProvider.notifier).setState(SessionState.notSignedIn());
         return;
       }
 
-      ref.read(sessionProvider.notifier).state = SessionState.logged(
+      ref.read(sessionProvider.notifier).setState(SessionState.logged(
         user: UserModel(
           email: email,
           userName: userName,
           imageUrl: signedInUser.imageUrl,
         ),
-      );
+      ));
     }
   }
 

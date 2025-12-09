@@ -9,9 +9,19 @@ import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
 
+/// Notifier for managing the current tab index in the dashboard.
+/// Migrated from StateNotifierProvider to NotifierProvider for Riverpod 3.0.
+class CurrentTabIndexNotifier extends Notifier<int> {
+  @override
+  int build() => 0;
+
+  void setPage(int page) {
+    state = page;
+  }
+}
+
 final currentTabIndexProvider =
-    StateNotifierProvider<CurrentTabIndexStateNotifier, int>(
-        CurrentTabIndexStateNotifier.new);
+    NotifierProvider<CurrentTabIndexNotifier, int>(CurrentTabIndexNotifier.new);
 
 final currentDashboardTabProvider = Provider<DashboardNavigationType>((ref) {
   final navigationOptions = ref.watch(possibleNavigationsProvider);
@@ -19,15 +29,6 @@ final currentDashboardTabProvider = Provider<DashboardNavigationType>((ref) {
 
   return navigationOptions[currentTabIndex];
 });
-
-class CurrentTabIndexStateNotifier extends StateNotifier<int> {
-  CurrentTabIndexStateNotifier(this.ref) : super(0);
-  final Ref ref;
-
-  void setPage(int page) {
-    state = page;
-  }
-}
 
 Future<void> changeTab(
   DashboardNavigationType tab,
@@ -62,7 +63,7 @@ Future<void> logOut(BuildContext context, WidgetRef ref) async {
   if (result == OkCancelResult.ok) {
     ref.globalLoadingSetter(() async {
       await ref.read(sessionManagerProvider).signOutDevice();
-      ref.read(sessionProvider.notifier).state = SessionState.notSignedIn();
+      ref.read(sessionProvider.notifier).setState(SessionState.notSignedIn());
     });
   }
 }
@@ -78,7 +79,7 @@ Future<void> rawLogOut(BuildContext context, Ref ref) async {
   if (result == OkCancelResult.ok) {
     ref.globalLoadingSetter(() async {
       await ref.read(sessionManagerProvider).signOutDevice();
-      ref.read(sessionProvider.notifier).state = SessionState.notSignedIn();
+      ref.read(sessionProvider.notifier).setState(SessionState.notSignedIn());
     });
   }
 }

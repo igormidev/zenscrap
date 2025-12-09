@@ -3,16 +3,14 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/analytics/analytics_state.dart';
 
-final analyticsProvider =
-    StateNotifierProvider<AnalyticsNotifier, AnalyticsState>(
-        AnalyticsNotifier.new);
-
-class AnalyticsNotifier extends StateNotifier<AnalyticsState> {
-  final Ref ref;
-  AnalyticsNotifier(this.ref) : super(AnalyticsState.initial());
-
+/// Notifier for managing analytics state.
+/// Migrated from StateNotifierProvider to NotifierProvider for Riverpod 3.0.
+class AnalyticsNotifier extends Notifier<AnalyticsState> {
   int _currentPage = 1;
   AnalyticsTimeScope _currentScope = AnalyticsTimeScope.last12Hours;
+
+  @override
+  AnalyticsState build() => AnalyticsState.initial();
 
   Future<void> getAnalyticsData({AnalyticsTimeScope? scope}) async {
     if (scope != null) {
@@ -85,3 +83,6 @@ class AnalyticsNotifier extends StateNotifier<AnalyticsState> {
 
   AnalyticsTimeScope get currentScope => _currentScope;
 }
+
+final analyticsProvider =
+    NotifierProvider<AnalyticsNotifier, AnalyticsState>(AnalyticsNotifier.new);
