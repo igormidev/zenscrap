@@ -26,23 +26,32 @@ final dashboardErrorProvider = Provider<ZenScrapException?>((ref) {
 
   final List<ZenScrapException?> pageDependenciesErrors =
       switch (selectedPage) {
-    DashboardNavigationType.analytics => [
-        ref.watch(analyticsProvider
-            .select((value) => value.whenOrNull(withError: (error) => error))),
-      ],
-    DashboardNavigationType.userEndpoints => [
-        ref.watch(userScrappablesProvider.select(
-            (value) => value.whenOrNull(withError: (error, _, __, ___) => error))),
-      ],
-    DashboardNavigationType.marketPlace => [
-        ref.watch(marketplaceProvider
-            .select((value) => value.whenOrNull(withError: (error) => error))),
-      ],
-    DashboardNavigationType.usage => [],
-    DashboardNavigationType.account => [],
-    DashboardNavigationType.logOut => [],
-    DashboardNavigationType.pricingPage => [],
-  };
+        DashboardNavigationType.analytics => [
+          ref.watch(
+            analyticsProvider.select(
+              (value) => value.whenOrNull(withError: (error) => error),
+            ),
+          ),
+        ],
+        DashboardNavigationType.userEndpoints => [
+          ref.watch(
+            userScrappablesProvider.select(
+              (value) => value.whenOrNull(withError: (error, _, _, _) => error),
+            ),
+          ),
+        ],
+        DashboardNavigationType.marketPlace => [
+          ref.watch(
+            marketplaceProvider.select(
+              (value) => value.whenOrNull(withError: (error) => error),
+            ),
+          ),
+        ],
+        DashboardNavigationType.usage => [],
+        DashboardNavigationType.account => [],
+        DashboardNavigationType.logOut => [],
+        DashboardNavigationType.pricingPage => [],
+      };
 
   return pageDependenciesErrors.firstWhereOrNull((element) => element != null);
 });

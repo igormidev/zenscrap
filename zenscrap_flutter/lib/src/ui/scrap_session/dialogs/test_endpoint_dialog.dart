@@ -33,11 +33,11 @@ class TestEndpointDialog extends ConsumerStatefulWidget {
     this.targetTime,
     this.apiKey,
   }) : assert(
-          isTestMode ? targetTime != null : apiKey != null,
-          isTestMode
-              ? 'targetTime is required in test mode'
-              : 'apiKey is required in production mode',
-        );
+         isTestMode ? targetTime != null : apiKey != null,
+         isTestMode
+             ? 'targetTime is required in test mode'
+             : 'apiKey is required in production mode',
+       );
 
   @override
   ConsumerState<TestEndpointDialog> createState() => _TestEndpointDialogState();
@@ -72,9 +72,9 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
     // Pre-fill with test data if available
     if (widget.testData != null) {
       try {
-        final testPayload = jsonDecode(
-          widget.testData!.referenceQueryParametersJson,
-        ) as Map<String, dynamic>;
+        final testPayload =
+            jsonDecode(widget.testData!.referenceQueryParametersJson)
+                as Map<String, dynamic>;
 
         testPayload.forEach((key, value) {
           if (_pathParamControllers.containsKey(key)) {
@@ -125,8 +125,10 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
 
       // Get base URL from client
       final client = ref.read(clientProvider);
-      final baseUrl =
-          client.host.replaceAll('localhost:8080/', 'localhost:8082');
+      final baseUrl = client.host.replaceAll(
+        'localhost:8080/',
+        'localhost:8082',
+      );
       final endpoint = widget.isTestMode
           ? '$baseUrl/api/scrappable/test'
           : '$baseUrl/api/scrappable/prod';
@@ -148,9 +150,7 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
         endpoint,
         data: requestData,
         options: Options(
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: {'Content-Type': 'application/json'},
           validateStatus: (status) {
             // Accept any status code to handle errors properly
             return status != null && status < 500;
@@ -195,9 +195,7 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       contentPadding: EdgeInsets.zero,
       content: Container(
         width: MediaQuery.of(context).size.width * 0.7,
@@ -249,10 +247,7 @@ class _TestDialogHeader extends StatelessWidget {
   final DateTime? targetTime;
   final bool isTestMode;
 
-  const _TestDialogHeader({
-    required this.targetTime,
-    required this.isTestMode,
-  });
+  const _TestDialogHeader({required this.targetTime, required this.isTestMode});
 
   @override
   Widget build(BuildContext context) {
@@ -284,10 +279,7 @@ class _TestDialogHeader extends StatelessWidget {
           const SizedBox(width: 12),
         ],
         IconButton(
-          icon: Icon(
-            Icons.close,
-            color: context.c.onSurfaceVariant,
-          ),
+          icon: Icon(Icons.close, color: context.c.onSurfaceVariant),
           onPressed: () => Navigator.of(context).pop(),
           tooltip: 'Close',
           style: IconButton.styleFrom(
@@ -339,7 +331,7 @@ class _RemainingTimeChipState extends State<_RemainingTimeChip> {
   Widget build(BuildContext context) {
     return ValueListenableBuilder<Duration?>(
       valueListenable: remaining,
-      builder: (_, value, __) {
+      builder: (_, value, _) {
         final Color baseColor;
         final String text;
         if (value == null) {
@@ -356,8 +348,9 @@ class _RemainingTimeChipState extends State<_RemainingTimeChip> {
               : (totalMinutesLeft < 35 ? Colors.orange : context.c.primary);
 
           final containsHour = hours != '00';
-          text =
-              containsHour ? '$hours:$minutes:$seconds' : '$minutes:$seconds';
+          text = containsHour
+              ? '$hours:$minutes:$seconds'
+              : '$minutes:$seconds';
         }
 
         return Container(
@@ -407,11 +400,7 @@ class _ParametersPanel extends StatelessWidget {
         // Section header
         Row(
           children: [
-            Icon(
-              Icons.tune_rounded,
-              size: 18,
-              color: context.c.primary,
-            ),
+            Icon(Icons.tune_rounded, size: 18, color: context.c.primary),
             const SizedBox(width: 8),
             Text(
               'Parameters',
@@ -545,10 +534,7 @@ class _ParameterSection extends StatelessWidget {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(
-                    color: context.c.primary,
-                    width: 1.5,
-                  ),
+                  borderSide: BorderSide(color: context.c.primary, width: 1.5),
                 ),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 14,
@@ -623,11 +609,7 @@ class _ResponsePanel extends StatelessWidget {
         // Section header
         Row(
           children: [
-            Icon(
-              Icons.code_rounded,
-              size: 18,
-              color: context.c.secondary,
-            ),
+            Icon(Icons.code_rounded, size: 18, color: context.c.secondary),
             const SizedBox(width: 8),
             Text(
               'Response',
@@ -735,9 +717,7 @@ class _ErrorState extends StatelessWidget {
       decoration: BoxDecoration(
         color: context.c.errorContainer.withAlpha(30),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: context.c.error.withAlpha(50),
-        ),
+        border: Border.all(color: context.c.error.withAlpha(50)),
       ),
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -801,9 +781,7 @@ class _SuccessState extends StatelessWidget {
       decoration: BoxDecoration(
         color: context.c.surfaceContainerLow,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: context.c.outline.withAlpha(40),
-        ),
+        border: Border.all(color: context.c.outline.withAlpha(40)),
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(

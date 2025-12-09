@@ -43,7 +43,7 @@ class _RemainingTimeIndicatorState extends State<RemainingTimeIndicator> {
     final scheme = context.c;
     return ValueListenableBuilder<Duration?>(
       valueListenable: remaining,
-      builder: (_, value, __) {
+      builder: (_, value, _) {
         final Color baseColor;
         final String text;
         if (value == null) {
@@ -57,10 +57,12 @@ class _RemainingTimeIndicatorState extends State<RemainingTimeIndicator> {
           // Choose color based on remaining time thresholds
           final totalMinutesLeft = value.inMinutes;
           baseColor = totalMinutesLeft < 15
-              ? scheme.error // red under 15m
+              ? scheme
+                    .error // red under 15m
               : (totalMinutesLeft < 35
-                  ? Colors.orange // yellow under 35m
-                  : scheme.primary); // default
+                    ? Colors
+                          .orange // yellow under 35m
+                    : scheme.primary); // default
 
           final containsHour = hours != '00';
           text =

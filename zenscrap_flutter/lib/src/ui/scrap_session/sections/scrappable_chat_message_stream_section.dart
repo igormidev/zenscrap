@@ -36,7 +36,7 @@ class _ScrappableChatMessageStreamSectionState
     final scrollController = ref.watch(chatScrollControllerProvider);
     final scrollHelper = ref.watch(chatScrollHelperProvider);
     final messagesAsync = ref.watch(chatMessagesProvider);
-    ref.listen(chatMessagesProvider, (_, __) => scrollHelper.scrollToBottom());
+    ref.listen(chatMessagesProvider, (_, _) => scrollHelper.scrollToBottom());
 
     return messagesAsync.when(
       loading: () => const Center(
@@ -63,8 +63,8 @@ class _ScrappableChatMessageStreamSectionState
             Text(
               error.toString(),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.error,
-                  ),
+                color: Theme.of(context).colorScheme.error,
+              ),
               textAlign: TextAlign.center,
             ),
           ],
@@ -79,30 +79,27 @@ class _ScrappableChatMessageStreamSectionState
                 Icon(
                   Icons.chat_bubble_outline,
                   size: 64,
-                  color: Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withValues(alpha: 0.3),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.3),
                 ),
                 const SizedBox(height: 16),
                 Text(
                   'No messages yet',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withValues(alpha: 0.5),
-                      ),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.5),
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Send a message to start the conversation',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withValues(alpha: 0.4),
-                      ),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.4),
+                  ),
                 ),
               ],
             ),
@@ -144,9 +141,7 @@ class _ScrappableChatMessageStreamSectionState
 }
 
 class GenericLoadingBubble extends StatelessWidget {
-  const GenericLoadingBubble({
-    super.key,
-  });
+  const GenericLoadingBubble({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -407,7 +402,9 @@ class _ChatMessageBubble extends StatelessWidget {
                       maxWidth: MediaQuery.of(context).size.width * 0.75,
                     ),
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 10),
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
                     decoration: BoxDecoration(
                       color: backgroundColor,
                       borderRadius: messageBorderRadius,
@@ -466,11 +463,7 @@ class _MessageAvatar extends StatelessWidget {
           ),
         ],
       ),
-      child: Icon(
-        icon,
-        size: 18,
-        color: iconColor,
-      ),
+      child: Icon(icon, size: 18, color: iconColor),
     );
   }
 }
@@ -479,20 +472,17 @@ class _TextMessage extends StatelessWidget {
   final String text;
   final Color textColor;
 
-  const _TextMessage({
-    required this.text,
-    required this.textColor,
-  });
+  const _TextMessage({required this.text, required this.textColor});
 
   @override
   Widget build(BuildContext context) {
     return SelectableText(
       text,
       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: textColor,
-            height: 1.4,
-            fontSize: 14,
-          ),
+        color: textColor,
+        height: 1.4,
+        fontSize: 14,
+      ),
     );
   }
 }
@@ -501,10 +491,7 @@ class _ErrorMessage extends StatelessWidget {
   final String errorMessage;
   final Color textColor;
 
-  const _ErrorMessage({
-    required this.errorMessage,
-    required this.textColor,
-  });
+  const _ErrorMessage({required this.errorMessage, required this.textColor});
 
   @override
   Widget build(BuildContext context) {
@@ -524,9 +511,9 @@ class _ErrorMessage extends StatelessWidget {
             Text(
               'Error',
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: textColor,
-                    fontWeight: FontWeight.w600,
-                  ),
+                color: textColor,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),
@@ -534,10 +521,10 @@ class _ErrorMessage extends StatelessWidget {
         SelectableText(
           errorMessage,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: textColor.withValues(alpha: 0.9),
-                height: 1.4,
-                fontSize: 14,
-              ),
+            color: textColor.withValues(alpha: 0.9),
+            height: 1.4,
+            fontSize: 14,
+          ),
         ),
       ],
     );
@@ -627,11 +614,14 @@ class _JsonDisplayMessageState extends State<_JsonDisplayMessage> {
             children: [
               InkWell(
                 onTap: () => setState(() => _isExpanded = !_isExpanded),
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(12)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(12),
+                ),
                 child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
                   child: Row(
                     children: [
                       Icon(
@@ -718,10 +708,7 @@ class _NewRuleMessage extends StatelessWidget {
   final String messageText;
   final Color textColor;
 
-  const _NewRuleMessage({
-    required this.messageText,
-    required this.textColor,
-  });
+  const _NewRuleMessage({required this.messageText, required this.textColor});
 
   @override
   Widget build(BuildContext context) {
@@ -742,11 +729,11 @@ class _NewRuleMessage extends StatelessWidget {
           child: SelectableText(
             messageText,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: textColor,
-                  height: 1.4,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
+              color: textColor,
+              height: 1.4,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
       ],
@@ -790,9 +777,9 @@ class _UpdatedScrappableRequestMessage extends StatelessWidget {
               child: Text(
                 messageText,
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: textColor,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  color: textColor,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ],
@@ -803,9 +790,7 @@ class _UpdatedScrappableRequestMessage extends StatelessWidget {
           decoration: BoxDecoration(
             color: backgroundColor.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: textColor.withValues(alpha: 0.2),
-            ),
+            border: Border.all(color: textColor.withValues(alpha: 0.2)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -862,27 +847,23 @@ class _InfoRow extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(
-          icon,
-          size: 14,
-          color: textColor.withValues(alpha: 0.7),
-        ),
+        Icon(icon, size: 14, color: textColor.withValues(alpha: 0.7)),
         const SizedBox(width: 6),
         Text(
           label,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: textColor.withValues(alpha: 0.8),
-                fontWeight: FontWeight.w600,
-              ),
+            color: textColor.withValues(alpha: 0.8),
+            fontWeight: FontWeight.w600,
+          ),
         ),
         const SizedBox(width: 6),
         Expanded(
           child: Text(
             value,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: textColor,
-                  fontFamily: 'monospace',
-                ),
+              color: textColor,
+              fontFamily: 'monospace',
+            ),
           ),
         ),
       ],
@@ -921,9 +902,9 @@ class _TestEndpointSuccessMessage extends StatelessWidget {
             Text(
               'Test Endpoint Called Successfully',
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: textColor,
-                    fontWeight: FontWeight.w600,
-                  ),
+                color: textColor,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),
@@ -981,9 +962,9 @@ class _TestEndpointErrorMessage extends StatelessWidget {
             Text(
               'Test Endpoint Failed',
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: textColor,
-                    fontWeight: FontWeight.w600,
-                  ),
+                color: textColor,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),
@@ -1005,18 +986,18 @@ class _TestEndpointErrorMessage extends StatelessWidget {
               Text(
                 errorTitle,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: textColor,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  color: textColor,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               const SizedBox(height: 4),
               SelectableText(
                 errorDescription,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: textColor.withValues(alpha: 0.9),
-                      height: 1.4,
-                      fontSize: 14,
-                    ),
+                  color: textColor.withValues(alpha: 0.9),
+                  height: 1.4,
+                  fontSize: 14,
+                ),
               ),
             ],
           ),
@@ -1060,8 +1041,7 @@ class _CreditLimitReachedMessage extends ConsumerWidget {
 
     // Check if API key has already been added (resolve state)
     final messages = ref.watch(chatMessagesProvider).value ?? [];
-    final hasApiKeyUpdated =
-        messages.any((m) => m is ApiKeyUpdatedResponse);
+    final hasApiKeyUpdated = messages.any((m) => m is ApiKeyUpdatedResponse);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1101,9 +1081,7 @@ class _CreditLimitReachedMessage extends ConsumerWidget {
           decoration: BoxDecoration(
             color: textColor.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: textColor.withValues(alpha: 0.15),
-            ),
+            border: Border.all(color: textColor.withValues(alpha: 0.15)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1343,7 +1321,8 @@ class _UserApiKeyQuotaExceededMessage extends StatelessWidget {
     required this.backgroundColor,
   });
 
-  static const _openAiBillingUrl = 'https://platform.openai.com/settings/organization/billing/overview';
+  static const _openAiBillingUrl =
+      'https://platform.openai.com/settings/organization/billing/overview';
 
   @override
   Widget build(BuildContext context) {
@@ -1401,9 +1380,7 @@ class _UserApiKeyQuotaExceededMessage extends StatelessWidget {
             decoration: BoxDecoration(
               color: textColor.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: textColor.withValues(alpha: 0.15),
-              ),
+              border: Border.all(color: textColor.withValues(alpha: 0.15)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1450,10 +1427,7 @@ class _UserApiKeyQuotaExceededMessage extends StatelessWidget {
             style: FilledButton.styleFrom(
               backgroundColor: colorScheme.primary,
               foregroundColor: colorScheme.onPrimary,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 14,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -1503,11 +1477,11 @@ class _ApiKeyUpdatedMessage extends StatelessWidget {
           child: SelectableText(
             messageText,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: textColor,
-                  height: 1.4,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
+              color: textColor,
+              height: 1.4,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
       ],
@@ -1535,10 +1509,12 @@ class _IpLimitReachedMessage extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<_IpLimitReachedMessage> createState() => _IpLimitReachedMessageState();
+  ConsumerState<_IpLimitReachedMessage> createState() =>
+      _IpLimitReachedMessageState();
 }
 
-class _IpLimitReachedMessageState extends ConsumerState<_IpLimitReachedMessage> {
+class _IpLimitReachedMessageState
+    extends ConsumerState<_IpLimitReachedMessage> {
   late Duration _remainingTime;
   late final DateTime _resetTime;
   bool _hasTrackedView = false;
@@ -1555,11 +1531,13 @@ class _IpLimitReachedMessageState extends ConsumerState<_IpLimitReachedMessage> 
   void _trackView() {
     if (!_hasTrackedView) {
       _hasTrackedView = true;
-      ref.read(analyticsServiceProvider).trackChatIpLimitReachedView(
-        totalSpentUsd: widget.totalSpentUsd,
-        spendingLimitUsd: widget.spendingLimitUsd,
-        timeUntilResetSeconds: widget.timeUntilReset.inSeconds,
-      );
+      ref
+          .read(analyticsServiceProvider)
+          .trackChatIpLimitReachedView(
+            totalSpentUsd: widget.totalSpentUsd,
+            spendingLimitUsd: widget.spendingLimitUsd,
+            timeUntilResetSeconds: widget.timeUntilReset.inSeconds,
+          );
     }
   }
 
@@ -1637,9 +1615,7 @@ class _IpLimitReachedMessageState extends ConsumerState<_IpLimitReachedMessage> 
           decoration: BoxDecoration(
             color: widget.textColor.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: widget.textColor.withValues(alpha: 0.15),
-            ),
+            border: Border.all(color: widget.textColor.withValues(alpha: 0.15)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1667,8 +1643,10 @@ class _IpLimitReachedMessageState extends ConsumerState<_IpLimitReachedMessage> 
               ClipRRect(
                 borderRadius: BorderRadius.circular(4),
                 child: LinearProgressIndicator(
-                  value:
-                      (widget.totalSpentUsd / widget.spendingLimitUsd).clamp(0.0, 1.0),
+                  value: (widget.totalSpentUsd / widget.spendingLimitUsd).clamp(
+                    0.0,
+                    1.0,
+                  ),
                   backgroundColor: widget.textColor.withValues(alpha: 0.1),
                   valueColor: AlwaysStoppedAnimation<Color>(colorScheme.error),
                   minHeight: 6,
@@ -1704,7 +1682,9 @@ class _IpLimitReachedMessageState extends ConsumerState<_IpLimitReachedMessage> 
                     Text(
                       'Resets in',
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: colorScheme.onPrimaryContainer.withValues(alpha: 0.7),
+                        color: colorScheme.onPrimaryContainer.withValues(
+                          alpha: 0.7,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -1744,10 +1724,7 @@ class _IpLimitReachedMessageState extends ConsumerState<_IpLimitReachedMessage> 
             style: FilledButton.styleFrom(
               backgroundColor: colorScheme.primary,
               foregroundColor: colorScheme.onPrimary,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 14,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -1769,17 +1746,17 @@ class _IpLimitReachedMessageState extends ConsumerState<_IpLimitReachedMessage> 
 
   void _navigateToSignUp(BuildContext context) {
     // Track the click event
-    ref.read(analyticsServiceProvider).trackChatIpLimitCreateAccountClick(
-      totalSpentUsd: widget.totalSpentUsd,
-      spendingLimitUsd: widget.spendingLimitUsd,
-      timeUntilResetSeconds: _remainingTime.inSeconds,
-    );
+    ref
+        .read(analyticsServiceProvider)
+        .trackChatIpLimitCreateAccountClick(
+          totalSpentUsd: widget.totalSpentUsd,
+          spendingLimitUsd: widget.spendingLimitUsd,
+          timeUntilResetSeconds: _remainingTime.inSeconds,
+        );
 
     // Navigate to the AuthView for sign up
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const AuthView(),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const AuthView()));
   }
 }
