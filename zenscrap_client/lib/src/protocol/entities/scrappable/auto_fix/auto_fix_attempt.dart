@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -32,12 +33,12 @@ abstract class AutoFixAttempt implements _i1.SerializableModel {
     int? outputTokens,
     int? reasoningTokens,
     required this.sessionId,
-  })  : succeeded = succeeded ?? false,
-        status = status ?? _i2.AutoFixAttemptStatus.in_progress,
-        costUsd = costUsd ?? 0.0,
-        inputTokens = inputTokens ?? 0,
-        outputTokens = outputTokens ?? 0,
-        reasoningTokens = reasoningTokens ?? 0;
+  }) : succeeded = succeeded ?? false,
+       status = status ?? _i2.AutoFixAttemptStatus.in_progress,
+       costUsd = costUsd ?? 0.0,
+       inputTokens = inputTokens ?? 0,
+       outputTokens = outputTokens ?? 0,
+       reasoningTokens = reasoningTokens ?? 0;
 
   factory AutoFixAttempt({
     int? id,
@@ -62,16 +63,19 @@ abstract class AutoFixAttempt implements _i1.SerializableModel {
   factory AutoFixAttempt.fromJson(Map<String, dynamic> jsonSerialization) {
     return AutoFixAttempt(
       id: jsonSerialization['id'] as int?,
-      startedAt:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['startedAt']),
+      startedAt: _i1.DateTimeJsonExtension.fromJson(
+        jsonSerialization['startedAt'],
+      ),
       completedAt: jsonSerialization['completedAt'] == null
           ? null
           : _i1.DateTimeJsonExtension.fromJson(
-              jsonSerialization['completedAt']),
+              jsonSerialization['completedAt'],
+            ),
       attemptNumber: jsonSerialization['attemptNumber'] as int,
       succeeded: jsonSerialization['succeeded'] as bool,
       status: _i2.AutoFixAttemptStatus.fromJson(
-          (jsonSerialization['status'] as int)),
+        (jsonSerialization['status'] as String),
+      ),
       errorMessage: jsonSerialization['errorMessage'] as String?,
       aiThinkingLog: jsonSerialization['aiThinkingLog'] as String?,
       generatedExtractRules:
@@ -149,6 +153,7 @@ abstract class AutoFixAttempt implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'AutoFixAttempt',
       if (id != null) 'id': id,
       'startedAt': startedAt.toJson(),
       if (completedAt != null) 'completedAt': completedAt?.toJson(),
@@ -199,24 +204,24 @@ class _AutoFixAttemptImpl extends AutoFixAttempt {
     int? reasoningTokens,
     required int sessionId,
   }) : super._(
-          id: id,
-          startedAt: startedAt,
-          completedAt: completedAt,
-          attemptNumber: attemptNumber,
-          succeeded: succeeded,
-          status: status,
-          errorMessage: errorMessage,
-          aiThinkingLog: aiThinkingLog,
-          generatedExtractRules: generatedExtractRules,
-          generatedJsScenario: generatedJsScenario,
-          validationPassed: validationPassed,
-          validationError: validationError,
-          costUsd: costUsd,
-          inputTokens: inputTokens,
-          outputTokens: outputTokens,
-          reasoningTokens: reasoningTokens,
-          sessionId: sessionId,
-        );
+         id: id,
+         startedAt: startedAt,
+         completedAt: completedAt,
+         attemptNumber: attemptNumber,
+         succeeded: succeeded,
+         status: status,
+         errorMessage: errorMessage,
+         aiThinkingLog: aiThinkingLog,
+         generatedExtractRules: generatedExtractRules,
+         generatedJsScenario: generatedJsScenario,
+         validationPassed: validationPassed,
+         validationError: validationError,
+         costUsd: costUsd,
+         inputTokens: inputTokens,
+         outputTokens: outputTokens,
+         reasoningTokens: reasoningTokens,
+         sessionId: sessionId,
+       );
 
   /// Returns a shallow copy of this [AutoFixAttempt]
   /// with some or all fields replaced by the given arguments.
@@ -249,18 +254,21 @@ class _AutoFixAttemptImpl extends AutoFixAttempt {
       succeeded: succeeded ?? this.succeeded,
       status: status ?? this.status,
       errorMessage: errorMessage is String? ? errorMessage : this.errorMessage,
-      aiThinkingLog:
-          aiThinkingLog is String? ? aiThinkingLog : this.aiThinkingLog,
+      aiThinkingLog: aiThinkingLog is String?
+          ? aiThinkingLog
+          : this.aiThinkingLog,
       generatedExtractRules: generatedExtractRules is String?
           ? generatedExtractRules
           : this.generatedExtractRules,
       generatedJsScenario: generatedJsScenario is String?
           ? generatedJsScenario
           : this.generatedJsScenario,
-      validationPassed:
-          validationPassed is bool? ? validationPassed : this.validationPassed,
-      validationError:
-          validationError is String? ? validationError : this.validationError,
+      validationPassed: validationPassed is bool?
+          ? validationPassed
+          : this.validationPassed,
+      validationError: validationError is String?
+          ? validationError
+          : this.validationError,
       costUsd: costUsd ?? this.costUsd,
       inputTokens: inputTokens ?? this.inputTokens,
       outputTokens: outputTokens ?? this.outputTokens,

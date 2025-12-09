@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 part of '../chat_response.dart';
 
@@ -31,20 +32,19 @@ abstract class UpdatedScrappableRequestResponse extends _i1.ChatResponse
   }) = _UpdatedScrappableRequestResponseImpl;
 
   factory UpdatedScrappableRequestResponse.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return UpdatedScrappableRequestResponse(
       role: _i3.PromptRole.fromJson((jsonSerialization['role'] as String)),
       expectsFollowUp: jsonSerialization['expectsFollowUp'] as bool,
       messageText: jsonSerialization['messageText'] as String,
       url: jsonSerialization['url'] as String,
-      queryParams:
-          (jsonSerialization['queryParams'] as Map).map((k, v) => MapEntry(
-                k as String,
-                v as String?,
-              )),
-      pathParams: (jsonSerialization['pathParams'] as List)
-          .map((e) => e as String)
-          .toList(),
+      queryParams: _i6.Protocol().deserialize<Map<String, String?>>(
+        jsonSerialization['queryParams'],
+      ),
+      pathParams: _i6.Protocol().deserialize<List<String>>(
+        jsonSerialization['pathParams'],
+      ),
     );
   }
 
@@ -58,6 +58,7 @@ abstract class UpdatedScrappableRequestResponse extends _i1.ChatResponse
 
   /// Returns a shallow copy of this [UpdatedScrappableRequestResponse]
   /// with some or all fields replaced by the given arguments.
+  @override
   @_i2.useResult
   UpdatedScrappableRequestResponse copyWith({
     _i3.PromptRole? role,
@@ -70,6 +71,7 @@ abstract class UpdatedScrappableRequestResponse extends _i1.ChatResponse
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'UpdatedScrappableRequestResponse',
       'role': role.toJson(),
       'expectsFollowUp': expectsFollowUp,
       'messageText': messageText,
@@ -95,13 +97,13 @@ class _UpdatedScrappableRequestResponseImpl
     required Map<String, String?> queryParams,
     required List<String> pathParams,
   }) : super._(
-          role: role,
-          expectsFollowUp: expectsFollowUp,
-          messageText: messageText,
-          url: url,
-          queryParams: queryParams,
-          pathParams: pathParams,
-        );
+         role: role,
+         expectsFollowUp: expectsFollowUp,
+         messageText: messageText,
+         url: url,
+         queryParams: queryParams,
+         pathParams: pathParams,
+       );
 
   /// Returns a shallow copy of this [UpdatedScrappableRequestResponse]
   /// with some or all fields replaced by the given arguments.
@@ -120,15 +122,17 @@ class _UpdatedScrappableRequestResponseImpl
       expectsFollowUp: expectsFollowUp ?? this.expectsFollowUp,
       messageText: messageText ?? this.messageText,
       url: url ?? this.url,
-      queryParams: queryParams ??
-          this.queryParams.map((
-                key0,
-                value0,
-              ) =>
-                  MapEntry(
-                    key0,
-                    value0,
-                  )),
+      queryParams:
+          queryParams ??
+          this.queryParams.map(
+            (
+              key0,
+              value0,
+            ) => MapEntry(
+              key0,
+              value0,
+            ),
+          ),
       pathParams: pathParams ?? this.pathParams.map((e0) => e0).toList(),
     );
   }

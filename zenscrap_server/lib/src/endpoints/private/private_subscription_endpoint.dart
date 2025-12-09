@@ -15,7 +15,7 @@ class PrivateSubscriptionEndpoint extends Endpoint {
     required bool isYearly,
   }) async {
     // Get authenticated user
-    final authenticationInfo = await session.authenticated;
+    final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
       throw Exception('User not authenticated');
     }
@@ -69,7 +69,7 @@ class PrivateSubscriptionEndpoint extends Endpoint {
 
   Future<Map<String, dynamic>> getSubscriptionStatus(Session session) async {
     // Get authenticated user
-    final authenticationInfo = await session.authenticated;
+    final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
       throw Exception('User not authenticated');
     }
@@ -95,7 +95,7 @@ class PrivateSubscriptionEndpoint extends Endpoint {
 
   Future<bool> cancelSubscription(Session session) async {
     // Get authenticated user
-    final authenticationInfo = await session.authenticated;
+    final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
       throw Exception('User not authenticated');
     }
@@ -144,7 +144,7 @@ class PrivateSubscriptionEndpoint extends Endpoint {
 
   Future<String> createCustomerPortalSession(Session session) async {
     // Get authenticated user
-    final authenticationInfo = await session.authenticated;
+    final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
       throw Exception('User not authenticated');
     }

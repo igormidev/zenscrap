@@ -14,7 +14,8 @@ class ExtractDataByRule {
   final Map<String, dynamic>? result;
   final String? errorMessage;
 
-  const ExtractDataByRule.withData({required this.result}) : errorMessage = null;
+  const ExtractDataByRule.withData({required this.result})
+    : errorMessage = null;
 
   const ExtractDataByRule.error({required this.errorMessage}) : result = null;
 
@@ -45,9 +46,9 @@ class ExtractFullDataByRule {
   }) : errorMessage = null;
 
   const ExtractFullDataByRule.error({required this.errorMessage})
-      : result = null,
-        html = null,
-        screenshot = null;
+    : result = null,
+      html = null,
+      screenshot = null;
 
   bool get hasError => errorMessage != null;
 
@@ -57,7 +58,7 @@ class ExtractFullDataByRule {
       String html,
       Uint8List screenshot,
     )
-        withData,
+    withData,
     required T Function(String errorMessage) error,
   }) {
     if (hasError) {
@@ -69,17 +70,16 @@ class ExtractFullDataByRule {
 
 /// Low-level client that wraps the ScrapingBee REST API.
 class ScrapingBeeClient {
-  ScrapingBeeClient({
-    required this.apiKey,
-    Dio? dio,
-  }) : _dio = dio ??
-            Dio(
-              BaseOptions(
-                baseUrl: _baseUrl,
-                connectTimeout: const Duration(seconds: 30),
-                receiveTimeout: const Duration(seconds: 60),
-              ),
-            );
+  ScrapingBeeClient({required this.apiKey, Dio? dio})
+    : _dio =
+          dio ??
+          Dio(
+            BaseOptions(
+              baseUrl: _baseUrl,
+              connectTimeout: const Duration(seconds: 30),
+              receiveTimeout: const Duration(seconds: 60),
+            ),
+          );
 
   final String apiKey;
   final Dio _dio;
@@ -128,7 +128,8 @@ class ScrapingBeeClient {
             needsCorrection = true;
             final selector = value['selector'] as String;
 
-            if (value['type'] == 'attribute' && value.containsKey('attribute')) {
+            if (value['type'] == 'attribute' &&
+                value.containsKey('attribute')) {
               final attribute = value['attribute'] as String;
               corrected[key] = '$selector@$attribute';
             } else {
@@ -144,6 +145,7 @@ class ScrapingBeeClient {
 
       if (needsCorrection) {
         final correctedJson = jsonEncode(corrected);
+        // ignore: avoid_print
         print(
           '⚠️ Auto-corrected extract_rules format for ScrapingBee. '
           'Original: $extractRules | Corrected: $correctedJson',
@@ -401,23 +403,17 @@ class ScrapingBeeClient {
           'ScrapingBee API error: ${data['message'] ?? data} (Status: ${response.statusCode})',
         );
       }
-      return onError(
-        'ScrapingBee API error (Status: ${response.statusCode})',
-      );
+      return onError('ScrapingBee API error (Status: ${response.statusCode})');
     } catch (_) {
-      return onError(
-        'ScrapingBee API error (Status: ${response.statusCode})',
-      );
+      return onError('ScrapingBee API error (Status: ${response.statusCode})');
     }
   }
 }
 
 /// Convenience wrapper used across the server to interact with ScrapingBee.
 class ScrapingBee {
-  ScrapingBee({
-    String apiKey = '',
-    Dio? dio,
-  }) : _client = ScrapingBeeClient(apiKey: apiKey, dio: dio);
+  ScrapingBee({String apiKey = '', Dio? dio})
+    : _client = ScrapingBeeClient(apiKey: apiKey, dio: dio);
 
   final ScrapingBeeClient _client;
 
@@ -425,8 +421,9 @@ class ScrapingBee {
     required String targetUrl,
     required ScrappingBeeExtractLogic scrappingBeeExtractLogic,
   }) async {
-    final String extractRulesWithHtml =
-        _withHtmlCapture(scrappingBeeExtractLogic.extractRules);
+    final String extractRulesWithHtml = _withHtmlCapture(
+      scrappingBeeExtractLogic.extractRules,
+    );
 
     return _client.fetchHtmlAndScreenshot(
       targetUrl: targetUrl,

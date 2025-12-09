@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -15,6 +16,7 @@ import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i3;
 import '../../entities/account/api_usage/account_api_usage.dart' as _i4;
 import '../../entities/account/plan_tier.dart' as _i5;
 import '../../entities/account/ai_usage/account_ai_usage.dart' as _i6;
+import 'package:zenscrap_client/src/protocol/protocol.dart' as _i7;
 
 abstract class AccountInfo implements _i1.SerializableModel {
   AccountInfo._({
@@ -52,19 +54,23 @@ abstract class AccountInfo implements _i1.SerializableModel {
   factory AccountInfo.fromJson(Map<String, dynamic> jsonSerialization) {
     return AccountInfo(
       id: jsonSerialization['id'] as int?,
-      scrappables: (jsonSerialization['scrappables'] as List?)
-          ?.map((e) => _i2.Scrappable.fromJson((e as Map<String, dynamic>)))
-          .toList(),
+      scrappables: jsonSerialization['scrappables'] == null
+          ? null
+          : _i7.Protocol().deserialize<List<_i2.Scrappable>>(
+              jsonSerialization['scrappables'],
+            ),
       userInfoId: jsonSerialization['userInfoId'] as int,
       userInfo: jsonSerialization['userInfo'] == null
           ? null
-          : _i3.UserInfo.fromJson(
-              (jsonSerialization['userInfo'] as Map<String, dynamic>)),
+          : _i7.Protocol().deserialize<_i3.UserInfo>(
+              jsonSerialization['userInfo'],
+            ),
       accountApiUsageId: jsonSerialization['accountApiUsageId'] as int,
       accountApiUsage: jsonSerialization['accountApiUsage'] == null
           ? null
-          : _i4.AccountApiUsage.fromJson(
-              (jsonSerialization['accountApiUsage'] as Map<String, dynamic>)),
+          : _i7.Protocol().deserialize<_i4.AccountApiUsage>(
+              jsonSerialization['accountApiUsage'],
+            ),
       planTier: _i5.PlanTier.fromJson((jsonSerialization['planTier'] as int)),
       stripeCustomerId: jsonSerialization['stripeCustomerId'] as String?,
       stripeSubscriptionId:
@@ -73,12 +79,14 @@ abstract class AccountInfo implements _i1.SerializableModel {
       subscriptionEndDate: jsonSerialization['subscriptionEndDate'] == null
           ? null
           : _i1.DateTimeJsonExtension.fromJson(
-              jsonSerialization['subscriptionEndDate']),
+              jsonSerialization['subscriptionEndDate'],
+            ),
       accountAIUsageId: jsonSerialization['accountAIUsageId'] as int,
       accountAIUsage: jsonSerialization['accountAIUsage'] == null
           ? null
-          : _i6.AccountAIUsage.fromJson(
-              (jsonSerialization['accountAIUsage'] as Map<String, dynamic>)),
+          : _i7.Protocol().deserialize<_i6.AccountAIUsage>(
+              jsonSerialization['accountAIUsage'],
+            ),
     );
   }
 
@@ -132,6 +140,7 @@ abstract class AccountInfo implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'AccountInfo',
       if (id != null) 'id': id,
       if (scrappables != null)
         'scrappables': scrappables?.toJson(valueToJson: (v) => v.toJson()),
@@ -175,20 +184,20 @@ class _AccountInfoImpl extends AccountInfo {
     required int accountAIUsageId,
     _i6.AccountAIUsage? accountAIUsage,
   }) : super._(
-          id: id,
-          scrappables: scrappables,
-          userInfoId: userInfoId,
-          userInfo: userInfo,
-          accountApiUsageId: accountApiUsageId,
-          accountApiUsage: accountApiUsage,
-          planTier: planTier,
-          stripeCustomerId: stripeCustomerId,
-          stripeSubscriptionId: stripeSubscriptionId,
-          subscriptionStatus: subscriptionStatus,
-          subscriptionEndDate: subscriptionEndDate,
-          accountAIUsageId: accountAIUsageId,
-          accountAIUsage: accountAIUsage,
-        );
+         id: id,
+         scrappables: scrappables,
+         userInfoId: userInfoId,
+         userInfo: userInfo,
+         accountApiUsageId: accountApiUsageId,
+         accountApiUsage: accountApiUsage,
+         planTier: planTier,
+         stripeCustomerId: stripeCustomerId,
+         stripeSubscriptionId: stripeSubscriptionId,
+         subscriptionStatus: subscriptionStatus,
+         subscriptionEndDate: subscriptionEndDate,
+         accountAIUsageId: accountAIUsageId,
+         accountAIUsage: accountAIUsage,
+       );
 
   /// Returns a shallow copy of this [AccountInfo]
   /// with some or all fields replaced by the given arguments.
@@ -215,8 +224,9 @@ class _AccountInfoImpl extends AccountInfo {
           ? scrappables
           : this.scrappables?.map((e0) => e0.copyWith()).toList(),
       userInfoId: userInfoId ?? this.userInfoId,
-      userInfo:
-          userInfo is _i3.UserInfo? ? userInfo : this.userInfo?.copyWith(),
+      userInfo: userInfo is _i3.UserInfo?
+          ? userInfo
+          : this.userInfo?.copyWith(),
       accountApiUsageId: accountApiUsageId ?? this.accountApiUsageId,
       accountApiUsage: accountApiUsage is _i4.AccountApiUsage?
           ? accountApiUsage

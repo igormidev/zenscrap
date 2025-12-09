@@ -1,9 +1,16 @@
-In @zenscrap_flutter/lib/src/ui/scrap_session/view/initial_chat_view.dart I want to make a giant refactor in the first page that apears for the user - the `InitialChatPage` of @zenscrap_flutter/lib/src/ui/scrap_session/pages/initial_chat_page.dart . Understand how the structure works today so we can make a general refactor on it (do not jump this step, understand how the UI works and the providers currently integrate between each other to then do the refactor I will ask you to)
+I want to update my project to use "serverpod: ^3.0.0".
 
-Well, I want to make a complete refactor of this page. It will now act as a landing page as well. 
+Seek in all yaml files for "2.9.2" and you will see that we need to update the packages serverpod, serverpod_client, serverpod_auth_client, serverpod_flutter, serverpod_auth_shared_flutter, serverpod_auth_email_flutter, serverpod_auth_server and serverpod_test that are all currently in version "2.9.2" to version "3.0.0". The yaml files that have those updated versions are:   @zenscrap_client/pubspec.yaml , @zenscrap_server/pubspec.yaml and @zenscrap_flutter/pubspec.yaml
 
-Context:
-I am ready to launch this project that is a saas that helps users to create web scrappers in a no-code way - they just talk to ai in a chat interface format asking where they will provide a link and then ask to the AI what they want to extract from that site and under the hood, like magic, it will generate a web scrapper for him. 
+The version 3 of serverpod was released today - its been not even 4 hours since its release so it is extremelly new and you will not have info about it in your training dataset and you will heavly rely on serverpod mcp... Ask serverpod mcp EVERYTHING, like, everything about version 3 and ALL the things needed to migrate - you should ask the mcp a loot - at least 10 times so I am sure you are consulting a good source and not hallucinating since it is a very new model. If the serverpod mcp does not work for any reason you should stop what you are doing and ask help for me to try to fix the mcp but DO NOT CONTINUE without it working and replying your messages... 
 
-Potential clients:
+Not only that, but I want you to, before even starting, have a deep dive into the following link: "https://docs.serverpod.dev/upgrading/upgrade-to-three"
+Please do not continue without reading this site... if you cant read it - stop what you are doing and tell me that you where not capable of seeing the site information but just DO NOT START without reading the content of this site. You might wonder what is this content; well it is a resume of how to migrate to version 3. I told you to rely heavly on serverpod mcp and thats true but for the first contact about migrating to version 3 I want you to see this site - before asking anything to the mcp - because it is a hole overall of all the points you will need to cover.  
 
+
+By the end, ensure there are no static analysis errors in the front or backend... Run the pub get command for each one of them in the end to ensure there is no error. And try to init the serverpod server locally to see if any error apears... Use general web research if needed and if you are stuck in a error stop and contact me.
+
+By the way, a context that is good for you to know:
+This codebase is for a saas that I am creating. It is not published yet - so there are zero people using besides me that is developing it... So you don't need to worry about breaking clients that are currently alive because there are no clients currently alive since the app is still not online yet. So no worries about potential operations that will delete data or deeling with complex migration things - its not worth it since I will start the database from zero anyways...
+
+Even so, it's a complicated task. a task that will require you time so DO NOT RUSH JUST TO END IT QUICKY - deeply analyse each migration part that will need to be done and do everything calm without rushing. ultrathink to do this task

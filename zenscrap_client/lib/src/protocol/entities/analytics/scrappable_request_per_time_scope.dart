@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -35,7 +36,8 @@ abstract class ScrappableRequestPerTimeScope implements _i1.SerializableModel {
   }) = _ScrappableRequestPerTimeScopeImpl;
 
   factory ScrappableRequestPerTimeScope.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return ScrappableRequestPerTimeScope(
       start: _i1.DateTimeJsonExtension.fromJson(jsonSerialization['start']),
       end: _i1.DateTimeJsonExtension.fromJson(jsonSerialization['end']),
@@ -83,6 +85,7 @@ abstract class ScrappableRequestPerTimeScope implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ScrappableRequestPerTimeScope',
       'start': start.toJson(),
       'end': end.toJson(),
       'successCount': successCount,
@@ -111,15 +114,15 @@ class _ScrappableRequestPerTimeScopeImpl extends ScrappableRequestPerTimeScope {
     required int maxConcurrencyExceededCount,
     required int failedAtScrappingBeeCount,
   }) : super._(
-          start: start,
-          end: end,
-          successCount: successCount,
-          clientErrorCount: clientErrorCount,
-          serverErrorCount: serverErrorCount,
-          insufficientCreditsCount: insufficientCreditsCount,
-          maxConcurrencyExceededCount: maxConcurrencyExceededCount,
-          failedAtScrappingBeeCount: failedAtScrappingBeeCount,
-        );
+         start: start,
+         end: end,
+         successCount: successCount,
+         clientErrorCount: clientErrorCount,
+         serverErrorCount: serverErrorCount,
+         insufficientCreditsCount: insufficientCreditsCount,
+         maxConcurrencyExceededCount: maxConcurrencyExceededCount,
+         failedAtScrappingBeeCount: failedAtScrappingBeeCount,
+       );
 
   /// Returns a shallow copy of this [ScrappableRequestPerTimeScope]
   /// with some or all fields replaced by the given arguments.

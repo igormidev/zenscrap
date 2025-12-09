@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -24,11 +25,11 @@ abstract class AutoFixConfig
     int? attemptCount,
     this.preferredAiModel,
     required this.scrappableId,
-  })  : enabled = enabled ?? true,
-        consecutiveErrorThreshold = consecutiveErrorThreshold ?? 100,
-        currentConsecutiveErrors = currentConsecutiveErrors ?? 0,
-        inProgress = inProgress ?? false,
-        attemptCount = attemptCount ?? 0;
+  }) : enabled = enabled ?? true,
+       consecutiveErrorThreshold = consecutiveErrorThreshold ?? 100,
+       currentConsecutiveErrors = currentConsecutiveErrors ?? 0,
+       inProgress = inProgress ?? false,
+       attemptCount = attemptCount ?? 0;
 
   factory AutoFixConfig({
     int? id,
@@ -53,13 +54,15 @@ abstract class AutoFixConfig
       lastAttemptAt: jsonSerialization['lastAttemptAt'] == null
           ? null
           : _i1.DateTimeJsonExtension.fromJson(
-              jsonSerialization['lastAttemptAt']),
+              jsonSerialization['lastAttemptAt'],
+            ),
       inProgress: jsonSerialization['inProgress'] as bool,
       attemptCount: jsonSerialization['attemptCount'] as int,
       preferredAiModel: jsonSerialization['preferredAiModel'] == null
           ? null
           : _i2.AiModel.fromJson(
-              (jsonSerialization['preferredAiModel'] as int)),
+              (jsonSerialization['preferredAiModel'] as String),
+            ),
       scrappableId: jsonSerialization['scrappableId'] as int,
     );
   }
@@ -107,6 +110,7 @@ abstract class AutoFixConfig
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'AutoFixConfig',
       if (id != null) 'id': id,
       'enabled': enabled,
       'consecutiveErrorThreshold': consecutiveErrorThreshold,
@@ -123,6 +127,7 @@ abstract class AutoFixConfig
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'AutoFixConfig',
       if (id != null) 'id': id,
       'enabled': enabled,
       'consecutiveErrorThreshold': consecutiveErrorThreshold,
@@ -180,16 +185,16 @@ class _AutoFixConfigImpl extends AutoFixConfig {
     _i2.AiModel? preferredAiModel,
     required int scrappableId,
   }) : super._(
-          id: id,
-          enabled: enabled,
-          consecutiveErrorThreshold: consecutiveErrorThreshold,
-          currentConsecutiveErrors: currentConsecutiveErrors,
-          lastAttemptAt: lastAttemptAt,
-          inProgress: inProgress,
-          attemptCount: attemptCount,
-          preferredAiModel: preferredAiModel,
-          scrappableId: scrappableId,
-        );
+         id: id,
+         enabled: enabled,
+         consecutiveErrorThreshold: consecutiveErrorThreshold,
+         currentConsecutiveErrors: currentConsecutiveErrors,
+         lastAttemptAt: lastAttemptAt,
+         inProgress: inProgress,
+         attemptCount: attemptCount,
+         preferredAiModel: preferredAiModel,
+         scrappableId: scrappableId,
+       );
 
   /// Returns a shallow copy of this [AutoFixConfig]
   /// with some or all fields replaced by the given arguments.
@@ -213,8 +218,9 @@ class _AutoFixConfigImpl extends AutoFixConfig {
           consecutiveErrorThreshold ?? this.consecutiveErrorThreshold,
       currentConsecutiveErrors:
           currentConsecutiveErrors ?? this.currentConsecutiveErrors,
-      lastAttemptAt:
-          lastAttemptAt is DateTime? ? lastAttemptAt : this.lastAttemptAt,
+      lastAttemptAt: lastAttemptAt is DateTime?
+          ? lastAttemptAt
+          : this.lastAttemptAt,
       inProgress: inProgress ?? this.inProgress,
       attemptCount: attemptCount ?? this.attemptCount,
       preferredAiModel: preferredAiModel is _i2.AiModel?
@@ -225,9 +231,59 @@ class _AutoFixConfigImpl extends AutoFixConfig {
   }
 }
 
+class AutoFixConfigUpdateTable extends _i1.UpdateTable<AutoFixConfigTable> {
+  AutoFixConfigUpdateTable(super.table);
+
+  _i1.ColumnValue<bool, bool> enabled(bool value) => _i1.ColumnValue(
+    table.enabled,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> consecutiveErrorThreshold(int value) =>
+      _i1.ColumnValue(
+        table.consecutiveErrorThreshold,
+        value,
+      );
+
+  _i1.ColumnValue<int, int> currentConsecutiveErrors(int value) =>
+      _i1.ColumnValue(
+        table.currentConsecutiveErrors,
+        value,
+      );
+
+  _i1.ColumnValue<DateTime, DateTime> lastAttemptAt(DateTime? value) =>
+      _i1.ColumnValue(
+        table.lastAttemptAt,
+        value,
+      );
+
+  _i1.ColumnValue<bool, bool> inProgress(bool value) => _i1.ColumnValue(
+    table.inProgress,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> attemptCount(int value) => _i1.ColumnValue(
+    table.attemptCount,
+    value,
+  );
+
+  _i1.ColumnValue<_i2.AiModel, _i2.AiModel> preferredAiModel(
+    _i2.AiModel? value,
+  ) => _i1.ColumnValue(
+    table.preferredAiModel,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> scrappableId(int value) => _i1.ColumnValue(
+    table.scrappableId,
+    value,
+  );
+}
+
 class AutoFixConfigTable extends _i1.Table<int?> {
   AutoFixConfigTable({super.tableRelation})
-      : super(tableName: 'auto_fix_config') {
+    : super(tableName: 'auto_fix_config') {
+    updateTable = AutoFixConfigUpdateTable(this);
     enabled = _i1.ColumnBool(
       'enabled',
       this,
@@ -260,13 +316,15 @@ class AutoFixConfigTable extends _i1.Table<int?> {
     preferredAiModel = _i1.ColumnEnum(
       'preferredAiModel',
       this,
-      _i1.EnumSerialization.byIndex,
+      _i1.EnumSerialization.byName,
     );
     scrappableId = _i1.ColumnInt(
       'scrappableId',
       this,
     );
   }
+
+  late final AutoFixConfigUpdateTable updateTable;
 
   late final _i1.ColumnBool enabled;
 
@@ -286,16 +344,16 @@ class AutoFixConfigTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        enabled,
-        consecutiveErrorThreshold,
-        currentConsecutiveErrors,
-        lastAttemptAt,
-        inProgress,
-        attemptCount,
-        preferredAiModel,
-        scrappableId,
-      ];
+    id,
+    enabled,
+    consecutiveErrorThreshold,
+    currentConsecutiveErrors,
+    lastAttemptAt,
+    inProgress,
+    attemptCount,
+    preferredAiModel,
+    scrappableId,
+  ];
 }
 
 class AutoFixConfigInclude extends _i1.IncludeObject {
@@ -483,6 +541,46 @@ class AutoFixConfigRepository {
     return session.db.updateRow<AutoFixConfig>(
       row,
       columns: columns?.call(AutoFixConfig.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [AutoFixConfig] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<AutoFixConfig?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<AutoFixConfigUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<AutoFixConfig>(
+      id,
+      columnValues: columnValues(AutoFixConfig.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [AutoFixConfig]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<AutoFixConfig>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<AutoFixConfigUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<AutoFixConfigTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<AutoFixConfigTable>? orderBy,
+    _i1.OrderByListBuilder<AutoFixConfigTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<AutoFixConfig>(
+      columnValues: columnValues(AutoFixConfig.t.updateTable),
+      where: where(AutoFixConfig.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(AutoFixConfig.t),
+      orderByList: orderByList?.call(AutoFixConfig.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

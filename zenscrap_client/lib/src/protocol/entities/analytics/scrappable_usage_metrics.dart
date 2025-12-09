@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -25,7 +26,8 @@ abstract class ScrappableUsageMetrics implements _i1.SerializableModel {
   }) = _ScrappableUsageMetricsImpl;
 
   factory ScrappableUsageMetrics.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return ScrappableUsageMetrics(
       successCount: jsonSerialization['successCount'] as int,
       errorCount: jsonSerialization['errorCount'] as int,
@@ -50,6 +52,7 @@ abstract class ScrappableUsageMetrics implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ScrappableUsageMetrics',
       'successCount': successCount,
       'errorCount': errorCount,
       'totalCount': totalCount,
@@ -68,10 +71,10 @@ class _ScrappableUsageMetricsImpl extends ScrappableUsageMetrics {
     required int errorCount,
     required int totalCount,
   }) : super._(
-          successCount: successCount,
-          errorCount: errorCount,
-          totalCount: totalCount,
-        );
+         successCount: successCount,
+         errorCount: errorCount,
+         totalCount: totalCount,
+       );
 
   /// Returns a shallow copy of this [ScrappableUsageMetrics]
   /// with some or all fields replaced by the given arguments.

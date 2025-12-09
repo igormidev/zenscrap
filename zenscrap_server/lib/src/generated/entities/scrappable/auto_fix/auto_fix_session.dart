@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: unnecessary_null_comparison
 
@@ -16,6 +17,7 @@ import '../../../entities/scrappable/auto_fix/auto_fix_session_status.dart'
     as _i2;
 import '../../../entities/scrappable/ai_model.dart' as _i3;
 import '../../../entities/scrappable/auto_fix/auto_fix_attempt.dart' as _i4;
+import 'package:zenscrap_server/src/generated/protocol.dart' as _i5;
 
 abstract class AutoFixSession
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -35,11 +37,11 @@ abstract class AutoFixSession
     int? totalOutputTokens,
     required this.scrappableId,
     this.attempts,
-  })  : status = status ?? _i2.AutoFixSessionStatus.pending,
-        usedUserApiKey = usedUserApiKey ?? false,
-        totalCostUsd = totalCostUsd ?? 0.0,
-        totalInputTokens = totalInputTokens ?? 0,
-        totalOutputTokens = totalOutputTokens ?? 0;
+  }) : status = status ?? _i2.AutoFixSessionStatus.pending,
+       usedUserApiKey = usedUserApiKey ?? false,
+       totalCostUsd = totalCostUsd ?? 0.0,
+       totalInputTokens = totalInputTokens ?? 0,
+       totalOutputTokens = totalOutputTokens ?? 0;
 
   factory AutoFixSession({
     int? id,
@@ -62,18 +64,22 @@ abstract class AutoFixSession
   factory AutoFixSession.fromJson(Map<String, dynamic> jsonSerialization) {
     return AutoFixSession(
       id: jsonSerialization['id'] as int?,
-      createdAt:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
+      createdAt: _i1.DateTimeJsonExtension.fromJson(
+        jsonSerialization['createdAt'],
+      ),
       completedAt: jsonSerialization['completedAt'] == null
           ? null
           : _i1.DateTimeJsonExtension.fromJson(
-              jsonSerialization['completedAt']),
+              jsonSerialization['completedAt'],
+            ),
       status: _i2.AutoFixSessionStatus.fromJson(
-          (jsonSerialization['status'] as int)),
+        (jsonSerialization['status'] as String),
+      ),
       triggeredAtErrorCount: jsonSerialization['triggeredAtErrorCount'] as int,
       configuredThreshold: jsonSerialization['configuredThreshold'] as int,
-      usedAiModel:
-          _i3.AiModel.fromJson((jsonSerialization['usedAiModel'] as int)),
+      usedAiModel: _i3.AiModel.fromJson(
+        (jsonSerialization['usedAiModel'] as String),
+      ),
       usedUserApiKey: jsonSerialization['usedUserApiKey'] as bool,
       successSummary: jsonSerialization['successSummary'] as String?,
       failureReason: jsonSerialization['failureReason'] as String?,
@@ -81,9 +87,11 @@ abstract class AutoFixSession
       totalInputTokens: jsonSerialization['totalInputTokens'] as int,
       totalOutputTokens: jsonSerialization['totalOutputTokens'] as int,
       scrappableId: jsonSerialization['scrappableId'] as int,
-      attempts: (jsonSerialization['attempts'] as List?)
-          ?.map((e) => _i4.AutoFixAttempt.fromJson((e as Map<String, dynamic>)))
-          .toList(),
+      attempts: jsonSerialization['attempts'] == null
+          ? null
+          : _i5.Protocol().deserialize<List<_i4.AutoFixAttempt>>(
+              jsonSerialization['attempts'],
+            ),
     );
   }
 
@@ -148,6 +156,7 @@ abstract class AutoFixSession
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'AutoFixSession',
       if (id != null) 'id': id,
       'createdAt': createdAt.toJson(),
       if (completedAt != null) 'completedAt': completedAt?.toJson(),
@@ -170,6 +179,7 @@ abstract class AutoFixSession
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'AutoFixSession',
       if (id != null) 'id': id,
       'createdAt': createdAt.toJson(),
       if (completedAt != null) 'completedAt': completedAt?.toJson(),
@@ -189,8 +199,9 @@ abstract class AutoFixSession
     };
   }
 
-  static AutoFixSessionInclude include(
-      {_i4.AutoFixAttemptIncludeList? attempts}) {
+  static AutoFixSessionInclude include({
+    _i4.AutoFixAttemptIncludeList? attempts,
+  }) {
     return AutoFixSessionInclude._(attempts: attempts);
   }
 
@@ -240,22 +251,22 @@ class _AutoFixSessionImpl extends AutoFixSession {
     required int scrappableId,
     List<_i4.AutoFixAttempt>? attempts,
   }) : super._(
-          id: id,
-          createdAt: createdAt,
-          completedAt: completedAt,
-          status: status,
-          triggeredAtErrorCount: triggeredAtErrorCount,
-          configuredThreshold: configuredThreshold,
-          usedAiModel: usedAiModel,
-          usedUserApiKey: usedUserApiKey,
-          successSummary: successSummary,
-          failureReason: failureReason,
-          totalCostUsd: totalCostUsd,
-          totalInputTokens: totalInputTokens,
-          totalOutputTokens: totalOutputTokens,
-          scrappableId: scrappableId,
-          attempts: attempts,
-        );
+         id: id,
+         createdAt: createdAt,
+         completedAt: completedAt,
+         status: status,
+         triggeredAtErrorCount: triggeredAtErrorCount,
+         configuredThreshold: configuredThreshold,
+         usedAiModel: usedAiModel,
+         usedUserApiKey: usedUserApiKey,
+         successSummary: successSummary,
+         failureReason: failureReason,
+         totalCostUsd: totalCostUsd,
+         totalInputTokens: totalInputTokens,
+         totalOutputTokens: totalOutputTokens,
+         scrappableId: scrappableId,
+         attempts: attempts,
+       );
 
   /// Returns a shallow copy of this [AutoFixSession]
   /// with some or all fields replaced by the given arguments.
@@ -288,10 +299,12 @@ class _AutoFixSessionImpl extends AutoFixSession {
       configuredThreshold: configuredThreshold ?? this.configuredThreshold,
       usedAiModel: usedAiModel ?? this.usedAiModel,
       usedUserApiKey: usedUserApiKey ?? this.usedUserApiKey,
-      successSummary:
-          successSummary is String? ? successSummary : this.successSummary,
-      failureReason:
-          failureReason is String? ? failureReason : this.failureReason,
+      successSummary: successSummary is String?
+          ? successSummary
+          : this.successSummary,
+      failureReason: failureReason is String?
+          ? failureReason
+          : this.failureReason,
       totalCostUsd: totalCostUsd ?? this.totalCostUsd,
       totalInputTokens: totalInputTokens ?? this.totalInputTokens,
       totalOutputTokens: totalOutputTokens ?? this.totalOutputTokens,
@@ -303,9 +316,86 @@ class _AutoFixSessionImpl extends AutoFixSession {
   }
 }
 
+class AutoFixSessionUpdateTable extends _i1.UpdateTable<AutoFixSessionTable> {
+  AutoFixSessionUpdateTable(super.table);
+
+  _i1.ColumnValue<DateTime, DateTime> createdAt(DateTime value) =>
+      _i1.ColumnValue(
+        table.createdAt,
+        value,
+      );
+
+  _i1.ColumnValue<DateTime, DateTime> completedAt(DateTime? value) =>
+      _i1.ColumnValue(
+        table.completedAt,
+        value,
+      );
+
+  _i1.ColumnValue<_i2.AutoFixSessionStatus, _i2.AutoFixSessionStatus> status(
+    _i2.AutoFixSessionStatus value,
+  ) => _i1.ColumnValue(
+    table.status,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> triggeredAtErrorCount(int value) => _i1.ColumnValue(
+    table.triggeredAtErrorCount,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> configuredThreshold(int value) => _i1.ColumnValue(
+    table.configuredThreshold,
+    value,
+  );
+
+  _i1.ColumnValue<_i3.AiModel, _i3.AiModel> usedAiModel(_i3.AiModel value) =>
+      _i1.ColumnValue(
+        table.usedAiModel,
+        value,
+      );
+
+  _i1.ColumnValue<bool, bool> usedUserApiKey(bool value) => _i1.ColumnValue(
+    table.usedUserApiKey,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> successSummary(String? value) =>
+      _i1.ColumnValue(
+        table.successSummary,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> failureReason(String? value) =>
+      _i1.ColumnValue(
+        table.failureReason,
+        value,
+      );
+
+  _i1.ColumnValue<double, double> totalCostUsd(double value) => _i1.ColumnValue(
+    table.totalCostUsd,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> totalInputTokens(int value) => _i1.ColumnValue(
+    table.totalInputTokens,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> totalOutputTokens(int value) => _i1.ColumnValue(
+    table.totalOutputTokens,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> scrappableId(int value) => _i1.ColumnValue(
+    table.scrappableId,
+    value,
+  );
+}
+
 class AutoFixSessionTable extends _i1.Table<int?> {
   AutoFixSessionTable({super.tableRelation})
-      : super(tableName: 'auto_fix_session') {
+    : super(tableName: 'auto_fix_session') {
+    updateTable = AutoFixSessionUpdateTable(this);
     createdAt = _i1.ColumnDateTime(
       'createdAt',
       this,
@@ -317,7 +407,7 @@ class AutoFixSessionTable extends _i1.Table<int?> {
     status = _i1.ColumnEnum(
       'status',
       this,
-      _i1.EnumSerialization.byIndex,
+      _i1.EnumSerialization.byName,
       hasDefault: true,
     );
     triggeredAtErrorCount = _i1.ColumnInt(
@@ -331,7 +421,7 @@ class AutoFixSessionTable extends _i1.Table<int?> {
     usedAiModel = _i1.ColumnEnum(
       'usedAiModel',
       this,
-      _i1.EnumSerialization.byIndex,
+      _i1.EnumSerialization.byName,
     );
     usedUserApiKey = _i1.ColumnBool(
       'usedUserApiKey',
@@ -366,6 +456,8 @@ class AutoFixSessionTable extends _i1.Table<int?> {
       this,
     );
   }
+
+  late final AutoFixSessionUpdateTable updateTable;
 
   late final _i1.ColumnDateTime createdAt;
 
@@ -423,28 +515,29 @@ class AutoFixSessionTable extends _i1.Table<int?> {
     _attempts = _i1.ManyRelation<_i4.AutoFixAttemptTable>(
       tableWithRelations: relationTable,
       table: _i4.AutoFixAttemptTable(
-          tableRelation: relationTable.tableRelation!.lastRelation),
+        tableRelation: relationTable.tableRelation!.lastRelation,
+      ),
     );
     return _attempts!;
   }
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        createdAt,
-        completedAt,
-        status,
-        triggeredAtErrorCount,
-        configuredThreshold,
-        usedAiModel,
-        usedUserApiKey,
-        successSummary,
-        failureReason,
-        totalCostUsd,
-        totalInputTokens,
-        totalOutputTokens,
-        scrappableId,
-      ];
+    id,
+    createdAt,
+    completedAt,
+    status,
+    triggeredAtErrorCount,
+    configuredThreshold,
+    usedAiModel,
+    usedUserApiKey,
+    successSummary,
+    failureReason,
+    totalCostUsd,
+    totalInputTokens,
+    totalOutputTokens,
+    scrappableId,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -654,6 +747,46 @@ class AutoFixSessionRepository {
     return session.db.updateRow<AutoFixSession>(
       row,
       columns: columns?.call(AutoFixSession.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [AutoFixSession] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<AutoFixSession?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<AutoFixSessionUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<AutoFixSession>(
+      id,
+      columnValues: columnValues(AutoFixSession.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [AutoFixSession]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<AutoFixSession>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<AutoFixSessionUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<AutoFixSessionTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<AutoFixSessionTable>? orderBy,
+    _i1.OrderByListBuilder<AutoFixSessionTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<AutoFixSession>(
+      columnValues: columnValues(AutoFixSession.t.updateTable),
+      where: where(AutoFixSession.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(AutoFixSession.t),
+      orderByList: orderByList?.call(AutoFixSession.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

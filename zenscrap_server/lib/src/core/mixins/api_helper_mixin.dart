@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 import 'package:result_dart/result_dart.dart';
 import 'package:serverpod/serverpod.dart' hide Result;
@@ -498,7 +497,6 @@ mixin ApiHelperMixin {
   AsyncResultDart<Map<String, dynamic>, ApiError> callFunc(
     Session session, {
     required int scrappableId,
-    required HttpRequest request,
     String? apiKey,
     required Map<String, dynamic> payload,
   }) async {

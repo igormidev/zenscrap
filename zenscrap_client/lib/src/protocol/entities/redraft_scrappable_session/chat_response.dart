@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import '../../protocol.dart' as _i1;
@@ -14,7 +15,8 @@ import 'package:serverpod_client/serverpod_client.dart' as _i2;
 import 'prompt_role_enum.dart' as _i3;
 import '../scrappable/scrapping_bee_extract_logic.dart' as _i4;
 import '../scrappable/reference_test_data.dart' as _i5;
-import '../scrappable/scrappable_request.dart' as _i6;
+import 'package:zenscrap_client/src/protocol/protocol.dart' as _i6;
+import '../scrappable/scrappable_request.dart' as _i7;
 part 'responses/api_key_updated_response.dart';
 part 'responses/candidate_extract_logic_update.dart';
 part 'responses/credit_limit_reached_response.dart';
@@ -36,6 +38,14 @@ sealed class ChatResponse implements _i2.SerializableModel {
   _i3.PromptRole role;
 
   bool expectsFollowUp;
+
+  /// Returns a shallow copy of this [ChatResponse]
+  /// with some or all fields replaced by the given arguments.
+  @_i2.useResult
+  ChatResponse copyWith({
+    _i3.PromptRole? role,
+    bool? expectsFollowUp,
+  });
 }
 
 class _Undefined {}

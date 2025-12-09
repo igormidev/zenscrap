@@ -7,12 +7,14 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import '../../entities/scrappable/request_status.dart' as _i2;
 import '../../entities/scrappable/scrappable.dart' as _i3;
 import '../../entities/analytics/analytics_request_details.dart' as _i4;
+import 'package:zenscrap_client/src/protocol/protocol.dart' as _i5;
 
 abstract class ScrappableAnalytics implements _i1.SerializableModel {
   ScrappableAnalytics._({
@@ -43,21 +45,25 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
     return ScrappableAnalytics(
       id: jsonSerialization['id'] as int?,
       requestStatus: _i2.RequestStatus.fromJson(
-          (jsonSerialization['requestStatus'] as int)),
-      requestedAt:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['requestedAt']),
+        (jsonSerialization['requestStatus'] as String),
+      ),
+      requestedAt: _i1.DateTimeJsonExtension.fromJson(
+        jsonSerialization['requestedAt'],
+      ),
       attachedNanoId: jsonSerialization['attachedNanoId'] as String,
       attachedApiKey: jsonSerialization['attachedApiKey'] as String,
       scrappableId: jsonSerialization['scrappableId'] as int,
       scrappable: jsonSerialization['scrappable'] == null
           ? null
-          : _i3.Scrappable.fromJson(
-              (jsonSerialization['scrappable'] as Map<String, dynamic>)),
+          : _i5.Protocol().deserialize<_i3.Scrappable>(
+              jsonSerialization['scrappable'],
+            ),
       detailsId: jsonSerialization['detailsId'] as int?,
       details: jsonSerialization['details'] == null
           ? null
-          : _i4.AnalyticsRequestDetails.fromJson(
-              (jsonSerialization['details'] as Map<String, dynamic>)),
+          : _i5.Protocol().deserialize<_i4.AnalyticsRequestDetails>(
+              jsonSerialization['details'],
+            ),
     );
   }
 
@@ -99,6 +105,7 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ScrappableAnalytics',
       if (id != null) 'id': id,
       'requestStatus': requestStatus.toJson(),
       'requestedAt': requestedAt.toJson(),
@@ -131,16 +138,16 @@ class _ScrappableAnalyticsImpl extends ScrappableAnalytics {
     int? detailsId,
     _i4.AnalyticsRequestDetails? details,
   }) : super._(
-          id: id,
-          requestStatus: requestStatus,
-          requestedAt: requestedAt,
-          attachedNanoId: attachedNanoId,
-          attachedApiKey: attachedApiKey,
-          scrappableId: scrappableId,
-          scrappable: scrappable,
-          detailsId: detailsId,
-          details: details,
-        );
+         id: id,
+         requestStatus: requestStatus,
+         requestedAt: requestedAt,
+         attachedNanoId: attachedNanoId,
+         attachedApiKey: attachedApiKey,
+         scrappableId: scrappableId,
+         scrappable: scrappable,
+         detailsId: detailsId,
+         details: details,
+       );
 
   /// Returns a shallow copy of this [ScrappableAnalytics]
   /// with some or all fields replaced by the given arguments.

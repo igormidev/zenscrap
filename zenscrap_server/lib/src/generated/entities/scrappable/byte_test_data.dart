@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -30,9 +31,11 @@ abstract class ByteTestData
     return ByteTestData(
       id: jsonSerialization['id'] as int?,
       referenceHtmlPage: _i1.ByteDataJsonExtension.fromJson(
-          jsonSerialization['referenceHtmlPage']),
+        jsonSerialization['referenceHtmlPage'],
+      ),
       referenceSiteScreenshot: _i1.ByteDataJsonExtension.fromJson(
-          jsonSerialization['referenceSiteScreenshot']),
+        jsonSerialization['referenceSiteScreenshot'],
+      ),
     );
   }
 
@@ -61,6 +64,7 @@ abstract class ByteTestData
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ByteTestData',
       if (id != null) 'id': id,
       'referenceHtmlPage': referenceHtmlPage.toJson(),
       'referenceSiteScreenshot': referenceSiteScreenshot.toJson(),
@@ -70,6 +74,7 @@ abstract class ByteTestData
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'ByteTestData',
       if (id != null) 'id': id,
       'referenceHtmlPage': referenceHtmlPage.toJson(),
       'referenceSiteScreenshot': referenceSiteScreenshot.toJson(),
@@ -114,10 +119,10 @@ class _ByteTestDataImpl extends ByteTestData {
     required _i2.ByteData referenceHtmlPage,
     required _i2.ByteData referenceSiteScreenshot,
   }) : super._(
-          id: id,
-          referenceHtmlPage: referenceHtmlPage,
-          referenceSiteScreenshot: referenceSiteScreenshot,
-        );
+         id: id,
+         referenceHtmlPage: referenceHtmlPage,
+         referenceSiteScreenshot: referenceSiteScreenshot,
+       );
 
   /// Returns a shallow copy of this [ByteTestData]
   /// with some or all fields replaced by the given arguments.
@@ -137,9 +142,28 @@ class _ByteTestDataImpl extends ByteTestData {
   }
 }
 
+class ByteTestDataUpdateTable extends _i1.UpdateTable<ByteTestDataTable> {
+  ByteTestDataUpdateTable(super.table);
+
+  _i1.ColumnValue<_i2.ByteData, _i2.ByteData> referenceHtmlPage(
+    _i2.ByteData value,
+  ) => _i1.ColumnValue(
+    table.referenceHtmlPage,
+    value,
+  );
+
+  _i1.ColumnValue<_i2.ByteData, _i2.ByteData> referenceSiteScreenshot(
+    _i2.ByteData value,
+  ) => _i1.ColumnValue(
+    table.referenceSiteScreenshot,
+    value,
+  );
+}
+
 class ByteTestDataTable extends _i1.Table<int?> {
   ByteTestDataTable({super.tableRelation})
-      : super(tableName: 'byte_test_data') {
+    : super(tableName: 'byte_test_data') {
+    updateTable = ByteTestDataUpdateTable(this);
     referenceHtmlPage = _i1.ColumnByteData(
       'referenceHtmlPage',
       this,
@@ -150,16 +174,18 @@ class ByteTestDataTable extends _i1.Table<int?> {
     );
   }
 
+  late final ByteTestDataUpdateTable updateTable;
+
   late final _i1.ColumnByteData referenceHtmlPage;
 
   late final _i1.ColumnByteData referenceSiteScreenshot;
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        referenceHtmlPage,
-        referenceSiteScreenshot,
-      ];
+    id,
+    referenceHtmlPage,
+    referenceSiteScreenshot,
+  ];
 }
 
 class ByteTestDataInclude extends _i1.IncludeObject {
@@ -347,6 +373,46 @@ class ByteTestDataRepository {
     return session.db.updateRow<ByteTestData>(
       row,
       columns: columns?.call(ByteTestData.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [ByteTestData] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<ByteTestData?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<ByteTestDataUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<ByteTestData>(
+      id,
+      columnValues: columnValues(ByteTestData.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [ByteTestData]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<ByteTestData>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<ByteTestDataUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<ByteTestDataTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<ByteTestDataTable>? orderBy,
+    _i1.OrderByListBuilder<ByteTestDataTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<ByteTestData>(
+      columnValues: columnValues(ByteTestData.t.updateTable),
+      where: where(ByteTestData.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(ByteTestData.t),
+      orderByList: orderByList?.call(ByteTestData.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

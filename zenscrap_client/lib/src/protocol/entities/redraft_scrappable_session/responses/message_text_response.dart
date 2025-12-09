@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 part of '../chat_response.dart';
 
@@ -36,6 +37,7 @@ abstract class MessageTextResponse extends _i1.ChatResponse
 
   /// Returns a shallow copy of this [MessageTextResponse]
   /// with some or all fields replaced by the given arguments.
+  @override
   @_i2.useResult
   MessageTextResponse copyWith({
     _i3.PromptRole? role,
@@ -45,6 +47,7 @@ abstract class MessageTextResponse extends _i1.ChatResponse
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'MessageTextResponse',
       'role': role.toJson(),
       'expectsFollowUp': expectsFollowUp,
       'messageText': messageText,
@@ -63,10 +66,10 @@ class _MessageTextResponseImpl extends MessageTextResponse {
     required bool expectsFollowUp,
     required String messageText,
   }) : super._(
-          role: role,
-          expectsFollowUp: expectsFollowUp,
-          messageText: messageText,
-        );
+         role: role,
+         expectsFollowUp: expectsFollowUp,
+         messageText: messageText,
+       );
 
   /// Returns a shallow copy of this [MessageTextResponse]
   /// with some or all fields replaced by the given arguments.

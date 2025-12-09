@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -34,10 +35,12 @@ abstract class AnonymousIpSpending
       id: jsonSerialization['id'] as int?,
       ipAddress: jsonSerialization['ipAddress'] as String,
       totalSpentUsd: (jsonSerialization['totalSpentUsd'] as num).toDouble(),
-      createdAt:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
+      createdAt: _i1.DateTimeJsonExtension.fromJson(
+        jsonSerialization['createdAt'],
+      ),
       lastUpdatedAt: _i1.DateTimeJsonExtension.fromJson(
-          jsonSerialization['lastUpdatedAt']),
+        jsonSerialization['lastUpdatedAt'],
+      ),
     );
   }
 
@@ -72,6 +75,7 @@ abstract class AnonymousIpSpending
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'AnonymousIpSpending',
       if (id != null) 'id': id,
       'ipAddress': ipAddress,
       'totalSpentUsd': totalSpentUsd,
@@ -83,6 +87,7 @@ abstract class AnonymousIpSpending
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'AnonymousIpSpending',
       if (id != null) 'id': id,
       'ipAddress': ipAddress,
       'totalSpentUsd': totalSpentUsd,
@@ -131,12 +136,12 @@ class _AnonymousIpSpendingImpl extends AnonymousIpSpending {
     required DateTime createdAt,
     required DateTime lastUpdatedAt,
   }) : super._(
-          id: id,
-          ipAddress: ipAddress,
-          totalSpentUsd: totalSpentUsd,
-          createdAt: createdAt,
-          lastUpdatedAt: lastUpdatedAt,
-        );
+         id: id,
+         ipAddress: ipAddress,
+         totalSpentUsd: totalSpentUsd,
+         createdAt: createdAt,
+         lastUpdatedAt: lastUpdatedAt,
+       );
 
   /// Returns a shallow copy of this [AnonymousIpSpending]
   /// with some or all fields replaced by the given arguments.
@@ -159,9 +164,38 @@ class _AnonymousIpSpendingImpl extends AnonymousIpSpending {
   }
 }
 
+class AnonymousIpSpendingUpdateTable
+    extends _i1.UpdateTable<AnonymousIpSpendingTable> {
+  AnonymousIpSpendingUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> ipAddress(String value) => _i1.ColumnValue(
+    table.ipAddress,
+    value,
+  );
+
+  _i1.ColumnValue<double, double> totalSpentUsd(double value) =>
+      _i1.ColumnValue(
+        table.totalSpentUsd,
+        value,
+      );
+
+  _i1.ColumnValue<DateTime, DateTime> createdAt(DateTime value) =>
+      _i1.ColumnValue(
+        table.createdAt,
+        value,
+      );
+
+  _i1.ColumnValue<DateTime, DateTime> lastUpdatedAt(DateTime value) =>
+      _i1.ColumnValue(
+        table.lastUpdatedAt,
+        value,
+      );
+}
+
 class AnonymousIpSpendingTable extends _i1.Table<int?> {
   AnonymousIpSpendingTable({super.tableRelation})
-      : super(tableName: 'anonymous_ip_spending') {
+    : super(tableName: 'anonymous_ip_spending') {
+    updateTable = AnonymousIpSpendingUpdateTable(this);
     ipAddress = _i1.ColumnString(
       'ipAddress',
       this,
@@ -180,6 +214,8 @@ class AnonymousIpSpendingTable extends _i1.Table<int?> {
     );
   }
 
+  late final AnonymousIpSpendingUpdateTable updateTable;
+
   late final _i1.ColumnString ipAddress;
 
   late final _i1.ColumnDouble totalSpentUsd;
@@ -190,12 +226,12 @@ class AnonymousIpSpendingTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        ipAddress,
-        totalSpentUsd,
-        createdAt,
-        lastUpdatedAt,
-      ];
+    id,
+    ipAddress,
+    totalSpentUsd,
+    createdAt,
+    lastUpdatedAt,
+  ];
 }
 
 class AnonymousIpSpendingInclude extends _i1.IncludeObject {
@@ -383,6 +419,48 @@ class AnonymousIpSpendingRepository {
     return session.db.updateRow<AnonymousIpSpending>(
       row,
       columns: columns?.call(AnonymousIpSpending.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [AnonymousIpSpending] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<AnonymousIpSpending?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<AnonymousIpSpendingUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<AnonymousIpSpending>(
+      id,
+      columnValues: columnValues(AnonymousIpSpending.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [AnonymousIpSpending]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<AnonymousIpSpending>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<AnonymousIpSpendingUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<AnonymousIpSpendingTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<AnonymousIpSpendingTable>? orderBy,
+    _i1.OrderByListBuilder<AnonymousIpSpendingTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<AnonymousIpSpending>(
+      columnValues: columnValues(AnonymousIpSpending.t.updateTable),
+      where: where(AnonymousIpSpending.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(AnonymousIpSpending.t),
+      orderByList: orderByList?.call(AnonymousIpSpending.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

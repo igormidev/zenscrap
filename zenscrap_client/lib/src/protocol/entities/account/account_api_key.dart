@@ -7,10 +7,12 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import '../../entities/account/api_usage/account_api_usage.dart' as _i2;
+import 'package:zenscrap_client/src/protocol/protocol.dart' as _i3;
 
 abstract class AccountApiKey implements _i1.SerializableModel {
   AccountApiKey._({
@@ -38,14 +40,16 @@ abstract class AccountApiKey implements _i1.SerializableModel {
       id: jsonSerialization['id'] as int?,
       apiKey: jsonSerialization['apiKey'] as String,
       name: jsonSerialization['name'] as String,
-      createdAt:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
+      createdAt: _i1.DateTimeJsonExtension.fromJson(
+        jsonSerialization['createdAt'],
+      ),
       isActive: jsonSerialization['isActive'] as bool,
       accountApiUsageId: jsonSerialization['accountApiUsageId'] as int,
       accountApiUsage: jsonSerialization['accountApiUsage'] == null
           ? null
-          : _i2.AccountApiUsage.fromJson(
-              (jsonSerialization['accountApiUsage'] as Map<String, dynamic>)),
+          : _i3.Protocol().deserialize<_i2.AccountApiUsage>(
+              jsonSerialization['accountApiUsage'],
+            ),
     );
   }
 
@@ -81,6 +85,7 @@ abstract class AccountApiKey implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'AccountApiKey',
       if (id != null) 'id': id,
       'apiKey': apiKey,
       'name': name,
@@ -109,14 +114,14 @@ class _AccountApiKeyImpl extends AccountApiKey {
     required int accountApiUsageId,
     _i2.AccountApiUsage? accountApiUsage,
   }) : super._(
-          id: id,
-          apiKey: apiKey,
-          name: name,
-          createdAt: createdAt,
-          isActive: isActive,
-          accountApiUsageId: accountApiUsageId,
-          accountApiUsage: accountApiUsage,
-        );
+         id: id,
+         apiKey: apiKey,
+         name: name,
+         createdAt: createdAt,
+         isActive: isActive,
+         accountApiUsageId: accountApiUsageId,
+         accountApiUsage: accountApiUsage,
+       );
 
   /// Returns a shallow copy of this [AccountApiKey]
   /// with some or all fields replaced by the given arguments.

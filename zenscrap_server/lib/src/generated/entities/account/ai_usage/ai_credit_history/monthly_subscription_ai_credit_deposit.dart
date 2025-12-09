@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -27,7 +28,8 @@ abstract class MonthlySubscriptionAICreditDeposit
   }) = _MonthlySubscriptionAICreditDepositImpl;
 
   factory MonthlySubscriptionAICreditDeposit.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return MonthlySubscriptionAICreditDeposit(
       id: jsonSerialization['id'] as int?,
       creditsAmountInDollars:
@@ -61,6 +63,7 @@ abstract class MonthlySubscriptionAICreditDeposit
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'MonthlySubscriptionAICreditDeposit',
       if (id != null) 'id': id,
       'creditsAmountInDollars': creditsAmountInDollars,
       'planTier': planTier.toJson(),
@@ -70,6 +73,7 @@ abstract class MonthlySubscriptionAICreditDeposit
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'MonthlySubscriptionAICreditDeposit',
       if (id != null) 'id': id,
       'creditsAmountInDollars': creditsAmountInDollars,
       'planTier': planTier.toJson(),
@@ -87,7 +91,7 @@ abstract class MonthlySubscriptionAICreditDeposit
     _i1.OrderByBuilder<MonthlySubscriptionAICreditDepositTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<MonthlySubscriptionAICreditDepositTable>?
-        orderByList,
+    orderByList,
     MonthlySubscriptionAICreditDepositInclude? include,
   }) {
     return MonthlySubscriptionAICreditDepositIncludeList._(
@@ -116,10 +120,10 @@ class _MonthlySubscriptionAICreditDepositImpl
     required double creditsAmountInDollars,
     required _i2.PlanTier planTier,
   }) : super._(
-          id: id,
-          creditsAmountInDollars: creditsAmountInDollars,
-          planTier: planTier,
-        );
+         id: id,
+         creditsAmountInDollars: creditsAmountInDollars,
+         planTier: planTier,
+       );
 
   /// Returns a shallow copy of this [MonthlySubscriptionAICreditDeposit]
   /// with some or all fields replaced by the given arguments.
@@ -139,9 +143,27 @@ class _MonthlySubscriptionAICreditDepositImpl
   }
 }
 
+class MonthlySubscriptionAICreditDepositUpdateTable
+    extends _i1.UpdateTable<MonthlySubscriptionAICreditDepositTable> {
+  MonthlySubscriptionAICreditDepositUpdateTable(super.table);
+
+  _i1.ColumnValue<double, double> creditsAmountInDollars(double value) =>
+      _i1.ColumnValue(
+        table.creditsAmountInDollars,
+        value,
+      );
+
+  _i1.ColumnValue<_i2.PlanTier, _i2.PlanTier> planTier(_i2.PlanTier value) =>
+      _i1.ColumnValue(
+        table.planTier,
+        value,
+      );
+}
+
 class MonthlySubscriptionAICreditDepositTable extends _i1.Table<int?> {
   MonthlySubscriptionAICreditDepositTable({super.tableRelation})
-      : super(tableName: 'monthly_subscription_ai_credit_deposit') {
+    : super(tableName: 'monthly_subscription_ai_credit_deposit') {
+    updateTable = MonthlySubscriptionAICreditDepositUpdateTable(this);
     creditsAmountInDollars = _i1.ColumnDouble(
       'creditsAmountInDollars',
       this,
@@ -153,16 +175,18 @@ class MonthlySubscriptionAICreditDepositTable extends _i1.Table<int?> {
     );
   }
 
+  late final MonthlySubscriptionAICreditDepositUpdateTable updateTable;
+
   late final _i1.ColumnDouble creditsAmountInDollars;
 
   late final _i1.ColumnEnum<_i2.PlanTier> planTier;
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        creditsAmountInDollars,
-        planTier,
-      ];
+    id,
+    creditsAmountInDollars,
+    planTier,
+  ];
 }
 
 class MonthlySubscriptionAICreditDepositInclude extends _i1.IncludeObject {
@@ -228,7 +252,7 @@ class MonthlySubscriptionAICreditDepositRepository {
     _i1.OrderByBuilder<MonthlySubscriptionAICreditDepositTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<MonthlySubscriptionAICreditDepositTable>?
-        orderByList,
+    orderByList,
     _i1.Transaction? transaction,
   }) async {
     return session.db.find<MonthlySubscriptionAICreditDeposit>(
@@ -266,7 +290,7 @@ class MonthlySubscriptionAICreditDepositRepository {
     _i1.OrderByBuilder<MonthlySubscriptionAICreditDepositTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<MonthlySubscriptionAICreditDepositTable>?
-        orderByList,
+    orderByList,
     _i1.Transaction? transaction,
   }) async {
     return session.db.findFirstRow<MonthlySubscriptionAICreditDeposit>(
@@ -356,6 +380,58 @@ class MonthlySubscriptionAICreditDepositRepository {
     );
   }
 
+  /// Updates a single [MonthlySubscriptionAICreditDeposit] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<MonthlySubscriptionAICreditDeposit?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<
+      MonthlySubscriptionAICreditDepositUpdateTable
+    >
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<MonthlySubscriptionAICreditDeposit>(
+      id,
+      columnValues: columnValues(
+        MonthlySubscriptionAICreditDeposit.t.updateTable,
+      ),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [MonthlySubscriptionAICreditDeposit]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<MonthlySubscriptionAICreditDeposit>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<
+      MonthlySubscriptionAICreditDepositUpdateTable
+    >
+    columnValues,
+    required _i1.WhereExpressionBuilder<MonthlySubscriptionAICreditDepositTable>
+    where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<MonthlySubscriptionAICreditDepositTable>? orderBy,
+    _i1.OrderByListBuilder<MonthlySubscriptionAICreditDepositTable>?
+    orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<MonthlySubscriptionAICreditDeposit>(
+      columnValues: columnValues(
+        MonthlySubscriptionAICreditDeposit.t.updateTable,
+      ),
+      where: where(MonthlySubscriptionAICreditDeposit.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(MonthlySubscriptionAICreditDeposit.t),
+      orderByList: orderByList?.call(MonthlySubscriptionAICreditDeposit.t),
+      orderDescending: orderDescending,
+      transaction: transaction,
+    );
+  }
+
   /// Deletes all [MonthlySubscriptionAICreditDeposit]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
@@ -386,7 +462,7 @@ class MonthlySubscriptionAICreditDepositRepository {
   Future<List<MonthlySubscriptionAICreditDeposit>> deleteWhere(
     _i1.Session session, {
     required _i1.WhereExpressionBuilder<MonthlySubscriptionAICreditDepositTable>
-        where,
+    where,
     _i1.Transaction? transaction,
   }) async {
     return session.db.deleteWhere<MonthlySubscriptionAICreditDeposit>(

@@ -1,4 +1,5 @@
 import 'package:serverpod/serverpod.dart';
+import 'package:serverpod_auth_server/serverpod_auth_server.dart';
 import 'package:zenscrap_server/src/core/default_classes.dart';
 import 'package:zenscrap_server/src/endpoints/public/scrappable_chat_session.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
@@ -19,7 +20,7 @@ mixin DeployEndpointMixin {
       );
     }
 
-    final int? userId = (await session.authenticated)?.userId;
+    final int? userId = session.authenticated?.userId;
     final Scrappable? scrappable;
     if (userId == null) {
       // If not autenticated, should only be able to modify scrappables that are not attached to any account

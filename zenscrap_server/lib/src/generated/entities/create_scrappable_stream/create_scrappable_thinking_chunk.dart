@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 part of 'create_scrappable_stream_item.dart';
 
@@ -19,25 +20,34 @@ abstract class CreateScrappableThinkingChunk
       _CreateScrappableThinkingChunkImpl;
 
   factory CreateScrappableThinkingChunk.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return CreateScrappableThinkingChunk(
-        thinkingText: jsonSerialization['thinkingText'] as String);
+      thinkingText: jsonSerialization['thinkingText'] as String,
+    );
   }
 
   String thinkingText;
 
   /// Returns a shallow copy of this [CreateScrappableThinkingChunk]
   /// with some or all fields replaced by the given arguments.
+  @override
   @_i2.useResult
   CreateScrappableThinkingChunk copyWith({String? thinkingText});
   @override
   Map<String, dynamic> toJson() {
-    return {'thinkingText': thinkingText};
+    return {
+      '__className__': 'CreateScrappableThinkingChunk',
+      'thinkingText': thinkingText,
+    };
   }
 
   @override
   Map<String, dynamic> toJsonForProtocol() {
-    return {'thinkingText': thinkingText};
+    return {
+      '__className__': 'CreateScrappableThinkingChunk',
+      'thinkingText': thinkingText,
+    };
   }
 
   @override
@@ -48,7 +58,7 @@ abstract class CreateScrappableThinkingChunk
 
 class _CreateScrappableThinkingChunkImpl extends CreateScrappableThinkingChunk {
   _CreateScrappableThinkingChunkImpl({required String thinkingText})
-      : super._(thinkingText: thinkingText);
+    : super._(thinkingText: thinkingText);
 
   /// Returns a shallow copy of this [CreateScrappableThinkingChunk]
   /// with some or all fields replaced by the given arguments.
@@ -56,6 +66,7 @@ class _CreateScrappableThinkingChunkImpl extends CreateScrappableThinkingChunk {
   @override
   CreateScrappableThinkingChunk copyWith({String? thinkingText}) {
     return CreateScrappableThinkingChunk(
-        thinkingText: thinkingText ?? this.thinkingText);
+      thinkingText: thinkingText ?? this.thinkingText,
+    );
   }
 }

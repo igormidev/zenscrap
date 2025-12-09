@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: unnecessary_null_comparison
 
@@ -15,6 +16,7 @@ import 'package:serverpod/serverpod.dart' as _i1;
 import '../../../entities/account/account.dart' as _i2;
 import '../../../entities/account/ai_usage/ai_credit_history/ai_usage_history_item.dart'
     as _i3;
+import 'package:zenscrap_server/src/generated/protocol.dart' as _i4;
 
 abstract class AccountAIUsage
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -43,12 +45,14 @@ abstract class AccountAIUsage
               .toDouble(),
       accountInfo: jsonSerialization['accountInfo'] == null
           ? null
-          : _i2.AccountInfo.fromJson(
-              (jsonSerialization['accountInfo'] as Map<String, dynamic>)),
-      history: (jsonSerialization['history'] as List?)
-          ?.map((e) =>
-              _i3.AICreditHistoryItem.fromJson((e as Map<String, dynamic>)))
-          .toList(),
+          : _i4.Protocol().deserialize<_i2.AccountInfo>(
+              jsonSerialization['accountInfo'],
+            ),
+      history: jsonSerialization['history'] == null
+          ? null
+          : _i4.Protocol().deserialize<List<_i3.AICreditHistoryItem>>(
+              jsonSerialization['history'],
+            ),
     );
   }
 
@@ -83,6 +87,7 @@ abstract class AccountAIUsage
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'AccountAIUsage',
       if (id != null) 'id': id,
       if (userOpenAiApiKey != null) 'userOpenAiApiKey': userOpenAiApiKey,
       'totalDollarsSpentFromTotalInUSD': totalDollarsSpentFromTotalInUSD,
@@ -95,6 +100,7 @@ abstract class AccountAIUsage
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'AccountAIUsage',
       if (id != null) 'id': id,
       if (userOpenAiApiKey != null) 'userOpenAiApiKey': userOpenAiApiKey,
       'totalDollarsSpentFromTotalInUSD': totalDollarsSpentFromTotalInUSD,
@@ -150,12 +156,12 @@ class _AccountAIUsageImpl extends AccountAIUsage {
     _i2.AccountInfo? accountInfo,
     List<_i3.AICreditHistoryItem>? history,
   }) : super._(
-          id: id,
-          userOpenAiApiKey: userOpenAiApiKey,
-          totalDollarsSpentFromTotalInUSD: totalDollarsSpentFromTotalInUSD,
-          accountInfo: accountInfo,
-          history: history,
-        );
+         id: id,
+         userOpenAiApiKey: userOpenAiApiKey,
+         totalDollarsSpentFromTotalInUSD: totalDollarsSpentFromTotalInUSD,
+         accountInfo: accountInfo,
+         history: history,
+       );
 
   /// Returns a shallow copy of this [AccountAIUsage]
   /// with some or all fields replaced by the given arguments.
@@ -173,7 +179,8 @@ class _AccountAIUsageImpl extends AccountAIUsage {
       userOpenAiApiKey: userOpenAiApiKey is String?
           ? userOpenAiApiKey
           : this.userOpenAiApiKey,
-      totalDollarsSpentFromTotalInUSD: totalDollarsSpentFromTotalInUSD ??
+      totalDollarsSpentFromTotalInUSD:
+          totalDollarsSpentFromTotalInUSD ??
           this.totalDollarsSpentFromTotalInUSD,
       accountInfo: accountInfo is _i2.AccountInfo?
           ? accountInfo
@@ -185,9 +192,27 @@ class _AccountAIUsageImpl extends AccountAIUsage {
   }
 }
 
+class AccountAIUsageUpdateTable extends _i1.UpdateTable<AccountAIUsageTable> {
+  AccountAIUsageUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> userOpenAiApiKey(String? value) =>
+      _i1.ColumnValue(
+        table.userOpenAiApiKey,
+        value,
+      );
+
+  _i1.ColumnValue<double, double> totalDollarsSpentFromTotalInUSD(
+    double value,
+  ) => _i1.ColumnValue(
+    table.totalDollarsSpentFromTotalInUSD,
+    value,
+  );
+}
+
 class AccountAIUsageTable extends _i1.Table<int?> {
   AccountAIUsageTable({super.tableRelation})
-      : super(tableName: 'account_ai_usage') {
+    : super(tableName: 'account_ai_usage') {
+    updateTable = AccountAIUsageUpdateTable(this);
     userOpenAiApiKey = _i1.ColumnString(
       'userOpenAiApiKey',
       this,
@@ -197,6 +222,8 @@ class AccountAIUsageTable extends _i1.Table<int?> {
       this,
     );
   }
+
+  late final AccountAIUsageUpdateTable updateTable;
 
   late final _i1.ColumnString userOpenAiApiKey;
 
@@ -247,17 +274,18 @@ class AccountAIUsageTable extends _i1.Table<int?> {
     _history = _i1.ManyRelation<_i3.AICreditHistoryItemTable>(
       tableWithRelations: relationTable,
       table: _i3.AICreditHistoryItemTable(
-          tableRelation: relationTable.tableRelation!.lastRelation),
+        tableRelation: relationTable.tableRelation!.lastRelation,
+      ),
     );
     return _history!;
   }
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        userOpenAiApiKey,
-        totalDollarsSpentFromTotalInUSD,
-      ];
+    id,
+    userOpenAiApiKey,
+    totalDollarsSpentFromTotalInUSD,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -286,9 +314,9 @@ class AccountAIUsageInclude extends _i1.IncludeObject {
 
   @override
   Map<String, _i1.Include?> get includes => {
-        'accountInfo': _accountInfo,
-        'history': _history,
-      };
+    'accountInfo': _accountInfo,
+    'history': _history,
+  };
 
   @override
   _i1.Table<int?> get table => AccountAIUsage.t;
@@ -487,6 +515,46 @@ class AccountAIUsageRepository {
     );
   }
 
+  /// Updates a single [AccountAIUsage] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<AccountAIUsage?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<AccountAIUsageUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<AccountAIUsage>(
+      id,
+      columnValues: columnValues(AccountAIUsage.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [AccountAIUsage]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<AccountAIUsage>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<AccountAIUsageUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<AccountAIUsageTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<AccountAIUsageTable>? orderBy,
+    _i1.OrderByListBuilder<AccountAIUsageTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<AccountAIUsage>(
+      columnValues: columnValues(AccountAIUsage.t.updateTable),
+      where: where(AccountAIUsage.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(AccountAIUsage.t),
+      orderByList: orderByList?.call(AccountAIUsage.t),
+      orderDescending: orderDescending,
+      transaction: transaction,
+    );
+  }
+
   /// Deletes all [AccountAIUsage]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
@@ -588,8 +656,9 @@ class AccountAIUsageAttachRowRepository {
       throw ArgumentError.notNull('accountAIUsage.id');
     }
 
-    var $accountInfo =
-        accountInfo.copyWith(accountAIUsageId: accountAIUsage.id);
+    var $accountInfo = accountInfo.copyWith(
+      accountAIUsageId: accountAIUsage.id,
+    );
     await session.db.updateRow<_i2.AccountInfo>(
       $accountInfo,
       columns: [_i2.AccountInfo.t.accountAIUsageId],
@@ -612,8 +681,9 @@ class AccountAIUsageAttachRowRepository {
       throw ArgumentError.notNull('accountAIUsage.id');
     }
 
-    var $aICreditHistoryItem =
-        aICreditHistoryItem.copyWith(accountAIUsageId: accountAIUsage.id);
+    var $aICreditHistoryItem = aICreditHistoryItem.copyWith(
+      accountAIUsageId: accountAIUsage.id,
+    );
     await session.db.updateRow<_i3.AICreditHistoryItem>(
       $aICreditHistoryItem,
       columns: [_i3.AICreditHistoryItem.t.accountAIUsageId],
@@ -667,8 +737,9 @@ class AccountAIUsageDetachRowRepository {
       throw ArgumentError.notNull('aICreditHistoryItem.id');
     }
 
-    var $aICreditHistoryItem =
-        aICreditHistoryItem.copyWith(accountAIUsageId: null);
+    var $aICreditHistoryItem = aICreditHistoryItem.copyWith(
+      accountAIUsageId: null,
+    );
     await session.db.updateRow<_i3.AICreditHistoryItem>(
       $aICreditHistoryItem,
       columns: [_i3.AICreditHistoryItem.t.accountAIUsageId],

@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -18,26 +19,27 @@ enum AutoFixAttemptStatus implements _i1.SerializableModel {
   api_error,
   success;
 
-  static AutoFixAttemptStatus fromJson(int index) {
-    switch (index) {
-      case 0:
+  static AutoFixAttemptStatus fromJson(String name) {
+    switch (name) {
+      case 'in_progress':
         return AutoFixAttemptStatus.in_progress;
-      case 1:
+      case 'validation_failed':
         return AutoFixAttemptStatus.validation_failed;
-      case 2:
+      case 'ai_error':
         return AutoFixAttemptStatus.ai_error;
-      case 3:
+      case 'api_error':
         return AutoFixAttemptStatus.api_error;
-      case 4:
+      case 'success':
         return AutoFixAttemptStatus.success;
       default:
         throw ArgumentError(
-            'Value "$index" cannot be converted to "AutoFixAttemptStatus"');
+          'Value "$name" cannot be converted to "AutoFixAttemptStatus"',
+        );
     }
   }
 
   @override
-  int toJson() => index;
+  String toJson() => name;
 
   @override
   String toString() => name;

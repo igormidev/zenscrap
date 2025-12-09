@@ -7,12 +7,14 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: unnecessary_null_comparison
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../entities/scrappable/scrappable.dart' as _i2;
+import 'package:zenscrap_server/src/generated/protocol.dart' as _i3;
 
 abstract class ScrappableRequest
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -38,24 +40,21 @@ abstract class ScrappableRequest
     return ScrappableRequest(
       id: jsonSerialization['id'] as int?,
       url: jsonSerialization['url'] as String,
-      queryParams:
-          (jsonSerialization['queryParams'] as Map).map((k, v) => MapEntry(
-                k as String,
-                v as String?,
-              )),
-      queryParamsNotRelatedToUrl:
-          (jsonSerialization['queryParamsNotRelatedToUrl'] as Map)
-              .map((k, v) => MapEntry(
-                    k as String,
-                    v as String?,
-                  )),
-      pathParams: (jsonSerialization['pathParams'] as List)
-          .map((e) => e as String)
-          .toList(),
+      queryParams: _i3.Protocol().deserialize<Map<String, String?>>(
+        jsonSerialization['queryParams'],
+      ),
+      queryParamsNotRelatedToUrl: _i3.Protocol()
+          .deserialize<Map<String, String?>>(
+            jsonSerialization['queryParamsNotRelatedToUrl'],
+          ),
+      pathParams: _i3.Protocol().deserialize<List<String>>(
+        jsonSerialization['pathParams'],
+      ),
       scrappable: jsonSerialization['scrappable'] == null
           ? null
-          : _i2.Scrappable.fromJson(
-              (jsonSerialization['scrappable'] as Map<String, dynamic>)),
+          : _i3.Protocol().deserialize<_i2.Scrappable>(
+              jsonSerialization['scrappable'],
+            ),
     );
   }
 
@@ -93,6 +92,7 @@ abstract class ScrappableRequest
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ScrappableRequest',
       if (id != null) 'id': id,
       'url': url,
       'queryParams': queryParams.toJson(),
@@ -105,6 +105,7 @@ abstract class ScrappableRequest
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'ScrappableRequest',
       if (id != null) 'id': id,
       'url': url,
       'queryParams': queryParams.toJson(),
@@ -155,13 +156,13 @@ class _ScrappableRequestImpl extends ScrappableRequest {
     required List<String> pathParams,
     _i2.Scrappable? scrappable,
   }) : super._(
-          id: id,
-          url: url,
-          queryParams: queryParams,
-          queryParamsNotRelatedToUrl: queryParamsNotRelatedToUrl,
-          pathParams: pathParams,
-          scrappable: scrappable,
-        );
+         id: id,
+         url: url,
+         queryParams: queryParams,
+         queryParamsNotRelatedToUrl: queryParamsNotRelatedToUrl,
+         pathParams: pathParams,
+         scrappable: scrappable,
+       );
 
   /// Returns a shallow copy of this [ScrappableRequest]
   /// with some or all fields replaced by the given arguments.
@@ -178,24 +179,28 @@ class _ScrappableRequestImpl extends ScrappableRequest {
     return ScrappableRequest(
       id: id is int? ? id : this.id,
       url: url ?? this.url,
-      queryParams: queryParams ??
-          this.queryParams.map((
-                key0,
-                value0,
-              ) =>
-                  MapEntry(
-                    key0,
-                    value0,
-                  )),
-      queryParamsNotRelatedToUrl: queryParamsNotRelatedToUrl ??
-          this.queryParamsNotRelatedToUrl.map((
-                key0,
-                value0,
-              ) =>
-                  MapEntry(
-                    key0,
-                    value0,
-                  )),
+      queryParams:
+          queryParams ??
+          this.queryParams.map(
+            (
+              key0,
+              value0,
+            ) => MapEntry(
+              key0,
+              value0,
+            ),
+          ),
+      queryParamsNotRelatedToUrl:
+          queryParamsNotRelatedToUrl ??
+          this.queryParamsNotRelatedToUrl.map(
+            (
+              key0,
+              value0,
+            ) => MapEntry(
+              key0,
+              value0,
+            ),
+          ),
       pathParams: pathParams ?? this.pathParams.map((e0) => e0).toList(),
       scrappable: scrappable is _i2.Scrappable?
           ? scrappable
@@ -204,34 +209,67 @@ class _ScrappableRequestImpl extends ScrappableRequest {
   }
 }
 
+class ScrappableRequestUpdateTable
+    extends _i1.UpdateTable<ScrappableRequestTable> {
+  ScrappableRequestUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> url(String value) => _i1.ColumnValue(
+    table.url,
+    value,
+  );
+
+  _i1.ColumnValue<Map<String, String?>, Map<String, String?>> queryParams(
+    Map<String, String?> value,
+  ) => _i1.ColumnValue(
+    table.queryParams,
+    value,
+  );
+
+  _i1.ColumnValue<Map<String, String?>, Map<String, String?>>
+  queryParamsNotRelatedToUrl(Map<String, String?> value) => _i1.ColumnValue(
+    table.queryParamsNotRelatedToUrl,
+    value,
+  );
+
+  _i1.ColumnValue<List<String>, List<String>> pathParams(List<String> value) =>
+      _i1.ColumnValue(
+        table.pathParams,
+        value,
+      );
+}
+
 class ScrappableRequestTable extends _i1.Table<int?> {
   ScrappableRequestTable({super.tableRelation})
-      : super(tableName: 'scrappable_target_request') {
+    : super(tableName: 'scrappable_target_request') {
+    updateTable = ScrappableRequestUpdateTable(this);
     url = _i1.ColumnString(
       'url',
       this,
     );
-    queryParams = _i1.ColumnSerializable(
+    queryParams = _i1.ColumnSerializable<Map<String, String?>>(
       'queryParams',
       this,
     );
-    queryParamsNotRelatedToUrl = _i1.ColumnSerializable(
+    queryParamsNotRelatedToUrl = _i1.ColumnSerializable<Map<String, String?>>(
       'queryParamsNotRelatedToUrl',
       this,
     );
-    pathParams = _i1.ColumnSerializable(
+    pathParams = _i1.ColumnSerializable<List<String>>(
       'pathParams',
       this,
     );
   }
 
+  late final ScrappableRequestUpdateTable updateTable;
+
   late final _i1.ColumnString url;
 
-  late final _i1.ColumnSerializable queryParams;
+  late final _i1.ColumnSerializable<Map<String, String?>> queryParams;
 
-  late final _i1.ColumnSerializable queryParamsNotRelatedToUrl;
+  late final _i1.ColumnSerializable<Map<String, String?>>
+  queryParamsNotRelatedToUrl;
 
-  late final _i1.ColumnSerializable pathParams;
+  late final _i1.ColumnSerializable<List<String>> pathParams;
 
   _i2.ScrappableTable? _scrappable;
 
@@ -250,12 +288,12 @@ class ScrappableRequestTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        url,
-        queryParams,
-        queryParamsNotRelatedToUrl,
-        pathParams,
-      ];
+    id,
+    url,
+    queryParams,
+    queryParamsNotRelatedToUrl,
+    pathParams,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -467,6 +505,48 @@ class ScrappableRequestRepository {
     );
   }
 
+  /// Updates a single [ScrappableRequest] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<ScrappableRequest?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<ScrappableRequestUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<ScrappableRequest>(
+      id,
+      columnValues: columnValues(ScrappableRequest.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [ScrappableRequest]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<ScrappableRequest>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<ScrappableRequestUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<ScrappableRequestTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<ScrappableRequestTable>? orderBy,
+    _i1.OrderByListBuilder<ScrappableRequestTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<ScrappableRequest>(
+      columnValues: columnValues(ScrappableRequest.t.updateTable),
+      where: where(ScrappableRequest.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(ScrappableRequest.t),
+      orderByList: orderByList?.call(ScrappableRequest.t),
+      orderDescending: orderDescending,
+      transaction: transaction,
+    );
+  }
+
   /// Deletes all [ScrappableRequest]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
@@ -539,8 +619,9 @@ class ScrappableRequestAttachRowRepository {
       throw ArgumentError.notNull('scrappableRequest.id');
     }
 
-    var $scrappable =
-        scrappable.copyWith(targetRequestId: scrappableRequest.id);
+    var $scrappable = scrappable.copyWith(
+      targetRequestId: scrappableRequest.id,
+    );
     await session.db.updateRow<_i2.Scrappable>(
       $scrappable,
       columns: [_i2.Scrappable.t.targetRequestId],

@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: unnecessary_null_comparison
 
@@ -15,6 +16,7 @@ import 'package:serverpod/serverpod.dart' as _i1;
 import '../../entities/scrappable/request_status.dart' as _i2;
 import '../../entities/scrappable/scrappable.dart' as _i3;
 import '../../entities/analytics/analytics_request_details.dart' as _i4;
+import 'package:zenscrap_server/src/generated/protocol.dart' as _i5;
 
 abstract class ScrappableAnalytics
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -46,21 +48,25 @@ abstract class ScrappableAnalytics
     return ScrappableAnalytics(
       id: jsonSerialization['id'] as int?,
       requestStatus: _i2.RequestStatus.fromJson(
-          (jsonSerialization['requestStatus'] as int)),
-      requestedAt:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['requestedAt']),
+        (jsonSerialization['requestStatus'] as String),
+      ),
+      requestedAt: _i1.DateTimeJsonExtension.fromJson(
+        jsonSerialization['requestedAt'],
+      ),
       attachedNanoId: jsonSerialization['attachedNanoId'] as String,
       attachedApiKey: jsonSerialization['attachedApiKey'] as String,
       scrappableId: jsonSerialization['scrappableId'] as int,
       scrappable: jsonSerialization['scrappable'] == null
           ? null
-          : _i3.Scrappable.fromJson(
-              (jsonSerialization['scrappable'] as Map<String, dynamic>)),
+          : _i5.Protocol().deserialize<_i3.Scrappable>(
+              jsonSerialization['scrappable'],
+            ),
       detailsId: jsonSerialization['detailsId'] as int?,
       details: jsonSerialization['details'] == null
           ? null
-          : _i4.AnalyticsRequestDetails.fromJson(
-              (jsonSerialization['details'] as Map<String, dynamic>)),
+          : _i5.Protocol().deserialize<_i4.AnalyticsRequestDetails>(
+              jsonSerialization['details'],
+            ),
     );
   }
 
@@ -107,6 +113,7 @@ abstract class ScrappableAnalytics
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ScrappableAnalytics',
       if (id != null) 'id': id,
       'requestStatus': requestStatus.toJson(),
       'requestedAt': requestedAt.toJson(),
@@ -122,6 +129,7 @@ abstract class ScrappableAnalytics
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'ScrappableAnalytics',
       if (id != null) 'id': id,
       'requestStatus': requestStatus.toJson(),
       'requestedAt': requestedAt.toJson(),
@@ -184,16 +192,16 @@ class _ScrappableAnalyticsImpl extends ScrappableAnalytics {
     int? detailsId,
     _i4.AnalyticsRequestDetails? details,
   }) : super._(
-          id: id,
-          requestStatus: requestStatus,
-          requestedAt: requestedAt,
-          attachedNanoId: attachedNanoId,
-          attachedApiKey: attachedApiKey,
-          scrappableId: scrappableId,
-          scrappable: scrappable,
-          detailsId: detailsId,
-          details: details,
-        );
+         id: id,
+         requestStatus: requestStatus,
+         requestedAt: requestedAt,
+         attachedNanoId: attachedNanoId,
+         attachedApiKey: attachedApiKey,
+         scrappableId: scrappableId,
+         scrappable: scrappable,
+         detailsId: detailsId,
+         details: details,
+       );
 
   /// Returns a shallow copy of this [ScrappableAnalytics]
   /// with some or all fields replaced by the given arguments.
@@ -228,13 +236,54 @@ class _ScrappableAnalyticsImpl extends ScrappableAnalytics {
   }
 }
 
+class ScrappableAnalyticsUpdateTable
+    extends _i1.UpdateTable<ScrappableAnalyticsTable> {
+  ScrappableAnalyticsUpdateTable(super.table);
+
+  _i1.ColumnValue<_i2.RequestStatus, _i2.RequestStatus> requestStatus(
+    _i2.RequestStatus value,
+  ) => _i1.ColumnValue(
+    table.requestStatus,
+    value,
+  );
+
+  _i1.ColumnValue<DateTime, DateTime> requestedAt(DateTime value) =>
+      _i1.ColumnValue(
+        table.requestedAt,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> attachedNanoId(String value) =>
+      _i1.ColumnValue(
+        table.attachedNanoId,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> attachedApiKey(String value) =>
+      _i1.ColumnValue(
+        table.attachedApiKey,
+        value,
+      );
+
+  _i1.ColumnValue<int, int> scrappableId(int value) => _i1.ColumnValue(
+    table.scrappableId,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> detailsId(int? value) => _i1.ColumnValue(
+    table.detailsId,
+    value,
+  );
+}
+
 class ScrappableAnalyticsTable extends _i1.Table<int?> {
   ScrappableAnalyticsTable({super.tableRelation})
-      : super(tableName: 'scrappable_analytics') {
+    : super(tableName: 'scrappable_analytics') {
+    updateTable = ScrappableAnalyticsUpdateTable(this);
     requestStatus = _i1.ColumnEnum(
       'requestStatus',
       this,
-      _i1.EnumSerialization.byIndex,
+      _i1.EnumSerialization.byName,
     );
     requestedAt = _i1.ColumnDateTime(
       'requestedAt',
@@ -257,6 +306,8 @@ class ScrappableAnalyticsTable extends _i1.Table<int?> {
       this,
     );
   }
+
+  late final ScrappableAnalyticsUpdateTable updateTable;
 
   late final _i1.ColumnEnum<_i2.RequestStatus> requestStatus;
 
@@ -302,14 +353,14 @@ class ScrappableAnalyticsTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        requestStatus,
-        requestedAt,
-        attachedNanoId,
-        attachedApiKey,
-        scrappableId,
-        detailsId,
-      ];
+    id,
+    requestStatus,
+    requestedAt,
+    attachedNanoId,
+    attachedApiKey,
+    scrappableId,
+    detailsId,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -338,9 +389,9 @@ class ScrappableAnalyticsInclude extends _i1.IncludeObject {
 
   @override
   Map<String, _i1.Include?> get includes => {
-        'scrappable': _scrappable,
-        'details': _details,
-      };
+    'scrappable': _scrappable,
+    'details': _details,
+  };
 
   @override
   _i1.Table<int?> get table => ScrappableAnalytics.t;
@@ -535,6 +586,48 @@ class ScrappableAnalyticsRepository {
     );
   }
 
+  /// Updates a single [ScrappableAnalytics] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<ScrappableAnalytics?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<ScrappableAnalyticsUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<ScrappableAnalytics>(
+      id,
+      columnValues: columnValues(ScrappableAnalytics.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [ScrappableAnalytics]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<ScrappableAnalytics>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<ScrappableAnalyticsUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<ScrappableAnalyticsTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<ScrappableAnalyticsTable>? orderBy,
+    _i1.OrderByListBuilder<ScrappableAnalyticsTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<ScrappableAnalytics>(
+      columnValues: columnValues(ScrappableAnalytics.t.updateTable),
+      where: where(ScrappableAnalytics.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(ScrappableAnalytics.t),
+      orderByList: orderByList?.call(ScrappableAnalytics.t),
+      orderDescending: orderDescending,
+      transaction: transaction,
+    );
+  }
+
   /// Deletes all [ScrappableAnalytics]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
@@ -607,8 +700,9 @@ class ScrappableAnalyticsAttachRowRepository {
       throw ArgumentError.notNull('scrappable.id');
     }
 
-    var $scrappableAnalytics =
-        scrappableAnalytics.copyWith(scrappableId: scrappable.id);
+    var $scrappableAnalytics = scrappableAnalytics.copyWith(
+      scrappableId: scrappable.id,
+    );
     await session.db.updateRow<ScrappableAnalytics>(
       $scrappableAnalytics,
       columns: [ScrappableAnalytics.t.scrappableId],
@@ -631,8 +725,9 @@ class ScrappableAnalyticsAttachRowRepository {
       throw ArgumentError.notNull('details.id');
     }
 
-    var $scrappableAnalytics =
-        scrappableAnalytics.copyWith(detailsId: details.id);
+    var $scrappableAnalytics = scrappableAnalytics.copyWith(
+      detailsId: details.id,
+    );
     await session.db.updateRow<ScrappableAnalytics>(
       $scrappableAnalytics,
       columns: [ScrappableAnalytics.t.detailsId],
@@ -651,16 +746,16 @@ class ScrappableAnalyticsDetachRowRepository {
   /// the related record.
   Future<void> details(
     _i1.Session session,
-    ScrappableAnalytics scrappableanalytics, {
+    ScrappableAnalytics scrappableAnalytics, {
     _i1.Transaction? transaction,
   }) async {
-    if (scrappableanalytics.id == null) {
-      throw ArgumentError.notNull('scrappableanalytics.id');
+    if (scrappableAnalytics.id == null) {
+      throw ArgumentError.notNull('scrappableAnalytics.id');
     }
 
-    var $scrappableanalytics = scrappableanalytics.copyWith(detailsId: null);
+    var $scrappableAnalytics = scrappableAnalytics.copyWith(detailsId: null);
     await session.db.updateRow<ScrappableAnalytics>(
-      $scrappableanalytics,
+      $scrappableAnalytics,
       columns: [ScrappableAnalytics.t.detailsId],
       transaction: transaction,
     );

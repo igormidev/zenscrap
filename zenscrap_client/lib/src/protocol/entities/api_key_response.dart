@@ -7,10 +7,12 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import '../entities/account/account_api_key.dart' as _i2;
+import 'package:zenscrap_client/src/protocol/protocol.dart' as _i3;
 
 abstract class ApiKeyResponse implements _i1.SerializableModel {
   ApiKeyResponse._({
@@ -25,11 +27,12 @@ abstract class ApiKeyResponse implements _i1.SerializableModel {
 
   factory ApiKeyResponse.fromJson(Map<String, dynamic> jsonSerialization) {
     return ApiKeyResponse(
-      apiKeys: (jsonSerialization['apiKeys'] as List)
-          .map((e) => _i2.AccountApiKey.fromJson((e as Map<String, dynamic>)))
-          .toList(),
-      usageStats: (jsonSerialization['usageStats'] as List).fold<Map<int, int>>(
-          {}, (t, e) => {...t, e['k'] as int: e['v'] as int}),
+      apiKeys: _i3.Protocol().deserialize<List<_i2.AccountApiKey>>(
+        jsonSerialization['apiKeys'],
+      ),
+      usageStats: _i3.Protocol().deserialize<Map<int, int>>(
+        jsonSerialization['usageStats'],
+      ),
     );
   }
 
@@ -47,6 +50,7 @@ abstract class ApiKeyResponse implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ApiKeyResponse',
       'apiKeys': apiKeys.toJson(valueToJson: (v) => v.toJson()),
       'usageStats': usageStats.toJson(),
     };
@@ -63,9 +67,9 @@ class _ApiKeyResponseImpl extends ApiKeyResponse {
     required List<_i2.AccountApiKey> apiKeys,
     required Map<int, int> usageStats,
   }) : super._(
-          apiKeys: apiKeys,
-          usageStats: usageStats,
-        );
+         apiKeys: apiKeys,
+         usageStats: usageStats,
+       );
 
   /// Returns a shallow copy of this [ApiKeyResponse]
   /// with some or all fields replaced by the given arguments.
@@ -77,15 +81,17 @@ class _ApiKeyResponseImpl extends ApiKeyResponse {
   }) {
     return ApiKeyResponse(
       apiKeys: apiKeys ?? this.apiKeys.map((e0) => e0.copyWith()).toList(),
-      usageStats: usageStats ??
-          this.usageStats.map((
-                key0,
-                value0,
-              ) =>
-                  MapEntry(
-                    key0,
-                    value0,
-                  )),
+      usageStats:
+          usageStats ??
+          this.usageStats.map(
+            (
+              key0,
+              value0,
+            ) => MapEntry(
+              key0,
+              value0,
+            ),
+          ),
     );
   }
 }

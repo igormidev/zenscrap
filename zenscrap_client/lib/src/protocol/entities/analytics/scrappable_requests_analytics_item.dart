@@ -7,11 +7,13 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import '../../entities/scrappable/scrappable.dart' as _i2;
 import '../../entities/analytics/scrappable_request_per_time_scope.dart' as _i3;
+import 'package:zenscrap_client/src/protocol/protocol.dart' as _i4;
 
 abstract class ScrappableRequestsAnalyticsItem
     implements _i1.SerializableModel {
@@ -38,10 +40,12 @@ abstract class ScrappableRequestsAnalyticsItem
   }) = _ScrappableRequestsAnalyticsItemImpl;
 
   factory ScrappableRequestsAnalyticsItem.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return ScrappableRequestsAnalyticsItem(
-      scrappable: _i2.Scrappable.fromJson(
-          (jsonSerialization['scrappable'] as Map<String, dynamic>)),
+      scrappable: _i4.Protocol().deserialize<_i2.Scrappable>(
+        jsonSerialization['scrappable'],
+      ),
       successTotalCount: jsonSerialization['successTotalCount'] as int,
       clientErrorTotalCount: jsonSerialization['clientErrorTotalCount'] as int,
       serverErrorTotalCount: jsonSerialization['serverErrorTotalCount'] as int,
@@ -51,10 +55,9 @@ abstract class ScrappableRequestsAnalyticsItem
           jsonSerialization['maxConcurrencyExceededTotalCount'] as int,
       failedAtScrappingBeeTotalCount:
           jsonSerialization['failedAtScrappingBeeTotalCount'] as int,
-      data: (jsonSerialization['data'] as List)
-          .map((e) => _i3.ScrappableRequestPerTimeScope.fromJson(
-              (e as Map<String, dynamic>)))
-          .toList(),
+      data: _i4.Protocol().deserialize<List<_i3.ScrappableRequestPerTimeScope>>(
+        jsonSerialization['data'],
+      ),
     );
   }
 
@@ -90,6 +93,7 @@ abstract class ScrappableRequestsAnalyticsItem
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ScrappableRequestsAnalyticsItem',
       'scrappable': scrappable.toJson(),
       'successTotalCount': successTotalCount,
       'clientErrorTotalCount': clientErrorTotalCount,
@@ -119,15 +123,15 @@ class _ScrappableRequestsAnalyticsItemImpl
     required int failedAtScrappingBeeTotalCount,
     required List<_i3.ScrappableRequestPerTimeScope> data,
   }) : super._(
-          scrappable: scrappable,
-          successTotalCount: successTotalCount,
-          clientErrorTotalCount: clientErrorTotalCount,
-          serverErrorTotalCount: serverErrorTotalCount,
-          insufficientCreditsTotalCount: insufficientCreditsTotalCount,
-          maxConcurrencyExceededTotalCount: maxConcurrencyExceededTotalCount,
-          failedAtScrappingBeeTotalCount: failedAtScrappingBeeTotalCount,
-          data: data,
-        );
+         scrappable: scrappable,
+         successTotalCount: successTotalCount,
+         clientErrorTotalCount: clientErrorTotalCount,
+         serverErrorTotalCount: serverErrorTotalCount,
+         insufficientCreditsTotalCount: insufficientCreditsTotalCount,
+         maxConcurrencyExceededTotalCount: maxConcurrencyExceededTotalCount,
+         failedAtScrappingBeeTotalCount: failedAtScrappingBeeTotalCount,
+         data: data,
+       );
 
   /// Returns a shallow copy of this [ScrappableRequestsAnalyticsItem]
   /// with some or all fields replaced by the given arguments.
@@ -152,7 +156,8 @@ class _ScrappableRequestsAnalyticsItemImpl
           serverErrorTotalCount ?? this.serverErrorTotalCount,
       insufficientCreditsTotalCount:
           insufficientCreditsTotalCount ?? this.insufficientCreditsTotalCount,
-      maxConcurrencyExceededTotalCount: maxConcurrencyExceededTotalCount ??
+      maxConcurrencyExceededTotalCount:
+          maxConcurrencyExceededTotalCount ??
           this.maxConcurrencyExceededTotalCount,
       failedAtScrappingBeeTotalCount:
           failedAtScrappingBeeTotalCount ?? this.failedAtScrappingBeeTotalCount,

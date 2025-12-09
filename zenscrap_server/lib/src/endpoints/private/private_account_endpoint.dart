@@ -15,7 +15,7 @@ class PrivateAccountEndpoint extends Endpoint {
     Session session, {
     required int? initialScrappableId,
   }) async {
-    final authenticationInfo = await session.authenticated;
+    final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
       throw defaultAuthenticationException;
     }

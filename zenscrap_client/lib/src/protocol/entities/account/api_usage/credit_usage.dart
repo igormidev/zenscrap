@@ -7,10 +7,12 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import '../../../entities/account/api_usage/account_api_usage.dart' as _i2;
+import 'package:zenscrap_client/src/protocol/protocol.dart' as _i3;
 
 abstract class CreditUsage implements _i1.SerializableModel {
   CreditUsage._({
@@ -34,8 +36,9 @@ abstract class CreditUsage implements _i1.SerializableModel {
       purchasedCredits: jsonSerialization['purchasedCredits'] as int,
       accountApiUsage: jsonSerialization['accountApiUsage'] == null
           ? null
-          : _i2.AccountApiUsage.fromJson(
-              (jsonSerialization['accountApiUsage'] as Map<String, dynamic>)),
+          : _i3.Protocol().deserialize<_i2.AccountApiUsage>(
+              jsonSerialization['accountApiUsage'],
+            ),
     );
   }
 
@@ -62,6 +65,7 @@ abstract class CreditUsage implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'CreditUsage',
       if (id != null) 'id': id,
       'subscriptionCredits': subscriptionCredits,
       'purchasedCredits': purchasedCredits,
@@ -84,11 +88,11 @@ class _CreditUsageImpl extends CreditUsage {
     required int purchasedCredits,
     _i2.AccountApiUsage? accountApiUsage,
   }) : super._(
-          id: id,
-          subscriptionCredits: subscriptionCredits,
-          purchasedCredits: purchasedCredits,
-          accountApiUsage: accountApiUsage,
-        );
+         id: id,
+         subscriptionCredits: subscriptionCredits,
+         purchasedCredits: purchasedCredits,
+         accountApiUsage: accountApiUsage,
+       );
 
   /// Returns a shallow copy of this [CreditUsage]
   /// with some or all fields replaced by the given arguments.

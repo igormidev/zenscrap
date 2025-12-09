@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -23,11 +24,11 @@ abstract class AutoFixConfig implements _i1.SerializableModel {
     int? attemptCount,
     this.preferredAiModel,
     required this.scrappableId,
-  })  : enabled = enabled ?? true,
-        consecutiveErrorThreshold = consecutiveErrorThreshold ?? 100,
-        currentConsecutiveErrors = currentConsecutiveErrors ?? 0,
-        inProgress = inProgress ?? false,
-        attemptCount = attemptCount ?? 0;
+  }) : enabled = enabled ?? true,
+       consecutiveErrorThreshold = consecutiveErrorThreshold ?? 100,
+       currentConsecutiveErrors = currentConsecutiveErrors ?? 0,
+       inProgress = inProgress ?? false,
+       attemptCount = attemptCount ?? 0;
 
   factory AutoFixConfig({
     int? id,
@@ -52,13 +53,15 @@ abstract class AutoFixConfig implements _i1.SerializableModel {
       lastAttemptAt: jsonSerialization['lastAttemptAt'] == null
           ? null
           : _i1.DateTimeJsonExtension.fromJson(
-              jsonSerialization['lastAttemptAt']),
+              jsonSerialization['lastAttemptAt'],
+            ),
       inProgress: jsonSerialization['inProgress'] as bool,
       attemptCount: jsonSerialization['attemptCount'] as int,
       preferredAiModel: jsonSerialization['preferredAiModel'] == null
           ? null
           : _i2.AiModel.fromJson(
-              (jsonSerialization['preferredAiModel'] as int)),
+              (jsonSerialization['preferredAiModel'] as String),
+            ),
       scrappableId: jsonSerialization['scrappableId'] as int,
     );
   }
@@ -101,6 +104,7 @@ abstract class AutoFixConfig implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'AutoFixConfig',
       if (id != null) 'id': id,
       'enabled': enabled,
       'consecutiveErrorThreshold': consecutiveErrorThreshold,
@@ -134,16 +138,16 @@ class _AutoFixConfigImpl extends AutoFixConfig {
     _i2.AiModel? preferredAiModel,
     required int scrappableId,
   }) : super._(
-          id: id,
-          enabled: enabled,
-          consecutiveErrorThreshold: consecutiveErrorThreshold,
-          currentConsecutiveErrors: currentConsecutiveErrors,
-          lastAttemptAt: lastAttemptAt,
-          inProgress: inProgress,
-          attemptCount: attemptCount,
-          preferredAiModel: preferredAiModel,
-          scrappableId: scrappableId,
-        );
+         id: id,
+         enabled: enabled,
+         consecutiveErrorThreshold: consecutiveErrorThreshold,
+         currentConsecutiveErrors: currentConsecutiveErrors,
+         lastAttemptAt: lastAttemptAt,
+         inProgress: inProgress,
+         attemptCount: attemptCount,
+         preferredAiModel: preferredAiModel,
+         scrappableId: scrappableId,
+       );
 
   /// Returns a shallow copy of this [AutoFixConfig]
   /// with some or all fields replaced by the given arguments.
@@ -167,8 +171,9 @@ class _AutoFixConfigImpl extends AutoFixConfig {
           consecutiveErrorThreshold ?? this.consecutiveErrorThreshold,
       currentConsecutiveErrors:
           currentConsecutiveErrors ?? this.currentConsecutiveErrors,
-      lastAttemptAt:
-          lastAttemptAt is DateTime? ? lastAttemptAt : this.lastAttemptAt,
+      lastAttemptAt: lastAttemptAt is DateTime?
+          ? lastAttemptAt
+          : this.lastAttemptAt,
       inProgress: inProgress ?? this.inProgress,
       attemptCount: attemptCount ?? this.attemptCount,
       preferredAiModel: preferredAiModel is _i2.AiModel?

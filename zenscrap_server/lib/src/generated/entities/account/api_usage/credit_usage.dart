@@ -7,12 +7,14 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: unnecessary_null_comparison
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../../entities/account/api_usage/account_api_usage.dart' as _i2;
+import 'package:zenscrap_server/src/generated/protocol.dart' as _i3;
 
 abstract class CreditUsage
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -37,8 +39,9 @@ abstract class CreditUsage
       purchasedCredits: jsonSerialization['purchasedCredits'] as int,
       accountApiUsage: jsonSerialization['accountApiUsage'] == null
           ? null
-          : _i2.AccountApiUsage.fromJson(
-              (jsonSerialization['accountApiUsage'] as Map<String, dynamic>)),
+          : _i3.Protocol().deserialize<_i2.AccountApiUsage>(
+              jsonSerialization['accountApiUsage'],
+            ),
     );
   }
 
@@ -70,6 +73,7 @@ abstract class CreditUsage
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'CreditUsage',
       if (id != null) 'id': id,
       'subscriptionCredits': subscriptionCredits,
       'purchasedCredits': purchasedCredits,
@@ -80,6 +84,7 @@ abstract class CreditUsage
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'CreditUsage',
       if (id != null) 'id': id,
       'subscriptionCredits': subscriptionCredits,
       'purchasedCredits': purchasedCredits,
@@ -88,8 +93,9 @@ abstract class CreditUsage
     };
   }
 
-  static CreditUsageInclude include(
-      {_i2.AccountApiUsageInclude? accountApiUsage}) {
+  static CreditUsageInclude include({
+    _i2.AccountApiUsageInclude? accountApiUsage,
+  }) {
     return CreditUsageInclude._(accountApiUsage: accountApiUsage);
   }
 
@@ -128,11 +134,11 @@ class _CreditUsageImpl extends CreditUsage {
     required int purchasedCredits,
     _i2.AccountApiUsage? accountApiUsage,
   }) : super._(
-          id: id,
-          subscriptionCredits: subscriptionCredits,
-          purchasedCredits: purchasedCredits,
-          accountApiUsage: accountApiUsage,
-        );
+         id: id,
+         subscriptionCredits: subscriptionCredits,
+         purchasedCredits: purchasedCredits,
+         accountApiUsage: accountApiUsage,
+       );
 
   /// Returns a shallow copy of this [CreditUsage]
   /// with some or all fields replaced by the given arguments.
@@ -155,8 +161,23 @@ class _CreditUsageImpl extends CreditUsage {
   }
 }
 
+class CreditUsageUpdateTable extends _i1.UpdateTable<CreditUsageTable> {
+  CreditUsageUpdateTable(super.table);
+
+  _i1.ColumnValue<int, int> subscriptionCredits(int value) => _i1.ColumnValue(
+    table.subscriptionCredits,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> purchasedCredits(int value) => _i1.ColumnValue(
+    table.purchasedCredits,
+    value,
+  );
+}
+
 class CreditUsageTable extends _i1.Table<int?> {
   CreditUsageTable({super.tableRelation}) : super(tableName: 'credit_usage') {
+    updateTable = CreditUsageUpdateTable(this);
     subscriptionCredits = _i1.ColumnInt(
       'subscriptionCredits',
       this,
@@ -166,6 +187,8 @@ class CreditUsageTable extends _i1.Table<int?> {
       this,
     );
   }
+
+  late final CreditUsageUpdateTable updateTable;
 
   late final _i1.ColumnInt subscriptionCredits;
 
@@ -188,10 +211,10 @@ class CreditUsageTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        subscriptionCredits,
-        purchasedCredits,
-      ];
+    id,
+    subscriptionCredits,
+    purchasedCredits,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -210,8 +233,9 @@ class CreditUsageInclude extends _i1.IncludeObject {
   _i2.AccountApiUsageInclude? _accountApiUsage;
 
   @override
-  Map<String, _i1.Include?> get includes =>
-      {'accountApiUsage': _accountApiUsage};
+  Map<String, _i1.Include?> get includes => {
+    'accountApiUsage': _accountApiUsage,
+  };
 
   @override
   _i1.Table<int?> get table => CreditUsage.t;
@@ -404,6 +428,46 @@ class CreditUsageRepository {
     );
   }
 
+  /// Updates a single [CreditUsage] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<CreditUsage?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<CreditUsageUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<CreditUsage>(
+      id,
+      columnValues: columnValues(CreditUsage.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [CreditUsage]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<CreditUsage>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<CreditUsageUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<CreditUsageTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<CreditUsageTable>? orderBy,
+    _i1.OrderByListBuilder<CreditUsageTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<CreditUsage>(
+      columnValues: columnValues(CreditUsage.t.updateTable),
+      where: where(CreditUsage.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(CreditUsage.t),
+      orderByList: orderByList?.call(CreditUsage.t),
+      orderDescending: orderDescending,
+      transaction: transaction,
+    );
+  }
+
   /// Deletes all [CreditUsage]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
@@ -476,8 +540,9 @@ class CreditUsageAttachRowRepository {
       throw ArgumentError.notNull('creditUsage.id');
     }
 
-    var $accountApiUsage =
-        accountApiUsage.copyWith(creditUsageId: creditUsage.id);
+    var $accountApiUsage = accountApiUsage.copyWith(
+      creditUsageId: creditUsage.id,
+    );
     await session.db.updateRow<_i2.AccountApiUsage>(
       $accountApiUsage,
       columns: [_i2.AccountApiUsage.t.creditUsageId],

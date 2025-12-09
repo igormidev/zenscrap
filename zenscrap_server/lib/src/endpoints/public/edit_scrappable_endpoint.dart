@@ -1,4 +1,5 @@
 import 'package:serverpod/serverpod.dart';
+import 'package:serverpod_auth_server/serverpod_auth_server.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class EditScrappableEndpoint extends Endpoint {
@@ -11,7 +12,7 @@ class EditScrappableEndpoint extends Endpoint {
     bool? willHideFromMarketplace,
   }) async {
     // Get the authenticated user ID (might be null if not logged in)
-    final userId = (await session.authenticated)?.userId;
+    final userId = session.authenticated?.userId;
 
     // Find the scrappable
     final scrappable = await Scrappable.db.findById(

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:serverpod_auth_server/serverpod_auth_server.dart';
 import 'package:collection/collection.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:serverpod/serverpod.dart';
@@ -12,16 +13,16 @@ typedef RedraftSrappableSessionId = String;
 typedef ThinkingSessionId = String;
 
 final Map<RedraftSrappableSessionId, ReplaySubject<ChatResponse>>
-    _scrapRedraftSessions = {};
+_scrapRedraftSessions = {};
 final Map<ThinkingSessionId, StreamController<String>> _thinkingStream = {};
 final Map<RedraftSrappableSessionId, IChatController> _chatSessions = {};
 final Map<int, RedraftSrappableSessionId> _scrappableOpenedSessionsIds = {};
 final Map<RedraftSrappableSessionId, int> _cacheScrappableIds = {};
 final Map<RedraftSrappableSessionId, ReferenceTestData> _cacheRefTestData = {};
 final Map<RedraftSrappableSessionId, ScrappingBeeExtractLogic?>
-    _cacheScrappingBeeExtractLogic = {};
+_cacheScrappingBeeExtractLogic = {};
 final Map<RedraftSrappableSessionId, ScrappableRequest>
-    _cacheScrappableRequest = {};
+_cacheScrappableRequest = {};
 
 // =============================================================================
 // AI Usage Credit Tracking
@@ -41,8 +42,7 @@ final Map<RedraftSrappableSessionId, double> _anonymousSessionSpending = {};
 final Map<RedraftSrappableSessionId, bool> _sessionUsesOwnApiKey = {};
 
 ScrappingBeeExtractLogic? getTestExtractRules(int scrappableId) {
-  return _cacheScrappingBeeExtractLogic[
-      _scrappableOpenedSessionsIds[scrappableId]];
+  return _cacheScrappingBeeExtractLogic[_scrappableOpenedSessionsIds[scrappableId]];
 }
 
 ScrappableRequest? getScrappableRequest(int scrappableId) {
@@ -96,7 +96,7 @@ class ScrappableChatSession extends Endpoint {
         description: 'No cache scrappable ID found for session $sessionUuid.',
       );
     }
-    final int? userId = (await session.authenticated)?.userId;
+    final int? userId = session.authenticated?.userId;
     final ReferenceTestData? testData = _cacheRefTestData[sessionUuid];
     final ScrappingBeeExtractLogic? scrappingBeeExtractLogic =
         _cacheScrappingBeeExtractLogic[sessionUuid];
@@ -115,10 +115,11 @@ class ScrappableChatSession extends Endpoint {
         final Scrappable? scrappable;
         if (userId == null) {
           // If not authenticated, should only be able to modify scrappables that are not attached to any account
-          scrappable = await Scrappable.db.findFirstRow(session,
-              where: (t) =>
-                  t.id.equals(scrappableId) & t.accountId.equals(null),
-              transaction: transaction);
+          scrappable = await Scrappable.db.findFirstRow(
+            session,
+            where: (t) => t.id.equals(scrappableId) & t.accountId.equals(null),
+            transaction: transaction,
+          );
         } else {
           final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
             session,
@@ -127,10 +128,12 @@ class ScrappableChatSession extends Endpoint {
           );
           final accountId = accountInfo?.id;
 
-          scrappable = await Scrappable.db.findFirstRow(session,
-              where: (t) =>
-                  t.id.equals(scrappableId) & t.accountId.equals(accountId),
-              transaction: transaction);
+          scrappable = await Scrappable.db.findFirstRow(
+            session,
+            where: (t) =>
+                t.id.equals(scrappableId) & t.accountId.equals(accountId),
+            transaction: transaction,
+          );
 
           if (scrappable == null) {
             throw defaultAuthenticationException;
@@ -146,21 +149,31 @@ class ScrappableChatSession extends Endpoint {
         }
 
         await Scrappable.db.updateRow(
-            session,
-            scrappable.copyWith(
-              extractRulesUpdatedAt: DateTime.now(),
-            ),
-            transaction: transaction);
+          session,
+          scrappable.copyWith(extractRulesUpdatedAt: DateTime.now()),
+          transaction: transaction,
+        );
 
         await ScrappingBeeExtractLogic.db.updateRow(
-            session, scrappingBeeExtractLogic,
-            transaction: transaction);
-        await ScrappableRequest.db
-            .updateRow(session, scrappableRequest, transaction: transaction);
-        await ByteTestData.db
-            .updateRow(session, testData.byteData!, transaction: transaction);
-        await ReferenceTestData.db
-            .updateRow(session, testData, transaction: transaction);
+          session,
+          scrappingBeeExtractLogic,
+          transaction: transaction,
+        );
+        await ScrappableRequest.db.updateRow(
+          session,
+          scrappableRequest,
+          transaction: transaction,
+        );
+        await ByteTestData.db.updateRow(
+          session,
+          testData.byteData!,
+          transaction: transaction,
+        );
+        await ReferenceTestData.db.updateRow(
+          session,
+          testData,
+          transaction: transaction,
+        );
       } catch (e, s) {
         session.log(
           'Failed to commit changes for session $sessionUuid',
@@ -205,7 +218,7 @@ class ScrappableChatSession extends Endpoint {
     }
 
     // Validate user is authenticated
-    final int? userId = (await session.authenticated)?.userId;
+    final int? userId = session.authenticated?.userId;
     if (userId == null) {
       throw ZenScrapException(
         title: 'Authentication Required',
@@ -229,9 +242,7 @@ class ScrappableChatSession extends Endpoint {
       final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
         session,
         where: (p0) => p0.userInfoId.equals(userId),
-        include: AccountInfo.include(
-          accountAIUsage: AccountAIUsage.include(),
-        ),
+        include: AccountInfo.include(accountAIUsage: AccountAIUsage.include()),
       );
 
       if (accountInfo == null) {
@@ -242,12 +253,10 @@ class ScrappableChatSession extends Endpoint {
       }
 
       accountAIUsage = accountInfo.accountAIUsage;
-      if (accountAIUsage == null) {
-        accountAIUsage = await AccountAIUsage.db.findById(
-          session,
-          accountInfo.accountAIUsageId,
-        );
-      }
+      accountAIUsage ??= await AccountAIUsage.db.findById(
+        session,
+        accountInfo.accountAIUsageId,
+      );
 
       if (accountAIUsage == null) {
         throw ZenScrapException(
@@ -265,9 +274,7 @@ class ScrappableChatSession extends Endpoint {
     // Persist to database immediately
     try {
       await AccountAIUsage.db.updateRow(session, accountAIUsage);
-      session.log(
-        'Updated user API key for session $sessionId (user $userId)',
-      );
+      session.log('Updated user API key for session $sessionId (user $userId)');
     } catch (e, s) {
       session.log(
         'Failed to persist API key update',
@@ -343,7 +350,7 @@ class ScrappableChatSession extends Endpoint {
     Session session, {
     required int scrappableId,
   }) async {
-    final int? userId = (await session.authenticated)?.userId;
+    final int? userId = session.authenticated?.userId;
     final bool isLoggedIn = userId != null;
 
     final Scrappable? scrappable = await Scrappable.db.findById(
@@ -382,9 +389,7 @@ class ScrappableChatSession extends Endpoint {
       final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
         session,
         where: (p0) => p0.userInfoId.equals(userId),
-        include: AccountInfo.include(
-          accountAIUsage: AccountAIUsage.include(),
-        ),
+        include: AccountInfo.include(accountAIUsage: AccountAIUsage.include()),
       );
       if (accountInfo == null || accountInfo.id != scrappable.accountId) {
         throw ZenScrapException(
@@ -424,9 +429,7 @@ class ScrappableChatSession extends Endpoint {
       final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
         session,
         where: (p0) => p0.userInfoId.equals(userId),
-        include: AccountInfo.include(
-          accountAIUsage: AccountAIUsage.include(),
-        ),
+        include: AccountInfo.include(accountAIUsage: AccountAIUsage.include()),
       );
 
       if (accountInfo != null) {
@@ -478,8 +481,8 @@ class ScrappableChatSession extends Endpoint {
             'No target request found for scrappable with id ${scrappable.id}.',
       );
     }
-    final bool isAlreadyAnyOpenedSession =
-        _scrappableOpenedSessionsIds.containsKey(scrappable.id!);
+    final bool isAlreadyAnyOpenedSession = _scrappableOpenedSessionsIds
+        .containsKey(scrappable.id!);
     if (isAlreadyAnyOpenedSession) {
       throw ZenScrapException(
         title: 'Session Already Opened',
@@ -497,10 +500,10 @@ class ScrappableChatSession extends Endpoint {
     String openAiApiKey;
     if (usesOwnApiKey && accountAIUsage?.userOpenAiApiKey != null) {
       openAiApiKey = accountAIUsage!.userOpenAiApiKey!;
-      session.log(
-          'Using user\'s own OpenAI API key for session $sessionUuid');
+      session.log('Using user\'s own OpenAI API key for session $sessionUuid');
     } else {
-      openAiApiKey = session.passwords['openAiApiKey'] ??
+      openAiApiKey =
+          session.passwords['openAiApiKey'] ??
           session.serverpod.getPassword('openAiApiKey') ??
           '';
       if (openAiApiKey.isEmpty) {
@@ -555,9 +558,11 @@ class ScrappableChatSession extends Endpoint {
     session.log('Scheduled dispose for session $sessionUuid');
     _cacheScrappableIds[sessionUuid] = scrappable.id!;
     await Scrappable.db.updateRow(
-        session,
-        scrappable.copyWith(
-            testEndpointAvailableUntil: DateTime.now().add(duration)));
+      session,
+      scrappable.copyWith(
+        testEndpointAvailableUntil: DateTime.now().add(duration),
+      ),
+    );
     session.log('Updated scrappable ${scrappable.id} expiration');
     return response;
   }
@@ -601,7 +606,7 @@ class ScrappableChatSession extends Endpoint {
 
     // Validate plan for powerful model
     if (aiModel == AiModel.powerful) {
-      final authenticationInfo = await session.authenticated;
+      final authenticationInfo = session.authenticated;
       if (authenticationInfo == null) {
         throw ZenScrapException(
           title: 'Authentication Required',
@@ -662,11 +667,13 @@ class ScrappableChatSession extends Endpoint {
 
     // Add user message to chat stream IMMEDIATELY for instant UI feedback
     // This ensures the user sees their message right away, before the AI starts processing
-    _scrapRedraftSessions[sessionId]?.add(MessageTextResponse(
-      role: PromptRole.user,
-      expectsFollowUp: true, // User message always expects AI response
-      messageText: userPrompt,
-    ));
+    _scrapRedraftSessions[sessionId]?.add(
+      MessageTextResponse(
+        role: PromptRole.user,
+        expectsFollowUp: true, // User message always expects AI response
+        messageText: userPrompt,
+      ),
+    );
 
     final ThinkingSessionId thinkingSessionId = uuid.v7();
     _thinkingStream[thinkingSessionId] = StreamController<ThinkingSessionId>();
@@ -674,7 +681,8 @@ class ScrappableChatSession extends Endpoint {
     // Get client IP address for anonymous user rate limiting
     String? clientIpAddress;
     if (session is MethodCallSession) {
-      clientIpAddress = session.httpRequest.remoteIpAddress;
+      clientIpAddress = session.request.connectionInfo.remote.address
+          .toString();
     }
 
     // Put future call
@@ -743,10 +751,7 @@ Future<void> _disposeSession({
 class TestScrappableDisposeFutureCall
     extends FutureCall<CreateSessionResponse> {
   @override
-  Future<void> invoke(
-    Session session,
-    CreateSessionResponse? object,
-  ) async {
+  Future<void> invoke(Session session, CreateSessionResponse? object) async {
     if (object == null) return;
     await _disposeSession(sessionId: object.sessionId, dbSession: session);
   }
@@ -783,16 +788,20 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
       // -----------------------------------------------------------------------
       // IP-based spending check for anonymous users (cross-session rate limit)
       // -----------------------------------------------------------------------
-      if (clientIpAddress != null && _anonymousSessionSpending.containsKey(sessionId)) {
+      if (clientIpAddress != null &&
+          _anonymousSessionSpending.containsKey(sessionId)) {
         // Check IP spending limit from database
         final ipSpending = await AnonymousIpSpending.db.findFirstRow(
           session,
           where: (t) => t.ipAddress.equals(clientIpAddress),
         );
 
-        if (ipSpending != null && ipSpending.totalSpentUsd >= kAnonymousIpSpendingLimitInDollars) {
+        if (ipSpending != null &&
+            ipSpending.totalSpentUsd >= kAnonymousIpSpendingLimitInDollars) {
           // Calculate time until the record expires (7 days from creation)
-          final expiryTime = ipSpending.createdAt.add(kAnonymousIpSpendingResetDuration);
+          final expiryTime = ipSpending.createdAt.add(
+            kAnonymousIpSpendingResetDuration,
+          );
           final timeUntilReset = expiryTime.difference(DateTime.now());
 
           _scrapRedraftSessions[sessionId]?.add(
@@ -802,7 +811,9 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
               messageText:
                   'You have reached the spending limit for your IP address (\$${kAnonymousIpSpendingLimitInDollars.toStringAsFixed(2)}). '
                   'This limit resets after 7 days, or you can create an account to get monthly credits.',
-              timeUntilReset: timeUntilReset.isNegative ? Duration.zero : timeUntilReset,
+              timeUntilReset: timeUntilReset.isNegative
+                  ? Duration.zero
+                  : timeUntilReset,
               totalSpentUsd: ipSpending.totalSpentUsd,
               spendingLimitUsd: kAnonymousIpSpendingLimitInDollars,
             ),
@@ -827,7 +838,8 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
               messageText:
                   'You have exhausted your AI credits for this month. '
                   'Your credits will reset at the beginning of next month, or you can add your own OpenAI API key in account settings to continue without limits.',
-              creditsSpent: kDefaultMonthlyAICreditsInDollars - remainingCredits,
+              creditsSpent:
+                  kDefaultMonthlyAICreditsInDollars - remainingCredits,
               creditsLimit: kDefaultMonthlyAICreditsInDollars,
               canUseOwnApiKey: true,
             ),
@@ -878,30 +890,32 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
     final StreamController<ChatResponse> chatSeason =
         StreamController<ChatResponse>();
 
-    final StreamSubscription<ChatResponse> subsChatSeason =
-        chatSeason.stream.listen((ChatResponse chatResponse) {
-      _scrapRedraftSessions[sessionId]?.add(chatResponse);
-      if (chatResponse is NewExtractRuleResponse) {
-        if (_cacheRefTestData.containsKey(sessionId)) {
-          _cacheRefTestData[sessionId] = chatResponse.referenceTestData;
-        }
-        if (_cacheScrappableRequest.containsKey(sessionId)) {
-          _cacheScrappableRequest[sessionId] = chatResponse.scrapperRequest;
-        }
-        if (_cacheScrappingBeeExtractLogic.containsKey(sessionId)) {
-          _cacheScrappingBeeExtractLogic[sessionId] =
-              chatResponse.scrappingBeeExtractLogic;
-        }
-      }
-    });
+    final StreamSubscription<ChatResponse> subsChatSeason = chatSeason.stream
+        .listen((ChatResponse chatResponse) {
+          _scrapRedraftSessions[sessionId]?.add(chatResponse);
+          if (chatResponse is NewExtractRuleResponse) {
+            if (_cacheRefTestData.containsKey(sessionId)) {
+              _cacheRefTestData[sessionId] = chatResponse.referenceTestData;
+            }
+            if (_cacheScrappableRequest.containsKey(sessionId)) {
+              _cacheScrappableRequest[sessionId] = chatResponse.scrapperRequest;
+            }
+            if (_cacheScrappingBeeExtractLogic.containsKey(sessionId)) {
+              _cacheScrappingBeeExtractLogic[sessionId] =
+                  chatResponse.scrappingBeeExtractLogic;
+            }
+          }
+        });
 
-    final StreamSubscription<String> subLlmThinking = llmThinking.stream.listen(
-      (event) {
-        _thinkingStream[thinkingSessionId]?.add(event.replaceAll(
-            '37N8150Q1JBVN85NS4RUOUIUYZ2AEUFX69QBM0X74VD13M9TLNRVOFWS7HZMKRG1X4SOH4BKJT5EUN6K',
-            '{API_KEY}'));
-      },
-    );
+    final StreamSubscription<String>
+    subLlmThinking = llmThinking.stream.listen((event) {
+      _thinkingStream[thinkingSessionId]?.add(
+        event.replaceAll(
+          '37N8150Q1JBVN85NS4RUOUIUYZ2AEUFX69QBM0X74VD13M9TLNRVOFWS7HZMKRG1X4SOH4BKJT5EUN6K',
+          '{API_KEY}',
+        ),
+      );
+    });
 
     // Note: User message is already added to the chat stream in sendPromptMessage()
     // for immediate UI feedback. Do NOT add it again here to avoid duplicates.
@@ -927,7 +941,8 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
         if (accountAIUsage != null) {
           // Deduct from logged-in user's credits
           // totalDollarsSpentFromTotalInUSD represents REMAINING credits (not spent)
-          accountAIUsage.totalDollarsSpentFromTotalInUSD -= messageResult.costInUsd;
+          accountAIUsage.totalDollarsSpentFromTotalInUSD -=
+              messageResult.costInUsd;
           session.log(
             'Deducted \$${messageResult.costInUsd.toStringAsFixed(6)} from user credits. '
             'Remaining: \$${accountAIUsage.totalDollarsSpentFromTotalInUSD.toStringAsFixed(4)}',
@@ -951,7 +966,8 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
         } else if (_anonymousSessionSpending.containsKey(sessionId)) {
           // Track anonymous session spending (in-memory per session)
           _anonymousSessionSpending[sessionId] =
-              (_anonymousSessionSpending[sessionId] ?? 0.0) + messageResult.costInUsd;
+              (_anonymousSessionSpending[sessionId] ?? 0.0) +
+              messageResult.costInUsd;
           session.log(
             'Anonymous session $sessionId spent \$${messageResult.costInUsd.toStringAsFixed(6)}. '
             'Total session spending: \$${_anonymousSessionSpending[sessionId]!.toStringAsFixed(4)}',
@@ -961,18 +977,24 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
           if (clientIpAddress != null) {
             try {
               final now = DateTime.now();
-              final existingIpSpending = await AnonymousIpSpending.db.findFirstRow(
-                session,
-                where: (t) => t.ipAddress.equals(clientIpAddress),
-              );
+              final existingIpSpending = await AnonymousIpSpending.db
+                  .findFirstRow(
+                    session,
+                    where: (t) => t.ipAddress.equals(clientIpAddress),
+                  );
 
               if (existingIpSpending != null) {
                 // Update existing record
                 final updatedSpending = existingIpSpending.copyWith(
-                  totalSpentUsd: existingIpSpending.totalSpentUsd + messageResult.costInUsd,
+                  totalSpentUsd:
+                      existingIpSpending.totalSpentUsd +
+                      messageResult.costInUsd,
                   lastUpdatedAt: now,
                 );
-                await AnonymousIpSpending.db.updateRow(session, updatedSpending);
+                await AnonymousIpSpending.db.updateRow(
+                  session,
+                  updatedSpending,
+                );
                 session.log(
                   'Updated IP spending for $clientIpAddress: '
                   '\$${updatedSpending.totalSpentUsd.toStringAsFixed(4)} total',
@@ -1035,11 +1057,13 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
       );
       // Don't rethrow - we've handled the error gracefully
     } catch (e, s) {
-      chatSeason.add(ErrorTextResponse(
-        role: PromptRole.system,
-        expectsFollowUp: false, // Terminal error, no follow-up
-        errorMessage: 'An error occurred while sending the message:\n$e',
-      ));
+      chatSeason.add(
+        ErrorTextResponse(
+          role: PromptRole.system,
+          expectsFollowUp: false, // Terminal error, no follow-up
+          errorMessage: 'An error occurred while sending the message:\n$e',
+        ),
+      );
       session.log(
         'Error occurred while sending message: $e',
         exception: e,

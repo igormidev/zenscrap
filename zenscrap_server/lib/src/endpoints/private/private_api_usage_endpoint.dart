@@ -1,5 +1,6 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as auth;
+import 'package:serverpod_auth_server/serverpod_auth_server.dart';
 import 'package:zenscrap_server/src/core/default_classes.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_api.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_config.dart';
@@ -15,7 +16,7 @@ class PrivateApiUsageEndpoint extends Endpoint {
     Session session, {
     int page = 1,
   }) async {
-    final authenticationInfo = await session.authenticated;
+    final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
       throw defaultAuthenticationException;
     }
@@ -84,7 +85,7 @@ class PrivateApiUsageEndpoint extends Endpoint {
     Session session, {
     required String name,
   }) async {
-    final authenticationInfo = await session.authenticated;
+    final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
       throw defaultAuthenticationException;
     }
@@ -137,7 +138,7 @@ class PrivateApiUsageEndpoint extends Endpoint {
     Session session, {
     required int apiKeyId,
   }) async {
-    final authenticationInfo = await session.authenticated;
+    final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
       throw defaultAuthenticationException;
     }
@@ -194,7 +195,7 @@ class PrivateApiUsageEndpoint extends Endpoint {
   Future<List<AccountApiKey>> getActiveApiKeys(
     Session session,
   ) async {
-    final authenticationInfo = await session.authenticated;
+    final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
       throw defaultAuthenticationException;
     }
@@ -229,7 +230,7 @@ class PrivateApiUsageEndpoint extends Endpoint {
   Future<Map<int, int>> getApiKeyUsageStats(
     Session session,
   ) async {
-    final authenticationInfo = await session.authenticated;
+    final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
       throw defaultAuthenticationException;
     }
@@ -277,7 +278,7 @@ class PrivateApiUsageEndpoint extends Endpoint {
   Future<AccountApiUsage> getApiUsageInfo(
     Session session,
   ) async {
-    final authenticationInfo = await session.authenticated;
+    final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
       throw defaultAuthenticationException;
     }
@@ -312,7 +313,7 @@ class PrivateApiUsageEndpoint extends Endpoint {
   Future<ApiKeyResponse> getApiKeysWithStats(
     Session session,
   ) async {
-    final authenticationInfo = await session.authenticated;
+    final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
       throw defaultAuthenticationException;
     }
@@ -370,7 +371,7 @@ class PrivateApiUsageEndpoint extends Endpoint {
     Session session, {
     required CreditPurchaseOption creditPackage,
   }) async {
-    final authenticationInfo = await session.authenticated;
+    final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
       throw defaultAuthenticationException;
     }

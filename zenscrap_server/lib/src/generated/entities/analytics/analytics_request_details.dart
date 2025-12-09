@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -36,11 +37,13 @@ abstract class AnalyticsRequestDetails
   }) = _AnalyticsRequestDetailsImpl;
 
   factory AnalyticsRequestDetails.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return AnalyticsRequestDetails(
       id: jsonSerialization['id'] as int?,
-      timeStamp:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['timeStamp']),
+      timeStamp: _i1.DateTimeJsonExtension.fromJson(
+        jsonSerialization['timeStamp'],
+      ),
       title: jsonSerialization['title'] as String?,
       description: jsonSerialization['description'] as String?,
       errorObjectAsString: jsonSerialization['errorObjectAsString'] as String?,
@@ -91,6 +94,7 @@ abstract class AnalyticsRequestDetails
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'AnalyticsRequestDetails',
       if (id != null) 'id': id,
       'timeStamp': timeStamp.toJson(),
       if (title != null) 'title': title,
@@ -108,6 +112,7 @@ abstract class AnalyticsRequestDetails
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'AnalyticsRequestDetails',
       if (id != null) 'id': id,
       'timeStamp': timeStamp.toJson(),
       if (title != null) 'title': title,
@@ -165,15 +170,15 @@ class _AnalyticsRequestDetailsImpl extends AnalyticsRequestDetails {
     required String stringifiedPayload,
     String? stringifiedResponse,
   }) : super._(
-          id: id,
-          timeStamp: timeStamp,
-          title: title,
-          description: description,
-          errorObjectAsString: errorObjectAsString,
-          errorStackTraceAsString: errorStackTraceAsString,
-          stringifiedPayload: stringifiedPayload,
-          stringifiedResponse: stringifiedResponse,
-        );
+         id: id,
+         timeStamp: timeStamp,
+         title: title,
+         description: description,
+         errorObjectAsString: errorObjectAsString,
+         errorStackTraceAsString: errorStackTraceAsString,
+         stringifiedPayload: stringifiedPayload,
+         stringifiedResponse: stringifiedResponse,
+       );
 
   /// Returns a shallow copy of this [AnalyticsRequestDetails]
   /// with some or all fields replaced by the given arguments.
@@ -208,9 +213,55 @@ class _AnalyticsRequestDetailsImpl extends AnalyticsRequestDetails {
   }
 }
 
+class AnalyticsRequestDetailsUpdateTable
+    extends _i1.UpdateTable<AnalyticsRequestDetailsTable> {
+  AnalyticsRequestDetailsUpdateTable(super.table);
+
+  _i1.ColumnValue<DateTime, DateTime> timeStamp(DateTime value) =>
+      _i1.ColumnValue(
+        table.timeStamp,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> title(String? value) => _i1.ColumnValue(
+    table.title,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> description(String? value) => _i1.ColumnValue(
+    table.description,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> errorObjectAsString(String? value) =>
+      _i1.ColumnValue(
+        table.errorObjectAsString,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> errorStackTraceAsString(String? value) =>
+      _i1.ColumnValue(
+        table.errorStackTraceAsString,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> stringifiedPayload(String value) =>
+      _i1.ColumnValue(
+        table.stringifiedPayload,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> stringifiedResponse(String? value) =>
+      _i1.ColumnValue(
+        table.stringifiedResponse,
+        value,
+      );
+}
+
 class AnalyticsRequestDetailsTable extends _i1.Table<int?> {
   AnalyticsRequestDetailsTable({super.tableRelation})
-      : super(tableName: 'analytics_request_details') {
+    : super(tableName: 'analytics_request_details') {
+    updateTable = AnalyticsRequestDetailsUpdateTable(this);
     timeStamp = _i1.ColumnDateTime(
       'timeStamp',
       this,
@@ -242,6 +293,8 @@ class AnalyticsRequestDetailsTable extends _i1.Table<int?> {
     );
   }
 
+  late final AnalyticsRequestDetailsUpdateTable updateTable;
+
   late final _i1.ColumnDateTime timeStamp;
 
   late final _i1.ColumnString title;
@@ -258,15 +311,15 @@ class AnalyticsRequestDetailsTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        timeStamp,
-        title,
-        description,
-        errorObjectAsString,
-        errorStackTraceAsString,
-        stringifiedPayload,
-        stringifiedResponse,
-      ];
+    id,
+    timeStamp,
+    title,
+    description,
+    errorObjectAsString,
+    errorStackTraceAsString,
+    stringifiedPayload,
+    stringifiedResponse,
+  ];
 }
 
 class AnalyticsRequestDetailsInclude extends _i1.IncludeObject {
@@ -454,6 +507,48 @@ class AnalyticsRequestDetailsRepository {
     return session.db.updateRow<AnalyticsRequestDetails>(
       row,
       columns: columns?.call(AnalyticsRequestDetails.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [AnalyticsRequestDetails] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<AnalyticsRequestDetails?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<AnalyticsRequestDetailsUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<AnalyticsRequestDetails>(
+      id,
+      columnValues: columnValues(AnalyticsRequestDetails.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [AnalyticsRequestDetails]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<AnalyticsRequestDetails>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<AnalyticsRequestDetailsUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<AnalyticsRequestDetailsTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<AnalyticsRequestDetailsTable>? orderBy,
+    _i1.OrderByListBuilder<AnalyticsRequestDetailsTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<AnalyticsRequestDetails>(
+      columnValues: columnValues(AnalyticsRequestDetails.t.updateTable),
+      where: where(AnalyticsRequestDetails.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(AnalyticsRequestDetails.t),
+      orderByList: orderByList?.call(AnalyticsRequestDetails.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

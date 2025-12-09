@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 part of 'create_scrappable_stream_item.dart';
 
@@ -23,14 +24,17 @@ abstract class CreateScrappableResult extends _i1.CreateScrappableStreamItem
   }) = _CreateScrappableResultImpl;
 
   factory CreateScrappableResult.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return CreateScrappableResult(
-      scrappable: _i3.Scrappable.fromJson(
-          (jsonSerialization['scrappable'] as Map<String, dynamic>)),
+      scrappable: _i5.Protocol().deserialize<_i3.Scrappable>(
+        jsonSerialization['scrappable'],
+      ),
       grounding: jsonSerialization['grounding'] == null
           ? null
-          : _i4.GroundingMetadataInfo.fromJson(
-              (jsonSerialization['grounding'] as Map<String, dynamic>)),
+          : _i5.Protocol().deserialize<_i4.GroundingMetadataInfo>(
+              jsonSerialization['grounding'],
+            ),
     );
   }
 
@@ -40,6 +44,7 @@ abstract class CreateScrappableResult extends _i1.CreateScrappableStreamItem
 
   /// Returns a shallow copy of this [CreateScrappableResult]
   /// with some or all fields replaced by the given arguments.
+  @override
   @_i2.useResult
   CreateScrappableResult copyWith({
     _i3.Scrappable? scrappable,
@@ -48,6 +53,7 @@ abstract class CreateScrappableResult extends _i1.CreateScrappableStreamItem
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'CreateScrappableResult',
       'scrappable': scrappable.toJson(),
       if (grounding != null) 'grounding': grounding?.toJson(),
     };
@@ -64,9 +70,9 @@ class _CreateScrappableResultImpl extends CreateScrappableResult {
     required _i3.Scrappable scrappable,
     _i4.GroundingMetadataInfo? grounding,
   }) : super._(
-          scrappable: scrappable,
-          grounding: grounding,
-        );
+         scrappable: scrappable,
+         grounding: grounding,
+       );
 
   /// Returns a shallow copy of this [CreateScrappableResult]
   /// with some or all fields replaced by the given arguments.

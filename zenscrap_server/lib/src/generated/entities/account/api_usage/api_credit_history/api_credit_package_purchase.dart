@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -26,7 +27,8 @@ abstract class ApiCreditPackagePurchase
   }) = _ApiCreditPackagePurchaseImpl;
 
   factory ApiCreditPackagePurchase.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return ApiCreditPackagePurchase(
       id: jsonSerialization['id'] as int?,
       value: (jsonSerialization['value'] as num).toDouble(),
@@ -59,6 +61,7 @@ abstract class ApiCreditPackagePurchase
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ApiCreditPackagePurchase',
       if (id != null) 'id': id,
       'value': value,
       if (stripePurchaseId != null) 'stripePurchaseId': stripePurchaseId,
@@ -68,6 +71,7 @@ abstract class ApiCreditPackagePurchase
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'ApiCreditPackagePurchase',
       if (id != null) 'id': id,
       'value': value,
       if (stripePurchaseId != null) 'stripePurchaseId': stripePurchaseId,
@@ -112,10 +116,10 @@ class _ApiCreditPackagePurchaseImpl extends ApiCreditPackagePurchase {
     required double value,
     String? stripePurchaseId,
   }) : super._(
-          id: id,
-          value: value,
-          stripePurchaseId: stripePurchaseId,
-        );
+         id: id,
+         value: value,
+         stripePurchaseId: stripePurchaseId,
+       );
 
   /// Returns a shallow copy of this [ApiCreditPackagePurchase]
   /// with some or all fields replaced by the given arguments.
@@ -136,9 +140,26 @@ class _ApiCreditPackagePurchaseImpl extends ApiCreditPackagePurchase {
   }
 }
 
+class ApiCreditPackagePurchaseUpdateTable
+    extends _i1.UpdateTable<ApiCreditPackagePurchaseTable> {
+  ApiCreditPackagePurchaseUpdateTable(super.table);
+
+  _i1.ColumnValue<double, double> value(double value) => _i1.ColumnValue(
+    table.value,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> stripePurchaseId(String? value) =>
+      _i1.ColumnValue(
+        table.stripePurchaseId,
+        value,
+      );
+}
+
 class ApiCreditPackagePurchaseTable extends _i1.Table<int?> {
   ApiCreditPackagePurchaseTable({super.tableRelation})
-      : super(tableName: 'api_credit_package_purchase') {
+    : super(tableName: 'api_credit_package_purchase') {
+    updateTable = ApiCreditPackagePurchaseUpdateTable(this);
     value = _i1.ColumnDouble(
       'value',
       this,
@@ -149,16 +170,18 @@ class ApiCreditPackagePurchaseTable extends _i1.Table<int?> {
     );
   }
 
+  late final ApiCreditPackagePurchaseUpdateTable updateTable;
+
   late final _i1.ColumnDouble value;
 
   late final _i1.ColumnString stripePurchaseId;
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        value,
-        stripePurchaseId,
-      ];
+    id,
+    value,
+    stripePurchaseId,
+  ];
 }
 
 class ApiCreditPackagePurchaseInclude extends _i1.IncludeObject {
@@ -346,6 +369,48 @@ class ApiCreditPackagePurchaseRepository {
     return session.db.updateRow<ApiCreditPackagePurchase>(
       row,
       columns: columns?.call(ApiCreditPackagePurchase.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [ApiCreditPackagePurchase] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<ApiCreditPackagePurchase?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<ApiCreditPackagePurchaseUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<ApiCreditPackagePurchase>(
+      id,
+      columnValues: columnValues(ApiCreditPackagePurchase.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [ApiCreditPackagePurchase]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<ApiCreditPackagePurchase>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<ApiCreditPackagePurchaseUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<ApiCreditPackagePurchaseTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<ApiCreditPackagePurchaseTable>? orderBy,
+    _i1.OrderByListBuilder<ApiCreditPackagePurchaseTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<ApiCreditPackagePurchase>(
+      columnValues: columnValues(ApiCreditPackagePurchase.t.updateTable),
+      where: where(ApiCreditPackagePurchase.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(ApiCreditPackagePurchase.t),
+      orderByList: orderByList?.call(ApiCreditPackagePurchase.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

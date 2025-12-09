@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 part of '../chat_response.dart';
 
@@ -31,16 +32,19 @@ abstract class TestEndpointCalledSuccessResponse extends _i1.ChatResponse
   }) = _TestEndpointCalledSuccessResponseImpl;
 
   factory TestEndpointCalledSuccessResponse.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return TestEndpointCalledSuccessResponse(
       role: _i3.PromptRole.fromJson((jsonSerialization['role'] as String)),
       expectsFollowUp: jsonSerialization['expectsFollowUp'] as bool,
       inputPayload: jsonSerialization['inputPayload'] as String,
       responseData: jsonSerialization['responseData'] as String,
-      timestamp:
-          _i2.DateTimeJsonExtension.fromJson(jsonSerialization['timestamp']),
-      referenceTestData: _i5.ReferenceTestData.fromJson(
-          (jsonSerialization['referenceTestData'] as Map<String, dynamic>)),
+      timestamp: _i2.DateTimeJsonExtension.fromJson(
+        jsonSerialization['timestamp'],
+      ),
+      referenceTestData: _i6.Protocol().deserialize<_i5.ReferenceTestData>(
+        jsonSerialization['referenceTestData'],
+      ),
     );
   }
 
@@ -54,6 +58,7 @@ abstract class TestEndpointCalledSuccessResponse extends _i1.ChatResponse
 
   /// Returns a shallow copy of this [TestEndpointCalledSuccessResponse]
   /// with some or all fields replaced by the given arguments.
+  @override
   @_i2.useResult
   TestEndpointCalledSuccessResponse copyWith({
     _i3.PromptRole? role,
@@ -66,6 +71,7 @@ abstract class TestEndpointCalledSuccessResponse extends _i1.ChatResponse
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'TestEndpointCalledSuccessResponse',
       'role': role.toJson(),
       'expectsFollowUp': expectsFollowUp,
       'inputPayload': inputPayload,
@@ -91,13 +97,13 @@ class _TestEndpointCalledSuccessResponseImpl
     required DateTime timestamp,
     required _i5.ReferenceTestData referenceTestData,
   }) : super._(
-          role: role,
-          expectsFollowUp: expectsFollowUp,
-          inputPayload: inputPayload,
-          responseData: responseData,
-          timestamp: timestamp,
-          referenceTestData: referenceTestData,
-        );
+         role: role,
+         expectsFollowUp: expectsFollowUp,
+         inputPayload: inputPayload,
+         responseData: responseData,
+         timestamp: timestamp,
+         referenceTestData: referenceTestData,
+       );
 
   /// Returns a shallow copy of this [TestEndpointCalledSuccessResponse]
   /// with some or all fields replaced by the given arguments.

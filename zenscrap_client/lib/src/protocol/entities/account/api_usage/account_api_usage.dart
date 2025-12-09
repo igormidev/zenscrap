@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -15,6 +16,7 @@ import '../../../entities/account/account.dart' as _i3;
 import '../../../entities/account/api_usage/api_credit_history/api_credit_history_item.dart'
     as _i4;
 import '../../../entities/account/account_api_key.dart' as _i5;
+import 'package:zenscrap_client/src/protocol/protocol.dart' as _i6;
 
 abstract class AccountApiUsage implements _i1.SerializableModel {
   AccountApiUsage._({
@@ -44,19 +46,24 @@ abstract class AccountApiUsage implements _i1.SerializableModel {
       creditUsageId: jsonSerialization['creditUsageId'] as int,
       creditUsage: jsonSerialization['creditUsage'] == null
           ? null
-          : _i2.CreditUsage.fromJson(
-              (jsonSerialization['creditUsage'] as Map<String, dynamic>)),
+          : _i6.Protocol().deserialize<_i2.CreditUsage>(
+              jsonSerialization['creditUsage'],
+            ),
       accountInfo: jsonSerialization['accountInfo'] == null
           ? null
-          : _i3.AccountInfo.fromJson(
-              (jsonSerialization['accountInfo'] as Map<String, dynamic>)),
-      history: (jsonSerialization['history'] as List?)
-          ?.map((e) =>
-              _i4.ApiCreditHistoryItem.fromJson((e as Map<String, dynamic>)))
-          .toList(),
-      apiKeys: (jsonSerialization['apiKeys'] as List?)
-          ?.map((e) => _i5.AccountApiKey.fromJson((e as Map<String, dynamic>)))
-          .toList(),
+          : _i6.Protocol().deserialize<_i3.AccountInfo>(
+              jsonSerialization['accountInfo'],
+            ),
+      history: jsonSerialization['history'] == null
+          ? null
+          : _i6.Protocol().deserialize<List<_i4.ApiCreditHistoryItem>>(
+              jsonSerialization['history'],
+            ),
+      apiKeys: jsonSerialization['apiKeys'] == null
+          ? null
+          : _i6.Protocol().deserialize<List<_i5.AccountApiKey>>(
+              jsonSerialization['apiKeys'],
+            ),
     );
   }
 
@@ -92,6 +99,7 @@ abstract class AccountApiUsage implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'AccountApiUsage',
       if (id != null) 'id': id,
       'nanoId': nanoId,
       'creditUsageId': creditUsageId,
@@ -122,14 +130,14 @@ class _AccountApiUsageImpl extends AccountApiUsage {
     List<_i4.ApiCreditHistoryItem>? history,
     List<_i5.AccountApiKey>? apiKeys,
   }) : super._(
-          id: id,
-          nanoId: nanoId,
-          creditUsageId: creditUsageId,
-          creditUsage: creditUsage,
-          accountInfo: accountInfo,
-          history: history,
-          apiKeys: apiKeys,
-        );
+         id: id,
+         nanoId: nanoId,
+         creditUsageId: creditUsageId,
+         creditUsage: creditUsage,
+         accountInfo: accountInfo,
+         history: history,
+         apiKeys: apiKeys,
+       );
 
   /// Returns a shallow copy of this [AccountApiUsage]
   /// with some or all fields replaced by the given arguments.

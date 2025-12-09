@@ -7,12 +7,14 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: unnecessary_null_comparison
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../entities/account/api_usage/account_api_usage.dart' as _i2;
+import 'package:zenscrap_server/src/generated/protocol.dart' as _i3;
 
 abstract class AccountApiKey
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -41,14 +43,16 @@ abstract class AccountApiKey
       id: jsonSerialization['id'] as int?,
       apiKey: jsonSerialization['apiKey'] as String,
       name: jsonSerialization['name'] as String,
-      createdAt:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
+      createdAt: _i1.DateTimeJsonExtension.fromJson(
+        jsonSerialization['createdAt'],
+      ),
       isActive: jsonSerialization['isActive'] as bool,
       accountApiUsageId: jsonSerialization['accountApiUsageId'] as int,
       accountApiUsage: jsonSerialization['accountApiUsage'] == null
           ? null
-          : _i2.AccountApiUsage.fromJson(
-              (jsonSerialization['accountApiUsage'] as Map<String, dynamic>)),
+          : _i3.Protocol().deserialize<_i2.AccountApiUsage>(
+              jsonSerialization['accountApiUsage'],
+            ),
     );
   }
 
@@ -89,6 +93,7 @@ abstract class AccountApiKey
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'AccountApiKey',
       if (id != null) 'id': id,
       'apiKey': apiKey,
       'name': name,
@@ -102,6 +107,7 @@ abstract class AccountApiKey
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'AccountApiKey',
       if (id != null) 'id': id,
       'apiKey': apiKey,
       'name': name,
@@ -113,8 +119,9 @@ abstract class AccountApiKey
     };
   }
 
-  static AccountApiKeyInclude include(
-      {_i2.AccountApiUsageInclude? accountApiUsage}) {
+  static AccountApiKeyInclude include({
+    _i2.AccountApiUsageInclude? accountApiUsage,
+  }) {
     return AccountApiKeyInclude._(accountApiUsage: accountApiUsage);
   }
 
@@ -156,14 +163,14 @@ class _AccountApiKeyImpl extends AccountApiKey {
     required int accountApiUsageId,
     _i2.AccountApiUsage? accountApiUsage,
   }) : super._(
-          id: id,
-          apiKey: apiKey,
-          name: name,
-          createdAt: createdAt,
-          isActive: isActive,
-          accountApiUsageId: accountApiUsageId,
-          accountApiUsage: accountApiUsage,
-        );
+         id: id,
+         apiKey: apiKey,
+         name: name,
+         createdAt: createdAt,
+         isActive: isActive,
+         accountApiUsageId: accountApiUsageId,
+         accountApiUsage: accountApiUsage,
+       );
 
   /// Returns a shallow copy of this [AccountApiKey]
   /// with some or all fields replaced by the given arguments.
@@ -192,9 +199,40 @@ class _AccountApiKeyImpl extends AccountApiKey {
   }
 }
 
+class AccountApiKeyUpdateTable extends _i1.UpdateTable<AccountApiKeyTable> {
+  AccountApiKeyUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> apiKey(String value) => _i1.ColumnValue(
+    table.apiKey,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> name(String value) => _i1.ColumnValue(
+    table.name,
+    value,
+  );
+
+  _i1.ColumnValue<DateTime, DateTime> createdAt(DateTime value) =>
+      _i1.ColumnValue(
+        table.createdAt,
+        value,
+      );
+
+  _i1.ColumnValue<bool, bool> isActive(bool value) => _i1.ColumnValue(
+    table.isActive,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> accountApiUsageId(int value) => _i1.ColumnValue(
+    table.accountApiUsageId,
+    value,
+  );
+}
+
 class AccountApiKeyTable extends _i1.Table<int?> {
   AccountApiKeyTable({super.tableRelation})
-      : super(tableName: 'account_api_key') {
+    : super(tableName: 'account_api_key') {
+    updateTable = AccountApiKeyUpdateTable(this);
     apiKey = _i1.ColumnString(
       'apiKey',
       this,
@@ -217,6 +255,8 @@ class AccountApiKeyTable extends _i1.Table<int?> {
       this,
     );
   }
+
+  late final AccountApiKeyUpdateTable updateTable;
 
   late final _i1.ColumnString apiKey;
 
@@ -245,13 +285,13 @@ class AccountApiKeyTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        apiKey,
-        name,
-        createdAt,
-        isActive,
-        accountApiUsageId,
-      ];
+    id,
+    apiKey,
+    name,
+    createdAt,
+    isActive,
+    accountApiUsageId,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -270,8 +310,9 @@ class AccountApiKeyInclude extends _i1.IncludeObject {
   _i2.AccountApiUsageInclude? _accountApiUsage;
 
   @override
-  Map<String, _i1.Include?> get includes =>
-      {'accountApiUsage': _accountApiUsage};
+  Map<String, _i1.Include?> get includes => {
+    'accountApiUsage': _accountApiUsage,
+  };
 
   @override
   _i1.Table<int?> get table => AccountApiKey.t;
@@ -464,6 +505,46 @@ class AccountApiKeyRepository {
     );
   }
 
+  /// Updates a single [AccountApiKey] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<AccountApiKey?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<AccountApiKeyUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<AccountApiKey>(
+      id,
+      columnValues: columnValues(AccountApiKey.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [AccountApiKey]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<AccountApiKey>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<AccountApiKeyUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<AccountApiKeyTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<AccountApiKeyTable>? orderBy,
+    _i1.OrderByListBuilder<AccountApiKeyTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<AccountApiKey>(
+      columnValues: columnValues(AccountApiKey.t.updateTable),
+      where: where(AccountApiKey.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(AccountApiKey.t),
+      orderByList: orderByList?.call(AccountApiKey.t),
+      orderDescending: orderDescending,
+      transaction: transaction,
+    );
+  }
+
   /// Deletes all [AccountApiKey]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
@@ -536,8 +617,9 @@ class AccountApiKeyAttachRowRepository {
       throw ArgumentError.notNull('accountApiUsage.id');
     }
 
-    var $accountApiKey =
-        accountApiKey.copyWith(accountApiUsageId: accountApiUsage.id);
+    var $accountApiKey = accountApiKey.copyWith(
+      accountApiUsageId: accountApiUsage.id,
+    );
     await session.db.updateRow<AccountApiKey>(
       $accountApiKey,
       columns: [AccountApiKey.t.accountApiUsageId],
