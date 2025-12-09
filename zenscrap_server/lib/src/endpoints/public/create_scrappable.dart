@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:serverpod/serverpod.dart';
+import 'package:zenscrap_server/src/core/consts.dart';
 import 'package:zenscrap_server/src/core/docs/scrappable_request_structure_guide.dart';
 import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';
 import 'package:zenscrap_server/src/core/gemini_client.dart';
@@ -34,6 +35,44 @@ class CreateScrappableEndpoint extends Endpoint {
             description:
                 'You have reached the maximum number of endpoints ($maxAllowed) for your ${accountInfo.planTier.name} plan. '
                 'Please upgrade your plan to create more endpoints.',
+          );
+        }
+      }
+    } else {
+      // Anonymous user - check IP spending limit
+      String? clientIpAddress;
+      if (session is MethodCallSession) {
+        clientIpAddress = session.httpRequest.remoteIpAddress;
+      }
+
+      if (clientIpAddress != null) {
+        final ipSpending = await AnonymousIpSpending.db.findFirstRow(
+          session,
+          where: (t) => t.ipAddress.equals(clientIpAddress),
+        );
+
+        if (ipSpending != null && ipSpending.totalSpentUsd >= kAnonymousIpSpendingLimitInDollars) {
+          // Calculate time until the record expires (7 days from creation)
+          final expiryTime = ipSpending.createdAt.add(kAnonymousIpSpendingResetDuration);
+          final timeUntilReset = expiryTime.difference(DateTime.now());
+          final remainingTime = timeUntilReset.isNegative ? Duration.zero : timeUntilReset;
+
+          // Format the remaining time nicely
+          final days = remainingTime.inDays;
+          final hours = remainingTime.inHours.remainder(24);
+          final minutes = remainingTime.inMinutes.remainder(60);
+          final timeStr = days > 0
+              ? '$days days, $hours hours'
+              : hours > 0
+                  ? '$hours hours, $minutes minutes'
+                  : '$minutes minutes';
+
+          throw ZenScrapException(
+            title: 'Usage Limit Reached',
+            description:
+                'You have reached the spending limit for your IP address '
+                '(\$${kAnonymousIpSpendingLimitInDollars.toStringAsFixed(2)}). '
+                'This limit resets in $timeStr, or you can create an account to get monthly AI credits.',
           );
         }
       }

@@ -1,0 +1,26 @@
+# AnonymousIpSpending
+#
+# Tracks the total spending by anonymous (not logged in) users based on their IP address.
+# This is used to prevent abuse by limiting how much an IP can spend within a 7-day period.
+#
+# The record is automatically cleaned up after 7 days via a periodic FutureCall,
+# allowing the user to use the platform again.
+#
+# Fields:
+# - ipAddress: The client's IP address (hashed for privacy in some cases)
+# - totalSpentUsd: The total amount spent in USD
+# - createdAt: When this record was first created
+# - lastUpdatedAt: When spending was last added to this record
+class: AnonymousIpSpending
+table: anonymous_ip_spending
+fields:
+  ipAddress: String
+  totalSpentUsd: double
+  createdAt: DateTime
+  lastUpdatedAt: DateTime
+indexes:
+  anonymous_ip_spending_ip_idx:
+    fields: ipAddress
+    unique: true
+  anonymous_ip_spending_created_at_idx:
+    fields: createdAt

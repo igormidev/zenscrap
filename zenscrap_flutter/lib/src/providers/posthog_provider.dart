@@ -1624,6 +1624,114 @@ class AnalyticsService {
   }
 
   // ========================================
+  // Credit Limit Events
+  // ========================================
+
+  /// Track when user sees the IP limit reached message
+  Future<void> trackChatIpLimitReachedView({
+    required double totalSpentUsd,
+    required double spendingLimitUsd,
+    required int timeUntilResetSeconds,
+  }) async {
+    await _safeCapture(
+      eventName: 'chat:ip_limit_reached_view',
+      properties: {
+        'total_spent_usd': totalSpentUsd,
+        'spending_limit_usd': spendingLimitUsd,
+        'time_until_reset_seconds': timeUntilResetSeconds,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user clicks "Create Account" button from IP limit message
+  Future<void> trackChatIpLimitCreateAccountClick({
+    required double totalSpentUsd,
+    required double spendingLimitUsd,
+    required int timeUntilResetSeconds,
+  }) async {
+    await _safeCapture(
+      eventName: 'chat:ip_limit_create_account_click',
+      properties: {
+        'total_spent_usd': totalSpentUsd,
+        'spending_limit_usd': spendingLimitUsd,
+        'time_until_reset_seconds': timeUntilResetSeconds,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user sees the IP limit error on create scrappable page
+  Future<void> trackCreateScrappableIpLimitView({
+    required String errorTitle,
+    required String errorDescription,
+  }) async {
+    await _safeCapture(
+      eventName: 'create_scrappable:ip_limit_view',
+      properties: {
+        'error_title': errorTitle,
+        'error_description': errorDescription,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user clicks "Create Account" from IP limit error on create scrappable page
+  Future<void> trackCreateScrappableIpLimitCreateAccountClick({
+    required String errorTitle,
+  }) async {
+    await _safeCapture(
+      eventName: 'create_scrappable:ip_limit_create_account_click',
+      properties: {
+        'error_title': errorTitle,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user clicks "Try Again" from IP limit error on create scrappable page
+  Future<void> trackCreateScrappableIpLimitTryAgainClick() async {
+    await _safeCapture(
+      eventName: 'create_scrappable:ip_limit_try_again_click',
+      properties: {
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user sees the session credit limit reached message
+  Future<void> trackChatSessionLimitReachedView({
+    required double creditsSpent,
+    required double creditsLimit,
+    required bool canUseOwnApiKey,
+  }) async {
+    await _safeCapture(
+      eventName: 'chat:session_limit_reached_view',
+      properties: {
+        'credits_spent': creditsSpent,
+        'credits_limit': creditsLimit,
+        'can_use_own_api_key': canUseOwnApiKey,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user clicks "Add Your OpenAI API Key" button from credit limit message
+  Future<void> trackChatSessionLimitAddApiKeyClick({
+    required double creditsSpent,
+    required double creditsLimit,
+  }) async {
+    await _safeCapture(
+      eventName: 'chat:session_limit_add_api_key_click',
+      properties: {
+        'credits_spent': creditsSpent,
+        'credits_limit': creditsLimit,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  // ========================================
   // General Utility Methods
   // ========================================
 

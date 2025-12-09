@@ -16,12 +16,14 @@ abstract class SessionPrompt implements _i1.SerializableModel {
     required this.userPrompt,
     required this.sessionId,
     required this.thinkingSessionId,
+    this.clientIpAddress,
   });
 
   factory SessionPrompt({
     required String userPrompt,
     required String sessionId,
     required String thinkingSessionId,
+    String? clientIpAddress,
   }) = _SessionPromptImpl;
 
   factory SessionPrompt.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -29,6 +31,7 @@ abstract class SessionPrompt implements _i1.SerializableModel {
       userPrompt: jsonSerialization['userPrompt'] as String,
       sessionId: jsonSerialization['sessionId'] as String,
       thinkingSessionId: jsonSerialization['thinkingSessionId'] as String,
+      clientIpAddress: jsonSerialization['clientIpAddress'] as String?,
     );
   }
 
@@ -38,6 +41,8 @@ abstract class SessionPrompt implements _i1.SerializableModel {
 
   String thinkingSessionId;
 
+  String? clientIpAddress;
+
   /// Returns a shallow copy of this [SessionPrompt]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
@@ -45,6 +50,7 @@ abstract class SessionPrompt implements _i1.SerializableModel {
     String? userPrompt,
     String? sessionId,
     String? thinkingSessionId,
+    String? clientIpAddress,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -52,6 +58,7 @@ abstract class SessionPrompt implements _i1.SerializableModel {
       'userPrompt': userPrompt,
       'sessionId': sessionId,
       'thinkingSessionId': thinkingSessionId,
+      if (clientIpAddress != null) 'clientIpAddress': clientIpAddress,
     };
   }
 
@@ -61,15 +68,19 @@ abstract class SessionPrompt implements _i1.SerializableModel {
   }
 }
 
+class _Undefined {}
+
 class _SessionPromptImpl extends SessionPrompt {
   _SessionPromptImpl({
     required String userPrompt,
     required String sessionId,
     required String thinkingSessionId,
+    String? clientIpAddress,
   }) : super._(
           userPrompt: userPrompt,
           sessionId: sessionId,
           thinkingSessionId: thinkingSessionId,
+          clientIpAddress: clientIpAddress,
         );
 
   /// Returns a shallow copy of this [SessionPrompt]
@@ -80,11 +91,14 @@ class _SessionPromptImpl extends SessionPrompt {
     String? userPrompt,
     String? sessionId,
     String? thinkingSessionId,
+    Object? clientIpAddress = _Undefined,
   }) {
     return SessionPrompt(
       userPrompt: userPrompt ?? this.userPrompt,
       sessionId: sessionId ?? this.sessionId,
       thinkingSessionId: thinkingSessionId ?? this.thinkingSessionId,
+      clientIpAddress:
+          clientIpAddress is String? ? clientIpAddress : this.clientIpAddress,
     );
   }
 }

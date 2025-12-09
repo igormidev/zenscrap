@@ -1,5 +1,16 @@
+# SessionPrompt
+#
+# Payload for the SessionPromptFutureCall that processes user messages
+# in the scrappable chat system.
+#
+# Fields:
+# - userPrompt: The message the user wants to send to the AI
+# - sessionId: The chat session identifier
+# - thinkingSessionId: ID for streaming the AI's thinking process
+# - clientIpAddress: The client's IP address (for anonymous user rate limiting)
 class: SessionPrompt
 fields:
   userPrompt: String
   sessionId: String
   thinkingSessionId: String
+  clientIpAddress: String?
