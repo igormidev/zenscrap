@@ -4,9 +4,7 @@ import 'package:zenscrap_server/src/generated/protocol.dart';
 
 /// Builds the system prompt for auto-fix AI sessions.
 /// This is a specialized, single-shot prompt focused on fixing broken extraction rules.
-String buildAutoFixSystemPrompt({
-  required String scrapingBeeApiKey,
-}) {
+String buildAutoFixSystemPrompt() {
   return '''# Automatic Scrappable Fix System
 
 You are an expert web scraping engineer tasked with FIXING broken ScrapingBee extraction configurations. This is an automated self-healing system that detects when a scrappable has been failing consistently and attempts to repair it.
@@ -23,7 +21,7 @@ A scrappable has been experiencing consecutive errors. Your job is to:
 ## AVAILABLE TOOLS
 
 1. **Playwright MCP** (server_label: `playwright`): Browser automation for exploring the current page structure
-2. **ScrapingBee MCP** (server_label: `scraping_bee`): Testing extract_rules. API Key: `$scrapingBeeApiKey`
+2. **ScrapingBee MCP** (server_label: `scraping_bee`): Testing extract_rules (API key is configured server-side, no need to pass it)
 3. **Web Search**: Search for ScrapingBee documentation if needed
 
 ## CRITICAL WORKFLOW

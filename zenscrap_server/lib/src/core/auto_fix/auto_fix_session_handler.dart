@@ -58,7 +58,6 @@ String _getModelName(AiModel model) {
 class AutoFixSessionHandler {
   final Session _session;
   final String _openAiApiKey;
-  final String _scrapingBeeApiKey;
   final Scrappable _scrappable;
   final ScrappableRequest _scrappableRequest;
   final ScrappingBeeExtractLogic _extractLogic;
@@ -70,7 +69,6 @@ class AutoFixSessionHandler {
   AutoFixSessionHandler({
     required Session session,
     required String openAiApiKey,
-    required String scrapingBeeApiKey,
     required Scrappable scrappable,
     required ScrappableRequest scrappableRequest,
     required ScrappingBeeExtractLogic extractLogic,
@@ -80,7 +78,6 @@ class AutoFixSessionHandler {
     required int autoFixSessionId,
   })  : _session = session,
         _openAiApiKey = openAiApiKey,
-        _scrapingBeeApiKey = scrapingBeeApiKey,
         _scrappable = scrappable,
         _scrappableRequest = scrappableRequest,
         _extractLogic = extractLogic,
@@ -114,9 +111,7 @@ class AutoFixSessionHandler {
       );
 
       // Build prompts
-      final systemPrompt = buildAutoFixSystemPrompt(
-        scrapingBeeApiKey: _scrapingBeeApiKey,
-      );
+      final systemPrompt = buildAutoFixSystemPrompt();
       final contextPrompt = buildAutoFixContextPrompt(
         scrappable: _scrappable,
         scrappableRequest: _scrappableRequest,

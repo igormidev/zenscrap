@@ -59,18 +59,6 @@ class PeriodicAutoFixBrokenScrappables extends FutureCall {
         level: LogLevel.info,
       );
 
-      // Get server's default ScrapingBee API key
-      final scrapingBeeApiKey = session.passwords['scrapingBeeApiKey'];
-
-      if (scrapingBeeApiKey == null) {
-        session.log(
-          'Auto-fix skipped: Missing scrapingBeeApiKey in server passwords',
-          level: LogLevel.warning,
-        );
-        await _scheduleNextRun(session);
-        return;
-      }
-
       // Find scrappables that need auto-fix via AutoFixConfig
       final candidates = await _findAutoFixCandidates(session);
 
@@ -94,7 +82,6 @@ class PeriodicAutoFixBrokenScrappables extends FutureCall {
           session: session,
           autoFixConfig: entry.autoFixConfig,
           scrappable: entry.scrappable,
-          scrapingBeeApiKey: scrapingBeeApiKey,
         );
       }
     } catch (e, stackTrace) {
@@ -252,7 +239,6 @@ class PeriodicAutoFixBrokenScrappables extends FutureCall {
     required Session session,
     required AutoFixConfig autoFixConfig,
     required Scrappable scrappable,
-    required String scrapingBeeApiKey,
   }) async {
     session.log(
       'Processing auto-fix for scrappable ${scrappable.id} (${scrappable.name})',
@@ -327,7 +313,6 @@ class PeriodicAutoFixBrokenScrappables extends FutureCall {
       final handler = AutoFixSessionHandler(
         session: session,
         openAiApiKey: openAiApiKey,
-        scrapingBeeApiKey: scrapingBeeApiKey,
         scrappable: scrappable,
         scrappableRequest: scrappable.targetRequest!,
         extractLogic: scrappable.scrappingBeeExtractRules!,
