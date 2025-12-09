@@ -54,6 +54,8 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
     TResult Function(_ScrapChatSessionStateBlank value)? blank,
     TResult Function(_ScrapChatSessionStateCreatingSessionState value)?
         creatingSessionState,
+    TResult Function(_ScrapChatSessionStateCreatingScrappable value)?
+        creatingScrappable,
     TResult Function(_ScrapChatSessionStateStandard value)? standard,
     TResult Function(_ScrapChatSessionStateWithError value)? withError,
     required TResult orElse(),
@@ -65,6 +67,9 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
       case _ScrapChatSessionStateCreatingSessionState()
           when creatingSessionState != null:
         return creatingSessionState(_that);
+      case _ScrapChatSessionStateCreatingScrappable()
+          when creatingScrappable != null:
+        return creatingScrappable(_that);
       case _ScrapChatSessionStateStandard() when standard != null:
         return standard(_that);
       case _ScrapChatSessionStateWithError() when withError != null:
@@ -92,6 +97,8 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
     required TResult Function(_ScrapChatSessionStateBlank value) blank,
     required TResult Function(_ScrapChatSessionStateCreatingSessionState value)
         creatingSessionState,
+    required TResult Function(_ScrapChatSessionStateCreatingScrappable value)
+        creatingScrappable,
     required TResult Function(_ScrapChatSessionStateStandard value) standard,
     required TResult Function(_ScrapChatSessionStateWithError value) withError,
   }) {
@@ -101,6 +108,8 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
         return blank(_that);
       case _ScrapChatSessionStateCreatingSessionState():
         return creatingSessionState(_that);
+      case _ScrapChatSessionStateCreatingScrappable():
+        return creatingScrappable(_that);
       case _ScrapChatSessionStateStandard():
         return standard(_that);
       case _ScrapChatSessionStateWithError():
@@ -127,6 +136,8 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
     TResult? Function(_ScrapChatSessionStateBlank value)? blank,
     TResult? Function(_ScrapChatSessionStateCreatingSessionState value)?
         creatingSessionState,
+    TResult? Function(_ScrapChatSessionStateCreatingScrappable value)?
+        creatingScrappable,
     TResult? Function(_ScrapChatSessionStateStandard value)? standard,
     TResult? Function(_ScrapChatSessionStateWithError value)? withError,
   }) {
@@ -137,6 +148,9 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
       case _ScrapChatSessionStateCreatingSessionState()
           when creatingSessionState != null:
         return creatingSessionState(_that);
+      case _ScrapChatSessionStateCreatingScrappable()
+          when creatingScrappable != null:
+        return creatingScrappable(_that);
       case _ScrapChatSessionStateStandard() when standard != null:
         return standard(_that);
       case _ScrapChatSessionStateWithError() when withError != null:
@@ -162,6 +176,9 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? blank,
     TResult Function()? creatingSessionState,
+    TResult Function(String referenceLink, List<String> thinkingChunks,
+            GroundingMetadataInfo? groundingMetadata)?
+        creatingScrappable,
     TResult Function(Scrappable data, DateTime testExpirationDate,
             String sessionUuid, List<String>? llmThinkingStream)?
         standard,
@@ -175,6 +192,10 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
       case _ScrapChatSessionStateCreatingSessionState()
           when creatingSessionState != null:
         return creatingSessionState();
+      case _ScrapChatSessionStateCreatingScrappable()
+          when creatingScrappable != null:
+        return creatingScrappable(
+            _that.referenceLink, _that.thinkingChunks, _that.groundingMetadata);
       case _ScrapChatSessionStateStandard() when standard != null:
         return standard(_that.data, _that.testExpirationDate, _that.sessionUuid,
             _that.llmThinkingStream);
@@ -202,6 +223,9 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
   TResult when<TResult extends Object?>({
     required TResult Function() blank,
     required TResult Function() creatingSessionState,
+    required TResult Function(String referenceLink, List<String> thinkingChunks,
+            GroundingMetadataInfo? groundingMetadata)
+        creatingScrappable,
     required TResult Function(Scrappable data, DateTime testExpirationDate,
             String sessionUuid, List<String>? llmThinkingStream)
         standard,
@@ -213,6 +237,9 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
         return blank();
       case _ScrapChatSessionStateCreatingSessionState():
         return creatingSessionState();
+      case _ScrapChatSessionStateCreatingScrappable():
+        return creatingScrappable(
+            _that.referenceLink, _that.thinkingChunks, _that.groundingMetadata);
       case _ScrapChatSessionStateStandard():
         return standard(_that.data, _that.testExpirationDate, _that.sessionUuid,
             _that.llmThinkingStream);
@@ -239,6 +266,9 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? blank,
     TResult? Function()? creatingSessionState,
+    TResult? Function(String referenceLink, List<String> thinkingChunks,
+            GroundingMetadataInfo? groundingMetadata)?
+        creatingScrappable,
     TResult? Function(Scrappable data, DateTime testExpirationDate,
             String sessionUuid, List<String>? llmThinkingStream)?
         standard,
@@ -251,6 +281,10 @@ extension ScrapChatSessionStatePatterns on ScrapChatSessionState {
       case _ScrapChatSessionStateCreatingSessionState()
           when creatingSessionState != null:
         return creatingSessionState();
+      case _ScrapChatSessionStateCreatingScrappable()
+          when creatingScrappable != null:
+        return creatingScrappable(
+            _that.referenceLink, _that.thinkingChunks, _that.groundingMetadata);
       case _ScrapChatSessionStateStandard() when standard != null:
         return standard(_that.data, _that.testExpirationDate, _that.sessionUuid,
             _that.llmThinkingStream);
@@ -302,6 +336,106 @@ class _ScrapChatSessionStateCreatingSessionState
   @override
   String toString() {
     return 'ScrapChatSessionState.creatingSessionState()';
+  }
+}
+
+/// @nodoc
+
+class _ScrapChatSessionStateCreatingScrappable
+    implements ScrapChatSessionState {
+  _ScrapChatSessionStateCreatingScrappable(
+      {required this.referenceLink,
+      required final List<String> thinkingChunks,
+      this.groundingMetadata})
+      : _thinkingChunks = thinkingChunks;
+
+  final String referenceLink;
+  final List<String> _thinkingChunks;
+  List<String> get thinkingChunks {
+    if (_thinkingChunks is EqualUnmodifiableListView) return _thinkingChunks;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_thinkingChunks);
+  }
+
+  final GroundingMetadataInfo? groundingMetadata;
+
+  /// Create a copy of ScrapChatSessionState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$ScrapChatSessionStateCreatingScrappableCopyWith<
+          _ScrapChatSessionStateCreatingScrappable>
+      get copyWith => __$ScrapChatSessionStateCreatingScrappableCopyWithImpl<
+          _ScrapChatSessionStateCreatingScrappable>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _ScrapChatSessionStateCreatingScrappable &&
+            (identical(other.referenceLink, referenceLink) ||
+                other.referenceLink == referenceLink) &&
+            const DeepCollectionEquality()
+                .equals(other._thinkingChunks, _thinkingChunks) &&
+            (identical(other.groundingMetadata, groundingMetadata) ||
+                other.groundingMetadata == groundingMetadata));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, referenceLink,
+      const DeepCollectionEquality().hash(_thinkingChunks), groundingMetadata);
+
+  @override
+  String toString() {
+    return 'ScrapChatSessionState.creatingScrappable(referenceLink: $referenceLink, thinkingChunks: $thinkingChunks, groundingMetadata: $groundingMetadata)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$ScrapChatSessionStateCreatingScrappableCopyWith<$Res>
+    implements $ScrapChatSessionStateCopyWith<$Res> {
+  factory _$ScrapChatSessionStateCreatingScrappableCopyWith(
+          _ScrapChatSessionStateCreatingScrappable value,
+          $Res Function(_ScrapChatSessionStateCreatingScrappable) _then) =
+      __$ScrapChatSessionStateCreatingScrappableCopyWithImpl;
+  @useResult
+  $Res call(
+      {String referenceLink,
+      List<String> thinkingChunks,
+      GroundingMetadataInfo? groundingMetadata});
+}
+
+/// @nodoc
+class __$ScrapChatSessionStateCreatingScrappableCopyWithImpl<$Res>
+    implements _$ScrapChatSessionStateCreatingScrappableCopyWith<$Res> {
+  __$ScrapChatSessionStateCreatingScrappableCopyWithImpl(
+      this._self, this._then);
+
+  final _ScrapChatSessionStateCreatingScrappable _self;
+  final $Res Function(_ScrapChatSessionStateCreatingScrappable) _then;
+
+  /// Create a copy of ScrapChatSessionState
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? referenceLink = null,
+    Object? thinkingChunks = null,
+    Object? groundingMetadata = freezed,
+  }) {
+    return _then(_ScrapChatSessionStateCreatingScrappable(
+      referenceLink: null == referenceLink
+          ? _self.referenceLink
+          : referenceLink // ignore: cast_nullable_to_non_nullable
+              as String,
+      thinkingChunks: null == thinkingChunks
+          ? _self._thinkingChunks
+          : thinkingChunks // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      groundingMetadata: freezed == groundingMetadata
+          ? _self.groundingMetadata
+          : groundingMetadata // ignore: cast_nullable_to_non_nullable
+              as GroundingMetadataInfo?,
+    ));
   }
 }
 

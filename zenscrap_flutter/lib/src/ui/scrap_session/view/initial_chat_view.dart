@@ -9,6 +9,7 @@ import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_stat
 import 'package:zenscrap_flutter/src/design_system/widgets/fullscreen_loading_page.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/pages/initial_chat_page.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/view/scrappable_edit_session.dart';
+import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/ai_thinking_stream_view.dart';
 
 class InitialChatView extends ConsumerStatefulWidget {
   final int? scrappableId;
@@ -64,6 +65,17 @@ class _InitialChatViewState extends ConsumerState<InitialChatView> {
               withError: ZenErrorTab.new,
               creatingSessionState: () => InitialChatPage(),
               blank: () => InitialChatPage(),
+              creatingScrappable: (
+                String referenceLink,
+                List<String> thinkingChunks,
+                GroundingMetadataInfo? groundingMetadata,
+              ) {
+                return AiThinkingStreamView(
+                  referenceLink: referenceLink,
+                  thinkingChunks: thinkingChunks,
+                  groundingMetadata: groundingMetadata,
+                );
+              },
               standard: (
                 Scrappable scrappable,
                 DateTime testExpirationDate,
