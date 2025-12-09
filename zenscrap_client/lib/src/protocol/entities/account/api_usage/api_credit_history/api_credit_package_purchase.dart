@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -25,7 +26,8 @@ abstract class ApiCreditPackagePurchase implements _i1.SerializableModel {
   }) = _ApiCreditPackagePurchaseImpl;
 
   factory ApiCreditPackagePurchase.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return ApiCreditPackagePurchase(
       id: jsonSerialization['id'] as int?,
       value: (jsonSerialization['value'] as num).toDouble(),
@@ -53,6 +55,7 @@ abstract class ApiCreditPackagePurchase implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ApiCreditPackagePurchase',
       if (id != null) 'id': id,
       'value': value,
       if (stripePurchaseId != null) 'stripePurchaseId': stripePurchaseId,
@@ -73,10 +76,10 @@ class _ApiCreditPackagePurchaseImpl extends ApiCreditPackagePurchase {
     required double value,
     String? stripePurchaseId,
   }) : super._(
-          id: id,
-          value: value,
-          stripePurchaseId: stripePurchaseId,
-        );
+         id: id,
+         value: value,
+         stripePurchaseId: stripePurchaseId,
+       );
 
   /// Returns a shallow copy of this [ApiCreditPackagePurchase]
   /// with some or all fields replaced by the given arguments.

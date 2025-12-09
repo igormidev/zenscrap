@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:serverpod_auth_server/serverpod_auth_server.dart';
 import 'package:collection/collection.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:serverpod/serverpod.dart';
@@ -96,7 +97,7 @@ class ScrappableChatSession extends Endpoint {
         description: 'No cache scrappable ID found for session $sessionUuid.',
       );
     }
-    final int? userId = (await session.authenticated)?.userId;
+    final int? userId = session.authenticated?.userId;
     final ReferenceTestData? testData = _cacheRefTestData[sessionUuid];
     final ScrappingBeeExtractLogic? scrappingBeeExtractLogic =
         _cacheScrappingBeeExtractLogic[sessionUuid];
@@ -205,7 +206,7 @@ class ScrappableChatSession extends Endpoint {
     }
 
     // Validate user is authenticated
-    final int? userId = (await session.authenticated)?.userId;
+    final int? userId = session.authenticated?.userId;
     if (userId == null) {
       throw ZenScrapException(
         title: 'Authentication Required',
@@ -343,7 +344,7 @@ class ScrappableChatSession extends Endpoint {
     Session session, {
     required int scrappableId,
   }) async {
-    final int? userId = (await session.authenticated)?.userId;
+    final int? userId = session.authenticated?.userId;
     final bool isLoggedIn = userId != null;
 
     final Scrappable? scrappable = await Scrappable.db.findById(
@@ -601,7 +602,7 @@ class ScrappableChatSession extends Endpoint {
 
     // Validate plan for powerful model
     if (aiModel == AiModel.powerful) {
-      final authenticationInfo = await session.authenticated;
+      final authenticationInfo = session.authenticated;
       if (authenticationInfo == null) {
         throw ZenScrapException(
           title: 'Authentication Required',
@@ -674,7 +675,7 @@ class ScrappableChatSession extends Endpoint {
     // Get client IP address for anonymous user rate limiting
     String? clientIpAddress;
     if (session is MethodCallSession) {
-      clientIpAddress = session.httpRequest.remoteIpAddress;
+      clientIpAddress = session.request.connectionInfo.remote.address.toString();
     }
 
     // Put future call

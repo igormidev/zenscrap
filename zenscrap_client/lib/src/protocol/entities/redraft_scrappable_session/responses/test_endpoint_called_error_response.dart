@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 part of '../chat_response.dart';
 
@@ -31,15 +32,17 @@ abstract class TestEndpointCalledErrorResponse extends _i1.ChatResponse
   }) = _TestEndpointCalledErrorResponseImpl;
 
   factory TestEndpointCalledErrorResponse.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return TestEndpointCalledErrorResponse(
       role: _i3.PromptRole.fromJson((jsonSerialization['role'] as String)),
       expectsFollowUp: jsonSerialization['expectsFollowUp'] as bool,
       errorTitle: jsonSerialization['errorTitle'] as String,
       errorDescription: jsonSerialization['errorDescription'] as String,
       inputPayload: jsonSerialization['inputPayload'] as String,
-      timestamp:
-          _i2.DateTimeJsonExtension.fromJson(jsonSerialization['timestamp']),
+      timestamp: _i2.DateTimeJsonExtension.fromJson(
+        jsonSerialization['timestamp'],
+      ),
     );
   }
 
@@ -53,6 +56,7 @@ abstract class TestEndpointCalledErrorResponse extends _i1.ChatResponse
 
   /// Returns a shallow copy of this [TestEndpointCalledErrorResponse]
   /// with some or all fields replaced by the given arguments.
+  @override
   @_i2.useResult
   TestEndpointCalledErrorResponse copyWith({
     _i3.PromptRole? role,
@@ -65,6 +69,7 @@ abstract class TestEndpointCalledErrorResponse extends _i1.ChatResponse
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'TestEndpointCalledErrorResponse',
       'role': role.toJson(),
       'expectsFollowUp': expectsFollowUp,
       'errorTitle': errorTitle,
@@ -90,13 +95,13 @@ class _TestEndpointCalledErrorResponseImpl
     required String inputPayload,
     required DateTime timestamp,
   }) : super._(
-          role: role,
-          expectsFollowUp: expectsFollowUp,
-          errorTitle: errorTitle,
-          errorDescription: errorDescription,
-          inputPayload: inputPayload,
-          timestamp: timestamp,
-        );
+         role: role,
+         expectsFollowUp: expectsFollowUp,
+         errorTitle: errorTitle,
+         errorDescription: errorDescription,
+         inputPayload: inputPayload,
+         timestamp: timestamp,
+       );
 
   /// Returns a shallow copy of this [TestEndpointCalledErrorResponse]
   /// with some or all fields replaced by the given arguments.

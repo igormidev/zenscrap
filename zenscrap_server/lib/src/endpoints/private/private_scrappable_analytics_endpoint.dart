@@ -1,4 +1,5 @@
 // ignore_for_file: constant_identifier_names
+import 'package:serverpod_auth_server/serverpod_auth_server.dart';
 
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/core/default_classes.dart';
@@ -15,7 +16,7 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
     AnalyticsTimeScope scope = AnalyticsTimeScope.last12Hours,
   }) async {
     const int pageSize = 20; // Fixed page size
-    final authenticationInfo = await session.authenticated;
+    final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) throw defaultAuthenticationException;
     final userId = authenticationInfo.userId;
     final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
@@ -159,7 +160,7 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
   }) async {
     const int daysBack = 7;
     const int pageSize = 30; // Fixed page size
-    final authenticationInfo = await session.authenticated;
+    final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) throw defaultAuthenticationException;
     final userId = authenticationInfo.userId;
     final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(

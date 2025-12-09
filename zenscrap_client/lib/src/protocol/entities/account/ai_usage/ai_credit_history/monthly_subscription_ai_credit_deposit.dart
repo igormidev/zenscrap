@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -27,7 +28,8 @@ abstract class MonthlySubscriptionAICreditDeposit
   }) = _MonthlySubscriptionAICreditDepositImpl;
 
   factory MonthlySubscriptionAICreditDeposit.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return MonthlySubscriptionAICreditDeposit(
       id: jsonSerialization['id'] as int?,
       creditsAmountInDollars:
@@ -56,6 +58,7 @@ abstract class MonthlySubscriptionAICreditDeposit
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'MonthlySubscriptionAICreditDeposit',
       if (id != null) 'id': id,
       'creditsAmountInDollars': creditsAmountInDollars,
       'planTier': planTier.toJson(),
@@ -77,10 +80,10 @@ class _MonthlySubscriptionAICreditDepositImpl
     required double creditsAmountInDollars,
     required _i2.PlanTier planTier,
   }) : super._(
-          id: id,
-          creditsAmountInDollars: creditsAmountInDollars,
-          planTier: planTier,
-        );
+         id: id,
+         creditsAmountInDollars: creditsAmountInDollars,
+         planTier: planTier,
+       );
 
   /// Returns a shallow copy of this [MonthlySubscriptionAICreditDeposit]
   /// with some or all fields replaced by the given arguments.

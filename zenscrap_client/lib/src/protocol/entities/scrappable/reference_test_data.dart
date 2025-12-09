@@ -7,11 +7,13 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import '../../entities/scrappable/byte_test_data.dart' as _i2;
 import '../../entities/scrappable/scrappable.dart' as _i3;
+import 'package:zenscrap_client/src/protocol/protocol.dart' as _i4;
 
 abstract class ReferenceTestData implements _i1.SerializableModel {
   ReferenceTestData._({
@@ -44,12 +46,14 @@ abstract class ReferenceTestData implements _i1.SerializableModel {
       byteDataId: jsonSerialization['byteDataId'] as int?,
       byteData: jsonSerialization['byteData'] == null
           ? null
-          : _i2.ByteTestData.fromJson(
-              (jsonSerialization['byteData'] as Map<String, dynamic>)),
+          : _i4.Protocol().deserialize<_i2.ByteTestData>(
+              jsonSerialization['byteData'],
+            ),
       scrappable: jsonSerialization['scrappable'] == null
           ? null
-          : _i3.Scrappable.fromJson(
-              (jsonSerialization['scrappable'] as Map<String, dynamic>)),
+          : _i4.Protocol().deserialize<_i3.Scrappable>(
+              jsonSerialization['scrappable'],
+            ),
     );
   }
 
@@ -85,6 +89,7 @@ abstract class ReferenceTestData implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ReferenceTestData',
       if (id != null) 'id': id,
       'referenceLinkUsed': referenceLinkUsed,
       'referenceQueryParametersJson': referenceQueryParametersJson,
@@ -113,14 +118,14 @@ class _ReferenceTestDataImpl extends ReferenceTestData {
     _i2.ByteTestData? byteData,
     _i3.Scrappable? scrappable,
   }) : super._(
-          id: id,
-          referenceLinkUsed: referenceLinkUsed,
-          referenceQueryParametersJson: referenceQueryParametersJson,
-          scrapResultJson: scrapResultJson,
-          byteDataId: byteDataId,
-          byteData: byteData,
-          scrappable: scrappable,
-        );
+         id: id,
+         referenceLinkUsed: referenceLinkUsed,
+         referenceQueryParametersJson: referenceQueryParametersJson,
+         scrapResultJson: scrapResultJson,
+         byteDataId: byteDataId,
+         byteData: byteData,
+         scrappable: scrappable,
+       );
 
   /// Returns a shallow copy of this [ReferenceTestData]
   /// with some or all fields replaced by the given arguments.
@@ -140,11 +145,13 @@ class _ReferenceTestDataImpl extends ReferenceTestData {
       referenceLinkUsed: referenceLinkUsed ?? this.referenceLinkUsed,
       referenceQueryParametersJson:
           referenceQueryParametersJson ?? this.referenceQueryParametersJson,
-      scrapResultJson:
-          scrapResultJson is String? ? scrapResultJson : this.scrapResultJson,
+      scrapResultJson: scrapResultJson is String?
+          ? scrapResultJson
+          : this.scrapResultJson,
       byteDataId: byteDataId is int? ? byteDataId : this.byteDataId,
-      byteData:
-          byteData is _i2.ByteTestData? ? byteData : this.byteData?.copyWith(),
+      byteData: byteData is _i2.ByteTestData?
+          ? byteData
+          : this.byteData?.copyWith(),
       scrappable: scrappable is _i3.Scrappable?
           ? scrappable
           : this.scrappable?.copyWith(),

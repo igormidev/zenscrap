@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 part of '../chat_response.dart';
 
@@ -31,19 +32,22 @@ abstract class CandidateExtractLogicUpdate extends _i1.ChatResponse
   }) = _CandidateExtractLogicUpdateImpl;
 
   factory CandidateExtractLogicUpdate.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return CandidateExtractLogicUpdate(
       role: _i3.PromptRole.fromJson((jsonSerialization['role'] as String)),
       expectsFollowUp: jsonSerialization['expectsFollowUp'] as bool,
       messageText: jsonSerialization['messageText'] as String,
-      thinkingSentences: (jsonSerialization['thinkingSentences'] as List)
-          .map((e) => e as String)
-          .toList(),
-      scrappingBeeExtractLogic: _i4.ScrappingBeeExtractLogic.fromJson(
-          (jsonSerialization['scrappingBeeExtractLogic']
-              as Map<String, dynamic>)),
-      referenceTestData: _i5.ReferenceTestData.fromJson(
-          (jsonSerialization['referenceTestData'] as Map<String, dynamic>)),
+      thinkingSentences: _i6.Protocol().deserialize<List<String>>(
+        jsonSerialization['thinkingSentences'],
+      ),
+      scrappingBeeExtractLogic: _i6.Protocol()
+          .deserialize<_i4.ScrappingBeeExtractLogic>(
+            jsonSerialization['scrappingBeeExtractLogic'],
+          ),
+      referenceTestData: _i6.Protocol().deserialize<_i5.ReferenceTestData>(
+        jsonSerialization['referenceTestData'],
+      ),
     );
   }
 
@@ -57,6 +61,7 @@ abstract class CandidateExtractLogicUpdate extends _i1.ChatResponse
 
   /// Returns a shallow copy of this [CandidateExtractLogicUpdate]
   /// with some or all fields replaced by the given arguments.
+  @override
   @_i2.useResult
   CandidateExtractLogicUpdate copyWith({
     _i3.PromptRole? role,
@@ -69,6 +74,7 @@ abstract class CandidateExtractLogicUpdate extends _i1.ChatResponse
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'CandidateExtractLogicUpdate',
       'role': role.toJson(),
       'expectsFollowUp': expectsFollowUp,
       'messageText': messageText,
@@ -81,6 +87,7 @@ abstract class CandidateExtractLogicUpdate extends _i1.ChatResponse
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'CandidateExtractLogicUpdate',
       'role': role.toJson(),
       'expectsFollowUp': expectsFollowUp,
       'messageText': messageText,
@@ -105,13 +112,13 @@ class _CandidateExtractLogicUpdateImpl extends CandidateExtractLogicUpdate {
     required _i4.ScrappingBeeExtractLogic scrappingBeeExtractLogic,
     required _i5.ReferenceTestData referenceTestData,
   }) : super._(
-          role: role,
-          expectsFollowUp: expectsFollowUp,
-          messageText: messageText,
-          thinkingSentences: thinkingSentences,
-          scrappingBeeExtractLogic: scrappingBeeExtractLogic,
-          referenceTestData: referenceTestData,
-        );
+         role: role,
+         expectsFollowUp: expectsFollowUp,
+         messageText: messageText,
+         thinkingSentences: thinkingSentences,
+         scrappingBeeExtractLogic: scrappingBeeExtractLogic,
+         referenceTestData: referenceTestData,
+       );
 
   /// Returns a shallow copy of this [CandidateExtractLogicUpdate]
   /// with some or all fields replaced by the given arguments.

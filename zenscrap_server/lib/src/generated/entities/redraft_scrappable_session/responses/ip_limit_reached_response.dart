@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 part of '../chat_response.dart';
 
@@ -31,16 +32,18 @@ abstract class IpLimitReachedResponse extends _i1.ChatResponse
   }) = _IpLimitReachedResponseImpl;
 
   factory IpLimitReachedResponse.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return IpLimitReachedResponse(
       role: _i3.PromptRole.fromJson((jsonSerialization['role'] as String)),
       expectsFollowUp: jsonSerialization['expectsFollowUp'] as bool,
       messageText: jsonSerialization['messageText'] as String,
       timeUntilReset: _i2.DurationJsonExtension.fromJson(
-          jsonSerialization['timeUntilReset']),
+        jsonSerialization['timeUntilReset'],
+      ),
       totalSpentUsd: (jsonSerialization['totalSpentUsd'] as num).toDouble(),
-      spendingLimitUsd:
-          (jsonSerialization['spendingLimitUsd'] as num).toDouble(),
+      spendingLimitUsd: (jsonSerialization['spendingLimitUsd'] as num)
+          .toDouble(),
     );
   }
 
@@ -54,6 +57,7 @@ abstract class IpLimitReachedResponse extends _i1.ChatResponse
 
   /// Returns a shallow copy of this [IpLimitReachedResponse]
   /// with some or all fields replaced by the given arguments.
+  @override
   @_i2.useResult
   IpLimitReachedResponse copyWith({
     _i3.PromptRole? role,
@@ -66,6 +70,7 @@ abstract class IpLimitReachedResponse extends _i1.ChatResponse
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'IpLimitReachedResponse',
       'role': role.toJson(),
       'expectsFollowUp': expectsFollowUp,
       'messageText': messageText,
@@ -78,6 +83,7 @@ abstract class IpLimitReachedResponse extends _i1.ChatResponse
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'IpLimitReachedResponse',
       'role': role.toJson(),
       'expectsFollowUp': expectsFollowUp,
       'messageText': messageText,
@@ -102,13 +108,13 @@ class _IpLimitReachedResponseImpl extends IpLimitReachedResponse {
     required double totalSpentUsd,
     required double spendingLimitUsd,
   }) : super._(
-          role: role,
-          expectsFollowUp: expectsFollowUp,
-          messageText: messageText,
-          timeUntilReset: timeUntilReset,
-          totalSpentUsd: totalSpentUsd,
-          spendingLimitUsd: spendingLimitUsd,
-        );
+         role: role,
+         expectsFollowUp: expectsFollowUp,
+         messageText: messageText,
+         timeUntilReset: timeUntilReset,
+         totalSpentUsd: totalSpentUsd,
+         spendingLimitUsd: spendingLimitUsd,
+       );
 
   /// Returns a shallow copy of this [IpLimitReachedResponse]
   /// with some or all fields replaced by the given arguments.

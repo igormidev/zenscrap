@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -15,6 +16,7 @@ import '../../../../entities/account/api_usage/api_credit_history/monthly_subscr
 import '../../../../entities/account/api_usage/api_credit_history/api_credit_package_purchase.dart'
     as _i3;
 import '../../../../entities/account/api_usage/account_api_usage.dart' as _i4;
+import 'package:zenscrap_client/src/protocol/protocol.dart' as _i5;
 
 abstract class ApiCreditHistoryItem implements _i1.SerializableModel {
   ApiCreditHistoryItem._({
@@ -33,7 +35,7 @@ abstract class ApiCreditHistoryItem implements _i1.SerializableModel {
     required DateTime date,
     int? monthlySubscriptionApiCreditDepositId,
     _i2.MonthlySubscriptionApiCreditDeposit?
-        monthlySubscriptionApiCreditDeposit,
+    monthlySubscriptionApiCreditDeposit,
     int? apiCreditPackagePurchaseId,
     _i3.ApiCreditPackagePurchase? apiCreditPackagePurchase,
     required int accountApiUsageId,
@@ -41,7 +43,8 @@ abstract class ApiCreditHistoryItem implements _i1.SerializableModel {
   }) = _ApiCreditHistoryItemImpl;
 
   factory ApiCreditHistoryItem.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return ApiCreditHistoryItem(
       id: jsonSerialization['id'] as int?,
       date: _i1.DateTimeJsonExtension.fromJson(jsonSerialization['date']),
@@ -49,23 +52,24 @@ abstract class ApiCreditHistoryItem implements _i1.SerializableModel {
           jsonSerialization['monthlySubscriptionApiCreditDepositId'] as int?,
       monthlySubscriptionApiCreditDeposit:
           jsonSerialization['monthlySubscriptionApiCreditDeposit'] == null
-              ? null
-              : _i2.MonthlySubscriptionApiCreditDeposit.fromJson(
-                  (jsonSerialization['monthlySubscriptionApiCreditDeposit']
-                      as Map<String, dynamic>)),
+          ? null
+          : _i5.Protocol().deserialize<_i2.MonthlySubscriptionApiCreditDeposit>(
+              jsonSerialization['monthlySubscriptionApiCreditDeposit'],
+            ),
       apiCreditPackagePurchaseId:
           jsonSerialization['apiCreditPackagePurchaseId'] as int?,
       apiCreditPackagePurchase:
           jsonSerialization['apiCreditPackagePurchase'] == null
-              ? null
-              : _i3.ApiCreditPackagePurchase.fromJson(
-                  (jsonSerialization['apiCreditPackagePurchase']
-                      as Map<String, dynamic>)),
+          ? null
+          : _i5.Protocol().deserialize<_i3.ApiCreditPackagePurchase>(
+              jsonSerialization['apiCreditPackagePurchase'],
+            ),
       accountApiUsageId: jsonSerialization['accountApiUsageId'] as int,
       accountApiUsage: jsonSerialization['accountApiUsage'] == null
           ? null
-          : _i4.AccountApiUsage.fromJson(
-              (jsonSerialization['accountApiUsage'] as Map<String, dynamic>)),
+          : _i5.Protocol().deserialize<_i4.AccountApiUsage>(
+              jsonSerialization['accountApiUsage'],
+            ),
     );
   }
 
@@ -96,7 +100,7 @@ abstract class ApiCreditHistoryItem implements _i1.SerializableModel {
     DateTime? date,
     int? monthlySubscriptionApiCreditDepositId,
     _i2.MonthlySubscriptionApiCreditDeposit?
-        monthlySubscriptionApiCreditDeposit,
+    monthlySubscriptionApiCreditDeposit,
     int? apiCreditPackagePurchaseId,
     _i3.ApiCreditPackagePurchase? apiCreditPackagePurchase,
     int? accountApiUsageId,
@@ -105,6 +109,7 @@ abstract class ApiCreditHistoryItem implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ApiCreditHistoryItem',
       if (id != null) 'id': id,
       'date': date.toJson(),
       if (monthlySubscriptionApiCreditDepositId != null)
@@ -136,23 +141,23 @@ class _ApiCreditHistoryItemImpl extends ApiCreditHistoryItem {
     required DateTime date,
     int? monthlySubscriptionApiCreditDepositId,
     _i2.MonthlySubscriptionApiCreditDeposit?
-        monthlySubscriptionApiCreditDeposit,
+    monthlySubscriptionApiCreditDeposit,
     int? apiCreditPackagePurchaseId,
     _i3.ApiCreditPackagePurchase? apiCreditPackagePurchase,
     required int accountApiUsageId,
     _i4.AccountApiUsage? accountApiUsage,
   }) : super._(
-          id: id,
-          date: date,
-          monthlySubscriptionApiCreditDepositId:
-              monthlySubscriptionApiCreditDepositId,
-          monthlySubscriptionApiCreditDeposit:
-              monthlySubscriptionApiCreditDeposit,
-          apiCreditPackagePurchaseId: apiCreditPackagePurchaseId,
-          apiCreditPackagePurchase: apiCreditPackagePurchase,
-          accountApiUsageId: accountApiUsageId,
-          accountApiUsage: accountApiUsage,
-        );
+         id: id,
+         date: date,
+         monthlySubscriptionApiCreditDepositId:
+             monthlySubscriptionApiCreditDepositId,
+         monthlySubscriptionApiCreditDeposit:
+             monthlySubscriptionApiCreditDeposit,
+         apiCreditPackagePurchaseId: apiCreditPackagePurchaseId,
+         apiCreditPackagePurchase: apiCreditPackagePurchase,
+         accountApiUsageId: accountApiUsageId,
+         accountApiUsage: accountApiUsage,
+       );
 
   /// Returns a shallow copy of this [ApiCreditHistoryItem]
   /// with some or all fields replaced by the given arguments.
@@ -173,9 +178,10 @@ class _ApiCreditHistoryItemImpl extends ApiCreditHistoryItem {
       date: date ?? this.date,
       monthlySubscriptionApiCreditDepositId:
           monthlySubscriptionApiCreditDepositId is int?
-              ? monthlySubscriptionApiCreditDepositId
-              : this.monthlySubscriptionApiCreditDepositId,
-      monthlySubscriptionApiCreditDeposit: monthlySubscriptionApiCreditDeposit
+          ? monthlySubscriptionApiCreditDepositId
+          : this.monthlySubscriptionApiCreditDepositId,
+      monthlySubscriptionApiCreditDeposit:
+          monthlySubscriptionApiCreditDeposit
               is _i2.MonthlySubscriptionApiCreditDeposit?
           ? monthlySubscriptionApiCreditDeposit
           : this.monthlySubscriptionApiCreditDeposit?.copyWith(),
@@ -184,8 +190,8 @@ class _ApiCreditHistoryItemImpl extends ApiCreditHistoryItem {
           : this.apiCreditPackagePurchaseId,
       apiCreditPackagePurchase:
           apiCreditPackagePurchase is _i3.ApiCreditPackagePurchase?
-              ? apiCreditPackagePurchase
-              : this.apiCreditPackagePurchase?.copyWith(),
+          ? apiCreditPackagePurchase
+          : this.apiCreditPackagePurchase?.copyWith(),
       accountApiUsageId: accountApiUsageId ?? this.accountApiUsageId,
       accountApiUsage: accountApiUsage is _i4.AccountApiUsage?
           ? accountApiUsage

@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -35,11 +36,13 @@ abstract class AnalyticsRequestDetails implements _i1.SerializableModel {
   }) = _AnalyticsRequestDetailsImpl;
 
   factory AnalyticsRequestDetails.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return AnalyticsRequestDetails(
       id: jsonSerialization['id'] as int?,
-      timeStamp:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['timeStamp']),
+      timeStamp: _i1.DateTimeJsonExtension.fromJson(
+        jsonSerialization['timeStamp'],
+      ),
       title: jsonSerialization['title'] as String?,
       description: jsonSerialization['description'] as String?,
       errorObjectAsString: jsonSerialization['errorObjectAsString'] as String?,
@@ -85,6 +88,7 @@ abstract class AnalyticsRequestDetails implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'AnalyticsRequestDetails',
       if (id != null) 'id': id,
       'timeStamp': timeStamp.toJson(),
       if (title != null) 'title': title,
@@ -118,15 +122,15 @@ class _AnalyticsRequestDetailsImpl extends AnalyticsRequestDetails {
     required String stringifiedPayload,
     String? stringifiedResponse,
   }) : super._(
-          id: id,
-          timeStamp: timeStamp,
-          title: title,
-          description: description,
-          errorObjectAsString: errorObjectAsString,
-          errorStackTraceAsString: errorStackTraceAsString,
-          stringifiedPayload: stringifiedPayload,
-          stringifiedResponse: stringifiedResponse,
-        );
+         id: id,
+         timeStamp: timeStamp,
+         title: title,
+         description: description,
+         errorObjectAsString: errorObjectAsString,
+         errorStackTraceAsString: errorStackTraceAsString,
+         stringifiedPayload: stringifiedPayload,
+         stringifiedResponse: stringifiedResponse,
+       );
 
   /// Returns a shallow copy of this [AnalyticsRequestDetails]
   /// with some or all fields replaced by the given arguments.

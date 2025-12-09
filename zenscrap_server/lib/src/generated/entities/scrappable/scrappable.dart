@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: unnecessary_null_comparison
 
@@ -18,6 +19,7 @@ import '../../entities/scrappable/reference_test_data.dart' as _i4;
 import '../../entities/scrappable/scrappable_analytics.dart' as _i5;
 import '../../entities/scrappable/scraper_category.dart' as _i6;
 import '../../entities/scrappable/auto_fix/auto_fix_config.dart' as _i7;
+import 'package:zenscrap_server/src/generated/protocol.dart' as _i8;
 
 abstract class Scrappable
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -70,48 +72,57 @@ abstract class Scrappable
       id: jsonSerialization['id'] as int?,
       accountId: jsonSerialization['accountId'] as int?,
       apiUsageOwnerNanoId: jsonSerialization['apiUsageOwnerNanoId'] as String?,
-      createdAt:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
+      createdAt: _i1.DateTimeJsonExtension.fromJson(
+        jsonSerialization['createdAt'],
+      ),
       generalInfosUpdatedAt: _i1.DateTimeJsonExtension.fromJson(
-          jsonSerialization['generalInfosUpdatedAt']),
+        jsonSerialization['generalInfosUpdatedAt'],
+      ),
       extractRulesUpdatedAt: _i1.DateTimeJsonExtension.fromJson(
-          jsonSerialization['extractRulesUpdatedAt']),
+        jsonSerialization['extractRulesUpdatedAt'],
+      ),
       name: jsonSerialization['name'] as String,
       description: jsonSerialization['description'] as String,
       testEndpointAvailableUntil:
           jsonSerialization['testEndpointAvailableUntil'] == null
-              ? null
-              : _i1.DateTimeJsonExtension.fromJson(
-                  jsonSerialization['testEndpointAvailableUntil']),
+          ? null
+          : _i1.DateTimeJsonExtension.fromJson(
+              jsonSerialization['testEndpointAvailableUntil'],
+            ),
       scrappingBeeExtractRules:
           jsonSerialization['scrappingBeeExtractRules'] == null
-              ? null
-              : _i2.ScrappingBeeExtractLogic.fromJson(
-                  (jsonSerialization['scrappingBeeExtractRules']
-                      as Map<String, dynamic>)),
+          ? null
+          : _i8.Protocol().deserialize<_i2.ScrappingBeeExtractLogic>(
+              jsonSerialization['scrappingBeeExtractRules'],
+            ),
       willHideFromMarketplace:
           jsonSerialization['willHideFromMarketplace'] as bool,
       targetRequestId: jsonSerialization['targetRequestId'] as int,
       targetRequest: jsonSerialization['targetRequest'] == null
           ? null
-          : _i3.ScrappableRequest.fromJson(
-              (jsonSerialization['targetRequest'] as Map<String, dynamic>)),
+          : _i8.Protocol().deserialize<_i3.ScrappableRequest>(
+              jsonSerialization['targetRequest'],
+            ),
       referenceTestDataId: jsonSerialization['referenceTestDataId'] as int,
       referenceTestData: jsonSerialization['referenceTestData'] == null
           ? null
-          : _i4.ReferenceTestData.fromJson(
-              (jsonSerialization['referenceTestData'] as Map<String, dynamic>)),
-      scrappableAnalytics: (jsonSerialization['scrappableAnalytics'] as List?)
-          ?.map((e) =>
-              _i5.ScrappableAnalytics.fromJson((e as Map<String, dynamic>)))
-          .toList(),
-      category:
-          _i6.ScraperCategory.fromJson((jsonSerialization['category'] as int)),
+          : _i8.Protocol().deserialize<_i4.ReferenceTestData>(
+              jsonSerialization['referenceTestData'],
+            ),
+      scrappableAnalytics: jsonSerialization['scrappableAnalytics'] == null
+          ? null
+          : _i8.Protocol().deserialize<List<_i5.ScrappableAnalytics>>(
+              jsonSerialization['scrappableAnalytics'],
+            ),
+      category: _i6.ScraperCategory.fromJson(
+        (jsonSerialization['category'] as String),
+      ),
       isDeleted: jsonSerialization['isDeleted'] as bool,
       autoFixConfig: jsonSerialization['autoFixConfig'] == null
           ? null
-          : _i7.AutoFixConfig.fromJson(
-              (jsonSerialization['autoFixConfig'] as Map<String, dynamic>)),
+          : _i8.Protocol().deserialize<_i7.AutoFixConfig>(
+              jsonSerialization['autoFixConfig'],
+            ),
     );
   }
 
@@ -188,6 +199,7 @@ abstract class Scrappable
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'Scrappable',
       if (id != null) 'id': id,
       if (accountId != null) 'accountId': accountId,
       if (apiUsageOwnerNanoId != null)
@@ -208,8 +220,9 @@ abstract class Scrappable
       if (referenceTestData != null)
         'referenceTestData': referenceTestData?.toJson(),
       if (scrappableAnalytics != null)
-        'scrappableAnalytics':
-            scrappableAnalytics?.toJson(valueToJson: (v) => v.toJson()),
+        'scrappableAnalytics': scrappableAnalytics?.toJson(
+          valueToJson: (v) => v.toJson(),
+        ),
       'category': category.toJson(),
       'isDeleted': isDeleted,
       if (autoFixConfig != null) 'autoFixConfig': autoFixConfig?.toJson(),
@@ -219,6 +232,7 @@ abstract class Scrappable
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'Scrappable',
       if (id != null) 'id': id,
       if (accountId != null) 'accountId': accountId,
       'createdAt': createdAt.toJson(),
@@ -229,8 +243,8 @@ abstract class Scrappable
       if (testEndpointAvailableUntil != null)
         'testEndpointAvailableUntil': testEndpointAvailableUntil?.toJson(),
       if (scrappingBeeExtractRules != null)
-        'scrappingBeeExtractRules':
-            scrappingBeeExtractRules?.toJsonForProtocol(),
+        'scrappingBeeExtractRules': scrappingBeeExtractRules
+            ?.toJsonForProtocol(),
       'willHideFromMarketplace': willHideFromMarketplace,
       'targetRequestId': targetRequestId,
       if (targetRequest != null)
@@ -240,7 +254,8 @@ abstract class Scrappable
         'referenceTestData': referenceTestData?.toJsonForProtocol(),
       if (scrappableAnalytics != null)
         'scrappableAnalytics': scrappableAnalytics?.toJson(
-            valueToJson: (v) => v.toJsonForProtocol()),
+          valueToJson: (v) => v.toJsonForProtocol(),
+        ),
       'category': category.toJson(),
       'isDeleted': isDeleted,
       if (autoFixConfig != null)
@@ -314,26 +329,26 @@ class _ScrappableImpl extends Scrappable {
     required bool isDeleted,
     _i7.AutoFixConfig? autoFixConfig,
   }) : super._(
-          id: id,
-          accountId: accountId,
-          apiUsageOwnerNanoId: apiUsageOwnerNanoId,
-          createdAt: createdAt,
-          generalInfosUpdatedAt: generalInfosUpdatedAt,
-          extractRulesUpdatedAt: extractRulesUpdatedAt,
-          name: name,
-          description: description,
-          testEndpointAvailableUntil: testEndpointAvailableUntil,
-          scrappingBeeExtractRules: scrappingBeeExtractRules,
-          willHideFromMarketplace: willHideFromMarketplace,
-          targetRequestId: targetRequestId,
-          targetRequest: targetRequest,
-          referenceTestDataId: referenceTestDataId,
-          referenceTestData: referenceTestData,
-          scrappableAnalytics: scrappableAnalytics,
-          category: category,
-          isDeleted: isDeleted,
-          autoFixConfig: autoFixConfig,
-        );
+         id: id,
+         accountId: accountId,
+         apiUsageOwnerNanoId: apiUsageOwnerNanoId,
+         createdAt: createdAt,
+         generalInfosUpdatedAt: generalInfosUpdatedAt,
+         extractRulesUpdatedAt: extractRulesUpdatedAt,
+         name: name,
+         description: description,
+         testEndpointAvailableUntil: testEndpointAvailableUntil,
+         scrappingBeeExtractRules: scrappingBeeExtractRules,
+         willHideFromMarketplace: willHideFromMarketplace,
+         targetRequestId: targetRequestId,
+         targetRequest: targetRequest,
+         referenceTestDataId: referenceTestDataId,
+         referenceTestData: referenceTestData,
+         scrappableAnalytics: scrappableAnalytics,
+         category: category,
+         isDeleted: isDeleted,
+         autoFixConfig: autoFixConfig,
+       );
 
   /// Returns a shallow copy of this [Scrappable]
   /// with some or all fields replaced by the given arguments.
@@ -378,8 +393,8 @@ class _ScrappableImpl extends Scrappable {
           : this.testEndpointAvailableUntil,
       scrappingBeeExtractRules:
           scrappingBeeExtractRules is _i2.ScrappingBeeExtractLogic?
-              ? scrappingBeeExtractRules
-              : this.scrappingBeeExtractRules?.copyWith(),
+          ? scrappingBeeExtractRules
+          : this.scrappingBeeExtractRules?.copyWith(),
       willHideFromMarketplace:
           willHideFromMarketplace ?? this.willHideFromMarketplace,
       targetRequestId: targetRequestId ?? this.targetRequestId,
@@ -402,8 +417,87 @@ class _ScrappableImpl extends Scrappable {
   }
 }
 
+class ScrappableUpdateTable extends _i1.UpdateTable<ScrappableTable> {
+  ScrappableUpdateTable(super.table);
+
+  _i1.ColumnValue<int, int> accountId(int? value) => _i1.ColumnValue(
+    table.accountId,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> apiUsageOwnerNanoId(String? value) =>
+      _i1.ColumnValue(
+        table.apiUsageOwnerNanoId,
+        value,
+      );
+
+  _i1.ColumnValue<DateTime, DateTime> createdAt(DateTime value) =>
+      _i1.ColumnValue(
+        table.createdAt,
+        value,
+      );
+
+  _i1.ColumnValue<DateTime, DateTime> generalInfosUpdatedAt(DateTime value) =>
+      _i1.ColumnValue(
+        table.generalInfosUpdatedAt,
+        value,
+      );
+
+  _i1.ColumnValue<DateTime, DateTime> extractRulesUpdatedAt(DateTime value) =>
+      _i1.ColumnValue(
+        table.extractRulesUpdatedAt,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> name(String value) => _i1.ColumnValue(
+    table.name,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> description(String value) => _i1.ColumnValue(
+    table.description,
+    value,
+  );
+
+  _i1.ColumnValue<DateTime, DateTime> testEndpointAvailableUntil(
+    DateTime? value,
+  ) => _i1.ColumnValue(
+    table.testEndpointAvailableUntil,
+    value,
+  );
+
+  _i1.ColumnValue<bool, bool> willHideFromMarketplace(bool value) =>
+      _i1.ColumnValue(
+        table.willHideFromMarketplace,
+        value,
+      );
+
+  _i1.ColumnValue<int, int> targetRequestId(int value) => _i1.ColumnValue(
+    table.targetRequestId,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> referenceTestDataId(int value) => _i1.ColumnValue(
+    table.referenceTestDataId,
+    value,
+  );
+
+  _i1.ColumnValue<_i6.ScraperCategory, _i6.ScraperCategory> category(
+    _i6.ScraperCategory value,
+  ) => _i1.ColumnValue(
+    table.category,
+    value,
+  );
+
+  _i1.ColumnValue<bool, bool> isDeleted(bool value) => _i1.ColumnValue(
+    table.isDeleted,
+    value,
+  );
+}
+
 class ScrappableTable extends _i1.Table<int?> {
   ScrappableTable({super.tableRelation}) : super(tableName: 'scrappable') {
+    updateTable = ScrappableUpdateTable(this);
     accountId = _i1.ColumnInt(
       'accountId',
       this,
@@ -451,13 +545,15 @@ class ScrappableTable extends _i1.Table<int?> {
     category = _i1.ColumnEnum(
       'category',
       this,
-      _i1.EnumSerialization.byIndex,
+      _i1.EnumSerialization.byName,
     );
     isDeleted = _i1.ColumnBool(
       'isDeleted',
       this,
     );
   }
+
+  late final ScrappableUpdateTable updateTable;
 
   late final _i1.ColumnInt accountId;
 
@@ -505,7 +601,8 @@ class ScrappableTable extends _i1.Table<int?> {
       foreignField: _i2.ScrappingBeeExtractLogic.t.scrappableId,
       tableRelation: tableRelation,
       createTable: (foreignTableRelation) => _i2.ScrappingBeeExtractLogicTable(
-          tableRelation: foreignTableRelation),
+        tableRelation: foreignTableRelation,
+      ),
     );
     return _scrappingBeeExtractRules!;
   }
@@ -575,28 +672,29 @@ class ScrappableTable extends _i1.Table<int?> {
     _scrappableAnalytics = _i1.ManyRelation<_i5.ScrappableAnalyticsTable>(
       tableWithRelations: relationTable,
       table: _i5.ScrappableAnalyticsTable(
-          tableRelation: relationTable.tableRelation!.lastRelation),
+        tableRelation: relationTable.tableRelation!.lastRelation,
+      ),
     );
     return _scrappableAnalytics!;
   }
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        accountId,
-        apiUsageOwnerNanoId,
-        createdAt,
-        generalInfosUpdatedAt,
-        extractRulesUpdatedAt,
-        name,
-        description,
-        testEndpointAvailableUntil,
-        willHideFromMarketplace,
-        targetRequestId,
-        referenceTestDataId,
-        category,
-        isDeleted,
-      ];
+    id,
+    accountId,
+    apiUsageOwnerNanoId,
+    createdAt,
+    generalInfosUpdatedAt,
+    extractRulesUpdatedAt,
+    name,
+    description,
+    testEndpointAvailableUntil,
+    willHideFromMarketplace,
+    targetRequestId,
+    referenceTestDataId,
+    category,
+    isDeleted,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -646,12 +744,12 @@ class ScrappableInclude extends _i1.IncludeObject {
 
   @override
   Map<String, _i1.Include?> get includes => {
-        'scrappingBeeExtractRules': _scrappingBeeExtractRules,
-        'targetRequest': _targetRequest,
-        'referenceTestData': _referenceTestData,
-        'scrappableAnalytics': _scrappableAnalytics,
-        'autoFixConfig': _autoFixConfig,
-      };
+    'scrappingBeeExtractRules': _scrappingBeeExtractRules,
+    'targetRequest': _targetRequest,
+    'referenceTestData': _referenceTestData,
+    'scrappableAnalytics': _scrappableAnalytics,
+    'autoFixConfig': _autoFixConfig,
+  };
 
   @override
   _i1.Table<int?> get table => Scrappable.t;
@@ -850,6 +948,46 @@ class ScrappableRepository {
     );
   }
 
+  /// Updates a single [Scrappable] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<Scrappable?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<ScrappableUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<Scrappable>(
+      id,
+      columnValues: columnValues(Scrappable.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [Scrappable]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<Scrappable>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<ScrappableUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<ScrappableTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<ScrappableTable>? orderBy,
+    _i1.OrderByListBuilder<ScrappableTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<Scrappable>(
+      columnValues: columnValues(Scrappable.t.updateTable),
+      where: where(Scrappable.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(Scrappable.t),
+      orderByList: orderByList?.call(Scrappable.t),
+      orderDescending: orderDescending,
+      transaction: transaction,
+    );
+  }
+
   /// Deletes all [Scrappable]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
@@ -951,8 +1089,9 @@ class ScrappableAttachRowRepository {
       throw ArgumentError.notNull('scrappable.id');
     }
 
-    var $scrappingBeeExtractRules =
-        scrappingBeeExtractRules.copyWith(scrappableId: scrappable.id);
+    var $scrappingBeeExtractRules = scrappingBeeExtractRules.copyWith(
+      scrappableId: scrappable.id,
+    );
     await session.db.updateRow<_i2.ScrappingBeeExtractLogic>(
       $scrappingBeeExtractRules,
       columns: [_i2.ScrappingBeeExtractLogic.t.scrappableId],
@@ -998,8 +1137,9 @@ class ScrappableAttachRowRepository {
       throw ArgumentError.notNull('referenceTestData.id');
     }
 
-    var $scrappable =
-        scrappable.copyWith(referenceTestDataId: referenceTestData.id);
+    var $scrappable = scrappable.copyWith(
+      referenceTestDataId: referenceTestData.id,
+    );
     await session.db.updateRow<Scrappable>(
       $scrappable,
       columns: [Scrappable.t.referenceTestDataId],
@@ -1045,8 +1185,9 @@ class ScrappableAttachRowRepository {
       throw ArgumentError.notNull('scrappable.id');
     }
 
-    var $scrappableAnalytics =
-        scrappableAnalytics.copyWith(scrappableId: scrappable.id);
+    var $scrappableAnalytics = scrappableAnalytics.copyWith(
+      scrappableId: scrappable.id,
+    );
     await session.db.updateRow<_i5.ScrappableAnalytics>(
       $scrappableAnalytics,
       columns: [_i5.ScrappableAnalytics.t.scrappableId],
@@ -1072,8 +1213,9 @@ class ScrappableDetachRepository {
       throw ArgumentError.notNull('scrappableAnalytics.id');
     }
 
-    var $scrappableAnalytics =
-        scrappableAnalytics.map((e) => e.copyWith(scrappableId: null)).toList();
+    var $scrappableAnalytics = scrappableAnalytics
+        .map((e) => e.copyWith(scrappableId: null))
+        .toList();
     await session.db.update<_i5.ScrappableAnalytics>(
       $scrappableAnalytics,
       columns: [_i5.ScrappableAnalytics.t.scrappableId],
@@ -1107,8 +1249,9 @@ class ScrappableDetachRowRepository {
       throw ArgumentError.notNull('scrappable.id');
     }
 
-    var $$scrappingBeeExtractRules =
-        $scrappingBeeExtractRules.copyWith(scrappableId: null);
+    var $$scrappingBeeExtractRules = $scrappingBeeExtractRules.copyWith(
+      scrappableId: null,
+    );
     await session.db.updateRow<_i2.ScrappingBeeExtractLogic>(
       $$scrappingBeeExtractRules,
       columns: [_i2.ScrappingBeeExtractLogic.t.scrappableId],

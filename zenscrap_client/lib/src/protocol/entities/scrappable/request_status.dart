@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -19,28 +20,29 @@ enum RequestStatus implements _i1.SerializableModel {
   maxConcurrencyExceeded,
   failedAtScrappingBee;
 
-  static RequestStatus fromJson(int index) {
-    switch (index) {
-      case 0:
+  static RequestStatus fromJson(String name) {
+    switch (name) {
+      case 'success':
         return RequestStatus.success;
-      case 1:
+      case 'clientError':
         return RequestStatus.clientError;
-      case 2:
+      case 'serverError':
         return RequestStatus.serverError;
-      case 3:
+      case 'insufficientCredits':
         return RequestStatus.insufficientCredits;
-      case 4:
+      case 'maxConcurrencyExceeded':
         return RequestStatus.maxConcurrencyExceeded;
-      case 5:
+      case 'failedAtScrappingBee':
         return RequestStatus.failedAtScrappingBee;
       default:
         throw ArgumentError(
-            'Value "$index" cannot be converted to "RequestStatus"');
+          'Value "$name" cannot be converted to "RequestStatus"',
+        );
     }
   }
 
   @override
-  int toJson() => index;
+  String toJson() => name;
 
   @override
   String toString() => name;

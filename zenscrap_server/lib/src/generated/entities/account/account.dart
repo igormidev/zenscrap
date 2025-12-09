@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: unnecessary_null_comparison
 
@@ -17,6 +18,7 @@ import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i3;
 import '../../entities/account/api_usage/account_api_usage.dart' as _i4;
 import '../../entities/account/plan_tier.dart' as _i5;
 import '../../entities/account/ai_usage/account_ai_usage.dart' as _i6;
+import 'package:zenscrap_server/src/generated/protocol.dart' as _i7;
 
 abstract class AccountInfo
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -55,19 +57,23 @@ abstract class AccountInfo
   factory AccountInfo.fromJson(Map<String, dynamic> jsonSerialization) {
     return AccountInfo(
       id: jsonSerialization['id'] as int?,
-      scrappables: (jsonSerialization['scrappables'] as List?)
-          ?.map((e) => _i2.Scrappable.fromJson((e as Map<String, dynamic>)))
-          .toList(),
+      scrappables: jsonSerialization['scrappables'] == null
+          ? null
+          : _i7.Protocol().deserialize<List<_i2.Scrappable>>(
+              jsonSerialization['scrappables'],
+            ),
       userInfoId: jsonSerialization['userInfoId'] as int,
       userInfo: jsonSerialization['userInfo'] == null
           ? null
-          : _i3.UserInfo.fromJson(
-              (jsonSerialization['userInfo'] as Map<String, dynamic>)),
+          : _i7.Protocol().deserialize<_i3.UserInfo>(
+              jsonSerialization['userInfo'],
+            ),
       accountApiUsageId: jsonSerialization['accountApiUsageId'] as int,
       accountApiUsage: jsonSerialization['accountApiUsage'] == null
           ? null
-          : _i4.AccountApiUsage.fromJson(
-              (jsonSerialization['accountApiUsage'] as Map<String, dynamic>)),
+          : _i7.Protocol().deserialize<_i4.AccountApiUsage>(
+              jsonSerialization['accountApiUsage'],
+            ),
       planTier: _i5.PlanTier.fromJson((jsonSerialization['planTier'] as int)),
       stripeCustomerId: jsonSerialization['stripeCustomerId'] as String?,
       stripeSubscriptionId:
@@ -76,12 +82,14 @@ abstract class AccountInfo
       subscriptionEndDate: jsonSerialization['subscriptionEndDate'] == null
           ? null
           : _i1.DateTimeJsonExtension.fromJson(
-              jsonSerialization['subscriptionEndDate']),
+              jsonSerialization['subscriptionEndDate'],
+            ),
       accountAIUsageId: jsonSerialization['accountAIUsageId'] as int,
       accountAIUsage: jsonSerialization['accountAIUsage'] == null
           ? null
-          : _i6.AccountAIUsage.fromJson(
-              (jsonSerialization['accountAIUsage'] as Map<String, dynamic>)),
+          : _i7.Protocol().deserialize<_i6.AccountAIUsage>(
+              jsonSerialization['accountAIUsage'],
+            ),
     );
   }
 
@@ -140,6 +148,7 @@ abstract class AccountInfo
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'AccountInfo',
       if (id != null) 'id': id,
       if (scrappables != null)
         'scrappables': scrappables?.toJson(valueToJson: (v) => v.toJson()),
@@ -162,10 +171,12 @@ abstract class AccountInfo
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'AccountInfo',
       if (id != null) 'id': id,
       if (scrappables != null)
-        'scrappables':
-            scrappables?.toJson(valueToJson: (v) => v.toJsonForProtocol()),
+        'scrappables': scrappables?.toJson(
+          valueToJson: (v) => v.toJsonForProtocol(),
+        ),
       'userInfoId': userInfoId,
       if (userInfo != null) 'userInfo': userInfo?.toJsonForProtocol(),
       'accountApiUsageId': accountApiUsageId,
@@ -242,20 +253,20 @@ class _AccountInfoImpl extends AccountInfo {
     required int accountAIUsageId,
     _i6.AccountAIUsage? accountAIUsage,
   }) : super._(
-          id: id,
-          scrappables: scrappables,
-          userInfoId: userInfoId,
-          userInfo: userInfo,
-          accountApiUsageId: accountApiUsageId,
-          accountApiUsage: accountApiUsage,
-          planTier: planTier,
-          stripeCustomerId: stripeCustomerId,
-          stripeSubscriptionId: stripeSubscriptionId,
-          subscriptionStatus: subscriptionStatus,
-          subscriptionEndDate: subscriptionEndDate,
-          accountAIUsageId: accountAIUsageId,
-          accountAIUsage: accountAIUsage,
-        );
+         id: id,
+         scrappables: scrappables,
+         userInfoId: userInfoId,
+         userInfo: userInfo,
+         accountApiUsageId: accountApiUsageId,
+         accountApiUsage: accountApiUsage,
+         planTier: planTier,
+         stripeCustomerId: stripeCustomerId,
+         stripeSubscriptionId: stripeSubscriptionId,
+         subscriptionStatus: subscriptionStatus,
+         subscriptionEndDate: subscriptionEndDate,
+         accountAIUsageId: accountAIUsageId,
+         accountAIUsage: accountAIUsage,
+       );
 
   /// Returns a shallow copy of this [AccountInfo]
   /// with some or all fields replaced by the given arguments.
@@ -282,8 +293,9 @@ class _AccountInfoImpl extends AccountInfo {
           ? scrappables
           : this.scrappables?.map((e0) => e0.copyWith()).toList(),
       userInfoId: userInfoId ?? this.userInfoId,
-      userInfo:
-          userInfo is _i3.UserInfo? ? userInfo : this.userInfo?.copyWith(),
+      userInfo: userInfo is _i3.UserInfo?
+          ? userInfo
+          : this.userInfo?.copyWith(),
       accountApiUsageId: accountApiUsageId ?? this.accountApiUsageId,
       accountApiUsage: accountApiUsage is _i4.AccountApiUsage?
           ? accountApiUsage
@@ -309,8 +321,58 @@ class _AccountInfoImpl extends AccountInfo {
   }
 }
 
+class AccountInfoUpdateTable extends _i1.UpdateTable<AccountInfoTable> {
+  AccountInfoUpdateTable(super.table);
+
+  _i1.ColumnValue<int, int> userInfoId(int value) => _i1.ColumnValue(
+    table.userInfoId,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> accountApiUsageId(int value) => _i1.ColumnValue(
+    table.accountApiUsageId,
+    value,
+  );
+
+  _i1.ColumnValue<_i5.PlanTier, _i5.PlanTier> planTier(_i5.PlanTier value) =>
+      _i1.ColumnValue(
+        table.planTier,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> stripeCustomerId(String? value) =>
+      _i1.ColumnValue(
+        table.stripeCustomerId,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> stripeSubscriptionId(String? value) =>
+      _i1.ColumnValue(
+        table.stripeSubscriptionId,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> subscriptionStatus(String? value) =>
+      _i1.ColumnValue(
+        table.subscriptionStatus,
+        value,
+      );
+
+  _i1.ColumnValue<DateTime, DateTime> subscriptionEndDate(DateTime? value) =>
+      _i1.ColumnValue(
+        table.subscriptionEndDate,
+        value,
+      );
+
+  _i1.ColumnValue<int, int> accountAIUsageId(int value) => _i1.ColumnValue(
+    table.accountAIUsageId,
+    value,
+  );
+}
+
 class AccountInfoTable extends _i1.Table<int?> {
   AccountInfoTable({super.tableRelation}) : super(tableName: 'account_info') {
+    updateTable = AccountInfoUpdateTable(this);
     userInfoId = _i1.ColumnInt(
       'userInfoId',
       this,
@@ -345,6 +407,8 @@ class AccountInfoTable extends _i1.Table<int?> {
       this,
     );
   }
+
+  late final AccountInfoUpdateTable updateTable;
 
   _i2.ScrappableTable? ___scrappables;
 
@@ -437,23 +501,24 @@ class AccountInfoTable extends _i1.Table<int?> {
     _scrappables = _i1.ManyRelation<_i2.ScrappableTable>(
       tableWithRelations: relationTable,
       table: _i2.ScrappableTable(
-          tableRelation: relationTable.tableRelation!.lastRelation),
+        tableRelation: relationTable.tableRelation!.lastRelation,
+      ),
     );
     return _scrappables!;
   }
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        userInfoId,
-        accountApiUsageId,
-        planTier,
-        stripeCustomerId,
-        stripeSubscriptionId,
-        subscriptionStatus,
-        subscriptionEndDate,
-        accountAIUsageId,
-      ];
+    id,
+    userInfoId,
+    accountApiUsageId,
+    planTier,
+    stripeCustomerId,
+    stripeSubscriptionId,
+    subscriptionStatus,
+    subscriptionEndDate,
+    accountAIUsageId,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -496,11 +561,11 @@ class AccountInfoInclude extends _i1.IncludeObject {
 
   @override
   Map<String, _i1.Include?> get includes => {
-        'scrappables': _scrappables,
-        'userInfo': _userInfo,
-        'accountApiUsage': _accountApiUsage,
-        'accountAIUsage': _accountAIUsage,
-      };
+    'scrappables': _scrappables,
+    'userInfo': _userInfo,
+    'accountApiUsage': _accountApiUsage,
+    'accountAIUsage': _accountAIUsage,
+  };
 
   @override
   _i1.Table<int?> get table => AccountInfo.t;
@@ -699,6 +764,46 @@ class AccountInfoRepository {
     );
   }
 
+  /// Updates a single [AccountInfo] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<AccountInfo?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<AccountInfoUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<AccountInfo>(
+      id,
+      columnValues: columnValues(AccountInfo.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [AccountInfo]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<AccountInfo>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<AccountInfoUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<AccountInfoTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<AccountInfoTable>? orderBy,
+    _i1.OrderByListBuilder<AccountInfoTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<AccountInfo>(
+      columnValues: columnValues(AccountInfo.t.updateTable),
+      where: where(AccountInfo.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(AccountInfo.t),
+      orderByList: orderByList?.call(AccountInfo.t),
+      orderDescending: orderDescending,
+      transaction: transaction,
+    );
+  }
+
   /// Deletes all [AccountInfo]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
@@ -771,8 +876,9 @@ class AccountInfoAttachRepository {
       throw ArgumentError.notNull('accountInfo.id');
     }
 
-    var $scrappable =
-        scrappable.map((e) => e.copyWith(accountId: accountInfo.id)).toList();
+    var $scrappable = scrappable
+        .map((e) => e.copyWith(accountId: accountInfo.id))
+        .toList();
     await session.db.update<_i2.Scrappable>(
       $scrappable,
       columns: [_i2.Scrappable.t.accountId],
@@ -822,8 +928,9 @@ class AccountInfoAttachRowRepository {
       throw ArgumentError.notNull('accountApiUsage.id');
     }
 
-    var $accountInfo =
-        accountInfo.copyWith(accountApiUsageId: accountApiUsage.id);
+    var $accountInfo = accountInfo.copyWith(
+      accountApiUsageId: accountApiUsage.id,
+    );
     await session.db.updateRow<AccountInfo>(
       $accountInfo,
       columns: [AccountInfo.t.accountApiUsageId],
@@ -846,8 +953,9 @@ class AccountInfoAttachRowRepository {
       throw ArgumentError.notNull('accountAIUsage.id');
     }
 
-    var $accountInfo =
-        accountInfo.copyWith(accountAIUsageId: accountAIUsage.id);
+    var $accountInfo = accountInfo.copyWith(
+      accountAIUsageId: accountAIUsage.id,
+    );
     await session.db.updateRow<AccountInfo>(
       $accountInfo,
       columns: [AccountInfo.t.accountAIUsageId],
@@ -896,8 +1004,9 @@ class AccountInfoDetachRepository {
       throw ArgumentError.notNull('scrappable.id');
     }
 
-    var $scrappable =
-        scrappable.map((e) => e.copyWith(accountId: null)).toList();
+    var $scrappable = scrappable
+        .map((e) => e.copyWith(accountId: null))
+        .toList();
     await session.db.update<_i2.Scrappable>(
       $scrappable,
       columns: [_i2.Scrappable.t.accountId],

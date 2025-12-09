@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: unnecessary_null_comparison
 
@@ -15,6 +16,7 @@ import 'package:serverpod/serverpod.dart' as _i1;
 import '../../../../entities/account/ai_usage/ai_credit_history/monthly_subscription_ai_credit_deposit.dart'
     as _i2;
 import '../../../../entities/account/ai_usage/account_ai_usage.dart' as _i3;
+import 'package:zenscrap_server/src/generated/protocol.dart' as _i4;
 
 abstract class AICreditHistoryItem
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -44,15 +46,16 @@ abstract class AICreditHistoryItem
           jsonSerialization['monthlySubscriptionAICreditDepositId'] as int?,
       monthlySubscriptionAICreditDeposit:
           jsonSerialization['monthlySubscriptionAICreditDeposit'] == null
-              ? null
-              : _i2.MonthlySubscriptionAICreditDeposit.fromJson(
-                  (jsonSerialization['monthlySubscriptionAICreditDeposit']
-                      as Map<String, dynamic>)),
+          ? null
+          : _i4.Protocol().deserialize<_i2.MonthlySubscriptionAICreditDeposit>(
+              jsonSerialization['monthlySubscriptionAICreditDeposit'],
+            ),
       accountAIUsageId: jsonSerialization['accountAIUsageId'] as int,
       accountAIUsage: jsonSerialization['accountAIUsage'] == null
           ? null
-          : _i3.AccountAIUsage.fromJson(
-              (jsonSerialization['accountAIUsage'] as Map<String, dynamic>)),
+          : _i4.Protocol().deserialize<_i3.AccountAIUsage>(
+              jsonSerialization['accountAIUsage'],
+            ),
     );
   }
 
@@ -90,14 +93,15 @@ abstract class AICreditHistoryItem
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'AICreditHistoryItem',
       if (id != null) 'id': id,
       'date': date.toJson(),
       if (monthlySubscriptionAICreditDepositId != null)
         'monthlySubscriptionAICreditDepositId':
             monthlySubscriptionAICreditDepositId,
       if (monthlySubscriptionAICreditDeposit != null)
-        'monthlySubscriptionAICreditDeposit':
-            monthlySubscriptionAICreditDeposit?.toJson(),
+        'monthlySubscriptionAICreditDeposit': monthlySubscriptionAICreditDeposit
+            ?.toJson(),
       'accountAIUsageId': accountAIUsageId,
       if (accountAIUsage != null) 'accountAIUsage': accountAIUsage?.toJson(),
     };
@@ -106,14 +110,15 @@ abstract class AICreditHistoryItem
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'AICreditHistoryItem',
       if (id != null) 'id': id,
       'date': date.toJson(),
       if (monthlySubscriptionAICreditDepositId != null)
         'monthlySubscriptionAICreditDepositId':
             monthlySubscriptionAICreditDepositId,
       if (monthlySubscriptionAICreditDeposit != null)
-        'monthlySubscriptionAICreditDeposit':
-            monthlySubscriptionAICreditDeposit?.toJsonForProtocol(),
+        'monthlySubscriptionAICreditDeposit': monthlySubscriptionAICreditDeposit
+            ?.toJsonForProtocol(),
       'accountAIUsageId': accountAIUsageId,
       if (accountAIUsage != null)
         'accountAIUsage': accountAIUsage?.toJsonForProtocol(),
@@ -122,7 +127,7 @@ abstract class AICreditHistoryItem
 
   static AICreditHistoryItemInclude include({
     _i2.MonthlySubscriptionAICreditDepositInclude?
-        monthlySubscriptionAICreditDeposit,
+    monthlySubscriptionAICreditDeposit,
     _i3.AccountAIUsageInclude? accountAIUsage,
   }) {
     return AICreditHistoryItemInclude._(
@@ -168,15 +173,14 @@ class _AICreditHistoryItemImpl extends AICreditHistoryItem {
     required int accountAIUsageId,
     _i3.AccountAIUsage? accountAIUsage,
   }) : super._(
-          id: id,
-          date: date,
-          monthlySubscriptionAICreditDepositId:
-              monthlySubscriptionAICreditDepositId,
-          monthlySubscriptionAICreditDeposit:
-              monthlySubscriptionAICreditDeposit,
-          accountAIUsageId: accountAIUsageId,
-          accountAIUsage: accountAIUsage,
-        );
+         id: id,
+         date: date,
+         monthlySubscriptionAICreditDepositId:
+             monthlySubscriptionAICreditDepositId,
+         monthlySubscriptionAICreditDeposit: monthlySubscriptionAICreditDeposit,
+         accountAIUsageId: accountAIUsageId,
+         accountAIUsage: accountAIUsage,
+       );
 
   /// Returns a shallow copy of this [AICreditHistoryItem]
   /// with some or all fields replaced by the given arguments.
@@ -195,9 +199,10 @@ class _AICreditHistoryItemImpl extends AICreditHistoryItem {
       date: date ?? this.date,
       monthlySubscriptionAICreditDepositId:
           monthlySubscriptionAICreditDepositId is int?
-              ? monthlySubscriptionAICreditDepositId
-              : this.monthlySubscriptionAICreditDepositId,
-      monthlySubscriptionAICreditDeposit: monthlySubscriptionAICreditDeposit
+          ? monthlySubscriptionAICreditDepositId
+          : this.monthlySubscriptionAICreditDepositId,
+      monthlySubscriptionAICreditDeposit:
+          monthlySubscriptionAICreditDeposit
               is _i2.MonthlySubscriptionAICreditDeposit?
           ? monthlySubscriptionAICreditDeposit
           : this.monthlySubscriptionAICreditDeposit?.copyWith(),
@@ -209,9 +214,31 @@ class _AICreditHistoryItemImpl extends AICreditHistoryItem {
   }
 }
 
+class AICreditHistoryItemUpdateTable
+    extends _i1.UpdateTable<AICreditHistoryItemTable> {
+  AICreditHistoryItemUpdateTable(super.table);
+
+  _i1.ColumnValue<DateTime, DateTime> date(DateTime value) => _i1.ColumnValue(
+    table.date,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> monthlySubscriptionAICreditDepositId(int? value) =>
+      _i1.ColumnValue(
+        table.monthlySubscriptionAICreditDepositId,
+        value,
+      );
+
+  _i1.ColumnValue<int, int> accountAIUsageId(int value) => _i1.ColumnValue(
+    table.accountAIUsageId,
+    value,
+  );
+}
+
 class AICreditHistoryItemTable extends _i1.Table<int?> {
   AICreditHistoryItemTable({super.tableRelation})
-      : super(tableName: 'ai_credit_history_item') {
+    : super(tableName: 'ai_credit_history_item') {
+    updateTable = AICreditHistoryItemUpdateTable(this);
     date = _i1.ColumnDateTime(
       'date',
       this,
@@ -226,19 +253,21 @@ class AICreditHistoryItemTable extends _i1.Table<int?> {
     );
   }
 
+  late final AICreditHistoryItemUpdateTable updateTable;
+
   late final _i1.ColumnDateTime date;
 
   late final _i1.ColumnInt monthlySubscriptionAICreditDepositId;
 
   _i2.MonthlySubscriptionAICreditDepositTable?
-      _monthlySubscriptionAICreditDeposit;
+  _monthlySubscriptionAICreditDeposit;
 
   late final _i1.ColumnInt accountAIUsageId;
 
   _i3.AccountAIUsageTable? _accountAIUsage;
 
   _i2.MonthlySubscriptionAICreditDepositTable
-      get monthlySubscriptionAICreditDeposit {
+  get monthlySubscriptionAICreditDeposit {
     if (_monthlySubscriptionAICreditDeposit != null)
       return _monthlySubscriptionAICreditDeposit!;
     _monthlySubscriptionAICreditDeposit = _i1.createRelationTable(
@@ -248,7 +277,8 @@ class AICreditHistoryItemTable extends _i1.Table<int?> {
       tableRelation: tableRelation,
       createTable: (foreignTableRelation) =>
           _i2.MonthlySubscriptionAICreditDepositTable(
-              tableRelation: foreignTableRelation),
+            tableRelation: foreignTableRelation,
+          ),
     );
     return _monthlySubscriptionAICreditDeposit!;
   }
@@ -268,11 +298,11 @@ class AICreditHistoryItemTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        date,
-        monthlySubscriptionAICreditDepositId,
-        accountAIUsageId,
-      ];
+    id,
+    date,
+    monthlySubscriptionAICreditDepositId,
+    accountAIUsageId,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -289,7 +319,7 @@ class AICreditHistoryItemTable extends _i1.Table<int?> {
 class AICreditHistoryItemInclude extends _i1.IncludeObject {
   AICreditHistoryItemInclude._({
     _i2.MonthlySubscriptionAICreditDepositInclude?
-        monthlySubscriptionAICreditDeposit,
+    monthlySubscriptionAICreditDeposit,
     _i3.AccountAIUsageInclude? accountAIUsage,
   }) {
     _monthlySubscriptionAICreditDeposit = monthlySubscriptionAICreditDeposit;
@@ -297,16 +327,15 @@ class AICreditHistoryItemInclude extends _i1.IncludeObject {
   }
 
   _i2.MonthlySubscriptionAICreditDepositInclude?
-      _monthlySubscriptionAICreditDeposit;
+  _monthlySubscriptionAICreditDeposit;
 
   _i3.AccountAIUsageInclude? _accountAIUsage;
 
   @override
   Map<String, _i1.Include?> get includes => {
-        'monthlySubscriptionAICreditDeposit':
-            _monthlySubscriptionAICreditDeposit,
-        'accountAIUsage': _accountAIUsage,
-      };
+    'monthlySubscriptionAICreditDeposit': _monthlySubscriptionAICreditDeposit,
+    'accountAIUsage': _accountAIUsage,
+  };
 
   @override
   _i1.Table<int?> get table => AICreditHistoryItem.t;
@@ -501,6 +530,48 @@ class AICreditHistoryItemRepository {
     );
   }
 
+  /// Updates a single [AICreditHistoryItem] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<AICreditHistoryItem?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<AICreditHistoryItemUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<AICreditHistoryItem>(
+      id,
+      columnValues: columnValues(AICreditHistoryItem.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [AICreditHistoryItem]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<AICreditHistoryItem>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<AICreditHistoryItemUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<AICreditHistoryItemTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<AICreditHistoryItemTable>? orderBy,
+    _i1.OrderByListBuilder<AICreditHistoryItemTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<AICreditHistoryItem>(
+      columnValues: columnValues(AICreditHistoryItem.t.updateTable),
+      where: where(AICreditHistoryItem.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(AICreditHistoryItem.t),
+      orderByList: orderByList?.call(AICreditHistoryItem.t),
+      orderDescending: orderDescending,
+      transaction: transaction,
+    );
+  }
+
   /// Deletes all [AICreditHistoryItem]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
@@ -574,8 +645,9 @@ class AICreditHistoryItemAttachRowRepository {
     }
 
     var $aICreditHistoryItem = aICreditHistoryItem.copyWith(
-        monthlySubscriptionAICreditDepositId:
-            monthlySubscriptionAICreditDeposit.id);
+      monthlySubscriptionAICreditDepositId:
+          monthlySubscriptionAICreditDeposit.id,
+    );
     await session.db.updateRow<AICreditHistoryItem>(
       $aICreditHistoryItem,
       columns: [AICreditHistoryItem.t.monthlySubscriptionAICreditDepositId],
@@ -598,8 +670,9 @@ class AICreditHistoryItemAttachRowRepository {
       throw ArgumentError.notNull('accountAIUsage.id');
     }
 
-    var $aICreditHistoryItem =
-        aICreditHistoryItem.copyWith(accountAIUsageId: accountAIUsage.id);
+    var $aICreditHistoryItem = aICreditHistoryItem.copyWith(
+      accountAIUsageId: accountAIUsage.id,
+    );
     await session.db.updateRow<AICreditHistoryItem>(
       $aICreditHistoryItem,
       columns: [AICreditHistoryItem.t.accountAIUsageId],
@@ -618,17 +691,18 @@ class AICreditHistoryItemDetachRowRepository {
   /// the related record.
   Future<void> monthlySubscriptionAICreditDeposit(
     _i1.Session session,
-    AICreditHistoryItem aicredithistoryitem, {
+    AICreditHistoryItem aICreditHistoryItem, {
     _i1.Transaction? transaction,
   }) async {
-    if (aicredithistoryitem.id == null) {
-      throw ArgumentError.notNull('aicredithistoryitem.id');
+    if (aICreditHistoryItem.id == null) {
+      throw ArgumentError.notNull('aICreditHistoryItem.id');
     }
 
-    var $aicredithistoryitem = aicredithistoryitem.copyWith(
-        monthlySubscriptionAICreditDepositId: null);
+    var $aICreditHistoryItem = aICreditHistoryItem.copyWith(
+      monthlySubscriptionAICreditDepositId: null,
+    );
     await session.db.updateRow<AICreditHistoryItem>(
-      $aicredithistoryitem,
+      $aICreditHistoryItem,
       columns: [AICreditHistoryItem.t.monthlySubscriptionAICreditDepositId],
       transaction: transaction,
     );

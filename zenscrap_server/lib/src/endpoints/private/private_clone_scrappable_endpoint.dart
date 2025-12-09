@@ -1,4 +1,5 @@
 import 'package:serverpod/serverpod.dart';
+import 'package:serverpod_auth_server/serverpod_auth_server.dart';
 import 'package:zenscrap_server/src/core/default_classes.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
@@ -10,7 +11,7 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
     Session session, {
     required int scrappableId,
   }) async {
-    final authenticationInfo = await session.authenticated;
+    final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
       throw defaultAuthenticationException;
     }

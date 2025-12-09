@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:serverpod_auth_server/serverpod_auth_server.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/core/consts.dart';
 import 'package:zenscrap_server/src/core/docs/scrappable_request_structure_guide.dart';
@@ -11,7 +12,7 @@ class CreateScrappableEndpoint extends Endpoint {
     Session session, {
     required String referenceLink,
   }) async* {
-    final userId = (await session.authenticated)?.userId;
+    final userId = session.authenticated?.userId;
 
     // Validate scrappable limit for authenticated users
     if (userId != null) {
@@ -42,7 +43,7 @@ class CreateScrappableEndpoint extends Endpoint {
       // Anonymous user - check IP spending limit
       String? clientIpAddress;
       if (session is MethodCallSession) {
-        clientIpAddress = session.httpRequest.remoteIpAddress;
+        clientIpAddress = session.request.connectionInfo.remote.address.toString();
       }
 
       if (clientIpAddress != null) {

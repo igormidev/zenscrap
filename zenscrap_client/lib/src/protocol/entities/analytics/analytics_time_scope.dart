@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -18,26 +19,27 @@ enum AnalyticsTimeScope implements _i1.SerializableModel {
   last7Days,
   last30Days;
 
-  static AnalyticsTimeScope fromJson(int index) {
-    switch (index) {
-      case 0:
+  static AnalyticsTimeScope fromJson(String name) {
+    switch (name) {
+      case 'lastHour':
         return AnalyticsTimeScope.lastHour;
-      case 1:
+      case 'last12Hours':
         return AnalyticsTimeScope.last12Hours;
-      case 2:
+      case 'last24Hours':
         return AnalyticsTimeScope.last24Hours;
-      case 3:
+      case 'last7Days':
         return AnalyticsTimeScope.last7Days;
-      case 4:
+      case 'last30Days':
         return AnalyticsTimeScope.last30Days;
       default:
         throw ArgumentError(
-            'Value "$index" cannot be converted to "AnalyticsTimeScope"');
+          'Value "$name" cannot be converted to "AnalyticsTimeScope"',
+        );
     }
   }
 
   @override
-  int toJson() => index;
+  String toJson() => name;
 
   @override
   String toString() => name;

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/auth/handlers/on_send_reset_email.dart';
 import 'package:zenscrap_server/src/auth/handlers/on_send_validation_email.dart';
@@ -11,7 +12,6 @@ import 'package:zenscrap_server/src/future_calls/monthly_subscription_credits_fu
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as auth;
 import 'package:zenscrap_server/src/endpoints/public/scrappable_chat_session.dart';
 import 'package:zenscrap_server/src/routes/scrappable_api_route.dart';
-import 'package:zenscrap_server/src/web/routes/route_single_page_app.dart';
 import 'package:zenscrap_server/src/webhooks/stripe_webhook.dart';
 import 'src/generated/protocol.dart';
 import 'src/generated/endpoints.dart';
@@ -38,19 +38,19 @@ void run(List<String> args) async {
   pod.webServer
       .addRoute(ScrappableApiRoute(isProd: true), '/api/scrappable/prod');
 
-  // Serve all files in the /static directory
+  // Serve all files in the /static directory using Serverpod 3.0 StaticRoute
   pod.webServer.addRoute(
-    RouteStaticDirectory(serverDirectory: 'static', basePath: '/'),
-    '/static/*',
+    StaticRoute.directory(Directory('web/static')),
+    '/static/**',
   );
 
-  // Setup single page app LAST (catch-all for remaining routes)
+  // Setup single page app using Serverpod 3.0 SpaRoute (catch-all for remaining routes)
   pod.webServer.addRoute(
-    RouteSinglePageApp(
-      serverDirectory: 'app',
-      appRootPath: 'index.html',
+    SpaRoute(
+      Directory('web/app'),
+      fallback: File('web/app/index.html'),
     ),
-    '/*',
+    '/**',
   );
 
   auth.AuthConfig.set(auth.AuthConfig(

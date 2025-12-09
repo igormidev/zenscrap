@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -19,28 +20,29 @@ enum AutoFixSessionStatus implements _i1.SerializableModel {
   exhausted,
   cancelled;
 
-  static AutoFixSessionStatus fromJson(int index) {
-    switch (index) {
-      case 0:
+  static AutoFixSessionStatus fromJson(String name) {
+    switch (name) {
+      case 'pending':
         return AutoFixSessionStatus.pending;
-      case 1:
+      case 'in_progress':
         return AutoFixSessionStatus.in_progress;
-      case 2:
+      case 'success':
         return AutoFixSessionStatus.success;
-      case 3:
+      case 'failed':
         return AutoFixSessionStatus.failed;
-      case 4:
+      case 'exhausted':
         return AutoFixSessionStatus.exhausted;
-      case 5:
+      case 'cancelled':
         return AutoFixSessionStatus.cancelled;
       default:
         throw ArgumentError(
-            'Value "$index" cannot be converted to "AutoFixSessionStatus"');
+          'Value "$name" cannot be converted to "AutoFixSessionStatus"',
+        );
     }
   }
 
   @override
-  int toJson() => index;
+  String toJson() => name;
 
   @override
   String toString() => name;

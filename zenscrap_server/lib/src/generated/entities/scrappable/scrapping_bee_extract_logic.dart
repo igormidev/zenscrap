@@ -7,12 +7,14 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: unnecessary_null_comparison
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../entities/scrappable/scrappable.dart' as _i2;
+import 'package:zenscrap_server/src/generated/protocol.dart' as _i3;
 
 abstract class ScrappingBeeExtractLogic
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -51,14 +53,16 @@ abstract class ScrappingBeeExtractLogic
   }) = _ScrappingBeeExtractLogicImpl;
 
   factory ScrappingBeeExtractLogic.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return ScrappingBeeExtractLogic(
       id: jsonSerialization['id'] as int?,
       scrappableId: jsonSerialization['scrappableId'] as int?,
       scrappable: jsonSerialization['scrappable'] == null
           ? null
-          : _i2.Scrappable.fromJson(
-              (jsonSerialization['scrappable'] as Map<String, dynamic>)),
+          : _i3.Protocol().deserialize<_i2.Scrappable>(
+              jsonSerialization['scrappable'],
+            ),
       extractRules: jsonSerialization['extractRules'] as String,
       jsScenario: jsonSerialization['jsScenario'] as String?,
       renderJs: jsonSerialization['renderJs'] as bool,
@@ -131,6 +135,7 @@ abstract class ScrappingBeeExtractLogic
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ScrappingBeeExtractLogic',
       if (id != null) 'id': id,
       if (scrappableId != null) 'scrappableId': scrappableId,
       if (scrappable != null) 'scrappable': scrappable?.toJson(),
@@ -151,6 +156,7 @@ abstract class ScrappingBeeExtractLogic
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'ScrappingBeeExtractLogic',
       if (id != null) 'id': id,
       if (scrappableId != null) 'scrappableId': scrappableId,
       if (scrappable != null) 'scrappable': scrappable?.toJsonForProtocol(),
@@ -168,8 +174,9 @@ abstract class ScrappingBeeExtractLogic
     };
   }
 
-  static ScrappingBeeExtractLogicInclude include(
-      {_i2.ScrappableInclude? scrappable}) {
+  static ScrappingBeeExtractLogicInclude include({
+    _i2.ScrappableInclude? scrappable,
+  }) {
     return ScrappingBeeExtractLogicInclude._(scrappable: scrappable);
   }
 
@@ -218,21 +225,21 @@ class _ScrappingBeeExtractLogicImpl extends ScrappingBeeExtractLogic {
     String? sessionId,
     bool? customGoogle,
   }) : super._(
-          id: id,
-          scrappableId: scrappableId,
-          scrappable: scrappable,
-          extractRules: extractRules,
-          jsScenario: jsScenario,
-          renderJs: renderJs,
-          wait: wait,
-          waitFor: waitFor,
-          waitBrowser: waitBrowser,
-          premiumProxy: premiumProxy,
-          stealthProxy: stealthProxy,
-          countryCode: countryCode,
-          sessionId: sessionId,
-          customGoogle: customGoogle,
-        );
+         id: id,
+         scrappableId: scrappableId,
+         scrappable: scrappable,
+         extractRules: extractRules,
+         jsScenario: jsScenario,
+         renderJs: renderJs,
+         wait: wait,
+         waitFor: waitFor,
+         waitBrowser: waitBrowser,
+         premiumProxy: premiumProxy,
+         stealthProxy: stealthProxy,
+         countryCode: countryCode,
+         sessionId: sessionId,
+         customGoogle: customGoogle,
+       );
 
   /// Returns a shallow copy of this [ScrappingBeeExtractLogic]
   /// with some or all fields replaced by the given arguments.
@@ -275,9 +282,75 @@ class _ScrappingBeeExtractLogicImpl extends ScrappingBeeExtractLogic {
   }
 }
 
+class ScrappingBeeExtractLogicUpdateTable
+    extends _i1.UpdateTable<ScrappingBeeExtractLogicTable> {
+  ScrappingBeeExtractLogicUpdateTable(super.table);
+
+  _i1.ColumnValue<int, int> scrappableId(int? value) => _i1.ColumnValue(
+    table.scrappableId,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> extractRules(String value) => _i1.ColumnValue(
+    table.extractRules,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> jsScenario(String? value) => _i1.ColumnValue(
+    table.jsScenario,
+    value,
+  );
+
+  _i1.ColumnValue<bool, bool> renderJs(bool value) => _i1.ColumnValue(
+    table.renderJs,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> wait(int? value) => _i1.ColumnValue(
+    table.wait,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> waitFor(String? value) => _i1.ColumnValue(
+    table.waitFor,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> waitBrowser(String? value) => _i1.ColumnValue(
+    table.waitBrowser,
+    value,
+  );
+
+  _i1.ColumnValue<bool, bool> premiumProxy(bool value) => _i1.ColumnValue(
+    table.premiumProxy,
+    value,
+  );
+
+  _i1.ColumnValue<bool, bool> stealthProxy(bool value) => _i1.ColumnValue(
+    table.stealthProxy,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> countryCode(String? value) => _i1.ColumnValue(
+    table.countryCode,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> sessionId(String? value) => _i1.ColumnValue(
+    table.sessionId,
+    value,
+  );
+
+  _i1.ColumnValue<bool, bool> customGoogle(bool? value) => _i1.ColumnValue(
+    table.customGoogle,
+    value,
+  );
+}
+
 class ScrappingBeeExtractLogicTable extends _i1.Table<int?> {
   ScrappingBeeExtractLogicTable({super.tableRelation})
-      : super(tableName: 'scrapping_bee_extract_logic') {
+    : super(tableName: 'scrapping_bee_extract_logic') {
+    updateTable = ScrappingBeeExtractLogicUpdateTable(this);
     scrappableId = _i1.ColumnInt(
       'scrappableId',
       this,
@@ -328,6 +401,8 @@ class ScrappingBeeExtractLogicTable extends _i1.Table<int?> {
     );
   }
 
+  late final ScrappingBeeExtractLogicUpdateTable updateTable;
+
   late final _i1.ColumnInt scrappableId;
 
   _i2.ScrappableTable? _scrappable;
@@ -369,20 +444,20 @@ class ScrappingBeeExtractLogicTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        scrappableId,
-        extractRules,
-        jsScenario,
-        renderJs,
-        wait,
-        waitFor,
-        waitBrowser,
-        premiumProxy,
-        stealthProxy,
-        countryCode,
-        sessionId,
-        customGoogle,
-      ];
+    id,
+    scrappableId,
+    extractRules,
+    jsScenario,
+    renderJs,
+    wait,
+    waitFor,
+    waitBrowser,
+    premiumProxy,
+    stealthProxy,
+    countryCode,
+    sessionId,
+    customGoogle,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -596,6 +671,48 @@ class ScrappingBeeExtractLogicRepository {
     );
   }
 
+  /// Updates a single [ScrappingBeeExtractLogic] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<ScrappingBeeExtractLogic?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<ScrappingBeeExtractLogicUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<ScrappingBeeExtractLogic>(
+      id,
+      columnValues: columnValues(ScrappingBeeExtractLogic.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [ScrappingBeeExtractLogic]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<ScrappingBeeExtractLogic>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<ScrappingBeeExtractLogicUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<ScrappingBeeExtractLogicTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<ScrappingBeeExtractLogicTable>? orderBy,
+    _i1.OrderByListBuilder<ScrappingBeeExtractLogicTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<ScrappingBeeExtractLogic>(
+      columnValues: columnValues(ScrappingBeeExtractLogic.t.updateTable),
+      where: where(ScrappingBeeExtractLogic.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(ScrappingBeeExtractLogic.t),
+      orderByList: orderByList?.call(ScrappingBeeExtractLogic.t),
+      orderDescending: orderDescending,
+      transaction: transaction,
+    );
+  }
+
   /// Deletes all [ScrappingBeeExtractLogic]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
@@ -668,8 +785,9 @@ class ScrappingBeeExtractLogicAttachRowRepository {
       throw ArgumentError.notNull('scrappable.id');
     }
 
-    var $scrappingBeeExtractLogic =
-        scrappingBeeExtractLogic.copyWith(scrappableId: scrappable.id);
+    var $scrappingBeeExtractLogic = scrappingBeeExtractLogic.copyWith(
+      scrappableId: scrappable.id,
+    );
     await session.db.updateRow<ScrappingBeeExtractLogic>(
       $scrappingBeeExtractLogic,
       columns: [ScrappingBeeExtractLogic.t.scrappableId],
@@ -688,17 +806,18 @@ class ScrappingBeeExtractLogicDetachRowRepository {
   /// the related record.
   Future<void> scrappable(
     _i1.Session session,
-    ScrappingBeeExtractLogic scrappingbeeextractlogic, {
+    ScrappingBeeExtractLogic scrappingBeeExtractLogic, {
     _i1.Transaction? transaction,
   }) async {
-    if (scrappingbeeextractlogic.id == null) {
-      throw ArgumentError.notNull('scrappingbeeextractlogic.id');
+    if (scrappingBeeExtractLogic.id == null) {
+      throw ArgumentError.notNull('scrappingBeeExtractLogic.id');
     }
 
-    var $scrappingbeeextractlogic =
-        scrappingbeeextractlogic.copyWith(scrappableId: null);
+    var $scrappingBeeExtractLogic = scrappingBeeExtractLogic.copyWith(
+      scrappableId: null,
+    );
     await session.db.updateRow<ScrappingBeeExtractLogic>(
-      $scrappingbeeextractlogic,
+      $scrappingBeeExtractLogic,
       columns: [ScrappingBeeExtractLogic.t.scrappableId],
       transaction: transaction,
     );

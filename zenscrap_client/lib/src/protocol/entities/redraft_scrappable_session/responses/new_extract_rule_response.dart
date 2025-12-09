@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 part of '../chat_response.dart';
 
@@ -27,22 +28,26 @@ abstract class NewExtractRuleResponse extends _i1.ChatResponse
     required String messageText,
     required _i5.ReferenceTestData referenceTestData,
     required _i4.ScrappingBeeExtractLogic scrappingBeeExtractLogic,
-    required _i6.ScrappableRequest scrapperRequest,
+    required _i7.ScrappableRequest scrapperRequest,
   }) = _NewExtractRuleResponseImpl;
 
   factory NewExtractRuleResponse.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return NewExtractRuleResponse(
       role: _i3.PromptRole.fromJson((jsonSerialization['role'] as String)),
       expectsFollowUp: jsonSerialization['expectsFollowUp'] as bool,
       messageText: jsonSerialization['messageText'] as String,
-      referenceTestData: _i5.ReferenceTestData.fromJson(
-          (jsonSerialization['referenceTestData'] as Map<String, dynamic>)),
-      scrappingBeeExtractLogic: _i4.ScrappingBeeExtractLogic.fromJson(
-          (jsonSerialization['scrappingBeeExtractLogic']
-              as Map<String, dynamic>)),
-      scrapperRequest: _i6.ScrappableRequest.fromJson(
-          (jsonSerialization['scrapperRequest'] as Map<String, dynamic>)),
+      referenceTestData: _i6.Protocol().deserialize<_i5.ReferenceTestData>(
+        jsonSerialization['referenceTestData'],
+      ),
+      scrappingBeeExtractLogic: _i6.Protocol()
+          .deserialize<_i4.ScrappingBeeExtractLogic>(
+            jsonSerialization['scrappingBeeExtractLogic'],
+          ),
+      scrapperRequest: _i6.Protocol().deserialize<_i7.ScrappableRequest>(
+        jsonSerialization['scrapperRequest'],
+      ),
     );
   }
 
@@ -52,10 +57,11 @@ abstract class NewExtractRuleResponse extends _i1.ChatResponse
 
   _i4.ScrappingBeeExtractLogic scrappingBeeExtractLogic;
 
-  _i6.ScrappableRequest scrapperRequest;
+  _i7.ScrappableRequest scrapperRequest;
 
   /// Returns a shallow copy of this [NewExtractRuleResponse]
   /// with some or all fields replaced by the given arguments.
+  @override
   @_i2.useResult
   NewExtractRuleResponse copyWith({
     _i3.PromptRole? role,
@@ -63,11 +69,12 @@ abstract class NewExtractRuleResponse extends _i1.ChatResponse
     String? messageText,
     _i5.ReferenceTestData? referenceTestData,
     _i4.ScrappingBeeExtractLogic? scrappingBeeExtractLogic,
-    _i6.ScrappableRequest? scrapperRequest,
+    _i7.ScrappableRequest? scrapperRequest,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'NewExtractRuleResponse',
       'role': role.toJson(),
       'expectsFollowUp': expectsFollowUp,
       'messageText': messageText,
@@ -90,15 +97,15 @@ class _NewExtractRuleResponseImpl extends NewExtractRuleResponse {
     required String messageText,
     required _i5.ReferenceTestData referenceTestData,
     required _i4.ScrappingBeeExtractLogic scrappingBeeExtractLogic,
-    required _i6.ScrappableRequest scrapperRequest,
+    required _i7.ScrappableRequest scrapperRequest,
   }) : super._(
-          role: role,
-          expectsFollowUp: expectsFollowUp,
-          messageText: messageText,
-          referenceTestData: referenceTestData,
-          scrappingBeeExtractLogic: scrappingBeeExtractLogic,
-          scrapperRequest: scrapperRequest,
-        );
+         role: role,
+         expectsFollowUp: expectsFollowUp,
+         messageText: messageText,
+         referenceTestData: referenceTestData,
+         scrappingBeeExtractLogic: scrappingBeeExtractLogic,
+         scrapperRequest: scrapperRequest,
+       );
 
   /// Returns a shallow copy of this [NewExtractRuleResponse]
   /// with some or all fields replaced by the given arguments.
@@ -110,7 +117,7 @@ class _NewExtractRuleResponseImpl extends NewExtractRuleResponse {
     String? messageText,
     _i5.ReferenceTestData? referenceTestData,
     _i4.ScrappingBeeExtractLogic? scrappingBeeExtractLogic,
-    _i6.ScrappableRequest? scrapperRequest,
+    _i7.ScrappableRequest? scrapperRequest,
   }) {
     return NewExtractRuleResponse(
       role: role ?? this.role,

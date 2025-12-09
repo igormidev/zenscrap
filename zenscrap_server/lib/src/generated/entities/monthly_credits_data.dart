@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -20,7 +21,8 @@ abstract class MonthlyCreditsData
 
   factory MonthlyCreditsData.fromJson(Map<String, dynamic> jsonSerialization) {
     return MonthlyCreditsData(
-        accountInfoId: jsonSerialization['accountInfoId'] as int);
+      accountInfoId: jsonSerialization['accountInfoId'] as int,
+    );
   }
 
   int accountInfoId;
@@ -31,12 +33,18 @@ abstract class MonthlyCreditsData
   MonthlyCreditsData copyWith({int? accountInfoId});
   @override
   Map<String, dynamic> toJson() {
-    return {'accountInfoId': accountInfoId};
+    return {
+      '__className__': 'MonthlyCreditsData',
+      'accountInfoId': accountInfoId,
+    };
   }
 
   @override
   Map<String, dynamic> toJsonForProtocol() {
-    return {'accountInfoId': accountInfoId};
+    return {
+      '__className__': 'MonthlyCreditsData',
+      'accountInfoId': accountInfoId,
+    };
   }
 
   @override
@@ -47,7 +55,7 @@ abstract class MonthlyCreditsData
 
 class _MonthlyCreditsDataImpl extends MonthlyCreditsData {
   _MonthlyCreditsDataImpl({required int accountInfoId})
-      : super._(accountInfoId: accountInfoId);
+    : super._(accountInfoId: accountInfoId);
 
   /// Returns a shallow copy of this [MonthlyCreditsData]
   /// with some or all fields replaced by the given arguments.
@@ -55,6 +63,7 @@ class _MonthlyCreditsDataImpl extends MonthlyCreditsData {
   @override
   MonthlyCreditsData copyWith({int? accountInfoId}) {
     return MonthlyCreditsData(
-        accountInfoId: accountInfoId ?? this.accountInfoId);
+      accountInfoId: accountInfoId ?? this.accountInfoId,
+    );
   }
 }

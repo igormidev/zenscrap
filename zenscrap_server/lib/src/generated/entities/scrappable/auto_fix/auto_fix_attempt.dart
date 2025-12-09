@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -33,12 +34,12 @@ abstract class AutoFixAttempt
     int? outputTokens,
     int? reasoningTokens,
     required this.sessionId,
-  })  : succeeded = succeeded ?? false,
-        status = status ?? _i2.AutoFixAttemptStatus.in_progress,
-        costUsd = costUsd ?? 0.0,
-        inputTokens = inputTokens ?? 0,
-        outputTokens = outputTokens ?? 0,
-        reasoningTokens = reasoningTokens ?? 0;
+  }) : succeeded = succeeded ?? false,
+       status = status ?? _i2.AutoFixAttemptStatus.in_progress,
+       costUsd = costUsd ?? 0.0,
+       inputTokens = inputTokens ?? 0,
+       outputTokens = outputTokens ?? 0,
+       reasoningTokens = reasoningTokens ?? 0;
 
   factory AutoFixAttempt({
     int? id,
@@ -63,16 +64,19 @@ abstract class AutoFixAttempt
   factory AutoFixAttempt.fromJson(Map<String, dynamic> jsonSerialization) {
     return AutoFixAttempt(
       id: jsonSerialization['id'] as int?,
-      startedAt:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['startedAt']),
+      startedAt: _i1.DateTimeJsonExtension.fromJson(
+        jsonSerialization['startedAt'],
+      ),
       completedAt: jsonSerialization['completedAt'] == null
           ? null
           : _i1.DateTimeJsonExtension.fromJson(
-              jsonSerialization['completedAt']),
+              jsonSerialization['completedAt'],
+            ),
       attemptNumber: jsonSerialization['attemptNumber'] as int,
       succeeded: jsonSerialization['succeeded'] as bool,
       status: _i2.AutoFixAttemptStatus.fromJson(
-          (jsonSerialization['status'] as int)),
+        (jsonSerialization['status'] as String),
+      ),
       errorMessage: jsonSerialization['errorMessage'] as String?,
       aiThinkingLog: jsonSerialization['aiThinkingLog'] as String?,
       generatedExtractRules:
@@ -155,6 +159,7 @@ abstract class AutoFixAttempt
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'AutoFixAttempt',
       if (id != null) 'id': id,
       'startedAt': startedAt.toJson(),
       if (completedAt != null) 'completedAt': completedAt?.toJson(),
@@ -180,6 +185,7 @@ abstract class AutoFixAttempt
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'AutoFixAttempt',
       if (id != null) 'id': id,
       'startedAt': startedAt.toJson(),
       if (completedAt != null) 'completedAt': completedAt?.toJson(),
@@ -254,24 +260,24 @@ class _AutoFixAttemptImpl extends AutoFixAttempt {
     int? reasoningTokens,
     required int sessionId,
   }) : super._(
-          id: id,
-          startedAt: startedAt,
-          completedAt: completedAt,
-          attemptNumber: attemptNumber,
-          succeeded: succeeded,
-          status: status,
-          errorMessage: errorMessage,
-          aiThinkingLog: aiThinkingLog,
-          generatedExtractRules: generatedExtractRules,
-          generatedJsScenario: generatedJsScenario,
-          validationPassed: validationPassed,
-          validationError: validationError,
-          costUsd: costUsd,
-          inputTokens: inputTokens,
-          outputTokens: outputTokens,
-          reasoningTokens: reasoningTokens,
-          sessionId: sessionId,
-        );
+         id: id,
+         startedAt: startedAt,
+         completedAt: completedAt,
+         attemptNumber: attemptNumber,
+         succeeded: succeeded,
+         status: status,
+         errorMessage: errorMessage,
+         aiThinkingLog: aiThinkingLog,
+         generatedExtractRules: generatedExtractRules,
+         generatedJsScenario: generatedJsScenario,
+         validationPassed: validationPassed,
+         validationError: validationError,
+         costUsd: costUsd,
+         inputTokens: inputTokens,
+         outputTokens: outputTokens,
+         reasoningTokens: reasoningTokens,
+         sessionId: sessionId,
+       );
 
   /// Returns a shallow copy of this [AutoFixAttempt]
   /// with some or all fields replaced by the given arguments.
@@ -304,18 +310,21 @@ class _AutoFixAttemptImpl extends AutoFixAttempt {
       succeeded: succeeded ?? this.succeeded,
       status: status ?? this.status,
       errorMessage: errorMessage is String? ? errorMessage : this.errorMessage,
-      aiThinkingLog:
-          aiThinkingLog is String? ? aiThinkingLog : this.aiThinkingLog,
+      aiThinkingLog: aiThinkingLog is String?
+          ? aiThinkingLog
+          : this.aiThinkingLog,
       generatedExtractRules: generatedExtractRules is String?
           ? generatedExtractRules
           : this.generatedExtractRules,
       generatedJsScenario: generatedJsScenario is String?
           ? generatedJsScenario
           : this.generatedJsScenario,
-      validationPassed:
-          validationPassed is bool? ? validationPassed : this.validationPassed,
-      validationError:
-          validationError is String? ? validationError : this.validationError,
+      validationPassed: validationPassed is bool?
+          ? validationPassed
+          : this.validationPassed,
+      validationError: validationError is String?
+          ? validationError
+          : this.validationError,
       costUsd: costUsd ?? this.costUsd,
       inputTokens: inputTokens ?? this.inputTokens,
       outputTokens: outputTokens ?? this.outputTokens,
@@ -325,9 +334,103 @@ class _AutoFixAttemptImpl extends AutoFixAttempt {
   }
 }
 
+class AutoFixAttemptUpdateTable extends _i1.UpdateTable<AutoFixAttemptTable> {
+  AutoFixAttemptUpdateTable(super.table);
+
+  _i1.ColumnValue<DateTime, DateTime> startedAt(DateTime value) =>
+      _i1.ColumnValue(
+        table.startedAt,
+        value,
+      );
+
+  _i1.ColumnValue<DateTime, DateTime> completedAt(DateTime? value) =>
+      _i1.ColumnValue(
+        table.completedAt,
+        value,
+      );
+
+  _i1.ColumnValue<int, int> attemptNumber(int value) => _i1.ColumnValue(
+    table.attemptNumber,
+    value,
+  );
+
+  _i1.ColumnValue<bool, bool> succeeded(bool value) => _i1.ColumnValue(
+    table.succeeded,
+    value,
+  );
+
+  _i1.ColumnValue<_i2.AutoFixAttemptStatus, _i2.AutoFixAttemptStatus> status(
+    _i2.AutoFixAttemptStatus value,
+  ) => _i1.ColumnValue(
+    table.status,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> errorMessage(String? value) =>
+      _i1.ColumnValue(
+        table.errorMessage,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> aiThinkingLog(String? value) =>
+      _i1.ColumnValue(
+        table.aiThinkingLog,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> generatedExtractRules(String? value) =>
+      _i1.ColumnValue(
+        table.generatedExtractRules,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> generatedJsScenario(String? value) =>
+      _i1.ColumnValue(
+        table.generatedJsScenario,
+        value,
+      );
+
+  _i1.ColumnValue<bool, bool> validationPassed(bool? value) => _i1.ColumnValue(
+    table.validationPassed,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> validationError(String? value) =>
+      _i1.ColumnValue(
+        table.validationError,
+        value,
+      );
+
+  _i1.ColumnValue<double, double> costUsd(double value) => _i1.ColumnValue(
+    table.costUsd,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> inputTokens(int value) => _i1.ColumnValue(
+    table.inputTokens,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> outputTokens(int value) => _i1.ColumnValue(
+    table.outputTokens,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> reasoningTokens(int value) => _i1.ColumnValue(
+    table.reasoningTokens,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> sessionId(int value) => _i1.ColumnValue(
+    table.sessionId,
+    value,
+  );
+}
+
 class AutoFixAttemptTable extends _i1.Table<int?> {
   AutoFixAttemptTable({super.tableRelation})
-      : super(tableName: 'auto_fix_attempt') {
+    : super(tableName: 'auto_fix_attempt') {
+    updateTable = AutoFixAttemptUpdateTable(this);
     startedAt = _i1.ColumnDateTime(
       'startedAt',
       this,
@@ -348,7 +451,7 @@ class AutoFixAttemptTable extends _i1.Table<int?> {
     status = _i1.ColumnEnum(
       'status',
       this,
-      _i1.EnumSerialization.byIndex,
+      _i1.EnumSerialization.byName,
       hasDefault: true,
     );
     errorMessage = _i1.ColumnString(
@@ -401,6 +504,8 @@ class AutoFixAttemptTable extends _i1.Table<int?> {
     );
   }
 
+  late final AutoFixAttemptUpdateTable updateTable;
+
   late final _i1.ColumnDateTime startedAt;
 
   late final _i1.ColumnDateTime completedAt;
@@ -435,24 +540,24 @@ class AutoFixAttemptTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        startedAt,
-        completedAt,
-        attemptNumber,
-        succeeded,
-        status,
-        errorMessage,
-        aiThinkingLog,
-        generatedExtractRules,
-        generatedJsScenario,
-        validationPassed,
-        validationError,
-        costUsd,
-        inputTokens,
-        outputTokens,
-        reasoningTokens,
-        sessionId,
-      ];
+    id,
+    startedAt,
+    completedAt,
+    attemptNumber,
+    succeeded,
+    status,
+    errorMessage,
+    aiThinkingLog,
+    generatedExtractRules,
+    generatedJsScenario,
+    validationPassed,
+    validationError,
+    costUsd,
+    inputTokens,
+    outputTokens,
+    reasoningTokens,
+    sessionId,
+  ];
 }
 
 class AutoFixAttemptInclude extends _i1.IncludeObject {
@@ -640,6 +745,46 @@ class AutoFixAttemptRepository {
     return session.db.updateRow<AutoFixAttempt>(
       row,
       columns: columns?.call(AutoFixAttempt.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [AutoFixAttempt] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<AutoFixAttempt?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<AutoFixAttemptUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<AutoFixAttempt>(
+      id,
+      columnValues: columnValues(AutoFixAttempt.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [AutoFixAttempt]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<AutoFixAttempt>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<AutoFixAttemptUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<AutoFixAttemptTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<AutoFixAttemptTable>? orderBy,
+    _i1.OrderByListBuilder<AutoFixAttemptTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<AutoFixAttempt>(
+      columnValues: columnValues(AutoFixAttempt.t.updateTable),
+      where: where(AutoFixAttempt.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(AutoFixAttempt.t),
+      orderByList: orderByList?.call(AutoFixAttempt.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

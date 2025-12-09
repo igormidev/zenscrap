@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: unnecessary_null_comparison
 
@@ -17,6 +18,7 @@ import '../../../entities/account/account.dart' as _i3;
 import '../../../entities/account/api_usage/api_credit_history/api_credit_history_item.dart'
     as _i4;
 import '../../../entities/account/account_api_key.dart' as _i5;
+import 'package:zenscrap_server/src/generated/protocol.dart' as _i6;
 
 abstract class AccountApiUsage
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -47,19 +49,24 @@ abstract class AccountApiUsage
       creditUsageId: jsonSerialization['creditUsageId'] as int,
       creditUsage: jsonSerialization['creditUsage'] == null
           ? null
-          : _i2.CreditUsage.fromJson(
-              (jsonSerialization['creditUsage'] as Map<String, dynamic>)),
+          : _i6.Protocol().deserialize<_i2.CreditUsage>(
+              jsonSerialization['creditUsage'],
+            ),
       accountInfo: jsonSerialization['accountInfo'] == null
           ? null
-          : _i3.AccountInfo.fromJson(
-              (jsonSerialization['accountInfo'] as Map<String, dynamic>)),
-      history: (jsonSerialization['history'] as List?)
-          ?.map((e) =>
-              _i4.ApiCreditHistoryItem.fromJson((e as Map<String, dynamic>)))
-          .toList(),
-      apiKeys: (jsonSerialization['apiKeys'] as List?)
-          ?.map((e) => _i5.AccountApiKey.fromJson((e as Map<String, dynamic>)))
-          .toList(),
+          : _i6.Protocol().deserialize<_i3.AccountInfo>(
+              jsonSerialization['accountInfo'],
+            ),
+      history: jsonSerialization['history'] == null
+          ? null
+          : _i6.Protocol().deserialize<List<_i4.ApiCreditHistoryItem>>(
+              jsonSerialization['history'],
+            ),
+      apiKeys: jsonSerialization['apiKeys'] == null
+          ? null
+          : _i6.Protocol().deserialize<List<_i5.AccountApiKey>>(
+              jsonSerialization['apiKeys'],
+            ),
     );
   }
 
@@ -100,6 +107,7 @@ abstract class AccountApiUsage
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'AccountApiUsage',
       if (id != null) 'id': id,
       'nanoId': nanoId,
       'creditUsageId': creditUsageId,
@@ -115,6 +123,7 @@ abstract class AccountApiUsage
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'AccountApiUsage',
       if (id != null) 'id': id,
       'nanoId': nanoId,
       'creditUsageId': creditUsageId,
@@ -179,14 +188,14 @@ class _AccountApiUsageImpl extends AccountApiUsage {
     List<_i4.ApiCreditHistoryItem>? history,
     List<_i5.AccountApiKey>? apiKeys,
   }) : super._(
-          id: id,
-          nanoId: nanoId,
-          creditUsageId: creditUsageId,
-          creditUsage: creditUsage,
-          accountInfo: accountInfo,
-          history: history,
-          apiKeys: apiKeys,
-        );
+         id: id,
+         nanoId: nanoId,
+         creditUsageId: creditUsageId,
+         creditUsage: creditUsage,
+         accountInfo: accountInfo,
+         history: history,
+         apiKeys: apiKeys,
+       );
 
   /// Returns a shallow copy of this [AccountApiUsage]
   /// with some or all fields replaced by the given arguments.
@@ -221,9 +230,24 @@ class _AccountApiUsageImpl extends AccountApiUsage {
   }
 }
 
+class AccountApiUsageUpdateTable extends _i1.UpdateTable<AccountApiUsageTable> {
+  AccountApiUsageUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> nanoId(String value) => _i1.ColumnValue(
+    table.nanoId,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> creditUsageId(int value) => _i1.ColumnValue(
+    table.creditUsageId,
+    value,
+  );
+}
+
 class AccountApiUsageTable extends _i1.Table<int?> {
   AccountApiUsageTable({super.tableRelation})
-      : super(tableName: 'account_api_usage') {
+    : super(tableName: 'account_api_usage') {
+    updateTable = AccountApiUsageUpdateTable(this);
     nanoId = _i1.ColumnString(
       'nanoId',
       this,
@@ -233,6 +257,8 @@ class AccountApiUsageTable extends _i1.Table<int?> {
       this,
     );
   }
+
+  late final AccountApiUsageUpdateTable updateTable;
 
   late final _i1.ColumnString nanoId;
 
@@ -315,7 +341,8 @@ class AccountApiUsageTable extends _i1.Table<int?> {
     _history = _i1.ManyRelation<_i4.ApiCreditHistoryItemTable>(
       tableWithRelations: relationTable,
       table: _i4.ApiCreditHistoryItemTable(
-          tableRelation: relationTable.tableRelation!.lastRelation),
+        tableRelation: relationTable.tableRelation!.lastRelation,
+      ),
     );
     return _history!;
   }
@@ -333,17 +360,18 @@ class AccountApiUsageTable extends _i1.Table<int?> {
     _apiKeys = _i1.ManyRelation<_i5.AccountApiKeyTable>(
       tableWithRelations: relationTable,
       table: _i5.AccountApiKeyTable(
-          tableRelation: relationTable.tableRelation!.lastRelation),
+        tableRelation: relationTable.tableRelation!.lastRelation,
+      ),
     );
     return _apiKeys!;
   }
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        nanoId,
-        creditUsageId,
-      ];
+    id,
+    nanoId,
+    creditUsageId,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -386,11 +414,11 @@ class AccountApiUsageInclude extends _i1.IncludeObject {
 
   @override
   Map<String, _i1.Include?> get includes => {
-        'creditUsage': _creditUsage,
-        'accountInfo': _accountInfo,
-        'history': _history,
-        'apiKeys': _apiKeys,
-      };
+    'creditUsage': _creditUsage,
+    'accountInfo': _accountInfo,
+    'history': _history,
+    'apiKeys': _apiKeys,
+  };
 
   @override
   _i1.Table<int?> get table => AccountApiUsage.t;
@@ -589,6 +617,48 @@ class AccountApiUsageRepository {
     );
   }
 
+  /// Updates a single [AccountApiUsage] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<AccountApiUsage?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<AccountApiUsageUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<AccountApiUsage>(
+      id,
+      columnValues: columnValues(AccountApiUsage.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [AccountApiUsage]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<AccountApiUsage>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<AccountApiUsageUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<AccountApiUsageTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<AccountApiUsageTable>? orderBy,
+    _i1.OrderByListBuilder<AccountApiUsageTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<AccountApiUsage>(
+      columnValues: columnValues(AccountApiUsage.t.updateTable),
+      where: where(AccountApiUsage.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(AccountApiUsage.t),
+      orderByList: orderByList?.call(AccountApiUsage.t),
+      orderDescending: orderDescending,
+      transaction: transaction,
+    );
+  }
+
   /// Deletes all [AccountApiUsage]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
@@ -715,8 +785,9 @@ class AccountApiUsageAttachRowRepository {
       throw ArgumentError.notNull('creditUsage.id');
     }
 
-    var $accountApiUsage =
-        accountApiUsage.copyWith(creditUsageId: creditUsage.id);
+    var $accountApiUsage = accountApiUsage.copyWith(
+      creditUsageId: creditUsage.id,
+    );
     await session.db.updateRow<AccountApiUsage>(
       $accountApiUsage,
       columns: [AccountApiUsage.t.creditUsageId],
@@ -739,8 +810,9 @@ class AccountApiUsageAttachRowRepository {
       throw ArgumentError.notNull('accountApiUsage.id');
     }
 
-    var $accountInfo =
-        accountInfo.copyWith(accountApiUsageId: accountApiUsage.id);
+    var $accountInfo = accountInfo.copyWith(
+      accountApiUsageId: accountApiUsage.id,
+    );
     await session.db.updateRow<_i3.AccountInfo>(
       $accountInfo,
       columns: [_i3.AccountInfo.t.accountApiUsageId],
@@ -763,8 +835,9 @@ class AccountApiUsageAttachRowRepository {
       throw ArgumentError.notNull('accountApiUsage.id');
     }
 
-    var $apiCreditHistoryItem =
-        apiCreditHistoryItem.copyWith(accountApiUsageId: accountApiUsage.id);
+    var $apiCreditHistoryItem = apiCreditHistoryItem.copyWith(
+      accountApiUsageId: accountApiUsage.id,
+    );
     await session.db.updateRow<_i4.ApiCreditHistoryItem>(
       $apiCreditHistoryItem,
       columns: [_i4.ApiCreditHistoryItem.t.accountApiUsageId],
@@ -787,8 +860,9 @@ class AccountApiUsageAttachRowRepository {
       throw ArgumentError.notNull('accountApiUsage.id');
     }
 
-    var $accountApiKey =
-        accountApiKey.copyWith(accountApiUsageId: accountApiUsage.id);
+    var $accountApiKey = accountApiKey.copyWith(
+      accountApiUsageId: accountApiUsage.id,
+    );
     await session.db.updateRow<_i5.AccountApiKey>(
       $accountApiKey,
       columns: [_i5.AccountApiKey.t.accountApiUsageId],
@@ -842,8 +916,9 @@ class AccountApiUsageDetachRowRepository {
       throw ArgumentError.notNull('apiCreditHistoryItem.id');
     }
 
-    var $apiCreditHistoryItem =
-        apiCreditHistoryItem.copyWith(accountApiUsageId: null);
+    var $apiCreditHistoryItem = apiCreditHistoryItem.copyWith(
+      accountApiUsageId: null,
+    );
     await session.db.updateRow<_i4.ApiCreditHistoryItem>(
       $apiCreditHistoryItem,
       columns: [_i4.ApiCreditHistoryItem.t.accountApiUsageId],

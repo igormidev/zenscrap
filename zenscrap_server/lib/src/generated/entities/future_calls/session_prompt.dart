@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -56,6 +57,7 @@ abstract class SessionPrompt
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'SessionPrompt',
       'userPrompt': userPrompt,
       'sessionId': sessionId,
       'thinkingSessionId': thinkingSessionId,
@@ -66,6 +68,7 @@ abstract class SessionPrompt
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'SessionPrompt',
       'userPrompt': userPrompt,
       'sessionId': sessionId,
       'thinkingSessionId': thinkingSessionId,
@@ -88,11 +91,11 @@ class _SessionPromptImpl extends SessionPrompt {
     required String thinkingSessionId,
     String? clientIpAddress,
   }) : super._(
-          userPrompt: userPrompt,
-          sessionId: sessionId,
-          thinkingSessionId: thinkingSessionId,
-          clientIpAddress: clientIpAddress,
-        );
+         userPrompt: userPrompt,
+         sessionId: sessionId,
+         thinkingSessionId: thinkingSessionId,
+         clientIpAddress: clientIpAddress,
+       );
 
   /// Returns a shallow copy of this [SessionPrompt]
   /// with some or all fields replaced by the given arguments.
@@ -108,8 +111,9 @@ class _SessionPromptImpl extends SessionPrompt {
       userPrompt: userPrompt ?? this.userPrompt,
       sessionId: sessionId ?? this.sessionId,
       thinkingSessionId: thinkingSessionId ?? this.thinkingSessionId,
-      clientIpAddress:
-          clientIpAddress is String? ? clientIpAddress : this.clientIpAddress,
+      clientIpAddress: clientIpAddress is String?
+          ? clientIpAddress
+          : this.clientIpAddress,
     );
   }
 }

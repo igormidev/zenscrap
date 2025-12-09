@@ -7,12 +7,14 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import '../../../../entities/account/ai_usage/ai_credit_history/monthly_subscription_ai_credit_deposit.dart'
     as _i2;
 import '../../../../entities/account/ai_usage/account_ai_usage.dart' as _i3;
+import 'package:zenscrap_client/src/protocol/protocol.dart' as _i4;
 
 abstract class AICreditHistoryItem implements _i1.SerializableModel {
   AICreditHistoryItem._({
@@ -41,15 +43,16 @@ abstract class AICreditHistoryItem implements _i1.SerializableModel {
           jsonSerialization['monthlySubscriptionAICreditDepositId'] as int?,
       monthlySubscriptionAICreditDeposit:
           jsonSerialization['monthlySubscriptionAICreditDeposit'] == null
-              ? null
-              : _i2.MonthlySubscriptionAICreditDeposit.fromJson(
-                  (jsonSerialization['monthlySubscriptionAICreditDeposit']
-                      as Map<String, dynamic>)),
+          ? null
+          : _i4.Protocol().deserialize<_i2.MonthlySubscriptionAICreditDeposit>(
+              jsonSerialization['monthlySubscriptionAICreditDeposit'],
+            ),
       accountAIUsageId: jsonSerialization['accountAIUsageId'] as int,
       accountAIUsage: jsonSerialization['accountAIUsage'] == null
           ? null
-          : _i3.AccountAIUsage.fromJson(
-              (jsonSerialization['accountAIUsage'] as Map<String, dynamic>)),
+          : _i4.Protocol().deserialize<_i3.AccountAIUsage>(
+              jsonSerialization['accountAIUsage'],
+            ),
     );
   }
 
@@ -82,14 +85,15 @@ abstract class AICreditHistoryItem implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'AICreditHistoryItem',
       if (id != null) 'id': id,
       'date': date.toJson(),
       if (monthlySubscriptionAICreditDepositId != null)
         'monthlySubscriptionAICreditDepositId':
             monthlySubscriptionAICreditDepositId,
       if (monthlySubscriptionAICreditDeposit != null)
-        'monthlySubscriptionAICreditDeposit':
-            monthlySubscriptionAICreditDeposit?.toJson(),
+        'monthlySubscriptionAICreditDeposit': monthlySubscriptionAICreditDeposit
+            ?.toJson(),
       'accountAIUsageId': accountAIUsageId,
       if (accountAIUsage != null) 'accountAIUsage': accountAIUsage?.toJson(),
     };
@@ -112,15 +116,14 @@ class _AICreditHistoryItemImpl extends AICreditHistoryItem {
     required int accountAIUsageId,
     _i3.AccountAIUsage? accountAIUsage,
   }) : super._(
-          id: id,
-          date: date,
-          monthlySubscriptionAICreditDepositId:
-              monthlySubscriptionAICreditDepositId,
-          monthlySubscriptionAICreditDeposit:
-              monthlySubscriptionAICreditDeposit,
-          accountAIUsageId: accountAIUsageId,
-          accountAIUsage: accountAIUsage,
-        );
+         id: id,
+         date: date,
+         monthlySubscriptionAICreditDepositId:
+             monthlySubscriptionAICreditDepositId,
+         monthlySubscriptionAICreditDeposit: monthlySubscriptionAICreditDeposit,
+         accountAIUsageId: accountAIUsageId,
+         accountAIUsage: accountAIUsage,
+       );
 
   /// Returns a shallow copy of this [AICreditHistoryItem]
   /// with some or all fields replaced by the given arguments.
@@ -139,9 +142,10 @@ class _AICreditHistoryItemImpl extends AICreditHistoryItem {
       date: date ?? this.date,
       monthlySubscriptionAICreditDepositId:
           monthlySubscriptionAICreditDepositId is int?
-              ? monthlySubscriptionAICreditDepositId
-              : this.monthlySubscriptionAICreditDepositId,
-      monthlySubscriptionAICreditDeposit: monthlySubscriptionAICreditDeposit
+          ? monthlySubscriptionAICreditDepositId
+          : this.monthlySubscriptionAICreditDepositId,
+      monthlySubscriptionAICreditDeposit:
+          monthlySubscriptionAICreditDeposit
               is _i2.MonthlySubscriptionAICreditDeposit?
           ? monthlySubscriptionAICreditDeposit
           : this.monthlySubscriptionAICreditDeposit?.copyWith(),

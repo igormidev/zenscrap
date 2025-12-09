@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -33,10 +34,12 @@ abstract class AnonymousIpSpending implements _i1.SerializableModel {
       id: jsonSerialization['id'] as int?,
       ipAddress: jsonSerialization['ipAddress'] as String,
       totalSpentUsd: (jsonSerialization['totalSpentUsd'] as num).toDouble(),
-      createdAt:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
+      createdAt: _i1.DateTimeJsonExtension.fromJson(
+        jsonSerialization['createdAt'],
+      ),
       lastUpdatedAt: _i1.DateTimeJsonExtension.fromJson(
-          jsonSerialization['lastUpdatedAt']),
+        jsonSerialization['lastUpdatedAt'],
+      ),
     );
   }
 
@@ -66,6 +69,7 @@ abstract class AnonymousIpSpending implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'AnonymousIpSpending',
       if (id != null) 'id': id,
       'ipAddress': ipAddress,
       'totalSpentUsd': totalSpentUsd,
@@ -90,12 +94,12 @@ class _AnonymousIpSpendingImpl extends AnonymousIpSpending {
     required DateTime createdAt,
     required DateTime lastUpdatedAt,
   }) : super._(
-          id: id,
-          ipAddress: ipAddress,
-          totalSpentUsd: totalSpentUsd,
-          createdAt: createdAt,
-          lastUpdatedAt: lastUpdatedAt,
-        );
+         id: id,
+         ipAddress: ipAddress,
+         totalSpentUsd: totalSpentUsd,
+         createdAt: createdAt,
+         lastUpdatedAt: lastUpdatedAt,
+       );
 
   /// Returns a shallow copy of this [AnonymousIpSpending]
   /// with some or all fields replaced by the given arguments.

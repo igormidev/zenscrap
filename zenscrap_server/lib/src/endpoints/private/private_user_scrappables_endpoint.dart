@@ -1,4 +1,5 @@
 import 'package:serverpod/serverpod.dart';
+import 'package:serverpod_auth_server/serverpod_auth_server.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class PrivateUserScrappablesEndpoint extends Endpoint {
@@ -11,7 +12,7 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
     String? searchQuery,
     List<ScraperCategory>? categories,
   }) async {
-    final userId = (await session.authenticated)?.userId;
+    final userId = session.authenticated?.userId;
     if (userId == null) {
       throw ZenScrapException(
         title: 'User Not Authenticated',
@@ -120,7 +121,7 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
 
   Future<Scrappable> getScrappableById(
       Session session, int scrappableId) async {
-    final userId = (await session.authenticated)?.userId;
+    final userId = session.authenticated?.userId;
     if (userId == null) {
       throw ZenScrapException(
         title: 'User Not Authenticated',

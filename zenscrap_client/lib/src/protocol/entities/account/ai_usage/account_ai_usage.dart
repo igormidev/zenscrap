@@ -7,12 +7,14 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import '../../../entities/account/account.dart' as _i2;
 import '../../../entities/account/ai_usage/ai_credit_history/ai_usage_history_item.dart'
     as _i3;
+import 'package:zenscrap_client/src/protocol/protocol.dart' as _i4;
 
 abstract class AccountAIUsage implements _i1.SerializableModel {
   AccountAIUsage._({
@@ -40,12 +42,14 @@ abstract class AccountAIUsage implements _i1.SerializableModel {
               .toDouble(),
       accountInfo: jsonSerialization['accountInfo'] == null
           ? null
-          : _i2.AccountInfo.fromJson(
-              (jsonSerialization['accountInfo'] as Map<String, dynamic>)),
-      history: (jsonSerialization['history'] as List?)
-          ?.map((e) =>
-              _i3.AICreditHistoryItem.fromJson((e as Map<String, dynamic>)))
-          .toList(),
+          : _i4.Protocol().deserialize<_i2.AccountInfo>(
+              jsonSerialization['accountInfo'],
+            ),
+      history: jsonSerialization['history'] == null
+          ? null
+          : _i4.Protocol().deserialize<List<_i3.AICreditHistoryItem>>(
+              jsonSerialization['history'],
+            ),
     );
   }
 
@@ -75,6 +79,7 @@ abstract class AccountAIUsage implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'AccountAIUsage',
       if (id != null) 'id': id,
       if (userOpenAiApiKey != null) 'userOpenAiApiKey': userOpenAiApiKey,
       'totalDollarsSpentFromTotalInUSD': totalDollarsSpentFromTotalInUSD,
@@ -100,12 +105,12 @@ class _AccountAIUsageImpl extends AccountAIUsage {
     _i2.AccountInfo? accountInfo,
     List<_i3.AICreditHistoryItem>? history,
   }) : super._(
-          id: id,
-          userOpenAiApiKey: userOpenAiApiKey,
-          totalDollarsSpentFromTotalInUSD: totalDollarsSpentFromTotalInUSD,
-          accountInfo: accountInfo,
-          history: history,
-        );
+         id: id,
+         userOpenAiApiKey: userOpenAiApiKey,
+         totalDollarsSpentFromTotalInUSD: totalDollarsSpentFromTotalInUSD,
+         accountInfo: accountInfo,
+         history: history,
+       );
 
   /// Returns a shallow copy of this [AccountAIUsage]
   /// with some or all fields replaced by the given arguments.
@@ -123,7 +128,8 @@ class _AccountAIUsageImpl extends AccountAIUsage {
       userOpenAiApiKey: userOpenAiApiKey is String?
           ? userOpenAiApiKey
           : this.userOpenAiApiKey,
-      totalDollarsSpentFromTotalInUSD: totalDollarsSpentFromTotalInUSD ??
+      totalDollarsSpentFromTotalInUSD:
+          totalDollarsSpentFromTotalInUSD ??
           this.totalDollarsSpentFromTotalInUSD,
       accountInfo: accountInfo is _i2.AccountInfo?
           ? accountInfo

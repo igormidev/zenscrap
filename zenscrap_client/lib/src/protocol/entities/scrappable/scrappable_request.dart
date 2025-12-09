@@ -7,10 +7,12 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import '../../entities/scrappable/scrappable.dart' as _i2;
+import 'package:zenscrap_client/src/protocol/protocol.dart' as _i3;
 
 abstract class ScrappableRequest implements _i1.SerializableModel {
   ScrappableRequest._({
@@ -35,24 +37,21 @@ abstract class ScrappableRequest implements _i1.SerializableModel {
     return ScrappableRequest(
       id: jsonSerialization['id'] as int?,
       url: jsonSerialization['url'] as String,
-      queryParams:
-          (jsonSerialization['queryParams'] as Map).map((k, v) => MapEntry(
-                k as String,
-                v as String?,
-              )),
-      queryParamsNotRelatedToUrl:
-          (jsonSerialization['queryParamsNotRelatedToUrl'] as Map)
-              .map((k, v) => MapEntry(
-                    k as String,
-                    v as String?,
-                  )),
-      pathParams: (jsonSerialization['pathParams'] as List)
-          .map((e) => e as String)
-          .toList(),
+      queryParams: _i3.Protocol().deserialize<Map<String, String?>>(
+        jsonSerialization['queryParams'],
+      ),
+      queryParamsNotRelatedToUrl: _i3.Protocol()
+          .deserialize<Map<String, String?>>(
+            jsonSerialization['queryParamsNotRelatedToUrl'],
+          ),
+      pathParams: _i3.Protocol().deserialize<List<String>>(
+        jsonSerialization['pathParams'],
+      ),
       scrappable: jsonSerialization['scrappable'] == null
           ? null
-          : _i2.Scrappable.fromJson(
-              (jsonSerialization['scrappable'] as Map<String, dynamic>)),
+          : _i3.Protocol().deserialize<_i2.Scrappable>(
+              jsonSerialization['scrappable'],
+            ),
     );
   }
 
@@ -85,6 +84,7 @@ abstract class ScrappableRequest implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ScrappableRequest',
       if (id != null) 'id': id,
       'url': url,
       'queryParams': queryParams.toJson(),
@@ -111,13 +111,13 @@ class _ScrappableRequestImpl extends ScrappableRequest {
     required List<String> pathParams,
     _i2.Scrappable? scrappable,
   }) : super._(
-          id: id,
-          url: url,
-          queryParams: queryParams,
-          queryParamsNotRelatedToUrl: queryParamsNotRelatedToUrl,
-          pathParams: pathParams,
-          scrappable: scrappable,
-        );
+         id: id,
+         url: url,
+         queryParams: queryParams,
+         queryParamsNotRelatedToUrl: queryParamsNotRelatedToUrl,
+         pathParams: pathParams,
+         scrappable: scrappable,
+       );
 
   /// Returns a shallow copy of this [ScrappableRequest]
   /// with some or all fields replaced by the given arguments.
@@ -134,24 +134,28 @@ class _ScrappableRequestImpl extends ScrappableRequest {
     return ScrappableRequest(
       id: id is int? ? id : this.id,
       url: url ?? this.url,
-      queryParams: queryParams ??
-          this.queryParams.map((
-                key0,
-                value0,
-              ) =>
-                  MapEntry(
-                    key0,
-                    value0,
-                  )),
-      queryParamsNotRelatedToUrl: queryParamsNotRelatedToUrl ??
-          this.queryParamsNotRelatedToUrl.map((
-                key0,
-                value0,
-              ) =>
-                  MapEntry(
-                    key0,
-                    value0,
-                  )),
+      queryParams:
+          queryParams ??
+          this.queryParams.map(
+            (
+              key0,
+              value0,
+            ) => MapEntry(
+              key0,
+              value0,
+            ),
+          ),
+      queryParamsNotRelatedToUrl:
+          queryParamsNotRelatedToUrl ??
+          this.queryParamsNotRelatedToUrl.map(
+            (
+              key0,
+              value0,
+            ) => MapEntry(
+              key0,
+              value0,
+            ),
+          ),
       pathParams: pathParams ?? this.pathParams.map((e0) => e0).toList(),
       scrappable: scrappable is _i2.Scrappable?
           ? scrappable

@@ -1,5 +1,5 @@
+import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/core/mixins/api_helper_mixin.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_api.dart';
@@ -8,18 +8,16 @@ import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class StripeWebhookRoute extends Route {
   @override
-  Future<bool> handleCall(Session session, HttpRequest request) async {
+  FutureOr<Result> handleCall(Session session, Request request) async {
     try {
       // Read the request body (Stripe sends JSON)
-      final body = await utf8.decoder.bind(request).join();
+      final body = await request.readAsString();
 
       // Get the Stripe signature header
-      final signature = request.headers.value('stripe-signature');
+      final signature = request.headers['stripe-signature']?.firstOrNull;
       if (signature == null) {
         session.log('Missing Stripe signature header');
-        request.response.statusCode = HttpStatus.badRequest;
-        await request.response.close();
-        return true;
+        return Response.badRequest();
       }
 
       // Verify webhook signature
@@ -29,18 +27,9 @@ class StripeWebhookRoute extends Route {
         secret: StripeConfig.webhookSecret,
       );
 
-      // print(JsonEncoder.withIndent('  ').convert({
-      //   'payload': jsonDecode(body),
-      //   'signature': signature,
-      //   'secret': StripeConfig.webhookSecret,
-      //   'isValid': isValid,
-      // }));
-
       if (!isValid) {
         session.log('Invalid Stripe signature');
-        request.response.statusCode = HttpStatus.forbidden;
-        await request.response.close();
-        return true;
+        return Response.forbidden();
       }
 
       // Parse the event data
@@ -51,9 +40,7 @@ class StripeWebhookRoute extends Route {
 
       if (eventType == null || eventObject == null) {
         session.log('Invalid event structure');
-        request.response.statusCode = HttpStatus.badRequest;
-        await request.response.close();
-        return true;
+        return Response.badRequest();
       }
 
       session.log('Processing Stripe event: $eventType');
@@ -89,14 +76,10 @@ class StripeWebhookRoute extends Route {
       }
 
       // Respond with 200 OK to acknowledge receipt
-      request.response.statusCode = HttpStatus.ok;
-      await request.response.close();
-      return true;
+      return Response.ok();
     } catch (e) {
       session.log('Error processing webhook: $e');
-      request.response.statusCode = HttpStatus.internalServerError;
-      await request.response.close();
-      return true;
+      return Response.internalServerError();
     }
   }
 

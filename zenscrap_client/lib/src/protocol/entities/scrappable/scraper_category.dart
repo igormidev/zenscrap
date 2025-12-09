@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -48,86 +49,87 @@ enum ScraperCategory implements _i1.SerializableModel {
   videos,
   other;
 
-  static ScraperCategory fromJson(int index) {
-    switch (index) {
-      case 0:
+  static ScraperCategory fromJson(String name) {
+    switch (name) {
+      case 'general':
         return ScraperCategory.general;
-      case 1:
+      case 'fitness':
         return ScraperCategory.fitness;
-      case 2:
+      case 'sports':
         return ScraperCategory.sports;
-      case 3:
+      case 'esports':
         return ScraperCategory.esports;
-      case 4:
+      case 'health':
         return ScraperCategory.health;
-      case 5:
+      case 'movies':
         return ScraperCategory.movies;
-      case 6:
+      case 'jobs':
         return ScraperCategory.jobs;
-      case 7:
+      case 'finance':
         return ScraperCategory.finance;
-      case 8:
+      case 'location':
         return ScraperCategory.location;
-      case 9:
+      case 'science':
         return ScraperCategory.science;
-      case 10:
+      case 'gaming':
         return ScraperCategory.gaming;
-      case 11:
+      case 'travel':
         return ScraperCategory.travel;
-      case 12:
+      case 'social_media':
         return ScraperCategory.social_media;
-      case 13:
+      case 'ecommerce':
         return ScraperCategory.ecommerce;
-      case 14:
+      case 'news':
         return ScraperCategory.news;
-      case 15:
+      case 'weather':
         return ScraperCategory.weather;
-      case 16:
+      case 'education':
         return ScraperCategory.education;
-      case 17:
+      case 'music':
         return ScraperCategory.music;
-      case 18:
+      case 'books':
         return ScraperCategory.books;
-      case 19:
+      case 'comics':
         return ScraperCategory.comics;
-      case 20:
+      case 'anime':
         return ScraperCategory.anime;
-      case 21:
+      case 'real_estate':
         return ScraperCategory.real_estate;
-      case 22:
+      case 'food':
         return ScraperCategory.food;
-      case 23:
+      case 'fashion':
         return ScraperCategory.fashion;
-      case 24:
+      case 'security':
         return ScraperCategory.security;
-      case 25:
+      case 'ai':
         return ScraperCategory.ai;
-      case 26:
+      case 'seo':
         return ScraperCategory.seo;
-      case 27:
+      case 'lead_generation':
         return ScraperCategory.lead_generation;
-      case 28:
+      case 'developer_tools':
         return ScraperCategory.developer_tools;
-      case 29:
+      case 'automotive':
         return ScraperCategory.automotive;
-      case 30:
+      case 'government':
         return ScraperCategory.government;
-      case 31:
+      case 'cryptocurrency':
         return ScraperCategory.cryptocurrency;
-      case 32:
+      case 'images':
         return ScraperCategory.images;
-      case 33:
+      case 'videos':
         return ScraperCategory.videos;
-      case 34:
+      case 'other':
         return ScraperCategory.other;
       default:
         throw ArgumentError(
-            'Value "$index" cannot be converted to "ScraperCategory"');
+          'Value "$name" cannot be converted to "ScraperCategory"',
+        );
     }
   }
 
   @override
-  int toJson() => index;
+  String toJson() => name;
 
   @override
   String toString() => name;

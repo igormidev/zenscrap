@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 part of '../chat_response.dart';
 
@@ -31,7 +32,8 @@ abstract class CreditLimitReachedResponse extends _i1.ChatResponse
   }) = _CreditLimitReachedResponseImpl;
 
   factory CreditLimitReachedResponse.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return CreditLimitReachedResponse(
       role: _i3.PromptRole.fromJson((jsonSerialization['role'] as String)),
       expectsFollowUp: jsonSerialization['expectsFollowUp'] as bool,
@@ -52,6 +54,7 @@ abstract class CreditLimitReachedResponse extends _i1.ChatResponse
 
   /// Returns a shallow copy of this [CreditLimitReachedResponse]
   /// with some or all fields replaced by the given arguments.
+  @override
   @_i2.useResult
   CreditLimitReachedResponse copyWith({
     _i3.PromptRole? role,
@@ -64,6 +67,7 @@ abstract class CreditLimitReachedResponse extends _i1.ChatResponse
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'CreditLimitReachedResponse',
       'role': role.toJson(),
       'expectsFollowUp': expectsFollowUp,
       'messageText': messageText,
@@ -88,13 +92,13 @@ class _CreditLimitReachedResponseImpl extends CreditLimitReachedResponse {
     required double creditsLimit,
     required bool canUseOwnApiKey,
   }) : super._(
-          role: role,
-          expectsFollowUp: expectsFollowUp,
-          messageText: messageText,
-          creditsSpent: creditsSpent,
-          creditsLimit: creditsLimit,
-          canUseOwnApiKey: canUseOwnApiKey,
-        );
+         role: role,
+         expectsFollowUp: expectsFollowUp,
+         messageText: messageText,
+         creditsSpent: creditsSpent,
+         creditsLimit: creditsLimit,
+         canUseOwnApiKey: canUseOwnApiKey,
+       );
 
   /// Returns a shallow copy of this [CreditLimitReachedResponse]
   /// with some or all fields replaced by the given arguments.

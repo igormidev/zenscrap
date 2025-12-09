@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -16,22 +17,23 @@ enum CreditPurchaseOption implements _i1.SerializableModel {
   medium,
   large;
 
-  static CreditPurchaseOption fromJson(int index) {
-    switch (index) {
-      case 0:
+  static CreditPurchaseOption fromJson(String name) {
+    switch (name) {
+      case 'small':
         return CreditPurchaseOption.small;
-      case 1:
+      case 'medium':
         return CreditPurchaseOption.medium;
-      case 2:
+      case 'large':
         return CreditPurchaseOption.large;
       default:
         throw ArgumentError(
-            'Value "$index" cannot be converted to "CreditPurchaseOption"');
+          'Value "$name" cannot be converted to "CreditPurchaseOption"',
+        );
     }
   }
 
   @override
-  int toJson() => index;
+  String toJson() => name;
 
   @override
   String toString() => name;

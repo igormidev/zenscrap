@@ -7,10 +7,12 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import '../../entities/scrappable/scrappable.dart' as _i2;
+import 'package:zenscrap_client/src/protocol/protocol.dart' as _i3;
 
 abstract class ScrappingBeeExtractLogic implements _i1.SerializableModel {
   ScrappingBeeExtractLogic._({
@@ -48,14 +50,16 @@ abstract class ScrappingBeeExtractLogic implements _i1.SerializableModel {
   }) = _ScrappingBeeExtractLogicImpl;
 
   factory ScrappingBeeExtractLogic.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return ScrappingBeeExtractLogic(
       id: jsonSerialization['id'] as int?,
       scrappableId: jsonSerialization['scrappableId'] as int?,
       scrappable: jsonSerialization['scrappable'] == null
           ? null
-          : _i2.Scrappable.fromJson(
-              (jsonSerialization['scrappable'] as Map<String, dynamic>)),
+          : _i3.Protocol().deserialize<_i2.Scrappable>(
+              jsonSerialization['scrappable'],
+            ),
       extractRules: jsonSerialization['extractRules'] as String,
       jsScenario: jsonSerialization['jsScenario'] as String?,
       renderJs: jsonSerialization['renderJs'] as bool,
@@ -123,6 +127,7 @@ abstract class ScrappingBeeExtractLogic implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ScrappingBeeExtractLogic',
       if (id != null) 'id': id,
       if (scrappableId != null) 'scrappableId': scrappableId,
       if (scrappable != null) 'scrappable': scrappable?.toJson(),
@@ -165,21 +170,21 @@ class _ScrappingBeeExtractLogicImpl extends ScrappingBeeExtractLogic {
     String? sessionId,
     bool? customGoogle,
   }) : super._(
-          id: id,
-          scrappableId: scrappableId,
-          scrappable: scrappable,
-          extractRules: extractRules,
-          jsScenario: jsScenario,
-          renderJs: renderJs,
-          wait: wait,
-          waitFor: waitFor,
-          waitBrowser: waitBrowser,
-          premiumProxy: premiumProxy,
-          stealthProxy: stealthProxy,
-          countryCode: countryCode,
-          sessionId: sessionId,
-          customGoogle: customGoogle,
-        );
+         id: id,
+         scrappableId: scrappableId,
+         scrappable: scrappable,
+         extractRules: extractRules,
+         jsScenario: jsScenario,
+         renderJs: renderJs,
+         wait: wait,
+         waitFor: waitFor,
+         waitBrowser: waitBrowser,
+         premiumProxy: premiumProxy,
+         stealthProxy: stealthProxy,
+         countryCode: countryCode,
+         sessionId: sessionId,
+         customGoogle: customGoogle,
+       );
 
   /// Returns a shallow copy of this [ScrappingBeeExtractLogic]
   /// with some or all fields replaced by the given arguments.

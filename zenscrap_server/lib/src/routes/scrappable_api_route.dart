@@ -1,5 +1,5 @@
+import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/core/mixins/api_helper_mixin.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
@@ -10,41 +10,35 @@ class ScrappableApiRoute extends Route with ApiHelperMixin {
   ScrappableApiRoute({required this.isProd});
 
   @override
-  Future<bool> handleCall(Session session, HttpRequest request) async {
+  FutureOr<Result> handleCall(Session session, Request request) async {
     // Only accept POST requests
-    if (request.method != 'POST') {
-      await _sendError(
-        request,
-        HttpStatus.methodNotAllowed,
+    if (request.method != Method.post) {
+      return _sendError(
+        405,
         'Method Not Allowed',
         'Only POST method is allowed',
       );
-      return true;
     }
 
     // Read and parse the request body
-    final body = await utf8.decoder.bind(request).join();
+    final body = await request.readAsString();
     if (body.isEmpty) {
-      await _sendError(
-        request,
-        HttpStatus.badRequest,
+      return _sendError(
+        400,
         'Bad Request',
         'Request body is required',
       );
-      return true;
     }
 
     Map<String, dynamic> requestData;
     try {
       requestData = jsonDecode(body);
     } catch (e) {
-      await _sendError(
-        request,
-        HttpStatus.badRequest,
+      return _sendError(
+        400,
         'Bad Request',
         'Invalid JSON in request body',
       );
-      return true;
     }
 
     // Extract required parameters
@@ -53,24 +47,20 @@ class ScrappableApiRoute extends Route with ApiHelperMixin {
 
     // Validate scrappableId
     if (scrappableId == null || scrappableId is! int) {
-      await _sendError(
-        request,
-        HttpStatus.badRequest,
+      return _sendError(
+        400,
         'Bad Request',
         'scrappableId is required and must be an integer',
       );
-      return true;
     }
 
     // Validate and cast payload
     if (payloadRaw == null || payloadRaw is! Map) {
-      await _sendError(
-        request,
-        HttpStatus.badRequest,
+      return _sendError(
+        400,
         'Bad Request',
         'payload is required and must be an object',
       );
-      return true;
     }
 
     // Cast payload to proper type
@@ -81,13 +71,11 @@ class ScrappableApiRoute extends Route with ApiHelperMixin {
     if (isProd) {
       final apiKeyRaw = requestData['apiKey'];
       if (apiKeyRaw == null || apiKeyRaw is! String || apiKeyRaw.isEmpty) {
-        await _sendError(
-          request,
-          HttpStatus.unauthorized,
+        return _sendError(
+          401,
           'Unauthorized',
           'API key is required for production endpoint',
         );
-        return true;
       }
       apiKey = apiKeyRaw;
     }
@@ -96,46 +84,40 @@ class ScrappableApiRoute extends Route with ApiHelperMixin {
     final result = await callFunc(
       session,
       scrappableId: scrappableId,
-      request: request,
       apiKey: apiKey,
       payload: payload,
     );
-    await result.fold(
-      (Map<String, dynamic> response) async {
+
+    return result.fold(
+      (Map<String, dynamic> response) {
         // Extract data and credits from the response
         final data = response['data'] as Map<String, dynamic>;
         final credits = response['credits'] as Map<String, dynamic>?;
-        await _sendSuccess(request, data, credits);
+        return _sendSuccess(data, credits);
       },
-      (ApiError error) async {
-        await _sendError(
-          request,
+      (ApiError error) {
+        return _sendError(
           switch (error.status) {
-            RequestStatus.success => HttpStatus.ok,
-            RequestStatus.clientError => HttpStatus.badRequest,
-            RequestStatus.serverError => HttpStatus.internalServerError,
-            RequestStatus.insufficientCredits => HttpStatus.paymentRequired,
-            RequestStatus.maxConcurrencyExceeded => HttpStatus.tooManyRequests,
-            RequestStatus.failedAtScrappingBee => HttpStatus.badGateway,
+            RequestStatus.success => 200,
+            RequestStatus.clientError => 400,
+            RequestStatus.serverError => 500,
+            RequestStatus.insufficientCredits => 402,
+            RequestStatus.maxConcurrencyExceeded => 429,
+            RequestStatus.failedAtScrappingBee => 502,
           },
           error.exception.title,
           error.exception.description,
         );
       },
     );
-    return true;
   }
 }
 
-Future<void> _sendError(
-  HttpRequest request,
+Response _sendError(
   int statusCode,
   String title,
   String description,
-) async {
-  request.response.statusCode = statusCode;
-  request.response.headers.contentType = ContentType.json;
-
+) {
   final errorResponse = {
     'error': {
       'title': title,
@@ -144,24 +126,29 @@ Future<void> _sendError(
     },
   };
 
-  request.response.write(jsonEncode(errorResponse));
-  await request.response.close();
+  return Response(
+    statusCode,
+    body: Body.fromString(
+      jsonEncode(errorResponse),
+      mimeType: MimeType.json,
+    ),
+  );
 }
 
-Future<void> _sendSuccess(
-  HttpRequest request,
+Response _sendSuccess(
   Map<String, dynamic> data,
   Map<String, dynamic>? credits,
-) async {
-  request.response.statusCode = HttpStatus.ok;
-  request.response.headers.contentType = ContentType.json;
-
+) {
   final successResponse = <String, dynamic>{
     'success': true,
     'data': data,
     if (credits != null) 'credits': credits,
   };
 
-  request.response.write(jsonEncode(successResponse));
-  await request.response.close();
+  return Response.ok(
+    body: Body.fromString(
+      jsonEncode(successResponse),
+      mimeType: MimeType.json,
+    ),
+  );
 }

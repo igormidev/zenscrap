@@ -7,12 +7,14 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../../../entities/account/api_usage/api_credit_history/api_credit_history_item.dart'
     as _i2;
 import '../../../../entities/marketplace/pagination_metadata.dart' as _i3;
+import 'package:zenscrap_server/src/generated/protocol.dart' as _i4;
 
 abstract class PaginatedApiCreditHistoryResponse
     implements _i1.SerializableModel, _i1.ProtocolSerialization {
@@ -27,14 +29,15 @@ abstract class PaginatedApiCreditHistoryResponse
   }) = _PaginatedApiCreditHistoryResponseImpl;
 
   factory PaginatedApiCreditHistoryResponse.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return PaginatedApiCreditHistoryResponse(
-      data: (jsonSerialization['data'] as List)
-          .map((e) =>
-              _i2.ApiCreditHistoryItem.fromJson((e as Map<String, dynamic>)))
-          .toList(),
-      pagination: _i3.PaginationMetadata.fromJson(
-          (jsonSerialization['pagination'] as Map<String, dynamic>)),
+      data: _i4.Protocol().deserialize<List<_i2.ApiCreditHistoryItem>>(
+        jsonSerialization['data'],
+      ),
+      pagination: _i4.Protocol().deserialize<_i3.PaginationMetadata>(
+        jsonSerialization['pagination'],
+      ),
     );
   }
 
@@ -52,6 +55,7 @@ abstract class PaginatedApiCreditHistoryResponse
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'PaginatedApiCreditHistoryResponse',
       'data': data.toJson(valueToJson: (v) => v.toJson()),
       'pagination': pagination.toJson(),
     };
@@ -60,6 +64,7 @@ abstract class PaginatedApiCreditHistoryResponse
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'PaginatedApiCreditHistoryResponse',
       'data': data.toJson(valueToJson: (v) => v.toJsonForProtocol()),
       'pagination': pagination.toJsonForProtocol(),
     };
@@ -77,9 +82,9 @@ class _PaginatedApiCreditHistoryResponseImpl
     required List<_i2.ApiCreditHistoryItem> data,
     required _i3.PaginationMetadata pagination,
   }) : super._(
-          data: data,
-          pagination: pagination,
-        );
+         data: data,
+         pagination: pagination,
+       );
 
   /// Returns a shallow copy of this [PaginatedApiCreditHistoryResponse]
   /// with some or all fields replaced by the given arguments.

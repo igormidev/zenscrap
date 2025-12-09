@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: unnecessary_null_comparison
 
@@ -14,6 +15,7 @@
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../entities/scrappable/byte_test_data.dart' as _i2;
 import '../../entities/scrappable/scrappable.dart' as _i3;
+import 'package:zenscrap_server/src/generated/protocol.dart' as _i4;
 
 abstract class ReferenceTestData
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -47,12 +49,14 @@ abstract class ReferenceTestData
       byteDataId: jsonSerialization['byteDataId'] as int?,
       byteData: jsonSerialization['byteData'] == null
           ? null
-          : _i2.ByteTestData.fromJson(
-              (jsonSerialization['byteData'] as Map<String, dynamic>)),
+          : _i4.Protocol().deserialize<_i2.ByteTestData>(
+              jsonSerialization['byteData'],
+            ),
       scrappable: jsonSerialization['scrappable'] == null
           ? null
-          : _i3.Scrappable.fromJson(
-              (jsonSerialization['scrappable'] as Map<String, dynamic>)),
+          : _i4.Protocol().deserialize<_i3.Scrappable>(
+              jsonSerialization['scrappable'],
+            ),
     );
   }
 
@@ -93,6 +97,7 @@ abstract class ReferenceTestData
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ReferenceTestData',
       if (id != null) 'id': id,
       'referenceLinkUsed': referenceLinkUsed,
       'referenceQueryParametersJson': referenceQueryParametersJson,
@@ -106,6 +111,7 @@ abstract class ReferenceTestData
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'ReferenceTestData',
       if (id != null) 'id': id,
       'referenceLinkUsed': referenceLinkUsed,
       'referenceQueryParametersJson': referenceQueryParametersJson,
@@ -164,14 +170,14 @@ class _ReferenceTestDataImpl extends ReferenceTestData {
     _i2.ByteTestData? byteData,
     _i3.Scrappable? scrappable,
   }) : super._(
-          id: id,
-          referenceLinkUsed: referenceLinkUsed,
-          referenceQueryParametersJson: referenceQueryParametersJson,
-          scrapResultJson: scrapResultJson,
-          byteDataId: byteDataId,
-          byteData: byteData,
-          scrappable: scrappable,
-        );
+         id: id,
+         referenceLinkUsed: referenceLinkUsed,
+         referenceQueryParametersJson: referenceQueryParametersJson,
+         scrapResultJson: scrapResultJson,
+         byteDataId: byteDataId,
+         byteData: byteData,
+         scrappable: scrappable,
+       );
 
   /// Returns a shallow copy of this [ReferenceTestData]
   /// with some or all fields replaced by the given arguments.
@@ -191,11 +197,13 @@ class _ReferenceTestDataImpl extends ReferenceTestData {
       referenceLinkUsed: referenceLinkUsed ?? this.referenceLinkUsed,
       referenceQueryParametersJson:
           referenceQueryParametersJson ?? this.referenceQueryParametersJson,
-      scrapResultJson:
-          scrapResultJson is String? ? scrapResultJson : this.scrapResultJson,
+      scrapResultJson: scrapResultJson is String?
+          ? scrapResultJson
+          : this.scrapResultJson,
       byteDataId: byteDataId is int? ? byteDataId : this.byteDataId,
-      byteData:
-          byteData is _i2.ByteTestData? ? byteData : this.byteData?.copyWith(),
+      byteData: byteData is _i2.ByteTestData?
+          ? byteData
+          : this.byteData?.copyWith(),
       scrappable: scrappable is _i3.Scrappable?
           ? scrappable
           : this.scrappable?.copyWith(),
@@ -203,9 +211,38 @@ class _ReferenceTestDataImpl extends ReferenceTestData {
   }
 }
 
+class ReferenceTestDataUpdateTable
+    extends _i1.UpdateTable<ReferenceTestDataTable> {
+  ReferenceTestDataUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> referenceLinkUsed(String value) =>
+      _i1.ColumnValue(
+        table.referenceLinkUsed,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> referenceQueryParametersJson(String value) =>
+      _i1.ColumnValue(
+        table.referenceQueryParametersJson,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> scrapResultJson(String? value) =>
+      _i1.ColumnValue(
+        table.scrapResultJson,
+        value,
+      );
+
+  _i1.ColumnValue<int, int> byteDataId(int? value) => _i1.ColumnValue(
+    table.byteDataId,
+    value,
+  );
+}
+
 class ReferenceTestDataTable extends _i1.Table<int?> {
   ReferenceTestDataTable({super.tableRelation})
-      : super(tableName: 'scrappable_test_data') {
+    : super(tableName: 'scrappable_test_data') {
+    updateTable = ReferenceTestDataUpdateTable(this);
     referenceLinkUsed = _i1.ColumnString(
       'referenceLinkUsed',
       this,
@@ -223,6 +260,8 @@ class ReferenceTestDataTable extends _i1.Table<int?> {
       this,
     );
   }
+
+  late final ReferenceTestDataUpdateTable updateTable;
 
   late final _i1.ColumnString referenceLinkUsed;
 
@@ -264,12 +303,12 @@ class ReferenceTestDataTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        referenceLinkUsed,
-        referenceQueryParametersJson,
-        scrapResultJson,
-        byteDataId,
-      ];
+    id,
+    referenceLinkUsed,
+    referenceQueryParametersJson,
+    scrapResultJson,
+    byteDataId,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -298,9 +337,9 @@ class ReferenceTestDataInclude extends _i1.IncludeObject {
 
   @override
   Map<String, _i1.Include?> get includes => {
-        'byteData': _byteData,
-        'scrappable': _scrappable,
-      };
+    'byteData': _byteData,
+    'scrappable': _scrappable,
+  };
 
   @override
   _i1.Table<int?> get table => ReferenceTestData.t;
@@ -495,6 +534,48 @@ class ReferenceTestDataRepository {
     );
   }
 
+  /// Updates a single [ReferenceTestData] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<ReferenceTestData?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<ReferenceTestDataUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<ReferenceTestData>(
+      id,
+      columnValues: columnValues(ReferenceTestData.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [ReferenceTestData]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<ReferenceTestData>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<ReferenceTestDataUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<ReferenceTestDataTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<ReferenceTestDataTable>? orderBy,
+    _i1.OrderByListBuilder<ReferenceTestDataTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<ReferenceTestData>(
+      columnValues: columnValues(ReferenceTestData.t.updateTable),
+      where: where(ReferenceTestData.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(ReferenceTestData.t),
+      orderByList: orderByList?.call(ReferenceTestData.t),
+      orderDescending: orderDescending,
+      transaction: transaction,
+    );
+  }
+
   /// Deletes all [ReferenceTestData]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
@@ -567,8 +648,9 @@ class ReferenceTestDataAttachRowRepository {
       throw ArgumentError.notNull('byteData.id');
     }
 
-    var $referenceTestData =
-        referenceTestData.copyWith(byteDataId: byteData.id);
+    var $referenceTestData = referenceTestData.copyWith(
+      byteDataId: byteData.id,
+    );
     await session.db.updateRow<ReferenceTestData>(
       $referenceTestData,
       columns: [ReferenceTestData.t.byteDataId],
@@ -591,8 +673,9 @@ class ReferenceTestDataAttachRowRepository {
       throw ArgumentError.notNull('referenceTestData.id');
     }
 
-    var $scrappable =
-        scrappable.copyWith(referenceTestDataId: referenceTestData.id);
+    var $scrappable = scrappable.copyWith(
+      referenceTestDataId: referenceTestData.id,
+    );
     await session.db.updateRow<_i3.Scrappable>(
       $scrappable,
       columns: [_i3.Scrappable.t.referenceTestDataId],
@@ -611,16 +694,16 @@ class ReferenceTestDataDetachRowRepository {
   /// the related record.
   Future<void> byteData(
     _i1.Session session,
-    ReferenceTestData referencetestdata, {
+    ReferenceTestData referenceTestData, {
     _i1.Transaction? transaction,
   }) async {
-    if (referencetestdata.id == null) {
-      throw ArgumentError.notNull('referencetestdata.id');
+    if (referenceTestData.id == null) {
+      throw ArgumentError.notNull('referenceTestData.id');
     }
 
-    var $referencetestdata = referencetestdata.copyWith(byteDataId: null);
+    var $referenceTestData = referenceTestData.copyWith(byteDataId: null);
     await session.db.updateRow<ReferenceTestData>(
-      $referencetestdata,
+      $referenceTestData,
       columns: [ReferenceTestData.t.byteDataId],
       transaction: transaction,
     );
@@ -633,19 +716,19 @@ class ReferenceTestDataDetachRowRepository {
   /// the related record.
   Future<void> scrappable(
     _i1.Session session,
-    ReferenceTestData referencetestdata, {
+    ReferenceTestData referenceTestData, {
     _i1.Transaction? transaction,
   }) async {
-    var $scrappable = referencetestdata.scrappable;
+    var $scrappable = referenceTestData.scrappable;
 
     if ($scrappable == null) {
-      throw ArgumentError.notNull('referencetestdata.scrappable');
+      throw ArgumentError.notNull('referenceTestData.scrappable');
     }
     if ($scrappable.id == null) {
-      throw ArgumentError.notNull('referencetestdata.scrappable.id');
+      throw ArgumentError.notNull('referenceTestData.scrappable.id');
     }
-    if (referencetestdata.id == null) {
-      throw ArgumentError.notNull('referencetestdata.id');
+    if (referenceTestData.id == null) {
+      throw ArgumentError.notNull('referenceTestData.id');
     }
 
     var $$scrappable = $scrappable.copyWith(referenceTestDataId: null);
