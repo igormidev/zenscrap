@@ -8,6 +8,12 @@ abstract class ScrapChatSessionState with _$ScrapChatSessionState {
   factory ScrapChatSessionState.blank() = _ScrapChatSessionStateBlank;
   factory ScrapChatSessionState.creatingSessionState() =
       _ScrapChatSessionStateCreatingSessionState;
+  /// State when AI is analyzing the URL and generating scrappable config
+  factory ScrapChatSessionState.creatingScrappable({
+    required String referenceLink,
+    required List<String> thinkingChunks,
+    GroundingMetadataInfo? groundingMetadata,
+  }) = _ScrapChatSessionStateCreatingScrappable;
   factory ScrapChatSessionState.standard({
     required Scrappable data,
     required DateTime testExpirationDate,

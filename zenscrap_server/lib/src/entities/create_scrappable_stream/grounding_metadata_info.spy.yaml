@@ -1,0 +1,4 @@
+class: GroundingMetadataInfo
+fields:
+    searchQueries: List<String>
+    sources: List<GroundingSourceInfo>

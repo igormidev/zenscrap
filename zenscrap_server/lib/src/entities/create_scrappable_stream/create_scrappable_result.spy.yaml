@@ -1,0 +1,5 @@
+class: CreateScrappableResult
+extends: CreateScrappableStreamItem
+fields:
+    scrappable: Scrappable
+    grounding: GroundingMetadataInfo?

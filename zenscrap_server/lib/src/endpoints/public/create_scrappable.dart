@@ -1,12 +1,12 @@
 import 'dart:convert';
-import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/core/docs/scrappable_request_structure_guide.dart';
 import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';
+import 'package:zenscrap_server/src/core/gemini_client.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class CreateScrappableEndpoint extends Endpoint {
-  Stream<Scrappable> call(
+  Stream<CreateScrappableStreamItem> call(
     Session session, {
     required String referenceLink,
   }) async* {
@@ -39,37 +39,8 @@ class CreateScrappableEndpoint extends Endpoint {
       }
     }
 
-    final GenerativeModel geminiModel = GenerativeModel(
-      model: 'gemini-3-pro',
-      apiKey: session.passwords['geminiApiKey']!,
-      systemInstruction: Content.system(
-          'You are a helpful assistant that analyzes URLs and converts them into structured data for API request handling. '
-          'Always return valid JSON with exactly the fields requested, nothing more, nothing less.'),
-      generationConfig:
-          GenerationConfig(responseSchema: createScrappableSchema),
-    );
-    final ChatSession chat = geminiModel.startChat();
-    final GenerateContentResponse result = await chat.sendMessage(
-      Content.text(getPromptToGenerateScrappableTargetRequest(referenceLink)),
-    );
-    var text = result.text;
-    if (text == null || text.isEmpty) {
-      throw ZenScrapException(
-          title: 'Gemini AI could not generate the scrappable data.',
-          description: 'No text was returned from the AI. Try again later.');
-    }
-
-    // Clean up the response in case the AI wrapped it in markdown code blocks
-    text = text.trim();
-    if (text.startsWith('```json')) {
-      text = text.substring(7); // Remove ```json
-    } else if (text.startsWith('```')) {
-      text = text.substring(3); // Remove ```
-    }
-    if (text.endsWith('```')) {
-      text = text.substring(0, text.length - 3); // Remove trailing ```
-    }
-    text = text.trim();
+    // Create GeminiClient and stream the response
+    final geminiClient = GeminiClient(apiKey: session.passwords['geminiApiKey']!);
 
     late final String name;
     late final String description;
@@ -79,64 +50,86 @@ class CreateScrappableEndpoint extends Endpoint {
     late final List<String> pathParams;
     late final Map<String, String> referenceLinkPathParameters;
     late final ScraperCategory category;
+    GroundingMetadata? grounding;
 
     try {
-      final Map<String, dynamic> convertedData =
-          jsonDecode(text) as Map<String, dynamic>;
-      name = convertedData['name'] as String;
-      description = convertedData['description'] as String;
+      await for (final chunk in geminiClient.streamWithSearchAndSchema(
+        prompt: _buildSystemPrompt() + getPromptToGenerateScrappableTargetRequest(referenceLink),
+        responseSchema: createScrappableJsonSchema,
+        thinkingLevel: 'high',
+        onLog: (msg) => session.log(msg),
+      )) {
+        if (chunk.isThinking) {
+          yield CreateScrappableThinkingChunk(thinkingText: chunk.thinkingText!);
+        } else if (chunk.isResult) {
+          final result = chunk.result!;
+          grounding = result.grounding;
 
-      // Extract scrappableRequest nested object
-      final Map<String, dynamic> scrappableRequestData =
-          convertedData['scrappableRequest'] as Map<String, dynamic>;
+          final Map<String, dynamic> convertedData = result.content;
+          name = convertedData['name'] as String;
+          description = convertedData['description'] as String;
 
-      url = scrappableRequestData['url'] as String;
+          // Extract scrappableRequest nested object
+          final Map<String, dynamic> scrappableRequestData =
+              convertedData['scrappableRequest'] as Map<String, dynamic>;
 
-      // Remove the __example__ key if present (it's just for schema validation)
-      final Map<String, dynamic> rawQueryParams = Map<String, dynamic>.from(
-          scrappableRequestData['queryParams'] as Map? ?? {});
-      rawQueryParams.remove('__example__');
-      queryParams = Map<String, String?>.from(rawQueryParams);
+          url = scrappableRequestData['url'] as String;
 
-      // Remove the __example__ key if present (it's just for schema validation)
-      final Map<String, dynamic> rawQueryParamsNotRelatedToUrl =
-          Map<String, dynamic>.from(
-              scrappableRequestData['queryParamsNotRelatedToUrl'] as Map? ??
-                  {});
-      rawQueryParamsNotRelatedToUrl.remove('__example__');
-      queryParamsNotRelatedToUrl =
-          Map<String, String?>.from(rawQueryParamsNotRelatedToUrl);
+          // Remove the __example__ key if present (it's just for schema validation)
+          final Map<String, dynamic> rawQueryParams = Map<String, dynamic>.from(
+              scrappableRequestData['queryParams'] as Map? ?? {});
+          rawQueryParams.remove('__example__');
+          queryParams = Map<String, String?>.from(rawQueryParams);
 
-      pathParams =
-          List<String>.from(scrappableRequestData['pathParams'] as List? ?? []);
+          // Remove the __example__ key if present (it's just for schema validation)
+          final Map<String, dynamic> rawQueryParamsNotRelatedToUrl =
+              Map<String, dynamic>.from(
+                  scrappableRequestData['queryParamsNotRelatedToUrl'] as Map? ??
+                      {});
+          rawQueryParamsNotRelatedToUrl.remove('__example__');
+          queryParamsNotRelatedToUrl =
+              Map<String, String?>.from(rawQueryParamsNotRelatedToUrl);
 
-      // Remove the __example__ key if present (it's just for schema validation)
-      final Map<String, dynamic> rawRefLinkParams = Map<String, dynamic>.from(
-          convertedData['referenceLinkPathParameters'] as Map? ?? {});
-      rawRefLinkParams.remove('__example__');
-      referenceLinkPathParameters = Map<String, String>.from(rawRefLinkParams);
+          pathParams =
+              List<String>.from(scrappableRequestData['pathParams'] as List? ?? []);
 
-      // Parse the category from the AI response
-      final String categoryStr =
-          convertedData['category'] as String? ?? 'general';
-      try {
-        category = ScraperCategory.values.byName(categoryStr);
-      } catch (e) {
-        // If the category doesn't match any enum value, default to general
-        category = ScraperCategory.general;
+          // Remove the __example__ key if present (it's just for schema validation)
+          final Map<String, dynamic> rawRefLinkParams = Map<String, dynamic>.from(
+              convertedData['referenceLinkPathParameters'] as Map? ?? {});
+          rawRefLinkParams.remove('__example__');
+          referenceLinkPathParameters = Map<String, String>.from(rawRefLinkParams);
+
+          // Parse the category from the AI response
+          final String categoryStr =
+              convertedData['category'] as String? ?? 'general';
+          try {
+            category = ScraperCategory.values.byName(categoryStr);
+          } catch (e) {
+            // If the category doesn't match any enum value, default to general
+            category = ScraperCategory.general;
+          }
+        }
       }
+    } on GeminiApiException catch (error, stackTrace) {
+      session.log(
+          'Gemini API error: ${error.message}',
+          level: LogLevel.error,
+          stackTrace: stackTrace);
+      throw ZenScrapException(
+          title: 'AI Generation Failed',
+          description: error.message);
     } catch (error, stackTrace) {
       session.log(
-          'Error decoding JSON from Gemini AI response:\n$error\n\nResponse Text:\n$text',
+          'Error during Gemini streaming:\n$error',
           level: LogLevel.error,
           stackTrace: stackTrace);
       throw ZenScrapException(
           title: 'Gemini AI could not generate the scrappable data.',
-          description:
-              'The returned text was not a valid JSON. Try again later.');
+          description: 'An unexpected error occurred. Try again later.');
     }
 
-    yield await session.db.transaction((transaction) async {
+    // Create the scrappable in the database
+    final scrappable = await session.db.transaction((transaction) async {
       final accountApiUsage = userId == null
           ? null
           : await AccountApiUsage.db.findFirstRow(session,
@@ -216,8 +209,29 @@ class CreateScrappableEndpoint extends Endpoint {
 
       return scrappable;
     });
+
+    // Convert grounding metadata to protocol model
+    GroundingMetadataInfo? groundingInfo;
+    if (grounding != null) {
+      groundingInfo = GroundingMetadataInfo(
+        searchQueries: grounding.searchQueries,
+        sources: grounding.sources
+            .map((s) => GroundingSourceInfo(uri: s.uri, title: s.title))
+            .toList(),
+      );
+    }
+
+    // Yield the final result
+    yield CreateScrappableResult(
+      scrappable: scrappable,
+      grounding: groundingInfo,
+    );
   }
 }
+
+String _buildSystemPrompt() =>
+    'You are a helpful assistant that analyzes URLs and converts them into structured data for API request handling. '
+    'Always return valid JSON with exactly the fields requested, nothing more, nothing less.\n\n';
 
 String getPromptToGenerateScrappableTargetRequest(String url,
         {String? userContext}) =>
@@ -435,7 +449,7 @@ IMPORTANT RULES:
 9. Return raw JSON only - no markdown, no code blocks, no extra text
 
 CATEGORY SELECTION RULES - EXTREMELY IMPORTANT:
-You MUST carefully analyze the URL content and domain to select the MOST SPECIFIC category. 
+You MUST carefully analyze the URL content and domain to select the MOST SPECIFIC category.
 DO NOT default to "general" unless you are 100% certain the URL doesn't fit ANY other category.
 
 Think step by step:
@@ -483,7 +497,7 @@ CATEGORY DESCRIPTIONS (select the MOST APPROPRIATE one):
 
 CATEGORY SELECTION EXAMPLES:
 - github.com/user/repo → "developer_tools"
-- twitter.com/user/status → "social_media"  
+- twitter.com/user/status → "social_media"
 - amazon.com/product/123 → "ecommerce"
 - imdb.com/movie/tt123 → "movies"
 - weather.com/forecast → "weather"
@@ -515,38 +529,27 @@ Use this information to better identify dynamic parameters!
 Return only raw json, without anything more (not even md notations like "```" in the begining... just the raw json).
 ''';
 
-final createScrappableSchema = Schema(
-  SchemaType.object,
-  description:
-      'Schema for Gemini AI to generate structured scrappable configuration from a user-provided URL. '
-      'This schema enforces the AI to analyze a reference URL and extract: '
-      '1) A normalized URL template with path parameters as placeholders (e.g., /posts/{postId}), '
-      '2) Query parameters with their default values from the reference URL, '
-      '3) Query parameters NOT related to the URL (for client-side interactions), '
-      '4) A list of path parameter names that will be dynamically replaced, '
-      '5) The actual values of path parameters from the reference URL for testing purposes, '
-      '6) A human-readable name, description, and category for the scrappable configuration. '
-      'The AI uses intelligent pattern recognition to identify dynamic segments in URLs (like IDs, slugs, usernames) '
-      'and converts them into reusable templates that can accept different values while maintaining the same URL structure.',
-  nullable: false,
-  properties: {
-    'name': Schema(
-      SchemaType.string,
-      nullable: false,
-      description:
+/// JSON Schema for the Gemini REST API structured output
+/// This matches the expected response format for createScrappable
+final Map<String, dynamic> createScrappableJsonSchema = {
+  'type': 'object',
+  'description':
+      'Schema for Gemini AI to generate structured scrappable configuration from a user-provided URL.',
+  'properties': {
+    'name': {
+      'type': 'string',
+      'description':
           'A short name for the scrappable, like "MySocialMedia Posts Comments".',
-    ),
-    'description': Schema(
-      SchemaType.string,
-      nullable: false,
-      description: 'A brief description of what this scrappable is for.',
-    ),
-    'category': Schema(
-      SchemaType.string,
-      nullable: false,
-      description:
-          'The category that best describes the purpose of this scrappable. Must be one of the predefined category values.',
-      enumValues: [
+    },
+    'description': {
+      'type': 'string',
+      'description': 'A brief description of what this scrappable is for.',
+    },
+    'category': {
+      'type': 'string',
+      'description':
+          'The category that best describes the purpose of this scrappable.',
+      'enum': [
         'general',
         'fitness',
         'sports',
@@ -583,75 +586,60 @@ final createScrappableSchema = Schema(
         'videos',
         'other',
       ],
-    ),
-    'scrappableRequest': Schema(
-      SchemaType.object,
-      nullable: false,
-      description:
-          'The scrappable request configuration defining how URLs are constructed and which parameters are available.',
-      properties: {
-        'url': Schema(
-          SchemaType.string,
-          nullable: false,
-          description:
+    },
+    'scrappableRequest': {
+      'type': 'object',
+      'description':
+          'The scrappable request configuration defining how URLs are constructed.',
+      'properties': {
+        'url': {
+          'type': 'string',
+          'description':
               'The URL with path parameters replaced by placeholders in {param} format.',
-        ),
-        'queryParams': Schema(
-          SchemaType.object,
-          nullable: false,
-          description:
-              'Query parameters that will be added to the URL via Uri(queryParameters:). Use this for parameters that actually modify the URL. This is a dynamic map where keys are parameter names and values are their default values (or null for dynamic values).',
-          properties: {
-            '__example__': Schema(
-              SchemaType.string,
-              nullable: true,
-              description:
-                  'This is just an example property to satisfy the schema requirement. The actual properties will be dynamic.',
-            ),
+        },
+        'queryParams': {
+          'type': 'object',
+          'description':
+              'Query parameters that will be added to the URL. Keys are parameter names, values are defaults or null for dynamic.',
+          'additionalProperties': {
+            'type': 'string',
+            'nullable': true,
           },
-        ),
-        'queryParamsNotRelatedToUrl': Schema(
-          SchemaType.object,
-          nullable: false,
-          description:
-              'Dynamic parameters used ONLY in extract_rules/js_scenario placeholders as {paramName}, NOT added to the URL. '
-              'Use this for client-side interactions like search boxes, pagination buttons, filters, form inputs that do NOT modify the URL. '
-              'These parameters will be replaced at runtime when users provide values in their API payload. '
-              'Example: {"searchQuery": null, "currentPage": null} - these will become {searchQuery} and {currentPage} placeholders in js_scenario.',
-          properties: {
-            '__example__': Schema(
-              SchemaType.string,
-              nullable: true,
-              description:
-                  'This is just an example property to satisfy the schema requirement. The actual properties will be dynamic.',
-            ),
+        },
+        'queryParamsNotRelatedToUrl': {
+          'type': 'object',
+          'description':
+              'Dynamic parameters used ONLY in extract_rules/js_scenario placeholders, NOT added to the URL.',
+          'additionalProperties': {
+            'type': 'string',
+            'nullable': true,
           },
-        ),
-        'pathParams': Schema(
-          SchemaType.array,
-          nullable: false,
-          description:
+        },
+        'pathParams': {
+          'type': 'array',
+          'description':
               'The path parameters that will be requested by the user in their payload.',
-          items: Schema(
-            SchemaType.string,
-            nullable: false,
-          ),
-        ),
+          'items': {
+            'type': 'string',
+          },
+        },
       },
-    ),
-    'referenceLinkPathParameters': Schema(
-      SchemaType.object,
-      nullable: false,
-      description:
-          'A JSON representation of the path parameters extracted from the reference link. This is a dynamic map where keys are parameter names and values are their extracted values from the reference URL.',
-      properties: {
-        '__example__': Schema(
-          SchemaType.string,
-          nullable: true,
-          description:
-              'This is just an example property to satisfy the schema requirement. The actual properties will be dynamic based on the URL path parameters.',
-        ),
+      'required': ['url', 'queryParams', 'queryParamsNotRelatedToUrl', 'pathParams'],
+    },
+    'referenceLinkPathParameters': {
+      'type': 'object',
+      'description':
+          'A JSON representation of the path parameters extracted from the reference link.',
+      'additionalProperties': {
+        'type': 'string',
       },
-    ),
+    },
   },
-);
+  'required': [
+    'name',
+    'description',
+    'category',
+    'scrappableRequest',
+    'referenceLinkPathParameters'
+  ],
+};

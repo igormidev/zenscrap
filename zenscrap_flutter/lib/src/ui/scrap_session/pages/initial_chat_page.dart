@@ -6,7 +6,6 @@ import 'package:form_validator/form_validator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 import 'package:simple_platform/simple_platform.dart';
-import 'package:zenscrap_flutter/src/design_system/components/adaptive_progress_indicator.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
@@ -25,7 +24,6 @@ class InitialChatPage extends ConsumerStatefulWidget {
 class _ChatViewPageState extends ConsumerState<InitialChatPage>
     with TickerProviderStateMixin {
   late AnimationController _controller;
-  final ValueNotifier<bool> _isLoading = ValueNotifier(false);
   final _formKey = GlobalKey<FormState>();
   bool _hasStartedUrlInput = false;
   bool _hasStartedPromptInput = false;
@@ -81,8 +79,9 @@ class _ChatViewPageState extends ConsumerState<InitialChatPage>
       promptLength: _promptEC.text.length,
     );
 
-    _isLoading.value = true;
     try {
+      // This will now navigate to the creatingScrappable state which shows
+      // the AI thinking stream view
       await ref.read(scrapChatProvider.notifier).createScrappable(
             targetUrl: targetUrl,
             userPrompt: _promptEC.text,
@@ -100,8 +99,6 @@ class _ChatViewPageState extends ConsumerState<InitialChatPage>
         targetUrl: targetUrl,
         errorMessage: e.toString(),
       );
-    } finally {
-      _isLoading.value = false;
     }
   }
 
@@ -265,30 +262,8 @@ class _ChatViewPageState extends ConsumerState<InitialChatPage>
                       style: FilledButton.styleFrom(
                         iconAlignment: IconAlignment.end,
                       ),
-                      // icon: const Icon(Icons.send),
-                      icon: ValueListenableBuilder(
-                        valueListenable: _isLoading,
-                        builder: (context, isLoading, child) {
-                          if (isLoading) {
-                            return const SizedBox(
-                              height: 20,
-                              child: AdaptiveProgressIndicator(),
-                            );
-                          }
-
-                          return const Icon(Icons.send);
-                        },
-                      ),
-                      label: ValueListenableBuilder(
-                        valueListenable: _isLoading,
-                        builder: (context, isLoading, child) {
-                          if (isLoading) {
-                            return Text('Creating scrappable...');
-                          }
-
-                          return Text('Create scrappable');
-                        },
-                      ),
+                      icon: const Icon(Icons.send),
+                      label: const Text('Create scrappable'),
                     ),
                   ),
                   SizedBox(height: 16),

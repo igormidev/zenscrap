@@ -1,0 +1,4 @@
+class: GroundingSourceInfo
+fields:
+    uri: String
+    title: String

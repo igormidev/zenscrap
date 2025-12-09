@@ -6,7 +6,6 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/serverpod_to_result.dart';
 import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 import 'package:zenscrap_flutter/src/design_system/default_error_snackbar.dart';
-import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_messages_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_state.dart';
@@ -42,23 +41,57 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
     required String targetUrl,
     required String userPrompt,
   }) async {
-    await ref.globalLoadingSetter(() async {
-      final result = await ref
-          .read(clientProvider)
-          .createScrappable(referenceLink: targetUrl)
-          .last
-          .toResult;
+    // Initialize the creating state with empty thinking chunks
+    state = ScrapChatSessionState.creatingScrappable(
+      referenceLink: targetUrl,
+      thinkingChunks: [],
+      groundingMetadata: null,
+    );
 
-      await result.fold(
-        (Scrappable scrappable) async {
-          await createSessionWithScrappable(scrappable);
-          await sendMessage(userPrompt);
-        },
-        (failure) {
-          state = ScrapChatSessionState.withError(error: failure);
-        },
-      );
-    });
+    try {
+      Scrappable? createdScrappable;
+      GroundingMetadataInfo? groundingMetadata;
+
+      await for (final item in ref.read(clientProvider).createScrappable(referenceLink: targetUrl)) {
+        if (item is CreateScrappableThinkingChunk) {
+          // Update state with new thinking chunk
+          state.mapOrNull(creatingScrappable: (current) {
+            state = current.copyWith(
+              thinkingChunks: [...current.thinkingChunks, item.thinkingText],
+            );
+          });
+        } else if (item is CreateScrappableResult) {
+          // Store the final result
+          createdScrappable = item.scrappable;
+          groundingMetadata = item.grounding;
+
+          // Update state with grounding info before transitioning
+          state.mapOrNull(creatingScrappable: (current) {
+            state = current.copyWith(
+              groundingMetadata: groundingMetadata,
+            );
+          });
+        }
+      }
+
+      if (createdScrappable != null) {
+        await createSessionWithScrappable(createdScrappable);
+        await sendMessage(userPrompt);
+      } else {
+        state = ScrapChatSessionState.withError(
+          error: ZenScrapException(
+            title: 'Creation Failed',
+            description: 'No scrappable was created. Please try again.',
+          ),
+        );
+      }
+    } on ZenScrapException catch (e, stackTrace) {
+      talker.handle(e, stackTrace);
+      state = ScrapChatSessionState.withError(error: e);
+    } catch (e, stackTrace) {
+      talker.handle(e, stackTrace);
+      state = ScrapChatSessionState.withError(error: defaultException);
+    }
   }
 
   Future<void> sendMessage(String userPrompt) async {
