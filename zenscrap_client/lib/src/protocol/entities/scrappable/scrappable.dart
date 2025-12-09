@@ -16,7 +16,6 @@ import '../../entities/scrappable/reference_test_data.dart' as _i4;
 import '../../entities/scrappable/scrappable_analytics.dart' as _i5;
 import '../../entities/scrappable/scraper_category.dart' as _i6;
 import '../../entities/scrappable/auto_fix/auto_fix_config.dart' as _i7;
-import '../../entities/scrappable/auto_fix/auto_fix_session.dart' as _i8;
 
 abstract class Scrappable implements _i1.SerializableModel {
   Scrappable._({
@@ -38,7 +37,6 @@ abstract class Scrappable implements _i1.SerializableModel {
     required this.category,
     required this.isDeleted,
     this.autoFixConfig,
-    this.autoFixSessions,
   });
 
   factory Scrappable({
@@ -60,7 +58,6 @@ abstract class Scrappable implements _i1.SerializableModel {
     required _i6.ScraperCategory category,
     required bool isDeleted,
     _i7.AutoFixConfig? autoFixConfig,
-    List<_i8.AutoFixSession>? autoFixSessions,
   }) = _ScrappableImpl;
 
   factory Scrappable.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -109,9 +106,6 @@ abstract class Scrappable implements _i1.SerializableModel {
           ? null
           : _i7.AutoFixConfig.fromJson(
               (jsonSerialization['autoFixConfig'] as Map<String, dynamic>)),
-      autoFixSessions: (jsonSerialization['autoFixSessions'] as List?)
-          ?.map((e) => _i8.AutoFixSession.fromJson((e as Map<String, dynamic>)))
-          .toList(),
     );
   }
 
@@ -154,8 +148,6 @@ abstract class Scrappable implements _i1.SerializableModel {
 
   _i7.AutoFixConfig? autoFixConfig;
 
-  List<_i8.AutoFixSession>? autoFixSessions;
-
   /// Returns a shallow copy of this [Scrappable]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
@@ -178,7 +170,6 @@ abstract class Scrappable implements _i1.SerializableModel {
     _i6.ScraperCategory? category,
     bool? isDeleted,
     _i7.AutoFixConfig? autoFixConfig,
-    List<_i8.AutoFixSession>? autoFixSessions,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -206,9 +197,6 @@ abstract class Scrappable implements _i1.SerializableModel {
       'category': category.toJson(),
       'isDeleted': isDeleted,
       if (autoFixConfig != null) 'autoFixConfig': autoFixConfig?.toJson(),
-      if (autoFixSessions != null)
-        'autoFixSessions':
-            autoFixSessions?.toJson(valueToJson: (v) => v.toJson()),
     };
   }
 
@@ -240,7 +228,6 @@ class _ScrappableImpl extends Scrappable {
     required _i6.ScraperCategory category,
     required bool isDeleted,
     _i7.AutoFixConfig? autoFixConfig,
-    List<_i8.AutoFixSession>? autoFixSessions,
   }) : super._(
           id: id,
           accountId: accountId,
@@ -260,7 +247,6 @@ class _ScrappableImpl extends Scrappable {
           category: category,
           isDeleted: isDeleted,
           autoFixConfig: autoFixConfig,
-          autoFixSessions: autoFixSessions,
         );
 
   /// Returns a shallow copy of this [Scrappable]
@@ -286,7 +272,6 @@ class _ScrappableImpl extends Scrappable {
     _i6.ScraperCategory? category,
     bool? isDeleted,
     Object? autoFixConfig = _Undefined,
-    Object? autoFixSessions = _Undefined,
   }) {
     return Scrappable(
       id: id is int? ? id : this.id,
@@ -323,9 +308,6 @@ class _ScrappableImpl extends Scrappable {
       autoFixConfig: autoFixConfig is _i7.AutoFixConfig?
           ? autoFixConfig
           : this.autoFixConfig?.copyWith(),
-      autoFixSessions: autoFixSessions is List<_i8.AutoFixSession>?
-          ? autoFixSessions
-          : this.autoFixSessions?.map((e0) => e0.copyWith()).toList(),
     );
   }
 }

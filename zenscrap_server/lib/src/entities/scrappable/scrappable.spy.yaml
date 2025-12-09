@@ -21,8 +21,6 @@ fields:
   isDeleted: bool
   # Auto-fix configuration (1:1 relationship - stored in separate table for smaller update footprint)
   autoFixConfig: AutoFixConfig?, relation(name=scrappable_auto_fix_config)
-  # Auto-fix session history (1:n relationship - multiple repair sessions over time)
-  autoFixSessions: List<AutoFixSession>?, relation(name=scrappable_auto_fix_sessions)
 indexes:
   scrappable_target_request_unique_idx:
     fields: targetRequestId

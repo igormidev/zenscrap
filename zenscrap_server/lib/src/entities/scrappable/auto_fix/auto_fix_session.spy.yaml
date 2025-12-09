@@ -59,7 +59,7 @@ fields:
   totalOutputTokens: int, default=0
 
   # Reference to the parent Scrappable
-  scrappableId: int, relation(name=scrappable_auto_fix_sessions, parent=scrappable)
+  scrappableId: int, relation(parent=scrappable)
 
   # List of attempts made during this session
   attempts: List<AutoFixAttempt>?, relation(name=session_attempts)

@@ -3,6 +3,7 @@ privateAccount:
 privateAiUsage:
   - getAiCreditHistory:
   - getAiUsageInfo:
+  - getAutoFixSessions:
 privateApiUsage:
   - getApiCreditHistory:
   - createApiKey:
