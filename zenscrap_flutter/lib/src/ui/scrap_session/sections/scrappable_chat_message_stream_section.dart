@@ -13,6 +13,7 @@ import 'package:zenscrap_flutter/src/states/chat_session/chat_scroll_controller_
 import 'package:zenscrap_flutter/src/states/chat_session/is_chat_loading_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_messages_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/llm_thinking_bubble.dart';
 
@@ -348,6 +349,19 @@ class _ChatMessageBubble extends StatelessWidget {
       messageContent = _ApiKeyUpdatedMessage(
         messageText: keyUpdatedMsg.messageText,
         textColor: textColor,
+      );
+    } else if (message is IpLimitReachedResponse) {
+      final ipLimitMsg = message as IpLimitReachedResponse;
+      // Override to warning colors
+      backgroundColor = colorScheme.errorContainer;
+      textColor = colorScheme.onErrorContainer;
+      messageContent = _IpLimitReachedMessage(
+        messageText: ipLimitMsg.messageText,
+        timeUntilReset: ipLimitMsg.timeUntilReset,
+        totalSpentUsd: ipLimitMsg.totalSpentUsd,
+        spendingLimitUsd: ipLimitMsg.spendingLimitUsd,
+        textColor: textColor,
+        backgroundColor: backgroundColor,
       );
     }
 
@@ -1497,6 +1511,275 @@ class _ApiKeyUpdatedMessage extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Widget that displays when an anonymous user has exceeded the IP-based
+/// spending limit. Shows a countdown timer and a CTA to create an account.
+class _IpLimitReachedMessage extends ConsumerStatefulWidget {
+  final String messageText;
+  final Duration timeUntilReset;
+  final double totalSpentUsd;
+  final double spendingLimitUsd;
+  final Color textColor;
+  final Color backgroundColor;
+
+  const _IpLimitReachedMessage({
+    required this.messageText,
+    required this.timeUntilReset,
+    required this.totalSpentUsd,
+    required this.spendingLimitUsd,
+    required this.textColor,
+    required this.backgroundColor,
+  });
+
+  @override
+  ConsumerState<_IpLimitReachedMessage> createState() => _IpLimitReachedMessageState();
+}
+
+class _IpLimitReachedMessageState extends ConsumerState<_IpLimitReachedMessage> {
+  late Duration _remainingTime;
+  late final DateTime _resetTime;
+  bool _hasTrackedView = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _remainingTime = widget.timeUntilReset;
+    _resetTime = DateTime.now().add(widget.timeUntilReset);
+    _startCountdown();
+    _trackView();
+  }
+
+  void _trackView() {
+    if (!_hasTrackedView) {
+      _hasTrackedView = true;
+      ref.read(analyticsServiceProvider).trackChatIpLimitReachedView(
+        totalSpentUsd: widget.totalSpentUsd,
+        spendingLimitUsd: widget.spendingLimitUsd,
+        timeUntilResetSeconds: widget.timeUntilReset.inSeconds,
+      );
+    }
+  }
+
+  void _startCountdown() {
+    Future.delayed(const Duration(seconds: 1), () {
+      if (!mounted) return;
+      final now = DateTime.now();
+      final remaining = _resetTime.difference(now);
+      setState(() {
+        _remainingTime = remaining.isNegative ? Duration.zero : remaining;
+      });
+      if (_remainingTime > Duration.zero) {
+        _startCountdown();
+      }
+    });
+  }
+
+  String _formatDuration(Duration duration) {
+    final days = duration.inDays;
+    final hours = duration.inHours.remainder(24);
+    final minutes = duration.inMinutes.remainder(60);
+    final seconds = duration.inSeconds.remainder(60);
+
+    final parts = <String>[];
+    if (days > 0) parts.add('${days}d');
+    if (hours > 0) parts.add('${hours}h');
+    if (minutes > 0) parts.add('${minutes}m');
+    if (seconds > 0 || parts.isEmpty) parts.add('${seconds}s');
+
+    return parts.join(' ');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Header with warning icon
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: colorScheme.error.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                Icons.timer_off_rounded,
+                size: 18,
+                color: colorScheme.error,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                'Usage Limit Reached',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: widget.textColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+
+        // Spending progress bar
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: widget.textColor.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: widget.textColor.withValues(alpha: 0.15),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'IP Spending',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: widget.textColor.withValues(alpha: 0.8),
+                    ),
+                  ),
+                  Text(
+                    '\$${widget.totalSpentUsd.toStringAsFixed(2)} / \$${widget.spendingLimitUsd.toStringAsFixed(2)}',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: widget.textColor,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'monospace',
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value:
+                      (widget.totalSpentUsd / widget.spendingLimitUsd).clamp(0.0, 1.0),
+                  backgroundColor: widget.textColor.withValues(alpha: 0.1),
+                  valueColor: AlwaysStoppedAnimation<Color>(colorScheme.error),
+                  minHeight: 6,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        // Countdown timer
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: colorScheme.primaryContainer.withValues(alpha: 0.3),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: colorScheme.primary.withValues(alpha: 0.2),
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.access_time_rounded,
+                size: 20,
+                color: colorScheme.primary,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Resets in',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: colorScheme.onPrimaryContainer.withValues(alpha: 0.7),
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      _formatDuration(_remainingTime),
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: colorScheme.primary,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'monospace',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        // Message text
+        SelectableText(
+          widget.messageText,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: widget.textColor.withValues(alpha: 0.9),
+            height: 1.5,
+          ),
+        ),
+
+        // CTA Button - sign up to get monthly credits
+        const SizedBox(height: 16),
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton.icon(
+            onPressed: () => _navigateToSignUp(context),
+            icon: const Icon(Icons.person_add_rounded, size: 18),
+            label: const Text('Create Account'),
+            style: FilledButton.styleFrom(
+              backgroundColor: colorScheme.primary,
+              foregroundColor: colorScheme.onPrimary,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 14,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Get monthly AI credits and continue without waiting',
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: widget.textColor.withValues(alpha: 0.6),
+            fontStyle: FontStyle.italic,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
+  void _navigateToSignUp(BuildContext context) {
+    // Track the click event
+    ref.read(analyticsServiceProvider).trackChatIpLimitCreateAccountClick(
+      totalSpentUsd: widget.totalSpentUsd,
+      spendingLimitUsd: widget.spendingLimitUsd,
+      timeUntilResetSeconds: _remainingTime.inSeconds,
+    );
+
+    // Navigate to the AuthView for sign up
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const AuthView(),
+      ),
     );
   }
 }

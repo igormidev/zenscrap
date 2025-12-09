@@ -1,0 +1,25 @@
+# IpLimitReachedResponse
+#
+# This response is sent when an anonymous (not logged in) user has exceeded
+# the per-IP spending limit within the 7-day rolling window.
+#
+# Unlike CreditLimitReachedResponse (which handles per-session limits),
+# this response indicates that the entire IP address has been rate-limited
+# due to excessive usage across multiple sessions.
+#
+# The user must wait until their IP spending record expires (7 days from first spend)
+# before they can use the AI chat again. They can resolve this immediately by
+# creating an account.
+#
+# Fields:
+# - messageText: Human-readable explanation of the limit
+# - timeUntilReset: Duration until the user can use the chat again
+# - totalSpentUsd: Total amount spent from this IP
+# - spendingLimitUsd: The limit that was exceeded
+class: IpLimitReachedResponse
+extends: ChatResponse
+fields:
+  messageText: String
+  timeUntilReset: Duration
+  totalSpentUsd: double
+  spendingLimitUsd: double

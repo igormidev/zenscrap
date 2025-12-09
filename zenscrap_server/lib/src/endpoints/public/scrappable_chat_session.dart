@@ -671,6 +671,12 @@ class ScrappableChatSession extends Endpoint {
     final ThinkingSessionId thinkingSessionId = uuid.v7();
     _thinkingStream[thinkingSessionId] = StreamController<ThinkingSessionId>();
 
+    // Get client IP address for anonymous user rate limiting
+    String? clientIpAddress;
+    if (session is MethodCallSession) {
+      clientIpAddress = session.httpRequest.remoteIpAddress;
+    }
+
     // Put future call
     await session.serverpod.futureCallWithDelay(
       'session_prompt',
@@ -678,6 +684,7 @@ class ScrappableChatSession extends Endpoint {
         sessionId: sessionId,
         userPrompt: userPrompt,
         thinkingSessionId: thinkingSessionId,
+        clientIpAddress: clientIpAddress,
       ),
       const Duration(seconds: 1),
     );
@@ -769,9 +776,43 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
     // AI Credits Check - Before sending message
     // =========================================================================
     final bool usesOwnApiKey = _sessionUsesOwnApiKey[sessionId] ?? false;
+    final String? clientIpAddress = object.clientIpAddress;
 
     // Only check credits if NOT using own API key
     if (!usesOwnApiKey) {
+      // -----------------------------------------------------------------------
+      // IP-based spending check for anonymous users (cross-session rate limit)
+      // -----------------------------------------------------------------------
+      if (clientIpAddress != null && _anonymousSessionSpending.containsKey(sessionId)) {
+        // Check IP spending limit from database
+        final ipSpending = await AnonymousIpSpending.db.findFirstRow(
+          session,
+          where: (t) => t.ipAddress.equals(clientIpAddress),
+        );
+
+        if (ipSpending != null && ipSpending.totalSpentUsd >= kAnonymousIpSpendingLimitInDollars) {
+          // Calculate time until the record expires (7 days from creation)
+          final expiryTime = ipSpending.createdAt.add(kAnonymousIpSpendingResetDuration);
+          final timeUntilReset = expiryTime.difference(DateTime.now());
+
+          _scrapRedraftSessions[sessionId]?.add(
+            IpLimitReachedResponse(
+              role: PromptRole.system,
+              expectsFollowUp: false,
+              messageText:
+                  'You have reached the spending limit for your IP address (\$${kAnonymousIpSpendingLimitInDollars.toStringAsFixed(2)}). '
+                  'This limit resets after 7 days, or you can create an account to get monthly credits.',
+              timeUntilReset: timeUntilReset.isNegative ? Duration.zero : timeUntilReset,
+              totalSpentUsd: ipSpending.totalSpentUsd,
+              spendingLimitUsd: kAnonymousIpSpendingLimitInDollars,
+            ),
+          );
+          await _thinkingStream[thinkingSessionId]?.close();
+          _thinkingStream.remove(thinkingSessionId);
+          return;
+        }
+      }
+
       final accountAIUsage = _sessionAccountAIUsage[sessionId];
       final anonymousSpending = _anonymousSessionSpending[sessionId];
 
@@ -908,13 +949,57 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
             );
           }
         } else if (_anonymousSessionSpending.containsKey(sessionId)) {
-          // Track anonymous session spending
+          // Track anonymous session spending (in-memory per session)
           _anonymousSessionSpending[sessionId] =
               (_anonymousSessionSpending[sessionId] ?? 0.0) + messageResult.costInUsd;
           session.log(
             'Anonymous session $sessionId spent \$${messageResult.costInUsd.toStringAsFixed(6)}. '
             'Total session spending: \$${_anonymousSessionSpending[sessionId]!.toStringAsFixed(4)}',
           );
+
+          // Also track IP spending in database (cross-session rate limit)
+          if (clientIpAddress != null) {
+            try {
+              final now = DateTime.now();
+              final existingIpSpending = await AnonymousIpSpending.db.findFirstRow(
+                session,
+                where: (t) => t.ipAddress.equals(clientIpAddress),
+              );
+
+              if (existingIpSpending != null) {
+                // Update existing record
+                final updatedSpending = existingIpSpending.copyWith(
+                  totalSpentUsd: existingIpSpending.totalSpentUsd + messageResult.costInUsd,
+                  lastUpdatedAt: now,
+                );
+                await AnonymousIpSpending.db.updateRow(session, updatedSpending);
+                session.log(
+                  'Updated IP spending for $clientIpAddress: '
+                  '\$${updatedSpending.totalSpentUsd.toStringAsFixed(4)} total',
+                );
+              } else {
+                // Create new record
+                final newIpSpending = AnonymousIpSpending(
+                  ipAddress: clientIpAddress,
+                  totalSpentUsd: messageResult.costInUsd,
+                  createdAt: now,
+                  lastUpdatedAt: now,
+                );
+                await AnonymousIpSpending.db.insertRow(session, newIpSpending);
+                session.log(
+                  'Created IP spending record for $clientIpAddress: '
+                  '\$${messageResult.costInUsd.toStringAsFixed(6)}',
+                );
+              }
+            } catch (e, s) {
+              session.log(
+                'Warning: Failed to track IP spending for $clientIpAddress',
+                exception: e,
+                stackTrace: s,
+                level: LogLevel.warning,
+              );
+            }
+          }
         }
       } else if (usesOwnApiKey) {
         session.log('User using own API key - no credits deducted');
