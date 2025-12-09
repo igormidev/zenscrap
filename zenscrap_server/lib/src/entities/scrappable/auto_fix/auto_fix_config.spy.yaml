@@ -1,0 +1,57 @@
+# AutoFixConfig - Configuration for automatic scrappable repair
+#
+# This model contains all auto-fix related configuration for a Scrappable.
+# Separated from the main Scrappable model for:
+# 1. Smaller update footprint (updating only auto-fix fields doesn't touch the big Scrappable row)
+# 2. Better organization and single responsibility
+# 3. Easier to extend with new auto-fix features
+#
+# Relationship: 1:1 with Scrappable (each Scrappable has exactly one AutoFixConfig)
+class: AutoFixConfig
+table: auto_fix_config
+fields:
+  # Whether auto-fix is enabled for this scrappable (user can toggle)
+  enabled: bool, default=true
+
+  # Number of consecutive errors required before triggering auto-fix
+  # User can customize this threshold per scrappable
+  consecutiveErrorThreshold: int, default=100
+
+  # Current count of consecutive errors (denormalized for query efficiency)
+  # Reset to 0 on success, incremented on error
+  # This avoids querying N analytics records to count errors
+  currentConsecutiveErrors: int, default=0
+
+  # Timestamp of last auto-fix attempt (for cooldown/backoff calculation)
+  lastAttemptAt: DateTime?
+
+  # Flag to prevent concurrent auto-fix attempts on the same scrappable
+  # Set to true when auto-fix starts, false when it completes
+  inProgress: bool, default=false
+
+  # Number of failed auto-fix attempts (for exponential backoff)
+  # Reset to 0 on successful fix, incremented on each failed attempt
+  # After maxAttempts (5) failures, auto-fix is disabled until manual reset
+  attemptCount: int, default=0
+
+  # AI model preference for auto-fix:
+  # - null (auto mode): Uses AiModel.normal if user has no API key,
+  #                     Uses AiModel.powerful if user has their own API key
+  # - normal: Uses the faster, cheaper model (gpt-5-mini)
+  # - powerful: Uses the most capable model (gpt-5.1)
+  #
+  # Auto mode is the recommended default as it optimizes cost for platform-funded
+  # sessions while using maximum capability when the user pays directly.
+  preferredAiModel: AiModel?
+
+  # Reference to the parent Scrappable
+  scrappableId: int, relation(name=scrappable_auto_fix_config, parent=scrappable, onDelete=Cascade)
+
+indexes:
+  # Unique constraint ensures 1:1 relationship with Scrappable
+  auto_fix_config_scrappable_unique_idx:
+    fields: scrappableId
+    unique: true
+  # Index for efficient auto-fix candidate queries
+  auto_fix_config_candidates_idx:
+    fields: enabled, inProgress, currentConsecutiveErrors

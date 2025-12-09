@@ -196,6 +196,24 @@ class CreateScrappableEndpoint extends Endpoint {
           session, scrappable, referenceTestData,
           transaction: transaction);
 
+      // Create default AutoFixConfig for the new scrappable
+      final autoFixConfig = await AutoFixConfig.db.insertRow(
+        session,
+        AutoFixConfig(
+          scrappableId: scrappable.id!,
+          enabled: true,
+          consecutiveErrorThreshold: 100,
+          currentConsecutiveErrors: 0,
+          inProgress: false,
+          attemptCount: 0,
+          preferredAiModel: null, // Auto mode (uses normal for platform key, powerful for user key)
+        ),
+        transaction: transaction,
+      );
+      await Scrappable.db.attachRow.autoFixConfig(
+          session, scrappable, autoFixConfig,
+          transaction: transaction);
+
       return scrappable;
     });
   }

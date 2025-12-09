@@ -1,0 +1,9 @@
+# Status of an AutoFixSession
+enum: AutoFixSessionStatus
+values:
+  - pending      # Session created but not yet started
+  - in_progress  # Session is active, AI is processing
+  - success      # A fix was successfully applied
+  - failed       # Session failed but more attempts available
+  - exhausted    # All attempts exhausted without success
+  - cancelled    # Manually cancelled by user or system

@@ -103,4 +103,99 @@ class PrivateAiUsageEndpoint extends Endpoint {
 
     return accountInfo.accountAIUsage!;
   }
+
+  /// Returns paginated auto-fix sessions for scrappables owned by the authenticated user.
+  ///
+  /// This includes all auto-fix repair attempts across all of the user's scrappables,
+  /// ordered by most recent first.
+  Future<PaginatedAutoFixSessionResponse> getAutoFixSessions(
+    Session session, {
+    int page = 1,
+  }) async {
+    final authenticationInfo = await session.authenticated;
+    if (authenticationInfo == null) {
+      throw defaultAuthenticationException;
+    }
+
+    final userId = authenticationInfo.userId;
+
+    final accountInfo = await AccountInfo.db.findFirstRow(
+      session,
+      where: (p0) => p0.userInfoId.equals(userId),
+    );
+
+    if (accountInfo == null) {
+      throw ZenScrapException(
+        title: 'Account Not Found',
+        description: 'Unable to find account information.',
+      );
+    }
+
+    const int pageSize = 10;
+
+    // Ensure page is at least 1
+    page = page < 1 ? 1 : page;
+
+    // Get all scrappable IDs owned by this user
+    final userScrappables = await Scrappable.db.find(
+      session,
+      where: (t) =>
+          t.accountId.equals(accountInfo.id) & t.isDeleted.equals(false),
+    );
+
+    final scrappableIds = userScrappables.map((s) => s.id!).toSet();
+
+    if (scrappableIds.isEmpty) {
+      return PaginatedAutoFixSessionResponse(
+        data: [],
+        pagination: PaginationMetadata(
+          currentPage: page,
+          pageSize: pageSize,
+          totalCount: 0,
+          totalPages: 1,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        ),
+      );
+    }
+
+    // Get total count for pagination
+    final totalCount = await AutoFixSession.db.count(
+      session,
+      where: (t) => t.scrappableId.inSet(scrappableIds),
+    );
+
+    // Calculate pagination metadata
+    final totalPages = totalCount == 0 ? 1 : (totalCount / pageSize).ceil();
+    final hasNextPage = page < totalPages;
+    final hasPreviousPage = page > 1;
+
+    // Calculate offset
+    final offset = (page - 1) * pageSize;
+
+    // Fetch auto-fix sessions with related data
+    final sessions = await AutoFixSession.db.find(
+      session,
+      where: (t) => t.scrappableId.inSet(scrappableIds),
+      limit: pageSize,
+      offset: offset,
+      orderBy: (t) => t.createdAt,
+      orderDescending: true,
+      include: AutoFixSession.include(
+        attempts: AutoFixAttempt.includeList(),
+      ),
+    );
+
+    return PaginatedAutoFixSessionResponse(
+      data: sessions,
+      pagination: PaginationMetadata(
+        currentPage: page,
+        pageSize: pageSize,
+        totalCount: totalCount,
+        totalPages: totalPages,
+        hasNextPage: hasNextPage,
+        hasPreviousPage: hasPreviousPage,
+      ),
+    );
+  }
 }

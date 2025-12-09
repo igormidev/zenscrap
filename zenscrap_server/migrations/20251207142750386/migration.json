@@ -1,0 +1,643 @@
+{
+  "actions": [
+    {
+      "type": "deleteTable",
+      "deleteTable": "monthly_subscription_credit_deposit"
+    },
+    {
+      "type": "deleteTable",
+      "deleteTable": "credit_package_purchase"
+    },
+    {
+      "type": "deleteTable",
+      "deleteTable": "credit_history_item"
+    },
+    {
+      "type": "createTable",
+      "createTable": {
+        "name": "account_ai_usage",
+        "dartName": "AccountAIUsage",
+        "module": "zenscrap",
+        "schema": "public",
+        "columns": [
+          {
+            "name": "id",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "nextval('account_ai_usage_id_seq'::regclass)",
+            "dartType": "int?"
+          },
+          {
+            "name": "userOpenAiApiKey",
+            "columnType": 0,
+            "isNullable": true,
+            "dartType": "String?"
+          },
+          {
+            "name": "totalDollarsSpentFromTotalInUSD",
+            "columnType": 3,
+            "isNullable": false,
+            "dartType": "double"
+          }
+        ],
+        "foreignKeys": [],
+        "indexes": [
+          {
+            "indexName": "account_ai_usage_pkey",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "id"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": true
+          }
+        ],
+        "managed": true
+      }
+    },
+    {
+      "type": "deleteTable",
+      "deleteTable": "account_info"
+    },
+    {
+      "type": "createTable",
+      "createTable": {
+        "name": "account_info",
+        "dartName": "AccountInfo",
+        "module": "zenscrap",
+        "schema": "public",
+        "columns": [
+          {
+            "name": "id",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "nextval('account_info_id_seq'::regclass)",
+            "dartType": "int?"
+          },
+          {
+            "name": "userInfoId",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "int"
+          },
+          {
+            "name": "accountApiUsageId",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "int"
+          },
+          {
+            "name": "planTier",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "protocol:PlanTier"
+          },
+          {
+            "name": "stripeCustomerId",
+            "columnType": 0,
+            "isNullable": true,
+            "dartType": "String?"
+          },
+          {
+            "name": "stripeSubscriptionId",
+            "columnType": 0,
+            "isNullable": true,
+            "dartType": "String?"
+          },
+          {
+            "name": "subscriptionStatus",
+            "columnType": 0,
+            "isNullable": true,
+            "dartType": "String?"
+          },
+          {
+            "name": "subscriptionEndDate",
+            "columnType": 4,
+            "isNullable": true,
+            "dartType": "DateTime?"
+          },
+          {
+            "name": "accountAIUsageId",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "int"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "constraintName": "account_info_fk_0",
+            "columns": [
+              "userInfoId"
+            ],
+            "referenceTable": "serverpod_user_info",
+            "referenceTableSchema": "public",
+            "referenceColumns": [
+              "id"
+            ],
+            "onUpdate": 3,
+            "onDelete": 3
+          },
+          {
+            "constraintName": "account_info_fk_1",
+            "columns": [
+              "accountApiUsageId"
+            ],
+            "referenceTable": "account_api_usage",
+            "referenceTableSchema": "public",
+            "referenceColumns": [
+              "id"
+            ],
+            "onUpdate": 3,
+            "onDelete": 3
+          },
+          {
+            "constraintName": "account_info_fk_2",
+            "columns": [
+              "accountAIUsageId"
+            ],
+            "referenceTable": "account_ai_usage",
+            "referenceTableSchema": "public",
+            "referenceColumns": [
+              "id"
+            ],
+            "onUpdate": 3,
+            "onDelete": 3
+          }
+        ],
+        "indexes": [
+          {
+            "indexName": "account_info_pkey",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "id"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": true
+          },
+          {
+            "indexName": "user_info_id_unique_idx",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "userInfoId"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": false
+          },
+          {
+            "indexName": "account_api_usage_id_unique_idx",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "accountApiUsageId"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": false
+          },
+          {
+            "indexName": "user_account_ai_usage_id_unique_idx",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "accountAIUsageId"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": false
+          }
+        ],
+        "managed": true
+      }
+    },
+    {
+      "type": "createTable",
+      "createTable": {
+        "name": "ai_credit_history_item",
+        "dartName": "AICreditHistoryItem",
+        "module": "zenscrap",
+        "schema": "public",
+        "columns": [
+          {
+            "name": "id",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "nextval('ai_credit_history_item_id_seq'::regclass)",
+            "dartType": "int?"
+          },
+          {
+            "name": "date",
+            "columnType": 4,
+            "isNullable": false,
+            "dartType": "DateTime"
+          },
+          {
+            "name": "monthlySubscriptionAICreditDepositId",
+            "columnType": 6,
+            "isNullable": true,
+            "dartType": "int?"
+          },
+          {
+            "name": "accountAIUsageId",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "int"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "constraintName": "ai_credit_history_item_fk_0",
+            "columns": [
+              "monthlySubscriptionAICreditDepositId"
+            ],
+            "referenceTable": "monthly_subscription_ai_credit_deposit",
+            "referenceTableSchema": "public",
+            "referenceColumns": [
+              "id"
+            ],
+            "onUpdate": 3,
+            "onDelete": 3
+          },
+          {
+            "constraintName": "ai_credit_history_item_fk_1",
+            "columns": [
+              "accountAIUsageId"
+            ],
+            "referenceTable": "account_ai_usage",
+            "referenceTableSchema": "public",
+            "referenceColumns": [
+              "id"
+            ],
+            "onUpdate": 3,
+            "onDelete": 3
+          }
+        ],
+        "indexes": [
+          {
+            "indexName": "ai_credit_history_item_pkey",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "id"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": true
+          }
+        ],
+        "managed": true
+      }
+    },
+    {
+      "type": "alterTable",
+      "alterTable": {
+        "name": "analytics_request_details",
+        "schema": "public",
+        "addColumns": [
+          {
+            "name": "stringifiedResponse",
+            "columnType": 0,
+            "isNullable": true,
+            "dartType": "String?"
+          }
+        ],
+        "deleteColumns": [],
+        "modifyColumns": [],
+        "addIndexes": [],
+        "deleteIndexes": [],
+        "addForeignKeys": [],
+        "deleteForeignKeys": [],
+        "warnings": [
+          {
+            "type": "tableDropped",
+            "message": "Table \"monthly_subscription_credit_deposit\" will be dropped.",
+            "table": "monthly_subscription_credit_deposit",
+            "columns": [],
+            "destrucive": true
+          },
+          {
+            "type": "tableDropped",
+            "message": "Table \"credit_package_purchase\" will be dropped.",
+            "table": "credit_package_purchase",
+            "columns": [],
+            "destrucive": true
+          },
+          {
+            "type": "tableDropped",
+            "message": "Table \"credit_history_item\" will be dropped.",
+            "table": "credit_history_item",
+            "columns": [],
+            "destrucive": true
+          },
+          {
+            "type": "uniqueIndexCreated",
+            "message": "Unique index \"user_account_ai_usage_id_unique_idx\" is added to table \"account_info\". If there are existing rows with duplicate values, this migration will fail.",
+            "table": "account_info",
+            "columns": [
+              "accountAIUsageId"
+            ],
+            "destrucive": false
+          },
+          {
+            "type": "tableDropped",
+            "message": "One or more columns are added to table \"account_info\" which cannot be added in a table migration. The complete table will be deleted and recreated.",
+            "table": "account_info",
+            "columns": [
+              "accountAIUsageId"
+            ],
+            "destrucive": true
+          }
+        ]
+      }
+    },
+    {
+      "type": "createTable",
+      "createTable": {
+        "name": "api_credit_history_item",
+        "dartName": "ApiCreditHistoryItem",
+        "module": "zenscrap",
+        "schema": "public",
+        "columns": [
+          {
+            "name": "id",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "nextval('api_credit_history_item_id_seq'::regclass)",
+            "dartType": "int?"
+          },
+          {
+            "name": "date",
+            "columnType": 4,
+            "isNullable": false,
+            "dartType": "DateTime"
+          },
+          {
+            "name": "monthlySubscriptionApiCreditDepositId",
+            "columnType": 6,
+            "isNullable": true,
+            "dartType": "int?"
+          },
+          {
+            "name": "apiCreditPackagePurchaseId",
+            "columnType": 6,
+            "isNullable": true,
+            "dartType": "int?"
+          },
+          {
+            "name": "accountApiUsageId",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "int"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "constraintName": "api_credit_history_item_fk_0",
+            "columns": [
+              "monthlySubscriptionApiCreditDepositId"
+            ],
+            "referenceTable": "monthly_subscription_api_credit_deposit",
+            "referenceTableSchema": "public",
+            "referenceColumns": [
+              "id"
+            ],
+            "onUpdate": 3,
+            "onDelete": 3
+          },
+          {
+            "constraintName": "api_credit_history_item_fk_1",
+            "columns": [
+              "apiCreditPackagePurchaseId"
+            ],
+            "referenceTable": "api_credit_package_purchase",
+            "referenceTableSchema": "public",
+            "referenceColumns": [
+              "id"
+            ],
+            "onUpdate": 3,
+            "onDelete": 3
+          },
+          {
+            "constraintName": "api_credit_history_item_fk_2",
+            "columns": [
+              "accountApiUsageId"
+            ],
+            "referenceTable": "account_api_usage",
+            "referenceTableSchema": "public",
+            "referenceColumns": [
+              "id"
+            ],
+            "onUpdate": 3,
+            "onDelete": 3
+          }
+        ],
+        "indexes": [
+          {
+            "indexName": "api_credit_history_item_pkey",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "id"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": true
+          }
+        ],
+        "managed": true
+      }
+    },
+    {
+      "type": "createTable",
+      "createTable": {
+        "name": "api_credit_package_purchase",
+        "dartName": "ApiCreditPackagePurchase",
+        "module": "zenscrap",
+        "schema": "public",
+        "columns": [
+          {
+            "name": "id",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "nextval('api_credit_package_purchase_id_seq'::regclass)",
+            "dartType": "int?"
+          },
+          {
+            "name": "value",
+            "columnType": 3,
+            "isNullable": false,
+            "dartType": "double"
+          },
+          {
+            "name": "stripePurchaseId",
+            "columnType": 0,
+            "isNullable": true,
+            "dartType": "String?"
+          }
+        ],
+        "foreignKeys": [],
+        "indexes": [
+          {
+            "indexName": "api_credit_package_purchase_pkey",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "id"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": true
+          }
+        ],
+        "managed": true
+      }
+    },
+    {
+      "type": "createTable",
+      "createTable": {
+        "name": "monthly_subscription_ai_credit_deposit",
+        "dartName": "MonthlySubscriptionAICreditDeposit",
+        "module": "zenscrap",
+        "schema": "public",
+        "columns": [
+          {
+            "name": "id",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "nextval('monthly_subscription_ai_credit_deposit_id_seq'::regclass)",
+            "dartType": "int?"
+          },
+          {
+            "name": "creditsAmountInDollars",
+            "columnType": 3,
+            "isNullable": false,
+            "dartType": "double"
+          },
+          {
+            "name": "planTier",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "protocol:PlanTier"
+          }
+        ],
+        "foreignKeys": [],
+        "indexes": [
+          {
+            "indexName": "monthly_subscription_ai_credit_deposit_pkey",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "id"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": true
+          }
+        ],
+        "managed": true
+      }
+    },
+    {
+      "type": "createTable",
+      "createTable": {
+        "name": "monthly_subscription_api_credit_deposit",
+        "dartName": "MonthlySubscriptionApiCreditDeposit",
+        "module": "zenscrap",
+        "schema": "public",
+        "columns": [
+          {
+            "name": "id",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "nextval('monthly_subscription_api_credit_deposit_id_seq'::regclass)",
+            "dartType": "int?"
+          },
+          {
+            "name": "creditsAmount",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "int"
+          },
+          {
+            "name": "planTier",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "protocol:PlanTier"
+          }
+        ],
+        "foreignKeys": [],
+        "indexes": [
+          {
+            "indexName": "monthly_subscription_api_credit_deposit_pkey",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "id"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": true
+          }
+        ],
+        "managed": true
+      }
+    }
+  ],
+  "warnings": [
+    {
+      "type": "tableDropped",
+      "message": "Table \"monthly_subscription_credit_deposit\" will be dropped.",
+      "table": "monthly_subscription_credit_deposit",
+      "columns": [],
+      "destrucive": true
+    },
+    {
+      "type": "tableDropped",
+      "message": "Table \"credit_package_purchase\" will be dropped.",
+      "table": "credit_package_purchase",
+      "columns": [],
+      "destrucive": true
+    },
+    {
+      "type": "tableDropped",
+      "message": "Table \"credit_history_item\" will be dropped.",
+      "table": "credit_history_item",
+      "columns": [],
+      "destrucive": true
+    },
+    {
+      "type": "uniqueIndexCreated",
+      "message": "Unique index \"user_account_ai_usage_id_unique_idx\" is added to table \"account_info\". If there are existing rows with duplicate values, this migration will fail.",
+      "table": "account_info",
+      "columns": [
+        "accountAIUsageId"
+      ],
+      "destrucive": false
+    },
+    {
+      "type": "tableDropped",
+      "message": "One or more columns are added to table \"account_info\" which cannot be added in a table migration. The complete table will be deleted and recreated.",
+      "table": "account_info",
+      "columns": [
+        "accountAIUsageId"
+      ],
+      "destrucive": true
+    }
+  ],
+  "migrationApiVersion": 1
+}

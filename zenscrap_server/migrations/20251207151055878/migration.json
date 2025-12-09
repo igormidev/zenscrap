@@ -1,0 +1,77 @@
+{
+  "actions": [
+    {
+      "type": "alterTable",
+      "alterTable": {
+        "name": "scrappable",
+        "schema": "public",
+        "addColumns": [
+          {
+            "name": "autoFixEnabled",
+            "columnType": 1,
+            "isNullable": false,
+            "columnDefault": "true",
+            "dartType": "bool"
+          },
+          {
+            "name": "consecutiveErrorThreshold",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "100",
+            "dartType": "int"
+          },
+          {
+            "name": "currentConsecutiveErrors",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "0",
+            "dartType": "int"
+          },
+          {
+            "name": "lastAutoFixAttemptAt",
+            "columnType": 4,
+            "isNullable": true,
+            "dartType": "DateTime?"
+          },
+          {
+            "name": "autoFixInProgress",
+            "columnType": 1,
+            "isNullable": false,
+            "columnDefault": "false",
+            "dartType": "bool"
+          }
+        ],
+        "deleteColumns": [],
+        "modifyColumns": [],
+        "addIndexes": [
+          {
+            "indexName": "scrappable_auto_fix_candidates_idx",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "autoFixEnabled"
+              },
+              {
+                "type": 0,
+                "definition": "autoFixInProgress"
+              },
+              {
+                "type": 0,
+                "definition": "currentConsecutiveErrors"
+              }
+            ],
+            "type": "btree",
+            "isUnique": false,
+            "isPrimary": false
+          }
+        ],
+        "deleteIndexes": [],
+        "addForeignKeys": [],
+        "deleteForeignKeys": [],
+        "warnings": []
+      }
+    }
+  ],
+  "warnings": [],
+  "migrationApiVersion": 1
+}

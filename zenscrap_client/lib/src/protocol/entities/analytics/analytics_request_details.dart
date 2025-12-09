@@ -20,6 +20,7 @@ abstract class AnalyticsRequestDetails implements _i1.SerializableModel {
     this.errorObjectAsString,
     this.errorStackTraceAsString,
     required this.stringifiedPayload,
+    this.stringifiedResponse,
   }) : timeStamp = timeStamp ?? DateTime.now();
 
   factory AnalyticsRequestDetails({
@@ -30,6 +31,7 @@ abstract class AnalyticsRequestDetails implements _i1.SerializableModel {
     String? errorObjectAsString,
     String? errorStackTraceAsString,
     required String stringifiedPayload,
+    String? stringifiedResponse,
   }) = _AnalyticsRequestDetailsImpl;
 
   factory AnalyticsRequestDetails.fromJson(
@@ -44,6 +46,7 @@ abstract class AnalyticsRequestDetails implements _i1.SerializableModel {
       errorStackTraceAsString:
           jsonSerialization['errorStackTraceAsString'] as String?,
       stringifiedPayload: jsonSerialization['stringifiedPayload'] as String,
+      stringifiedResponse: jsonSerialization['stringifiedResponse'] as String?,
     );
   }
 
@@ -64,6 +67,8 @@ abstract class AnalyticsRequestDetails implements _i1.SerializableModel {
 
   String stringifiedPayload;
 
+  String? stringifiedResponse;
+
   /// Returns a shallow copy of this [AnalyticsRequestDetails]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
@@ -75,6 +80,7 @@ abstract class AnalyticsRequestDetails implements _i1.SerializableModel {
     String? errorObjectAsString,
     String? errorStackTraceAsString,
     String? stringifiedPayload,
+    String? stringifiedResponse,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -88,6 +94,8 @@ abstract class AnalyticsRequestDetails implements _i1.SerializableModel {
       if (errorStackTraceAsString != null)
         'errorStackTraceAsString': errorStackTraceAsString,
       'stringifiedPayload': stringifiedPayload,
+      if (stringifiedResponse != null)
+        'stringifiedResponse': stringifiedResponse,
     };
   }
 
@@ -108,6 +116,7 @@ class _AnalyticsRequestDetailsImpl extends AnalyticsRequestDetails {
     String? errorObjectAsString,
     String? errorStackTraceAsString,
     required String stringifiedPayload,
+    String? stringifiedResponse,
   }) : super._(
           id: id,
           timeStamp: timeStamp,
@@ -116,6 +125,7 @@ class _AnalyticsRequestDetailsImpl extends AnalyticsRequestDetails {
           errorObjectAsString: errorObjectAsString,
           errorStackTraceAsString: errorStackTraceAsString,
           stringifiedPayload: stringifiedPayload,
+          stringifiedResponse: stringifiedResponse,
         );
 
   /// Returns a shallow copy of this [AnalyticsRequestDetails]
@@ -130,6 +140,7 @@ class _AnalyticsRequestDetailsImpl extends AnalyticsRequestDetails {
     Object? errorObjectAsString = _Undefined,
     Object? errorStackTraceAsString = _Undefined,
     String? stringifiedPayload,
+    Object? stringifiedResponse = _Undefined,
   }) {
     return AnalyticsRequestDetails(
       id: id is int? ? id : this.id,
@@ -143,6 +154,9 @@ class _AnalyticsRequestDetailsImpl extends AnalyticsRequestDetails {
           ? errorStackTraceAsString
           : this.errorStackTraceAsString,
       stringifiedPayload: stringifiedPayload ?? this.stringifiedPayload,
+      stringifiedResponse: stringifiedResponse is String?
+          ? stringifiedResponse
+          : this.stringifiedResponse,
     );
   }
 }

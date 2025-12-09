@@ -1,0 +1,4 @@
+class: PaginatedAutoFixSessionResponse
+fields:
+  data: List<AutoFixSession>
+  pagination: PaginationMetadata

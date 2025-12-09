@@ -512,9 +512,8 @@ class ScrappableChatSession extends Endpoint {
       }
     }
 
-    final scrapingBeeApiKey = session.passwords['scrapingBeeApiKey'] ??
-        session.serverpod.getPassword('scrapingBeeApiKey') ??
-        '';
+    // ScrapingBee API key is now configured server-side in the MCP,
+    // so we don't need to pass it to the chat controller anymore
 
     _chatSessions[sessionUuid] = ChatControllerOpenAiSdkImpl.startChat(
       scrappableId: scrappable.id!,
@@ -522,7 +521,6 @@ class ScrappableChatSession extends Endpoint {
       referenceTestData: referenceTestData,
       currentFetchSettings: scrappable.scrappingBeeExtractRules,
       openAiApiKey: openAiApiKey,
-      scrapingBeeApiKey: scrapingBeeApiKey,
     );
     _cacheRefTestData[sessionUuid] = referenceTestData;
     _cacheScrappingBeeExtractLogic[sessionUuid] = scrappingBeeExtractLogic;

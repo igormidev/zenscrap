@@ -1,0 +1,73 @@
+# AutoFixSession - A complete auto-fix repair session for a Scrappable
+#
+# This is the "father" model that groups one or more AutoFixAttempts.
+# A session is created when the periodic job detects a scrappable needs fixing,
+# and it tracks the overall progress until either:
+# - A successful fix is applied
+# - Maximum attempts are exhausted
+# - The session is manually cancelled
+#
+# Relationship:
+# - n:1 with Scrappable (a Scrappable can have many AutoFixSessions over time)
+# - 1:n with AutoFixAttempt (a session can have multiple attempts due to retries/backoff)
+class: AutoFixSession
+table: auto_fix_session
+fields:
+  # When this session was created (triggered by periodic check)
+  createdAt: DateTime
+
+  # When this session was completed (success, failure, or cancelled)
+  completedAt: DateTime?
+
+  # Final status of the session
+  # - pending: Session is still active, waiting for attempts
+  # - success: A fix was successfully applied
+  # - failed: All attempts exhausted without success
+  # - cancelled: Manually cancelled by user or system
+  status: AutoFixSessionStatus, default=pending
+
+  # Number of consecutive errors that triggered this session
+  # Captured at session creation for historical context
+  triggeredAtErrorCount: int
+
+  # The error threshold that was configured when session started
+  # Captured for historical context (user might change threshold later)
+  configuredThreshold: int
+
+  # AI model that was used for this session
+  # Captured for cost tracking and debugging
+  usedAiModel: AiModel
+
+  # Whether the user's own API key was used (no platform cost)
+  usedUserApiKey: bool, default=false
+
+  # Summary message if session completed successfully
+  # Contains what was fixed (e.g., "Updated CSS selectors for product list")
+  successSummary: String?
+
+  # Error message if session failed completely
+  failureReason: String?
+
+  # Total cost in USD for all attempts in this session
+  # Only tracked if using platform API key (usedUserApiKey = false)
+  totalCostUsd: double, default=0.0
+
+  # Total input tokens used across all attempts
+  totalInputTokens: int, default=0
+
+  # Total output tokens used across all attempts
+  totalOutputTokens: int, default=0
+
+  # Reference to the parent Scrappable
+  scrappableId: int, relation(parent=scrappable)
+
+  # List of attempts made during this session
+  attempts: List<AutoFixAttempt>?, relation(name=session_attempts)
+
+indexes:
+  # Index for finding sessions by scrappable
+  auto_fix_session_scrappable_idx:
+    fields: scrappableId
+  # Index for finding active/pending sessions
+  auto_fix_session_status_idx:
+    fields: status, createdAt

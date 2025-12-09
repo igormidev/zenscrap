@@ -561,6 +561,7 @@ mixin ApiHelperMixin {
 
           return extractResponse.when(
               withData: (scrapedData, html, pageFullscreenScreenshot) async {
+            final responseJson = jsonEncode(scrapedData);
             // Track success analytics
             if (_pendingAnalytics[scrappableId]?[nanoId]?.containsKey(apiKey) ==
                 true) {
@@ -569,6 +570,7 @@ mixin ApiHelperMixin {
                   time: DateTime.now(),
                   status: RequestStatus.success,
                   stringifiedPayload: stringifiedPayload,
+                  stringifiedResponse: responseJson,
                 ),
               );
             }
@@ -665,6 +667,7 @@ mixin ApiHelperMixin {
           );
 
           return extractResponse.when(withData: (scrapedData) {
+            final responseJson = jsonEncode(scrapedData);
             // Track success analytics
             if (_pendingAnalytics[scrappableId]?[nanoId]?.containsKey(apiKey) ==
                 true) {
@@ -673,6 +676,7 @@ mixin ApiHelperMixin {
                   time: DateTime.now(),
                   status: RequestStatus.success,
                   stringifiedPayload: stringifiedPayload,
+                  stringifiedResponse: responseJson,
                 ),
               );
             }
@@ -843,6 +847,9 @@ class AnalyticsPayload {
   final String? errorStackTraceAsString;
   final String stringifiedPayload;
 
+  /// The JSON-encoded response data (only present on successful requests)
+  final String? stringifiedResponse;
+
   const AnalyticsPayload({
     required this.time,
     required this.status,
@@ -851,6 +858,7 @@ class AnalyticsPayload {
     this.description,
     this.errorObjectAsString,
     this.errorStackTraceAsString,
+    this.stringifiedResponse,
   });
 }
 
@@ -965,6 +973,7 @@ Future<void> _setScrappableAnalytics(
             errorObjectAsString: e.errorObjectAsString,
             errorStackTraceAsString: e.errorStackTraceAsString,
             stringifiedPayload: e.stringifiedPayload,
+            stringifiedResponse: e.stringifiedResponse,
           );
         }).toList(),
         transaction: transaction,
@@ -992,6 +1001,45 @@ Future<void> _setScrappableAnalytics(
         analytics,
         transaction: transaction,
       );
+
+      // Update consecutive error counter for auto-fix feature
+      // The counter is now stored in AutoFixConfig (separate model for smaller update footprint)
+      final autoFixConfig = await AutoFixConfig.db.findFirstRow(
+        session,
+        where: (t) => t.scrappableId.equals(scrappable.id),
+        transaction: transaction,
+      );
+
+      if (autoFixConfig != null) {
+        // Sort items by timestamp to process in chronological order
+        final sortedItems = List<AnalyticsPayload>.from(items)
+          ..sort((a, b) => a.time.compareTo(b.time));
+
+        // Calculate new consecutive error count
+        // Start with current count from the auto-fix config
+        int newConsecutiveErrors = autoFixConfig.currentConsecutiveErrors;
+
+        for (final item in sortedItems) {
+          if (item.status == RequestStatus.success) {
+            // Success resets the counter
+            newConsecutiveErrors = 0;
+          } else {
+            // Any error increments the counter
+            newConsecutiveErrors++;
+          }
+        }
+
+        // Only update if the counter changed
+        if (newConsecutiveErrors != autoFixConfig.currentConsecutiveErrors) {
+          await AutoFixConfig.db.updateRow(
+            session,
+            autoFixConfig.copyWith(
+                currentConsecutiveErrors: newConsecutiveErrors),
+            columns: (t) => [t.currentConsecutiveErrors],
+            transaction: transaction,
+          );
+        }
+      }
     });
   }
 }

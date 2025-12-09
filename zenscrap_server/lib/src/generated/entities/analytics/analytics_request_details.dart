@@ -21,6 +21,7 @@ abstract class AnalyticsRequestDetails
     this.errorObjectAsString,
     this.errorStackTraceAsString,
     required this.stringifiedPayload,
+    this.stringifiedResponse,
   }) : timeStamp = timeStamp ?? DateTime.now();
 
   factory AnalyticsRequestDetails({
@@ -31,6 +32,7 @@ abstract class AnalyticsRequestDetails
     String? errorObjectAsString,
     String? errorStackTraceAsString,
     required String stringifiedPayload,
+    String? stringifiedResponse,
   }) = _AnalyticsRequestDetailsImpl;
 
   factory AnalyticsRequestDetails.fromJson(
@@ -45,6 +47,7 @@ abstract class AnalyticsRequestDetails
       errorStackTraceAsString:
           jsonSerialization['errorStackTraceAsString'] as String?,
       stringifiedPayload: jsonSerialization['stringifiedPayload'] as String,
+      stringifiedResponse: jsonSerialization['stringifiedResponse'] as String?,
     );
   }
 
@@ -67,6 +70,8 @@ abstract class AnalyticsRequestDetails
 
   String stringifiedPayload;
 
+  String? stringifiedResponse;
+
   @override
   _i1.Table<int?> get table => t;
 
@@ -81,6 +86,7 @@ abstract class AnalyticsRequestDetails
     String? errorObjectAsString,
     String? errorStackTraceAsString,
     String? stringifiedPayload,
+    String? stringifiedResponse,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -94,6 +100,8 @@ abstract class AnalyticsRequestDetails
       if (errorStackTraceAsString != null)
         'errorStackTraceAsString': errorStackTraceAsString,
       'stringifiedPayload': stringifiedPayload,
+      if (stringifiedResponse != null)
+        'stringifiedResponse': stringifiedResponse,
     };
   }
 
@@ -109,6 +117,8 @@ abstract class AnalyticsRequestDetails
       if (errorStackTraceAsString != null)
         'errorStackTraceAsString': errorStackTraceAsString,
       'stringifiedPayload': stringifiedPayload,
+      if (stringifiedResponse != null)
+        'stringifiedResponse': stringifiedResponse,
     };
   }
 
@@ -153,6 +163,7 @@ class _AnalyticsRequestDetailsImpl extends AnalyticsRequestDetails {
     String? errorObjectAsString,
     String? errorStackTraceAsString,
     required String stringifiedPayload,
+    String? stringifiedResponse,
   }) : super._(
           id: id,
           timeStamp: timeStamp,
@@ -161,6 +172,7 @@ class _AnalyticsRequestDetailsImpl extends AnalyticsRequestDetails {
           errorObjectAsString: errorObjectAsString,
           errorStackTraceAsString: errorStackTraceAsString,
           stringifiedPayload: stringifiedPayload,
+          stringifiedResponse: stringifiedResponse,
         );
 
   /// Returns a shallow copy of this [AnalyticsRequestDetails]
@@ -175,6 +187,7 @@ class _AnalyticsRequestDetailsImpl extends AnalyticsRequestDetails {
     Object? errorObjectAsString = _Undefined,
     Object? errorStackTraceAsString = _Undefined,
     String? stringifiedPayload,
+    Object? stringifiedResponse = _Undefined,
   }) {
     return AnalyticsRequestDetails(
       id: id is int? ? id : this.id,
@@ -188,6 +201,9 @@ class _AnalyticsRequestDetailsImpl extends AnalyticsRequestDetails {
           ? errorStackTraceAsString
           : this.errorStackTraceAsString,
       stringifiedPayload: stringifiedPayload ?? this.stringifiedPayload,
+      stringifiedResponse: stringifiedResponse is String?
+          ? stringifiedResponse
+          : this.stringifiedResponse,
     );
   }
 }
@@ -220,6 +236,10 @@ class AnalyticsRequestDetailsTable extends _i1.Table<int?> {
       'stringifiedPayload',
       this,
     );
+    stringifiedResponse = _i1.ColumnString(
+      'stringifiedResponse',
+      this,
+    );
   }
 
   late final _i1.ColumnDateTime timeStamp;
@@ -234,6 +254,8 @@ class AnalyticsRequestDetailsTable extends _i1.Table<int?> {
 
   late final _i1.ColumnString stringifiedPayload;
 
+  late final _i1.ColumnString stringifiedResponse;
+
   @override
   List<_i1.Column> get columns => [
         id,
@@ -243,6 +265,7 @@ class AnalyticsRequestDetailsTable extends _i1.Table<int?> {
         errorObjectAsString,
         errorStackTraceAsString,
         stringifiedPayload,
+        stringifiedResponse,
       ];
 }
 

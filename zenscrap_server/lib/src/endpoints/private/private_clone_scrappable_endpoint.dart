@@ -179,6 +179,24 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
       await Scrappable.db.attachRow.scrappingBeeExtractRules(
           session, clonedScrappable!, scrappingBeeExtractLogic,
           transaction: transaction);
+
+      // Create default AutoFixConfig for the cloned scrappable
+      final autoFixConfig = await AutoFixConfig.db.insertRow(
+        session,
+        AutoFixConfig(
+          scrappableId: clonedScrappable!.id!,
+          enabled: true,
+          consecutiveErrorThreshold: 100,
+          currentConsecutiveErrors: 0,
+          inProgress: false,
+          attemptCount: 0,
+          preferredAiModel: null, // Auto mode
+        ),
+        transaction: transaction,
+      );
+      await Scrappable.db.attachRow.autoFixConfig(
+          session, clonedScrappable!, autoFixConfig,
+          transaction: transaction);
     });
 
     // Return the cloned scrappable with all relations (after commit)

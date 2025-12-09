@@ -17,6 +17,7 @@ import '../../entities/scrappable/scrappable_request.dart' as _i3;
 import '../../entities/scrappable/reference_test_data.dart' as _i4;
 import '../../entities/scrappable/scrappable_analytics.dart' as _i5;
 import '../../entities/scrappable/scraper_category.dart' as _i6;
+import '../../entities/scrappable/auto_fix/auto_fix_config.dart' as _i7;
 
 abstract class Scrappable
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -39,6 +40,7 @@ abstract class Scrappable
     this.scrappableAnalytics,
     required this.category,
     required this.isDeleted,
+    this.autoFixConfig,
   });
 
   factory Scrappable({
@@ -60,6 +62,7 @@ abstract class Scrappable
     List<_i5.ScrappableAnalytics>? scrappableAnalytics,
     required _i6.ScraperCategory category,
     required bool isDeleted,
+    _i7.AutoFixConfig? autoFixConfig,
   }) = _ScrappableImpl;
 
   factory Scrappable.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -105,6 +108,10 @@ abstract class Scrappable
       category:
           _i6.ScraperCategory.fromJson((jsonSerialization['category'] as int)),
       isDeleted: jsonSerialization['isDeleted'] as bool,
+      autoFixConfig: jsonSerialization['autoFixConfig'] == null
+          ? null
+          : _i7.AutoFixConfig.fromJson(
+              (jsonSerialization['autoFixConfig'] as Map<String, dynamic>)),
     );
   }
 
@@ -149,6 +156,8 @@ abstract class Scrappable
 
   bool isDeleted;
 
+  _i7.AutoFixConfig? autoFixConfig;
+
   @override
   _i1.Table<int?> get table => t;
 
@@ -174,6 +183,7 @@ abstract class Scrappable
     List<_i5.ScrappableAnalytics>? scrappableAnalytics,
     _i6.ScraperCategory? category,
     bool? isDeleted,
+    _i7.AutoFixConfig? autoFixConfig,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -202,6 +212,7 @@ abstract class Scrappable
             scrappableAnalytics?.toJson(valueToJson: (v) => v.toJson()),
       'category': category.toJson(),
       'isDeleted': isDeleted,
+      if (autoFixConfig != null) 'autoFixConfig': autoFixConfig?.toJson(),
     };
   }
 
@@ -232,6 +243,8 @@ abstract class Scrappable
             valueToJson: (v) => v.toJsonForProtocol()),
       'category': category.toJson(),
       'isDeleted': isDeleted,
+      if (autoFixConfig != null)
+        'autoFixConfig': autoFixConfig?.toJsonForProtocol(),
     };
   }
 
@@ -240,12 +253,14 @@ abstract class Scrappable
     _i3.ScrappableRequestInclude? targetRequest,
     _i4.ReferenceTestDataInclude? referenceTestData,
     _i5.ScrappableAnalyticsIncludeList? scrappableAnalytics,
+    _i7.AutoFixConfigInclude? autoFixConfig,
   }) {
     return ScrappableInclude._(
       scrappingBeeExtractRules: scrappingBeeExtractRules,
       targetRequest: targetRequest,
       referenceTestData: referenceTestData,
       scrappableAnalytics: scrappableAnalytics,
+      autoFixConfig: autoFixConfig,
     );
   }
 
@@ -297,6 +312,7 @@ class _ScrappableImpl extends Scrappable {
     List<_i5.ScrappableAnalytics>? scrappableAnalytics,
     required _i6.ScraperCategory category,
     required bool isDeleted,
+    _i7.AutoFixConfig? autoFixConfig,
   }) : super._(
           id: id,
           accountId: accountId,
@@ -316,6 +332,7 @@ class _ScrappableImpl extends Scrappable {
           scrappableAnalytics: scrappableAnalytics,
           category: category,
           isDeleted: isDeleted,
+          autoFixConfig: autoFixConfig,
         );
 
   /// Returns a shallow copy of this [Scrappable]
@@ -341,6 +358,7 @@ class _ScrappableImpl extends Scrappable {
     Object? scrappableAnalytics = _Undefined,
     _i6.ScraperCategory? category,
     bool? isDeleted,
+    Object? autoFixConfig = _Undefined,
   }) {
     return Scrappable(
       id: id is int? ? id : this.id,
@@ -377,6 +395,9 @@ class _ScrappableImpl extends Scrappable {
           : this.scrappableAnalytics?.map((e0) => e0.copyWith()).toList(),
       category: category ?? this.category,
       isDeleted: isDeleted ?? this.isDeleted,
+      autoFixConfig: autoFixConfig is _i7.AutoFixConfig?
+          ? autoFixConfig
+          : this.autoFixConfig?.copyWith(),
     );
   }
 }
@@ -474,6 +495,8 @@ class ScrappableTable extends _i1.Table<int?> {
 
   late final _i1.ColumnBool isDeleted;
 
+  _i7.AutoFixConfigTable? _autoFixConfig;
+
   _i2.ScrappingBeeExtractLogicTable get scrappingBeeExtractRules {
     if (_scrappingBeeExtractRules != null) return _scrappingBeeExtractRules!;
     _scrappingBeeExtractRules = _i1.createRelationTable(
@@ -526,6 +549,19 @@ class ScrappableTable extends _i1.Table<int?> {
     return ___scrappableAnalytics!;
   }
 
+  _i7.AutoFixConfigTable get autoFixConfig {
+    if (_autoFixConfig != null) return _autoFixConfig!;
+    _autoFixConfig = _i1.createRelationTable(
+      relationFieldName: 'autoFixConfig',
+      field: Scrappable.t.id,
+      foreignField: _i7.AutoFixConfig.t.scrappableId,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _i7.AutoFixConfigTable(tableRelation: foreignTableRelation),
+    );
+    return _autoFixConfig!;
+  }
+
   _i1.ManyRelation<_i5.ScrappableAnalyticsTable> get scrappableAnalytics {
     if (_scrappableAnalytics != null) return _scrappableAnalytics!;
     var relationTable = _i1.createRelationTable(
@@ -576,6 +612,9 @@ class ScrappableTable extends _i1.Table<int?> {
     if (relationField == 'scrappableAnalytics') {
       return __scrappableAnalytics;
     }
+    if (relationField == 'autoFixConfig') {
+      return autoFixConfig;
+    }
     return null;
   }
 }
@@ -586,11 +625,13 @@ class ScrappableInclude extends _i1.IncludeObject {
     _i3.ScrappableRequestInclude? targetRequest,
     _i4.ReferenceTestDataInclude? referenceTestData,
     _i5.ScrappableAnalyticsIncludeList? scrappableAnalytics,
+    _i7.AutoFixConfigInclude? autoFixConfig,
   }) {
     _scrappingBeeExtractRules = scrappingBeeExtractRules;
     _targetRequest = targetRequest;
     _referenceTestData = referenceTestData;
     _scrappableAnalytics = scrappableAnalytics;
+    _autoFixConfig = autoFixConfig;
   }
 
   _i2.ScrappingBeeExtractLogicInclude? _scrappingBeeExtractRules;
@@ -601,12 +642,15 @@ class ScrappableInclude extends _i1.IncludeObject {
 
   _i5.ScrappableAnalyticsIncludeList? _scrappableAnalytics;
 
+  _i7.AutoFixConfigInclude? _autoFixConfig;
+
   @override
   Map<String, _i1.Include?> get includes => {
         'scrappingBeeExtractRules': _scrappingBeeExtractRules,
         'targetRequest': _targetRequest,
         'referenceTestData': _referenceTestData,
         'scrappableAnalytics': _scrappableAnalytics,
+        'autoFixConfig': _autoFixConfig,
       };
 
   @override
@@ -959,6 +1003,29 @@ class ScrappableAttachRowRepository {
     await session.db.updateRow<Scrappable>(
       $scrappable,
       columns: [Scrappable.t.referenceTestDataId],
+      transaction: transaction,
+    );
+  }
+
+  /// Creates a relation between the given [Scrappable] and [AutoFixConfig]
+  /// by setting the [Scrappable]'s foreign key `id` to refer to the [AutoFixConfig].
+  Future<void> autoFixConfig(
+    _i1.Session session,
+    Scrappable scrappable,
+    _i7.AutoFixConfig autoFixConfig, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (autoFixConfig.id == null) {
+      throw ArgumentError.notNull('autoFixConfig.id');
+    }
+    if (scrappable.id == null) {
+      throw ArgumentError.notNull('scrappable.id');
+    }
+
+    var $autoFixConfig = autoFixConfig.copyWith(scrappableId: scrappable.id);
+    await session.db.updateRow<_i7.AutoFixConfig>(
+      $autoFixConfig,
+      columns: [_i7.AutoFixConfig.t.scrappableId],
       transaction: transaction,
     );
   }
