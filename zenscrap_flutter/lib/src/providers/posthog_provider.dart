@@ -1661,6 +1661,44 @@ class AnalyticsService {
     );
   }
 
+  /// Track when user sees the IP limit error on create scrappable page
+  Future<void> trackCreateScrappableIpLimitView({
+    required String errorTitle,
+    required String errorDescription,
+  }) async {
+    await _safeCapture(
+      eventName: 'create_scrappable:ip_limit_view',
+      properties: {
+        'error_title': errorTitle,
+        'error_description': errorDescription,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user clicks "Create Account" from IP limit error on create scrappable page
+  Future<void> trackCreateScrappableIpLimitCreateAccountClick({
+    required String errorTitle,
+  }) async {
+    await _safeCapture(
+      eventName: 'create_scrappable:ip_limit_create_account_click',
+      properties: {
+        'error_title': errorTitle,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user clicks "Try Again" from IP limit error on create scrappable page
+  Future<void> trackCreateScrappableIpLimitTryAgainClick() async {
+    await _safeCapture(
+      eventName: 'create_scrappable:ip_limit_try_again_click',
+      properties: {
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
   /// Track when user sees the session credit limit reached message
   Future<void> trackChatSessionLimitReachedView({
     required double creditsSpent,
