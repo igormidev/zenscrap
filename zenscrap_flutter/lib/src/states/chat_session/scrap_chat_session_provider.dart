@@ -10,25 +10,24 @@ import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_messages_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_state.dart';
 
-final scrapChatProvider =
-    StateNotifierProvider<ScrapChatSessionNotifier, ScrapChatSessionState>(
-        ScrapChatSessionNotifier.new);
-
-class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
-  final Ref ref;
+/// Notifier for managing scrap chat session state.
+/// Migrated from StateNotifierProvider to NotifierProvider for Riverpod 3.0.
+class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
   StreamSubscription<ChatResponse>? _chatResponseSubscription;
   StreamSubscription<String>? _aiCurrentThinkingSubscription;
-  ScrapChatSessionNotifier(this.ref) : super(ScrapChatSessionState.blank());
 
   @override
-  void dispose() {
-    _chatResponseSubscription?.cancel();
-    _aiCurrentThinkingSubscription?.cancel();
-    super.dispose();
+  ScrapChatSessionState build() {
+    // Clean up subscriptions when the notifier is disposed
+    ref.onDispose(() {
+      _chatResponseSubscription?.cancel();
+      _aiCurrentThinkingSubscription?.cancel();
+    });
+    return ScrapChatSessionState.blank();
   }
 
   void reset() {
-    ref.read(chatMessagesProvider.notifier).state = const AsyncValue.data([]);
+    ref.read(chatMessagesProvider.notifier).setMessages(const AsyncValue.data([]));
     state = ScrapChatSessionState.blank();
 
     _chatResponseSubscription?.cancel();
@@ -188,11 +187,13 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
         },
       );
     }
-    ref.read(chatMessagesProvider.notifier).state =
-        ref.read(chatMessagesProvider).maybeMap(
-              data: (data) => AsyncValue.data([...data.value, chatResponse]),
-              orElse: () => AsyncValue.data([chatResponse]),
-            );
+    final currentMessages = ref.read(chatMessagesProvider);
+    ref.read(chatMessagesProvider.notifier).setMessages(
+          currentMessages.maybeMap(
+            data: (data) => AsyncValue.data([...data.value, chatResponse]),
+            orElse: () => AsyncValue.data([chatResponse]),
+          ),
+        );
   }
 
   void updateScrappableDetails({
@@ -292,3 +293,7 @@ class ScrapChatSessionNotifier extends StateNotifier<ScrapChatSessionState> {
         .updateUserApiKey(sessionId: sessionUuid, openAiApiKey: apiKey);
   }
 }
+
+final scrapChatProvider =
+    NotifierProvider<ScrapChatSessionNotifier, ScrapChatSessionState>(
+        ScrapChatSessionNotifier.new);

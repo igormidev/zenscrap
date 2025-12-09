@@ -65,8 +65,9 @@ class _ZenChatTextfieldState extends ConsumerState<ZenChatTextfield> {
   }
 
   Future<void> _sendMessage() async {
-    if (!(_formKey.currentState?.validate() ?? false) || _isSendingMessage)
+    if (!(_formKey.currentState?.validate() ?? false) || _isSendingMessage) {
       return;
+    }
 
     final message = _promptEC.text.trim();
     final analytics = ref.read(analyticsServiceProvider);
@@ -154,7 +155,7 @@ class _ZenChatTextfieldState extends ConsumerState<ZenChatTextfield> {
   @override
   Widget build(BuildContext context) {
     // Watch chat messages to check for credit exhaustion
-    final messages = ref.watch(chatMessagesProvider).valueOrNull ?? [];
+    final messages = ref.watch(chatMessagesProvider).value ?? [];
     final isCreditsExhausted = _areCreditsExhausted(messages);
 
     final isDisabled = isEndpointTimeExpired ||

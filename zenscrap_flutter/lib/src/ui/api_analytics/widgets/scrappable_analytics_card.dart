@@ -48,9 +48,9 @@ class ScrappableAnalyticsCard extends ConsumerWidget {
           );
 
           if (isSelected) {
-            ref.read(selectedScrappableProvider.notifier).state = null;
+            ref.read(selectedScrappableProvider.notifier).clear();
           } else {
-            ref.read(selectedScrappableProvider.notifier).state = item;
+            ref.read(selectedScrappableProvider.notifier).select(item);
           }
         },
         child: Container(

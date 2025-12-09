@@ -1,25 +1,20 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/serverpod_to_result.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/ai_usage/ai_usage_state.dart';
 
-final aiUsageProvider =
-    StateNotifierProvider<AIUsageNotifier, AIUsageState>((ref) {
-  final client = ref.watch(clientProvider);
-  return AIUsageNotifier(client);
-});
-
-class AIUsageNotifier extends StateNotifier<AIUsageState> {
-  final Client _client;
-
-  AIUsageNotifier(this._client) : super(const AIUsageState.initial());
+/// Notifier for managing AI usage state.
+/// Migrated from StateNotifierProvider to NotifierProvider for Riverpod 3.0.
+class AIUsageNotifier extends Notifier<AIUsageState> {
+  @override
+  AIUsageState build() => const AIUsageState.initial();
 
   Future<void> loadAiUsage() async {
     state = const AIUsageState.loading();
 
+    final client = ref.read(clientProvider);
     final aiUsageResult =
-        await _client.privateAiUsage.getAiUsageInfo().toResult;
+        await client.privateAiUsage.getAiUsageInfo().toResult;
 
     state = aiUsageResult.fold(
       (aiUsage) => AIUsageState.loaded(aiUsage: aiUsage),
@@ -31,3 +26,6 @@ class AIUsageNotifier extends StateNotifier<AIUsageState> {
     await loadAiUsage();
   }
 }
+
+final aiUsageProvider =
+    NotifierProvider<AIUsageNotifier, AIUsageState>(AIUsageNotifier.new);

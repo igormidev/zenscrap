@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:riverpod/riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
@@ -20,112 +20,120 @@ import 'package:zenscrap_flutter/src/ui/scrappables/view/user_scrappables_listag
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
-final StateProvider routerProvider = StateProvider((ref) {
-  final sessionState = ref.watch(sessionProvider);
-  final haveUser = sessionState.maybeMap(
-    orElse: () => false,
-    logged: (_) => true,
-  );
-  final isLoading = sessionState.maybeMap(
-    orElse: () => false,
-    loading: (_) => true,
-  );
+/// Notifier for managing GoRouter configuration.
+/// Rebuilds router when session state changes to handle authentication redirects.
+class RouterNotifier extends Notifier<GoRouter> {
+  @override
+  GoRouter build() {
+    final sessionState = ref.watch(sessionProvider);
+    final haveUser = sessionState.maybeMap(
+      orElse: () => false,
+      logged: (_) => true,
+    );
+    final isLoading = sessionState.maybeMap(
+      orElse: () => false,
+      loading: (_) => true,
+    );
 
-  return GoRouter(
-    navigatorKey: _rootNavigatorKey,
-    observers: <NavigatorObserver>[
-      if (kDebugMode) TalkerRouteObserver(talker),
-    ],
-    redirect: (context, state) {
-      final path = state.fullPath;
+    return GoRouter(
+      navigatorKey: _rootNavigatorKey,
+      observers: <NavigatorObserver>[
+        if (kDebugMode) TalkerRouteObserver(talker),
+      ],
+      redirect: (context, state) {
+        final path = state.fullPath;
 
-      // Don't redirect while session is still loading
-      if (isLoading) {
-        return null;
-      }
-
-      if (path == '/splash') {
-        return null;
-      }
-      if (path == null) {
-        return '/splash';
-      }
-
-      if (haveUser == false) {
-        if (path == '/auth') {
+        // Don't redirect while session is still loading
+        if (isLoading) {
           return null;
         }
 
-        // Allow unauthenticated access to auth, splash, and review session routes
-        // The review route is public so anyone can help review hardcoded strings
-        if (path.contains('/scrappable-form') == false &&
-            path.contains('/splash') == false) {
+        if (path == '/splash') {
+          return null;
+        }
+        if (path == null) {
           return '/splash';
         }
-      } else {
-        // If user is authenticated and trying to access auth page, redirect to labels
-        if (path == '/auth' || path.contains('/auth')) {
-          return DashboardNavigationType.userEndpoints.routeOnClick;
-        }
-      }
 
-      return null;
-    },
-    // initialLocation: '/scrappable-form',
-    initialLocation: '/splash',
-    routes: [
-      GoRoute(
-        path: '/splash',
-        builder: (context, state) {
-          return const SplashView();
-        },
-      ),
-      GoRoute(
-        path: '/scrappable-form',
-        builder: (context, state) {
-          final scrappableIdStr = state.uri.queryParameters['id'];
-          final int? scrappableId = scrappableIdStr != null ? int.tryParse(scrappableIdStr) : null;
-          return InitialChatView(scrappableId: scrappableId);
-        },
-      ),
-      ShellRoute(
-        navigatorKey: _shellNavigatorKey,
-        routes: [
-          GoRoute(
-            path: DashboardNavigationType.userEndpoints.routeOnClick!,
-            builder: (context, state) => UserScrappablesListage(),
-          ),
-          GoRoute(
-            path: DashboardNavigationType.marketPlace.routeOnClick!,
-            builder: (context, state) => MarketplaceView(),
-          ),
-          GoRoute(
-            path: DashboardNavigationType.usage.routeOnClick!,
-            builder: (context, state) => ApiUsageView(),
-          ),
-          GoRoute(
-            path: DashboardNavigationType.analytics.routeOnClick!,
-            builder: (context, state) => ApiAnalyticsView(),
-          ),
-          GoRoute(
-            path: DashboardNavigationType.account.routeOnClick!,
-            builder: (context, state) => AccountView(),
-          ),
-          GoRoute(
-            path: DashboardNavigationType.pricingPage.routeOnClick!,
-            builder: (context, state) => ZenScrapPricingPage(),
-          ),
-        ],
-        builder: (context, state, child) {
-          return DashboardView(child: child);
-        },
-      ),
-      GoRoute(
-        path: '/auth',
-        builder: (context, state) {
-          return const AuthView();
-        },
-      ),
-    ],
-  );
-});
+        if (haveUser == false) {
+          if (path == '/auth') {
+            return null;
+          }
+
+          // Allow unauthenticated access to auth, splash, and review session routes
+          // The review route is public so anyone can help review hardcoded strings
+          if (path.contains('/scrappable-form') == false &&
+              path.contains('/splash') == false) {
+            return '/splash';
+          }
+        } else {
+          // If user is authenticated and trying to access auth page, redirect to labels
+          if (path == '/auth' || path.contains('/auth')) {
+            return DashboardNavigationType.userEndpoints.routeOnClick;
+          }
+        }
+
+        return null;
+      },
+      // initialLocation: '/scrappable-form',
+      initialLocation: '/splash',
+      routes: [
+        GoRoute(
+          path: '/splash',
+          builder: (context, state) {
+            return const SplashView();
+          },
+        ),
+        GoRoute(
+          path: '/scrappable-form',
+          builder: (context, state) {
+            final scrappableIdStr = state.uri.queryParameters['id'];
+            final int? scrappableId =
+                scrappableIdStr != null ? int.tryParse(scrappableIdStr) : null;
+            return InitialChatView(scrappableId: scrappableId);
+          },
+        ),
+        ShellRoute(
+          navigatorKey: _shellNavigatorKey,
+          routes: [
+            GoRoute(
+              path: DashboardNavigationType.userEndpoints.routeOnClick!,
+              builder: (context, state) => UserScrappablesListage(),
+            ),
+            GoRoute(
+              path: DashboardNavigationType.marketPlace.routeOnClick!,
+              builder: (context, state) => MarketplaceView(),
+            ),
+            GoRoute(
+              path: DashboardNavigationType.usage.routeOnClick!,
+              builder: (context, state) => ApiUsageView(),
+            ),
+            GoRoute(
+              path: DashboardNavigationType.analytics.routeOnClick!,
+              builder: (context, state) => ApiAnalyticsView(),
+            ),
+            GoRoute(
+              path: DashboardNavigationType.account.routeOnClick!,
+              builder: (context, state) => AccountView(),
+            ),
+            GoRoute(
+              path: DashboardNavigationType.pricingPage.routeOnClick!,
+              builder: (context, state) => ZenScrapPricingPage(),
+            ),
+          ],
+          builder: (context, state, child) {
+            return DashboardView(child: child);
+          },
+        ),
+        GoRoute(
+          path: '/auth',
+          builder: (context, state) {
+            return const AuthView();
+          },
+        ),
+      ],
+    );
+  }
+}
+
+final routerProvider = NotifierProvider<RouterNotifier, GoRouter>(RouterNotifier.new);

@@ -132,7 +132,7 @@ class _AnalyticsContent extends ConsumerWidget {
 
                             ref
                                 .read(selectedScrappableProvider.notifier)
-                                .state = null;
+                                .clear();
                           },
                         ),
                         const SizedBox(width: 8),

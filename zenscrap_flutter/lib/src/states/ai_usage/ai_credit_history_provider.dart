@@ -5,19 +5,16 @@ import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/ai_usage/ai_credit_history_state.dart';
 
-final aiCreditHistoryProvider =
-    StateNotifierProvider<AICreditHistoryNotifier, AICreditHistoryState>((ref) {
-  final client = ref.watch(clientProvider);
-  return AICreditHistoryNotifier(client);
-});
-
-class AICreditHistoryNotifier extends StateNotifier<AICreditHistoryState> {
-  final Client _client;
+/// Notifier for managing AI credit history state.
+/// Migrated from StateNotifierProvider to NotifierProvider for Riverpod 3.0.
+class AICreditHistoryNotifier extends Notifier<AICreditHistoryState> {
   int _currentPage = 1;
   List<AICreditHistoryItem> _allHistory = [];
 
-  AICreditHistoryNotifier(this._client)
-      : super(const AICreditHistoryState.initial());
+  @override
+  AICreditHistoryState build() => const AICreditHistoryState.initial();
+
+  Client get _client => ref.read(clientProvider);
 
   Future<void> loadCreditHistory() async {
     try {
@@ -132,3 +129,7 @@ class AICreditHistoryNotifier extends StateNotifier<AICreditHistoryState> {
     await loadCreditHistory();
   }
 }
+
+final aiCreditHistoryProvider =
+    NotifierProvider<AICreditHistoryNotifier, AICreditHistoryState>(
+        AICreditHistoryNotifier.new);

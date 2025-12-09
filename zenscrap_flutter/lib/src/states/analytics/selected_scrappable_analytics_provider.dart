@@ -3,17 +3,15 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/analytics/selected_scrappable_analytics_state.dart';
 
-final selectedScrappableAnalyticsProvider = StateNotifierProvider<
-    SelectedScrappableAnalyticsNotifier,
-    SelectedScrappableAnalyticsState>(SelectedScrappableAnalyticsNotifier.new);
-
+/// Notifier for managing selected scrappable analytics state.
+/// Migrated from StateNotifierProvider to NotifierProvider for Riverpod 3.0.
 class SelectedScrappableAnalyticsNotifier
-    extends StateNotifier<SelectedScrappableAnalyticsState> {
-  final Ref ref;
-  SelectedScrappableAnalyticsNotifier(this.ref)
-      : super(SelectedScrappableAnalyticsState.none());
-
+    extends Notifier<SelectedScrappableAnalyticsState> {
   int _currentPage = 1;
+
+  @override
+  SelectedScrappableAnalyticsState build() =>
+      SelectedScrappableAnalyticsState.none();
 
   void resetState() {
     _currentPage = 1;
@@ -79,3 +77,8 @@ class SelectedScrappableAnalyticsNotifier
     }
   }
 }
+
+final selectedScrappableAnalyticsProvider = NotifierProvider<
+    SelectedScrappableAnalyticsNotifier, SelectedScrappableAnalyticsState>(
+  SelectedScrappableAnalyticsNotifier.new,
+);

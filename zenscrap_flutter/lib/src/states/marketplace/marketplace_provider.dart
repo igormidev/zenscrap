@@ -5,20 +5,17 @@ import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/marketplace/marketplace_state.dart';
 
-final marketplaceProvider =
-    StateNotifierProvider<MarketplaceNotifier, MarketplaceState>((ref) {
-  final client = ref.watch(clientProvider);
-  return MarketplaceNotifier(client);
-});
-
-class MarketplaceNotifier extends StateNotifier<MarketplaceState> {
-  final Client _client;
-
-  MarketplaceNotifier(this._client) : super(const MarketplaceState.initial());
-
+/// Notifier for managing marketplace state.
+/// Migrated from StateNotifierProvider to NotifierProvider for Riverpod 3.0.
+class MarketplaceNotifier extends Notifier<MarketplaceState> {
   String _currentSearchQuery = '';
   Set<ScraperCategory> _currentCategories = {};
   int _currentPage = 1;
+
+  @override
+  MarketplaceState build() => const MarketplaceState.initial();
+
+  Client get _client => ref.read(clientProvider);
 
   Future<void> loadMarketplace({
     int page = 1,
@@ -34,9 +31,8 @@ class MarketplaceNotifier extends StateNotifier<MarketplaceState> {
       final response = await _client.marketplace.getItems(
         page: page,
         searchQuery: searchQuery.isNotEmpty ? searchQuery : null,
-        categories: _currentCategories.isEmpty
-            ? null
-            : _currentCategories.toList(),
+        categories:
+            _currentCategories.isEmpty ? null : _currentCategories.toList(),
       );
 
       state = MarketplaceState.loaded(
@@ -94,3 +90,7 @@ class MarketplaceNotifier extends StateNotifier<MarketplaceState> {
     );
   }
 }
+
+final marketplaceProvider =
+    NotifierProvider<MarketplaceNotifier, MarketplaceState>(
+        MarketplaceNotifier.new);

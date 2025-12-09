@@ -50,9 +50,9 @@ class LoginPage extends ConsumerWidget {
         ),
       ],
       onSubmitSuccess: (data) {
-        ref.read(sessionProvider.notifier).state = SessionState.logged(
+        ref.read(sessionProvider.notifier).setState(SessionState.logged(
           user: data,
-        );
+        ));
       },
       onSubmit: (items) async {
         final String email = items[0];

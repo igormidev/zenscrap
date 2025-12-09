@@ -6,17 +6,15 @@ import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables_state.dart';
 
-final userScrappablesProvider =
-    StateNotifierProvider<UserScrappablesNotifier, UserScrappablesState>(
-        UserScrappablesNotifier.new);
-
-class UserScrappablesNotifier extends StateNotifier<UserScrappablesState> {
-  final Ref ref;
-  UserScrappablesNotifier(this.ref) : super(UserScrappablesState.initial());
-
+/// Notifier for managing user scrappables state.
+/// Migrated from StateNotifierProvider to NotifierProvider for Riverpod 3.0.
+class UserScrappablesNotifier extends Notifier<UserScrappablesState> {
   String _currentSearchQuery = '';
   Set<ScraperCategory> _currentCategories = {};
   int _currentPage = 1;
+
+  @override
+  UserScrappablesState build() => UserScrappablesState.initial();
 
   Future<void> loadScrappables({
     int page = 1,
@@ -39,7 +37,6 @@ class UserScrappablesNotifier extends StateNotifier<UserScrappablesState> {
     );
 
     try {
-
       state = UserScrappablesState.loading(
         response: previousResponse,
         searchQuery: _currentSearchQuery,
@@ -133,3 +130,7 @@ class UserScrappablesNotifier extends StateNotifier<UserScrappablesState> {
     await loadScrappables(page: 1, searchQuery: '');
   }
 }
+
+final userScrappablesProvider =
+    NotifierProvider<UserScrappablesNotifier, UserScrappablesState>(
+        UserScrappablesNotifier.new);
