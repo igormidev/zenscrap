@@ -293,27 +293,22 @@ class _HeroSectionState extends ConsumerState<HeroSection>
               // Right side - Robot Lottie (Z-pattern right end)
               Expanded(
                 flex: 4,
-                child:
-                    AnimatedOpacity(
-                          duration: const Duration(milliseconds: 300),
-                          opacity: _isDescriptionFocused ? 0.3 : 1.0,
-                          child: SizedBox(
-                            height: 500,
-                            child: Transform.scale(
-                              scale: 1.2,
-                              child: Lottie.network(
-                                'https://lottie.host/5f15ff4c-0e86-4f26-9bbc-29afbf753eb0/okRB2OAoWp.lottie',
-                                decoder: customDecoder,
-                              ),
-                            ),
-                          ),
-                        )
-                        .animate()
-                        .fadeIn(duration: 800.ms, delay: 500.ms)
-                        .scale(
-                          begin: const Offset(0.9, 0.9),
-                          end: const Offset(1, 1),
+                child: SizedBox(
+                      height: 500,
+                      child: Transform.scale(
+                        scale: 1.2,
+                        child: Lottie.network(
+                          'https://lottie.host/5f15ff4c-0e86-4f26-9bbc-29afbf753eb0/okRB2OAoWp.lottie',
+                          decoder: customDecoder,
                         ),
+                      ),
+                    )
+                    .animate()
+                    .fadeIn(duration: 800.ms, delay: 500.ms)
+                    .scale(
+                      begin: const Offset(0.9, 0.9),
+                      end: const Offset(1, 1),
+                    ),
               ),
             ],
           ),
