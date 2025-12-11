@@ -17,7 +17,7 @@ import 'auto_fix_email_templates.dart';
 /// - Scraper breaks with auto-fix disabled
 class AutoFixNotificationService {
   // Base URL for the application - should be configured via environment
-  static const String _baseUrl = 'https://app.zenscrap.com';
+  static const String _baseUrl = 'https://zenscrap.com';
 
   /// Notifies the user that an auto-fix session has started.
   ///
