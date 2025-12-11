@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:result_dart/result_dart.dart';
@@ -8,6 +9,7 @@ import 'package:zenscrap_server/src/core/scraping_bee.dart';
 import 'package:zenscrap_server/src/endpoints/public/marketplace_endpoint.dart';
 import 'package:zenscrap_server/src/endpoints/public/scrappable_chat_session.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
+import 'package:zenscrap_server/src/notifications/auto_fix_notification_service.dart';
 
 typedef ApiKey = String;
 typedef NanoId = String;
@@ -1036,6 +1038,24 @@ Future<void> _setScrappableAnalytics(
             columns: (t) => [t.currentConsecutiveErrors],
             transaction: transaction,
           );
+
+          // Check if we just reached the threshold and auto-fix is disabled
+          // Only notify when we cross the threshold (previous count was below, new count is at/above)
+          final justReachedThreshold =
+              autoFixConfig.currentConsecutiveErrors <
+                      autoFixConfig.consecutiveErrorThreshold &&
+                  newConsecutiveErrors >=
+                      autoFixConfig.consecutiveErrorThreshold;
+
+          if (justReachedThreshold && !autoFixConfig.enabled) {
+            // Send notification outside transaction to avoid blocking
+            // Use unawaited to not block the transaction
+            unawaited(AutoFixNotificationService.notifyScraperBroken(
+              session: session,
+              scrappable: scrappable,
+              errorCount: newConsecutiveErrors,
+            ));
+          }
         }
       }
     });
