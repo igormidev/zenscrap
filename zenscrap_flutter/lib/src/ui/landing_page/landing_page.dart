@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 import 'package:simple_platform/simple_platform.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_state.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
@@ -49,6 +50,15 @@ class _LandingPageState extends ConsumerState<LandingPage>
   final _marketplaceKey = GlobalKey();
   final _pricingKey = GlobalKey();
 
+  // Analytics tracking state
+  late DateTime _pageViewStartTime;
+  final Set<int> _trackedScrollDepthMilestones = {};
+  final Set<String> _viewedSections = {};
+  int _maxScrollDepthPercentage = 0;
+  int _navClicksCount = 0;
+  int _ctaClicksCount = 0;
+  bool _hasTrackedPageView = false;
+
   @override
   void initState() {
     super.initState();
@@ -57,6 +67,7 @@ class _LandingPageState extends ConsumerState<LandingPage>
       vsync: this,
       duration: const Duration(seconds: 22),
     );
+    _pageViewStartTime = DateTime.now();
   }
 
   void _onScroll() {
@@ -72,8 +83,42 @@ class _LandingPageState extends ConsumerState<LandingPage>
       setState(() => _learnMoreOpacity = newOpacity);
     }
 
+    // Track scroll depth milestones (25%, 50%, 75%, 100%)
+    _trackScrollDepth();
+
     // Update active section based on scroll position
     _updateActiveSection();
+  }
+
+  /// Track scroll depth milestones for analytics
+  /// Research shows users who scroll past 70% convert at 5.8x higher rate
+  void _trackScrollDepth() {
+    if (!_scrollController.hasClients) return;
+
+    final maxExtent = _scrollController.position.maxScrollExtent;
+    if (maxExtent <= 0) return;
+
+    final currentPosition = _scrollController.offset;
+    final depthPercentage = ((currentPosition / maxExtent) * 100).round();
+
+    // Update max scroll depth
+    if (depthPercentage > _maxScrollDepthPercentage) {
+      _maxScrollDepthPercentage = depthPercentage;
+    }
+
+    // Track milestones: 25%, 50%, 75%, 100%
+    final milestones = [25, 50, 75, 100];
+    for (final milestone in milestones) {
+      if (depthPercentage >= milestone &&
+          !_trackedScrollDepthMilestones.contains(milestone)) {
+        _trackedScrollDepthMilestones.add(milestone);
+        ref.read(analyticsServiceProvider).trackLandingScrollDepth(
+              depthPercentage: milestone,
+              scrollPosition: currentPosition,
+              maxScrollExtent: maxExtent,
+            );
+      }
+    }
   }
 
   void _updateActiveSection() {
@@ -85,6 +130,7 @@ class _LandingPageState extends ConsumerState<LandingPage>
     if (scrollOffset < 100) {
       if (_activeSection != LandingSection.createScrappable) {
         setState(() => _activeSection = LandingSection.createScrappable);
+        _trackSectionView('hero', 0);
       }
       return;
     }
@@ -120,7 +166,40 @@ class _LandingPageState extends ConsumerState<LandingPage>
 
     if (newSection != _activeSection) {
       setState(() => _activeSection = newSection);
+      // Track section view for analytics
+      _trackSectionViewForLandingSection(newSection);
     }
+  }
+
+  /// Track section visibility for analytics
+  void _trackSectionView(String sectionName, int sectionIndex) {
+    if (_viewedSections.contains(sectionName)) return;
+
+    _viewedSections.add(sectionName);
+    final scrollPosition =
+        _scrollController.hasClients ? _scrollController.offset : 0.0;
+
+    ref.read(analyticsServiceProvider).trackLandingSectionView(
+          sectionName: sectionName,
+          sectionIndex: sectionIndex,
+          scrollPosition: scrollPosition,
+        );
+  }
+
+  /// Map LandingSection enum to section name and index for analytics
+  void _trackSectionViewForLandingSection(LandingSection? section) {
+    if (section == null) return;
+
+    final sectionData = switch (section) {
+      LandingSection.createScrappable => ('hero', 0),
+      LandingSection.howItWorks => ('howItWorks', 2),
+      LandingSection.autoFix => ('autoFix', 3),
+      LandingSection.features => ('features', 4),
+      LandingSection.marketplace => ('marketplace', 5),
+      LandingSection.pricing => ('pricing', 6),
+    };
+
+    _trackSectionView(sectionData.$1, sectionData.$2);
   }
 
   /// Get the scroll position where a widget starts (relative to scroll extent)
@@ -140,6 +219,9 @@ class _LandingPageState extends ConsumerState<LandingPage>
   }
 
   void _scrollToSection(LandingSection section) {
+    // Track navigation click for analytics
+    _trackNavClick(section);
+
     // Handle createScrappable - scroll to top
     if (section == LandingSection.createScrappable) {
       _scrollController.animateTo(
@@ -185,6 +267,20 @@ class _LandingPageState extends ConsumerState<LandingPage>
     }
   }
 
+  /// Track navigation item click for analytics
+  void _trackNavClick(LandingSection targetSection) {
+    _navClicksCount++;
+    final currentSection = _activeSection?.name ?? 'unknown';
+    final scrollPosition =
+        _scrollController.hasClients ? _scrollController.offset : 0.0;
+
+    ref.read(analyticsServiceProvider).trackLandingNavClick(
+          sectionName: targetSection.name,
+          currentSection: currentSection,
+          scrollPosition: scrollPosition,
+        );
+  }
+
   void _scrollToTop() {
     _scrollController.animateTo(
       0,
@@ -193,8 +289,73 @@ class _LandingPageState extends ConsumerState<LandingPage>
     );
   }
 
+  /// Track "Learn more" scroll indicator click
+  void _trackLearnMoreClick() {
+    final scrollPosition =
+        _scrollController.hasClients ? _scrollController.offset : 0.0;
+
+    ref.read(analyticsServiceProvider).trackLandingLearnMoreClick(
+          scrollPosition: scrollPosition,
+        );
+  }
+
+  /// Track Sign In button click
+  void _trackSignInClick() {
+    final currentSection = _activeSection?.name ?? 'unknown';
+    final scrollPosition =
+        _scrollController.hasClients ? _scrollController.offset : 0.0;
+
+    ref.read(analyticsServiceProvider).trackLandingSignInClick(
+          currentSection: currentSection,
+          scrollPosition: scrollPosition,
+        );
+  }
+
+  /// Track Final CTA "Create Your First Scraper" button click
+  void _trackFinalCtaCreateClick() {
+    _ctaClicksCount++;
+    final scrollPosition =
+        _scrollController.hasClients ? _scrollController.offset : 0.0;
+
+    ref.read(analyticsServiceProvider).trackLandingFinalCtaClick(
+          buttonType: 'create_scraper',
+          scrollPosition: scrollPosition,
+        );
+  }
+
+  /// Track Final CTA "Browse Marketplace" button click
+  void _trackFinalCtaMarketplaceClick() {
+    _ctaClicksCount++;
+    final scrollPosition =
+        _scrollController.hasClients ? _scrollController.offset : 0.0;
+
+    ref.read(analyticsServiceProvider).trackLandingFinalCtaClick(
+          buttonType: 'browse_marketplace',
+          scrollPosition: scrollPosition,
+        );
+  }
+
+  /// Track engagement summary when user leaves the landing page
+  void _trackEngagementSummary() {
+    final engagementTimeSeconds =
+        DateTime.now().difference(_pageViewStartTime).inSeconds;
+
+    // Only track if user spent more than 1 second on the page
+    if (engagementTimeSeconds < 1) return;
+
+    ref.read(analyticsServiceProvider).trackLandingEngagement(
+          engagementTimeSeconds: engagementTimeSeconds,
+          maxScrollDepthPercentage: _maxScrollDepthPercentage,
+          sectionsViewed: _viewedSections.toList(),
+          navClicksCount: _navClicksCount,
+          ctaClicksCount: _ctaClicksCount,
+        );
+  }
+
   @override
   void dispose() {
+    // Track engagement summary before disposing
+    _trackEngagementSummary();
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     _backgroundController.dispose();
@@ -238,6 +399,14 @@ class _LandingPageState extends ConsumerState<LandingPage>
 
   Widget _buildLandingPage(BuildContext context) {
     const appBarHeight = 80.0;
+
+    // Track page view once when landing page is built
+    if (!_hasTrackedPageView) {
+      _hasTrackedPageView = true;
+      ref.read(analyticsServiceProvider).trackLandingPageView();
+      // Track initial hero section view
+      _trackSectionView('hero', 0);
+    }
 
     return Scaffold(
       // Make scaffold background transparent so Lottie shows through
@@ -342,7 +511,11 @@ class _LandingPageState extends ConsumerState<LandingPage>
 
                   // Final CTA Section
                   SliverToBoxAdapter(
-                    child: FinalCtaSection(onScrollToTop: _scrollToTop),
+                    child: FinalCtaSection(
+                      onScrollToTop: _scrollToTop,
+                      onCreateScraperTap: _trackFinalCtaCreateClick,
+                      onBrowseMarketplaceTap: _trackFinalCtaMarketplaceClick,
+                    ),
                   ),
                 ],
               ),
@@ -356,6 +529,7 @@ class _LandingPageState extends ConsumerState<LandingPage>
                   activeSection: _activeSection,
                   isScrolled: _isScrolled,
                   onSectionTap: _scrollToSection,
+                  onSignInTap: _trackSignInClick,
                 ),
               ),
 
@@ -372,8 +546,10 @@ class _LandingPageState extends ConsumerState<LandingPage>
                       opacity: _learnMoreOpacity,
                       child: Center(
                         child: GestureDetector(
-                          onTap: () =>
-                              _scrollToSection(LandingSection.howItWorks),
+                          onTap: () {
+                            _trackLearnMoreClick();
+                            _scrollToSection(LandingSection.howItWorks);
+                          },
                           child: MouseRegion(
                             cursor: SystemMouseCursors.click,
                             child: Column(

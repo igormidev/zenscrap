@@ -9,9 +9,17 @@ class FinalCtaSection extends StatelessWidget {
   /// Callback when user wants to scroll to top/hero section
   final VoidCallback? onScrollToTop;
 
+  /// Callback when user clicks "Create Your First Scraper" button
+  final VoidCallback? onCreateScraperTap;
+
+  /// Callback when user clicks "Browse Marketplace" button
+  final VoidCallback? onBrowseMarketplaceTap;
+
   const FinalCtaSection({
     super.key,
     this.onScrollToTop,
+    this.onCreateScraperTap,
+    this.onBrowseMarketplaceTap,
   });
 
   @override
@@ -54,7 +62,10 @@ class FinalCtaSection extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               FilledButton.icon(
-                onPressed: onScrollToTop,
+                onPressed: () {
+                  onCreateScraperTap?.call();
+                  onScrollToTop?.call();
+                },
                 icon: const Icon(Icons.rocket_launch_rounded),
                 label: const Text('Create Your First Scraper'),
                 style: FilledButton.styleFrom(
@@ -68,6 +79,7 @@ class FinalCtaSection extends StatelessWidget {
               const SizedBox(width: 16),
               OutlinedButton.icon(
                 onPressed: () {
+                  onBrowseMarketplaceTap?.call();
                   // Navigate to marketplace - handled by parent
                 },
                 icon: const Icon(Icons.store_outlined),
