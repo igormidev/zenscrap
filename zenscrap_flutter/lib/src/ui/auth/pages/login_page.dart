@@ -8,6 +8,7 @@ import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 import 'package:zenscrap_flutter/src/states/session/user_model.dart';
 import 'package:zenscrap_flutter/src/ui/auth/templates/auth_form_template.dart';
+import 'package:zenscrap_flutter/src/ui/auth/widgets/google_sign_in_button.dart';
 
 class LoginPage extends ConsumerWidget {
   final EmailAuthController emailAuth;
@@ -90,6 +91,11 @@ class LoginPage extends ConsumerWidget {
           imageUrl: user?.imageUrl,
         );
       },
+      children: const [
+        SizedBox(height: 8),
+        ZenScrapGoogleSignInButton(),
+        SizedBox(height: 16),
+      ],
     );
   }
 }

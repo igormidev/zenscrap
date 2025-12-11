@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/ui/legal/terms_of_service_dialog.dart';
 
 /// Final call-to-action section at the bottom of the landing page.
 /// Drives urgency and provides a clear path to action.
@@ -134,6 +135,15 @@ class FinalCtaSection extends StatelessWidget {
                     color: context.c.onSurfaceVariant,
                   ),
                 ),
+                const SizedBox(width: 16),
+                Text(
+                  '•',
+                  style: context.t.bodyMedium?.copyWith(
+                    color: context.c.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                const TermsOfServiceLink(),
               ],
             ),
           )

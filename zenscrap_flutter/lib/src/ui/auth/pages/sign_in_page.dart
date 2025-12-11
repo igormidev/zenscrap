@@ -5,6 +5,7 @@ import 'package:serverpod_auth_email_flutter/serverpod_auth_email_flutter.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/ui/auth/templates/auth_form_template.dart';
+import 'package:zenscrap_flutter/src/ui/auth/widgets/google_sign_in_button.dart';
 
 class SignInPage extends ConsumerWidget {
   final EmailAuthController emailAuth;
@@ -107,6 +108,11 @@ class SignInPage extends ConsumerWidget {
 
         return email;
       },
+      children: const [
+        SizedBox(height: 8),
+        ZenScrapGoogleSignInButton(),
+        SizedBox(height: 16),
+      ],
     );
   }
 }

@@ -32,6 +32,9 @@ void run(List<String> args) async {
   // Register API routes FIRST (before catch-all routes)
   pod.webServer.addRoute(StripeWebhookRoute(), '/stripe/webhook');
 
+  // Register Google Sign In route for web authentication
+  pod.webServer.addRoute(auth.RouteGoogleSignIn(), '/googlesignin');
+
   // Register Scrappable API routes
   pod.webServer
       .addRoute(ScrappableApiRoute(isProd: false), '/api/scrappable/test');
