@@ -82,10 +82,9 @@ class _ChatViewPageState extends ConsumerState<InitialChatPage>
     try {
       // This will now navigate to the creatingScrappable state which shows
       // the AI thinking stream view
-      await ref.read(scrapChatProvider.notifier).createScrappable(
-            targetUrl: targetUrl,
-            userPrompt: _promptEC.text,
-          );
+      await ref
+          .read(scrapChatProvider.notifier)
+          .createScrappable(targetUrl: targetUrl, userPrompt: _promptEC.text);
 
       // Track success
       // Note: scrappableId will be 0 here as the state might not be updated yet
@@ -116,10 +115,9 @@ class _ChatViewPageState extends ConsumerState<InitialChatPage>
   Widget build(BuildContext context) {
     // Track page view with authentication status
     final analytics = ref.read(analyticsServiceProvider);
-    final isAuthenticated = ref.watch(sessionProvider).maybeMap(
-          orElse: () => false,
-          logged: (_) => true,
-        );
+    final isAuthenticated = ref
+        .watch(sessionProvider)
+        .maybeMap(orElse: () => false, logged: (_) => true);
     analytics.trackScrappableCreationFormView(isAuthenticated: isAuthenticated);
 
     return Stack(
@@ -137,9 +135,9 @@ class _ChatViewPageState extends ConsumerState<InitialChatPage>
               },
             ),
           ).animate().fadeIn(
-                duration: const Duration(seconds: 1),
-                delay: const Duration(milliseconds: 800),
-              ),
+            duration: const Duration(seconds: 1),
+            delay: const Duration(milliseconds: 800),
+          ),
         Center(
           child: ConstrainedBox(
             constraints: BoxConstraints(maxWidth: 600),
@@ -155,24 +153,26 @@ class _ChatViewPageState extends ConsumerState<InitialChatPage>
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 500),
                     height: _isDescriptionFocussed ? 120 : 400,
-                    child: SizedBox(
-                      height: 500,
-                      child: Transform.scale(
-                        scale: 1.3,
-                        child: Lottie.network(
-                          'https://lottie.host/5f15ff4c-0e86-4f26-9bbc-29afbf753eb0/okRB2OAoWp.lottie',
-                          decoder: customDecoder,
-                        ),
-                      ),
-                    )
-                        .animate()
-                        .fadeIn(
-                            duration: const Duration(seconds: 1),
-                            delay: const Duration(milliseconds: 300))
-                        .animate(target: _isDescriptionFocussed ? 1 : 0)
-                        .fadeOut(
-                          duration: const Duration(milliseconds: 200),
-                        ),
+                    child:
+                        SizedBox(
+                              height: 500,
+                              child: Transform.scale(
+                                scale: 1.3,
+                                child: Lottie.network(
+                                  'https://lottie.host/5f15ff4c-0e86-4f26-9bbc-29afbf753eb0/okRB2OAoWp.lottie',
+                                  decoder: customDecoder,
+                                ),
+                              ),
+                            )
+                            .animate()
+                            .fadeIn(
+                              duration: const Duration(seconds: 1),
+                              delay: const Duration(milliseconds: 300),
+                            )
+                            .animate(target: _isDescriptionFocussed ? 1 : 0)
+                            .fadeOut(
+                              duration: const Duration(milliseconds: 200),
+                            ),
                   ),
                   Center(
                     child: Transform.translate(
@@ -190,23 +190,24 @@ class _ChatViewPageState extends ConsumerState<InitialChatPage>
                   SizedBox(height: 20),
                   ZenTextfield(
                     controller: _referenceLinkEC,
-                    labelText: 'Type a reference link',
+                    labelText: 'Drop a target link',
                     hintText: 'E.g https://example.com/product/12345',
                     onSubmitted: (_) => _submitForm(),
-                    validator: (s) => ValidationBuilder()
-                        .url('Please enter a valid URL')
-                        .minLength(10, 'URL must be at least 10 characters')
-                        .maxLength(500, 'URL must be less than 500 characters')
-                        .build()(s?.startsWith('http') ==
-                            true
-                        ? s
-                        : 'http://$s'),
+                    validator: (s) =>
+                        ValidationBuilder()
+                            .url('Please enter a valid URL')
+                            .minLength(10, 'URL must be at least 10 characters')
+                            .maxLength(
+                              500,
+                              'URL must be less than 500 characters',
+                            )
+                            .build()(
+                          s?.startsWith('http') == true ? s : 'http://$s',
+                        ),
                   ),
                   AnimatedSize(
                     duration: const Duration(milliseconds: 100),
-                    child: SizedBox(
-                      height: _isDescriptionFocussed ? 30 : 12,
-                    ),
+                    child: SizedBox(height: _isDescriptionFocussed ? 30 : 12),
                   ),
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
@@ -219,8 +220,9 @@ class _ChatViewPageState extends ConsumerState<InitialChatPage>
                             _isDescriptionFocussed = true;
                           });
                         } else if (!hasFocus && _isDescriptionFocussed) {
-                          final hasSomethingTyped =
-                              _promptEC.text.trim().isNotEmpty;
+                          final hasSomethingTyped = _promptEC.text
+                              .trim()
+                              .isNotEmpty;
                           if (hasSomethingTyped) return;
                           setState(() {
                             _isDescriptionFocussed = false;
@@ -248,9 +250,13 @@ class _ChatViewPageState extends ConsumerState<InitialChatPage>
                         onSubmitted: (_) => _submitForm(),
                         validator: ValidationBuilder()
                             .minLength(
-                                10, 'Prompt must be at least 10 characters')
-                            .maxLength(2200,
-                                'Prompt must be less than 2200 characters')
+                              10,
+                              'Prompt must be at least 10 characters',
+                            )
+                            .maxLength(
+                              2200,
+                              'Prompt must be less than 2200 characters',
+                            )
                             .build(),
                       ),
                     ),
@@ -275,16 +281,18 @@ class _ChatViewPageState extends ConsumerState<InitialChatPage>
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: 32)
+                  SizedBox(height: 32),
                 ],
               ),
             ),
           ),
         ),
-        if (ref.watch(sessionProvider.select((value) => value.maybeMap(
-              orElse: () => false,
-              notSignedIn: (_) => true,
-            )))) ...[
+        if (ref.watch(
+          sessionProvider.select(
+            (value) =>
+                value.maybeMap(orElse: () => false, notSignedIn: (_) => true),
+          ),
+        )) ...[
           Align(
             alignment: Alignment.topRight,
             child: TextButton.icon(
@@ -313,7 +321,7 @@ class _ChatViewPageState extends ConsumerState<InitialChatPage>
               ),
             ),
           ),
-        ]
+        ],
       ],
     );
   }
