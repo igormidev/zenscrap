@@ -27,6 +27,9 @@ class LandingAppBar extends StatelessWidget {
   /// Callback when a section navigation item is tapped.
   final void Function(LandingSection section)? onSectionTap;
 
+  /// Callback when Sign In button is tapped (for analytics tracking).
+  final VoidCallback? onSignInTap;
+
   /// Whether the appbar should show a solid background (when scrolled).
   final bool isScrolled;
 
@@ -34,6 +37,7 @@ class LandingAppBar extends StatelessWidget {
     super.key,
     this.activeSection,
     this.onSectionTap,
+    this.onSignInTap,
     this.isScrolled = false,
   });
 
@@ -67,7 +71,7 @@ class LandingAppBar extends StatelessWidget {
               ),
               const Spacer(),
               // Login button
-              _LoginButton(),
+              _LoginButton(onTap: onSignInTap),
             ],
           ),
         ),
@@ -194,10 +198,17 @@ class _NavItemState extends State<_NavItem> {
 }
 
 class _LoginButton extends StatelessWidget {
+  final VoidCallback? onTap;
+
+  const _LoginButton({this.onTap});
+
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
-      onPressed: () => context.push('/auth'),
+      onPressed: () {
+        onTap?.call();
+        context.push('/auth');
+      },
       style: OutlinedButton.styleFrom(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       ),

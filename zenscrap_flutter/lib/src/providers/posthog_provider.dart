@@ -1732,6 +1732,165 @@ class AnalyticsService {
   }
 
   // ========================================
+  // Landing Page Events
+  // ========================================
+
+  /// Track when landing page is viewed
+  Future<void> trackLandingPageView() async {
+    await _safeCapture(
+      eventName: 'landing:page_view',
+      properties: {
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track scroll depth milestones (25%, 50%, 75%, 100%)
+  ///
+  /// Based on research:
+  /// - 50%+ scroll depth is above average engagement
+  /// - Users who scroll past 70% convert at 5.8x higher rate
+  Future<void> trackLandingScrollDepth({
+    required int depthPercentage,
+    required double scrollPosition,
+    required double maxScrollExtent,
+  }) async {
+    await _safeCapture(
+      eventName: 'landing:scroll_depth',
+      properties: {
+        'depth_percentage': depthPercentage,
+        'scroll_position': scrollPosition,
+        'max_scroll_extent': maxScrollExtent,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when a landing page section becomes visible in viewport
+  ///
+  /// This helps understand which content users actually see and engage with.
+  /// Sections: hero, problem, howItWorks, autoFix, features, marketplace, pricing, finalCta
+  Future<void> trackLandingSectionView({
+    required String sectionName,
+    required int sectionIndex,
+    required double scrollPosition,
+  }) async {
+    await _safeCapture(
+      eventName: 'landing:section_view',
+      properties: {
+        'section_name': sectionName,
+        'section_index': sectionIndex,
+        'scroll_position': scrollPosition,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user clicks a navigation item in the landing appbar
+  ///
+  /// This shows which sections users are most interested in navigating to directly.
+  Future<void> trackLandingNavClick({
+    required String sectionName,
+    required String currentSection,
+    required double scrollPosition,
+  }) async {
+    await _safeCapture(
+      eventName: 'landing:nav_item_click',
+      properties: {
+        'clicked_section': sectionName,
+        'from_section': currentSection,
+        'scroll_position': scrollPosition,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user clicks the "Learn more" scroll indicator
+  Future<void> trackLandingLearnMoreClick({
+    required double scrollPosition,
+  }) async {
+    await _safeCapture(
+      eventName: 'landing:learn_more_click',
+      properties: {
+        'scroll_position': scrollPosition,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user clicks the "Sign In" button in landing appbar
+  Future<void> trackLandingSignInClick({
+    required String currentSection,
+    required double scrollPosition,
+  }) async {
+    await _safeCapture(
+      eventName: 'landing:sign_in_click',
+      properties: {
+        'from_section': currentSection,
+        'scroll_position': scrollPosition,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track CTA button clicks on landing page
+  ///
+  /// Tracks all call-to-action buttons: "Create Your First Scraper", "Browse Marketplace", etc.
+  Future<void> trackLandingCtaClick({
+    required String buttonLabel,
+    required String sectionName,
+    required double scrollPosition,
+  }) async {
+    await _safeCapture(
+      eventName: 'landing:cta_button_click',
+      properties: {
+        'button_label': buttonLabel,
+        'section_name': sectionName,
+        'scroll_position': scrollPosition,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user clicks "Create Your First Scraper" from Final CTA section
+  /// (separate from hero section which is tracked by trackScrappableCreationAttempt)
+  Future<void> trackLandingFinalCtaClick({
+    required String buttonType,
+    required double scrollPosition,
+  }) async {
+    await _safeCapture(
+      eventName: 'landing:final_cta_click',
+      properties: {
+        'button_type': buttonType,
+        'scroll_position': scrollPosition,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track engagement time on landing page when user leaves
+  Future<void> trackLandingEngagement({
+    required int engagementTimeSeconds,
+    required int maxScrollDepthPercentage,
+    required List<String> sectionsViewed,
+    required int navClicksCount,
+    required int ctaClicksCount,
+  }) async {
+    await _safeCapture(
+      eventName: 'landing:engagement_summary',
+      properties: {
+        'engagement_time_seconds': engagementTimeSeconds,
+        'max_scroll_depth_percentage': maxScrollDepthPercentage,
+        'sections_viewed': sectionsViewed.join(','),
+        'sections_viewed_count': sectionsViewed.length,
+        'nav_clicks_count': navClicksCount,
+        'cta_clicks_count': ctaClicksCount,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  // ========================================
   // General Utility Methods
   // ========================================
 
