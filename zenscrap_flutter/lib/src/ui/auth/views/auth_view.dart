@@ -18,6 +18,7 @@ import 'package:zenscrap_flutter/src/ui/auth/pages/sign_in_page.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/scrappable_card_indicator.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_state.dart';
+import 'package:zenscrap_flutter/src/ui/legal/terms_of_service_dialog.dart';
 
 class AuthView extends ConsumerStatefulWidget {
   const AuthView({super.key});
@@ -122,6 +123,18 @@ class _AuthViewState extends ConsumerState<AuthView>
                 duration: const Duration(seconds: 1),
                 delay: const Duration(milliseconds: 800),
               ),
+          // Terms of Service link - bottom right corner
+          Positioned(
+            bottom: 16,
+            right: 16,
+            child: TermsOfServiceLink(
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Colors.grey[600],
+                    decoration: TextDecoration.underline,
+                    decorationColor: Colors.grey[600],
+                  ),
+            ),
+          ),
           Center(
             child: ConstrainedBox(
               constraints: BoxConstraints(maxWidth: isCompactSize ? 600 : 1700),

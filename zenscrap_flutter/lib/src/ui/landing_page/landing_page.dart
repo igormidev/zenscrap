@@ -16,6 +16,7 @@ import 'package:zenscrap_flutter/src/ui/landing_page/sections/how_it_works_secti
 import 'package:zenscrap_flutter/src/ui/landing_page/sections/marketplace_section.dart';
 import 'package:zenscrap_flutter/src/ui/landing_page/sections/problem_section.dart';
 import 'package:zenscrap_flutter/src/ui/landing_page/widgets/landing_appbar.dart';
+import 'package:zenscrap_flutter/src/ui/legal/terms_of_service_dialog.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/view/scrappable_edit_session.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/ai_thinking_stream_view.dart';
 import 'package:zenscrap_flutter/src/design_system/elements/ip_limit_error_view.dart';
@@ -404,6 +405,13 @@ class _LandingPageState extends ConsumerState<LandingPage>
                     ),
                   ),
                 ),
+
+              // Terms of Service link - bottom right corner
+              Positioned(
+                bottom: 16,
+                right: 16,
+                child: const TermsOfServiceLink(),
+              ),
             ],
           );
         },
