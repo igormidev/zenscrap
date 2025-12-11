@@ -7,8 +7,6 @@ import 'package:lottie/lottie.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
-import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
-import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
 import 'package:zenscrap_flutter/src/ui/landing_page/widgets/trust_badges_row.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/zen_textfield.dart';
@@ -79,6 +77,13 @@ class _HeroSectionState extends ConsumerState<HeroSection>
     final analytics = ref.read(analyticsServiceProvider);
     final targetUrl = _referenceLinkEC.text;
 
+    // Track as landing page CTA click
+    await analytics.trackLandingCtaClick(
+      buttonLabel: 'Create Your First Scraper',
+      sectionName: 'hero',
+      scrollPosition: 0.0, // Hero section is at the top
+    );
+
     await analytics.trackScrappableCreationAttempt(
       targetUrl: targetUrl,
       promptLength: _promptEC.text.length,
@@ -114,11 +119,8 @@ class _HeroSectionState extends ConsumerState<HeroSection>
 
   @override
   Widget build(BuildContext context) {
-    final analytics = ref.read(analyticsServiceProvider);
-    final isAuthenticated = ref
-        .watch(sessionProvider)
-        .maybeMap(orElse: () => false, logged: (_) => true);
-    analytics.trackScrappableCreationFormView(isAuthenticated: isAuthenticated);
+    // Note: Form view tracking is now handled by landing page trackLandingPageView
+    // to avoid redundant calls on every rebuild
 
     // Calculate scale factor based on available height
     // Base reference height is 720px (typical laptop viewport minus app bar)
