@@ -1,6 +1,7 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/core/auto_fix/auto_fix_session_handler.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
+import 'package:zenscrap_server/src/notifications/auto_fix_notification_service.dart';
 
 /// Configuration constants for auto-fix
 class AutoFixConstants {
@@ -309,6 +310,13 @@ class PeriodicAutoFixBrokenScrappables extends FutureCall {
         ),
       );
 
+      // Send notification that auto-fix has started
+      await AutoFixNotificationService.notifyAutoFixStarted(
+        session: session,
+        scrappable: scrappable,
+        autoFixSession: autoFixSession,
+      );
+
       // Create the auto-fix handler
       final handler = AutoFixSessionHandler(
         session: session,
@@ -346,6 +354,7 @@ class PeriodicAutoFixBrokenScrappables extends FutureCall {
             session: session,
             autoFixConfig: autoFixConfig,
             autoFixSession: autoFixSession,
+            scrappable: scrappable,
             errorMessage: errorMessage,
           );
           session.log(
@@ -426,6 +435,17 @@ class PeriodicAutoFixBrokenScrappables extends FutureCall {
         transaction: transaction,
       );
     });
+
+    // Send notification that auto-fix succeeded (after transaction completes)
+    await AutoFixNotificationService.notifyAutoFixSuccess(
+      session: session,
+      scrappable: scrappable,
+      autoFixSession: autoFixSession.copyWith(
+        completedAt: now,
+        status: AutoFixSessionStatus.success,
+        successSummary: resumeMessage,
+      ),
+    );
   }
 
   /// Marks an auto-fix attempt as failed
@@ -433,6 +453,7 @@ class PeriodicAutoFixBrokenScrappables extends FutureCall {
     required Session session,
     required AutoFixConfig autoFixConfig,
     required AutoFixSession autoFixSession,
+    required Scrappable scrappable,
     required String errorMessage,
   }) async {
     final now = DateTime.now();
@@ -464,6 +485,19 @@ class PeriodicAutoFixBrokenScrappables extends FutureCall {
       ),
       columns: (t) => [t.completedAt, t.status, t.failureReason],
     );
+
+    // Send notification only when all attempts are exhausted
+    if (sessionStatus == AutoFixSessionStatus.exhausted) {
+      await AutoFixNotificationService.notifyAutoFixExhausted(
+        session: session,
+        scrappable: scrappable,
+        autoFixSession: autoFixSession.copyWith(
+          completedAt: now,
+          status: sessionStatus,
+          failureReason: errorMessage,
+        ),
+      );
+    }
 
     // Log next retry info
     final nextCooldown = AutoFixConstants.calculateCooldown(newAttemptCount);
