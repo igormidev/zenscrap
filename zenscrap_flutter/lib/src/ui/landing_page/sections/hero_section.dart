@@ -14,15 +14,20 @@ import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/zen_textfield.dart
 
 /// Hero section for the landing page with Z-pattern layout.
 /// Contains headline, subheadline, CTA form (URL + prompt inputs), and robot Lottie.
+/// Scales content based on available screen height for optimal display.
 class HeroSection extends ConsumerStatefulWidget {
   /// Callback when user successfully submits the form.
   /// This allows the landing page to transition to the scrappable creation flow.
   final VoidCallback? onFormSubmitted;
 
-  /// Callback when scroll indicator is clicked.
-  final VoidCallback? onScrollDown;
+  /// The available height for the hero section (screen height minus app bar).
+  final double availableHeight;
 
-  const HeroSection({super.key, this.onFormSubmitted, this.onScrollDown});
+  const HeroSection({
+    super.key,
+    this.onFormSubmitted,
+    required this.availableHeight,
+  });
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _HeroSectionState();
@@ -114,239 +119,214 @@ class _HeroSectionState extends ConsumerState<HeroSection>
         .maybeMap(orElse: () => false, logged: (_) => true);
     analytics.trackScrappableCreationFormView(isAuthenticated: isAuthenticated);
 
-    final screenHeight = MediaQuery.of(context).size.height;
+    // Calculate scale factor based on available height
+    // Base reference height is 720px (typical laptop viewport minus app bar)
+    const baseHeight = 720.0;
+    final scaleFactor =
+        (widget.availableHeight / baseHeight).clamp(0.65, 1.4);
+
+    // Scale values for different elements
+    final lottieHeight = (420 * scaleFactor).clamp(280.0, 580.0);
+    final headlineSize = (context.t.displayLarge?.fontSize ?? 57) * scaleFactor;
+    final subheadlineSize =
+        (context.t.titleMedium?.fontSize ?? 16) * scaleFactor;
+    final verticalSpacing = (24 * scaleFactor).clamp(12.0, 32.0);
+    final formSpacing = (48 * scaleFactor).clamp(24.0, 64.0);
+    final horizontalPadding = (60 * scaleFactor).clamp(24.0, 80.0);
+    final verticalPadding = (40 * scaleFactor).clamp(16.0, 56.0);
 
     return Container(
       width: double.infinity,
-      constraints: BoxConstraints(
-        minHeight: screenHeight - 80,
-      ), // Account for appbar
-      padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 40),
-      child: Stack(
+      height: widget.availableHeight,
+      padding: EdgeInsets.symmetric(
+        horizontal: horizontalPadding,
+        vertical: verticalPadding,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Left side - Content (Z-pattern left start)
-              Expanded(
-                flex: 5,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Headline
-                    Text(
-                          'Web Scrapers That\nFix Themselves',
-                          style: context.t.displayLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: context.c.onSurface,
-                            height: 1.1,
-                          ),
-                        )
-                        .animate()
-                        .fadeIn(duration: 600.ms, delay: 200.ms)
-                        .slideX(begin: -0.1, end: 0),
-                    const SizedBox(height: 24),
-                    // Subheadline
-                    ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 520),
-                          child: Text(
-                            'Describe what you want to extract. Our AI builds, tests, and maintains your scraper automatically. No code. No CSS selectors. No broken endpoints.',
-                            style: context.t.titleMedium?.copyWith(
-                              color: context.c.onSurfaceVariant,
-                              height: 1.6,
-                            ),
-                          ),
-                        )
-                        .animate()
-                        .fadeIn(duration: 600.ms, delay: 400.ms)
-                        .slideX(begin: -0.1, end: 0),
-                    const SizedBox(height: 48),
-                    // Form
-                    Form(
-                      key: _formKey,
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 480),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ZenTextfield(
-                                  controller: _referenceLinkEC,
-                                  labelText: 'Target URL',
-                                  hintText: 'https://example.com/product/12345',
-                                  onSubmitted: (_) => _submitForm(),
-                                  maxLines: 1,
-                                  validator: (s) =>
-                                      ValidationBuilder()
-                                          .url('Please enter a valid URL')
-                                          .minLength(
-                                            10,
-                                            'URL must be at least 10 characters',
-                                          )
-                                          .maxLength(
-                                            500,
-                                            'URL must be less than 500 characters',
-                                          )
-                                          .build()(
-                                        s?.startsWith('http') == true
-                                            ? s
-                                            : 'http://$s',
-                                      ),
-                                )
-                                .animate()
-                                .fadeIn(duration: 500.ms, delay: 600.ms)
-                                .slideY(begin: 0.2, end: 0),
-                            const SizedBox(height: 16),
-                            AnimatedContainer(
-                                  duration: const Duration(milliseconds: 200),
-                                  height: _isDescriptionFocused ? 200 : 56,
-                                  child: Focus(
-                                    onFocusChange: (hasFocus) {
-                                      if (hasFocus && !_isDescriptionFocused) {
-                                        setState(
-                                          () => _isDescriptionFocused = true,
-                                        );
-                                      } else if (!hasFocus &&
-                                          _isDescriptionFocused) {
-                                        if (_promptEC.text.trim().isNotEmpty)
-                                          return;
-                                        setState(
-                                          () => _isDescriptionFocused = false,
-                                        );
-                                      }
-                                    },
-                                    child: ZenTextfield(
-                                      controller: _promptEC,
-                                      labelText: 'What do you want to extract?',
-                                      hintText:
-                                          'E.g. Extract product name, price, and images',
-                                      expands: true,
-                                      maxLines: null,
-                                      minLines: null,
-                                      onSubmitted: (_) => _submitForm(),
-                                      validator: ValidationBuilder()
-                                          .minLength(
-                                            10,
-                                            'Prompt must be at least 10 characters',
-                                          )
-                                          .maxLength(
-                                            2200,
-                                            'Prompt must be less than 2200 characters',
-                                          )
-                                          .build(),
-                                    ),
-                                  ),
-                                )
-                                .animate()
-                                .fadeIn(duration: 500.ms, delay: 700.ms)
-                                .slideY(begin: 0.2, end: 0),
-                            const SizedBox(height: 24),
-                            Row(
-                                  children: [
-                                    FilledButton.icon(
-                                      onPressed: _submitForm,
-                                      icon: const Icon(
-                                        Icons.auto_awesome_rounded,
-                                      ),
-                                      label: const Text(
-                                        'Create Your First Scraper',
-                                      ),
-                                      style: FilledButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 24,
-                                          vertical: 18,
-                                        ),
-                                        textStyle: context.t.titleMedium
-                                            ?.copyWith(
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Text(
-                                      'Free',
-                                      style: context.t.labelLarge?.copyWith(
-                                        color: context.c.primary,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                )
-                                .animate()
-                                .fadeIn(duration: 500.ms, delay: 800.ms)
-                                .slideY(begin: 0.2, end: 0),
-                            const SizedBox(height: 16),
-                            Text(
-                              'No login required to test',
-                              style: context.t.bodyMedium?.copyWith(
-                                color: context.c.outline,
-                              ),
-                            ).animate().fadeIn(duration: 400.ms, delay: 900.ms),
-                          ],
-                        ),
+          // Left side - Content (Z-pattern left start)
+          Expanded(
+            flex: 5,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Headline
+                Text(
+                      'Web Scrapers That\nFix Themselves',
+                      style: context.t.displayLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: context.c.onSurface,
+                        height: 1.1,
+                        fontSize: headlineSize,
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 40),
-              // Right side - Robot Lottie (Z-pattern right end)
-              Expanded(
-                flex: 4,
-                child: SizedBox(
-                      height: 500,
-                      child: Transform.scale(
-                        scale: 1.2,
-                        child: Lottie.network(
-                          'https://lottie.host/5f15ff4c-0e86-4f26-9bbc-29afbf753eb0/okRB2OAoWp.lottie',
-                          decoder: customDecoder,
+                    )
+                    .animate()
+                    .fadeIn(duration: 600.ms, delay: 200.ms)
+                    .slideX(begin: -0.1, end: 0),
+                SizedBox(height: verticalSpacing),
+                // Subheadline
+                ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 520),
+                      child: Text(
+                        'Describe what you want to extract. Our AI builds, tests, and maintains your scraper automatically. No code. No CSS selectors. No broken endpoints.',
+                        style: context.t.titleMedium?.copyWith(
+                          color: context.c.onSurfaceVariant,
+                          height: 1.6,
+                          fontSize: subheadlineSize,
                         ),
                       ),
                     )
                     .animate()
-                    .fadeIn(duration: 800.ms, delay: 500.ms)
-                    .scale(
-                      begin: const Offset(0.9, 0.9),
-                      end: const Offset(1, 1),
+                    .fadeIn(duration: 600.ms, delay: 400.ms)
+                    .slideX(begin: -0.1, end: 0),
+                SizedBox(height: formSpacing),
+                // Form - textfields don't scale per user request
+                Form(
+                  key: _formKey,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 480),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ZenTextfield(
+                              controller: _referenceLinkEC,
+                              labelText: 'Target URL',
+                              hintText: 'https://example.com/product/12345',
+                              onSubmitted: (_) => _submitForm(),
+                              maxLines: 1,
+                              validator: (s) =>
+                                  ValidationBuilder()
+                                      .url('Please enter a valid URL')
+                                      .minLength(
+                                        10,
+                                        'URL must be at least 10 characters',
+                                      )
+                                      .maxLength(
+                                        500,
+                                        'URL must be less than 500 characters',
+                                      )
+                                      .build()(
+                                    s?.startsWith('http') == true
+                                        ? s
+                                        : 'http://$s',
+                                  ),
+                            )
+                            .animate()
+                            .fadeIn(duration: 500.ms, delay: 600.ms)
+                            .slideY(begin: 0.2, end: 0),
+                        const SizedBox(height: 16),
+                        AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              height: _isDescriptionFocused ? 200 : 56,
+                              child: Focus(
+                                onFocusChange: (hasFocus) {
+                                  if (hasFocus && !_isDescriptionFocused) {
+                                    setState(
+                                      () => _isDescriptionFocused = true,
+                                    );
+                                  } else if (!hasFocus &&
+                                      _isDescriptionFocused) {
+                                    if (_promptEC.text.trim().isNotEmpty) return;
+                                    setState(
+                                      () => _isDescriptionFocused = false,
+                                    );
+                                  }
+                                },
+                                child: ZenTextfield(
+                                  controller: _promptEC,
+                                  labelText: 'What do you want to extract?',
+                                  hintText:
+                                      'E.g. Extract product name, price, and images',
+                                  expands: true,
+                                  maxLines: null,
+                                  minLines: null,
+                                  onSubmitted: (_) => _submitForm(),
+                                  validator: ValidationBuilder()
+                                      .minLength(
+                                        10,
+                                        'Prompt must be at least 10 characters',
+                                      )
+                                      .maxLength(
+                                        2200,
+                                        'Prompt must be less than 2200 characters',
+                                      )
+                                      .build(),
+                                ),
+                              ),
+                            )
+                            .animate()
+                            .fadeIn(duration: 500.ms, delay: 700.ms)
+                            .slideY(begin: 0.2, end: 0),
+                        const SizedBox(height: 24),
+                        Row(
+                              children: [
+                                FilledButton.icon(
+                                  onPressed: _submitForm,
+                                  icon: const Icon(
+                                    Icons.auto_awesome_rounded,
+                                  ),
+                                  label: const Text(
+                                    'Create Your First Scraper',
+                                  ),
+                                  style: FilledButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 24,
+                                      vertical: 18,
+                                    ),
+                                    textStyle: context.t.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Text(
+                                  'Free',
+                                  style: context.t.labelLarge?.copyWith(
+                                    color: context.c.primary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            )
+                            .animate()
+                            .fadeIn(duration: 500.ms, delay: 800.ms)
+                            .slideY(begin: 0.2, end: 0),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No login required to test',
+                          style: context.t.bodyMedium?.copyWith(
+                            color: context.c.outline,
+                          ),
+                        ).animate().fadeIn(duration: 400.ms, delay: 900.ms),
+                      ],
                     ),
-              ),
-            ],
-          ),
-          // Scroll indicator at bottom center
-          Positioned(
-            bottom: 20,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: GestureDetector(
-                onTap: widget.onScrollDown,
-                child: MouseRegion(
-                  cursor: SystemMouseCursors.click,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Learn more',
-                        style: context.t.labelMedium?.copyWith(
-                          color: context.c.onSurfaceVariant,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Icon(
-                            Icons.keyboard_arrow_down_rounded,
-                            size: 28,
-                            color: context.c.primary,
-                          )
-                          .animate(
-                            onPlay: (controller) =>
-                                controller.repeat(reverse: true),
-                          )
-                          .moveY(begin: 0, end: 8, duration: 800.ms),
-                    ],
                   ),
                 ),
-              ),
-            ).animate().fadeIn(duration: 600.ms, delay: 1200.ms),
+              ],
+            ),
+          ),
+          const SizedBox(width: 40),
+          // Right side - Robot Lottie (Z-pattern right end)
+          Expanded(
+            flex: 4,
+            child: SizedBox(
+                  height: lottieHeight,
+                  child: Transform.scale(
+                    scale: 1.2,
+                    child: Lottie.network(
+                      'https://lottie.host/5f15ff4c-0e86-4f26-9bbc-29afbf753eb0/okRB2OAoWp.lottie',
+                      decoder: customDecoder,
+                    ),
+                  ),
+                )
+                .animate()
+                .fadeIn(duration: 800.ms, delay: 500.ms)
+                .scale(
+                  begin: const Offset(0.9, 0.9),
+                  end: const Offset(1, 1),
+                ),
           ),
         ],
       ),

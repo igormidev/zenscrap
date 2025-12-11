@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 import 'package:simple_platform/simple_platform.dart';
@@ -37,6 +38,9 @@ class _LandingPageState extends ConsumerState<LandingPage>
   bool _isScrolled = false;
   LandingSection? _activeSection;
 
+  // For "Learn more" button fade animation based on scroll
+  double _learnMoreOpacity = 1.0;
+
   // Section keys for scroll position detection and navigation
   final _heroKey = GlobalKey();
   final _howItWorksKey = GlobalKey();
@@ -60,6 +64,12 @@ class _LandingPageState extends ConsumerState<LandingPage>
     final isScrolled = _scrollController.offset > 50;
     if (isScrolled != _isScrolled) {
       setState(() => _isScrolled = isScrolled);
+    }
+
+    // Update "Learn more" button opacity - fade out over 150px of scroll
+    final newOpacity = (1.0 - (_scrollController.offset / 150)).clamp(0.0, 1.0);
+    if (newOpacity != _learnMoreOpacity) {
+      setState(() => _learnMoreOpacity = newOpacity);
     }
 
     // Update active section based on scroll position
@@ -227,119 +237,176 @@ class _LandingPageState extends ConsumerState<LandingPage>
   }
 
   Widget _buildLandingPage(BuildContext context) {
+    const appBarHeight = 80.0;
+
     return Scaffold(
       // Make scaffold background transparent so Lottie shows through
       backgroundColor: Colors.transparent,
-      body: Stack(
-        children: [
-          // Base background color layer
-          Positioned.fill(child: Container(color: context.c.surface)),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final availableHeroHeight = constraints.maxHeight - appBarHeight;
 
-          // Fixed background Lottie animation
-          if (!DevicePlatform.isWindows)
-            Positioned.fill(
-              child: IgnorePointer(
-                child: Lottie.network(
-                  'https://lottie.host/b70b435a-8472-4e19-ad03-71579dd08074/zOcB4gAPwC.lottie',
-                  decoder: customDecoder,
-                  fit: BoxFit.cover,
-                  frameRate: FrameRate(60),
-                  controller: _backgroundController,
-                  onLoaded: (composition) {
-                    _backgroundController.repeat();
-                  },
-                ),
-              ),
-            ),
+          return Stack(
+            children: [
+              // Base background color layer
+              Positioned.fill(child: Container(color: context.c.surface)),
 
-          // Scrollable content with transparent background
-          CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              // Spacer for appbar
-              const SliverToBoxAdapter(child: SizedBox(height: 80)),
-
-              // Hero Section - key on the child widget, not the sliver
-              SliverToBoxAdapter(
-                child: HeroSection(
-                  key: _heroKey,
-                  onScrollDown: () =>
-                      _scrollToSection(LandingSection.howItWorks),
-                ),
-              ),
-
-              // Problem Section
-              const SliverToBoxAdapter(child: ProblemSection()),
-
-              // How It Works Section - key on the child widget
-              SliverToBoxAdapter(child: HowItWorksSection(key: _howItWorksKey)),
-
-              // Auto-Fix Section - key on the child widget
-              SliverToBoxAdapter(child: AutoFixSection(key: _autoFixKey)),
-
-              // Features Section - key on the child widget
-              SliverToBoxAdapter(child: FeaturesSection(key: _featuresKey)),
-
-              // Marketplace Section - key on the child widget
-              SliverToBoxAdapter(
-                child: MarketplaceSection(key: _marketplaceKey),
-              ),
-
-              // Pricing Section - key on the Container wrapper
-              SliverToBoxAdapter(
-                child: Container(
-                  key: _pricingKey,
-                  // No background - transparent
-                  padding: const EdgeInsets.symmetric(vertical: 60),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Simple, Transparent Pricing',
-                        style: context.t.displaySmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: context.c.onSurface,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Choose the plan that fits your needs. Scale as you grow.',
-                        style: context.t.titleMedium?.copyWith(
-                          color: context.c.onSurfaceVariant,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 48),
-                      const SizedBox(
-                        height: 980,
-                        child: RawPricingPageComponent(
-                          isInsideLandingPage: true,
-                        ),
-                      ),
-                    ],
+              // Fixed background Lottie animation
+              if (!DevicePlatform.isWindows)
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: Lottie.network(
+                      'https://lottie.host/b70b435a-8472-4e19-ad03-71579dd08074/zOcB4gAPwC.lottie',
+                      decoder: customDecoder,
+                      fit: BoxFit.cover,
+                      frameRate: FrameRate(60),
+                      controller: _backgroundController,
+                      onLoaded: (composition) {
+                        _backgroundController.repeat();
+                      },
+                    ),
                   ),
                 ),
+
+              // Scrollable content with transparent background
+              CustomScrollView(
+                controller: _scrollController,
+                slivers: [
+                  // Spacer for appbar
+                  const SliverToBoxAdapter(
+                    child: SizedBox(height: appBarHeight),
+                  ),
+
+                  // Hero Section - key on the child widget, not the sliver
+                  SliverToBoxAdapter(
+                    child: HeroSection(
+                      key: _heroKey,
+                      availableHeight: availableHeroHeight,
+                    ),
+                  ),
+
+                  // Problem Section
+                  const SliverToBoxAdapter(child: ProblemSection()),
+
+                  // How It Works Section - key on the child widget
+                  SliverToBoxAdapter(
+                    child: HowItWorksSection(key: _howItWorksKey),
+                  ),
+
+                  // Auto-Fix Section - key on the child widget
+                  SliverToBoxAdapter(child: AutoFixSection(key: _autoFixKey)),
+
+                  // Features Section - key on the child widget
+                  SliverToBoxAdapter(child: FeaturesSection(key: _featuresKey)),
+
+                  // Marketplace Section - key on the child widget
+                  SliverToBoxAdapter(
+                    child: MarketplaceSection(key: _marketplaceKey),
+                  ),
+
+                  // Pricing Section - key on the Container wrapper
+                  SliverToBoxAdapter(
+                    child: Container(
+                      key: _pricingKey,
+                      // No background - transparent
+                      padding: const EdgeInsets.symmetric(vertical: 60),
+                      child: Column(
+                        children: [
+                          Text(
+                            'Simple, Transparent Pricing',
+                            style: context.t.displaySmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: context.c.onSurface,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Choose the plan that fits your needs. Scale as you grow.',
+                            style: context.t.titleMedium?.copyWith(
+                              color: context.c.onSurfaceVariant,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 48),
+                          const SizedBox(
+                            height: 980,
+                            child: RawPricingPageComponent(
+                              isInsideLandingPage: true,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // Final CTA Section
+                  SliverToBoxAdapter(
+                    child: FinalCtaSection(onScrollToTop: _scrollToTop),
+                  ),
+                ],
               ),
 
-              // Final CTA Section
-              SliverToBoxAdapter(
-                child: FinalCtaSection(onScrollToTop: _scrollToTop),
+              // Fixed floating appbar
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: LandingAppBar(
+                  activeSection: _activeSection,
+                  isScrolled: _isScrolled,
+                  onSectionTap: _scrollToSection,
+                ),
               ),
+
+              // "Learn more" scroll indicator - overlays on top, fades out on scroll
+              if (_learnMoreOpacity > 0)
+                Positioned(
+                  bottom: 20,
+                  left: 0,
+                  right: 0,
+                  child: IgnorePointer(
+                    ignoring: _learnMoreOpacity < 0.5,
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 100),
+                      opacity: _learnMoreOpacity,
+                      child: Center(
+                        child: GestureDetector(
+                          onTap: () =>
+                              _scrollToSection(LandingSection.howItWorks),
+                          child: MouseRegion(
+                            cursor: SystemMouseCursors.click,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'Learn more',
+                                  style: context.t.labelMedium?.copyWith(
+                                    color: context.c.onSurfaceVariant,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Icon(
+                                      Icons.keyboard_arrow_down_rounded,
+                                      size: 28,
+                                      color: context.c.primary,
+                                    )
+                                    .animate(
+                                      onPlay: (controller) =>
+                                          controller.repeat(reverse: true),
+                                    )
+                                    .moveY(begin: 0, end: 8, duration: 800.ms),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
             ],
-          ),
-
-          // Fixed floating appbar
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: LandingAppBar(
-              activeSection: _activeSection,
-              isScrolled: _isScrolled,
-              onSectionTap: _scrollToSection,
-            ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
