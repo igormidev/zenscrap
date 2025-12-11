@@ -14,6 +14,7 @@ import 'package:zenscrap_flutter/src/ui/auth/views/splash_view.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/pages/pricing_page.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
 import 'package:zenscrap_flutter/src/ui/marketplace/views/marketplace_view.dart';
+import 'package:zenscrap_flutter/src/ui/landing_page/landing_page.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/view/initial_chat_view.dart';
 import 'package:zenscrap_flutter/src/ui/scrappables/view/user_scrappables_listage.dart';
 
@@ -60,11 +61,10 @@ class RouterNotifier extends Notifier<GoRouter> {
             return null;
           }
 
-          // Allow unauthenticated access to auth, splash, and review session routes
-          // The review route is public so anyone can help review hardcoded strings
+          // Allow unauthenticated access to auth, splash, and landing page routes
           if (path.contains('/scrappable-form') == false &&
               path.contains('/splash') == false) {
-            return '/splash';
+            return '/scrappable-form'; // Redirect to landing page
           }
         } else {
           // If user is authenticated and trying to access auth page, redirect to labels
@@ -90,7 +90,12 @@ class RouterNotifier extends Notifier<GoRouter> {
             final scrappableIdStr = state.uri.queryParameters['id'];
             final int? scrappableId =
                 scrappableIdStr != null ? int.tryParse(scrappableIdStr) : null;
-            return InitialChatView(scrappableId: scrappableId);
+            // If editing an existing scrappable, use InitialChatView
+            // Otherwise, show the landing page
+            if (scrappableId != null) {
+              return InitialChatView(scrappableId: scrappableId);
+            }
+            return const LandingPage();
           },
         ),
         ShellRoute(

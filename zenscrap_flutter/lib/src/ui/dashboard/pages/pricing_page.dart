@@ -8,7 +8,37 @@ import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 
 class ZenScrapPricingPage extends ConsumerWidget {
-  const ZenScrapPricingPage({super.key});
+  /// When true, clicking a plan will redirect to auth page instead of Stripe.
+  /// Used when embedding the pricing page in the landing page.
+  final bool isInsideLandingPage;
+
+  const ZenScrapPricingPage({super.key, this.isInsideLandingPage = false});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Theme(
+      data: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.cyanAccent),
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Scaffold(
+            backgroundColor: const Color.fromARGB(255, 224, 240, 255),
+            body: PricingBackground(
+              child: RawPricingPageComponent(
+                isInsideLandingPage: isInsideLandingPage,
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class RawPricingPageComponent extends ConsumerWidget {
+  final bool isInsideLandingPage;
+  const RawPricingPageComponent({super.key, required this.isInsideLandingPage});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -16,112 +46,129 @@ class ZenScrapPricingPage extends ConsumerWidget {
 
     // Track page view when pricing page is displayed
     analytics.trackPricingPageView();
-
-    return Theme(
-      data: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.cyanAccent),
-      ),
-      child: LayoutBuilder(builder: (context, constraints) {
-        return Scaffold(
-          backgroundColor: const Color.fromARGB(255, 224, 240, 255),
-          body: PricingBackground(
-            child: PricingPage(
-              width: 865,
-              childAspectRatio: 0.45,
-              perMonthText: 'Per month',
-              perYearText: 'Per year',
-              subtitle:
-                  "We have you covered, whether you're an unique person running\na side-project, a startup or even an enterprise company.",
-              decorationMapper: (decoration) {
-                return decoration.copyWith(
-                  color: Theme.of(context).colorScheme.onSecondary,
-                );
-              },
-              pricesList: [
-                PricesModel(
-                  title: 'BASIC',
-                  subTitle: 'FOR SIDE-PROJECTS',
-                  monthlyPrice: 100,
-                  yearlyPrice: 1050,
-                  advantagesListage: [
-                    '<b><u><tC>250.000<tC><u><b> api credits',
-                    '<b><u><tC>10<tC><u><b> concurrent requests',
-                    '<b><u><tC>3<tC><u><b> active endpoints',
-                  ],
-                  onTap: (bool isYearly) async {
-                    // Track plan click
-                    await analytics.trackPricingPlanClick(
-                      planTier: 'basic',
-                      isYearly: isYearly,
-                      price: isYearly ? 1050.0 : 100.0,
-                    );
-
-                    await ref.globalLoadingSetter(() async {
-                      await _handleSubscription(ref, context, 'basic', isYearly,
-                          isYearly ? 1050.0 : 100.0);
-                    });
-                  },
-                ),
-                PricesModel(
-                  title: 'PRO',
-                  subTitle: 'FOR STARTUP',
-                  emphasisText: 'MOST POPULAR',
-                  monthlyPrice: 199,
-                  yearlyPrice: 1999,
-                  advantagesListage: [
-                    '<b><u><tC>1.000.000<tC><u><b> api credits',
-                    '<b><u><tC>30<tC><u><b> concurrent requests',
-                    '<b><u><tC>10<tC><u><b> active endpoints',
-                    'Access a best AI model',
-                  ],
-                  onTap: (bool isYearly) async {
-                    // Track plan click
-                    await analytics.trackPricingPlanClick(
-                      planTier: 'pro',
-                      isYearly: isYearly,
-                      price: isYearly ? 1999.0 : 199.0,
-                    );
-
-                    await ref.globalLoadingSetter(() async {
-                      await _handleSubscription(ref, context, 'pro', isYearly,
-                          isYearly ? 1999.0 : 199.0);
-                    });
-                  },
-                ),
-                PricesModel(
-                  title: 'ULTRA',
-                  subTitle: 'ENTERPRISE USAGE',
-                  monthlyPrice: 500,
-                  yearlyPrice: 5500,
-                  advantagesListage: [
-                    '<b><u><tC>4.000.000<tC><u><b> api credits',
-                    '<b><u><tC>100<tC><u><b> concurrent requests',
-                    '<b><u><tC>100<tC><u><b> active endpoints',
-                    'Access a best AI model',
-                    'Priority Support',
-                    'Hide your endpoints from marketplace',
-                    'Copy endpoints from marketplace',
-                    'Ability to purchase one time add-on api credits',
-                  ],
-                  onTap: (bool isYearly) async {
-                    // Track plan click
-                    await analytics.trackPricingPlanClick(
-                      planTier: 'ultra',
-                      isYearly: isYearly,
-                      price: isYearly ? 5500.0 : 500.0,
-                    );
-
-                    await ref.globalLoadingSetter(() async {
-                      await _handleSubscription(ref, context, 'ultra', isYearly,
-                          isYearly ? 5500.0 : 500.0);
-                    });
-                  },
-                ),
-              ],
-            ),
-          ),
+    return PricingPage(
+      width: 865,
+      childAspectRatio: 0.45,
+      perMonthText: 'Per month',
+      perYearText: 'Per year',
+      subtitle:
+          "We have you covered, whether you're an unique person running\na side-project, a startup or even an enterprise company.",
+      decorationMapper: (decoration) {
+        return decoration.copyWith(
+          color: Theme.of(context).colorScheme.onSecondary,
         );
-      }),
+      },
+      pricesList: [
+        PricesModel(
+          title: 'BASIC',
+          subTitle: 'FOR SIDE-PROJECTS',
+          monthlyPrice: 100,
+          yearlyPrice: 1050,
+          advantagesListage: [
+            '<b><u><tC>250.000<tC><u><b> api credits',
+            '<b><u><tC>10<tC><u><b> concurrent requests',
+            '<b><u><tC>3<tC><u><b> active endpoints',
+          ],
+          onTap: (bool isYearly) async {
+            // Track plan click
+            await analytics.trackPricingPlanClick(
+              planTier: 'basic',
+              isYearly: isYearly,
+              price: isYearly ? 1050.0 : 100.0,
+            );
+
+            if (isInsideLandingPage) {
+              context.push('/auth');
+              return;
+            }
+
+            await ref.globalLoadingSetter(() async {
+              await _handleSubscription(
+                ref,
+                context,
+                'basic',
+                isYearly,
+                isYearly ? 1050.0 : 100.0,
+              );
+            });
+          },
+        ),
+        PricesModel(
+          title: 'PRO',
+          subTitle: 'FOR STARTUP',
+          emphasisText: 'MOST POPULAR',
+          monthlyPrice: 199,
+          yearlyPrice: 1999,
+          advantagesListage: [
+            '<b><u><tC>1.000.000<tC><u><b> api credits',
+            '<b><u><tC>30<tC><u><b> concurrent requests',
+            '<b><u><tC>10<tC><u><b> active endpoints',
+            'Access a best AI model',
+          ],
+          onTap: (bool isYearly) async {
+            // Track plan click
+            await analytics.trackPricingPlanClick(
+              planTier: 'pro',
+              isYearly: isYearly,
+              price: isYearly ? 1999.0 : 199.0,
+            );
+
+            if (isInsideLandingPage) {
+              context.push('/auth');
+              return;
+            }
+
+            await ref.globalLoadingSetter(() async {
+              await _handleSubscription(
+                ref,
+                context,
+                'pro',
+                isYearly,
+                isYearly ? 1999.0 : 199.0,
+              );
+            });
+          },
+        ),
+        PricesModel(
+          title: 'ULTRA',
+          subTitle: 'ENTERPRISE USAGE',
+          monthlyPrice: 500,
+          yearlyPrice: 5500,
+          advantagesListage: [
+            '<b><u><tC>4.000.000<tC><u><b> api credits',
+            '<b><u><tC>100<tC><u><b> concurrent requests',
+            '<b><u><tC>100<tC><u><b> active endpoints',
+            'Access a best AI model',
+            'Priority Support',
+            'Hide your endpoints from marketplace',
+            'Copy endpoints from marketplace',
+            'Ability to purchase one time add-on api credits',
+          ],
+          onTap: (bool isYearly) async {
+            // Track plan click
+            await analytics.trackPricingPlanClick(
+              planTier: 'ultra',
+              isYearly: isYearly,
+              price: isYearly ? 5500.0 : 500.0,
+            );
+
+            if (isInsideLandingPage) {
+              context.push('/auth');
+              return;
+            }
+
+            await ref.globalLoadingSetter(() async {
+              await _handleSubscription(
+                ref,
+                context,
+                'ultra',
+                isYearly,
+                isYearly ? 5500.0 : 500.0,
+              );
+            });
+          },
+        ),
+      ],
     );
   }
 
@@ -144,9 +191,7 @@ class ZenScrapPricingPage extends ConsumerWidget {
         );
         if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please sign in to subscribe'),
-          ),
+          const SnackBar(content: Text('Please sign in to subscribe')),
         );
         await Future.delayed(const Duration(milliseconds: 500));
         // ignore: use_build_context_synchronously
@@ -158,10 +203,7 @@ class ZenScrapPricingPage extends ConsumerWidget {
       final checkoutUrl = await ref
           .read(clientProvider)
           .privateSubscription
-          .createCheckoutSession(
-            planTier: planTier,
-            isYearly: isYearly,
-          );
+          .createCheckoutSession(planTier: planTier, isYearly: isYearly);
 
       // Track successful checkout session creation
       if (checkoutUrl.isNotEmpty) {
@@ -182,10 +224,7 @@ class ZenScrapPricingPage extends ConsumerWidget {
             isYearly: isYearly,
           );
 
-          await launchUrl(
-            uri,
-            mode: LaunchMode.externalApplication,
-          );
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
         } else {
           // Track checkout failure - can't launch URL
           await analytics.trackPricingCheckoutFailure(
@@ -196,9 +235,7 @@ class ZenScrapPricingPage extends ConsumerWidget {
 
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Could not open checkout page'),
-              ),
+              const SnackBar(content: Text('Could not open checkout page')),
             );
           }
         }
@@ -219,11 +256,9 @@ class ZenScrapPricingPage extends ConsumerWidget {
       );
 
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: ${e.toString()}'),
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
       }
     }
   }
