@@ -10,6 +10,7 @@ import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_prov
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
+import 'package:zenscrap_flutter/src/ui/landing_page/widgets/trust_badges_row.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/zen_textfield.dart';
 
 /// Hero section for the landing page with Z-pattern layout.
@@ -122,11 +123,11 @@ class _HeroSectionState extends ConsumerState<HeroSection>
     // Calculate scale factor based on available height
     // Base reference height is 720px (typical laptop viewport minus app bar)
     const baseHeight = 720.0;
-    final scaleFactor =
-        (widget.availableHeight / baseHeight).clamp(0.65, 1.4);
+    final scaleFactor = (widget.availableHeight / baseHeight).clamp(0.65, 1.4);
 
     // Scale values for different elements
-    final lottieHeight = (420 * scaleFactor).clamp(280.0, 580.0);
+    // Lottie scale: use Transform.scale based on available height
+    final lottieScale = (1.2 * scaleFactor).clamp(0.9, 1.6);
     final headlineSize = (context.t.displayLarge?.fontSize ?? 57) * scaleFactor;
     final subheadlineSize =
         (context.t.titleMedium?.fontSize ?? 16) * scaleFactor;
@@ -228,7 +229,9 @@ class _HeroSectionState extends ConsumerState<HeroSection>
                                     );
                                   } else if (!hasFocus &&
                                       _isDescriptionFocused) {
-                                    if (_promptEC.text.trim().isNotEmpty) return;
+                                    if (_promptEC.text.trim().isNotEmpty) {
+                                      return;
+                                    }
                                     setState(
                                       () => _isDescriptionFocused = false,
                                     );
@@ -264,9 +267,7 @@ class _HeroSectionState extends ConsumerState<HeroSection>
                               children: [
                                 FilledButton.icon(
                                   onPressed: _submitForm,
-                                  icon: const Icon(
-                                    Icons.auto_awesome_rounded,
-                                  ),
+                                  icon: const Icon(Icons.auto_awesome_rounded),
                                   label: const Text(
                                     'Create Your First Scraper',
                                   ),
@@ -293,13 +294,6 @@ class _HeroSectionState extends ConsumerState<HeroSection>
                             .animate()
                             .fadeIn(duration: 500.ms, delay: 800.ms)
                             .slideY(begin: 0.2, end: 0),
-                        const SizedBox(height: 16),
-                        Text(
-                          'No login required to test',
-                          style: context.t.bodyMedium?.copyWith(
-                            color: context.c.outline,
-                          ),
-                        ).animate().fadeIn(duration: 400.ms, delay: 900.ms),
                       ],
                     ),
                   ),
@@ -307,26 +301,35 @@ class _HeroSectionState extends ConsumerState<HeroSection>
               ],
             ),
           ),
-          const SizedBox(width: 40),
-          // Right side - Robot Lottie (Z-pattern right end)
+          // Right side - Robot Lottie with trust badges below (Z-pattern right end)
           Expanded(
             flex: 4,
-            child: SizedBox(
-                  height: lottieHeight,
-                  child: Transform.scale(
-                    scale: 1.2,
-                    child: Lottie.network(
-                      'https://lottie.host/5f15ff4c-0e86-4f26-9bbc-29afbf753eb0/okRB2OAoWp.lottie',
-                      decoder: customDecoder,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Transform.scale(
+                      scale: lottieScale,
+                      child: SizedBox(
+                        height: 500,
+                        child: Lottie.network(
+                          'https://lottie.host/5f15ff4c-0e86-4f26-9bbc-29afbf753eb0/okRB2OAoWp.lottie',
+                          decoder: customDecoder,
+                        ),
+                      ),
+                    )
+                    .animate()
+                    .fadeIn(duration: 800.ms, delay: 500.ms)
+                    .scale(
+                      begin: const Offset(0.9, 0.9),
+                      end: const Offset(1, 1),
                     ),
-                  ),
-                )
-                .animate()
-                .fadeIn(duration: 800.ms, delay: 500.ms)
-                .scale(
-                  begin: const Offset(0.9, 0.9),
-                  end: const Offset(1, 1),
+                const SizedBox(height: 16),
+                const TrustBadgesRow().animate().fadeIn(
+                  duration: 600.ms,
+                  delay: 1000.ms,
                 ),
+              ],
+            ),
           ),
         ],
       ),
