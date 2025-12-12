@@ -68,6 +68,44 @@
   <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
   <link rel="icon" type="image/png" sizes="16x16" href="favicon.png">
 
+  <!-- ============================================
+       Asset Preloading for Performance
+       Preload critical resources to start loading early in parallel
+       See: https://web.dev/articles/preload-critical-assets
+       ============================================ -->
+
+  <!-- Preconnect to external domains used by the app -->
+  <link rel="preconnect" href="https://lottie.host" crossorigin>
+  <link rel="preconnect" href="https://us.i.posthog.com" crossorigin>
+
+  <!-- WASM files - Critical for Flutter WASM renderer
+       These are large files that take time to download, so preloading
+       allows them to start downloading while the browser parses the HTML.
+       The crossorigin attribute is required for CORS-enabled fetch requests. -->
+  <link rel="preload" href="main.dart.wasm" as="fetch" crossorigin>
+  <link rel="preload" href="canvaskit/skwasm.wasm" as="fetch" crossorigin>
+
+  <!-- JavaScript modules - Module preload for ES modules
+       modulepreload is more efficient than regular preload for JS modules
+       as it also parses and compiles the module. -->
+  <link rel="modulepreload" href="main.dart.mjs" crossorigin>
+
+  <!-- Font preloading - Avoid flash of unstyled text (FOUT)
+       The crossorigin attribute is REQUIRED for fonts even on same-origin
+       to match how browsers normally request fonts (anonymous mode). -->
+  <link rel="preload" href="assets/fonts/MaterialIcons-Regular.otf" as="font" type="font/otf" crossorigin>
+
+  <!-- Splash images - Needed immediately for loading screen
+       Preload both light and dark variants with media queries for
+       responsive loading based on user's color scheme preference.
+       Using fetchpriority="high" since these are above-the-fold images. -->
+  <link rel="preload" href="splash/img/light-1x.png" as="image" media="(prefers-color-scheme: light)" fetchpriority="high">
+  <link rel="preload" href="splash/img/dark-1x.png" as="image" media="(prefers-color-scheme: dark)" fetchpriority="high">
+
+  <!-- Higher resolution splash images for retina displays -->
+  <link rel="preload" href="splash/img/light-2x.png" as="image" media="(prefers-color-scheme: light) and (min-resolution: 2dppx)" fetchpriority="low">
+  <link rel="preload" href="splash/img/dark-2x.png" as="image" media="(prefers-color-scheme: dark) and (min-resolution: 2dppx)" fetchpriority="low">
+
   <!-- Structured Data (JSON-LD) for SEO -->
   <script type="application/ld+json">
   {
