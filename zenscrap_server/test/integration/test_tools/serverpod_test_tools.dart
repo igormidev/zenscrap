@@ -52,18 +52,19 @@ import 'package:zenscrap_server/src/generated/entities/scrappable/scraper_catego
     as _i21;
 import 'package:zenscrap_server/src/generated/entities/create_scrappable_stream/create_scrappable_stream_item.dart'
     as _i22;
+import 'dart:convert' as _i23;
 import 'package:zenscrap_server/src/generated/entities/marketplace/paginated_scrappable_response.dart'
-    as _i23;
-import 'package:zenscrap_server/src/generated/entities/scrappable/byte_test_data.dart'
     as _i24;
-import 'package:zenscrap_server/src/generated/entities/account/plan_tier.dart'
+import 'package:zenscrap_server/src/generated/entities/scrappable/byte_test_data.dart'
     as _i25;
-import 'package:zenscrap_server/src/generated/entities/redraft_scrappable_session/create_session_response.dart'
+import 'package:zenscrap_server/src/generated/entities/account/plan_tier.dart'
     as _i26;
-import 'package:zenscrap_server/src/generated/entities/redraft_scrappable_session/chat_response.dart'
+import 'package:zenscrap_server/src/generated/entities/redraft_scrappable_session/create_session_response.dart'
     as _i27;
-import 'package:zenscrap_server/src/generated/entities/scrappable/ai_model.dart'
+import 'package:zenscrap_server/src/generated/entities/redraft_scrappable_session/chat_response.dart'
     as _i28;
+import 'package:zenscrap_server/src/generated/entities/scrappable/ai_model.dart'
+    as _i29;
 import 'package:zenscrap_server/src/generated/protocol.dart';
 import 'package:zenscrap_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -1105,6 +1106,7 @@ class _CreateScrappableEndpoint {
   _i3.Stream<_i22.CreateScrappableStreamItem> call(
     _i1.TestSessionBuilder sessionBuilder, {
     required String referenceLink,
+    required _i5.SupportedLanguage language,
   }) {
     var _localTestStreamManager =
         _i1.TestStreamManager<_i22.CreateScrappableStreamItem>();
@@ -1120,7 +1122,12 @@ class _CreateScrappableEndpoint {
               createSessionCallback: (_) => _localUniqueSession,
               endpointPath: 'createScrappable',
               methodName: 'call',
-              arguments: {'referenceLink': referenceLink},
+              arguments: {
+                'referenceLink': referenceLink,
+                'language': _i23.jsonDecode(
+                  _i2.SerializationManager.encode(language),
+                ),
+              },
               requestedInputStreams: [],
               serializationManager: _serializationManager,
             );
@@ -1149,6 +1156,7 @@ class _DeleteScrappableEndpoint {
   _i3.Future<bool> call(
     _i1.TestSessionBuilder sessionBuilder, {
     required int scrappableId,
+    required _i5.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1161,7 +1169,10 @@ class _DeleteScrappableEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'deleteScrappable',
           methodName: 'call',
-          parameters: _i1.testObjectToJson({'scrappableId': scrappableId}),
+          parameters: _i1.testObjectToJson({
+            'scrappableId': scrappableId,
+            'language': language,
+          }),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -1193,6 +1204,7 @@ class _EditScrappableEndpoint {
     required int scrappableId,
     required String name,
     required String description,
+    required _i5.SupportedLanguage language,
     _i21.ScraperCategory? category,
     bool? willHideFromMarketplace,
   }) async {
@@ -1211,6 +1223,7 @@ class _EditScrappableEndpoint {
             'scrappableId': scrappableId,
             'name': name,
             'description': description,
+            'language': language,
             'category': category,
             'willHideFromMarketplace': willHideFromMarketplace,
           }),
@@ -1240,11 +1253,12 @@ class _MarketplaceEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i23.PaginatedScrappableResponse> getItems(
+  _i3.Future<_i24.PaginatedScrappableResponse> getItems(
     _i1.TestSessionBuilder sessionBuilder, {
     required int page,
     String? searchQuery,
     List<_i21.ScraperCategory>? categories,
+    required _i5.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1261,6 +1275,7 @@ class _MarketplaceEndpoint {
             'page': page,
             'searchQuery': searchQuery,
             'categories': categories,
+            'language': language,
           }),
           serializationManager: _serializationManager,
         );
@@ -1269,7 +1284,7 @@ class _MarketplaceEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i23.PaginatedScrappableResponse>);
+                as _i3.Future<_i24.PaginatedScrappableResponse>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1288,10 +1303,11 @@ class _PublicScrappableEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i24.ByteTestData?> getByteTestData(
+  _i3.Future<_i25.ByteTestData?> getByteTestData(
     _i1.TestSessionBuilder sessionBuilder,
-    int scrappableId,
-  ) async {
+    int scrappableId, {
+    required _i5.SupportedLanguage language,
+  }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
@@ -1303,7 +1319,10 @@ class _PublicScrappableEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'publicScrappable',
           methodName: 'getByteTestData',
-          parameters: _i1.testObjectToJson({'scrappableId': scrappableId}),
+          parameters: _i1.testObjectToJson({
+            'scrappableId': scrappableId,
+            'language': language,
+          }),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -1311,7 +1330,7 @@ class _PublicScrappableEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i24.ByteTestData?>);
+                as _i3.Future<_i25.ByteTestData?>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1334,7 +1353,7 @@ class _PublicTierEndpoint {
     _i1.TestSessionBuilder sessionBuilder, {
     required String email,
     required String tierManipulationKey,
-    required _i25.PlanTier planTier,
+    required _i26.PlanTier planTier,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1381,6 +1400,7 @@ class _ScrappableChatSession {
   _i3.Future<void> commitCurrentEditState(
     _i1.TestSessionBuilder sessionBuilder, {
     required String sessionUuid,
+    required _i5.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1393,7 +1413,10 @@ class _ScrappableChatSession {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'scrappableChatSession',
           methodName: 'commitCurrentEditState',
-          parameters: _i1.testObjectToJson({'sessionUuid': sessionUuid}),
+          parameters: _i1.testObjectToJson({
+            'sessionUuid': sessionUuid,
+            'language': language,
+          }),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -1444,6 +1467,7 @@ class _ScrappableChatSession {
     _i1.TestSessionBuilder sessionBuilder, {
     required String sessionId,
     required String openAiApiKey,
+    required _i5.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1459,6 +1483,7 @@ class _ScrappableChatSession {
           parameters: _i1.testObjectToJson({
             'sessionId': sessionId,
             'openAiApiKey': openAiApiKey,
+            'language': language,
           }),
           serializationManager: _serializationManager,
         );
@@ -1481,6 +1506,7 @@ class _ScrappableChatSession {
     required String url,
     required List<String> pathParams,
     required Map<String, String?> queryParams,
+    required _i5.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1498,6 +1524,7 @@ class _ScrappableChatSession {
             'url': url,
             'pathParams': pathParams,
             'queryParams': queryParams,
+            'language': language,
           }),
           serializationManager: _serializationManager,
         );
@@ -1514,9 +1541,10 @@ class _ScrappableChatSession {
     });
   }
 
-  _i3.Future<_i26.CreateSessionResponse> createSession(
+  _i3.Future<_i27.CreateSessionResponse> createSession(
     _i1.TestSessionBuilder sessionBuilder, {
     required int scrappableId,
+    required _i5.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1529,7 +1557,10 @@ class _ScrappableChatSession {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'scrappableChatSession',
           methodName: 'createSession',
-          parameters: _i1.testObjectToJson({'scrappableId': scrappableId}),
+          parameters: _i1.testObjectToJson({
+            'scrappableId': scrappableId,
+            'language': language,
+          }),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -1537,7 +1568,7 @@ class _ScrappableChatSession {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i26.CreateSessionResponse>);
+                as _i3.Future<_i27.CreateSessionResponse>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1545,11 +1576,12 @@ class _ScrappableChatSession {
     });
   }
 
-  _i3.Stream<_i27.ChatResponse> listenToScrappableRedraftSession(
+  _i3.Stream<_i28.ChatResponse> listenToScrappableRedraftSession(
     _i1.TestSessionBuilder sessionBuilder, {
     required String sessionUuid,
+    required _i5.SupportedLanguage language,
   }) {
-    var _localTestStreamManager = _i1.TestStreamManager<_i27.ChatResponse>();
+    var _localTestStreamManager = _i1.TestStreamManager<_i28.ChatResponse>();
     _i1.callStreamFunctionAndHandleExceptions(
       () async {
         var _localUniqueSession =
@@ -1562,7 +1594,12 @@ class _ScrappableChatSession {
               createSessionCallback: (_) => _localUniqueSession,
               endpointPath: 'scrappableChatSession',
               methodName: 'listenToScrappableRedraftSession',
-              arguments: {'sessionUuid': sessionUuid},
+              arguments: {
+                'sessionUuid': sessionUuid,
+                'language': _i23.jsonDecode(
+                  _i2.SerializationManager.encode(language),
+                ),
+              },
               requestedInputStreams: [],
               serializationManager: _serializationManager,
             );
@@ -1580,7 +1617,8 @@ class _ScrappableChatSession {
   _i3.Future<void> changeChatModel(
     _i1.TestSessionBuilder sessionBuilder, {
     required String sessionUuid,
-    required _i28.AiModel aiModel,
+    required _i29.AiModel aiModel,
+    required _i5.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1596,6 +1634,7 @@ class _ScrappableChatSession {
           parameters: _i1.testObjectToJson({
             'sessionUuid': sessionUuid,
             'aiModel': aiModel,
+            'language': language,
           }),
           serializationManager: _serializationManager,
         );
@@ -1616,6 +1655,7 @@ class _ScrappableChatSession {
     _i1.TestSessionBuilder sessionBuilder, {
     required String sessionId,
     required String userPrompt,
+    required _i5.SupportedLanguage language,
   }) {
     var _localTestStreamManager = _i1.TestStreamManager<String>();
     _i1.callStreamFunctionAndHandleExceptions(
@@ -1633,6 +1673,9 @@ class _ScrappableChatSession {
               arguments: {
                 'sessionId': sessionId,
                 'userPrompt': userPrompt,
+                'language': _i23.jsonDecode(
+                  _i2.SerializationManager.encode(language),
+                ),
               },
               requestedInputStreams: [],
               serializationManager: _serializationManager,

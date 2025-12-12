@@ -217,6 +217,164 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.ptBR: 'Acesso Negado',
     SupportedLanguage.ja: 'アクセスが拒否されました',
   },
+  'permission_denied': {
+    SupportedLanguage.en: 'Permission Denied',
+    SupportedLanguage.es: 'Permiso Denegado',
+    SupportedLanguage.de: 'Berechtigung verweigert',
+    SupportedLanguage.fr: 'Permission refusee',
+    SupportedLanguage.ptBR: 'Permissao Negada',
+    SupportedLanguage.ja: '権限がありません',
+  },
+
+  // Usage limit errors
+  'usage_limit_reached': {
+    SupportedLanguage.en: 'Usage Limit Reached',
+    SupportedLanguage.es: 'Limite de Uso Alcanzado',
+    SupportedLanguage.de: 'Nutzungslimit erreicht',
+    SupportedLanguage.fr: 'Limite d\'utilisation atteinte',
+    SupportedLanguage.ptBR: 'Limite de Uso Atingido',
+    SupportedLanguage.ja: '使用制限に達しました',
+  },
+  'ai_credits_exhausted': {
+    SupportedLanguage.en: 'AI Credits Exhausted',
+    SupportedLanguage.es: 'Creditos de IA Agotados',
+    SupportedLanguage.de: 'KI-Guthaben aufgebraucht',
+    SupportedLanguage.fr: 'Credits IA epuises',
+    SupportedLanguage.ptBR: 'Creditos de IA Esgotados',
+    SupportedLanguage.ja: 'AIクレジットが不足しています',
+  },
+
+  // Delete errors
+  'already_deleted': {
+    SupportedLanguage.en: 'Already Deleted',
+    SupportedLanguage.es: 'Ya Eliminado',
+    SupportedLanguage.de: 'Bereits geloscht',
+    SupportedLanguage.fr: 'Deja supprime',
+    SupportedLanguage.ptBR: 'Ja Excluido',
+    SupportedLanguage.ja: '既に削除されています',
+  },
+  'delete_failed': {
+    SupportedLanguage.en: 'Delete Failed',
+    SupportedLanguage.es: 'Error al Eliminar',
+    SupportedLanguage.de: 'Loschen fehlgeschlagen',
+    SupportedLanguage.fr: 'Echec de la suppression',
+    SupportedLanguage.ptBR: 'Falha ao Excluir',
+    SupportedLanguage.ja: '削除に失敗しました',
+  },
+  'update_failed': {
+    SupportedLanguage.en: 'Update Failed',
+    SupportedLanguage.es: 'Error al Actualizar',
+    SupportedLanguage.de: 'Aktualisierung fehlgeschlagen',
+    SupportedLanguage.fr: 'Echec de la mise a jour',
+    SupportedLanguage.ptBR: 'Falha ao Atualizar',
+    SupportedLanguage.ja: '更新に失敗しました',
+  },
+
+  // Validation errors
+  'invalid_name': {
+    SupportedLanguage.en: 'Invalid Name',
+    SupportedLanguage.es: 'Nombre Invalido',
+    SupportedLanguage.de: 'Unzultiger Name',
+    SupportedLanguage.fr: 'Nom invalide',
+    SupportedLanguage.ptBR: 'Nome Invalido',
+    SupportedLanguage.ja: '無効な名前',
+  },
+  'name_too_long': {
+    SupportedLanguage.en: 'Name Too Long',
+    SupportedLanguage.es: 'Nombre Muy Largo',
+    SupportedLanguage.de: 'Name zu lang',
+    SupportedLanguage.fr: 'Nom trop long',
+    SupportedLanguage.ptBR: 'Nome Muito Longo',
+    SupportedLanguage.ja: '名前が長すぎます',
+  },
+  'invalid_description': {
+    SupportedLanguage.en: 'Invalid Description',
+    SupportedLanguage.es: 'Descripcion Invalida',
+    SupportedLanguage.de: 'Unzultige Beschreibung',
+    SupportedLanguage.fr: 'Description invalide',
+    SupportedLanguage.ptBR: 'Descricao Invalida',
+    SupportedLanguage.ja: '無効な説明',
+  },
+  'description_too_long': {
+    SupportedLanguage.en: 'Description Too Long',
+    SupportedLanguage.es: 'Descripcion Muy Larga',
+    SupportedLanguage.de: 'Beschreibung zu lang',
+    SupportedLanguage.fr: 'Description trop longue',
+    SupportedLanguage.ptBR: 'Descricao Muito Longa',
+    SupportedLanguage.ja: '説明が長すぎます',
+  },
+  'invalid_api_key': {
+    SupportedLanguage.en: 'Invalid API Key',
+    SupportedLanguage.es: 'Clave API Invalida',
+    SupportedLanguage.de: 'Unzultiger API-Schlussel',
+    SupportedLanguage.fr: 'Cle API invalide',
+    SupportedLanguage.ptBR: 'Chave API Invalida',
+    SupportedLanguage.ja: '無効なAPIキー',
+  },
+
+  // Scrappable availability errors
+  'scrappable_not_available': {
+    SupportedLanguage.en: 'Scrappable Not Available',
+    SupportedLanguage.es: 'Scrappable No Disponible',
+    SupportedLanguage.de: 'Scrappable nicht verfugbar',
+    SupportedLanguage.fr: 'Scrappable non disponible',
+    SupportedLanguage.ptBR: 'Scrappable Nao Disponivel',
+    SupportedLanguage.ja: 'Scrappableは利用できません',
+  },
+
+  // Session errors
+  'session_not_found': {
+    SupportedLanguage.en: 'Session Not Found',
+    SupportedLanguage.es: 'Sesion No Encontrada',
+    SupportedLanguage.de: 'Sitzung nicht gefunden',
+    SupportedLanguage.fr: 'Session non trouvee',
+    SupportedLanguage.ptBR: 'Sessao Nao Encontrada',
+    SupportedLanguage.ja: 'セッションが見つかりません',
+  },
+  'session_already_opened': {
+    SupportedLanguage.en: 'Session Already Opened',
+    SupportedLanguage.es: 'Sesion Ya Abierta',
+    SupportedLanguage.de: 'Sitzung bereits geoffnet',
+    SupportedLanguage.fr: 'Session deja ouverte',
+    SupportedLanguage.ptBR: 'Sessao Ja Aberta',
+    SupportedLanguage.ja: 'セッションは既に開いています',
+  },
+  'ai_usage_record_not_found': {
+    SupportedLanguage.en: 'AI Usage Record Not Found',
+    SupportedLanguage.es: 'Registro de Uso de IA No Encontrado',
+    SupportedLanguage.de: 'KI-Nutzungsdatensatz nicht gefunden',
+    SupportedLanguage.fr: 'Enregistrement d\'utilisation IA non trouve',
+    SupportedLanguage.ptBR: 'Registro de Uso de IA Nao Encontrado',
+    SupportedLanguage.ja: 'AI使用記録が見つかりません',
+  },
+  'failed_to_save_api_key': {
+    SupportedLanguage.en: 'Failed to Save API Key',
+    SupportedLanguage.es: 'Error al Guardar Clave API',
+    SupportedLanguage.de: 'API-Schlussel speichern fehlgeschlagen',
+    SupportedLanguage.fr: 'Echec de l\'enregistrement de la cle API',
+    SupportedLanguage.ptBR: 'Falha ao Salvar Chave API',
+    SupportedLanguage.ja: 'APIキーの保存に失敗しました',
+  },
+
+  // AI generation errors
+  'ai_generation_failed': {
+    SupportedLanguage.en: 'AI Generation Failed',
+    SupportedLanguage.es: 'Error en la Generacion de IA',
+    SupportedLanguage.de: 'KI-Generierung fehlgeschlagen',
+    SupportedLanguage.fr: 'Echec de la generation IA',
+    SupportedLanguage.ptBR: 'Falha na Geracao de IA',
+    SupportedLanguage.ja: 'AI生成に失敗しました',
+  },
+
+  // Ultra plan specific
+  'ultra_plan_required_marketplace': {
+    SupportedLanguage.en: 'Ultra Plan Required',
+    SupportedLanguage.es: 'Se Requiere Plan Ultra',
+    SupportedLanguage.de: 'Ultra-Plan erforderlich',
+    SupportedLanguage.fr: 'Plan Ultra requis',
+    SupportedLanguage.ptBR: 'Plano Ultra Necessario',
+    SupportedLanguage.ja: 'Ultraプランが必要です',
+  },
 };
 
 // ============================================================================
@@ -450,5 +608,239 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.fr: 'Vous n\'avez pas la permission d\'acceder a ce scrappable.',
     SupportedLanguage.ptBR: 'Voce nao tem permissao para acessar este scrappable.',
     SupportedLanguage.ja: 'このscrappableにアクセスする権限がありません。',
+  },
+  'permission_denied_delete': {
+    SupportedLanguage.en: 'You do not have permission to delete this scrappable.',
+    SupportedLanguage.es: 'No tienes permiso para eliminar este scrappable.',
+    SupportedLanguage.de: 'Sie haben keine Berechtigung, dieses Scrappable zu loschen.',
+    SupportedLanguage.fr: 'Vous n\'avez pas la permission de supprimer ce scrappable.',
+    SupportedLanguage.ptBR: 'Voce nao tem permissao para excluir este scrappable.',
+    SupportedLanguage.ja: 'このscrappableを削除する権限がありません。',
+  },
+  'permission_denied_edit': {
+    SupportedLanguage.en: 'You do not have permission to edit this scrappable.',
+    SupportedLanguage.es: 'No tienes permiso para editar este scrappable.',
+    SupportedLanguage.de: 'Sie haben keine Berechtigung, dieses Scrappable zu bearbeiten.',
+    SupportedLanguage.fr: 'Vous n\'avez pas la permission de modifier ce scrappable.',
+    SupportedLanguage.ptBR: 'Voce nao tem permissao para editar este scrappable.',
+    SupportedLanguage.ja: 'このscrappableを編集する権限がありません。',
+  },
+
+  // Usage limit errors
+  'usage_limit_reached': {
+    SupportedLanguage.en: 'You have reached the spending limit for your IP address (\${limit}). This limit resets in {timeStr}, or you can create an account to get monthly AI credits.',
+    SupportedLanguage.es: 'Has alcanzado el limite de gasto para tu direccion IP (\${limit}). Este limite se restablece en {timeStr}, o puedes crear una cuenta para obtener creditos de IA mensuales.',
+    SupportedLanguage.de: 'Sie haben das Ausgabenlimit fur Ihre IP-Adresse erreicht (\${limit}). Dieses Limit wird in {timeStr} zuruckgesetzt, oder Sie konnen ein Konto erstellen, um monatliche KI-Guthaben zu erhalten.',
+    SupportedLanguage.fr: 'Vous avez atteint la limite de depenses pour votre adresse IP (\${limit}). Cette limite sera reinitialise dans {timeStr}, ou vous pouvez creer un compte pour obtenir des credits IA mensuels.',
+    SupportedLanguage.ptBR: 'Voce atingiu o limite de gastos para seu endereco IP (\${limit}). Este limite sera redefinido em {timeStr}, ou voce pode criar uma conta para obter creditos de IA mensais.',
+    SupportedLanguage.ja: 'IPアドレスの使用制限に達しました（\${limit}）。この制限は{timeStr}でリセットされます。月次AIクレジットを取得するにはアカウントを作成してください。',
+  },
+  'ai_credits_exhausted': {
+    SupportedLanguage.en: 'You have used all your AI credits for this month (\${limit} limit). Credits will reset next month, or you can add your own OpenAI API key in account settings to continue without limits.',
+    SupportedLanguage.es: 'Has usado todos tus creditos de IA para este mes (limite de \${limit}). Los creditos se restablecera el proximo mes, o puedes agregar tu propia clave API de OpenAI en la configuracion de tu cuenta para continuar sin limites.',
+    SupportedLanguage.de: 'Sie haben alle Ihre KI-Guthaben fur diesen Monat aufgebraucht (Limit: \${limit}). Die Guthaben werden nachsten Monat zuruckgesetzt, oder Sie konnen Ihren eigenen OpenAI API-Schlussel in den Kontoeinstellungen hinzufugen, um ohne Limits fortzufahren.',
+    SupportedLanguage.fr: 'Vous avez utilise tous vos credits IA pour ce mois (limite de \${limit}). Les credits seront reinitialises le mois prochain, ou vous pouvez ajouter votre propre cle API OpenAI dans les parametres du compte pour continuer sans limites.',
+    SupportedLanguage.ptBR: 'Voce usou todos os seus creditos de IA para este mes (limite de \${limit}). Os creditos serao redefinidos no proximo mes, ou voce pode adicionar sua propria chave API do OpenAI nas configuracoes da conta para continuar sem limites.',
+    SupportedLanguage.ja: '今月のAIクレジットをすべて使い切りました（\${limit}の制限）。クレジットは来月リセットされます。制限なく続けるにはアカウント設定でOpenAI APIキーを追加してください。',
+  },
+
+  // Delete errors
+  'already_deleted': {
+    SupportedLanguage.en: 'This scrappable has already been deleted.',
+    SupportedLanguage.es: 'Este scrappable ya ha sido eliminado.',
+    SupportedLanguage.de: 'Dieses Scrappable wurde bereits geloscht.',
+    SupportedLanguage.fr: 'Ce scrappable a deja ete supprime.',
+    SupportedLanguage.ptBR: 'Este scrappable ja foi excluido.',
+    SupportedLanguage.ja: 'このscrappableは既に削除されています。',
+  },
+  'delete_failed': {
+    SupportedLanguage.en: 'Failed to delete the scrappable. Please try again.',
+    SupportedLanguage.es: 'Error al eliminar el scrappable. Por favor, intentelo de nuevo.',
+    SupportedLanguage.de: 'Das Scrappable konnte nicht geloscht werden. Bitte versuchen Sie es erneut.',
+    SupportedLanguage.fr: 'Echec de la suppression du scrappable. Veuillez reessayer.',
+    SupportedLanguage.ptBR: 'Falha ao excluir o scrappable. Por favor, tente novamente.',
+    SupportedLanguage.ja: 'scrappableの削除に失敗しました。もう一度お試しください。',
+  },
+  'update_failed': {
+    SupportedLanguage.en: 'Failed to update the scrappable. Please try again.',
+    SupportedLanguage.es: 'Error al actualizar el scrappable. Por favor, intentelo de nuevo.',
+    SupportedLanguage.de: 'Das Scrappable konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut.',
+    SupportedLanguage.fr: 'Echec de la mise a jour du scrappable. Veuillez reessayer.',
+    SupportedLanguage.ptBR: 'Falha ao atualizar o scrappable. Por favor, tente novamente.',
+    SupportedLanguage.ja: 'scrappableの更新に失敗しました。もう一度お試しください。',
+  },
+
+  // Validation errors
+  'invalid_name': {
+    SupportedLanguage.en: 'Scrappable name cannot be empty.',
+    SupportedLanguage.es: 'El nombre del scrappable no puede estar vacio.',
+    SupportedLanguage.de: 'Der Scrappable-Name darf nicht leer sein.',
+    SupportedLanguage.fr: 'Le nom du scrappable ne peut pas etre vide.',
+    SupportedLanguage.ptBR: 'O nome do scrappable nao pode estar vazio.',
+    SupportedLanguage.ja: 'scrappableの名前を空にすることはできません。',
+  },
+  'name_too_long': {
+    SupportedLanguage.en: 'Scrappable name must be {maxLength} characters or less.',
+    SupportedLanguage.es: 'El nombre del scrappable debe tener {maxLength} caracteres o menos.',
+    SupportedLanguage.de: 'Der Scrappable-Name darf hochstens {maxLength} Zeichen lang sein.',
+    SupportedLanguage.fr: 'Le nom du scrappable doit contenir {maxLength} caracteres ou moins.',
+    SupportedLanguage.ptBR: 'O nome do scrappable deve ter {maxLength} caracteres ou menos.',
+    SupportedLanguage.ja: 'scrappableの名前は{maxLength}文字以下にしてください。',
+  },
+  'invalid_description': {
+    SupportedLanguage.en: 'Scrappable description cannot be empty.',
+    SupportedLanguage.es: 'La descripcion del scrappable no puede estar vacia.',
+    SupportedLanguage.de: 'Die Scrappable-Beschreibung darf nicht leer sein.',
+    SupportedLanguage.fr: 'La description du scrappable ne peut pas etre vide.',
+    SupportedLanguage.ptBR: 'A descricao do scrappable nao pode estar vazia.',
+    SupportedLanguage.ja: 'scrappableの説明を空にすることはできません。',
+  },
+  'description_too_long': {
+    SupportedLanguage.en: 'Scrappable description must be {maxLength} characters or less.',
+    SupportedLanguage.es: 'La descripcion del scrappable debe tener {maxLength} caracteres o menos.',
+    SupportedLanguage.de: 'Die Scrappable-Beschreibung darf hochstens {maxLength} Zeichen lang sein.',
+    SupportedLanguage.fr: 'La description du scrappable doit contenir {maxLength} caracteres ou moins.',
+    SupportedLanguage.ptBR: 'A descricao do scrappable deve ter {maxLength} caracteres ou menos.',
+    SupportedLanguage.ja: 'scrappableの説明は{maxLength}文字以下にしてください。',
+  },
+  'invalid_api_key': {
+    SupportedLanguage.en: 'Please provide a valid OpenAI API key.',
+    SupportedLanguage.es: 'Por favor, proporciona una clave API de OpenAI valida.',
+    SupportedLanguage.de: 'Bitte geben Sie einen gultigen OpenAI API-Schlussel an.',
+    SupportedLanguage.fr: 'Veuillez fournir une cle API OpenAI valide.',
+    SupportedLanguage.ptBR: 'Por favor, forneca uma chave API do OpenAI valida.',
+    SupportedLanguage.ja: '有効なOpenAI APIキーを入力してください。',
+  },
+
+  // Scrappable availability errors
+  'scrappable_not_available': {
+    SupportedLanguage.en: 'The requested scrappable is not available.',
+    SupportedLanguage.es: 'El scrappable solicitado no esta disponible.',
+    SupportedLanguage.de: 'Das angeforderte Scrappable ist nicht verfugbar.',
+    SupportedLanguage.fr: 'Le scrappable demande n\'est pas disponible.',
+    SupportedLanguage.ptBR: 'O scrappable solicitado nao esta disponivel.',
+    SupportedLanguage.ja: 'リクエストされたscrappableは利用できません。',
+  },
+  'scrappable_not_found_by_id': {
+    SupportedLanguage.en: 'The scrappable with the provided ID does not exist.',
+    SupportedLanguage.es: 'El scrappable con el ID proporcionado no existe.',
+    SupportedLanguage.de: 'Das Scrappable mit der angegebenen ID existiert nicht.',
+    SupportedLanguage.fr: 'Le scrappable avec l\'ID fourni n\'existe pas.',
+    SupportedLanguage.ptBR: 'O scrappable com o ID fornecido nao existe.',
+    SupportedLanguage.ja: '指定されたIDのscrappableは存在しません。',
+  },
+
+  // Session errors
+  'session_not_found': {
+    SupportedLanguage.en: 'No active session found with the provided ID.',
+    SupportedLanguage.es: 'No se encontro ninguna sesion activa con el ID proporcionado.',
+    SupportedLanguage.de: 'Keine aktive Sitzung mit der angegebenen ID gefunden.',
+    SupportedLanguage.fr: 'Aucune session active trouvee avec l\'ID fourni.',
+    SupportedLanguage.ptBR: 'Nenhuma sessao ativa encontrada com o ID fornecido.',
+    SupportedLanguage.ja: '指定されたIDのアクティブなセッションが見つかりません。',
+  },
+  'session_already_opened': {
+    SupportedLanguage.en: 'There is already an opened session for this scrappable. Please close the existing session before creating a new one.',
+    SupportedLanguage.es: 'Ya hay una sesion abierta para este scrappable. Por favor, cierra la sesion existente antes de crear una nueva.',
+    SupportedLanguage.de: 'Es gibt bereits eine geoffnete Sitzung fur dieses Scrappable. Bitte schliessen Sie die bestehende Sitzung, bevor Sie eine neue erstellen.',
+    SupportedLanguage.fr: 'Il existe deja une session ouverte pour ce scrappable. Veuillez fermer la session existante avant d\'en creer une nouvelle.',
+    SupportedLanguage.ptBR: 'Ja existe uma sessao aberta para este scrappable. Por favor, feche a sessao existente antes de criar uma nova.',
+    SupportedLanguage.ja: 'このscrappableには既にセッションが開いています。新しいセッションを作成する前に既存のセッションを閉じてください。',
+  },
+  'ai_usage_record_not_found': {
+    SupportedLanguage.en: 'Could not find your AI usage record.',
+    SupportedLanguage.es: 'No se pudo encontrar tu registro de uso de IA.',
+    SupportedLanguage.de: 'Ihr KI-Nutzungsdatensatz konnte nicht gefunden werden.',
+    SupportedLanguage.fr: 'Impossible de trouver votre enregistrement d\'utilisation IA.',
+    SupportedLanguage.ptBR: 'Nao foi possivel encontrar seu registro de uso de IA.',
+    SupportedLanguage.ja: 'AI使用記録が見つかりませんでした。',
+  },
+  'failed_to_save_api_key': {
+    SupportedLanguage.en: 'Could not save your API key. Please try again.',
+    SupportedLanguage.es: 'No se pudo guardar tu clave API. Por favor, intentelo de nuevo.',
+    SupportedLanguage.de: 'Ihr API-Schlussel konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.',
+    SupportedLanguage.fr: 'Impossible d\'enregistrer votre cle API. Veuillez reessayer.',
+    SupportedLanguage.ptBR: 'Nao foi possivel salvar sua chave API. Por favor, tente novamente.',
+    SupportedLanguage.ja: 'APIキーを保存できませんでした。もう一度お試しください。',
+  },
+
+  // Authentication errors for specific actions
+  'authentication_required_delete': {
+    SupportedLanguage.en: 'You must be logged in to delete this scrappable.',
+    SupportedLanguage.es: 'Debes iniciar sesion para eliminar este scrappable.',
+    SupportedLanguage.de: 'Sie mussen angemeldet sein, um dieses Scrappable zu loschen.',
+    SupportedLanguage.fr: 'Vous devez etre connecte pour supprimer ce scrappable.',
+    SupportedLanguage.ptBR: 'Voce deve estar logado para excluir este scrappable.',
+    SupportedLanguage.ja: 'このscrappableを削除するにはログインが必要です。',
+  },
+  'authentication_required_edit': {
+    SupportedLanguage.en: 'You must be logged in to edit this scrappable.',
+    SupportedLanguage.es: 'Debes iniciar sesion para editar este scrappable.',
+    SupportedLanguage.de: 'Sie mussen angemeldet sein, um dieses Scrappable zu bearbeiten.',
+    SupportedLanguage.fr: 'Vous devez etre connecte pour modifier ce scrappable.',
+    SupportedLanguage.ptBR: 'Voce deve estar logado para editar este scrappable.',
+    SupportedLanguage.ja: 'このscrappableを編集するにはログインが必要です。',
+  },
+  'authentication_required_marketplace': {
+    SupportedLanguage.en: 'You must be logged in to hide scrappables from marketplace.',
+    SupportedLanguage.es: 'Debes iniciar sesion para ocultar scrappables del marketplace.',
+    SupportedLanguage.de: 'Sie mussen angemeldet sein, um Scrappables vom Marketplace zu verstecken.',
+    SupportedLanguage.fr: 'Vous devez etre connecte pour masquer les scrappables du marketplace.',
+    SupportedLanguage.ptBR: 'Voce deve estar logado para ocultar scrappables do marketplace.',
+    SupportedLanguage.ja: 'マーケットプレイスからscrappableを非表示にするにはログインが必要です。',
+  },
+  'authentication_required_api_key': {
+    SupportedLanguage.en: 'You must be logged in to add an API key.',
+    SupportedLanguage.es: 'Debes iniciar sesion para agregar una clave API.',
+    SupportedLanguage.de: 'Sie mussen angemeldet sein, um einen API-Schlussel hinzuzufugen.',
+    SupportedLanguage.fr: 'Vous devez etre connecte pour ajouter une cle API.',
+    SupportedLanguage.ptBR: 'Voce deve estar logado para adicionar uma chave API.',
+    SupportedLanguage.ja: 'APIキーを追加するにはログインが必要です。',
+  },
+  'authentication_required_session': {
+    SupportedLanguage.en: 'You must be the owner of this scrappable to create a session for it.',
+    SupportedLanguage.es: 'Debes ser el propietario de este scrappable para crear una sesion para el.',
+    SupportedLanguage.de: 'Sie mussen der Besitzer dieses Scrappables sein, um eine Sitzung dafur zu erstellen.',
+    SupportedLanguage.fr: 'Vous devez etre le proprietaire de ce scrappable pour creer une session.',
+    SupportedLanguage.ptBR: 'Voce deve ser o proprietario deste scrappable para criar uma sessao para ele.',
+    SupportedLanguage.ja: 'セッションを作成するにはこのscrappableの所有者である必要があります。',
+  },
+  'authentication_required_ai_model': {
+    SupportedLanguage.en: 'You must be logged in to use this AI model.',
+    SupportedLanguage.es: 'Debes iniciar sesion para usar este modelo de IA.',
+    SupportedLanguage.de: 'Sie mussen angemeldet sein, um dieses KI-Modell zu verwenden.',
+    SupportedLanguage.fr: 'Vous devez etre connecte pour utiliser ce modele IA.',
+    SupportedLanguage.ptBR: 'Voce deve estar logado para usar este modelo de IA.',
+    SupportedLanguage.ja: 'このAIモデルを使用するにはログインが必要です。',
+  },
+
+  // AI generation errors
+  'ai_generation_failed': {
+    SupportedLanguage.en: 'An unexpected error occurred while generating the scrappable. Please try again later.',
+    SupportedLanguage.es: 'Ocurrio un error inesperado al generar el scrappable. Por favor, intentelo mas tarde.',
+    SupportedLanguage.de: 'Beim Generieren des Scrappables ist ein unerwarteter Fehler aufgetreten. Bitte versuchen Sie es spater erneut.',
+    SupportedLanguage.fr: 'Une erreur inattendue s\'est produite lors de la generation du scrappable. Veuillez reessayer plus tard.',
+    SupportedLanguage.ptBR: 'Ocorreu um erro inesperado ao gerar o scrappable. Por favor, tente novamente mais tarde.',
+    SupportedLanguage.ja: 'scrappableの生成中に予期しないエラーが発生しました。後でもう一度お試しください。',
+  },
+
+  // Ultra plan specific
+  'ultra_plan_required_marketplace': {
+    SupportedLanguage.en: 'Hiding scrappables from marketplace is only available for Ultra plan users.',
+    SupportedLanguage.es: 'Ocultar scrappables del marketplace solo esta disponible para usuarios del plan Ultra.',
+    SupportedLanguage.de: 'Das Verstecken von Scrappables vom Marketplace ist nur fur Ultra-Plan-Benutzer verfugbar.',
+    SupportedLanguage.fr: 'Masquer les scrappables du marketplace est disponible uniquement pour les utilisateurs du plan Ultra.',
+    SupportedLanguage.ptBR: 'Ocultar scrappables do marketplace esta disponivel apenas para usuarios do plano Ultra.',
+    SupportedLanguage.ja: 'マーケットプレイスからscrappableを非表示にするにはUltraプランが必要です。',
+  },
+
+  // Upgrade errors
+  'upgrade_required_ai_model': {
+    SupportedLanguage.en: 'You need at least a Pro plan to use this AI model. Upgrade your plan to access advanced AI models.',
+    SupportedLanguage.es: 'Necesitas al menos un plan Pro para usar este modelo de IA. Actualiza tu plan para acceder a modelos de IA avanzados.',
+    SupportedLanguage.de: 'Sie benotigen mindestens einen Pro-Plan, um dieses KI-Modell zu verwenden. Aktualisieren Sie Ihren Plan, um auf erweiterte KI-Modelle zuzugreifen.',
+    SupportedLanguage.fr: 'Vous avez besoin d\'au moins un plan Pro pour utiliser ce modele IA. Mettez a niveau votre plan pour acceder aux modeles IA avances.',
+    SupportedLanguage.ptBR: 'Voce precisa de pelo menos um plano Pro para usar este modelo de IA. Atualize seu plano para acessar modelos de IA avancados.',
+    SupportedLanguage.ja: 'このAIモデルを使用するにはProプラン以上が必要です。高度なAIモデルにアクセスするにはプランをアップグレードしてください。',
   },
 };

@@ -379,6 +379,7 @@ class EndpointCreateScrappable extends _i1.EndpointRef {
 
   _i2.Stream<_i20.CreateScrappableStreamItem> call({
     required String referenceLink,
+    required _i4.SupportedLanguage language,
   }) =>
       caller.callStreamingServerEndpoint<
         _i2.Stream<_i20.CreateScrappableStreamItem>,
@@ -386,7 +387,10 @@ class EndpointCreateScrappable extends _i1.EndpointRef {
       >(
         'createScrappable',
         'call',
-        {'referenceLink': referenceLink},
+        {
+          'referenceLink': referenceLink,
+          'language': language,
+        },
         {},
       );
 }
@@ -398,12 +402,17 @@ class EndpointDeleteScrappable extends _i1.EndpointRef {
   @override
   String get name => 'deleteScrappable';
 
-  _i2.Future<bool> call({required int scrappableId}) =>
-      caller.callServerEndpoint<bool>(
-        'deleteScrappable',
-        'call',
-        {'scrappableId': scrappableId},
-      );
+  _i2.Future<bool> call({
+    required int scrappableId,
+    required _i4.SupportedLanguage language,
+  }) => caller.callServerEndpoint<bool>(
+    'deleteScrappable',
+    'call',
+    {
+      'scrappableId': scrappableId,
+      'language': language,
+    },
+  );
 }
 
 /// {@category Endpoint}
@@ -417,6 +426,7 @@ class EndpointEditScrappable extends _i1.EndpointRef {
     required int scrappableId,
     required String name,
     required String description,
+    required _i4.SupportedLanguage language,
     _i19.ScraperCategory? category,
     bool? willHideFromMarketplace,
   }) => caller.callServerEndpoint<bool>(
@@ -426,6 +436,7 @@ class EndpointEditScrappable extends _i1.EndpointRef {
       'scrappableId': scrappableId,
       'name': name,
       'description': description,
+      'language': language,
       'category': category,
       'willHideFromMarketplace': willHideFromMarketplace,
     },
@@ -443,6 +454,7 @@ class EndpointMarketplace extends _i1.EndpointRef {
     required int page,
     String? searchQuery,
     List<_i19.ScraperCategory>? categories,
+    required _i4.SupportedLanguage language,
   }) => caller.callServerEndpoint<_i21.PaginatedScrappableResponse>(
     'marketplace',
     'getItems',
@@ -450,6 +462,7 @@ class EndpointMarketplace extends _i1.EndpointRef {
       'page': page,
       'searchQuery': searchQuery,
       'categories': categories,
+      'language': language,
     },
   );
 }
@@ -463,12 +476,17 @@ class EndpointPublicScrappable extends _i1.EndpointRef {
 
   /// Retrieves ByteTestData for a scrappable
   /// This is a public endpoint to allow viewing test data in the marketplace
-  _i2.Future<_i22.ByteTestData?> getByteTestData(int scrappableId) =>
-      caller.callServerEndpoint<_i22.ByteTestData?>(
-        'publicScrappable',
-        'getByteTestData',
-        {'scrappableId': scrappableId},
-      );
+  _i2.Future<_i22.ByteTestData?> getByteTestData(
+    int scrappableId, {
+    required _i4.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i22.ByteTestData?>(
+    'publicScrappable',
+    'getByteTestData',
+    {
+      'scrappableId': scrappableId,
+      'language': language,
+    },
+  );
 }
 
 /// {@category Endpoint}
@@ -500,12 +518,17 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
   @override
   String get name => 'scrappableChatSession';
 
-  _i2.Future<void> commitCurrentEditState({required String sessionUuid}) =>
-      caller.callServerEndpoint<void>(
-        'scrappableChatSession',
-        'commitCurrentEditState',
-        {'sessionUuid': sessionUuid},
-      );
+  _i2.Future<void> commitCurrentEditState({
+    required String sessionUuid,
+    required _i4.SupportedLanguage language,
+  }) => caller.callServerEndpoint<void>(
+    'scrappableChatSession',
+    'commitCurrentEditState',
+    {
+      'sessionUuid': sessionUuid,
+      'language': language,
+    },
+  );
 
   _i2.Future<void> disposeSession({required String sessionId}) =>
       caller.callServerEndpoint<void>(
@@ -528,12 +551,14 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
   _i2.Future<void> updateUserApiKey({
     required String sessionId,
     required String openAiApiKey,
+    required _i4.SupportedLanguage language,
   }) => caller.callServerEndpoint<void>(
     'scrappableChatSession',
     'updateUserApiKey',
     {
       'sessionId': sessionId,
       'openAiApiKey': openAiApiKey,
+      'language': language,
     },
   );
 
@@ -542,6 +567,7 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
     required String url,
     required List<String> pathParams,
     required Map<String, String?> queryParams,
+    required _i4.SupportedLanguage language,
   }) => caller.callServerEndpoint<void>(
     'scrappableChatSession',
     'updateScrappableRequest',
@@ -550,19 +576,25 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
       'url': url,
       'pathParams': pathParams,
       'queryParams': queryParams,
+      'language': language,
     },
   );
 
   _i2.Future<_i24.CreateSessionResponse> createSession({
     required int scrappableId,
+    required _i4.SupportedLanguage language,
   }) => caller.callServerEndpoint<_i24.CreateSessionResponse>(
     'scrappableChatSession',
     'createSession',
-    {'scrappableId': scrappableId},
+    {
+      'scrappableId': scrappableId,
+      'language': language,
+    },
   );
 
   _i2.Stream<_i25.ChatResponse> listenToScrappableRedraftSession({
     required String sessionUuid,
+    required _i4.SupportedLanguage language,
   }) =>
       caller.callStreamingServerEndpoint<
         _i2.Stream<_i25.ChatResponse>,
@@ -570,31 +602,38 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
       >(
         'scrappableChatSession',
         'listenToScrappableRedraftSession',
-        {'sessionUuid': sessionUuid},
+        {
+          'sessionUuid': sessionUuid,
+          'language': language,
+        },
         {},
       );
 
   _i2.Future<void> changeChatModel({
     required String sessionUuid,
     required _i26.AiModel aiModel,
+    required _i4.SupportedLanguage language,
   }) => caller.callServerEndpoint<void>(
     'scrappableChatSession',
     'changeChatModel',
     {
       'sessionUuid': sessionUuid,
       'aiModel': aiModel,
+      'language': language,
     },
   );
 
   _i2.Stream<String> sendPromptMessage({
     required String sessionId,
     required String userPrompt,
+    required _i4.SupportedLanguage language,
   }) => caller.callStreamingServerEndpoint<_i2.Stream<String>, String>(
     'scrappableChatSession',
     'sendPromptMessage',
     {
       'sessionId': sessionId,
       'userPrompt': userPrompt,
+      'language': language,
     },
     {},
   );

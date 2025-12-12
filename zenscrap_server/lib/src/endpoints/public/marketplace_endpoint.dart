@@ -11,6 +11,7 @@ class MarketplaceEndpoint extends Endpoint {
     int page = 1,
     String? searchQuery,
     List<ScraperCategory>? categories,
+    SupportedLanguage language = SupportedLanguage.en,
   }) async {
     final now = DateTime.now();
     const int pageSize = 12;

@@ -748,6 +748,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<String>(),
               nullable: false,
             ),
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
+              nullable: false,
+            ),
           },
           streamParams: {},
           returnType: _i1.MethodStreamReturnType.streamType,
@@ -762,6 +767,7 @@ class Endpoints extends _i1.EndpointDispatch {
                       .call(
                         session,
                         referenceLink: params['referenceLink'],
+                        language: params['language'],
                       ),
         ),
       },
@@ -778,6 +784,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<int>(),
               nullable: false,
             ),
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
+              nullable: false,
+            ),
           },
           call:
               (
@@ -789,6 +800,7 @@ class Endpoints extends _i1.EndpointDispatch {
                       .call(
                         session,
                         scrappableId: params['scrappableId'],
+                        language: params['language'],
                       ),
         ),
       },
@@ -815,6 +827,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<String>(),
               nullable: false,
             ),
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
+              nullable: false,
+            ),
             'category': _i1.ParameterDescription(
               name: 'category',
               type: _i1.getType<_i20.ScraperCategory?>(),
@@ -837,6 +854,7 @@ class Endpoints extends _i1.EndpointDispatch {
                         scrappableId: params['scrappableId'],
                         name: params['name'],
                         description: params['description'],
+                        language: params['language'],
                         category: params['category'],
                         willHideFromMarketplace:
                             params['willHideFromMarketplace'],
@@ -866,6 +884,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<List<_i20.ScraperCategory>?>(),
               nullable: true,
             ),
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
+              nullable: false,
+            ),
           },
           call:
               (
@@ -877,6 +900,7 @@ class Endpoints extends _i1.EndpointDispatch {
                     page: params['page'],
                     searchQuery: params['searchQuery'],
                     categories: params['categories'],
+                    language: params['language'],
                   ),
         ),
       },
@@ -893,6 +917,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<int>(),
               nullable: false,
             ),
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
+              nullable: false,
+            ),
           },
           call:
               (
@@ -904,6 +933,7 @@ class Endpoints extends _i1.EndpointDispatch {
                       .getByteTestData(
                         session,
                         params['scrappableId'],
+                        language: params['language'],
                       ),
         ),
       },
@@ -957,6 +987,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<String>(),
               nullable: false,
             ),
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
+              nullable: false,
+            ),
           },
           call:
               (
@@ -968,6 +1003,7 @@ class Endpoints extends _i1.EndpointDispatch {
                       .commitCurrentEditState(
                         session,
                         sessionUuid: params['sessionUuid'],
+                        language: params['language'],
                       ),
         ),
         'disposeSession': _i1.MethodConnector(
@@ -1004,6 +1040,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<String>(),
               nullable: false,
             ),
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
+              nullable: false,
+            ),
           },
           call:
               (
@@ -1016,6 +1057,7 @@ class Endpoints extends _i1.EndpointDispatch {
                         session,
                         sessionId: params['sessionId'],
                         openAiApiKey: params['openAiApiKey'],
+                        language: params['language'],
                       ),
         ),
         'updateScrappableRequest': _i1.MethodConnector(
@@ -1041,6 +1083,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<Map<String, String?>>(),
               nullable: false,
             ),
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
+              nullable: false,
+            ),
           },
           call:
               (
@@ -1055,6 +1102,7 @@ class Endpoints extends _i1.EndpointDispatch {
                         url: params['url'],
                         pathParams: params['pathParams'],
                         queryParams: params['queryParams'],
+                        language: params['language'],
                       ),
         ),
         'createSession': _i1.MethodConnector(
@@ -1063,6 +1111,11 @@ class Endpoints extends _i1.EndpointDispatch {
             'scrappableId': _i1.ParameterDescription(
               name: 'scrappableId',
               type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -1076,6 +1129,7 @@ class Endpoints extends _i1.EndpointDispatch {
                       .createSession(
                         session,
                         scrappableId: params['scrappableId'],
+                        language: params['language'],
                       ),
         ),
         'changeChatModel': _i1.MethodConnector(
@@ -1091,6 +1145,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<_i22.AiModel>(),
               nullable: false,
             ),
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
+              nullable: false,
+            ),
           },
           call:
               (
@@ -1103,6 +1162,7 @@ class Endpoints extends _i1.EndpointDispatch {
                         session,
                         sessionUuid: params['sessionUuid'],
                         aiModel: params['aiModel'],
+                        language: params['language'],
                       ),
         ),
         'listenToScrappableRedraftSession': _i1.MethodStreamConnector(
@@ -1111,6 +1171,11 @@ class Endpoints extends _i1.EndpointDispatch {
             'sessionUuid': _i1.ParameterDescription(
               name: 'sessionUuid',
               type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -1127,6 +1192,7 @@ class Endpoints extends _i1.EndpointDispatch {
                       .listenToScrappableRedraftSession(
                         session,
                         sessionUuid: params['sessionUuid'],
+                        language: params['language'],
                       ),
         ),
         'sendPromptMessage': _i1.MethodStreamConnector(
@@ -1140,6 +1206,11 @@ class Endpoints extends _i1.EndpointDispatch {
             'userPrompt': _i1.ParameterDescription(
               name: 'userPrompt',
               type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -1157,6 +1228,7 @@ class Endpoints extends _i1.EndpointDispatch {
                         session,
                         sessionId: params['sessionId'],
                         userPrompt: params['userPrompt'],
+                        language: params['language'],
                       ),
         ),
       },
