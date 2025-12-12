@@ -1585,4 +1585,213 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get marketplace_view_plans => 'Plaene anzeigen';
+
+  @override
+  String get scrap_session_copied_to_clipboard => 'In Zwischenablage kopiert';
+
+  @override
+  String get scrap_session_tab_result => 'ERGEBNIS';
+
+  @override
+  String get scrap_session_tab_html => 'HTML';
+
+  @override
+  String get scrap_session_tab_screenshot => 'Screenshot';
+
+  @override
+  String get scrap_session_no_json_response => 'Keine JSON-Antwort verfuegbar';
+
+  @override
+  String get scrap_session_no_html_content => 'Kein HTML-Inhalt verfuegbar';
+
+  @override
+  String get scrap_session_no_screenshot => 'Kein Screenshot verfuegbar';
+
+  @override
+  String get scrap_session_copy => 'Kopieren';
+
+  @override
+  String get scrap_session_increase_font_size => 'Schriftgroesse erhoehen';
+
+  @override
+  String get scrap_session_decrease_font_size => 'Schriftgroesse verringern';
+
+  @override
+  String get scrap_session_test_suite => 'Test-Suite';
+
+  @override
+  String get scrap_session_scrappable_info => 'Scrappable-Info';
+
+  @override
+  String get scrap_session_powerful_model_upgrade =>
+      'Schalten Sie den Zugang zum leistungsstarken KI-Modell frei fuer ueberlegene Extraktionsgenauigkeit und besseres Verstaendnis komplexer Webseiten. Perfekt fuer fortgeschrittene Scraping-Anforderungen.';
+
+  @override
+  String get scrap_session_sign_in_required => 'Anmeldung Erforderlich';
+
+  @override
+  String get scrap_session_sign_in_unlock_features =>
+      'Melden Sie sich an, um leistungsstarke Funktionen freizuschalten:';
+
+  @override
+  String get scrap_session_advanced_ai_models => 'Erweiterte KI-Modelle';
+
+  @override
+  String get scrap_session_advanced_ai_models_desc =>
+      'Zugang zu leistungsstarken KI-Modellen und anderen Premium-Funktionen';
+
+  @override
+  String get scrap_session_no_time_limits => 'Keine Zeitlimits';
+
+  @override
+  String get scrap_session_no_time_limits_desc =>
+      'Endpoints laufen mit einem Abonnement nie ab';
+
+  @override
+  String get scrap_session_more_api_credits => 'Mehr API-Guthaben';
+
+  @override
+  String get scrap_session_more_api_credits_desc =>
+      'Erhalten Sie tausende API-Guthaben pro Monat';
+
+  @override
+  String get scrap_session_multiple_endpoints => 'Mehrere Endpoints';
+
+  @override
+  String get scrap_session_multiple_endpoints_desc =>
+      'Erstellen und verwalten Sie mehrere Scraping-Endpoints';
+
+  @override
+  String get scrap_session_maybe_later => 'Vielleicht spaeter';
+
+  @override
+  String get scrap_session_sign_in => 'Anmelden';
+
+  @override
+  String scrap_session_model_changed(String modelName) {
+    return 'Scrap-KI-Modell wurde auf $modelName geaendert';
+  }
+
+  @override
+  String get scrap_session_current => 'Aktuell';
+
+  @override
+  String get scrap_session_deploy_tooltip =>
+      'Bearbeiten/nutzen Sie diesen Scrappable-Endpoint\nweiter, indem Sie ihn bereitstellen!';
+
+  @override
+  String get scrap_session_deploy_endpoint => 'ENDPOINT BEREITSTELLEN';
+
+  @override
+  String get scrap_session_discard_changes => 'Aenderungen verwerfen';
+
+  @override
+  String get scrap_session_go_back => 'Zurueck';
+
+  @override
+  String get scrap_session_edit_request => 'Scrappable-Anfrage bearbeiten';
+
+  @override
+  String get scrap_session_no_test_data => 'Keine Testdaten verfuegbar';
+
+  @override
+  String get scrap_session_chat_loading => 'Chat wird geladen...';
+
+  @override
+  String get scrap_session_copy_curl => 'Test-cURL-Befehl kopieren';
+
+  @override
+  String get scrap_session_analyzing_url => 'URL wird analysiert';
+
+  @override
+  String scrap_session_thoughts_processed(int count) {
+    return '$count Gedanken verarbeitet';
+  }
+
+  @override
+  String get scrap_session_ai_thinking => 'KI denkt nach...';
+
+  @override
+  String get scrap_session_initializing_ai =>
+      'KI-Analyse wird initialisiert...';
+
+  @override
+  String get scrap_session_web_search_grounding => 'Websuche-Verankerung';
+
+  @override
+  String scrap_session_sources_referenced(int count) {
+    return '$count Quellen referenziert';
+  }
+
+  @override
+  String get scrap_session_ai_analyzing_pattern =>
+      'Gemini 3 Pro analysiert Ihr URL-Muster...';
+
+  @override
+  String get scrap_session_test_endpoint => 'Endpoint testen';
+
+  @override
+  String get scrap_session_creating_session => 'Sitzung wird erstellt...';
+
+  @override
+  String get scrap_session_add_api_key =>
+      'API-Schluessel hinzufuegen um fortzufahren...';
+
+  @override
+  String get scrap_session_ask_modification =>
+      'Beliebige Aenderung anfragen...';
+
+  @override
+  String get scrap_session_message_min_length =>
+      'Nachricht muss mindestens 3 Zeichen haben';
+
+  @override
+  String get scrap_session_message_max_length =>
+      'Nachricht muss weniger als 1000 Zeichen haben';
+
+  @override
+  String get scrap_session_edit_request_title =>
+      'Scrappable-Anfrage bearbeiten';
+
+  @override
+  String get scrap_session_edit_request_subtitle =>
+      'URL-Vorlage, Pfadparameter und Abfrageparameter anpassen';
+
+  @override
+  String scrap_session_path_params_hint(Object postId, Object userId) {
+    return 'Pfadparameter sollten in geschweiften Klammern wie $userId oder $postId eingeschlossen werden. Sie stellen dynamische Segmente in der URL dar, die durch tatsaechliche Werte ersetzt werden.';
+  }
+
+  @override
+  String scrap_session_use_param_name(Object paramName) {
+    return '$paramName fuer Pfadparameter verwenden';
+  }
+
+  @override
+  String get scrap_session_save_changes => 'Aenderungen speichern';
+
+  @override
+  String get scrap_session_duplicate_param => 'Doppelter Parameter';
+
+  @override
+  String get scrap_session_duplicate_path_param =>
+      'Dieser Pfadparameter existiert bereits.';
+
+  @override
+  String get scrap_session_duplicate_query_param =>
+      'Dieser Abfrageparameter existiert bereits.';
+
+  @override
+  String get scrap_session_missing_path_params => 'Fehlende Pfadparameter';
+
+  @override
+  String get scrap_session_unused_path_params =>
+      'Nicht verwendete Pfadparameter';
+
+  @override
+  String get scrap_session_request_updated =>
+      'Scrappable-Anfrage erfolgreich aktualisiert!';
+
+  @override
+  String get scrap_session_close => 'Schliessen';
 }

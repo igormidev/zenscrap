@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_validator/form_validator.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
@@ -154,6 +155,7 @@ class _ZenChatTextfieldState extends ConsumerState<ZenChatTextfield> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     // Watch chat messages to check for credit exhaustion
     final messages = ref.watch(chatMessagesProvider).value ?? [];
     final isCreditsExhausted = _areCreditsExhausted(messages);
@@ -180,17 +182,17 @@ class _ZenChatTextfieldState extends ConsumerState<ZenChatTextfield> {
                   controller: _promptEC,
                   focusNode: _focusNode,
                   labelText: isCreditsExhausted
-                      ? 'Add API key to continue...'
-                      : 'Ask for any modification...',
+                      ? l10n.scrap_session_add_api_key
+                      : l10n.scrap_session_ask_modification,
                   hintText: '',
                   minLines: 1,
                   maxLines: 5,
                   enabled: !isDisabled,
                   onSubmitted: (_) => _sendMessage(),
                   validator: ValidationBuilder()
-                      .minLength(3, 'Message must be at least 3 characters')
+                      .minLength(3, l10n.scrap_session_message_min_length)
                       .maxLength(
-                          1000, 'Message must be less than 1000 characters')
+                          1000, l10n.scrap_session_message_max_length)
                       .build(),
                 ),
               ),

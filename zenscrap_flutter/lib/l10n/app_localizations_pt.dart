@@ -1557,6 +1557,210 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get marketplace_view_plans => 'View Plans';
+
+  @override
+  String get scrap_session_copied_to_clipboard => 'Copied to clipboard';
+
+  @override
+  String get scrap_session_tab_result => 'RESULT';
+
+  @override
+  String get scrap_session_tab_html => 'HTML';
+
+  @override
+  String get scrap_session_tab_screenshot => 'Screenshot';
+
+  @override
+  String get scrap_session_no_json_response => 'No JSON response available';
+
+  @override
+  String get scrap_session_no_html_content => 'No HTML content available';
+
+  @override
+  String get scrap_session_no_screenshot => 'No screenshot available';
+
+  @override
+  String get scrap_session_copy => 'Copy';
+
+  @override
+  String get scrap_session_increase_font_size => 'Increase font size';
+
+  @override
+  String get scrap_session_decrease_font_size => 'Decrease font size';
+
+  @override
+  String get scrap_session_test_suite => 'Test suite';
+
+  @override
+  String get scrap_session_scrappable_info => 'Scrappable info';
+
+  @override
+  String get scrap_session_powerful_model_upgrade =>
+      'Unlock access to the Powerful AI model for superior extraction accuracy and better understanding of complex web pages. Perfect for advanced scraping needs.';
+
+  @override
+  String get scrap_session_sign_in_required => 'Sign In Required';
+
+  @override
+  String get scrap_session_sign_in_unlock_features =>
+      'Sign in to unlock powerful features:';
+
+  @override
+  String get scrap_session_advanced_ai_models => 'Advanced AI Models';
+
+  @override
+  String get scrap_session_advanced_ai_models_desc =>
+      'Access Powerful AI models and other premium features';
+
+  @override
+  String get scrap_session_no_time_limits => 'No Time Limits';
+
+  @override
+  String get scrap_session_no_time_limits_desc =>
+      'Endpoints never expire with a subscription';
+
+  @override
+  String get scrap_session_more_api_credits => 'More API Credits';
+
+  @override
+  String get scrap_session_more_api_credits_desc =>
+      'Get thousands of API credits per month';
+
+  @override
+  String get scrap_session_multiple_endpoints => 'Multiple Endpoints';
+
+  @override
+  String get scrap_session_multiple_endpoints_desc =>
+      'Create and manage multiple scraping endpoints';
+
+  @override
+  String get scrap_session_maybe_later => 'Maybe Later';
+
+  @override
+  String get scrap_session_sign_in => 'Sign In';
+
+  @override
+  String scrap_session_model_changed(String modelName) {
+    return 'Scrap AI model changed to $modelName';
+  }
+
+  @override
+  String get scrap_session_current => 'Current';
+
+  @override
+  String get scrap_session_deploy_tooltip =>
+      'Continue to edit/use this scrappable\nendpoint by deploying it!';
+
+  @override
+  String get scrap_session_deploy_endpoint => 'DEPLOY ENDPOINT';
+
+  @override
+  String get scrap_session_discard_changes => 'Discard changes';
+
+  @override
+  String get scrap_session_go_back => 'Go back';
+
+  @override
+  String get scrap_session_edit_request => 'Edit scrappable request';
+
+  @override
+  String get scrap_session_no_test_data => 'No test data available';
+
+  @override
+  String get scrap_session_chat_loading => 'Chat is loading...';
+
+  @override
+  String get scrap_session_copy_curl => 'Copy the test cURL command';
+
+  @override
+  String get scrap_session_analyzing_url => 'Analyzing URL';
+
+  @override
+  String scrap_session_thoughts_processed(int count) {
+    return '$count thoughts processed';
+  }
+
+  @override
+  String get scrap_session_ai_thinking => 'AI is thinking...';
+
+  @override
+  String get scrap_session_initializing_ai => 'Initializing AI analysis...';
+
+  @override
+  String get scrap_session_web_search_grounding => 'Web Search Grounding';
+
+  @override
+  String scrap_session_sources_referenced(int count) {
+    return '$count sources referenced';
+  }
+
+  @override
+  String get scrap_session_ai_analyzing_pattern =>
+      'Gemini 3 Pro is analyzing your URL pattern...';
+
+  @override
+  String get scrap_session_test_endpoint => 'Test endpoint';
+
+  @override
+  String get scrap_session_creating_session => 'Creating session...';
+
+  @override
+  String get scrap_session_add_api_key => 'Add API key to continue...';
+
+  @override
+  String get scrap_session_ask_modification => 'Ask for any modification...';
+
+  @override
+  String get scrap_session_message_min_length =>
+      'Message must be at least 3 characters';
+
+  @override
+  String get scrap_session_message_max_length =>
+      'Message must be less than 1000 characters';
+
+  @override
+  String get scrap_session_edit_request_title => 'Edit Scrappable Request';
+
+  @override
+  String get scrap_session_edit_request_subtitle =>
+      'Customize the URL template, path parameters, and query parameters';
+
+  @override
+  String scrap_session_path_params_hint(Object postId, Object userId) {
+    return 'Path parameters should be wrapped in curly braces like $userId or $postId. They represent dynamic segments in the URL that will be replaced with actual values.';
+  }
+
+  @override
+  String scrap_session_use_param_name(Object paramName) {
+    return 'Use $paramName for path parameters';
+  }
+
+  @override
+  String get scrap_session_save_changes => 'Save Changes';
+
+  @override
+  String get scrap_session_duplicate_param => 'Duplicate Parameter';
+
+  @override
+  String get scrap_session_duplicate_path_param =>
+      'This path parameter already exists.';
+
+  @override
+  String get scrap_session_duplicate_query_param =>
+      'This query parameter already exists.';
+
+  @override
+  String get scrap_session_missing_path_params => 'Missing Path Parameters';
+
+  @override
+  String get scrap_session_unused_path_params => 'Unused Path Parameters';
+
+  @override
+  String get scrap_session_request_updated =>
+      'Scrappable request updated successfully!';
+
+  @override
+  String get scrap_session_close => 'Close';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -3141,4 +3345,215 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get marketplace_view_plans => 'Ver Planos';
+
+  @override
+  String get scrap_session_copied_to_clipboard =>
+      'Copiado para a area de transferencia';
+
+  @override
+  String get scrap_session_tab_result => 'RESULTADO';
+
+  @override
+  String get scrap_session_tab_html => 'HTML';
+
+  @override
+  String get scrap_session_tab_screenshot => 'Captura de Tela';
+
+  @override
+  String get scrap_session_no_json_response =>
+      'Nenhuma resposta JSON disponivel';
+
+  @override
+  String get scrap_session_no_html_content => 'Nenhum conteudo HTML disponivel';
+
+  @override
+  String get scrap_session_no_screenshot =>
+      'Nenhuma captura de tela disponivel';
+
+  @override
+  String get scrap_session_copy => 'Copiar';
+
+  @override
+  String get scrap_session_increase_font_size => 'Aumentar tamanho da fonte';
+
+  @override
+  String get scrap_session_decrease_font_size => 'Diminuir tamanho da fonte';
+
+  @override
+  String get scrap_session_test_suite => 'Suite de testes';
+
+  @override
+  String get scrap_session_scrappable_info => 'Info do Scrappable';
+
+  @override
+  String get scrap_session_powerful_model_upgrade =>
+      'Desbloqueie o acesso ao modelo de IA Potente para precisao de extracao superior e melhor compreensao de paginas web complexas. Perfeito para necessidades avancadas de scraping.';
+
+  @override
+  String get scrap_session_sign_in_required => 'Login Necessario';
+
+  @override
+  String get scrap_session_sign_in_unlock_features =>
+      'Faca login para desbloquear recursos poderosos:';
+
+  @override
+  String get scrap_session_advanced_ai_models => 'Modelos de IA Avancados';
+
+  @override
+  String get scrap_session_advanced_ai_models_desc =>
+      'Acesse modelos de IA potentes e outros recursos premium';
+
+  @override
+  String get scrap_session_no_time_limits => 'Sem Limites de Tempo';
+
+  @override
+  String get scrap_session_no_time_limits_desc =>
+      'Endpoints nunca expiram com uma assinatura';
+
+  @override
+  String get scrap_session_more_api_credits => 'Mais Creditos de API';
+
+  @override
+  String get scrap_session_more_api_credits_desc =>
+      'Obtenha milhares de creditos de API por mes';
+
+  @override
+  String get scrap_session_multiple_endpoints => 'Multiplos Endpoints';
+
+  @override
+  String get scrap_session_multiple_endpoints_desc =>
+      'Crie e gerencie multiplos endpoints de scraping';
+
+  @override
+  String get scrap_session_maybe_later => 'Talvez Depois';
+
+  @override
+  String get scrap_session_sign_in => 'Entrar';
+
+  @override
+  String scrap_session_model_changed(String modelName) {
+    return 'Modelo de IA de Scrap alterado para $modelName';
+  }
+
+  @override
+  String get scrap_session_current => 'Atual';
+
+  @override
+  String get scrap_session_deploy_tooltip =>
+      'Continue editando/usando este endpoint\nscrappable implantando-o!';
+
+  @override
+  String get scrap_session_deploy_endpoint => 'IMPLANTAR ENDPOINT';
+
+  @override
+  String get scrap_session_discard_changes => 'Descartar alteracoes';
+
+  @override
+  String get scrap_session_go_back => 'Voltar';
+
+  @override
+  String get scrap_session_edit_request => 'Editar requisicao do scrappable';
+
+  @override
+  String get scrap_session_no_test_data => 'Nenhum dado de teste disponivel';
+
+  @override
+  String get scrap_session_chat_loading => 'Carregando chat...';
+
+  @override
+  String get scrap_session_copy_curl => 'Copiar o comando cURL de teste';
+
+  @override
+  String get scrap_session_analyzing_url => 'Analisando URL';
+
+  @override
+  String scrap_session_thoughts_processed(int count) {
+    return '$count pensamentos processados';
+  }
+
+  @override
+  String get scrap_session_ai_thinking => 'A IA esta pensando...';
+
+  @override
+  String get scrap_session_initializing_ai => 'Inicializando analise de IA...';
+
+  @override
+  String get scrap_session_web_search_grounding => 'Fundamentacao de Busca Web';
+
+  @override
+  String scrap_session_sources_referenced(int count) {
+    return '$count fontes referenciadas';
+  }
+
+  @override
+  String get scrap_session_ai_analyzing_pattern =>
+      'Gemini 3 Pro esta analisando seu padrao de URL...';
+
+  @override
+  String get scrap_session_test_endpoint => 'Testar endpoint';
+
+  @override
+  String get scrap_session_creating_session => 'Criando sessao...';
+
+  @override
+  String get scrap_session_add_api_key =>
+      'Adicione chave API para continuar...';
+
+  @override
+  String get scrap_session_ask_modification => 'Peca qualquer modificacao...';
+
+  @override
+  String get scrap_session_message_min_length =>
+      'A mensagem deve ter pelo menos 3 caracteres';
+
+  @override
+  String get scrap_session_message_max_length =>
+      'A mensagem deve ter menos de 1000 caracteres';
+
+  @override
+  String get scrap_session_edit_request_title =>
+      'Editar Requisicao do Scrappable';
+
+  @override
+  String get scrap_session_edit_request_subtitle =>
+      'Personalize o modelo de URL, parametros de caminho e parametros de consulta';
+
+  @override
+  String scrap_session_path_params_hint(Object postId, Object userId) {
+    return 'Os parametros de caminho devem estar entre chaves como $userId ou $postId. Eles representam segmentos dinamicos na URL que serao substituidos por valores reais.';
+  }
+
+  @override
+  String scrap_session_use_param_name(Object paramName) {
+    return 'Use $paramName para parametros de caminho';
+  }
+
+  @override
+  String get scrap_session_save_changes => 'Salvar Alteracoes';
+
+  @override
+  String get scrap_session_duplicate_param => 'Parametro Duplicado';
+
+  @override
+  String get scrap_session_duplicate_path_param =>
+      'Este parametro de caminho ja existe.';
+
+  @override
+  String get scrap_session_duplicate_query_param =>
+      'Este parametro de consulta ja existe.';
+
+  @override
+  String get scrap_session_missing_path_params =>
+      'Parametros de Caminho Faltando';
+
+  @override
+  String get scrap_session_unused_path_params =>
+      'Parametros de Caminho Nao Usados';
+
+  @override
+  String get scrap_session_request_updated =>
+      'Requisicao do scrappable atualizada com sucesso!';
+
+  @override
+  String get scrap_session_close => 'Fechar';
 }

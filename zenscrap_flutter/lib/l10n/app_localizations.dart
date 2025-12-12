@@ -2855,6 +2855,366 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'View Plans'**
   String get marketplace_view_plans;
+
+  /// Snackbar message when content is copied
+  ///
+  /// In en, this message translates to:
+  /// **'Copied to clipboard'**
+  String get scrap_session_copied_to_clipboard;
+
+  /// Result tab label
+  ///
+  /// In en, this message translates to:
+  /// **'RESULT'**
+  String get scrap_session_tab_result;
+
+  /// HTML tab label
+  ///
+  /// In en, this message translates to:
+  /// **'HTML'**
+  String get scrap_session_tab_html;
+
+  /// Screenshot tab label
+  ///
+  /// In en, this message translates to:
+  /// **'Screenshot'**
+  String get scrap_session_tab_screenshot;
+
+  /// Empty state message when no JSON response
+  ///
+  /// In en, this message translates to:
+  /// **'No JSON response available'**
+  String get scrap_session_no_json_response;
+
+  /// Empty state message when no HTML content
+  ///
+  /// In en, this message translates to:
+  /// **'No HTML content available'**
+  String get scrap_session_no_html_content;
+
+  /// Empty state message when no screenshot
+  ///
+  /// In en, this message translates to:
+  /// **'No screenshot available'**
+  String get scrap_session_no_screenshot;
+
+  /// Copy button tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get scrap_session_copy;
+
+  /// Tooltip for increase font size button
+  ///
+  /// In en, this message translates to:
+  /// **'Increase font size'**
+  String get scrap_session_increase_font_size;
+
+  /// Tooltip for decrease font size button
+  ///
+  /// In en, this message translates to:
+  /// **'Decrease font size'**
+  String get scrap_session_decrease_font_size;
+
+  /// Tab label for test suite
+  ///
+  /// In en, this message translates to:
+  /// **'Test suite'**
+  String get scrap_session_test_suite;
+
+  /// Tab label for scrappable information
+  ///
+  /// In en, this message translates to:
+  /// **'Scrappable info'**
+  String get scrap_session_scrappable_info;
+
+  /// Message shown when user tries to use powerful AI model without proper plan
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock access to the Powerful AI model for superior extraction accuracy and better understanding of complex web pages. Perfect for advanced scraping needs.'**
+  String get scrap_session_powerful_model_upgrade;
+
+  /// Dialog title for sign in requirement
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In Required'**
+  String get scrap_session_sign_in_required;
+
+  /// Sign in dialog subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to unlock powerful features:'**
+  String get scrap_session_sign_in_unlock_features;
+
+  /// Sign in benefit title
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced AI Models'**
+  String get scrap_session_advanced_ai_models;
+
+  /// Sign in benefit description
+  ///
+  /// In en, this message translates to:
+  /// **'Access Powerful AI models and other premium features'**
+  String get scrap_session_advanced_ai_models_desc;
+
+  /// Sign in benefit title
+  ///
+  /// In en, this message translates to:
+  /// **'No Time Limits'**
+  String get scrap_session_no_time_limits;
+
+  /// Sign in benefit description
+  ///
+  /// In en, this message translates to:
+  /// **'Endpoints never expire with a subscription'**
+  String get scrap_session_no_time_limits_desc;
+
+  /// Sign in benefit title
+  ///
+  /// In en, this message translates to:
+  /// **'More API Credits'**
+  String get scrap_session_more_api_credits;
+
+  /// Sign in benefit description
+  ///
+  /// In en, this message translates to:
+  /// **'Get thousands of API credits per month'**
+  String get scrap_session_more_api_credits_desc;
+
+  /// Sign in benefit title
+  ///
+  /// In en, this message translates to:
+  /// **'Multiple Endpoints'**
+  String get scrap_session_multiple_endpoints;
+
+  /// Sign in benefit description
+  ///
+  /// In en, this message translates to:
+  /// **'Create and manage multiple scraping endpoints'**
+  String get scrap_session_multiple_endpoints_desc;
+
+  /// Button to dismiss dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Maybe Later'**
+  String get scrap_session_maybe_later;
+
+  /// Sign in button text
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In'**
+  String get scrap_session_sign_in;
+
+  /// Success message when AI model is changed
+  ///
+  /// In en, this message translates to:
+  /// **'Scrap AI model changed to {modelName}'**
+  String scrap_session_model_changed(String modelName);
+
+  /// Label for currently selected AI model
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get scrap_session_current;
+
+  /// Tooltip for deploy button
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to edit/use this scrappable\nendpoint by deploying it!'**
+  String get scrap_session_deploy_tooltip;
+
+  /// Deploy button label
+  ///
+  /// In en, this message translates to:
+  /// **'DEPLOY ENDPOINT'**
+  String get scrap_session_deploy_endpoint;
+
+  /// Button to discard changes
+  ///
+  /// In en, this message translates to:
+  /// **'Discard changes'**
+  String get scrap_session_discard_changes;
+
+  /// Button to go back
+  ///
+  /// In en, this message translates to:
+  /// **'Go back'**
+  String get scrap_session_go_back;
+
+  /// Tooltip for edit scrappable request button
+  ///
+  /// In en, this message translates to:
+  /// **'Edit scrappable request'**
+  String get scrap_session_edit_request;
+
+  /// Message when no test data is available
+  ///
+  /// In en, this message translates to:
+  /// **'No test data available'**
+  String get scrap_session_no_test_data;
+
+  /// Message when chat is loading
+  ///
+  /// In en, this message translates to:
+  /// **'Chat is loading...'**
+  String get scrap_session_chat_loading;
+
+  /// Tooltip for copy cURL button
+  ///
+  /// In en, this message translates to:
+  /// **'Copy the test cURL command'**
+  String get scrap_session_copy_curl;
+
+  /// Header text when AI is analyzing URL
+  ///
+  /// In en, this message translates to:
+  /// **'Analyzing URL'**
+  String get scrap_session_analyzing_url;
+
+  /// Status showing number of AI thoughts processed
+  ///
+  /// In en, this message translates to:
+  /// **'{count} thoughts processed'**
+  String scrap_session_thoughts_processed(int count);
+
+  /// Status when AI is processing
+  ///
+  /// In en, this message translates to:
+  /// **'AI is thinking...'**
+  String get scrap_session_ai_thinking;
+
+  /// Message when AI analysis is starting
+  ///
+  /// In en, this message translates to:
+  /// **'Initializing AI analysis...'**
+  String get scrap_session_initializing_ai;
+
+  /// Title for web search grounding section
+  ///
+  /// In en, this message translates to:
+  /// **'Web Search Grounding'**
+  String get scrap_session_web_search_grounding;
+
+  /// Status showing number of sources referenced
+  ///
+  /// In en, this message translates to:
+  /// **'{count} sources referenced'**
+  String scrap_session_sources_referenced(int count);
+
+  /// Status message during AI analysis
+  ///
+  /// In en, this message translates to:
+  /// **'Gemini 3 Pro is analyzing your URL pattern...'**
+  String get scrap_session_ai_analyzing_pattern;
+
+  /// Tooltip for test endpoint button
+  ///
+  /// In en, this message translates to:
+  /// **'Test endpoint'**
+  String get scrap_session_test_endpoint;
+
+  /// Loading message when creating session
+  ///
+  /// In en, this message translates to:
+  /// **'Creating session...'**
+  String get scrap_session_creating_session;
+
+  /// Placeholder when credits are exhausted
+  ///
+  /// In en, this message translates to:
+  /// **'Add API key to continue...'**
+  String get scrap_session_add_api_key;
+
+  /// Placeholder for chat input
+  ///
+  /// In en, this message translates to:
+  /// **'Ask for any modification...'**
+  String get scrap_session_ask_modification;
+
+  /// Validation message for minimum message length
+  ///
+  /// In en, this message translates to:
+  /// **'Message must be at least 3 characters'**
+  String get scrap_session_message_min_length;
+
+  /// Validation message for maximum message length
+  ///
+  /// In en, this message translates to:
+  /// **'Message must be less than 1000 characters'**
+  String get scrap_session_message_max_length;
+
+  /// Dialog title for editing scrappable request
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Scrappable Request'**
+  String get scrap_session_edit_request_title;
+
+  /// Dialog subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Customize the URL template, path parameters, and query parameters'**
+  String get scrap_session_edit_request_subtitle;
+
+  /// Info about path parameters
+  ///
+  /// In en, this message translates to:
+  /// **'Path parameters should be wrapped in curly braces like {userId} or {postId}. They represent dynamic segments in the URL that will be replaced with actual values.'**
+  String scrap_session_path_params_hint(Object postId, Object userId);
+
+  /// Helper text for URL input
+  ///
+  /// In en, this message translates to:
+  /// **'Use {paramName} for path parameters'**
+  String scrap_session_use_param_name(Object paramName);
+
+  /// Button to save changes
+  ///
+  /// In en, this message translates to:
+  /// **'Save Changes'**
+  String get scrap_session_save_changes;
+
+  /// Error dialog title for duplicate parameter
+  ///
+  /// In en, this message translates to:
+  /// **'Duplicate Parameter'**
+  String get scrap_session_duplicate_param;
+
+  /// Error message for duplicate path parameter
+  ///
+  /// In en, this message translates to:
+  /// **'This path parameter already exists.'**
+  String get scrap_session_duplicate_path_param;
+
+  /// Error message for duplicate query parameter
+  ///
+  /// In en, this message translates to:
+  /// **'This query parameter already exists.'**
+  String get scrap_session_duplicate_query_param;
+
+  /// Error dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Missing Path Parameters'**
+  String get scrap_session_missing_path_params;
+
+  /// Error dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Unused Path Parameters'**
+  String get scrap_session_unused_path_params;
+
+  /// Success message when request is updated
+  ///
+  /// In en, this message translates to:
+  /// **'Scrappable request updated successfully!'**
+  String get scrap_session_request_updated;
+
+  /// Close button tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get scrap_session_close;
 }
 
 class _AppLocalizationsDelegate

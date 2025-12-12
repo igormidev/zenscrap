@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
@@ -112,8 +113,12 @@ class _DiscardChangesButtonState extends ConsumerState<DiscardChangesButton> {
                         // ignore: use_build_context_synchronously
                         return context.pop(true);
                       },
-                label:
-                    Text(hasAtLeastOneMessage ? 'Discard changes' : 'Go back'),
+                label: Builder(builder: (context) {
+                  final l10n = AppLocalizations.of(context)!;
+                  return Text(hasAtLeastOneMessage
+                      ? l10n.scrap_session_discard_changes
+                      : l10n.scrap_session_go_back);
+                }),
                 icon: isDiscarding
                     ? CupertinoActivityIndicator()
                     : Icon(

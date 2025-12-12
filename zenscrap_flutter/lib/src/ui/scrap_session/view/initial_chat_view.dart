@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/elements/ip_limit_error_view.dart';
@@ -57,8 +58,9 @@ class _InitialChatViewState extends ConsumerState<InitialChatView> {
             final isLoading =
                 asyncSnapshot.connectionState == ConnectionState.waiting;
             if (isLoading) {
+              final l10n = AppLocalizations.of(context)!;
               return FullpageLoadingPage(
-                loadingMessage: 'Creating session...',
+                loadingMessage: l10n.scrap_session_creating_session,
               );
             }
 

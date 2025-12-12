@@ -2061,5 +2061,261 @@
   "marketplace_view_plans": "View Plans",
   "@marketplace_view_plans": {
     "description": "Button to view pricing plans"
+  },
+
+  "scrap_session_copied_to_clipboard": "Copied to clipboard",
+  "@scrap_session_copied_to_clipboard": {
+    "description": "Snackbar message when content is copied"
+  },
+  "scrap_session_tab_result": "RESULT",
+  "@scrap_session_tab_result": {
+    "description": "Result tab label"
+  },
+  "scrap_session_tab_html": "HTML",
+  "@scrap_session_tab_html": {
+    "description": "HTML tab label"
+  },
+  "scrap_session_tab_screenshot": "Screenshot",
+  "@scrap_session_tab_screenshot": {
+    "description": "Screenshot tab label"
+  },
+  "scrap_session_no_json_response": "No JSON response available",
+  "@scrap_session_no_json_response": {
+    "description": "Empty state message when no JSON response"
+  },
+  "scrap_session_no_html_content": "No HTML content available",
+  "@scrap_session_no_html_content": {
+    "description": "Empty state message when no HTML content"
+  },
+  "scrap_session_no_screenshot": "No screenshot available",
+  "@scrap_session_no_screenshot": {
+    "description": "Empty state message when no screenshot"
+  },
+  "scrap_session_copy": "Copy",
+  "@scrap_session_copy": {
+    "description": "Copy button tooltip"
+  },
+  "scrap_session_increase_font_size": "Increase font size",
+  "@scrap_session_increase_font_size": {
+    "description": "Tooltip for increase font size button"
+  },
+  "scrap_session_decrease_font_size": "Decrease font size",
+  "@scrap_session_decrease_font_size": {
+    "description": "Tooltip for decrease font size button"
+  },
+  "scrap_session_test_suite": "Test suite",
+  "@scrap_session_test_suite": {
+    "description": "Tab label for test suite"
+  },
+  "scrap_session_scrappable_info": "Scrappable info",
+  "@scrap_session_scrappable_info": {
+    "description": "Tab label for scrappable information"
+  },
+  "scrap_session_powerful_model_upgrade": "Unlock access to the Powerful AI model for superior extraction accuracy and better understanding of complex web pages. Perfect for advanced scraping needs.",
+  "@scrap_session_powerful_model_upgrade": {
+    "description": "Message shown when user tries to use powerful AI model without proper plan"
+  },
+  "scrap_session_sign_in_required": "Sign In Required",
+  "@scrap_session_sign_in_required": {
+    "description": "Dialog title for sign in requirement"
+  },
+  "scrap_session_sign_in_unlock_features": "Sign in to unlock powerful features:",
+  "@scrap_session_sign_in_unlock_features": {
+    "description": "Sign in dialog subtitle"
+  },
+  "scrap_session_advanced_ai_models": "Advanced AI Models",
+  "@scrap_session_advanced_ai_models": {
+    "description": "Sign in benefit title"
+  },
+  "scrap_session_advanced_ai_models_desc": "Access Powerful AI models and other premium features",
+  "@scrap_session_advanced_ai_models_desc": {
+    "description": "Sign in benefit description"
+  },
+  "scrap_session_no_time_limits": "No Time Limits",
+  "@scrap_session_no_time_limits": {
+    "description": "Sign in benefit title"
+  },
+  "scrap_session_no_time_limits_desc": "Endpoints never expire with a subscription",
+  "@scrap_session_no_time_limits_desc": {
+    "description": "Sign in benefit description"
+  },
+  "scrap_session_more_api_credits": "More API Credits",
+  "@scrap_session_more_api_credits": {
+    "description": "Sign in benefit title"
+  },
+  "scrap_session_more_api_credits_desc": "Get thousands of API credits per month",
+  "@scrap_session_more_api_credits_desc": {
+    "description": "Sign in benefit description"
+  },
+  "scrap_session_multiple_endpoints": "Multiple Endpoints",
+  "@scrap_session_multiple_endpoints": {
+    "description": "Sign in benefit title"
+  },
+  "scrap_session_multiple_endpoints_desc": "Create and manage multiple scraping endpoints",
+  "@scrap_session_multiple_endpoints_desc": {
+    "description": "Sign in benefit description"
+  },
+  "scrap_session_maybe_later": "Maybe Later",
+  "@scrap_session_maybe_later": {
+    "description": "Button to dismiss dialog"
+  },
+  "scrap_session_sign_in": "Sign In",
+  "@scrap_session_sign_in": {
+    "description": "Sign in button text"
+  },
+  "scrap_session_model_changed": "Scrap AI model changed to {modelName}",
+  "@scrap_session_model_changed": {
+    "description": "Success message when AI model is changed",
+    "placeholders": {
+      "modelName": {
+        "type": "String"
+      }
+    }
+  },
+  "scrap_session_current": "Current",
+  "@scrap_session_current": {
+    "description": "Label for currently selected AI model"
+  },
+  "scrap_session_deploy_tooltip": "Continue to edit/use this scrappable\nendpoint by deploying it!",
+  "@scrap_session_deploy_tooltip": {
+    "description": "Tooltip for deploy button"
+  },
+  "scrap_session_deploy_endpoint": "DEPLOY ENDPOINT",
+  "@scrap_session_deploy_endpoint": {
+    "description": "Deploy button label"
+  },
+  "scrap_session_discard_changes": "Discard changes",
+  "@scrap_session_discard_changes": {
+    "description": "Button to discard changes"
+  },
+  "scrap_session_go_back": "Go back",
+  "@scrap_session_go_back": {
+    "description": "Button to go back"
+  },
+  "scrap_session_edit_request": "Edit scrappable request",
+  "@scrap_session_edit_request": {
+    "description": "Tooltip for edit scrappable request button"
+  },
+  "scrap_session_no_test_data": "No test data available",
+  "@scrap_session_no_test_data": {
+    "description": "Message when no test data is available"
+  },
+  "scrap_session_chat_loading": "Chat is loading...",
+  "@scrap_session_chat_loading": {
+    "description": "Message when chat is loading"
+  },
+  "scrap_session_copy_curl": "Copy the test cURL command",
+  "@scrap_session_copy_curl": {
+    "description": "Tooltip for copy cURL button"
+  },
+  "scrap_session_analyzing_url": "Analyzing URL",
+  "@scrap_session_analyzing_url": {
+    "description": "Header text when AI is analyzing URL"
+  },
+  "scrap_session_thoughts_processed": "{count} thoughts processed",
+  "@scrap_session_thoughts_processed": {
+    "description": "Status showing number of AI thoughts processed",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scrap_session_ai_thinking": "AI is thinking...",
+  "@scrap_session_ai_thinking": {
+    "description": "Status when AI is processing"
+  },
+  "scrap_session_initializing_ai": "Initializing AI analysis...",
+  "@scrap_session_initializing_ai": {
+    "description": "Message when AI analysis is starting"
+  },
+  "scrap_session_web_search_grounding": "Web Search Grounding",
+  "@scrap_session_web_search_grounding": {
+    "description": "Title for web search grounding section"
+  },
+  "scrap_session_sources_referenced": "{count} sources referenced",
+  "@scrap_session_sources_referenced": {
+    "description": "Status showing number of sources referenced",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scrap_session_ai_analyzing_pattern": "Gemini 3 Pro is analyzing your URL pattern...",
+  "@scrap_session_ai_analyzing_pattern": {
+    "description": "Status message during AI analysis"
+  },
+  "scrap_session_test_endpoint": "Test endpoint",
+  "@scrap_session_test_endpoint": {
+    "description": "Tooltip for test endpoint button"
+  },
+  "scrap_session_creating_session": "Creating session...",
+  "@scrap_session_creating_session": {
+    "description": "Loading message when creating session"
+  },
+  "scrap_session_add_api_key": "Add API key to continue...",
+  "@scrap_session_add_api_key": {
+    "description": "Placeholder when credits are exhausted"
+  },
+  "scrap_session_ask_modification": "Ask for any modification...",
+  "@scrap_session_ask_modification": {
+    "description": "Placeholder for chat input"
+  },
+  "scrap_session_message_min_length": "Message must be at least 3 characters",
+  "@scrap_session_message_min_length": {
+    "description": "Validation message for minimum message length"
+  },
+  "scrap_session_message_max_length": "Message must be less than 1000 characters",
+  "@scrap_session_message_max_length": {
+    "description": "Validation message for maximum message length"
+  },
+  "scrap_session_edit_request_title": "Edit Scrappable Request",
+  "@scrap_session_edit_request_title": {
+    "description": "Dialog title for editing scrappable request"
+  },
+  "scrap_session_edit_request_subtitle": "Customize the URL template, path parameters, and query parameters",
+  "@scrap_session_edit_request_subtitle": {
+    "description": "Dialog subtitle"
+  },
+  "scrap_session_path_params_hint": "Path parameters should be wrapped in curly braces like {userId} or {postId}. They represent dynamic segments in the URL that will be replaced with actual values.",
+  "@scrap_session_path_params_hint": {
+    "description": "Info about path parameters"
+  },
+  "scrap_session_use_param_name": "Use {paramName} for path parameters",
+  "@scrap_session_use_param_name": {
+    "description": "Helper text for URL input"
+  },
+  "scrap_session_save_changes": "Save Changes",
+  "@scrap_session_save_changes": {
+    "description": "Button to save changes"
+  },
+  "scrap_session_duplicate_param": "Duplicate Parameter",
+  "@scrap_session_duplicate_param": {
+    "description": "Error dialog title for duplicate parameter"
+  },
+  "scrap_session_duplicate_path_param": "This path parameter already exists.",
+  "@scrap_session_duplicate_path_param": {
+    "description": "Error message for duplicate path parameter"
+  },
+  "scrap_session_duplicate_query_param": "This query parameter already exists.",
+  "@scrap_session_duplicate_query_param": {
+    "description": "Error message for duplicate query parameter"
+  },
+  "scrap_session_missing_path_params": "Missing Path Parameters",
+  "@scrap_session_missing_path_params": {
+    "description": "Error dialog title"
+  },
+  "scrap_session_unused_path_params": "Unused Path Parameters",
+  "@scrap_session_unused_path_params": {
+    "description": "Error dialog title"
+  },
+  "scrap_session_request_updated": "Scrappable request updated successfully!",
+  "@scrap_session_request_updated": {
+    "description": "Success message when request is updated"
+  },
+  "scrap_session_close": "Close",
+  "@scrap_session_close": {
+    "description": "Close button tooltip"
   }
 }

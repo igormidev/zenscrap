@@ -1512,4 +1512,200 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get marketplace_view_plans => 'プランを見る';
+
+  @override
+  String get scrap_session_copied_to_clipboard => 'クリップボードにコピーしました';
+
+  @override
+  String get scrap_session_tab_result => '結果';
+
+  @override
+  String get scrap_session_tab_html => 'HTML';
+
+  @override
+  String get scrap_session_tab_screenshot => 'スクリーンショット';
+
+  @override
+  String get scrap_session_no_json_response => 'JSONレスポンスがありません';
+
+  @override
+  String get scrap_session_no_html_content => 'HTMLコンテンツがありません';
+
+  @override
+  String get scrap_session_no_screenshot => 'スクリーンショットがありません';
+
+  @override
+  String get scrap_session_copy => 'コピー';
+
+  @override
+  String get scrap_session_increase_font_size => 'フォントサイズを拡大';
+
+  @override
+  String get scrap_session_decrease_font_size => 'フォントサイズを縮小';
+
+  @override
+  String get scrap_session_test_suite => 'テストスイート';
+
+  @override
+  String get scrap_session_scrappable_info => 'Scrappable情報';
+
+  @override
+  String get scrap_session_powerful_model_upgrade =>
+      '高性能AIモデルへのアクセスを解除して、優れた抽出精度と複雑なWebページの理解を実現しましょう。高度なスクレイピングニーズに最適です。';
+
+  @override
+  String get scrap_session_sign_in_required => 'ログインが必要です';
+
+  @override
+  String get scrap_session_sign_in_unlock_features => 'ログインして強力な機能をアンロック:';
+
+  @override
+  String get scrap_session_advanced_ai_models => '高度なAIモデル';
+
+  @override
+  String get scrap_session_advanced_ai_models_desc =>
+      '高性能AIモデルやその他のプレミアム機能にアクセス';
+
+  @override
+  String get scrap_session_no_time_limits => '時間制限なし';
+
+  @override
+  String get scrap_session_no_time_limits_desc =>
+      'サブスクリプションでエンドポイントは期限切れになりません';
+
+  @override
+  String get scrap_session_more_api_credits => 'より多くのAPIクレジット';
+
+  @override
+  String get scrap_session_more_api_credits_desc => '毎月数千のAPIクレジットを取得';
+
+  @override
+  String get scrap_session_multiple_endpoints => '複数のエンドポイント';
+
+  @override
+  String get scrap_session_multiple_endpoints_desc => '複数のスクレイピングエンドポイントを作成・管理';
+
+  @override
+  String get scrap_session_maybe_later => '後で検討';
+
+  @override
+  String get scrap_session_sign_in => 'ログイン';
+
+  @override
+  String scrap_session_model_changed(String modelName) {
+    return 'スクラップAIモデルが$modelNameに変更されました';
+  }
+
+  @override
+  String get scrap_session_current => '現在';
+
+  @override
+  String get scrap_session_deploy_tooltip =>
+      'このScrappableエンドポイントを\nデプロイして編集/使用を続けましょう!';
+
+  @override
+  String get scrap_session_deploy_endpoint => 'エンドポイントをデプロイ';
+
+  @override
+  String get scrap_session_discard_changes => '変更を破棄';
+
+  @override
+  String get scrap_session_go_back => '戻る';
+
+  @override
+  String get scrap_session_edit_request => 'Scrappableリクエストを編集';
+
+  @override
+  String get scrap_session_no_test_data => 'テストデータがありません';
+
+  @override
+  String get scrap_session_chat_loading => 'チャットを読み込み中...';
+
+  @override
+  String get scrap_session_copy_curl => 'テストcURLコマンドをコピー';
+
+  @override
+  String get scrap_session_analyzing_url => 'URLを分析中';
+
+  @override
+  String scrap_session_thoughts_processed(int count) {
+    return '$count個の思考を処理済み';
+  }
+
+  @override
+  String get scrap_session_ai_thinking => 'AIが思考中...';
+
+  @override
+  String get scrap_session_initializing_ai => 'AI分析を初期化中...';
+
+  @override
+  String get scrap_session_web_search_grounding => 'ウェブ検索グラウンディング';
+
+  @override
+  String scrap_session_sources_referenced(int count) {
+    return '$count件のソースを参照';
+  }
+
+  @override
+  String get scrap_session_ai_analyzing_pattern =>
+      'Gemini 3 ProがURLパターンを分析中...';
+
+  @override
+  String get scrap_session_test_endpoint => 'エンドポイントをテスト';
+
+  @override
+  String get scrap_session_creating_session => 'セッションを作成中...';
+
+  @override
+  String get scrap_session_add_api_key => '続行するにはAPIキーを追加してください...';
+
+  @override
+  String get scrap_session_ask_modification => '変更をリクエスト...';
+
+  @override
+  String get scrap_session_message_min_length => 'メッセージは3文字以上である必要があります';
+
+  @override
+  String get scrap_session_message_max_length => 'メッセージは1000文字未満である必要があります';
+
+  @override
+  String get scrap_session_edit_request_title => 'Scrappableリクエストを編集';
+
+  @override
+  String get scrap_session_edit_request_subtitle =>
+      'URLテンプレート、パスパラメータ、クエリパラメータをカスタマイズ';
+
+  @override
+  String scrap_session_path_params_hint(Object postId, Object userId) {
+    return 'パスパラメータは$userIdや$postIdのように中括弧で囲む必要があります。これらはURLの動的セグメントを表し、実際の値に置き換えられます。';
+  }
+
+  @override
+  String scrap_session_use_param_name(Object paramName) {
+    return 'パスパラメータには$paramNameを使用';
+  }
+
+  @override
+  String get scrap_session_save_changes => '変更を保存';
+
+  @override
+  String get scrap_session_duplicate_param => '重複パラメータ';
+
+  @override
+  String get scrap_session_duplicate_path_param => 'このパスパラメータは既に存在します。';
+
+  @override
+  String get scrap_session_duplicate_query_param => 'このクエリパラメータは既に存在します。';
+
+  @override
+  String get scrap_session_missing_path_params => '不足しているパスパラメータ';
+
+  @override
+  String get scrap_session_unused_path_params => '未使用のパスパラメータ';
+
+  @override
+  String get scrap_session_request_updated => 'Scrappableリクエストが正常に更新されました!';
+
+  @override
+  String get scrap_session_close => '閉じる';
 }
