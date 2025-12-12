@@ -1,9 +1,9 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as auth;
 import 'package:serverpod_auth_server/serverpod_auth_server.dart';
-import 'package:zenscrap_server/src/core/default_classes.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_api.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_config.dart';
+import 'package:zenscrap_server/src/core/translations/error_translations.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class PrivateApiUsageEndpoint extends Endpoint {
@@ -15,10 +15,11 @@ class PrivateApiUsageEndpoint extends Endpoint {
   Future<PaginatedApiCreditHistoryResponse> getApiCreditHistory(
     Session session, {
     int page = 1,
+    SupportedLanguage language = SupportedLanguage.en,
   }) async {
     final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
-      throw defaultAuthenticationException;
+      throw _authenticationFailed(language);
     }
 
     final userId = authenticationInfo.userId;
@@ -29,10 +30,7 @@ class PrivateApiUsageEndpoint extends Endpoint {
     );
 
     if (accountInfo == null) {
-      throw ZenScrapException(
-        title: 'Account Not Found',
-        description: 'Unable to find account information.',
-      );
+      throw _accountNotFound(language);
     }
 
     const int pageSize = 6;
@@ -84,10 +82,11 @@ class PrivateApiUsageEndpoint extends Endpoint {
   Future<AccountApiKey> createApiKey(
     Session session, {
     required String name,
+    SupportedLanguage language = SupportedLanguage.en,
   }) async {
     final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
-      throw defaultAuthenticationException;
+      throw _authenticationFailed(language);
     }
 
     final userId = authenticationInfo.userId;
@@ -101,10 +100,7 @@ class PrivateApiUsageEndpoint extends Endpoint {
     );
 
     if (accountInfo == null || accountInfo.accountApiUsage == null) {
-      throw ZenScrapException(
-        title: 'Account Not Found',
-        description: 'Unable to find account information.',
-      );
+      throw _accountNotFound(language);
     }
 
     final nanoId = accountInfo.accountApiUsage!.nanoId;
@@ -137,10 +133,11 @@ class PrivateApiUsageEndpoint extends Endpoint {
   Future<bool> deactivateApiKey(
     Session session, {
     required int apiKeyId,
+    SupportedLanguage language = SupportedLanguage.en,
   }) async {
     final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
-      throw defaultAuthenticationException;
+      throw _authenticationFailed(language);
     }
 
     final userId = authenticationInfo.userId;
@@ -159,30 +156,20 @@ class PrivateApiUsageEndpoint extends Endpoint {
     );
 
     if (accountInfo == null || accountInfo.accountApiUsage == null) {
-      throw ZenScrapException(
-        title: 'Account Not Found',
-        description: 'Unable to find account information.',
-      );
+      throw _accountNotFound(language);
     }
 
     final activeKeys = accountInfo.accountApiUsage!.apiKeys ?? [];
 
     // Check if this is the last active key
     if (activeKeys.length <= 1) {
-      throw ZenScrapException(
-        title: 'Cannot Deactivate',
-        description: 'You must have at least one active API key.',
-      );
+      throw _cannotDeactivateApiKey(language);
     }
 
     // Check if the key belongs to this user
     final keyToDeactivate = activeKeys.firstWhere(
       (k) => k.id == apiKeyId,
-      orElse: () => throw ZenScrapException(
-        title: 'API Key Not Found',
-        description:
-            'The specified API key was not found or does not belong to your account.',
-      ),
+      orElse: () => throw _apiKeyNotFound(language),
     );
 
     // Deactivate the key
@@ -193,11 +180,12 @@ class PrivateApiUsageEndpoint extends Endpoint {
   }
 
   Future<List<AccountApiKey>> getActiveApiKeys(
-    Session session,
-  ) async {
+    Session session, {
+    SupportedLanguage language = SupportedLanguage.en,
+  }) async {
     final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
-      throw defaultAuthenticationException;
+      throw _authenticationFailed(language);
     }
 
     final userId = authenticationInfo.userId;
@@ -218,21 +206,19 @@ class PrivateApiUsageEndpoint extends Endpoint {
     );
 
     if (accountInfo == null || accountInfo.accountApiUsage == null) {
-      throw ZenScrapException(
-        title: 'Account Not Found',
-        description: 'Unable to find account information.',
-      );
+      throw _accountNotFound(language);
     }
 
     return accountInfo.accountApiUsage!.apiKeys ?? [];
   }
 
   Future<Map<int, int>> getApiKeyUsageStats(
-    Session session,
-  ) async {
+    Session session, {
+    SupportedLanguage language = SupportedLanguage.en,
+  }) async {
     final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
-      throw defaultAuthenticationException;
+      throw _authenticationFailed(language);
     }
 
     final userId = authenticationInfo.userId;
@@ -250,10 +236,7 @@ class PrivateApiUsageEndpoint extends Endpoint {
     );
 
     if (accountInfo == null || accountInfo.accountApiUsage == null) {
-      throw ZenScrapException(
-        title: 'Account Not Found',
-        description: 'Unable to find account information.',
-      );
+      throw _accountNotFound(language);
     }
 
     final thirtyDaysAgo = DateTime.now().subtract(Duration(days: 30));
@@ -276,11 +259,12 @@ class PrivateApiUsageEndpoint extends Endpoint {
   }
 
   Future<AccountApiUsage> getApiUsageInfo(
-    Session session,
-  ) async {
+    Session session, {
+    SupportedLanguage language = SupportedLanguage.en,
+  }) async {
     final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
-      throw defaultAuthenticationException;
+      throw _authenticationFailed(language);
     }
 
     final userId = authenticationInfo.userId;
@@ -301,21 +285,19 @@ class PrivateApiUsageEndpoint extends Endpoint {
     );
 
     if (accountInfo == null || accountInfo.accountApiUsage == null) {
-      throw ZenScrapException(
-        title: 'Account Not Found',
-        description: 'Unable to find account information.',
-      );
+      throw _accountNotFound(language);
     }
 
     return accountInfo.accountApiUsage!;
   }
 
   Future<ApiKeyResponse> getApiKeysWithStats(
-    Session session,
-  ) async {
+    Session session, {
+    SupportedLanguage language = SupportedLanguage.en,
+  }) async {
     final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
-      throw defaultAuthenticationException;
+      throw _authenticationFailed(language);
     }
 
     final userId = authenticationInfo.userId;
@@ -336,14 +318,11 @@ class PrivateApiUsageEndpoint extends Endpoint {
     );
 
     if (accountInfo == null || accountInfo.accountApiUsage == null) {
-      throw ZenScrapException(
-        title: 'Account Not Found',
-        description: 'Unable to find account information.',
-      );
+      throw _accountNotFound(language);
     }
 
     final apiKeys = accountInfo.accountApiUsage!.apiKeys ?? [];
-    
+
     // Get usage stats for each API key
     final thirtyDaysAgo = DateTime.now().subtract(Duration(days: 30));
     final Map<int, int> usageStats = {};
@@ -370,10 +349,11 @@ class PrivateApiUsageEndpoint extends Endpoint {
   Future<String> createCreditPurchaseCheckout(
     Session session, {
     required CreditPurchaseOption creditPackage,
+    SupportedLanguage language = SupportedLanguage.en,
   }) async {
     final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
-      throw defaultAuthenticationException;
+      throw _authenticationFailed(language);
     }
 
     final userId = authenticationInfo.userId;
@@ -388,18 +368,12 @@ class PrivateApiUsageEndpoint extends Endpoint {
     );
 
     if (accountInfo == null || accountInfo.userInfo == null) {
-      throw ZenScrapException(
-        title: 'Account Not Found',
-        description: 'Unable to find account information.',
-      );
+      throw _accountNotFound(language);
     }
 
     // Validate that user has Ultra plan
     if (accountInfo.planTier != PlanTier.ultra) {
-      throw ZenScrapException(
-        title: 'Ultra Plan Required',
-        description: 'Credit packages are only available for Ultra plan subscribers. Please upgrade to Ultra to purchase additional credits.',
-      );
+      throw _ultraPlanRequired(language);
     }
 
     // Get price ID and credit amount based on the package
@@ -421,16 +395,35 @@ class PrivateApiUsageEndpoint extends Endpoint {
 
     // Return the checkout URL
     final checkoutUrl = checkoutSession['url'] as String?;
-    
+
     if (checkoutUrl == null) {
-      throw ZenScrapException(
-        title: 'Checkout Creation Failed',
-        description: 'Failed to create checkout session.',
-      );
+      throw _checkoutCreationFailed(language);
     }
 
     session.log('Created credit purchase checkout for user $userId, package: $packageName');
-    
+
     return checkoutUrl;
   }
 }
+
+// ============================================================================
+// Error-returning functions
+// ============================================================================
+
+ZenScrapException _authenticationFailed(SupportedLanguage lang) =>
+    createTranslatedException('authentication_failed', lang);
+
+ZenScrapException _accountNotFound(SupportedLanguage lang) =>
+    createTranslatedException('account_not_found', lang);
+
+ZenScrapException _cannotDeactivateApiKey(SupportedLanguage lang) =>
+    createTranslatedException('cannot_deactivate_api_key', lang);
+
+ZenScrapException _apiKeyNotFound(SupportedLanguage lang) =>
+    createTranslatedException('api_key_not_found', lang);
+
+ZenScrapException _ultraPlanRequired(SupportedLanguage lang) =>
+    createTranslatedException('ultra_plan_required', lang);
+
+ZenScrapException _checkoutCreationFailed(SupportedLanguage lang) =>
+    createTranslatedException('checkout_creation_failed', lang);

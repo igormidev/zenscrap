@@ -4,6 +4,7 @@ import 'package:serverpod_auth_server/serverpod_auth_server.dart';
 import 'package:zenscrap_server/src/core/consts.dart';
 import 'package:zenscrap_server/src/core/default_classes.dart';
 import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';
+import 'package:zenscrap_server/src/core/translations/error_translations.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class PrivateAccountEndpoint extends Endpoint {
@@ -14,10 +15,11 @@ class PrivateAccountEndpoint extends Endpoint {
   Future<AccountInfo> getAccountInfo(
     Session session, {
     required int? initialScrappableId,
+    SupportedLanguage language = SupportedLanguage.en,
   }) async {
     final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
-      throw defaultAuthenticationException;
+      throw _authenticationFailed(language);
     }
 
     final userId = authenticationInfo.userId;
@@ -30,11 +32,7 @@ class PrivateAccountEndpoint extends Endpoint {
         include: include,
       );
     } catch (e) {
-      throw ZenScrapException(
-        title: 'Database Error',
-        description:
-            'Failed to retrieve account information. Please try again later.',
-      );
+      throw _databaseError(language);
     }
 
     final isNewAccount = accountInfo == null;
@@ -42,7 +40,7 @@ class PrivateAccountEndpoint extends Endpoint {
     if (!isNewAccount && initialScrappableId != null) {
       return await session.db.transaction((transaction) async {
         await _attachScrappable(
-            session, transaction, accountInfo!, initialScrappableId);
+            session, transaction, accountInfo!, initialScrappableId, language);
         return accountInfo;
       });
     }
@@ -175,16 +173,12 @@ class PrivateAccountEndpoint extends Endpoint {
           transaction: transaction,
         );
         if (accountAdded == null) {
-          throw ZenScrapException(
-            title: 'Account Creation Failed',
-            description:
-                'Unable to create new account. Please try again later.',
-          );
+          throw _accountCreationFailed(language);
         }
 
         if (initialScrappableId != null) {
           await _attachScrappable(
-              session, transaction, accountInfo, initialScrappableId);
+              session, transaction, accountInfo, initialScrappableId, language);
         }
 
         return accountAdded;
@@ -211,10 +205,7 @@ class PrivateAccountEndpoint extends Endpoint {
         level: LogLevel.error,
         stackTrace: stackTrace,
       );
-      throw ZenScrapException(
-        title: 'Account Creation Failed',
-        description: 'This is a Internal error. Please try again later.',
-      );
+      throw _accountCreationInternalError(language);
     }
   }
 
@@ -223,6 +214,7 @@ class PrivateAccountEndpoint extends Endpoint {
     Transaction transaction,
     AccountInfo accountInfo,
     int targetAttachScrappableId,
+    SupportedLanguage language,
   ) async {
     Scrappable? existingScrappable = await Scrappable.db.findById(
       session,
@@ -237,19 +229,12 @@ class PrivateAccountEndpoint extends Endpoint {
         scrappableAccountId != null && scrappableAccountId != accountInfo.id;
 
     if (!existsScrappableWithTargetId) {
-      throw ZenScrapException(
-        title: 'Scrappable Not Found',
-        description: 'The scrappable you are trying to attach does not exist.',
-      );
+      throw _scrappableNotFoundAttach(language);
     }
 
     if (isAccountAlreadyAttachedToOtherUser == true) {
       // Already attached to another account
-      throw ZenScrapException(
-        title: 'Scrappable Already Attached',
-        description:
-            'The scrappable you are trying to attach is already linked to another account.',
-      );
+      throw _scrappableAlreadyAttached(language);
     }
 
     // If already attached to this account, no need to check limits or re-attach
@@ -268,12 +253,7 @@ class PrivateAccountEndpoint extends Endpoint {
     final maxAllowed = accountInfo.planTier.maxScrappables;
 
     if (currentScrappablesCount >= maxAllowed) {
-      throw ZenScrapException(
-        title: 'Endpoint Limit Reached',
-        description:
-            'You have reached the maximum number of endpoints ($maxAllowed) for your ${accountInfo.planTier.name} plan. '
-            'Please upgrade your plan to attach more endpoints.',
-      );
+      throw _endpointLimitReached(language, maxAllowed, accountInfo.planTier.name);
     }
 
     existingScrappable = existingScrappable.copyWith(accountId: accountInfo.id);
@@ -295,3 +275,33 @@ class PrivateAccountEndpoint extends Endpoint {
     ),
   );
 }
+
+// ============================================================================
+// Error-returning functions
+// ============================================================================
+
+ZenScrapException _authenticationFailed(SupportedLanguage lang) =>
+    createTranslatedException('authentication_failed', lang);
+
+ZenScrapException _databaseError(SupportedLanguage lang) =>
+    createTranslatedException('database_error', lang);
+
+ZenScrapException _accountCreationFailed(SupportedLanguage lang) =>
+    createTranslatedException('account_creation_failed', lang);
+
+ZenScrapException _accountCreationInternalError(SupportedLanguage lang) =>
+    createTranslatedException('account_creation_internal_error', lang);
+
+ZenScrapException _scrappableNotFoundAttach(SupportedLanguage lang) =>
+    createTranslatedException('scrappable_not_found_attach', lang);
+
+ZenScrapException _scrappableAlreadyAttached(SupportedLanguage lang) =>
+    createTranslatedException('scrappable_already_attached', lang);
+
+ZenScrapException _endpointLimitReached(
+        SupportedLanguage lang, int maxAllowed, String planName) =>
+    createTranslatedException(
+      'endpoint_limit_reached',
+      lang,
+      params: {'maxAllowed': maxAllowed.toString(), 'planName': planName},
+    );

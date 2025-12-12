@@ -25,18 +25,20 @@ import '../endpoints/public/marketplace_endpoint.dart' as _i12;
 import '../endpoints/public/public_scrappable_endpoint.dart' as _i13;
 import '../endpoints/public/public_tier_endpoint.dart' as _i14;
 import '../endpoints/public/scrappable_chat_session.dart' as _i15;
-import 'package:zenscrap_server/src/generated/protocol.dart' as _i16;
+import 'package:zenscrap_server/src/generated/entities/supported_language.dart'
+    as _i16;
+import 'package:zenscrap_server/src/generated/protocol.dart' as _i17;
 import 'package:zenscrap_server/src/generated/entities/account/credit_purchase_option.dart'
-    as _i17;
-import 'package:zenscrap_server/src/generated/entities/analytics/analytics_time_scope.dart'
     as _i18;
-import 'package:zenscrap_server/src/generated/entities/scrappable/scraper_category.dart'
+import 'package:zenscrap_server/src/generated/entities/analytics/analytics_time_scope.dart'
     as _i19;
-import 'package:zenscrap_server/src/generated/entities/account/plan_tier.dart'
+import 'package:zenscrap_server/src/generated/entities/scrappable/scraper_category.dart'
     as _i20;
-import 'package:zenscrap_server/src/generated/entities/scrappable/ai_model.dart'
+import 'package:zenscrap_server/src/generated/entities/account/plan_tier.dart'
     as _i21;
-import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i22;
+import 'package:zenscrap_server/src/generated/entities/scrappable/ai_model.dart'
+    as _i22;
+import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i23;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -139,6 +141,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<int?>(),
               nullable: true,
             ),
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
+              nullable: false,
+            ),
           },
           call:
               (
@@ -149,6 +156,7 @@ class Endpoints extends _i1.EndpointDispatch {
                       .getAccountInfo(
                         session,
                         initialScrappableId: params['initialScrappableId'],
+                        language: params['language'],
                       ),
         ),
       },
@@ -165,6 +173,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<int>(),
               nullable: false,
             ),
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
+              nullable: false,
+            ),
           },
           call:
               (
@@ -175,18 +188,28 @@ class Endpoints extends _i1.EndpointDispatch {
                       .getAiCreditHistory(
                         session,
                         page: params['page'],
+                        language: params['language'],
                       ),
         ),
         'getAiUsageInfo': _i1.MethodConnector(
           name: 'getAiUsageInfo',
-          params: {},
+          params: {
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
+              nullable: false,
+            ),
+          },
           call:
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
                   (endpoints['privateAiUsage'] as _i3.PrivateAiUsageEndpoint)
-                      .getAiUsageInfo(session),
+                      .getAiUsageInfo(
+                        session,
+                        language: params['language'],
+                      ),
         ),
         'getAutoFixSessions': _i1.MethodConnector(
           name: 'getAutoFixSessions',
@@ -194,6 +217,11 @@ class Endpoints extends _i1.EndpointDispatch {
             'page': _i1.ParameterDescription(
               name: 'page',
               type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -206,6 +234,7 @@ class Endpoints extends _i1.EndpointDispatch {
                       .getAutoFixSessions(
                         session,
                         page: params['page'],
+                        language: params['language'],
                       ),
         ),
       },
@@ -222,6 +251,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<int>(),
               nullable: false,
             ),
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
+              nullable: false,
+            ),
           },
           call:
               (
@@ -232,6 +266,7 @@ class Endpoints extends _i1.EndpointDispatch {
                       .getApiCreditHistory(
                         session,
                         page: params['page'],
+                        language: params['language'],
                       ),
         ),
         'createApiKey': _i1.MethodConnector(
@@ -240,6 +275,11 @@ class Endpoints extends _i1.EndpointDispatch {
             'name': _i1.ParameterDescription(
               name: 'name',
               type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -252,6 +292,7 @@ class Endpoints extends _i1.EndpointDispatch {
                       .createApiKey(
                         session,
                         name: params['name'],
+                        language: params['language'],
                       ),
         ),
         'deactivateApiKey': _i1.MethodConnector(
@@ -260,6 +301,11 @@ class Endpoints extends _i1.EndpointDispatch {
             'apiKeyId': _i1.ParameterDescription(
               name: 'apiKeyId',
               type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -272,59 +318,101 @@ class Endpoints extends _i1.EndpointDispatch {
                       .deactivateApiKey(
                         session,
                         apiKeyId: params['apiKeyId'],
+                        language: params['language'],
                       ),
         ),
         'getActiveApiKeys': _i1.MethodConnector(
           name: 'getActiveApiKeys',
-          params: {},
+          params: {
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
+              nullable: false,
+            ),
+          },
           call:
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
                   (endpoints['privateApiUsage'] as _i4.PrivateApiUsageEndpoint)
-                      .getActiveApiKeys(session),
+                      .getActiveApiKeys(
+                        session,
+                        language: params['language'],
+                      ),
         ),
         'getApiKeyUsageStats': _i1.MethodConnector(
           name: 'getApiKeyUsageStats',
-          params: {},
+          params: {
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
+              nullable: false,
+            ),
+          },
           call:
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
                   (endpoints['privateApiUsage'] as _i4.PrivateApiUsageEndpoint)
-                      .getApiKeyUsageStats(session)
-                      .then((container) => _i16.mapContainerToJson(container)),
+                      .getApiKeyUsageStats(
+                        session,
+                        language: params['language'],
+                      )
+                      .then((container) => _i17.mapContainerToJson(container)),
         ),
         'getApiUsageInfo': _i1.MethodConnector(
           name: 'getApiUsageInfo',
-          params: {},
+          params: {
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
+              nullable: false,
+            ),
+          },
           call:
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
                   (endpoints['privateApiUsage'] as _i4.PrivateApiUsageEndpoint)
-                      .getApiUsageInfo(session),
+                      .getApiUsageInfo(
+                        session,
+                        language: params['language'],
+                      ),
         ),
         'getApiKeysWithStats': _i1.MethodConnector(
           name: 'getApiKeysWithStats',
-          params: {},
+          params: {
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
+              nullable: false,
+            ),
+          },
           call:
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
                   (endpoints['privateApiUsage'] as _i4.PrivateApiUsageEndpoint)
-                      .getApiKeysWithStats(session),
+                      .getApiKeysWithStats(
+                        session,
+                        language: params['language'],
+                      ),
         ),
         'createCreditPurchaseCheckout': _i1.MethodConnector(
           name: 'createCreditPurchaseCheckout',
           params: {
             'creditPackage': _i1.ParameterDescription(
               name: 'creditPackage',
-              type: _i1.getType<_i17.CreditPurchaseOption>(),
+              type: _i1.getType<_i18.CreditPurchaseOption>(),
+              nullable: false,
+            ),
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -337,6 +425,7 @@ class Endpoints extends _i1.EndpointDispatch {
                       .createCreditPurchaseCheckout(
                         session,
                         creditPackage: params['creditPackage'],
+                        language: params['language'],
                       ),
         ),
       },
@@ -353,6 +442,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<int>(),
               nullable: false,
             ),
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
+              nullable: false,
+            ),
           },
           call:
               (
@@ -364,6 +458,7 @@ class Endpoints extends _i1.EndpointDispatch {
                       .cloneFromMarketplace(
                         session,
                         scrappableId: params['scrappableId'],
+                        language: params['language'],
                       ),
         ),
       },
@@ -382,7 +477,12 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'scope': _i1.ParameterDescription(
               name: 'scope',
-              type: _i1.getType<_i18.AnalyticsTimeScope>(),
+              type: _i1.getType<_i19.AnalyticsTimeScope>(),
+              nullable: false,
+            ),
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -397,6 +497,7 @@ class Endpoints extends _i1.EndpointDispatch {
                         session,
                         page: params['page'],
                         scope: params['scope'],
+                        language: params['language'],
                       ),
         ),
         'getScrappableAnalytics': _i1.MethodConnector(
@@ -412,6 +513,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<int>(),
               nullable: false,
             ),
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
+              nullable: false,
+            ),
           },
           call:
               (
@@ -424,6 +530,7 @@ class Endpoints extends _i1.EndpointDispatch {
                         session,
                         scrappableId: params['scrappableId'],
                         page: params['page'],
+                        language: params['language'],
                       ),
         ),
         'getScrappableUsageMetrics': _i1.MethodConnector(
@@ -432,6 +539,11 @@ class Endpoints extends _i1.EndpointDispatch {
             'scrappableId': _i1.ParameterDescription(
               name: 'scrappableId',
               type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -445,6 +557,7 @@ class Endpoints extends _i1.EndpointDispatch {
                       .getScrappableUsageMetrics(
                         session,
                         scrappableId: params['scrappableId'],
+                        language: params['language'],
                       ),
         ),
       },
@@ -466,6 +579,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<bool>(),
               nullable: false,
             ),
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
+              nullable: false,
+            ),
           },
           call:
               (
@@ -478,11 +596,18 @@ class Endpoints extends _i1.EndpointDispatch {
                         session,
                         planTier: params['planTier'],
                         isYearly: params['isYearly'],
+                        language: params['language'],
                       ),
         ),
         'getSubscriptionStatus': _i1.MethodConnector(
           name: 'getSubscriptionStatus',
-          params: {},
+          params: {
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
+              nullable: false,
+            ),
+          },
           call:
               (
                 _i1.Session session,
@@ -490,11 +615,20 @@ class Endpoints extends _i1.EndpointDispatch {
               ) async =>
                   (endpoints['privateSubscription']
                           as _i7.PrivateSubscriptionEndpoint)
-                      .getSubscriptionStatus(session),
+                      .getSubscriptionStatus(
+                        session,
+                        language: params['language'],
+                      ),
         ),
         'cancelSubscription': _i1.MethodConnector(
           name: 'cancelSubscription',
-          params: {},
+          params: {
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
+              nullable: false,
+            ),
+          },
           call:
               (
                 _i1.Session session,
@@ -502,11 +636,20 @@ class Endpoints extends _i1.EndpointDispatch {
               ) async =>
                   (endpoints['privateSubscription']
                           as _i7.PrivateSubscriptionEndpoint)
-                      .cancelSubscription(session),
+                      .cancelSubscription(
+                        session,
+                        language: params['language'],
+                      ),
         ),
         'createCustomerPortalSession': _i1.MethodConnector(
           name: 'createCustomerPortalSession',
-          params: {},
+          params: {
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
+              nullable: false,
+            ),
+          },
           call:
               (
                 _i1.Session session,
@@ -514,7 +657,10 @@ class Endpoints extends _i1.EndpointDispatch {
               ) async =>
                   (endpoints['privateSubscription']
                           as _i7.PrivateSubscriptionEndpoint)
-                      .createCustomerPortalSession(session),
+                      .createCustomerPortalSession(
+                        session,
+                        language: params['language'],
+                      ),
         ),
       },
     );
@@ -537,8 +683,13 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'categories': _i1.ParameterDescription(
               name: 'categories',
-              type: _i1.getType<List<_i19.ScraperCategory>?>(),
+              type: _i1.getType<List<_i20.ScraperCategory>?>(),
               nullable: true,
+            ),
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
+              nullable: false,
             ),
           },
           call:
@@ -553,6 +704,7 @@ class Endpoints extends _i1.EndpointDispatch {
                         page: params['page'],
                         searchQuery: params['searchQuery'],
                         categories: params['categories'],
+                        language: params['language'],
                       ),
         ),
         'getScrappableById': _i1.MethodConnector(
@@ -561,6 +713,11 @@ class Endpoints extends _i1.EndpointDispatch {
             'scrappableId': _i1.ParameterDescription(
               name: 'scrappableId',
               type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -574,6 +731,7 @@ class Endpoints extends _i1.EndpointDispatch {
                       .getScrappableById(
                         session,
                         params['scrappableId'],
+                        language: params['language'],
                       ),
         ),
       },
@@ -659,7 +817,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'category': _i1.ParameterDescription(
               name: 'category',
-              type: _i1.getType<_i19.ScraperCategory?>(),
+              type: _i1.getType<_i20.ScraperCategory?>(),
               nullable: true,
             ),
             'willHideFromMarketplace': _i1.ParameterDescription(
@@ -705,7 +863,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'categories': _i1.ParameterDescription(
               name: 'categories',
-              type: _i1.getType<List<_i19.ScraperCategory>?>(),
+              type: _i1.getType<List<_i20.ScraperCategory>?>(),
               nullable: true,
             ),
           },
@@ -769,7 +927,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'planTier': _i1.ParameterDescription(
               name: 'planTier',
-              type: _i1.getType<_i20.PlanTier>(),
+              type: _i1.getType<_i21.PlanTier>(),
               nullable: false,
             ),
           },
@@ -930,7 +1088,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'aiModel': _i1.ParameterDescription(
               name: 'aiModel',
-              type: _i1.getType<_i21.AiModel>(),
+              type: _i1.getType<_i22.AiModel>(),
               nullable: false,
             ),
           },
@@ -1003,6 +1161,6 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
       },
     );
-    modules['serverpod_auth'] = _i22.Endpoints()..initializeEndpoints(server);
+    modules['serverpod_auth'] = _i23.Endpoints()..initializeEndpoints(server);
   }
 }

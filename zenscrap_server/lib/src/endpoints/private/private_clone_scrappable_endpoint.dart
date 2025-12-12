@@ -1,6 +1,6 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart';
-import 'package:zenscrap_server/src/core/default_classes.dart';
+import 'package:zenscrap_server/src/core/translations/error_translations.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class PrivateCloneScrappableEndpoint extends Endpoint {
@@ -10,10 +10,11 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
   Future<Scrappable> cloneFromMarketplace(
     Session session, {
     required int scrappableId,
+    SupportedLanguage language = SupportedLanguage.en,
   }) async {
     final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
-      throw defaultAuthenticationException;
+      throw _authenticationFailed(language);
     }
 
     final authenticatedUserId = authenticationInfo.userId;
@@ -28,18 +29,12 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
     );
 
     if (accountInfo == null) {
-      throw ZenScrapException(
-        title: 'Account Not Found',
-        description: 'Could not find your account information.',
-      );
+      throw _accountNotFound(language);
     }
 
     // Check if user has unlimited plan
     if (accountInfo.planTier != PlanTier.ultra) {
-      throw ZenScrapException(
-        title: 'Upgrade Required',
-        description: 'Cloning marketplace scrappables requires an Ultra plan.',
-      );
+      throw _upgradeRequiredClone(language);
     }
 
     // Get the source scrappable to clone
@@ -56,18 +51,12 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
     );
 
     if (sourceScrappable == null) {
-      throw ZenScrapException(
-        title: 'Scrappable Not Found',
-        description: 'The scrappable you are trying to clone does not exist.',
-      );
+      throw _scrappableNotFoundClone(language);
     }
 
     // Verify it's a public scrappable
     if (sourceScrappable.willHideFromMarketplace) {
-      throw ZenScrapException(
-        title: 'Access Denied',
-        description: 'This scrappable is private and cannot be cloned.',
-      );
+      throw _scrappablePrivateCannotClone(language);
     }
 
     // Transaction: clone request, test data, reference data, and scrappable atomically
@@ -215,3 +204,22 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
     return result!;
   }
 }
+
+// ============================================================================
+// Error-returning functions
+// ============================================================================
+
+ZenScrapException _authenticationFailed(SupportedLanguage lang) =>
+    createTranslatedException('authentication_failed', lang);
+
+ZenScrapException _accountNotFound(SupportedLanguage lang) =>
+    createTranslatedException('account_not_found', lang);
+
+ZenScrapException _upgradeRequiredClone(SupportedLanguage lang) =>
+    createTranslatedException('upgrade_required_clone', lang);
+
+ZenScrapException _scrappableNotFoundClone(SupportedLanguage lang) =>
+    createTranslatedException('scrappable_not_found_clone', lang);
+
+ZenScrapException _scrappablePrivateCannotClone(SupportedLanguage lang) =>
+    createTranslatedException('scrappable_private_cannot_clone', lang);
