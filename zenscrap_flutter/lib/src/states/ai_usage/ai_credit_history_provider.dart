@@ -22,8 +22,10 @@ class AICreditHistoryNotifier extends Notifier<AICreditHistoryState> {
       _currentPage = 1;
       _allHistory = [];
 
+      final language = ref.read(currentLanguageProvider);
       final response = await _client.privateAiUsage.getAiCreditHistory(
         page: 1,
+        language: language,
       );
 
       _allHistory = response.data;
@@ -74,8 +76,10 @@ class AICreditHistoryNotifier extends Notifier<AICreditHistoryState> {
       );
 
       _currentPage++;
+      final language = ref.read(currentLanguageProvider);
       final response = await _client.privateAiUsage.getAiCreditHistory(
         page: _currentPage,
+        language: language,
       );
 
       _allHistory.addAll(response.data);

@@ -132,9 +132,11 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
 
   Future<bool> _onDelete() async {
     final client = ref.read(clientProvider);
+    final language = ref.read(currentLanguageProvider);
     final result = await client.deleteScrappable
         .call(
           scrappableId: widget.scrappable.id!,
+          language: language,
         )
         .toResult;
 

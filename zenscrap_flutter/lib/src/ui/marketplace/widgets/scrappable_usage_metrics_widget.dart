@@ -39,8 +39,9 @@ class _ScrappableUsageMetricsWidgetState
 
     try {
       final client = ref.read(clientProvider);
+      final language = ref.read(currentLanguageProvider);
       final metrics = await client.privateScrappableAnalytics
-          .getScrappableUsageMetrics(scrappableId: widget.scrappableId);
+          .getScrappableUsageMetrics(scrappableId: widget.scrappableId, language: language);
 
       if (mounted) {
         setState(() {

@@ -13,8 +13,9 @@ class AIUsageNotifier extends Notifier<AIUsageState> {
     state = const AIUsageState.loading();
 
     final client = ref.read(clientProvider);
+    final language = ref.read(currentLanguageProvider);
     final aiUsageResult =
-        await client.privateAiUsage.getAiUsageInfo().toResult;
+        await client.privateAiUsage.getAiUsageInfo(language: language).toResult;
 
     state = aiUsageResult.fold(
       (aiUsage) => AIUsageState.loaded(aiUsage: aiUsage),

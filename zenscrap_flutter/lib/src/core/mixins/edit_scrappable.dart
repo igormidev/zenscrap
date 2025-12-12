@@ -19,6 +19,7 @@ mixin EditScrappable<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     void Function() onSuccess,
   ) async {
     final client = ref.read(clientProvider);
+    final language = ref.read(currentLanguageProvider);
     final result = await client
         .editScrappable(
           scrappableId: scrappable.id!,
@@ -26,6 +27,7 @@ mixin EditScrappable<T extends ConsumerStatefulWidget> on ConsumerState<T> {
           description: description,
           category: category,
           willHideFromMarketplace: willHideFromMarketplace,
+          language: language,
         )
         .toResult;
 

@@ -820,8 +820,9 @@ class _CheckoutLoadingDialogState
   Future<void> _initiateCheckout() async {
     try {
       final client = widget.ref.read(clientProvider);
+      final language = widget.ref.read(currentLanguageProvider);
       final checkoutUrl = await client.privateApiUsage
-          .createCreditPurchaseCheckout(creditPackage: widget.package);
+          .createCreditPurchaseCheckout(creditPackage: widget.package, language: language);
 
       if (!mounted) return;
 

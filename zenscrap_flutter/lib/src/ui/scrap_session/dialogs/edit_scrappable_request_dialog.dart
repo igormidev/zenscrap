@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/serverpod_to_result.dart';
@@ -185,12 +185,14 @@ class _EditScrappableRequestDialogState
 
     // Call API to update the scrappable request
     final client = ref.read(clientProvider);
+    final language = ref.read(currentLanguageProvider);
     final result = await client.scrappableChatSession
         .updateScrappableRequest(
           scrappableId: widget.scrappableId,
           url: url,
           pathParams: _pathParams,
           queryParams: _queryParams,
+          language: language,
         )
         .toResult;
 
@@ -295,7 +297,7 @@ class _EditScrappableRequestDialogState
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      l10n.scrap_session_path_params_hint,
+                      l10n.scrap_session_path_params_hint('postId', 'userId'),
                       style: context.t.bodySmall?.copyWith(
                         color: context.c.onSurface,
                       ),
@@ -326,7 +328,7 @@ class _EditScrappableRequestDialogState
                                 horizontal: 16,
                                 vertical: 12,
                               ),
-                              helperText: l10n.scrap_session_use_param_name,
+                              helperText: l10n.scrap_session_use_param_name('{paramName}'),
                               helperMaxLines: 2,
                             ),
                             style: context.t.bodyMedium?.copyWith(

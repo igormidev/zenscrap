@@ -205,10 +205,11 @@ class RawPricingPageComponent extends ConsumerWidget {
       }
 
       // Create checkout session
+      final language = ref.read(currentLanguageProvider);
       final checkoutUrl = await ref
           .read(clientProvider)
           .privateSubscription
-          .createCheckoutSession(planTier: planTier, isYearly: isYearly);
+          .createCheckoutSession(planTier: planTier, isYearly: isYearly, language: language);
 
       // Track successful checkout session creation
       if (checkoutUrl.isNotEmpty) {

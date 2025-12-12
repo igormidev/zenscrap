@@ -119,8 +119,10 @@ class _ExampleResponseDialogState extends ConsumerState<ExampleResponseDialog>
 
     try {
       final client = ref.read(clientProvider);
+      final language = ref.read(currentLanguageProvider);
       final byteData = await client.publicScrappable.getByteTestData(
         widget.scrappable.id!,
+        language: language,
       );
 
       if (byteData?.referenceHtmlPage != null) {
@@ -147,8 +149,10 @@ class _ExampleResponseDialogState extends ConsumerState<ExampleResponseDialog>
 
     try {
       final client = ref.read(clientProvider);
+      final language = ref.read(currentLanguageProvider);
       final byteData = await client.publicScrappable.getByteTestData(
         widget.scrappable.id!,
+        language: language,
       );
 
       if (byteData?.referenceSiteScreenshot != null) {

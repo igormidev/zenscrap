@@ -491,9 +491,11 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
 
     try {
       final client = ref.read(clientProvider);
+      final language = ref.read(currentLanguageProvider);
       final clonedScrappable =
           await client.privateCloneScrappable.cloneFromMarketplace(
         scrappableId: widget.scrappable.id!,
+        language: language,
       );
 
       if (context.mounted) {

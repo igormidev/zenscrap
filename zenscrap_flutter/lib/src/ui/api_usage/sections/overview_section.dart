@@ -20,7 +20,7 @@ class CreditsOverviewSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final totalCredits = subscriptionCredits + purchasedCredits;
-    final creditsOwnedPerMonth = planTier.apiCreditsAddedPerMonth;
+    final creditsOwnedPerMonth = planTier.apiCreditsAddedPerMonthInt;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20),

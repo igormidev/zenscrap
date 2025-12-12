@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
@@ -220,10 +220,11 @@ class _ChangeAiModelButtonState extends ConsumerState<ChangeAiModelButton> {
     _isChangingVN.value = true;
     await ref.globalLoadingSetter(() async {
       await Future.delayed(const Duration(milliseconds: 600));
+      final language = ref.read(currentLanguageProvider);
       final changeResult = await ref
           .read(clientProvider)
           .scrappableChatSession
-          .changeChatModel(sessionUuid: sessionUuid, aiModel: aiModel)
+          .changeChatModel(sessionUuid: sessionUuid, aiModel: aiModel, language: language)
           .toResult;
       _isChangingVN.value = false;
 
