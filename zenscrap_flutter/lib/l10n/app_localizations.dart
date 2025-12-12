@@ -2077,6 +2077,216 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Free'**
   String get api_usage_plan_free;
+
+  /// Welcome title on auth page
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome'**
+  String get auth_welcome;
+
+  /// Login tab label
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get auth_login_tab;
+
+  /// Sign up tab label
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Up'**
+  String get auth_sign_up_tab;
+
+  /// Password reset tab label
+  ///
+  /// In en, this message translates to:
+  /// **'Password Reset'**
+  String get auth_password_reset_tab;
+
+  /// Log in button label
+  ///
+  /// In en, this message translates to:
+  /// **'Log In'**
+  String get auth_log_in_button;
+
+  /// Sign up button label
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Up'**
+  String get auth_sign_up_button;
+
+  /// Email field label
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get auth_email_label;
+
+  /// Email field hint text
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your email'**
+  String get auth_email_hint;
+
+  /// Email hint for password reset
+  ///
+  /// In en, this message translates to:
+  /// **'The email you registered with'**
+  String get auth_email_registered_hint;
+
+  /// Password field label
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get auth_password_label;
+
+  /// Password field hint text
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your password'**
+  String get auth_password_hint;
+
+  /// Confirm password field label
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm password'**
+  String get auth_confirm_password_label;
+
+  /// Confirm password field hint text
+  ///
+  /// In en, this message translates to:
+  /// **'Type your password again'**
+  String get auth_confirm_password_hint;
+
+  /// User name field label
+  ///
+  /// In en, this message translates to:
+  /// **'User display name (Typically the company name)'**
+  String get auth_user_name_label;
+
+  /// User name field hint text
+  ///
+  /// In en, this message translates to:
+  /// **'User name (or company name)'**
+  String get auth_user_name_hint;
+
+  /// New password field label
+  ///
+  /// In en, this message translates to:
+  /// **'New password'**
+  String get auth_new_password_label;
+
+  /// New password field hint text
+  ///
+  /// In en, this message translates to:
+  /// **'Define your new password'**
+  String get auth_new_password_hint;
+
+  /// Confirm new password field hint text
+  ///
+  /// In en, this message translates to:
+  /// **'Type again your new password'**
+  String get auth_new_password_confirm_hint;
+
+  /// Validation code field label
+  ///
+  /// In en, this message translates to:
+  /// **'Validation code'**
+  String get auth_validation_code_label;
+
+  /// Validation code field hint text
+  ///
+  /// In en, this message translates to:
+  /// **'Check your email for the validation code'**
+  String get auth_validation_code_hint;
+
+  /// Confirm email button label
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm your email'**
+  String get auth_confirm_email_button;
+
+  /// Check email message with email address
+  ///
+  /// In en, this message translates to:
+  /// **'Check your \"{email}\"'**
+  String auth_check_email(String email);
+
+  /// Send verification code button label
+  ///
+  /// In en, this message translates to:
+  /// **'Send verification code'**
+  String get auth_send_verification_code;
+
+  /// Verification code info message
+  ///
+  /// In en, this message translates to:
+  /// **'A verification code will be sent to your email'**
+  String get auth_verification_code_info;
+
+  /// Validate code button label
+  ///
+  /// In en, this message translates to:
+  /// **'Validate the code sent to email'**
+  String get auth_validate_code_button;
+
+  /// Password reset success dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Password reset successfully!'**
+  String get auth_password_reset_success_title;
+
+  /// Password reset success dialog message
+  ///
+  /// In en, this message translates to:
+  /// **'Now you can log in with the new password'**
+  String get auth_password_reset_success_message;
+
+  /// Email confirmed dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Email confirmed!'**
+  String get auth_email_confirmed_title;
+
+  /// Email confirmed dialog message
+  ///
+  /// In en, this message translates to:
+  /// **'Now you can log in with your email and password.'**
+  String get auth_email_confirmed_message;
+
+  /// OK button label
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get auth_ok_button;
+
+  /// Or divider text for social login
+  ///
+  /// In en, this message translates to:
+  /// **'or'**
+  String get auth_or_divider;
+
+  /// Continue with Google button label
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Google'**
+  String get auth_continue_with_google;
+
+  /// Signing in loading text
+  ///
+  /// In en, this message translates to:
+  /// **'Signing in...'**
+  String get auth_signing_in;
+
+  /// Google sign in description text
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in or create an account with Google'**
+  String get auth_google_sign_in_description;
+
+  /// Google sign in failed error message
+  ///
+  /// In en, this message translates to:
+  /// **'Google sign-in failed. Please try again or use email.'**
+  String get auth_google_sign_in_failed;
 }
 
 class _AppLocalizationsDelegate

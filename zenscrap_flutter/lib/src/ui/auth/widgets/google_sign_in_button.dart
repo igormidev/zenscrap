@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:serverpod_auth_google_flutter/serverpod_auth_google_flutter.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart' show localhost;
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
@@ -67,6 +68,7 @@ class _ZenScrapGoogleSignInButtonState
 
     final client = ref.watch(clientProvider);
     final analytics = ref.read(analyticsServiceProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Column(
       children: [
@@ -77,7 +79,7 @@ class _ZenScrapGoogleSignInButtonState
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
-                'or',
+                l10n.auth_or_divider,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(context).colorScheme.outline,
                     ),
@@ -151,7 +153,7 @@ class _ZenScrapGoogleSignInButtonState
                       if (context.mounted) {
                         showErrorSnackbar(
                           context,
-                          'Google sign-in failed. Please try again or use email.',
+                          l10n.auth_google_sign_in_failed,
                         );
                       }
                     } finally {
@@ -176,7 +178,7 @@ class _ZenScrapGoogleSignInButtonState
                     errorBuilder: (context, error, stackTrace) =>
                         const Icon(Icons.g_mobiledata, size: 20),
                   ),
-            label: Text(_isLoading ? 'Signing in...' : 'Continue with Google'),
+            label: Text(_isLoading ? l10n.auth_signing_in : l10n.auth_continue_with_google),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
               shape: RoundedRectangleBorder(
@@ -187,7 +189,7 @@ class _ZenScrapGoogleSignInButtonState
         ),
         const SizedBox(height: 8),
         Text(
-          'Sign in or create an account with Google',
+          l10n.auth_google_sign_in_description,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Theme.of(context).colorScheme.outline,
               ),

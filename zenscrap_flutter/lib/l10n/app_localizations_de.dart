@@ -1140,4 +1140,121 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get api_usage_plan_free => 'Kostenlos';
+
+  @override
+  String get auth_welcome => 'Willkommen';
+
+  @override
+  String get auth_login_tab => 'Anmelden';
+
+  @override
+  String get auth_sign_up_tab => 'Registrieren';
+
+  @override
+  String get auth_password_reset_tab => 'Passwort zuruecksetzen';
+
+  @override
+  String get auth_log_in_button => 'Anmelden';
+
+  @override
+  String get auth_sign_up_button => 'Registrieren';
+
+  @override
+  String get auth_email_label => 'E-Mail';
+
+  @override
+  String get auth_email_hint => 'Geben Sie Ihre E-Mail ein';
+
+  @override
+  String get auth_email_registered_hint =>
+      'Die E-Mail, mit der Sie sich registriert haben';
+
+  @override
+  String get auth_password_label => 'Passwort';
+
+  @override
+  String get auth_password_hint => 'Geben Sie Ihr Passwort ein';
+
+  @override
+  String get auth_confirm_password_label => 'Passwort bestaetigen';
+
+  @override
+  String get auth_confirm_password_hint => 'Geben Sie Ihr Passwort erneut ein';
+
+  @override
+  String get auth_user_name_label =>
+      'Anzeigename (Normalerweise der Firmenname)';
+
+  @override
+  String get auth_user_name_hint => 'Benutzername (oder Firmenname)';
+
+  @override
+  String get auth_new_password_label => 'Neues Passwort';
+
+  @override
+  String get auth_new_password_hint => 'Legen Sie Ihr neues Passwort fest';
+
+  @override
+  String get auth_new_password_confirm_hint =>
+      'Geben Sie Ihr neues Passwort erneut ein';
+
+  @override
+  String get auth_validation_code_label => 'Bestaetigungscode';
+
+  @override
+  String get auth_validation_code_hint =>
+      'Pruefen Sie Ihre E-Mail auf den Bestaetigungscode';
+
+  @override
+  String get auth_confirm_email_button => 'E-Mail bestaetigen';
+
+  @override
+  String auth_check_email(String email) {
+    return 'Pruefen Sie Ihre \"$email\"';
+  }
+
+  @override
+  String get auth_send_verification_code => 'Bestaetigungscode senden';
+
+  @override
+  String get auth_verification_code_info =>
+      'Ein Bestaetigungscode wird an Ihre E-Mail gesendet';
+
+  @override
+  String get auth_validate_code_button => 'Code aus E-Mail validieren';
+
+  @override
+  String get auth_password_reset_success_title =>
+      'Passwort erfolgreich zurueckgesetzt!';
+
+  @override
+  String get auth_password_reset_success_message =>
+      'Sie koennen sich jetzt mit dem neuen Passwort anmelden';
+
+  @override
+  String get auth_email_confirmed_title => 'E-Mail bestaetigt!';
+
+  @override
+  String get auth_email_confirmed_message =>
+      'Sie koennen sich jetzt mit Ihrer E-Mail und Ihrem Passwort anmelden.';
+
+  @override
+  String get auth_ok_button => 'OK';
+
+  @override
+  String get auth_or_divider => 'oder';
+
+  @override
+  String get auth_continue_with_google => 'Mit Google fortfahren';
+
+  @override
+  String get auth_signing_in => 'Anmeldung laeuft...';
+
+  @override
+  String get auth_google_sign_in_description =>
+      'Anmelden oder Konto mit Google erstellen';
+
+  @override
+  String get auth_google_sign_in_failed =>
+      'Google-Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut oder verwenden Sie E-Mail.';
 }

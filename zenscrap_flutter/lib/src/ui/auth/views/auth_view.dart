@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 import 'package:serverpod_auth_email_flutter/serverpod_auth_email_flutter.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/core/mixins/edit_scrappable.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/contact_support_button.dart';
@@ -74,11 +75,12 @@ class _AuthViewState extends ConsumerState<AuthView>
   }
 
   Future<void> _onSuccessConfirmEmail() async {
+    final l10n = AppLocalizations.of(context)!;
     await showOkAlertDialog(
       context: context,
-      title: 'Email confirmed!',
-      message: 'Now you can log in with your email and password.',
-      okLabel: 'OK',
+      title: l10n.auth_email_confirmed_title,
+      message: l10n.auth_email_confirmed_message,
+      okLabel: l10n.auth_ok_button,
       barrierDismissible: true,
       useRootNavigator: false,
     );
@@ -172,7 +174,7 @@ class _AuthViewState extends ConsumerState<AuthView>
                                     ),
                                   ),
                                 Text(
-                                  'Welcome',
+                                  AppLocalizations.of(context)!.auth_welcome,
                                   style: Theme.of(
                                     context,
                                   ).textTheme.displayMedium,
@@ -239,7 +241,7 @@ class _AuthViewState extends ConsumerState<AuthView>
                                   SizedBox(height: 8),
                                 ],
                                 Text(
-                                  'Welcome',
+                                  AppLocalizations.of(context)!.auth_welcome,
                                   style: Theme.of(
                                     context,
                                   ).textTheme.displayLarge,
@@ -364,17 +366,18 @@ class AuthContainer extends StatelessWidget {
                 builder: (context, String? passwordEmail, child) {
                   final isPasswordEmail = passwordEmail != null;
                   final isHover = isEmailActivated || isPasswordEmail;
+                  final l10n = AppLocalizations.of(context)!;
                   return IgnorePointer(
                     ignoring: isHover,
                     child: Opacity(
                       opacity: isHover ? 0.7 : 1,
                       child: TabBar(
                         controller: tabController,
-                        tabs: const [
-                          Tab(text: 'Login', icon: Icon(Icons.login)),
-                          Tab(text: 'Sign In', icon: Icon(Icons.person_add)),
+                        tabs: [
+                          Tab(text: l10n.auth_login_tab, icon: Icon(Icons.login)),
+                          Tab(text: l10n.auth_sign_up_tab, icon: Icon(Icons.person_add)),
                           Tab(
-                            text: 'Password Reset',
+                            text: l10n.auth_password_reset_tab,
                             icon: Icon(Icons.vpn_key),
                           ),
                         ],

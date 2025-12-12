@@ -2,6 +2,7 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:serverpod_auth_email_flutter/serverpod_auth_email_flutter.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/dialog_message.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
@@ -21,6 +22,7 @@ class PasswordResetValidateCodePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final analytics = ref.read(analyticsServiceProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     // Track view when the password reset validation form is visible
     analytics.trackAuthPasswordResetValidationViewed(email: email);
@@ -28,32 +30,32 @@ class PasswordResetValidateCodePage extends ConsumerWidget {
     return AuthFormTemplate<bool>(
       items: [
         AuthFormItem(
-          hintText: 'Validation code',
-          labelText: 'New password',
+          hintText: l10n.auth_validation_code_label,
+          labelText: l10n.auth_validation_code_label,
           autofillHints: AutofillHints.oneTimeCode,
           validator: FormBuilderValidators.maxLength(8),
         ),
         AuthFormItem(
-          hintText: 'Define your new password',
-          labelText: 'New password',
+          hintText: l10n.auth_new_password_hint,
+          labelText: l10n.auth_new_password_label,
           autofillHints: AutofillHints.newPassword,
           keyboardType: TextInputType.visiblePassword,
           validator: FormBuilderValidators.password(maxLength: 64),
         ),
         AuthFormItem(
-          hintText: 'Type again your new password',
-          labelText: 'Confirm password',
+          hintText: l10n.auth_new_password_confirm_hint,
+          labelText: l10n.auth_confirm_password_label,
           autofillHints: AutofillHints.newPassword,
           keyboardType: TextInputType.visiblePassword,
           validator: FormBuilderValidators.password(maxLength: 64),
         ),
       ],
-      submitText: 'Validate the code sent to email',
+      submitText: l10n.auth_validate_code_button,
       onSubmitSuccess: (data) async {
         await showSuccessDialog(
           context: context,
-          title: 'Password reseted with success!',
-          message: 'Now you can log in with the new password',
+          title: l10n.auth_password_reset_success_title,
+          message: l10n.auth_password_reset_success_message,
           onConfirm: () => onSuccessChangePassword(),
         );
       },

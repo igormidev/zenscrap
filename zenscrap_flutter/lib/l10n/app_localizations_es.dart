@@ -1137,4 +1137,121 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get api_usage_plan_free => 'Gratis';
+
+  @override
+  String get auth_welcome => 'Bienvenido';
+
+  @override
+  String get auth_login_tab => 'Iniciar sesion';
+
+  @override
+  String get auth_sign_up_tab => 'Registrarse';
+
+  @override
+  String get auth_password_reset_tab => 'Restablecer contrasena';
+
+  @override
+  String get auth_log_in_button => 'Iniciar sesion';
+
+  @override
+  String get auth_sign_up_button => 'Registrarse';
+
+  @override
+  String get auth_email_label => 'Correo electronico';
+
+  @override
+  String get auth_email_hint => 'Ingresa tu correo electronico';
+
+  @override
+  String get auth_email_registered_hint =>
+      'El correo con el que te registraste';
+
+  @override
+  String get auth_password_label => 'Contrasena';
+
+  @override
+  String get auth_password_hint => 'Ingresa tu contrasena';
+
+  @override
+  String get auth_confirm_password_label => 'Confirmar contrasena';
+
+  @override
+  String get auth_confirm_password_hint => 'Escribe tu contrasena nuevamente';
+
+  @override
+  String get auth_user_name_label =>
+      'Nombre de usuario (Normalmente el nombre de la empresa)';
+
+  @override
+  String get auth_user_name_hint => 'Nombre de usuario (o nombre de empresa)';
+
+  @override
+  String get auth_new_password_label => 'Nueva contrasena';
+
+  @override
+  String get auth_new_password_hint => 'Define tu nueva contrasena';
+
+  @override
+  String get auth_new_password_confirm_hint =>
+      'Escribe nuevamente tu nueva contrasena';
+
+  @override
+  String get auth_validation_code_label => 'Codigo de validacion';
+
+  @override
+  String get auth_validation_code_hint =>
+      'Revisa tu correo para el codigo de validacion';
+
+  @override
+  String get auth_confirm_email_button => 'Confirmar tu correo';
+
+  @override
+  String auth_check_email(String email) {
+    return 'Revisa tu \"$email\"';
+  }
+
+  @override
+  String get auth_send_verification_code => 'Enviar codigo de verificacion';
+
+  @override
+  String get auth_verification_code_info =>
+      'Un codigo de verificacion sera enviado a tu correo';
+
+  @override
+  String get auth_validate_code_button => 'Validar el codigo enviado al correo';
+
+  @override
+  String get auth_password_reset_success_title =>
+      'Contrasena restablecida exitosamente!';
+
+  @override
+  String get auth_password_reset_success_message =>
+      'Ahora puedes iniciar sesion con tu nueva contrasena';
+
+  @override
+  String get auth_email_confirmed_title => 'Correo confirmado!';
+
+  @override
+  String get auth_email_confirmed_message =>
+      'Ahora puedes iniciar sesion con tu correo y contrasena.';
+
+  @override
+  String get auth_ok_button => 'OK';
+
+  @override
+  String get auth_or_divider => 'o';
+
+  @override
+  String get auth_continue_with_google => 'Continuar con Google';
+
+  @override
+  String get auth_signing_in => 'Iniciando sesion...';
+
+  @override
+  String get auth_google_sign_in_description =>
+      'Inicia sesion o crea una cuenta con Google';
+
+  @override
+  String get auth_google_sign_in_failed =>
+      'Error al iniciar sesion con Google. Por favor intenta de nuevo o usa correo electronico.';
 }

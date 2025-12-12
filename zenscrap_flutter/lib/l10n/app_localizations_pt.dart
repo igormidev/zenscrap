@@ -1120,6 +1120,121 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get api_usage_plan_free => 'Free';
+
+  @override
+  String get auth_welcome => 'Welcome';
+
+  @override
+  String get auth_login_tab => 'Login';
+
+  @override
+  String get auth_sign_up_tab => 'Sign Up';
+
+  @override
+  String get auth_password_reset_tab => 'Password Reset';
+
+  @override
+  String get auth_log_in_button => 'Log In';
+
+  @override
+  String get auth_sign_up_button => 'Sign Up';
+
+  @override
+  String get auth_email_label => 'Email';
+
+  @override
+  String get auth_email_hint => 'Enter your email';
+
+  @override
+  String get auth_email_registered_hint => 'The email you registered with';
+
+  @override
+  String get auth_password_label => 'Password';
+
+  @override
+  String get auth_password_hint => 'Enter your password';
+
+  @override
+  String get auth_confirm_password_label => 'Confirm password';
+
+  @override
+  String get auth_confirm_password_hint => 'Type your password again';
+
+  @override
+  String get auth_user_name_label =>
+      'User display name (Typically the company name)';
+
+  @override
+  String get auth_user_name_hint => 'User name (or company name)';
+
+  @override
+  String get auth_new_password_label => 'New password';
+
+  @override
+  String get auth_new_password_hint => 'Define your new password';
+
+  @override
+  String get auth_new_password_confirm_hint => 'Type again your new password';
+
+  @override
+  String get auth_validation_code_label => 'Validation code';
+
+  @override
+  String get auth_validation_code_hint =>
+      'Check your email for the validation code';
+
+  @override
+  String get auth_confirm_email_button => 'Confirm your email';
+
+  @override
+  String auth_check_email(String email) {
+    return 'Check your \"$email\"';
+  }
+
+  @override
+  String get auth_send_verification_code => 'Send verification code';
+
+  @override
+  String get auth_verification_code_info =>
+      'A verification code will be sent to your email';
+
+  @override
+  String get auth_validate_code_button => 'Validate the code sent to email';
+
+  @override
+  String get auth_password_reset_success_title =>
+      'Password reset successfully!';
+
+  @override
+  String get auth_password_reset_success_message =>
+      'Now you can log in with the new password';
+
+  @override
+  String get auth_email_confirmed_title => 'Email confirmed!';
+
+  @override
+  String get auth_email_confirmed_message =>
+      'Now you can log in with your email and password.';
+
+  @override
+  String get auth_ok_button => 'OK';
+
+  @override
+  String get auth_or_divider => 'or';
+
+  @override
+  String get auth_continue_with_google => 'Continue with Google';
+
+  @override
+  String get auth_signing_in => 'Signing in...';
+
+  @override
+  String get auth_google_sign_in_description =>
+      'Sign in or create an account with Google';
+
+  @override
+  String get auth_google_sign_in_failed =>
+      'Google sign-in failed. Please try again or use email.';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -2256,4 +2371,121 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get api_usage_plan_free => 'Gratis';
+
+  @override
+  String get auth_welcome => 'Bem-vindo';
+
+  @override
+  String get auth_login_tab => 'Entrar';
+
+  @override
+  String get auth_sign_up_tab => 'Cadastrar';
+
+  @override
+  String get auth_password_reset_tab => 'Redefinir senha';
+
+  @override
+  String get auth_log_in_button => 'Entrar';
+
+  @override
+  String get auth_sign_up_button => 'Cadastrar';
+
+  @override
+  String get auth_email_label => 'E-mail';
+
+  @override
+  String get auth_email_hint => 'Digite seu e-mail';
+
+  @override
+  String get auth_email_registered_hint =>
+      'O e-mail com o qual voce se cadastrou';
+
+  @override
+  String get auth_password_label => 'Senha';
+
+  @override
+  String get auth_password_hint => 'Digite sua senha';
+
+  @override
+  String get auth_confirm_password_label => 'Confirmar senha';
+
+  @override
+  String get auth_confirm_password_hint => 'Digite sua senha novamente';
+
+  @override
+  String get auth_user_name_label =>
+      'Nome de exibicao (Geralmente o nome da empresa)';
+
+  @override
+  String get auth_user_name_hint => 'Nome de usuario (ou nome da empresa)';
+
+  @override
+  String get auth_new_password_label => 'Nova senha';
+
+  @override
+  String get auth_new_password_hint => 'Defina sua nova senha';
+
+  @override
+  String get auth_new_password_confirm_hint =>
+      'Digite novamente sua nova senha';
+
+  @override
+  String get auth_validation_code_label => 'Codigo de validacao';
+
+  @override
+  String get auth_validation_code_hint =>
+      'Verifique seu e-mail para o codigo de validacao';
+
+  @override
+  String get auth_confirm_email_button => 'Confirmar seu e-mail';
+
+  @override
+  String auth_check_email(String email) {
+    return 'Verifique seu \"$email\"';
+  }
+
+  @override
+  String get auth_send_verification_code => 'Enviar codigo de verificacao';
+
+  @override
+  String get auth_verification_code_info =>
+      'Um codigo de verificacao sera enviado para seu e-mail';
+
+  @override
+  String get auth_validate_code_button => 'Validar o codigo enviado por e-mail';
+
+  @override
+  String get auth_password_reset_success_title =>
+      'Senha redefinida com sucesso!';
+
+  @override
+  String get auth_password_reset_success_message =>
+      'Agora voce pode entrar com sua nova senha';
+
+  @override
+  String get auth_email_confirmed_title => 'E-mail confirmado!';
+
+  @override
+  String get auth_email_confirmed_message =>
+      'Agora voce pode entrar com seu e-mail e senha.';
+
+  @override
+  String get auth_ok_button => 'OK';
+
+  @override
+  String get auth_or_divider => 'ou';
+
+  @override
+  String get auth_continue_with_google => 'Continuar com Google';
+
+  @override
+  String get auth_signing_in => 'Entrando...';
+
+  @override
+  String get auth_google_sign_in_description =>
+      'Entre ou crie uma conta com Google';
+
+  @override
+  String get auth_google_sign_in_failed =>
+      'Falha ao entrar com Google. Por favor, tente novamente ou use e-mail.';
 }

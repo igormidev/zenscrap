@@ -1144,4 +1144,121 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get api_usage_plan_free => 'Gratuit';
+
+  @override
+  String get auth_welcome => 'Bienvenue';
+
+  @override
+  String get auth_login_tab => 'Connexion';
+
+  @override
+  String get auth_sign_up_tab => 'S\'inscrire';
+
+  @override
+  String get auth_password_reset_tab => 'Reinitialiser le mot de passe';
+
+  @override
+  String get auth_log_in_button => 'Se connecter';
+
+  @override
+  String get auth_sign_up_button => 'S\'inscrire';
+
+  @override
+  String get auth_email_label => 'E-mail';
+
+  @override
+  String get auth_email_hint => 'Entrez votre e-mail';
+
+  @override
+  String get auth_email_registered_hint =>
+      'L\'e-mail avec lequel vous vous etes inscrit';
+
+  @override
+  String get auth_password_label => 'Mot de passe';
+
+  @override
+  String get auth_password_hint => 'Entrez votre mot de passe';
+
+  @override
+  String get auth_confirm_password_label => 'Confirmer le mot de passe';
+
+  @override
+  String get auth_confirm_password_hint => 'Retapez votre mot de passe';
+
+  @override
+  String get auth_user_name_label =>
+      'Nom d\'affichage (Generalement le nom de l\'entreprise)';
+
+  @override
+  String get auth_user_name_hint => 'Nom d\'utilisateur (ou nom d\'entreprise)';
+
+  @override
+  String get auth_new_password_label => 'Nouveau mot de passe';
+
+  @override
+  String get auth_new_password_hint => 'Definissez votre nouveau mot de passe';
+
+  @override
+  String get auth_new_password_confirm_hint =>
+      'Retapez votre nouveau mot de passe';
+
+  @override
+  String get auth_validation_code_label => 'Code de validation';
+
+  @override
+  String get auth_validation_code_hint =>
+      'Verifiez votre e-mail pour le code de validation';
+
+  @override
+  String get auth_confirm_email_button => 'Confirmer votre e-mail';
+
+  @override
+  String auth_check_email(String email) {
+    return 'Verifiez votre \"$email\"';
+  }
+
+  @override
+  String get auth_send_verification_code => 'Envoyer le code de verification';
+
+  @override
+  String get auth_verification_code_info =>
+      'Un code de verification sera envoye a votre e-mail';
+
+  @override
+  String get auth_validate_code_button => 'Valider le code envoye par e-mail';
+
+  @override
+  String get auth_password_reset_success_title =>
+      'Mot de passe reinitialise avec succes!';
+
+  @override
+  String get auth_password_reset_success_message =>
+      'Vous pouvez maintenant vous connecter avec votre nouveau mot de passe';
+
+  @override
+  String get auth_email_confirmed_title => 'E-mail confirme!';
+
+  @override
+  String get auth_email_confirmed_message =>
+      'Vous pouvez maintenant vous connecter avec votre e-mail et mot de passe.';
+
+  @override
+  String get auth_ok_button => 'OK';
+
+  @override
+  String get auth_or_divider => 'ou';
+
+  @override
+  String get auth_continue_with_google => 'Continuer avec Google';
+
+  @override
+  String get auth_signing_in => 'Connexion en cours...';
+
+  @override
+  String get auth_google_sign_in_description =>
+      'Connectez-vous ou creez un compte avec Google';
+
+  @override
+  String get auth_google_sign_in_failed =>
+      'Echec de la connexion Google. Veuillez reessayer ou utiliser l\'e-mail.';
 }

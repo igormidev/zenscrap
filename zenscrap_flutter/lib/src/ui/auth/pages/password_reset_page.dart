@@ -2,6 +2,7 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:serverpod_auth_email_flutter/serverpod_auth_email_flutter.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/ui/auth/templates/auth_form_template.dart';
@@ -18,16 +19,17 @@ class PasswordResetPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final analytics = ref.read(analyticsServiceProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     // Track view when the password reset form is visible
     analytics.trackAuthPasswordResetViewed();
 
     return AuthFormTemplate<String>(
-      submitText: 'Send verification code',
+      submitText: l10n.auth_send_verification_code,
       items: [
         AuthFormItem(
-          hintText: 'The email you registered with',
-          labelText: 'Email',
+          hintText: l10n.auth_email_registered_hint,
+          labelText: l10n.auth_email_label,
           autofillHints: AutofillHints.email,
           keyboardType: TextInputType.emailAddress,
           validator: FormBuilderValidators.compose([
@@ -39,7 +41,7 @@ class PasswordResetPage extends ConsumerWidget {
       ],
       children: [
         Text(
-          'A verification code will be sent to your email',
+          l10n.auth_verification_code_info,
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         const SizedBox(height: 8),

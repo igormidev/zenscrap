@@ -1120,4 +1120,119 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get api_usage_plan_free => 'Free';
+
+  @override
+  String get auth_welcome => 'Welcome';
+
+  @override
+  String get auth_login_tab => 'Login';
+
+  @override
+  String get auth_sign_up_tab => 'Sign Up';
+
+  @override
+  String get auth_password_reset_tab => 'Password Reset';
+
+  @override
+  String get auth_log_in_button => 'Log In';
+
+  @override
+  String get auth_sign_up_button => 'Sign Up';
+
+  @override
+  String get auth_email_label => 'Email';
+
+  @override
+  String get auth_email_hint => 'Enter your email';
+
+  @override
+  String get auth_email_registered_hint => 'The email you registered with';
+
+  @override
+  String get auth_password_label => 'Password';
+
+  @override
+  String get auth_password_hint => 'Enter your password';
+
+  @override
+  String get auth_confirm_password_label => 'Confirm password';
+
+  @override
+  String get auth_confirm_password_hint => 'Type your password again';
+
+  @override
+  String get auth_user_name_label =>
+      'User display name (Typically the company name)';
+
+  @override
+  String get auth_user_name_hint => 'User name (or company name)';
+
+  @override
+  String get auth_new_password_label => 'New password';
+
+  @override
+  String get auth_new_password_hint => 'Define your new password';
+
+  @override
+  String get auth_new_password_confirm_hint => 'Type again your new password';
+
+  @override
+  String get auth_validation_code_label => 'Validation code';
+
+  @override
+  String get auth_validation_code_hint =>
+      'Check your email for the validation code';
+
+  @override
+  String get auth_confirm_email_button => 'Confirm your email';
+
+  @override
+  String auth_check_email(String email) {
+    return 'Check your \"$email\"';
+  }
+
+  @override
+  String get auth_send_verification_code => 'Send verification code';
+
+  @override
+  String get auth_verification_code_info =>
+      'A verification code will be sent to your email';
+
+  @override
+  String get auth_validate_code_button => 'Validate the code sent to email';
+
+  @override
+  String get auth_password_reset_success_title =>
+      'Password reset successfully!';
+
+  @override
+  String get auth_password_reset_success_message =>
+      'Now you can log in with the new password';
+
+  @override
+  String get auth_email_confirmed_title => 'Email confirmed!';
+
+  @override
+  String get auth_email_confirmed_message =>
+      'Now you can log in with your email and password.';
+
+  @override
+  String get auth_ok_button => 'OK';
+
+  @override
+  String get auth_or_divider => 'or';
+
+  @override
+  String get auth_continue_with_google => 'Continue with Google';
+
+  @override
+  String get auth_signing_in => 'Signing in...';
+
+  @override
+  String get auth_google_sign_in_description =>
+      'Sign in or create an account with Google';
+
+  @override
+  String get auth_google_sign_in_failed =>
+      'Google sign-in failed. Please try again or use email.';
 }

@@ -1090,4 +1090,112 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get api_usage_plan_free => '無料';
+
+  @override
+  String get auth_welcome => 'ようこそ';
+
+  @override
+  String get auth_login_tab => 'ログイン';
+
+  @override
+  String get auth_sign_up_tab => '新規登録';
+
+  @override
+  String get auth_password_reset_tab => 'パスワードリセット';
+
+  @override
+  String get auth_log_in_button => 'ログイン';
+
+  @override
+  String get auth_sign_up_button => '新規登録';
+
+  @override
+  String get auth_email_label => 'メールアドレス';
+
+  @override
+  String get auth_email_hint => 'メールアドレスを入力';
+
+  @override
+  String get auth_email_registered_hint => '登録時のメールアドレス';
+
+  @override
+  String get auth_password_label => 'パスワード';
+
+  @override
+  String get auth_password_hint => 'パスワードを入力';
+
+  @override
+  String get auth_confirm_password_label => 'パスワード確認';
+
+  @override
+  String get auth_confirm_password_hint => 'パスワードを再入力';
+
+  @override
+  String get auth_user_name_label => '表示名（通常は会社名）';
+
+  @override
+  String get auth_user_name_hint => 'ユーザー名（または会社名）';
+
+  @override
+  String get auth_new_password_label => '新しいパスワード';
+
+  @override
+  String get auth_new_password_hint => '新しいパスワードを設定';
+
+  @override
+  String get auth_new_password_confirm_hint => '新しいパスワードを再入力';
+
+  @override
+  String get auth_validation_code_label => '認証コード';
+
+  @override
+  String get auth_validation_code_hint => 'メールで届いた認証コードを確認してください';
+
+  @override
+  String get auth_confirm_email_button => 'メールアドレスを確認';
+
+  @override
+  String auth_check_email(String email) {
+    return '「$email」を確認してください';
+  }
+
+  @override
+  String get auth_send_verification_code => '認証コードを送信';
+
+  @override
+  String get auth_verification_code_info => '認証コードがメールで送信されます';
+
+  @override
+  String get auth_validate_code_button => 'メールで届いたコードを認証';
+
+  @override
+  String get auth_password_reset_success_title => 'パスワードのリセットが完了しました！';
+
+  @override
+  String get auth_password_reset_success_message => '新しいパスワードでログインできます';
+
+  @override
+  String get auth_email_confirmed_title => 'メールアドレスが確認されました！';
+
+  @override
+  String get auth_email_confirmed_message => 'メールアドレスとパスワードでログインできます。';
+
+  @override
+  String get auth_ok_button => 'OK';
+
+  @override
+  String get auth_or_divider => 'または';
+
+  @override
+  String get auth_continue_with_google => 'Googleで続ける';
+
+  @override
+  String get auth_signing_in => 'ログイン中...';
+
+  @override
+  String get auth_google_sign_in_description => 'Googleでログインまたはアカウント作成';
+
+  @override
+  String get auth_google_sign_in_failed =>
+      'Googleログインに失敗しました。もう一度お試しいただくか、メールをご利用ください。';
 }
