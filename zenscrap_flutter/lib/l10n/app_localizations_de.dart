@@ -794,4 +794,350 @@ class AppLocalizationsDe extends AppLocalizations {
   String api_analytics_expand_more_lines(int count) {
     return 'Klicken Sie auf Aufklappen, um $count+ weitere Zeilen zu sehen';
   }
+
+  @override
+  String get api_usage_page_title => 'API-Guthaben & Schluessel';
+
+  @override
+  String get api_usage_refresh => 'Aktualisieren';
+
+  @override
+  String get api_usage_retry => 'Erneut versuchen';
+
+  @override
+  String get api_usage_overview => 'Uebersicht';
+
+  @override
+  String get api_usage_api_keys => 'API-Schluessel';
+
+  @override
+  String get api_usage_history => 'Verlauf';
+
+  @override
+  String get api_usage_overview_title => 'API-Nutzungsuebersicht';
+
+  @override
+  String get api_usage_credit_history => 'Guthaben-Verlauf';
+
+  @override
+  String get api_usage_new_api_key_created => 'Neuer API-Schluessel erstellt';
+
+  @override
+  String get api_usage_copy_api_key_warning =>
+      'Bitte kopieren und speichern Sie diesen API-Schluessel. Sie werden ihn nicht wieder sehen koennen!';
+
+  @override
+  String get api_usage_api_key_copied =>
+      'API-Schluessel in Zwischenablage kopiert';
+
+  @override
+  String get api_usage_done => 'Fertig';
+
+  @override
+  String get api_usage_deactivate_api_key => 'API-Schluessel deaktivieren';
+
+  @override
+  String get api_usage_deactivate_confirmation =>
+      'Sind Sie sicher, dass Sie diesen API-Schluessel deaktivieren moechten? Diese Aktion kann nicht rueckgaengig gemacht werden.';
+
+  @override
+  String get api_usage_cancel => 'Abbrechen';
+
+  @override
+  String get api_usage_deactivate => 'Deaktivieren';
+
+  @override
+  String get api_usage_create_key => 'Schluessel erstellen';
+
+  @override
+  String get api_usage_no_api_keys => 'Noch keine API-Schluessel';
+
+  @override
+  String get api_usage_purchase_credits => 'API-Guthaben kaufen';
+
+  @override
+  String get api_usage_best_value => 'BESTER WERT';
+
+  @override
+  String get api_usage_bulk_discount => 'MENGENRABATT';
+
+  @override
+  String get api_usage_credits_never_expire =>
+      'Guthaben laeuft nie ab • Sofortige Aktivierung';
+
+  @override
+  String api_usage_unit_price(String unitPrice) {
+    return 'Stueckpreis: $unitPrice';
+  }
+
+  @override
+  String get api_usage_ultra_plan_required => 'Ultra-Plan erforderlich';
+
+  @override
+  String get api_usage_ultra_exclusive_benefit =>
+      'Guthaben-Pakete sind ein exklusiver Vorteil fuer Ultra-Plan-Abonnenten.';
+
+  @override
+  String get api_usage_credits_never_expire_benefit =>
+      'Guthaben, das nie verfaellt';
+
+  @override
+  String get api_usage_perfect_for_traffic_spikes =>
+      'Perfekt fuer Traffic-Spitzen';
+
+  @override
+  String get api_usage_maybe_later => 'Vielleicht spaeter';
+
+  @override
+  String get api_usage_upgrade_to_ultra => 'Auf Ultra upgraden';
+
+  @override
+  String get api_usage_unlock_credits_message =>
+      'Schalten Sie die Moeglichkeit frei, zusaetzliches Guthaben zu kaufen, das nie verfaellt. Perfekt fuer Traffic-Spitzen und saisonale Anforderungen.';
+
+  @override
+  String get api_usage_get_credits_title =>
+      'Holen Sie sich Guthaben, das nie verfaellt';
+
+  @override
+  String get api_usage_traffic_spikes_subtitle =>
+      'Perfekt fuer Traffic-Spitzen & langfristige Planung';
+
+  @override
+  String get api_usage_credits_never_expire_title => 'Guthaben verfaellt nie';
+
+  @override
+  String get api_usage_credits_never_expire_description =>
+      'Im Gegensatz zu Abonnement-Guthaben, das monatlich zurueckgesetzt wird, bleibt gekauftes Guthaben fuer immer in Ihrem Konto, solange Ihr Ultra-Plan aktiv ist.';
+
+  @override
+  String get api_usage_instant_activation_title => 'Sofortige Aktivierung';
+
+  @override
+  String get api_usage_instant_activation_description =>
+      'Guthaben wird Ihrem Konto sofort nach Zahlung gutgeschrieben - kein Warten, keine Verzoegerungen.';
+
+  @override
+  String get api_usage_scale_without_limits_title => 'Skalieren ohne Grenzen';
+
+  @override
+  String get api_usage_scale_without_limits_description =>
+      'Bewaeltigen Sie Traffic-Spitzen, saisonale Anforderungen oder Sonderprojekte ohne Upgrade Ihres monatlichen Plans.';
+
+  @override
+  String get api_usage_choose_package => 'Waehlen Sie Ihr Paket';
+
+  @override
+  String get api_usage_100k_credits => '100.000 Guthaben';
+
+  @override
+  String get api_usage_1m_credits => '1.000.000 Guthaben';
+
+  @override
+  String get api_usage_2_5m_credits => '2.500.000 Guthaben';
+
+  @override
+  String get api_usage_small_package_description =>
+      'Ideal zum Testen und fuer kleine Projekte';
+
+  @override
+  String get api_usage_medium_package_description =>
+      'Bester Wert fuer wachsende Anwendungen';
+
+  @override
+  String get api_usage_large_package_description =>
+      'Maximale Ersparnis fuer Unternehmensanforderungen';
+
+  @override
+  String get api_usage_most_popular => 'AM BELIEBTESTEN';
+
+  @override
+  String get api_usage_best_deal => 'BESTES ANGEBOT';
+
+  @override
+  String get api_usage_secure_payment_stripe => 'Sichere Zahlung via Stripe';
+
+  @override
+  String get api_usage_instant_delivery => 'Sofortige Lieferung';
+
+  @override
+  String get api_usage_not_now => 'Nicht jetzt';
+
+  @override
+  String get api_usage_get_100k_credits => '100K Guthaben erhalten';
+
+  @override
+  String get api_usage_get_1m_credits => '1M Guthaben erhalten';
+
+  @override
+  String get api_usage_get_2_5m_credits => '2,5M Guthaben erhalten';
+
+  @override
+  String get api_usage_preparing_checkout => 'Checkout wird vorbereitet...';
+
+  @override
+  String get api_usage_redirect_to_stripe =>
+      'Sie werden in Kuerze zu Stripe weitergeleitet';
+
+  @override
+  String get api_usage_checkout_failed => 'Checkout fehlgeschlagen';
+
+  @override
+  String get api_usage_unexpected_error =>
+      'Ein unerwarteter Fehler ist aufgetreten';
+
+  @override
+  String get api_usage_close => 'Schliessen';
+
+  @override
+  String get api_usage_complete_purchase => 'Kauf abschliessen';
+
+  @override
+  String get api_usage_checkout_opened => 'Checkout in neuem Tab geoeffnet';
+
+  @override
+  String get api_usage_complete_in_stripe =>
+      'Schliessen Sie Ihren Kauf auf der Stripe-Checkout-Seite ab und aktualisieren Sie dann diese Seite, um Ihr neues Guthaben zu sehen.';
+
+  @override
+  String get api_usage_secure_payment_powered_by_stripe =>
+      'Sichere Zahlung powered by Stripe';
+
+  @override
+  String get api_usage_refresh_and_close => 'Aktualisieren & Schliessen';
+
+  @override
+  String get api_usage_unable_to_verify_account =>
+      'Kontostatus konnte nicht verifiziert werden. Bitte versuchen Sie es erneut.';
+
+  @override
+  String get api_usage_account_refreshed => 'Konto aktualisiert';
+
+  @override
+  String get api_usage_credits_overview => 'API-Guthaben Uebersicht';
+
+  @override
+  String get api_usage_total_available => 'Gesamt verfuegbar';
+
+  @override
+  String get api_usage_credits_combined_description =>
+      'Guthaben aus Kauf und Abonnement kombiniert';
+
+  @override
+  String get api_usage_subscription => 'Abonnement';
+
+  @override
+  String get api_usage_subscribe_to_unlock =>
+      'Abonnieren Sie, um einen Plan freizuschalten';
+
+  @override
+  String api_usage_will_renew_monthly(int credits) {
+    return 'Wird monatlich erneuert $credits';
+  }
+
+  @override
+  String get api_usage_purchased => 'Gekauft';
+
+  @override
+  String get api_usage_purchased_description =>
+      'Einmalig gekauftes Guthaben, das nie verfaellt';
+
+  @override
+  String get api_usage_credits_info =>
+      'Sie koennen zusaetzliches Guthaben kaufen • Abonnement-Guthaben wird monatlich erneuert';
+
+  @override
+  String get api_usage_inactive => 'INAKTIV';
+
+  @override
+  String api_usage_created_date(String date) {
+    return 'Erstellt $date';
+  }
+
+  @override
+  String api_usage_requests_count(int count) {
+    return '$count Anfragen';
+  }
+
+  @override
+  String get api_usage_last_30_days => 'Letzte 30 Tage';
+
+  @override
+  String get api_usage_api_key_label => 'API-Schluessel';
+
+  @override
+  String get api_usage_copy_api_key => 'API-Schluessel kopieren';
+
+  @override
+  String get api_usage_account_id => 'Konto-ID';
+
+  @override
+  String get api_usage_copy_account_id => 'Konto-ID kopieren';
+
+  @override
+  String get api_usage_account_id_copied =>
+      'Konto-ID in Zwischenablage kopiert';
+
+  @override
+  String get api_usage_create_new_api_key => 'Neuen API-Schluessel erstellen';
+
+  @override
+  String get api_usage_api_key_name_description =>
+      'Geben Sie Ihrem API-Schluessel einen beschreibenden Namen, um ihn spaeter zu identifizieren.';
+
+  @override
+  String get api_usage_api_key_name => 'API-Schluessel-Name';
+
+  @override
+  String get api_usage_api_key_name_hint =>
+      'z.B. Produktionsserver, Mobile App, Testing';
+
+  @override
+  String get api_usage_name_required =>
+      'Bitte geben Sie einen Namen fuer den API-Schluessel ein';
+
+  @override
+  String get api_usage_name_min_length =>
+      'Der Name muss mindestens 3 Zeichen lang sein';
+
+  @override
+  String get api_usage_name_max_length =>
+      'Der Name muss weniger als 50 Zeichen haben';
+
+  @override
+  String get api_usage_api_key_security_warning =>
+      'Wer Zugriff auf diesen API-Schluessel hat, hat die gleichen Berechtigungen wie Ihr Konto. Bewahren Sie ihn sicher auf und teilen Sie ihn nicht oeffentlich.';
+
+  @override
+  String get api_usage_creating => 'Wird erstellt...';
+
+  @override
+  String get api_usage_create_api_key => 'API-Schluessel erstellen';
+
+  @override
+  String get api_usage_no_credit_history => 'Noch kein Guthaben-Verlauf';
+
+  @override
+  String get api_usage_credit_transactions_appear_here =>
+      'Ihre Guthaben-Transaktionen werden hier angezeigt';
+
+  @override
+  String get api_usage_load_more => 'Mehr laden';
+
+  @override
+  String get api_usage_monthly_subscription => 'Monatliches Abonnement';
+
+  @override
+  String api_usage_plan_date_subtitle(String planName, String date) {
+    return '$planName-Plan • $date';
+  }
+
+  @override
+  String get api_usage_credit_purchase => 'Guthaben-Kauf';
+
+  @override
+  String get api_usage_unknown_transaction => 'Unbekannte Transaktion';
+
+  @override
+  String get api_usage_plan_free => 'Kostenlos';
 }

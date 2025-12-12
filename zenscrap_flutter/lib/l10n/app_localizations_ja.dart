@@ -765,4 +765,329 @@ class AppLocalizationsJa extends AppLocalizations {
   String api_analytics_expand_more_lines(int count) {
     return '展開をクリックして残り$count行以上を表示';
   }
+
+  @override
+  String get api_usage_page_title => 'APIクレジット＆キー';
+
+  @override
+  String get api_usage_refresh => '更新';
+
+  @override
+  String get api_usage_retry => '再試行';
+
+  @override
+  String get api_usage_overview => '概要';
+
+  @override
+  String get api_usage_api_keys => 'APIキー';
+
+  @override
+  String get api_usage_history => '履歴';
+
+  @override
+  String get api_usage_overview_title => 'API使用状況の概要';
+
+  @override
+  String get api_usage_credit_history => 'クレジット履歴';
+
+  @override
+  String get api_usage_new_api_key_created => '新しいAPIキーが作成されました';
+
+  @override
+  String get api_usage_copy_api_key_warning =>
+      'このAPIキーをコピーして保存してください。再度表示することはできません！';
+
+  @override
+  String get api_usage_api_key_copied => 'APIキーをクリップボードにコピーしました';
+
+  @override
+  String get api_usage_done => '完了';
+
+  @override
+  String get api_usage_deactivate_api_key => 'APIキーを無効化';
+
+  @override
+  String get api_usage_deactivate_confirmation =>
+      'このAPIキーを無効化してもよろしいですか？この操作は元に戻せません。';
+
+  @override
+  String get api_usage_cancel => 'キャンセル';
+
+  @override
+  String get api_usage_deactivate => '無効化';
+
+  @override
+  String get api_usage_create_key => 'キーを作成';
+
+  @override
+  String get api_usage_no_api_keys => 'APIキーはまだありません';
+
+  @override
+  String get api_usage_purchase_credits => 'APIクレジットを購入';
+
+  @override
+  String get api_usage_best_value => 'お得';
+
+  @override
+  String get api_usage_bulk_discount => '大量割引';
+
+  @override
+  String get api_usage_credits_never_expire => 'クレジットは期限切れになりません • 即時有効化';
+
+  @override
+  String api_usage_unit_price(String unitPrice) {
+    return '単価: $unitPrice';
+  }
+
+  @override
+  String get api_usage_ultra_plan_required => 'Ultraプランが必要です';
+
+  @override
+  String get api_usage_ultra_exclusive_benefit =>
+      'クレジットパッケージはUltraプラン加入者限定の特典です。';
+
+  @override
+  String get api_usage_credits_never_expire_benefit => '期限切れのないクレジット';
+
+  @override
+  String get api_usage_perfect_for_traffic_spikes => 'トラフィックスパイクに最適';
+
+  @override
+  String get api_usage_maybe_later => '後で検討';
+
+  @override
+  String get api_usage_upgrade_to_ultra => 'Ultraにアップグレード';
+
+  @override
+  String get api_usage_unlock_credits_message =>
+      '期限切れのない追加クレジットを購入できるようになります。トラフィックスパイクや季節的な需要に対応するのに最適です。';
+
+  @override
+  String get api_usage_get_credits_title => '期限切れのないクレジットを取得';
+
+  @override
+  String get api_usage_traffic_spikes_subtitle => 'トラフィックスパイクと長期計画に最適';
+
+  @override
+  String get api_usage_credits_never_expire_title => 'クレジットは期限切れになりません';
+
+  @override
+  String get api_usage_credits_never_expire_description =>
+      '毎月リセットされるサブスクリプションクレジットとは異なり、購入したクレジットはUltraプランがアクティブな限り永久にアカウントに残ります。';
+
+  @override
+  String get api_usage_instant_activation_title => '即時有効化';
+
+  @override
+  String get api_usage_instant_activation_description =>
+      'お支払い後すぐにクレジットがアカウントに追加されます - 待ち時間なし、遅延なし。';
+
+  @override
+  String get api_usage_scale_without_limits_title => '無制限にスケール';
+
+  @override
+  String get api_usage_scale_without_limits_description =>
+      '月額プランをアップグレードせずに、トラフィックスパイク、季節的な需要、特別プロジェクトに対応できます。';
+
+  @override
+  String get api_usage_choose_package => 'パッケージを選択';
+
+  @override
+  String get api_usage_100k_credits => '100,000クレジット';
+
+  @override
+  String get api_usage_1m_credits => '1,000,000クレジット';
+
+  @override
+  String get api_usage_2_5m_credits => '2,500,000クレジット';
+
+  @override
+  String get api_usage_small_package_description => 'テストや小規模プロジェクトに最適';
+
+  @override
+  String get api_usage_medium_package_description => '成長中のアプリケーションに最適な価値';
+
+  @override
+  String get api_usage_large_package_description => '企業ニーズに最大の節約';
+
+  @override
+  String get api_usage_most_popular => '人気No.1';
+
+  @override
+  String get api_usage_best_deal => 'お買い得';
+
+  @override
+  String get api_usage_secure_payment_stripe => 'Stripeによる安全なお支払い';
+
+  @override
+  String get api_usage_instant_delivery => '即時配信';
+
+  @override
+  String get api_usage_not_now => '今はしない';
+
+  @override
+  String get api_usage_get_100k_credits => '10万クレジットを取得';
+
+  @override
+  String get api_usage_get_1m_credits => '100万クレジットを取得';
+
+  @override
+  String get api_usage_get_2_5m_credits => '250万クレジットを取得';
+
+  @override
+  String get api_usage_preparing_checkout => '決済を準備中...';
+
+  @override
+  String get api_usage_redirect_to_stripe => 'まもなくStripeにリダイレクトされます';
+
+  @override
+  String get api_usage_checkout_failed => '決済に失敗しました';
+
+  @override
+  String get api_usage_unexpected_error => '予期しないエラーが発生しました';
+
+  @override
+  String get api_usage_close => '閉じる';
+
+  @override
+  String get api_usage_complete_purchase => '購入を完了';
+
+  @override
+  String get api_usage_checkout_opened => '新しいタブで決済が開きました';
+
+  @override
+  String get api_usage_complete_in_stripe =>
+      'Stripeの決済ページで購入を完了し、このページを更新して新しいクレジットを確認してください。';
+
+  @override
+  String get api_usage_secure_payment_powered_by_stripe => 'Stripeによる安全なお支払い';
+
+  @override
+  String get api_usage_refresh_and_close => '更新して閉じる';
+
+  @override
+  String get api_usage_unable_to_verify_account =>
+      'アカウントステータスを確認できませんでした。もう一度お試しください。';
+
+  @override
+  String get api_usage_account_refreshed => 'アカウントを更新しました';
+
+  @override
+  String get api_usage_credits_overview => 'APIクレジット概要';
+
+  @override
+  String get api_usage_total_available => '利用可能合計';
+
+  @override
+  String get api_usage_credits_combined_description => '購入とサブスクリプションのクレジットを合算';
+
+  @override
+  String get api_usage_subscription => 'サブスクリプション';
+
+  @override
+  String get api_usage_subscribe_to_unlock => 'プランをアンロックするには登録してください';
+
+  @override
+  String api_usage_will_renew_monthly(int credits) {
+    return '毎月更新されます $credits';
+  }
+
+  @override
+  String get api_usage_purchased => '購入済み';
+
+  @override
+  String get api_usage_purchased_description => '期限切れのない一度限りの購入クレジット';
+
+  @override
+  String get api_usage_credits_info =>
+      '追加クレジットを購入できます • サブスクリプションクレジットは毎月更新されます';
+
+  @override
+  String get api_usage_inactive => '無効';
+
+  @override
+  String api_usage_created_date(String date) {
+    return '$dateに作成';
+  }
+
+  @override
+  String api_usage_requests_count(int count) {
+    return '$count件のリクエスト';
+  }
+
+  @override
+  String get api_usage_last_30_days => '過去30日間';
+
+  @override
+  String get api_usage_api_key_label => 'APIキー';
+
+  @override
+  String get api_usage_copy_api_key => 'APIキーをコピー';
+
+  @override
+  String get api_usage_account_id => 'アカウントID';
+
+  @override
+  String get api_usage_copy_account_id => 'アカウントIDをコピー';
+
+  @override
+  String get api_usage_account_id_copied => 'アカウントIDをクリップボードにコピーしました';
+
+  @override
+  String get api_usage_create_new_api_key => '新しいAPIキーを作成';
+
+  @override
+  String get api_usage_api_key_name_description =>
+      '後で識別しやすいように、APIキーに説明的な名前を付けてください。';
+
+  @override
+  String get api_usage_api_key_name => 'APIキー名';
+
+  @override
+  String get api_usage_api_key_name_hint => '例: 本番サーバー、モバイルアプリ、テスト';
+
+  @override
+  String get api_usage_name_required => 'APIキーの名前を入力してください';
+
+  @override
+  String get api_usage_name_min_length => '名前は3文字以上である必要があります';
+
+  @override
+  String get api_usage_name_max_length => '名前は50文字未満である必要があります';
+
+  @override
+  String get api_usage_api_key_security_warning =>
+      'このAPIキーにアクセスできる人は、あなたのアカウントと同じ権限を持ちます。安全に保管し、公開しないでください。';
+
+  @override
+  String get api_usage_creating => '作成中...';
+
+  @override
+  String get api_usage_create_api_key => 'APIキーを作成';
+
+  @override
+  String get api_usage_no_credit_history => 'クレジット履歴はまだありません';
+
+  @override
+  String get api_usage_credit_transactions_appear_here => 'クレジット取引がここに表示されます';
+
+  @override
+  String get api_usage_load_more => 'もっと読み込む';
+
+  @override
+  String get api_usage_monthly_subscription => '月額サブスクリプション';
+
+  @override
+  String api_usage_plan_date_subtitle(String planName, String date) {
+    return '$planNameプラン • $date';
+  }
+
+  @override
+  String get api_usage_credit_purchase => 'クレジット購入';
+
+  @override
+  String get api_usage_unknown_transaction => '不明な取引';
+
+  @override
+  String get api_usage_plan_free => '無料';
 }

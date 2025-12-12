@@ -1471,6 +1471,612 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Click expand to see {count}+ more lines'**
   String api_analytics_expand_more_lines(int count);
+
+  /// Main title for API usage page
+  ///
+  /// In en, this message translates to:
+  /// **'Api Credits & Keys'**
+  String get api_usage_page_title;
+
+  /// Refresh button label
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get api_usage_refresh;
+
+  /// Retry button label
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get api_usage_retry;
+
+  /// Overview navigation tab label
+  ///
+  /// In en, this message translates to:
+  /// **'Overview'**
+  String get api_usage_overview;
+
+  /// API Keys navigation tab label
+  ///
+  /// In en, this message translates to:
+  /// **'API Keys'**
+  String get api_usage_api_keys;
+
+  /// History navigation tab label
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get api_usage_history;
+
+  /// Title for API usage overview section
+  ///
+  /// In en, this message translates to:
+  /// **'API Usage Overview'**
+  String get api_usage_overview_title;
+
+  /// Credit history section title
+  ///
+  /// In en, this message translates to:
+  /// **'Credit History'**
+  String get api_usage_credit_history;
+
+  /// Dialog title when new API key is created
+  ///
+  /// In en, this message translates to:
+  /// **'New API Key Created'**
+  String get api_usage_new_api_key_created;
+
+  /// Warning message to save API key
+  ///
+  /// In en, this message translates to:
+  /// **'Please copy and save this API key. You won\'t be able to see it again!'**
+  String get api_usage_copy_api_key_warning;
+
+  /// Snackbar message when API key is copied
+  ///
+  /// In en, this message translates to:
+  /// **'API key copied to clipboard'**
+  String get api_usage_api_key_copied;
+
+  /// Done button label
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get api_usage_done;
+
+  /// Deactivate API key dialog title and tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Deactivate API Key'**
+  String get api_usage_deactivate_api_key;
+
+  /// Confirmation message for deactivating API key
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to deactivate this API key? This action cannot be undone.'**
+  String get api_usage_deactivate_confirmation;
+
+  /// Cancel button label
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get api_usage_cancel;
+
+  /// Deactivate button label
+  ///
+  /// In en, this message translates to:
+  /// **'Deactivate'**
+  String get api_usage_deactivate;
+
+  /// Create key button label
+  ///
+  /// In en, this message translates to:
+  /// **'Create Key'**
+  String get api_usage_create_key;
+
+  /// Empty state message when no API keys exist
+  ///
+  /// In en, this message translates to:
+  /// **'No API keys yet'**
+  String get api_usage_no_api_keys;
+
+  /// Purchase credits section title
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase API Credits'**
+  String get api_usage_purchase_credits;
+
+  /// Best value badge label
+  ///
+  /// In en, this message translates to:
+  /// **'BEST VALUE'**
+  String get api_usage_best_value;
+
+  /// Bulk discount badge label
+  ///
+  /// In en, this message translates to:
+  /// **'BULK DISCOUNT'**
+  String get api_usage_bulk_discount;
+
+  /// Info text about credits not expiring
+  ///
+  /// In en, this message translates to:
+  /// **'Credits never expire • Instant activation'**
+  String get api_usage_credits_never_expire;
+
+  /// Unit price display
+  ///
+  /// In en, this message translates to:
+  /// **'Unit price: {unitPrice}'**
+  String api_usage_unit_price(String unitPrice);
+
+  /// Dialog title when Ultra plan is required
+  ///
+  /// In en, this message translates to:
+  /// **'Ultra Plan Required'**
+  String get api_usage_ultra_plan_required;
+
+  /// Message explaining Ultra plan requirement
+  ///
+  /// In en, this message translates to:
+  /// **'Credit packages are an exclusive benefit for Ultra plan subscribers.'**
+  String get api_usage_ultra_exclusive_benefit;
+
+  /// Benefit item text
+  ///
+  /// In en, this message translates to:
+  /// **'Credits that never expire'**
+  String get api_usage_credits_never_expire_benefit;
+
+  /// Benefit item text
+  ///
+  /// In en, this message translates to:
+  /// **'Perfect for traffic spikes'**
+  String get api_usage_perfect_for_traffic_spikes;
+
+  /// Maybe later button label
+  ///
+  /// In en, this message translates to:
+  /// **'Maybe Later'**
+  String get api_usage_maybe_later;
+
+  /// Upgrade to Ultra button label
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to Ultra'**
+  String get api_usage_upgrade_to_ultra;
+
+  /// Message for upgrade dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock the ability to purchase additional credits that never expire. Perfect for handling traffic spikes and seasonal demands.'**
+  String get api_usage_unlock_credits_message;
+
+  /// Dialog header title
+  ///
+  /// In en, this message translates to:
+  /// **'Get Credits That Never Expire'**
+  String get api_usage_get_credits_title;
+
+  /// Dialog subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Perfect for traffic spikes & long-term planning'**
+  String get api_usage_traffic_spikes_subtitle;
+
+  /// Benefit title
+  ///
+  /// In en, this message translates to:
+  /// **'Credits Never Expire'**
+  String get api_usage_credits_never_expire_title;
+
+  /// Benefit description
+  ///
+  /// In en, this message translates to:
+  /// **'Unlike subscription credits that reset monthly, purchased credits stay in your account forever while your Ultra plan is active.'**
+  String get api_usage_credits_never_expire_description;
+
+  /// Benefit title
+  ///
+  /// In en, this message translates to:
+  /// **'Instant Activation'**
+  String get api_usage_instant_activation_title;
+
+  /// Benefit description
+  ///
+  /// In en, this message translates to:
+  /// **'Credits are added to your account immediately after payment - no waiting, no delays.'**
+  String get api_usage_instant_activation_description;
+
+  /// Benefit title
+  ///
+  /// In en, this message translates to:
+  /// **'Scale Without Limits'**
+  String get api_usage_scale_without_limits_title;
+
+  /// Benefit description
+  ///
+  /// In en, this message translates to:
+  /// **'Handle traffic spikes, seasonal demands, or special projects without upgrading your monthly plan.'**
+  String get api_usage_scale_without_limits_description;
+
+  /// Package selection section title
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Your Package'**
+  String get api_usage_choose_package;
+
+  /// 100K credits package
+  ///
+  /// In en, this message translates to:
+  /// **'100,000 credits'**
+  String get api_usage_100k_credits;
+
+  /// 1M credits package
+  ///
+  /// In en, this message translates to:
+  /// **'1,000,000 credits'**
+  String get api_usage_1m_credits;
+
+  /// 2.5M credits package
+  ///
+  /// In en, this message translates to:
+  /// **'2,500,000 credits'**
+  String get api_usage_2_5m_credits;
+
+  /// Small package description
+  ///
+  /// In en, this message translates to:
+  /// **'Great for testing and small projects'**
+  String get api_usage_small_package_description;
+
+  /// Medium package description
+  ///
+  /// In en, this message translates to:
+  /// **'Best value for growing applications'**
+  String get api_usage_medium_package_description;
+
+  /// Large package description
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum savings for enterprise needs'**
+  String get api_usage_large_package_description;
+
+  /// Most popular badge
+  ///
+  /// In en, this message translates to:
+  /// **'MOST POPULAR'**
+  String get api_usage_most_popular;
+
+  /// Best deal badge
+  ///
+  /// In en, this message translates to:
+  /// **'BEST DEAL'**
+  String get api_usage_best_deal;
+
+  /// Secure payment trust signal
+  ///
+  /// In en, this message translates to:
+  /// **'Secure payment via Stripe'**
+  String get api_usage_secure_payment_stripe;
+
+  /// Instant delivery trust signal
+  ///
+  /// In en, this message translates to:
+  /// **'Instant delivery'**
+  String get api_usage_instant_delivery;
+
+  /// Not now button label
+  ///
+  /// In en, this message translates to:
+  /// **'Not Now'**
+  String get api_usage_not_now;
+
+  /// Get 100K credits button
+  ///
+  /// In en, this message translates to:
+  /// **'Get 100K Credits'**
+  String get api_usage_get_100k_credits;
+
+  /// Get 1M credits button
+  ///
+  /// In en, this message translates to:
+  /// **'Get 1M Credits'**
+  String get api_usage_get_1m_credits;
+
+  /// Get 2.5M credits button
+  ///
+  /// In en, this message translates to:
+  /// **'Get 2.5M Credits'**
+  String get api_usage_get_2_5m_credits;
+
+  /// Checkout loading message
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing checkout...'**
+  String get api_usage_preparing_checkout;
+
+  /// Redirect message
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ll be redirected to Stripe in a moment'**
+  String get api_usage_redirect_to_stripe;
+
+  /// Checkout failed error title
+  ///
+  /// In en, this message translates to:
+  /// **'Checkout Failed'**
+  String get api_usage_checkout_failed;
+
+  /// Generic error message
+  ///
+  /// In en, this message translates to:
+  /// **'An unexpected error occurred'**
+  String get api_usage_unexpected_error;
+
+  /// Close button label
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get api_usage_close;
+
+  /// Complete purchase dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Complete Your Purchase'**
+  String get api_usage_complete_purchase;
+
+  /// Checkout opened message
+  ///
+  /// In en, this message translates to:
+  /// **'Checkout opened in a new tab'**
+  String get api_usage_checkout_opened;
+
+  /// Instructions to complete purchase
+  ///
+  /// In en, this message translates to:
+  /// **'Complete your purchase in the Stripe checkout page, then refresh this page to see your new credits.'**
+  String get api_usage_complete_in_stripe;
+
+  /// Stripe security message
+  ///
+  /// In en, this message translates to:
+  /// **'Secure payment powered by Stripe'**
+  String get api_usage_secure_payment_powered_by_stripe;
+
+  /// Refresh and close button
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh & Close'**
+  String get api_usage_refresh_and_close;
+
+  /// Account verification error
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to verify account status. Please try again.'**
+  String get api_usage_unable_to_verify_account;
+
+  /// Account refreshed snackbar
+  ///
+  /// In en, this message translates to:
+  /// **'Account refreshed'**
+  String get api_usage_account_refreshed;
+
+  /// Credits overview section title
+  ///
+  /// In en, this message translates to:
+  /// **'API Credits Overview'**
+  String get api_usage_credits_overview;
+
+  /// Total available credits label
+  ///
+  /// In en, this message translates to:
+  /// **'Total Available'**
+  String get api_usage_total_available;
+
+  /// Description for total credits
+  ///
+  /// In en, this message translates to:
+  /// **'Credits of purchase and subscription combined'**
+  String get api_usage_credits_combined_description;
+
+  /// Subscription credits label
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription'**
+  String get api_usage_subscription;
+
+  /// Message when user has no plan
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribe to unlock a plan'**
+  String get api_usage_subscribe_to_unlock;
+
+  /// Monthly renewal description
+  ///
+  /// In en, this message translates to:
+  /// **'Will renew monthly {credits}'**
+  String api_usage_will_renew_monthly(int credits);
+
+  /// Purchased credits label
+  ///
+  /// In en, this message translates to:
+  /// **'Purchased'**
+  String get api_usage_purchased;
+
+  /// Description for purchased credits
+  ///
+  /// In en, this message translates to:
+  /// **'One-time purchase credits that never expire'**
+  String get api_usage_purchased_description;
+
+  /// Info text about credits
+  ///
+  /// In en, this message translates to:
+  /// **'You can purchase additional credits • Subscription credits renew monthly'**
+  String get api_usage_credits_info;
+
+  /// Inactive API key badge
+  ///
+  /// In en, this message translates to:
+  /// **'INACTIVE'**
+  String get api_usage_inactive;
+
+  /// API key created date
+  ///
+  /// In en, this message translates to:
+  /// **'Created {date}'**
+  String api_usage_created_date(String date);
+
+  /// Number of requests
+  ///
+  /// In en, this message translates to:
+  /// **'{count} requests'**
+  String api_usage_requests_count(int count);
+
+  /// Last 30 days label
+  ///
+  /// In en, this message translates to:
+  /// **'Last 30 days'**
+  String get api_usage_last_30_days;
+
+  /// API Key field label
+  ///
+  /// In en, this message translates to:
+  /// **'API Key'**
+  String get api_usage_api_key_label;
+
+  /// Copy API key tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Copy API Key'**
+  String get api_usage_copy_api_key;
+
+  /// Account ID label
+  ///
+  /// In en, this message translates to:
+  /// **'Account ID'**
+  String get api_usage_account_id;
+
+  /// Copy account ID tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Account ID'**
+  String get api_usage_copy_account_id;
+
+  /// Account ID copied snackbar
+  ///
+  /// In en, this message translates to:
+  /// **'Account ID copied to clipboard'**
+  String get api_usage_account_id_copied;
+
+  /// Create new API key dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Create New API Key'**
+  String get api_usage_create_new_api_key;
+
+  /// API key name instruction
+  ///
+  /// In en, this message translates to:
+  /// **'Give your API key a descriptive name to help you identify it later.'**
+  String get api_usage_api_key_name_description;
+
+  /// API key name field label
+  ///
+  /// In en, this message translates to:
+  /// **'API Key Name'**
+  String get api_usage_api_key_name;
+
+  /// API key name hint text
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., Production Server, Mobile App, Testing'**
+  String get api_usage_api_key_name_hint;
+
+  /// Name required validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a name for the API key'**
+  String get api_usage_name_required;
+
+  /// Name min length validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Name must be at least 3 characters long'**
+  String get api_usage_name_min_length;
+
+  /// Name max length validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Name must be less than 50 characters'**
+  String get api_usage_name_max_length;
+
+  /// API key security warning
+  ///
+  /// In en, this message translates to:
+  /// **'Whoever has access to this API key will have the same permissions as your account. Keep it secure and do not share it publicly.'**
+  String get api_usage_api_key_security_warning;
+
+  /// Creating button state
+  ///
+  /// In en, this message translates to:
+  /// **'Creating...'**
+  String get api_usage_creating;
+
+  /// Create API key button
+  ///
+  /// In en, this message translates to:
+  /// **'Create API Key'**
+  String get api_usage_create_api_key;
+
+  /// Empty state for credit history
+  ///
+  /// In en, this message translates to:
+  /// **'No credit history yet'**
+  String get api_usage_no_credit_history;
+
+  /// Empty state description for credit history
+  ///
+  /// In en, this message translates to:
+  /// **'Your credit transactions will appear here'**
+  String get api_usage_credit_transactions_appear_here;
+
+  /// Load more button
+  ///
+  /// In en, this message translates to:
+  /// **'Load More'**
+  String get api_usage_load_more;
+
+  /// Monthly subscription transaction title
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Subscription'**
+  String get api_usage_monthly_subscription;
+
+  /// Plan and date subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'{planName} plan • {date}'**
+  String api_usage_plan_date_subtitle(String planName, String date);
+
+  /// Credit purchase transaction title
+  ///
+  /// In en, this message translates to:
+  /// **'Credit Purchase'**
+  String get api_usage_credit_purchase;
+
+  /// Unknown transaction title
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown Transaction'**
+  String get api_usage_unknown_transaction;
+
+  /// Free plan name
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get api_usage_plan_free;
 }
 
 class _AppLocalizationsDelegate

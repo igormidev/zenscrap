@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/core/extensions/plan_tier_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 
@@ -17,6 +18,7 @@ class CreditsOverviewSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final totalCredits = subscriptionCredits + purchasedCredits;
     final creditsOwnedPerMonth = planTier.apiCreditsAddedPerMonth;
 
@@ -35,7 +37,7 @@ class CreditsOverviewSection extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'API Credits Overview',
+                l10n.api_usage_credits_overview,
                 style: context.t.titleLarge,
               ),
               Icon(
@@ -50,8 +52,8 @@ class CreditsOverviewSection extends StatelessWidget {
             children: [
               Expanded(
                 child: CreditItem(
-                  label: 'Total Available',
-                  description: 'Credits of purchase and subscription combined',
+                  label: l10n.api_usage_total_available,
+                  description: l10n.api_usage_credits_combined_description,
                   value: totalCredits.toString(),
                   icon: Icons.check_circle,
                   isHighlighted: true,
@@ -60,10 +62,10 @@ class CreditsOverviewSection extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: CreditItem(
-                  label: 'Subscription',
+                  label: l10n.api_usage_subscription,
                   description: planTier == PlanTier.none
-                      ? 'Subscribe to unlock a plan'
-                      : 'Will renew monthly $creditsOwnedPerMonth',
+                      ? l10n.api_usage_subscribe_to_unlock
+                      : l10n.api_usage_will_renew_monthly(creditsOwnedPerMonth),
                   value: subscriptionCredits.toString(),
                   icon: Icons.calendar_month,
                 ),
@@ -71,8 +73,8 @@ class CreditsOverviewSection extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: CreditItem(
-                  label: 'Purchased',
-                  description: 'One-time purchase credits that never expire',
+                  label: l10n.api_usage_purchased,
+                  description: l10n.api_usage_purchased_description,
                   value: purchasedCredits.toString(),
                   icon: Icons.shopping_cart,
                 ),
@@ -90,7 +92,7 @@ class CreditsOverviewSection extends StatelessWidget {
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  'You can purchase additional credits • Subscription credits renew monthly',
+                  l10n.api_usage_credits_info,
                   style: context.t.labelSmall?.copyWith(
                     color: context.c.onSurfaceVariant.withAlpha(150),
                   ),

@@ -795,4 +795,353 @@ class AppLocalizationsFr extends AppLocalizations {
   String api_analytics_expand_more_lines(int count) {
     return 'Cliquez sur developper pour voir $count+ lignes supplementaires';
   }
+
+  @override
+  String get api_usage_page_title => 'Credits et Cles API';
+
+  @override
+  String get api_usage_refresh => 'Actualiser';
+
+  @override
+  String get api_usage_retry => 'Reessayer';
+
+  @override
+  String get api_usage_overview => 'Apercu';
+
+  @override
+  String get api_usage_api_keys => 'Cles API';
+
+  @override
+  String get api_usage_history => 'Historique';
+
+  @override
+  String get api_usage_overview_title => 'Apercu de l\'utilisation API';
+
+  @override
+  String get api_usage_credit_history => 'Historique des Credits';
+
+  @override
+  String get api_usage_new_api_key_created => 'Nouvelle Cle API Creee';
+
+  @override
+  String get api_usage_copy_api_key_warning =>
+      'Veuillez copier et sauvegarder cette cle API. Vous ne pourrez plus la voir!';
+
+  @override
+  String get api_usage_api_key_copied =>
+      'Cle API copiee dans le presse-papiers';
+
+  @override
+  String get api_usage_done => 'Termine';
+
+  @override
+  String get api_usage_deactivate_api_key => 'Desactiver la Cle API';
+
+  @override
+  String get api_usage_deactivate_confirmation =>
+      'Etes-vous sur de vouloir desactiver cette cle API? Cette action est irreversible.';
+
+  @override
+  String get api_usage_cancel => 'Annuler';
+
+  @override
+  String get api_usage_deactivate => 'Desactiver';
+
+  @override
+  String get api_usage_create_key => 'Creer une Cle';
+
+  @override
+  String get api_usage_no_api_keys => 'Pas encore de cles API';
+
+  @override
+  String get api_usage_purchase_credits => 'Acheter des Credits API';
+
+  @override
+  String get api_usage_best_value => 'MEILLEURE VALEUR';
+
+  @override
+  String get api_usage_bulk_discount => 'REMISE VOLUME';
+
+  @override
+  String get api_usage_credits_never_expire =>
+      'Les credits n\'expirent jamais • Activation instantanee';
+
+  @override
+  String api_usage_unit_price(String unitPrice) {
+    return 'Prix unitaire: $unitPrice';
+  }
+
+  @override
+  String get api_usage_ultra_plan_required => 'Plan Ultra Requis';
+
+  @override
+  String get api_usage_ultra_exclusive_benefit =>
+      'Les paquets de credits sont un avantage exclusif pour les abonnes au plan Ultra.';
+
+  @override
+  String get api_usage_credits_never_expire_benefit =>
+      'Des credits qui n\'expirent jamais';
+
+  @override
+  String get api_usage_perfect_for_traffic_spikes =>
+      'Parfait pour les pics de trafic';
+
+  @override
+  String get api_usage_maybe_later => 'Peut-etre Plus Tard';
+
+  @override
+  String get api_usage_upgrade_to_ultra => 'Passer a Ultra';
+
+  @override
+  String get api_usage_unlock_credits_message =>
+      'Debloquez la possibilite d\'acheter des credits supplementaires qui n\'expirent jamais. Parfait pour gerer les pics de trafic et les demandes saisonnieres.';
+
+  @override
+  String get api_usage_get_credits_title =>
+      'Obtenez des Credits Qui N\'expirent Jamais';
+
+  @override
+  String get api_usage_traffic_spikes_subtitle =>
+      'Parfait pour les pics de trafic et la planification a long terme';
+
+  @override
+  String get api_usage_credits_never_expire_title =>
+      'Les Credits N\'expirent Jamais';
+
+  @override
+  String get api_usage_credits_never_expire_description =>
+      'Contrairement aux credits d\'abonnement qui se reinitialisant mensuellement, les credits achetes restent dans votre compte pour toujours tant que votre plan Ultra est actif.';
+
+  @override
+  String get api_usage_instant_activation_title => 'Activation Instantanee';
+
+  @override
+  String get api_usage_instant_activation_description =>
+      'Les credits sont ajoutes a votre compte immediatement apres le paiement - sans attente, sans delai.';
+
+  @override
+  String get api_usage_scale_without_limits_title => 'Evoluez Sans Limites';
+
+  @override
+  String get api_usage_scale_without_limits_description =>
+      'Gerez les pics de trafic, les demandes saisonnieres ou les projets speciaux sans mettre a niveau votre plan mensuel.';
+
+  @override
+  String get api_usage_choose_package => 'Choisissez Votre Forfait';
+
+  @override
+  String get api_usage_100k_credits => '100 000 credits';
+
+  @override
+  String get api_usage_1m_credits => '1 000 000 credits';
+
+  @override
+  String get api_usage_2_5m_credits => '2 500 000 credits';
+
+  @override
+  String get api_usage_small_package_description =>
+      'Ideal pour les tests et les petits projets';
+
+  @override
+  String get api_usage_medium_package_description =>
+      'Meilleure valeur pour les applications en croissance';
+
+  @override
+  String get api_usage_large_package_description =>
+      'Economies maximales pour les besoins d\'entreprise';
+
+  @override
+  String get api_usage_most_popular => 'LE PLUS POPULAIRE';
+
+  @override
+  String get api_usage_best_deal => 'MEILLEURE OFFRE';
+
+  @override
+  String get api_usage_secure_payment_stripe => 'Paiement securise via Stripe';
+
+  @override
+  String get api_usage_instant_delivery => 'Livraison instantanee';
+
+  @override
+  String get api_usage_not_now => 'Pas Maintenant';
+
+  @override
+  String get api_usage_get_100k_credits => 'Obtenir 100K Credits';
+
+  @override
+  String get api_usage_get_1m_credits => 'Obtenir 1M Credits';
+
+  @override
+  String get api_usage_get_2_5m_credits => 'Obtenir 2,5M Credits';
+
+  @override
+  String get api_usage_preparing_checkout => 'Preparation du paiement...';
+
+  @override
+  String get api_usage_redirect_to_stripe =>
+      'Vous serez redirige vers Stripe dans un instant';
+
+  @override
+  String get api_usage_checkout_failed => 'Echec du Paiement';
+
+  @override
+  String get api_usage_unexpected_error =>
+      'Une erreur inattendue s\'est produite';
+
+  @override
+  String get api_usage_close => 'Fermer';
+
+  @override
+  String get api_usage_complete_purchase => 'Finalisez Votre Achat';
+
+  @override
+  String get api_usage_checkout_opened =>
+      'Paiement ouvert dans un nouvel onglet';
+
+  @override
+  String get api_usage_complete_in_stripe =>
+      'Finalisez votre achat sur la page de paiement Stripe, puis actualisez cette page pour voir vos nouveaux credits.';
+
+  @override
+  String get api_usage_secure_payment_powered_by_stripe =>
+      'Paiement securise propulse par Stripe';
+
+  @override
+  String get api_usage_refresh_and_close => 'Actualiser et Fermer';
+
+  @override
+  String get api_usage_unable_to_verify_account =>
+      'Impossible de verifier le statut du compte. Veuillez reessayer.';
+
+  @override
+  String get api_usage_account_refreshed => 'Compte actualise';
+
+  @override
+  String get api_usage_credits_overview => 'Apercu des Credits API';
+
+  @override
+  String get api_usage_total_available => 'Total Disponible';
+
+  @override
+  String get api_usage_credits_combined_description =>
+      'Credits d\'achat et d\'abonnement combines';
+
+  @override
+  String get api_usage_subscription => 'Abonnement';
+
+  @override
+  String get api_usage_subscribe_to_unlock =>
+      'Abonnez-vous pour debloquer un forfait';
+
+  @override
+  String api_usage_will_renew_monthly(int credits) {
+    return 'Se renouvellera mensuellement $credits';
+  }
+
+  @override
+  String get api_usage_purchased => 'Achetes';
+
+  @override
+  String get api_usage_purchased_description =>
+      'Credits d\'achat unique qui n\'expirent jamais';
+
+  @override
+  String get api_usage_credits_info =>
+      'Vous pouvez acheter des credits supplementaires • Les credits d\'abonnement se renouvellent mensuellement';
+
+  @override
+  String get api_usage_inactive => 'INACTIF';
+
+  @override
+  String api_usage_created_date(String date) {
+    return 'Cree le $date';
+  }
+
+  @override
+  String api_usage_requests_count(int count) {
+    return '$count requetes';
+  }
+
+  @override
+  String get api_usage_last_30_days => '30 derniers jours';
+
+  @override
+  String get api_usage_api_key_label => 'Cle API';
+
+  @override
+  String get api_usage_copy_api_key => 'Copier la Cle API';
+
+  @override
+  String get api_usage_account_id => 'ID du Compte';
+
+  @override
+  String get api_usage_copy_account_id => 'Copier l\'ID du Compte';
+
+  @override
+  String get api_usage_account_id_copied =>
+      'ID du compte copie dans le presse-papiers';
+
+  @override
+  String get api_usage_create_new_api_key => 'Creer une Nouvelle Cle API';
+
+  @override
+  String get api_usage_api_key_name_description =>
+      'Donnez a votre cle API un nom descriptif pour vous aider a l\'identifier plus tard.';
+
+  @override
+  String get api_usage_api_key_name => 'Nom de la Cle API';
+
+  @override
+  String get api_usage_api_key_name_hint =>
+      'ex., Serveur de Production, App Mobile, Tests';
+
+  @override
+  String get api_usage_name_required =>
+      'Veuillez entrer un nom pour la cle API';
+
+  @override
+  String get api_usage_name_min_length =>
+      'Le nom doit contenir au moins 3 caracteres';
+
+  @override
+  String get api_usage_name_max_length =>
+      'Le nom doit contenir moins de 50 caracteres';
+
+  @override
+  String get api_usage_api_key_security_warning =>
+      'Quiconque a acces a cette cle API aura les memes permissions que votre compte. Gardez-la securisee et ne la partagez pas publiquement.';
+
+  @override
+  String get api_usage_creating => 'Creation...';
+
+  @override
+  String get api_usage_create_api_key => 'Creer une Cle API';
+
+  @override
+  String get api_usage_no_credit_history =>
+      'Pas encore d\'historique de credits';
+
+  @override
+  String get api_usage_credit_transactions_appear_here =>
+      'Vos transactions de credits apparaitront ici';
+
+  @override
+  String get api_usage_load_more => 'Charger Plus';
+
+  @override
+  String get api_usage_monthly_subscription => 'Abonnement Mensuel';
+
+  @override
+  String api_usage_plan_date_subtitle(String planName, String date) {
+    return 'Forfait $planName • $date';
+  }
+
+  @override
+  String get api_usage_credit_purchase => 'Achat de Credits';
+
+  @override
+  String get api_usage_unknown_transaction => 'Transaction Inconnue';
+
+  @override
+  String get api_usage_plan_free => 'Gratuit';
 }

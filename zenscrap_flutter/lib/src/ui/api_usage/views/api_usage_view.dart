@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
@@ -95,13 +96,13 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: Text('New API Key Created'),
+        title: Text(AppLocalizations.of(context)!.api_usage_new_api_key_created),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Please copy and save this API key. You won\'t be able to see it again!',
+              AppLocalizations.of(context)!.api_usage_copy_api_key_warning,
               style: context.t.bodyMedium,
             ),
             const SizedBox(height: 16),
@@ -134,7 +135,7 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
 
                       Clipboard.setData(ClipboardData(text: apiKey.apiKey));
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('API key copied to clipboard')),
+                        SnackBar(content: Text(AppLocalizations.of(context)!.api_usage_api_key_copied)),
                       );
                     },
                   ),
@@ -146,7 +147,7 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text('Done'),
+            child: Text(AppLocalizations.of(context)!.api_usage_done),
           ),
         ],
       ),
@@ -171,9 +172,8 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Deactivate API Key'),
-        content: const Text(
-            'Are you sure you want to deactivate this API key? This action cannot be undone.'),
+        title: Text(AppLocalizations.of(context)!.api_usage_deactivate_api_key),
+        content: Text(AppLocalizations.of(context)!.api_usage_deactivate_confirmation),
         actions: [
           TextButton(
             onPressed: () {
@@ -185,14 +185,14 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
                   );
               Navigator.of(context).pop(false);
             },
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.api_usage_cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: TextButton.styleFrom(
               foregroundColor: context.c.error,
             ),
-            child: const Text('Deactivate'),
+            child: Text(AppLocalizations.of(context)!.api_usage_deactivate),
           ),
         ],
       ),
@@ -288,7 +288,7 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
                 ref.read(apiKeysProvider.notifier).refresh();
                 ref.read(apiCreditHistoryProvider.notifier).refresh();
               },
-              child: const Text('Retry'),
+              child: Text(AppLocalizations.of(context)!.api_usage_retry),
             ),
           ],
         ),
@@ -446,7 +446,8 @@ class MobileLayout extends ConsumerWidget {
       ),
     ];
 
-    final tabNames = ['Overview', 'API Keys', 'History'];
+    final l10n = AppLocalizations.of(context)!;
+    final tabNames = [l10n.api_usage_overview, l10n.api_usage_api_keys, l10n.api_usage_history];
 
     return Scaffold(
       body: IndexedStack(
@@ -463,21 +464,21 @@ class MobileLayout extends ConsumerWidget {
               );
           onTabSelected(index);
         },
-        destinations: const [
+        destinations: [
           NavigationDestination(
             icon: Icon(Icons.dashboard_outlined),
             selectedIcon: Icon(Icons.dashboard),
-            label: 'Overview',
+            label: l10n.api_usage_overview,
           ),
           NavigationDestination(
             icon: Icon(Icons.key_outlined),
             selectedIcon: Icon(Icons.key),
-            label: 'API Keys',
+            label: l10n.api_usage_api_keys,
           ),
           NavigationDestination(
             icon: Icon(Icons.history_outlined),
             selectedIcon: Icon(Icons.history),
-            label: 'History',
+            label: l10n.api_usage_history,
           ),
         ],
       ),
@@ -528,7 +529,7 @@ class DesktopLayout extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    'Api Credits & Keys',
+                    AppLocalizations.of(context)!.api_usage_page_title,
                     style: context.t.displaySmall,
                   ),
                 ),
@@ -537,7 +538,7 @@ class DesktopLayout extends StatelessWidget {
                     builder: (context, isRefresh, _) {
                       return FilledButton.tonalIcon(
                         onPressed: isRefresh ? null : onRefresh,
-                        label: Text('Refresh'),
+                        label: Text(AppLocalizations.of(context)!.api_usage_refresh),
                         icon: isRefresh
                             ? CupertinoActivityIndicator()
                             : Icon(Icons.refresh),
@@ -612,7 +613,7 @@ class OverviewTab extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'API Usage Overview',
+            AppLocalizations.of(context)!.api_usage_overview_title,
             style: context.t.headlineMedium,
           ),
           const SizedBox(height: 16),
@@ -649,7 +650,7 @@ class ApiKeysTab extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'API Keys',
+            AppLocalizations.of(context)!.api_usage_api_keys,
             style: context.t.headlineMedium,
           ),
           const SizedBox(height: 16),
@@ -687,7 +688,7 @@ class HistoryTab extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Credit History',
+            AppLocalizations.of(context)!.api_usage_credit_history,
             style: context.t.headlineMedium,
           ),
           const SizedBox(height: 16),

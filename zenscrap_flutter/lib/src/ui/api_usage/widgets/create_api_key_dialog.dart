@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 
 class CreateApiKeyDialog extends StatefulWidget {
@@ -50,6 +51,7 @@ class _CreateApiKeyDialogState extends State<CreateApiKeyDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
@@ -80,7 +82,7 @@ class _CreateApiKeyDialogState extends State<CreateApiKeyDialog> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'Create New API Key',
+                      l10n.api_usage_create_new_api_key,
                       style: context.t.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -98,7 +100,7 @@ class _CreateApiKeyDialogState extends State<CreateApiKeyDialog> {
               ),
               const SizedBox(height: 24),
               Text(
-                'Give your API key a descriptive name to help you identify it later.',
+                l10n.api_usage_api_key_name_description,
                 style: context.t.bodyMedium?.copyWith(
                   color: context.c.onSurface.withAlpha(150),
                 ),
@@ -109,8 +111,8 @@ class _CreateApiKeyDialogState extends State<CreateApiKeyDialog> {
                 enabled: !_isCreating,
                 autofocus: true,
                 decoration: InputDecoration(
-                  labelText: 'API Key Name',
-                  hintText: 'e.g., Production Server, Mobile App, Testing',
+                  labelText: l10n.api_usage_api_key_name,
+                  hintText: l10n.api_usage_api_key_name_hint,
                   prefixIcon: Icon(Icons.label_outline),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -120,13 +122,13 @@ class _CreateApiKeyDialogState extends State<CreateApiKeyDialog> {
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Please enter a name for the API key';
+                    return l10n.api_usage_name_required;
                   }
                   if (value.trim().length < 3) {
-                    return 'Name must be at least 3 characters long';
+                    return l10n.api_usage_name_min_length;
                   }
                   if (value.trim().length > 50) {
-                    return 'Name must be less than 50 characters';
+                    return l10n.api_usage_name_max_length;
                   }
                   return null;
                 },
@@ -152,7 +154,7 @@ class _CreateApiKeyDialogState extends State<CreateApiKeyDialog> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Whoever has access to this API key will have the same permissions as your account. Keep it secure and do not share it publicly.',
+                        l10n.api_usage_api_key_security_warning,
                         style: context.t.bodySmall?.copyWith(
                           color: context.c.onSurface.withAlpha(150),
                         ),
@@ -168,7 +170,7 @@ class _CreateApiKeyDialogState extends State<CreateApiKeyDialog> {
                   TextButton(
                     onPressed:
                         _isCreating ? null : () => Navigator.of(context).pop(),
-                    child: Text('Cancel'),
+                    child: Text(l10n.api_usage_cancel),
                   ),
                   const SizedBox(width: 12),
                   FilledButton.icon(
@@ -184,7 +186,7 @@ class _CreateApiKeyDialogState extends State<CreateApiKeyDialog> {
                             ),
                           )
                         : Icon(Icons.add),
-                    label: Text(_isCreating ? 'Creating...' : 'Create API Key'),
+                    label: Text(_isCreating ? l10n.api_usage_creating : l10n.api_usage_create_api_key),
                   ),
                 ],
               ),

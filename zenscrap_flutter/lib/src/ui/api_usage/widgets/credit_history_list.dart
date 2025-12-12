@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 
@@ -21,6 +22,7 @@ class CreditHistoryList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     if (creditHistory.isEmpty) {
       return Center(
         child: Padding(
@@ -35,14 +37,14 @@ class CreditHistoryList extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'No credit history yet',
+                l10n.api_usage_no_credit_history,
                 style: context.t.bodyLarge?.copyWith(
                   color: context.c.onSurface.withAlpha(150),
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                'Your credit transactions will appear here',
+                l10n.api_usage_credit_transactions_appear_here,
                 style: context.t.bodySmall?.copyWith(
                   color: context.c.onSurface.withAlpha(100),
                 ),
@@ -110,7 +112,7 @@ class CreditHistoryList extends ConsumerWidget {
                           size: 20,
                         ),
                         const SizedBox(width: 8),
-                        Text('Load More'),
+                        Text(l10n.api_usage_load_more),
                       ],
                     ),
             ),
@@ -121,6 +123,7 @@ class CreditHistoryList extends ConsumerWidget {
   }
 
   Widget _buildHistoryItem(BuildContext context, ApiCreditHistoryItem item) {
+    final l10n = AppLocalizations.of(context)!;
     final isSubscription = item.monthlySubscriptionApiCreditDeposit != null;
     final isPurchase = item.apiCreditPackagePurchase != null;
 
@@ -138,21 +141,21 @@ class CreditHistoryList extends ConsumerWidget {
       icon = Icons.calendar_month;
       final deposit = item.monthlySubscriptionApiCreditDeposit!;
       final planName = deposit.planTier == PlanTier.none
-          ? 'Free'
+          ? l10n.api_usage_plan_free
           : deposit.planTier.name.toUpperCase();
-      title = 'Monthly Subscription';
-      subtitle = '$planName plan • $dateStr';
+      title = l10n.api_usage_monthly_subscription;
+      subtitle = l10n.api_usage_plan_date_subtitle(planName, dateStr);
       color = context.c.primary;
       amount = '+${deposit.creditsAmount}';
     } else if (isPurchase) {
       icon = Icons.shopping_cart;
-      title = 'Credit Purchase';
+      title = l10n.api_usage_credit_purchase;
       subtitle = dateStr;
       color = context.c.secondary;
       amount = '+${item.apiCreditPackagePurchase!.value.toInt()}';
     } else {
       icon = Icons.help_outline;
-      title = 'Unknown Transaction';
+      title = l10n.api_usage_unknown_transaction;
       subtitle = dateStr;
       color = context.c.onSurface.withAlpha(150);
       amount = null;

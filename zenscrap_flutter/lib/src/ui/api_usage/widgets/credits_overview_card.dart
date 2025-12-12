@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 
@@ -18,6 +19,7 @@ class CreditsOverviewCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final totalCredits = subscriptionCredits + purchasedCredits;
 
     return Container(
@@ -47,7 +49,7 @@ class CreditsOverviewCard extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'API Credits Overview',
+                l10n.api_usage_credits_overview,
                 style: context.t.headlineSmall?.copyWith(
                   color: context.c.onPrimary,
                   fontWeight: FontWeight.bold,
@@ -66,7 +68,7 @@ class CreditsOverviewCard extends ConsumerWidget {
               Expanded(
                 child: _buildCreditItem(
                   context,
-                  'Total Available',
+                  l10n.api_usage_total_available,
                   totalCredits.toString(),
                   Icons.check_circle,
                   isHighlighted: true,
@@ -76,7 +78,7 @@ class CreditsOverviewCard extends ConsumerWidget {
               Expanded(
                 child: _buildCreditItem(
                   context,
-                  'Subscription',
+                  l10n.api_usage_subscription,
                   subscriptionCredits.toString(),
                   Icons.calendar_month,
                 ),
@@ -85,7 +87,7 @@ class CreditsOverviewCard extends ConsumerWidget {
               Expanded(
                 child: _buildCreditItem(
                   context,
-                  'Purchased',
+                  l10n.api_usage_purchased,
                   purchasedCredits.toString(),
                   Icons.shopping_cart,
                 ),
@@ -112,7 +114,7 @@ class CreditsOverviewCard extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Account ID',
+                        l10n.api_usage_account_id,
                         style: context.t.labelSmall?.copyWith(
                           color: context.c.onPrimary.withAlpha(200),
                         ),
@@ -144,12 +146,12 @@ class CreditsOverviewCard extends ConsumerWidget {
                     Clipboard.setData(ClipboardData(text: accountId));
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Account ID copied to clipboard'),
+                        content: Text(l10n.api_usage_account_id_copied),
                         duration: const Duration(seconds: 2),
                       ),
                     );
                   },
-                  tooltip: 'Copy Account ID',
+                  tooltip: l10n.api_usage_copy_account_id,
                 ),
               ],
             ),

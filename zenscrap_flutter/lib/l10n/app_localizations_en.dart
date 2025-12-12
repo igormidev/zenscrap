@@ -780,4 +780,344 @@ class AppLocalizationsEn extends AppLocalizations {
   String api_analytics_expand_more_lines(int count) {
     return 'Click expand to see $count+ more lines';
   }
+
+  @override
+  String get api_usage_page_title => 'Api Credits & Keys';
+
+  @override
+  String get api_usage_refresh => 'Refresh';
+
+  @override
+  String get api_usage_retry => 'Retry';
+
+  @override
+  String get api_usage_overview => 'Overview';
+
+  @override
+  String get api_usage_api_keys => 'API Keys';
+
+  @override
+  String get api_usage_history => 'History';
+
+  @override
+  String get api_usage_overview_title => 'API Usage Overview';
+
+  @override
+  String get api_usage_credit_history => 'Credit History';
+
+  @override
+  String get api_usage_new_api_key_created => 'New API Key Created';
+
+  @override
+  String get api_usage_copy_api_key_warning =>
+      'Please copy and save this API key. You won\'t be able to see it again!';
+
+  @override
+  String get api_usage_api_key_copied => 'API key copied to clipboard';
+
+  @override
+  String get api_usage_done => 'Done';
+
+  @override
+  String get api_usage_deactivate_api_key => 'Deactivate API Key';
+
+  @override
+  String get api_usage_deactivate_confirmation =>
+      'Are you sure you want to deactivate this API key? This action cannot be undone.';
+
+  @override
+  String get api_usage_cancel => 'Cancel';
+
+  @override
+  String get api_usage_deactivate => 'Deactivate';
+
+  @override
+  String get api_usage_create_key => 'Create Key';
+
+  @override
+  String get api_usage_no_api_keys => 'No API keys yet';
+
+  @override
+  String get api_usage_purchase_credits => 'Purchase API Credits';
+
+  @override
+  String get api_usage_best_value => 'BEST VALUE';
+
+  @override
+  String get api_usage_bulk_discount => 'BULK DISCOUNT';
+
+  @override
+  String get api_usage_credits_never_expire =>
+      'Credits never expire • Instant activation';
+
+  @override
+  String api_usage_unit_price(String unitPrice) {
+    return 'Unit price: $unitPrice';
+  }
+
+  @override
+  String get api_usage_ultra_plan_required => 'Ultra Plan Required';
+
+  @override
+  String get api_usage_ultra_exclusive_benefit =>
+      'Credit packages are an exclusive benefit for Ultra plan subscribers.';
+
+  @override
+  String get api_usage_credits_never_expire_benefit =>
+      'Credits that never expire';
+
+  @override
+  String get api_usage_perfect_for_traffic_spikes =>
+      'Perfect for traffic spikes';
+
+  @override
+  String get api_usage_maybe_later => 'Maybe Later';
+
+  @override
+  String get api_usage_upgrade_to_ultra => 'Upgrade to Ultra';
+
+  @override
+  String get api_usage_unlock_credits_message =>
+      'Unlock the ability to purchase additional credits that never expire. Perfect for handling traffic spikes and seasonal demands.';
+
+  @override
+  String get api_usage_get_credits_title => 'Get Credits That Never Expire';
+
+  @override
+  String get api_usage_traffic_spikes_subtitle =>
+      'Perfect for traffic spikes & long-term planning';
+
+  @override
+  String get api_usage_credits_never_expire_title => 'Credits Never Expire';
+
+  @override
+  String get api_usage_credits_never_expire_description =>
+      'Unlike subscription credits that reset monthly, purchased credits stay in your account forever while your Ultra plan is active.';
+
+  @override
+  String get api_usage_instant_activation_title => 'Instant Activation';
+
+  @override
+  String get api_usage_instant_activation_description =>
+      'Credits are added to your account immediately after payment - no waiting, no delays.';
+
+  @override
+  String get api_usage_scale_without_limits_title => 'Scale Without Limits';
+
+  @override
+  String get api_usage_scale_without_limits_description =>
+      'Handle traffic spikes, seasonal demands, or special projects without upgrading your monthly plan.';
+
+  @override
+  String get api_usage_choose_package => 'Choose Your Package';
+
+  @override
+  String get api_usage_100k_credits => '100,000 credits';
+
+  @override
+  String get api_usage_1m_credits => '1,000,000 credits';
+
+  @override
+  String get api_usage_2_5m_credits => '2,500,000 credits';
+
+  @override
+  String get api_usage_small_package_description =>
+      'Great for testing and small projects';
+
+  @override
+  String get api_usage_medium_package_description =>
+      'Best value for growing applications';
+
+  @override
+  String get api_usage_large_package_description =>
+      'Maximum savings for enterprise needs';
+
+  @override
+  String get api_usage_most_popular => 'MOST POPULAR';
+
+  @override
+  String get api_usage_best_deal => 'BEST DEAL';
+
+  @override
+  String get api_usage_secure_payment_stripe => 'Secure payment via Stripe';
+
+  @override
+  String get api_usage_instant_delivery => 'Instant delivery';
+
+  @override
+  String get api_usage_not_now => 'Not Now';
+
+  @override
+  String get api_usage_get_100k_credits => 'Get 100K Credits';
+
+  @override
+  String get api_usage_get_1m_credits => 'Get 1M Credits';
+
+  @override
+  String get api_usage_get_2_5m_credits => 'Get 2.5M Credits';
+
+  @override
+  String get api_usage_preparing_checkout => 'Preparing checkout...';
+
+  @override
+  String get api_usage_redirect_to_stripe =>
+      'You\'ll be redirected to Stripe in a moment';
+
+  @override
+  String get api_usage_checkout_failed => 'Checkout Failed';
+
+  @override
+  String get api_usage_unexpected_error => 'An unexpected error occurred';
+
+  @override
+  String get api_usage_close => 'Close';
+
+  @override
+  String get api_usage_complete_purchase => 'Complete Your Purchase';
+
+  @override
+  String get api_usage_checkout_opened => 'Checkout opened in a new tab';
+
+  @override
+  String get api_usage_complete_in_stripe =>
+      'Complete your purchase in the Stripe checkout page, then refresh this page to see your new credits.';
+
+  @override
+  String get api_usage_secure_payment_powered_by_stripe =>
+      'Secure payment powered by Stripe';
+
+  @override
+  String get api_usage_refresh_and_close => 'Refresh & Close';
+
+  @override
+  String get api_usage_unable_to_verify_account =>
+      'Unable to verify account status. Please try again.';
+
+  @override
+  String get api_usage_account_refreshed => 'Account refreshed';
+
+  @override
+  String get api_usage_credits_overview => 'API Credits Overview';
+
+  @override
+  String get api_usage_total_available => 'Total Available';
+
+  @override
+  String get api_usage_credits_combined_description =>
+      'Credits of purchase and subscription combined';
+
+  @override
+  String get api_usage_subscription => 'Subscription';
+
+  @override
+  String get api_usage_subscribe_to_unlock => 'Subscribe to unlock a plan';
+
+  @override
+  String api_usage_will_renew_monthly(int credits) {
+    return 'Will renew monthly $credits';
+  }
+
+  @override
+  String get api_usage_purchased => 'Purchased';
+
+  @override
+  String get api_usage_purchased_description =>
+      'One-time purchase credits that never expire';
+
+  @override
+  String get api_usage_credits_info =>
+      'You can purchase additional credits • Subscription credits renew monthly';
+
+  @override
+  String get api_usage_inactive => 'INACTIVE';
+
+  @override
+  String api_usage_created_date(String date) {
+    return 'Created $date';
+  }
+
+  @override
+  String api_usage_requests_count(int count) {
+    return '$count requests';
+  }
+
+  @override
+  String get api_usage_last_30_days => 'Last 30 days';
+
+  @override
+  String get api_usage_api_key_label => 'API Key';
+
+  @override
+  String get api_usage_copy_api_key => 'Copy API Key';
+
+  @override
+  String get api_usage_account_id => 'Account ID';
+
+  @override
+  String get api_usage_copy_account_id => 'Copy Account ID';
+
+  @override
+  String get api_usage_account_id_copied => 'Account ID copied to clipboard';
+
+  @override
+  String get api_usage_create_new_api_key => 'Create New API Key';
+
+  @override
+  String get api_usage_api_key_name_description =>
+      'Give your API key a descriptive name to help you identify it later.';
+
+  @override
+  String get api_usage_api_key_name => 'API Key Name';
+
+  @override
+  String get api_usage_api_key_name_hint =>
+      'e.g., Production Server, Mobile App, Testing';
+
+  @override
+  String get api_usage_name_required => 'Please enter a name for the API key';
+
+  @override
+  String get api_usage_name_min_length =>
+      'Name must be at least 3 characters long';
+
+  @override
+  String get api_usage_name_max_length =>
+      'Name must be less than 50 characters';
+
+  @override
+  String get api_usage_api_key_security_warning =>
+      'Whoever has access to this API key will have the same permissions as your account. Keep it secure and do not share it publicly.';
+
+  @override
+  String get api_usage_creating => 'Creating...';
+
+  @override
+  String get api_usage_create_api_key => 'Create API Key';
+
+  @override
+  String get api_usage_no_credit_history => 'No credit history yet';
+
+  @override
+  String get api_usage_credit_transactions_appear_here =>
+      'Your credit transactions will appear here';
+
+  @override
+  String get api_usage_load_more => 'Load More';
+
+  @override
+  String get api_usage_monthly_subscription => 'Monthly Subscription';
+
+  @override
+  String api_usage_plan_date_subtitle(String planName, String date) {
+    return '$planName plan • $date';
+  }
+
+  @override
+  String get api_usage_credit_purchase => 'Credit Purchase';
+
+  @override
+  String get api_usage_unknown_transaction => 'Unknown Transaction';
+
+  @override
+  String get api_usage_plan_free => 'Free';
 }
