@@ -1616,5 +1616,165 @@
   "auth_google_sign_in_failed": "Google sign-in failed. Please try again or use email.",
   "@auth_google_sign_in_failed": {
     "description": "Google sign in failed error message"
+  },
+
+  "dashboard_app_title": "Zen scrap",
+  "@dashboard_app_title": {
+    "description": "Application title in dashboard appbar"
+  },
+  "dashboard_nav_your_endpoints": "Your endpoints",
+  "@dashboard_nav_your_endpoints": {
+    "description": "Navigation label for user endpoints"
+  },
+  "dashboard_nav_marketplace": "Marketplace",
+  "@dashboard_nav_marketplace": {
+    "description": "Navigation label for marketplace"
+  },
+  "dashboard_nav_credits_keys": "Credits & Keys",
+  "@dashboard_nav_credits_keys": {
+    "description": "Navigation label for credits and API keys"
+  },
+  "dashboard_nav_api_analytics": "Api analytics",
+  "@dashboard_nav_api_analytics": {
+    "description": "Navigation label for API analytics"
+  },
+  "dashboard_nav_account": "Account",
+  "@dashboard_nav_account": {
+    "description": "Navigation label for account settings"
+  },
+  "dashboard_nav_log_out": "Log out",
+  "@dashboard_nav_log_out": {
+    "description": "Navigation label for logging out"
+  },
+  "dashboard_nav_subscription": "Subscription",
+  "@dashboard_nav_subscription": {
+    "description": "Navigation label for subscription/pricing page"
+  },
+  "dashboard_collapse_tab": "Collapse tab",
+  "@dashboard_collapse_tab": {
+    "description": "Button text to collapse navigation sidebar"
+  },
+  "dashboard_app_version": "App version: {version}",
+  "@dashboard_app_version": {
+    "description": "Application version display text",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_version_short": "v{version}",
+  "@dashboard_version_short": {
+    "description": "Short version format for compact display",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+
+  "pricing_per_month": "Per month",
+  "@pricing_per_month": {
+    "description": "Monthly billing label"
+  },
+  "pricing_per_year": "Per year",
+  "@pricing_per_year": {
+    "description": "Yearly billing label"
+  },
+  "pricing_subtitle": "We have you covered, whether you're an unique person running\na side-project, a startup or even an enterprise company.",
+  "@pricing_subtitle": {
+    "description": "Pricing page subtitle"
+  },
+  "pricing_plan_basic": "BASIC",
+  "@pricing_plan_basic": {
+    "description": "Basic plan name"
+  },
+  "pricing_plan_basic_subtitle": "FOR SIDE-PROJECTS",
+  "@pricing_plan_basic_subtitle": {
+    "description": "Basic plan subtitle"
+  },
+  "pricing_plan_pro": "PRO",
+  "@pricing_plan_pro": {
+    "description": "Pro plan name"
+  },
+  "pricing_plan_pro_subtitle": "FOR STARTUP",
+  "@pricing_plan_pro_subtitle": {
+    "description": "Pro plan subtitle"
+  },
+  "pricing_plan_pro_emphasis": "MOST POPULAR",
+  "@pricing_plan_pro_emphasis": {
+    "description": "Pro plan emphasis badge"
+  },
+  "pricing_plan_ultra": "ULTRA",
+  "@pricing_plan_ultra": {
+    "description": "Ultra plan name"
+  },
+  "pricing_plan_ultra_subtitle": "ENTERPRISE USAGE",
+  "@pricing_plan_ultra_subtitle": {
+    "description": "Ultra plan subtitle"
+  },
+  "pricing_feature_api_credits": "{count} api credits",
+  "@pricing_feature_api_credits": {
+    "description": "API credits feature",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "pricing_feature_concurrent_requests": "{count} concurrent requests",
+  "@pricing_feature_concurrent_requests": {
+    "description": "Concurrent requests feature",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "pricing_feature_active_endpoints": "{count} active endpoints",
+  "@pricing_feature_active_endpoints": {
+    "description": "Active endpoints feature",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "pricing_feature_best_ai_model": "Access a best AI model",
+  "@pricing_feature_best_ai_model": {
+    "description": "Best AI model access feature"
+  },
+  "pricing_feature_priority_support": "Priority Support",
+  "@pricing_feature_priority_support": {
+    "description": "Priority support feature"
+  },
+  "pricing_feature_hide_endpoints": "Hide your endpoints from marketplace",
+  "@pricing_feature_hide_endpoints": {
+    "description": "Hide endpoints feature"
+  },
+  "pricing_feature_copy_endpoints": "Copy endpoints from marketplace",
+  "@pricing_feature_copy_endpoints": {
+    "description": "Copy endpoints feature"
+  },
+  "pricing_feature_addon_credits": "Ability to purchase one time add-on api credits",
+  "@pricing_feature_addon_credits": {
+    "description": "Add-on credits feature"
+  },
+  "pricing_sign_in_required": "Please sign in to subscribe",
+  "@pricing_sign_in_required": {
+    "description": "Message when user needs to sign in before subscribing"
+  },
+  "pricing_checkout_error": "Could not open checkout page",
+  "@pricing_checkout_error": {
+    "description": "Error message when checkout page cannot be opened"
+  },
+  "pricing_error_message": "Error: {error}",
+  "@pricing_error_message": {
+    "description": "Generic error message with error details",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
   }
 }

@@ -1198,4 +1198,112 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get auth_google_sign_in_failed =>
       'Googleログインに失敗しました。もう一度お試しいただくか、メールをご利用ください。';
+
+  @override
+  String get dashboard_app_title => 'Zen scrap';
+
+  @override
+  String get dashboard_nav_your_endpoints => 'あなたのエンドポイント';
+
+  @override
+  String get dashboard_nav_marketplace => 'マーケットプレイス';
+
+  @override
+  String get dashboard_nav_credits_keys => 'クレジット＆キー';
+
+  @override
+  String get dashboard_nav_api_analytics => 'API分析';
+
+  @override
+  String get dashboard_nav_account => 'アカウント';
+
+  @override
+  String get dashboard_nav_log_out => 'ログアウト';
+
+  @override
+  String get dashboard_nav_subscription => 'サブスクリプション';
+
+  @override
+  String get dashboard_collapse_tab => 'タブを折りたたむ';
+
+  @override
+  String dashboard_app_version(String version) {
+    return 'アプリバージョン: $version';
+  }
+
+  @override
+  String dashboard_version_short(String version) {
+    return 'v$version';
+  }
+
+  @override
+  String get pricing_per_month => '月額';
+
+  @override
+  String get pricing_per_year => '年額';
+
+  @override
+  String get pricing_subtitle => '個人プロジェクト、スタートアップ、企業まで、\nあらゆるニーズにお応えします。';
+
+  @override
+  String get pricing_plan_basic => 'ベーシック';
+
+  @override
+  String get pricing_plan_basic_subtitle => '個人プロジェクト向け';
+
+  @override
+  String get pricing_plan_pro => 'プロ';
+
+  @override
+  String get pricing_plan_pro_subtitle => 'スタートアップ向け';
+
+  @override
+  String get pricing_plan_pro_emphasis => '人気No.1';
+
+  @override
+  String get pricing_plan_ultra => 'ウルトラ';
+
+  @override
+  String get pricing_plan_ultra_subtitle => '企業向け';
+
+  @override
+  String pricing_feature_api_credits(String count) {
+    return '$count APIクレジット';
+  }
+
+  @override
+  String pricing_feature_concurrent_requests(String count) {
+    return '$count 同時リクエスト';
+  }
+
+  @override
+  String pricing_feature_active_endpoints(String count) {
+    return '$count アクティブエンドポイント';
+  }
+
+  @override
+  String get pricing_feature_best_ai_model => '最高のAIモデルへのアクセス';
+
+  @override
+  String get pricing_feature_priority_support => '優先サポート';
+
+  @override
+  String get pricing_feature_hide_endpoints => 'マーケットプレイスからエンドポイントを非表示';
+
+  @override
+  String get pricing_feature_copy_endpoints => 'マーケットプレイスからエンドポイントをコピー';
+
+  @override
+  String get pricing_feature_addon_credits => '追加APIクレジットの購入が可能';
+
+  @override
+  String get pricing_sign_in_required => 'サブスクリプションにはログインが必要です';
+
+  @override
+  String get pricing_checkout_error => '決済ページを開けませんでした';
+
+  @override
+  String pricing_error_message(String error) {
+    return 'エラー: $error';
+  }
 }

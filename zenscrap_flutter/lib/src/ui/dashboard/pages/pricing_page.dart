@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pricing_page/pricing_page.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
@@ -46,13 +47,13 @@ class RawPricingPageComponent extends ConsumerWidget {
 
     // Track page view when pricing page is displayed
     analytics.trackPricingPageView();
+    final l10n = AppLocalizations.of(context)!;
     return PricingPage(
       width: 865,
       childAspectRatio: 0.45,
-      perMonthText: 'Per month',
-      perYearText: 'Per year',
-      subtitle:
-          "We have you covered, whether you're an unique person running\na side-project, a startup or even an enterprise company.",
+      perMonthText: l10n.pricing_per_month,
+      perYearText: l10n.pricing_per_year,
+      subtitle: l10n.pricing_subtitle,
       decorationMapper: (decoration) {
         return decoration.copyWith(
           color: Theme.of(context).colorScheme.onSecondary,
@@ -60,14 +61,14 @@ class RawPricingPageComponent extends ConsumerWidget {
       },
       pricesList: [
         PricesModel(
-          title: 'BASIC',
-          subTitle: 'FOR SIDE-PROJECTS',
+          title: l10n.pricing_plan_basic,
+          subTitle: l10n.pricing_plan_basic_subtitle,
           monthlyPrice: 100,
           yearlyPrice: 1050,
           advantagesListage: [
-            '<b><u><tC>250.000<tC><u><b> api credits',
-            '<b><u><tC>10<tC><u><b> concurrent requests',
-            '<b><u><tC>3<tC><u><b> active endpoints',
+            '<b><u><tC>250.000<tC><u><b> ${l10n.pricing_feature_api_credits('')}'.replaceFirst(' ', ''),
+            '<b><u><tC>10<tC><u><b> ${l10n.pricing_feature_concurrent_requests('')}'.replaceFirst(' ', ''),
+            '<b><u><tC>3<tC><u><b> ${l10n.pricing_feature_active_endpoints('')}'.replaceFirst(' ', ''),
           ],
           onTap: (bool isYearly) async {
             // Track plan click
@@ -86,6 +87,7 @@ class RawPricingPageComponent extends ConsumerWidget {
               await _handleSubscription(
                 ref,
                 context,
+                l10n,
                 'basic',
                 isYearly,
                 isYearly ? 1050.0 : 100.0,
@@ -94,16 +96,16 @@ class RawPricingPageComponent extends ConsumerWidget {
           },
         ),
         PricesModel(
-          title: 'PRO',
-          subTitle: 'FOR STARTUP',
-          emphasisText: 'MOST POPULAR',
+          title: l10n.pricing_plan_pro,
+          subTitle: l10n.pricing_plan_pro_subtitle,
+          emphasisText: l10n.pricing_plan_pro_emphasis,
           monthlyPrice: 199,
           yearlyPrice: 1999,
           advantagesListage: [
-            '<b><u><tC>1.000.000<tC><u><b> api credits',
-            '<b><u><tC>30<tC><u><b> concurrent requests',
-            '<b><u><tC>10<tC><u><b> active endpoints',
-            'Access a best AI model',
+            '<b><u><tC>1.000.000<tC><u><b> ${l10n.pricing_feature_api_credits('')}'.replaceFirst(' ', ''),
+            '<b><u><tC>30<tC><u><b> ${l10n.pricing_feature_concurrent_requests('')}'.replaceFirst(' ', ''),
+            '<b><u><tC>10<tC><u><b> ${l10n.pricing_feature_active_endpoints('')}'.replaceFirst(' ', ''),
+            l10n.pricing_feature_best_ai_model,
           ],
           onTap: (bool isYearly) async {
             // Track plan click
@@ -122,6 +124,7 @@ class RawPricingPageComponent extends ConsumerWidget {
               await _handleSubscription(
                 ref,
                 context,
+                l10n,
                 'pro',
                 isYearly,
                 isYearly ? 1999.0 : 199.0,
@@ -130,19 +133,19 @@ class RawPricingPageComponent extends ConsumerWidget {
           },
         ),
         PricesModel(
-          title: 'ULTRA',
-          subTitle: 'ENTERPRISE USAGE',
+          title: l10n.pricing_plan_ultra,
+          subTitle: l10n.pricing_plan_ultra_subtitle,
           monthlyPrice: 500,
           yearlyPrice: 5500,
           advantagesListage: [
-            '<b><u><tC>4.000.000<tC><u><b> api credits',
-            '<b><u><tC>100<tC><u><b> concurrent requests',
-            '<b><u><tC>100<tC><u><b> active endpoints',
-            'Access a best AI model',
-            'Priority Support',
-            'Hide your endpoints from marketplace',
-            'Copy endpoints from marketplace',
-            'Ability to purchase one time add-on api credits',
+            '<b><u><tC>4.000.000<tC><u><b> ${l10n.pricing_feature_api_credits('')}'.replaceFirst(' ', ''),
+            '<b><u><tC>100<tC><u><b> ${l10n.pricing_feature_concurrent_requests('')}'.replaceFirst(' ', ''),
+            '<b><u><tC>100<tC><u><b> ${l10n.pricing_feature_active_endpoints('')}'.replaceFirst(' ', ''),
+            l10n.pricing_feature_best_ai_model,
+            l10n.pricing_feature_priority_support,
+            l10n.pricing_feature_hide_endpoints,
+            l10n.pricing_feature_copy_endpoints,
+            l10n.pricing_feature_addon_credits,
           ],
           onTap: (bool isYearly) async {
             // Track plan click
@@ -161,6 +164,7 @@ class RawPricingPageComponent extends ConsumerWidget {
               await _handleSubscription(
                 ref,
                 context,
+                l10n,
                 'ultra',
                 isYearly,
                 isYearly ? 5500.0 : 500.0,
@@ -175,6 +179,7 @@ class RawPricingPageComponent extends ConsumerWidget {
   Future<void> _handleSubscription(
     WidgetRef ref,
     BuildContext context,
+    AppLocalizations l10n,
     String planTier,
     bool isYearly,
     double price,
@@ -191,7 +196,7 @@ class RawPricingPageComponent extends ConsumerWidget {
         );
         if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please sign in to subscribe')),
+          SnackBar(content: Text(l10n.pricing_sign_in_required)),
         );
         await Future.delayed(const Duration(milliseconds: 500));
         // ignore: use_build_context_synchronously
@@ -235,7 +240,7 @@ class RawPricingPageComponent extends ConsumerWidget {
 
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Could not open checkout page')),
+              SnackBar(content: Text(l10n.pricing_checkout_error)),
             );
           }
         }
@@ -258,7 +263,7 @@ class RawPricingPageComponent extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+        ).showSnackBar(SnackBar(content: Text(l10n.pricing_error_message(e.toString()))));
       }
     }
   }

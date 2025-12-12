@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/widgets/account_image.dart';
@@ -22,7 +23,7 @@ class CompactDashboardAppBar extends ConsumerWidget
         icon: const Icon(Icons.menu),
         onPressed: () => Scaffold.of(context).openDrawer(),
       ),
-      title: Text('Zen scrap'),
+      title: Text(AppLocalizations.of(context)!.dashboard_app_title),
       actions: [
         Padding(
           padding: const EdgeInsets.only(right: 16),

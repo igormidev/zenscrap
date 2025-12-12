@@ -1257,4 +1257,118 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get auth_google_sign_in_failed =>
       'Google-Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut oder verwenden Sie E-Mail.';
+
+  @override
+  String get dashboard_app_title => 'Zen scrap';
+
+  @override
+  String get dashboard_nav_your_endpoints => 'Ihre Endpunkte';
+
+  @override
+  String get dashboard_nav_marketplace => 'Marktplatz';
+
+  @override
+  String get dashboard_nav_credits_keys => 'Guthaben & Schluessel';
+
+  @override
+  String get dashboard_nav_api_analytics => 'API-Analytik';
+
+  @override
+  String get dashboard_nav_account => 'Konto';
+
+  @override
+  String get dashboard_nav_log_out => 'Abmelden';
+
+  @override
+  String get dashboard_nav_subscription => 'Abonnement';
+
+  @override
+  String get dashboard_collapse_tab => 'Tab zuklappen';
+
+  @override
+  String dashboard_app_version(String version) {
+    return 'App-Version: $version';
+  }
+
+  @override
+  String dashboard_version_short(String version) {
+    return 'v$version';
+  }
+
+  @override
+  String get pricing_per_month => 'Pro Monat';
+
+  @override
+  String get pricing_per_year => 'Pro Jahr';
+
+  @override
+  String get pricing_subtitle =>
+      'Wir haben Sie abgedeckt, ob Sie eine Einzelperson mit einem\nNebenprojekt, ein Startup oder ein Unternehmen sind.';
+
+  @override
+  String get pricing_plan_basic => 'BASIC';
+
+  @override
+  String get pricing_plan_basic_subtitle => 'FUER NEBENPROJEKTE';
+
+  @override
+  String get pricing_plan_pro => 'PRO';
+
+  @override
+  String get pricing_plan_pro_subtitle => 'FUER STARTUPS';
+
+  @override
+  String get pricing_plan_pro_emphasis => 'AM BELIEBTESTEN';
+
+  @override
+  String get pricing_plan_ultra => 'ULTRA';
+
+  @override
+  String get pricing_plan_ultra_subtitle => 'UNTERNEHMENSNUTZUNG';
+
+  @override
+  String pricing_feature_api_credits(String count) {
+    return '$count API-Guthaben';
+  }
+
+  @override
+  String pricing_feature_concurrent_requests(String count) {
+    return '$count gleichzeitige Anfragen';
+  }
+
+  @override
+  String pricing_feature_active_endpoints(String count) {
+    return '$count aktive Endpunkte';
+  }
+
+  @override
+  String get pricing_feature_best_ai_model => 'Zugang zum besten KI-Modell';
+
+  @override
+  String get pricing_feature_priority_support => 'Prioritaets-Support';
+
+  @override
+  String get pricing_feature_hide_endpoints =>
+      'Endpunkte vom Marktplatz ausblenden';
+
+  @override
+  String get pricing_feature_copy_endpoints =>
+      'Endpunkte vom Marktplatz kopieren';
+
+  @override
+  String get pricing_feature_addon_credits =>
+      'Moeglichkeit, einmalige API-Zusatzguthaben zu kaufen';
+
+  @override
+  String get pricing_sign_in_required =>
+      'Bitte melden Sie sich an, um zu abonnieren';
+
+  @override
+  String get pricing_checkout_error =>
+      'Checkout-Seite konnte nicht geoeffnet werden';
+
+  @override
+  String pricing_error_message(String error) {
+    return 'Fehler: $error';
+  }
 }

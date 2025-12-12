@@ -2287,6 +2287,198 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Google sign-in failed. Please try again or use email.'**
   String get auth_google_sign_in_failed;
+
+  /// Application title in dashboard appbar
+  ///
+  /// In en, this message translates to:
+  /// **'Zen scrap'**
+  String get dashboard_app_title;
+
+  /// Navigation label for user endpoints
+  ///
+  /// In en, this message translates to:
+  /// **'Your endpoints'**
+  String get dashboard_nav_your_endpoints;
+
+  /// Navigation label for marketplace
+  ///
+  /// In en, this message translates to:
+  /// **'Marketplace'**
+  String get dashboard_nav_marketplace;
+
+  /// Navigation label for credits and API keys
+  ///
+  /// In en, this message translates to:
+  /// **'Credits & Keys'**
+  String get dashboard_nav_credits_keys;
+
+  /// Navigation label for API analytics
+  ///
+  /// In en, this message translates to:
+  /// **'Api analytics'**
+  String get dashboard_nav_api_analytics;
+
+  /// Navigation label for account settings
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get dashboard_nav_account;
+
+  /// Navigation label for logging out
+  ///
+  /// In en, this message translates to:
+  /// **'Log out'**
+  String get dashboard_nav_log_out;
+
+  /// Navigation label for subscription/pricing page
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription'**
+  String get dashboard_nav_subscription;
+
+  /// Button text to collapse navigation sidebar
+  ///
+  /// In en, this message translates to:
+  /// **'Collapse tab'**
+  String get dashboard_collapse_tab;
+
+  /// Application version display text
+  ///
+  /// In en, this message translates to:
+  /// **'App version: {version}'**
+  String dashboard_app_version(String version);
+
+  /// Short version format for compact display
+  ///
+  /// In en, this message translates to:
+  /// **'v{version}'**
+  String dashboard_version_short(String version);
+
+  /// Monthly billing label
+  ///
+  /// In en, this message translates to:
+  /// **'Per month'**
+  String get pricing_per_month;
+
+  /// Yearly billing label
+  ///
+  /// In en, this message translates to:
+  /// **'Per year'**
+  String get pricing_per_year;
+
+  /// Pricing page subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'We have you covered, whether you\'re an unique person running\na side-project, a startup or even an enterprise company.'**
+  String get pricing_subtitle;
+
+  /// Basic plan name
+  ///
+  /// In en, this message translates to:
+  /// **'BASIC'**
+  String get pricing_plan_basic;
+
+  /// Basic plan subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'FOR SIDE-PROJECTS'**
+  String get pricing_plan_basic_subtitle;
+
+  /// Pro plan name
+  ///
+  /// In en, this message translates to:
+  /// **'PRO'**
+  String get pricing_plan_pro;
+
+  /// Pro plan subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'FOR STARTUP'**
+  String get pricing_plan_pro_subtitle;
+
+  /// Pro plan emphasis badge
+  ///
+  /// In en, this message translates to:
+  /// **'MOST POPULAR'**
+  String get pricing_plan_pro_emphasis;
+
+  /// Ultra plan name
+  ///
+  /// In en, this message translates to:
+  /// **'ULTRA'**
+  String get pricing_plan_ultra;
+
+  /// Ultra plan subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'ENTERPRISE USAGE'**
+  String get pricing_plan_ultra_subtitle;
+
+  /// API credits feature
+  ///
+  /// In en, this message translates to:
+  /// **'{count} api credits'**
+  String pricing_feature_api_credits(String count);
+
+  /// Concurrent requests feature
+  ///
+  /// In en, this message translates to:
+  /// **'{count} concurrent requests'**
+  String pricing_feature_concurrent_requests(String count);
+
+  /// Active endpoints feature
+  ///
+  /// In en, this message translates to:
+  /// **'{count} active endpoints'**
+  String pricing_feature_active_endpoints(String count);
+
+  /// Best AI model access feature
+  ///
+  /// In en, this message translates to:
+  /// **'Access a best AI model'**
+  String get pricing_feature_best_ai_model;
+
+  /// Priority support feature
+  ///
+  /// In en, this message translates to:
+  /// **'Priority Support'**
+  String get pricing_feature_priority_support;
+
+  /// Hide endpoints feature
+  ///
+  /// In en, this message translates to:
+  /// **'Hide your endpoints from marketplace'**
+  String get pricing_feature_hide_endpoints;
+
+  /// Copy endpoints feature
+  ///
+  /// In en, this message translates to:
+  /// **'Copy endpoints from marketplace'**
+  String get pricing_feature_copy_endpoints;
+
+  /// Add-on credits feature
+  ///
+  /// In en, this message translates to:
+  /// **'Ability to purchase one time add-on api credits'**
+  String get pricing_feature_addon_credits;
+
+  /// Message when user needs to sign in before subscribing
+  ///
+  /// In en, this message translates to:
+  /// **'Please sign in to subscribe'**
+  String get pricing_sign_in_required;
+
+  /// Error message when checkout page cannot be opened
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open checkout page'**
+  String get pricing_checkout_error;
+
+  /// Generic error message with error details
+  ///
+  /// In en, this message translates to:
+  /// **'Error: {error}'**
+  String pricing_error_message(String error);
 }
 
 class _AppLocalizationsDelegate

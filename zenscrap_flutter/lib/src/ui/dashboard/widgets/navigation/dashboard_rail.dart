@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/states/dashboard/dashboard_index_provider.dart';
 import 'package:zenscrap_flutter/src/states/dashboard/possible_navigations_provider.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
@@ -51,7 +52,7 @@ class DashboardRail extends ConsumerWidget {
                     disabled: !isActive,
                     icon: Icon(item.inactiveIcon),
                     selectedIcon: Icon(item.activeIcon),
-                    label: Text(item.label),
+                    label: Text(item.getLocalizedLabel(context)),
                   );
                 },
               ),
@@ -67,7 +68,7 @@ class DashboardRail extends ConsumerWidget {
         ),
         const SizedBox(height: 8),
         VersionIndicator(
-          versionText: (version) => 'v$version',
+          versionText: (version) => AppLocalizations.of(context)!.dashboard_version_short(version),
         ),
         const SizedBox(height: 16),
       ],

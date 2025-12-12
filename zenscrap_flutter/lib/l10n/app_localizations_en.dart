@@ -1235,4 +1235,116 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get auth_google_sign_in_failed =>
       'Google sign-in failed. Please try again or use email.';
+
+  @override
+  String get dashboard_app_title => 'Zen scrap';
+
+  @override
+  String get dashboard_nav_your_endpoints => 'Your endpoints';
+
+  @override
+  String get dashboard_nav_marketplace => 'Marketplace';
+
+  @override
+  String get dashboard_nav_credits_keys => 'Credits & Keys';
+
+  @override
+  String get dashboard_nav_api_analytics => 'Api analytics';
+
+  @override
+  String get dashboard_nav_account => 'Account';
+
+  @override
+  String get dashboard_nav_log_out => 'Log out';
+
+  @override
+  String get dashboard_nav_subscription => 'Subscription';
+
+  @override
+  String get dashboard_collapse_tab => 'Collapse tab';
+
+  @override
+  String dashboard_app_version(String version) {
+    return 'App version: $version';
+  }
+
+  @override
+  String dashboard_version_short(String version) {
+    return 'v$version';
+  }
+
+  @override
+  String get pricing_per_month => 'Per month';
+
+  @override
+  String get pricing_per_year => 'Per year';
+
+  @override
+  String get pricing_subtitle =>
+      'We have you covered, whether you\'re an unique person running\na side-project, a startup or even an enterprise company.';
+
+  @override
+  String get pricing_plan_basic => 'BASIC';
+
+  @override
+  String get pricing_plan_basic_subtitle => 'FOR SIDE-PROJECTS';
+
+  @override
+  String get pricing_plan_pro => 'PRO';
+
+  @override
+  String get pricing_plan_pro_subtitle => 'FOR STARTUP';
+
+  @override
+  String get pricing_plan_pro_emphasis => 'MOST POPULAR';
+
+  @override
+  String get pricing_plan_ultra => 'ULTRA';
+
+  @override
+  String get pricing_plan_ultra_subtitle => 'ENTERPRISE USAGE';
+
+  @override
+  String pricing_feature_api_credits(String count) {
+    return '$count api credits';
+  }
+
+  @override
+  String pricing_feature_concurrent_requests(String count) {
+    return '$count concurrent requests';
+  }
+
+  @override
+  String pricing_feature_active_endpoints(String count) {
+    return '$count active endpoints';
+  }
+
+  @override
+  String get pricing_feature_best_ai_model => 'Access a best AI model';
+
+  @override
+  String get pricing_feature_priority_support => 'Priority Support';
+
+  @override
+  String get pricing_feature_hide_endpoints =>
+      'Hide your endpoints from marketplace';
+
+  @override
+  String get pricing_feature_copy_endpoints =>
+      'Copy endpoints from marketplace';
+
+  @override
+  String get pricing_feature_addon_credits =>
+      'Ability to purchase one time add-on api credits';
+
+  @override
+  String get pricing_sign_in_required => 'Please sign in to subscribe';
+
+  @override
+  String get pricing_checkout_error => 'Could not open checkout page';
+
+  @override
+  String pricing_error_message(String error) {
+    return 'Error: $error';
+  }
 }
