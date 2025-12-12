@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/analytics/analytics_provider.dart';
@@ -8,18 +9,19 @@ import 'package:zenscrap_flutter/src/states/analytics/analytics_provider.dart';
 class ScopeSelectorDropdown extends ConsumerWidget {
   const ScopeSelectorDropdown({super.key});
 
-  String _getScopeLabel(AnalyticsTimeScope scope) {
+  String _getScopeLabel(BuildContext context, AnalyticsTimeScope scope) {
+    final l10n = AppLocalizations.of(context)!;
     switch (scope) {
       case AnalyticsTimeScope.lastHour:
-        return 'Last Hour';
+        return l10n.api_analytics_scope_last_hour;
       case AnalyticsTimeScope.last12Hours:
-        return 'Last 12 Hours';
+        return l10n.api_analytics_scope_last_12_hours;
       case AnalyticsTimeScope.last24Hours:
-        return 'Last 24 Hours';
+        return l10n.api_analytics_scope_last_24_hours;
       case AnalyticsTimeScope.last7Days:
-        return 'Last 7 Days';
+        return l10n.api_analytics_scope_last_7_days;
       case AnalyticsTimeScope.last30Days:
-        return 'Last 30 Days';
+        return l10n.api_analytics_scope_last_30_days;
     }
   }
 
@@ -73,7 +75,7 @@ class ScopeSelectorDropdown extends ConsumerWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  _getScopeLabel(scope),
+                  _getScopeLabel(context, scope),
                   style: context.t.labelLarge?.copyWith(
                     color: context.c.onSurface,
                   ),

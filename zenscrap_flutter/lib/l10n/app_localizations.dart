@@ -1096,6 +1096,381 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Load More'**
   String get ai_usage_load_more;
+
+  /// Main title for API analytics page
+  ///
+  /// In en, this message translates to:
+  /// **'API Analytics'**
+  String get api_analytics_title;
+
+  /// Retry button text
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get api_analytics_retry;
+
+  /// Refresh button text
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get api_analytics_refresh;
+
+  /// Load more button text
+  ///
+  /// In en, this message translates to:
+  /// **'Load More'**
+  String get api_analytics_load_more;
+
+  /// Title when no scrappable is selected
+  ///
+  /// In en, this message translates to:
+  /// **'No Scrappable Selected'**
+  String get api_analytics_no_scrappable_selected;
+
+  /// Hint text to select a scrappable
+  ///
+  /// In en, this message translates to:
+  /// **'Select a scrappable from the list to view detailed analytics'**
+  String get api_analytics_select_scrappable_hint;
+
+  /// Message when there are no more analytics to load
+  ///
+  /// In en, this message translates to:
+  /// **'No more analytics to load'**
+  String get api_analytics_no_more_to_load;
+
+  /// Error title when analytics fail to load
+  ///
+  /// In en, this message translates to:
+  /// **'Error Loading Analytics'**
+  String get api_analytics_error_loading;
+
+  /// Shows count of items displayed
+  ///
+  /// In en, this message translates to:
+  /// **'Showing {current} of {total}'**
+  String api_analytics_showing_count(int current, int total);
+
+  /// Items count display
+  ///
+  /// In en, this message translates to:
+  /// **'{current} of {total}'**
+  String api_analytics_items_count(int current, int total);
+
+  /// Success status label
+  ///
+  /// In en, this message translates to:
+  /// **'Success'**
+  String get api_analytics_status_success;
+
+  /// Client error status label
+  ///
+  /// In en, this message translates to:
+  /// **'Client Error'**
+  String get api_analytics_status_client_error;
+
+  /// Server error status label
+  ///
+  /// In en, this message translates to:
+  /// **'Server Error'**
+  String get api_analytics_status_server_error;
+
+  /// Insufficient credits status label
+  ///
+  /// In en, this message translates to:
+  /// **'Insufficient Credits'**
+  String get api_analytics_status_insufficient_credits;
+
+  /// Max concurrency exceeded status label
+  ///
+  /// In en, this message translates to:
+  /// **'Max Concurrency'**
+  String get api_analytics_status_max_concurrency;
+
+  /// Extract rules error status label
+  ///
+  /// In en, this message translates to:
+  /// **'Extract Rules Error'**
+  String get api_analytics_status_extract_rules_error;
+
+  /// 4xx status code label
+  ///
+  /// In en, this message translates to:
+  /// **'4xx'**
+  String get api_analytics_status_4xx;
+
+  /// 5xx status code label
+  ///
+  /// In en, this message translates to:
+  /// **'5xx'**
+  String get api_analytics_status_5xx;
+
+  /// 2xx status code label
+  ///
+  /// In en, this message translates to:
+  /// **'2xx'**
+  String get api_analytics_status_2xx;
+
+  /// No credits stat card label
+  ///
+  /// In en, this message translates to:
+  /// **'No Credits'**
+  String get api_analytics_stat_no_credits;
+
+  /// Extract rules errors stat card label
+  ///
+  /// In en, this message translates to:
+  /// **'Extract rules errors'**
+  String get api_analytics_stat_extract_rules_errors;
+
+  /// Tooltip for success status
+  ///
+  /// In en, this message translates to:
+  /// **'Requests completed successfully'**
+  String get api_analytics_tooltip_success;
+
+  /// Tooltip for client error status
+  ///
+  /// In en, this message translates to:
+  /// **'Client errors - invalid request parameters or missing data'**
+  String get api_analytics_tooltip_client_error;
+
+  /// Tooltip for server error status
+  ///
+  /// In en, this message translates to:
+  /// **'Server errors - issues with the target website'**
+  String get api_analytics_tooltip_server_error;
+
+  /// Tooltip for extract rules error status
+  ///
+  /// In en, this message translates to:
+  /// **'The AI-generated extract rules failed to parse the response'**
+  String get api_analytics_tooltip_extract_rules_error;
+
+  /// Tooltip for insufficient credits status
+  ///
+  /// In en, this message translates to:
+  /// **'Requests failed due to insufficient credits'**
+  String get api_analytics_tooltip_insufficient_credits;
+
+  /// Tooltip for max concurrency status
+  ///
+  /// In en, this message translates to:
+  /// **'Requests rejected due to concurrency limit'**
+  String get api_analytics_tooltip_max_concurrency;
+
+  /// Last hour time scope option
+  ///
+  /// In en, this message translates to:
+  /// **'Last Hour'**
+  String get api_analytics_scope_last_hour;
+
+  /// Last 12 hours time scope option
+  ///
+  /// In en, this message translates to:
+  /// **'Last 12 Hours'**
+  String get api_analytics_scope_last_12_hours;
+
+  /// Last 24 hours time scope option
+  ///
+  /// In en, this message translates to:
+  /// **'Last 24 Hours'**
+  String get api_analytics_scope_last_24_hours;
+
+  /// Last 7 days time scope option
+  ///
+  /// In en, this message translates to:
+  /// **'Last 7 Days'**
+  String get api_analytics_scope_last_7_days;
+
+  /// Last 30 days time scope option
+  ///
+  /// In en, this message translates to:
+  /// **'Last 30 Days'**
+  String get api_analytics_scope_last_30_days;
+
+  /// Scope explanation for last hour
+  ///
+  /// In en, this message translates to:
+  /// **'Each column represents 5 minutes'**
+  String get api_analytics_column_5_minutes;
+
+  /// Scope explanation for last 12 hours
+  ///
+  /// In en, this message translates to:
+  /// **'Each column represents 1 hour'**
+  String get api_analytics_column_1_hour;
+
+  /// Scope explanation for last 24 hours
+  ///
+  /// In en, this message translates to:
+  /// **'Each column represents 2 hours'**
+  String get api_analytics_column_2_hours;
+
+  /// Scope explanation for last 7 or 30 days
+  ///
+  /// In en, this message translates to:
+  /// **'Each column represents 1 day'**
+  String get api_analytics_column_1_day;
+
+  /// Warning about request delay
+  ///
+  /// In en, this message translates to:
+  /// **'A request can take up to 10 minutes to appear here'**
+  String get api_analytics_request_delay_warning;
+
+  /// Empty state for scrappable with no requests
+  ///
+  /// In en, this message translates to:
+  /// **'No requests'**
+  String get api_analytics_no_requests;
+
+  /// Max concurrency exceeded chip label
+  ///
+  /// In en, this message translates to:
+  /// **'Max concurrency exceeded'**
+  String get api_analytics_max_concurrency_exceeded;
+
+  /// Insufficient credits chip label
+  ///
+  /// In en, this message translates to:
+  /// **'Insufficient credits'**
+  String get api_analytics_insufficient_credits_chip;
+
+  /// Last 12 hours badge label
+  ///
+  /// In en, this message translates to:
+  /// **'Last 12 hours'**
+  String get api_analytics_last_12_hours;
+
+  /// Total requests count in tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Total: {count} requests'**
+  String api_analytics_total_requests(int count);
+
+  /// Success count in tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Success: {count} ({percentage}%)'**
+  String api_analytics_tooltip_success_count(int count, String percentage);
+
+  /// 4xx error count in tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'4xx: {count} ({percentage}%)'**
+  String api_analytics_tooltip_4xx_count(int count, String percentage);
+
+  /// 5xx error count in tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'5xx: {count} ({percentage}%)'**
+  String api_analytics_tooltip_5xx_count(int count, String percentage);
+
+  /// ScrapingBee error count in tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'ScrapingBee Error: {count} ({percentage}%)'**
+  String api_analytics_tooltip_scraping_bee_error(int count, String percentage);
+
+  /// No credits count in tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'No Credits: {count} ({percentage}%)'**
+  String api_analytics_tooltip_no_credits_count(int count, String percentage);
+
+  /// Max concurrency count in tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Max Concurrency: {count} ({percentage}%)'**
+  String api_analytics_tooltip_max_concurrency_count(
+    int count,
+    String percentage,
+  );
+
+  /// Show less tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Show less'**
+  String get api_analytics_show_less;
+
+  /// Show details tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Show details'**
+  String get api_analytics_show_details;
+
+  /// Title field label in details
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get api_analytics_detail_title;
+
+  /// Description field label in details
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get api_analytics_detail_description;
+
+  /// Error object field label in details
+  ///
+  /// In en, this message translates to:
+  /// **'Error Object'**
+  String get api_analytics_detail_error_object;
+
+  /// Stack trace field label in details
+  ///
+  /// In en, this message translates to:
+  /// **'Stack Trace'**
+  String get api_analytics_detail_stack_trace;
+
+  /// Request payload field label in details
+  ///
+  /// In en, this message translates to:
+  /// **'Request Payload'**
+  String get api_analytics_detail_request_payload;
+
+  /// Response data field label in details
+  ///
+  /// In en, this message translates to:
+  /// **'Response Data'**
+  String get api_analytics_detail_response_data;
+
+  /// Success badge text
+  ///
+  /// In en, this message translates to:
+  /// **'SUCCESS'**
+  String get api_analytics_success_badge;
+
+  /// Collapse tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Collapse'**
+  String get api_analytics_collapse;
+
+  /// Expand tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Expand'**
+  String get api_analytics_expand;
+
+  /// Snackbar message when content is copied
+  ///
+  /// In en, this message translates to:
+  /// **'{label} copied to clipboard'**
+  String api_analytics_copied_to_clipboard(String label);
+
+  /// Copy button tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Copy {label}'**
+  String api_analytics_copy_label(String label);
+
+  /// Message to expand more lines
+  ///
+  /// In en, this message translates to:
+  /// **'Click expand to see {count}+ more lines'**
+  String api_analytics_expand_more_lines(int count);
 }
 
 class _AppLocalizationsDelegate

@@ -563,4 +563,235 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get ai_usage_load_more => 'Mehr laden';
+
+  @override
+  String get api_analytics_title => 'API-Analytik';
+
+  @override
+  String get api_analytics_retry => 'Erneut versuchen';
+
+  @override
+  String get api_analytics_refresh => 'Aktualisieren';
+
+  @override
+  String get api_analytics_load_more => 'Mehr laden';
+
+  @override
+  String get api_analytics_no_scrappable_selected =>
+      'Kein Scrappable ausgewaehlt';
+
+  @override
+  String get api_analytics_select_scrappable_hint =>
+      'Waehlen Sie ein Scrappable aus der Liste, um detaillierte Analytik anzuzeigen';
+
+  @override
+  String get api_analytics_no_more_to_load =>
+      'Keine weiteren Analytiken zu laden';
+
+  @override
+  String get api_analytics_error_loading => 'Fehler beim Laden der Analytik';
+
+  @override
+  String api_analytics_showing_count(int current, int total) {
+    return 'Zeige $current von $total';
+  }
+
+  @override
+  String api_analytics_items_count(int current, int total) {
+    return '$current von $total';
+  }
+
+  @override
+  String get api_analytics_status_success => 'Erfolgreich';
+
+  @override
+  String get api_analytics_status_client_error => 'Client-Fehler';
+
+  @override
+  String get api_analytics_status_server_error => 'Server-Fehler';
+
+  @override
+  String get api_analytics_status_insufficient_credits =>
+      'Ungenuegend Guthaben';
+
+  @override
+  String get api_analytics_status_max_concurrency => 'Max. Parallelitaet';
+
+  @override
+  String get api_analytics_status_extract_rules_error =>
+      'Extraktionsregel-Fehler';
+
+  @override
+  String get api_analytics_status_4xx => '4xx';
+
+  @override
+  String get api_analytics_status_5xx => '5xx';
+
+  @override
+  String get api_analytics_status_2xx => '2xx';
+
+  @override
+  String get api_analytics_stat_no_credits => 'Kein Guthaben';
+
+  @override
+  String get api_analytics_stat_extract_rules_errors =>
+      'Extraktionsregel-Fehler';
+
+  @override
+  String get api_analytics_tooltip_success =>
+      'Anfragen erfolgreich abgeschlossen';
+
+  @override
+  String get api_analytics_tooltip_client_error =>
+      'Client-Fehler - ungueltige Anfrageparameter oder fehlende Daten';
+
+  @override
+  String get api_analytics_tooltip_server_error =>
+      'Server-Fehler - Probleme mit der Zielwebsite';
+
+  @override
+  String get api_analytics_tooltip_extract_rules_error =>
+      'Die KI-generierten Extraktionsregeln konnten die Antwort nicht analysieren';
+
+  @override
+  String get api_analytics_tooltip_insufficient_credits =>
+      'Anfragen aufgrund unzureichenden Guthabens fehlgeschlagen';
+
+  @override
+  String get api_analytics_tooltip_max_concurrency =>
+      'Anfragen aufgrund des Parallelitaetslimits abgelehnt';
+
+  @override
+  String get api_analytics_scope_last_hour => 'Letzte Stunde';
+
+  @override
+  String get api_analytics_scope_last_12_hours => 'Letzte 12 Stunden';
+
+  @override
+  String get api_analytics_scope_last_24_hours => 'Letzte 24 Stunden';
+
+  @override
+  String get api_analytics_scope_last_7_days => 'Letzte 7 Tage';
+
+  @override
+  String get api_analytics_scope_last_30_days => 'Letzte 30 Tage';
+
+  @override
+  String get api_analytics_column_5_minutes =>
+      'Jede Spalte entspricht 5 Minuten';
+
+  @override
+  String get api_analytics_column_1_hour => 'Jede Spalte entspricht 1 Stunde';
+
+  @override
+  String get api_analytics_column_2_hours => 'Jede Spalte entspricht 2 Stunden';
+
+  @override
+  String get api_analytics_column_1_day => 'Jede Spalte entspricht 1 Tag';
+
+  @override
+  String get api_analytics_request_delay_warning =>
+      'Eine Anfrage kann bis zu 10 Minuten brauchen, um hier zu erscheinen';
+
+  @override
+  String get api_analytics_no_requests => 'Keine Anfragen';
+
+  @override
+  String get api_analytics_max_concurrency_exceeded =>
+      'Maximale Parallelitaet ueberschritten';
+
+  @override
+  String get api_analytics_insufficient_credits_chip => 'Ungenuegend Guthaben';
+
+  @override
+  String get api_analytics_last_12_hours => 'Letzte 12 Stunden';
+
+  @override
+  String api_analytics_total_requests(int count) {
+    return 'Gesamt: $count Anfragen';
+  }
+
+  @override
+  String api_analytics_tooltip_success_count(int count, String percentage) {
+    return 'Erfolgreich: $count ($percentage%)';
+  }
+
+  @override
+  String api_analytics_tooltip_4xx_count(int count, String percentage) {
+    return '4xx: $count ($percentage%)';
+  }
+
+  @override
+  String api_analytics_tooltip_5xx_count(int count, String percentage) {
+    return '5xx: $count ($percentage%)';
+  }
+
+  @override
+  String api_analytics_tooltip_scraping_bee_error(
+    int count,
+    String percentage,
+  ) {
+    return 'ScrapingBee-Fehler: $count ($percentage%)';
+  }
+
+  @override
+  String api_analytics_tooltip_no_credits_count(int count, String percentage) {
+    return 'Kein Guthaben: $count ($percentage%)';
+  }
+
+  @override
+  String api_analytics_tooltip_max_concurrency_count(
+    int count,
+    String percentage,
+  ) {
+    return 'Max. Parallelitaet: $count ($percentage%)';
+  }
+
+  @override
+  String get api_analytics_show_less => 'Weniger anzeigen';
+
+  @override
+  String get api_analytics_show_details => 'Details anzeigen';
+
+  @override
+  String get api_analytics_detail_title => 'Titel';
+
+  @override
+  String get api_analytics_detail_description => 'Beschreibung';
+
+  @override
+  String get api_analytics_detail_error_object => 'Fehlerobjekt';
+
+  @override
+  String get api_analytics_detail_stack_trace => 'Stack-Trace';
+
+  @override
+  String get api_analytics_detail_request_payload => 'Anfrage-Payload';
+
+  @override
+  String get api_analytics_detail_response_data => 'Antwortdaten';
+
+  @override
+  String get api_analytics_success_badge => 'ERFOLGREICH';
+
+  @override
+  String get api_analytics_collapse => 'Zuklappen';
+
+  @override
+  String get api_analytics_expand => 'Aufklappen';
+
+  @override
+  String api_analytics_copied_to_clipboard(String label) {
+    return '$label in Zwischenablage kopiert';
+  }
+
+  @override
+  String api_analytics_copy_label(String label) {
+    return '$label kopieren';
+  }
+
+  @override
+  String api_analytics_expand_more_lines(int count) {
+    return 'Klicken Sie auf Aufklappen, um $count+ weitere Zeilen zu sehen';
+  }
 }

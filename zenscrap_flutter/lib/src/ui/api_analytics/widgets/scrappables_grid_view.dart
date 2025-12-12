@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
@@ -32,18 +33,19 @@ class ScrappablesGridView extends ConsumerStatefulWidget {
 class _ScrappablesGridViewState extends ConsumerState<ScrappablesGridView> {
   int? _selectedCardIndex;
 
-  String _getScopeExplanation() {
+  String _getScopeExplanation(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     switch (widget.data.scope) {
       case AnalyticsTimeScope.lastHour:
-        return 'Each column represents 5 minutes';
+        return l10n.api_analytics_column_5_minutes;
       case AnalyticsTimeScope.last12Hours:
-        return 'Each column represents 1 hour';
+        return l10n.api_analytics_column_1_hour;
       case AnalyticsTimeScope.last24Hours:
-        return 'Each column represents 2 hours';
+        return l10n.api_analytics_column_2_hours;
       case AnalyticsTimeScope.last7Days:
-        return 'Each column represents 1 day';
+        return l10n.api_analytics_column_1_day;
       case AnalyticsTimeScope.last30Days:
-        return 'Each column represents 1 day';
+        return l10n.api_analytics_column_1_day;
     }
   }
 
@@ -143,7 +145,10 @@ class _ScrappablesGridViewState extends ConsumerState<ScrappablesGridView> {
           ),
         );
       },
-      child: Column(
+      child: Builder(
+        builder: (context) {
+          final l10n = AppLocalizations.of(context)!;
+          return Column(
         children: [
           const SizedBox(height: 12),
           // Header with title, scope selector, and refresh button
@@ -151,7 +156,7 @@ class _ScrappablesGridViewState extends ConsumerState<ScrappablesGridView> {
             children: [
               Expanded(
                 child: Text(
-                  'API Analytics',
+                  l10n.api_analytics_title,
                   style: context.t.displaySmall,
                 ),
               ),
@@ -180,7 +185,7 @@ class _ScrappablesGridViewState extends ConsumerState<ScrappablesGridView> {
                               widget.isRefreshVN.value = false;
                             }
                           },
-                    label: const Text('Refresh'),
+                    label: Text(l10n.api_analytics_refresh),
                     icon: isRefresh
                         ? const CupertinoActivityIndicator()
                         : const Icon(Icons.refresh),
@@ -214,7 +219,7 @@ class _ScrappablesGridViewState extends ConsumerState<ScrappablesGridView> {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      'A request can take up to 10 minutes to appear here',
+                      l10n.api_analytics_request_delay_warning,
                       style: context.t.bodySmall?.copyWith(
                         color: context.c.onSurface.withAlpha(150),
                       ),
@@ -245,7 +250,7 @@ class _ScrappablesGridViewState extends ConsumerState<ScrappablesGridView> {
                     Padding(
                       padding: const EdgeInsets.only(top: 1),
                       child: Text(
-                        _getScopeExplanation(),
+                        _getScopeExplanation(context),
                         // 'A request can take up to 10 minutes to appear here',
                         style: context.t.bodySmall?.copyWith(
                           color: context.c.onSurface.withAlpha(150),
@@ -291,6 +296,8 @@ class _ScrappablesGridViewState extends ConsumerState<ScrappablesGridView> {
             ),
           ),
         ],
+      );
+        },
       ),
     );
   }

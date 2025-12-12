@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/ui/api_analytics/widgets/stat_card.dart';
 
@@ -13,6 +14,7 @@ class AnalyticsStatsSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     // Calculate totals from all loaded items
     int totalSuccess = 0;
     int totalClientError = 0;
@@ -60,45 +62,45 @@ class AnalyticsStatsSummary extends StatelessWidget {
               children: [
                 SizedBox(width: 16),
                 StatCard(
-                  label: 'Success',
+                  label: l10n.api_analytics_status_success,
                   count: totalSuccess,
                   color: Colors.green,
-                  tooltip: 'Requests completed successfully',
+                  tooltip: l10n.api_analytics_tooltip_success,
                 ),
                 const SizedBox(width: 16),
                 StatCard(
-                  label: '4xx',
+                  label: l10n.api_analytics_status_4xx,
                   count: totalClientError,
                   color: Colors.orange,
-                  tooltip: 'Client errors - invalid request parameters or missing data',
+                  tooltip: l10n.api_analytics_tooltip_client_error,
                 ),
                 const SizedBox(width: 16),
                 StatCard(
-                  label: '5xx',
+                  label: l10n.api_analytics_status_5xx,
                   count: totalServerError,
                   color: Colors.red,
-                  tooltip: 'Server errors - issues with the target website',
+                  tooltip: l10n.api_analytics_tooltip_server_error,
                 ),
                 const SizedBox(width: 16),
                 StatCard(
-                  label: 'Extract rules errors',
+                  label: l10n.api_analytics_stat_extract_rules_errors,
                   count: totalFailedAtScrappingBee,
                   color: const Color(0xFFE91E63),
-                  tooltip: 'The AI-generated extract rules failed to parse the response',
+                  tooltip: l10n.api_analytics_tooltip_extract_rules_error,
                 ),
                 const SizedBox(width: 16),
                 StatCard(
-                  label: 'No Credits',
+                  label: l10n.api_analytics_stat_no_credits,
                   count: totalInsufficientCredits,
                   color: Colors.purple,
-                  tooltip: 'Requests failed due to insufficient credits',
+                  tooltip: l10n.api_analytics_tooltip_insufficient_credits,
                 ),
                 const SizedBox(width: 16),
                 StatCard(
-                  label: 'Max Concurrency',
+                  label: l10n.api_analytics_status_max_concurrency,
                   count: totalMaxConcurrency,
                   color: Colors.cyan,
-                  tooltip: 'Requests rejected due to concurrency limit',
+                  tooltip: l10n.api_analytics_tooltip_max_concurrency,
                 ),
               ],
             ),
@@ -127,7 +129,7 @@ class AnalyticsStatsSummary extends StatelessWidget {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    'Showing ${data.items.length} of ${data.totalCount}',
+                    l10n.api_analytics_showing_count(data.items.length, data.totalCount),
                     style: context.t.bodySmall?.copyWith(
                       color: context.c.onSurface.withAlpha(150),
                     ),

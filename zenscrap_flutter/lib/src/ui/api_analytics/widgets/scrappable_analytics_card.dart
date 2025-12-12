@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/core/extensions/request_status_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
@@ -242,6 +243,7 @@ class EmptyIndicatorOfRequests extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -264,7 +266,7 @@ class EmptyIndicatorOfRequests extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'No requests',
+            l10n.api_analytics_no_requests,
             style: context.t.labelSmall?.copyWith(
               color: context.c.onSurfaceVariant.withAlpha(150),
             ),

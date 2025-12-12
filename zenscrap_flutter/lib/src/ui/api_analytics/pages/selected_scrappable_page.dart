@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/analytics/selected_scrappable_provider.dart';
@@ -182,12 +183,13 @@ class _LoadMoreSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     if (!data.hasNextPage) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 16),
         child: Center(
           child: Text(
-            'No more analytics to load',
+            l10n.api_analytics_no_more_to_load,
             style: context.t.bodyMedium?.copyWith(
               color: context.c.onSurface.withAlpha(150),
             ),
@@ -214,7 +216,7 @@ class _LoadMoreSection extends ConsumerWidget {
                       .loadMoreAnalytics();
                 },
                 icon: const Icon(Icons.add),
-                label: const Text('Load More'),
+                label: Text(l10n.api_analytics_load_more),
               ),
       ),
     );
@@ -230,6 +232,7 @@ class _AnalyticsErrorState extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -241,7 +244,7 @@ class _AnalyticsErrorState extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'Error Loading Analytics',
+            l10n.api_analytics_error_loading,
             style: context.t.headlineSmall?.copyWith(
               color: context.c.error,
             ),
@@ -261,7 +264,7 @@ class _AnalyticsErrorState extends ConsumerWidget {
                   .read(selectedScrappableAnalyticsProvider.notifier)
                   .resetState();
             },
-            child: const Text('Retry'),
+            child: Text(l10n.api_analytics_retry),
           ),
         ],
       ),

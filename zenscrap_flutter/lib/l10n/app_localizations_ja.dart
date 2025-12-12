@@ -544,4 +544,225 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get ai_usage_load_more => 'もっと読み込む';
+
+  @override
+  String get api_analytics_title => 'API分析';
+
+  @override
+  String get api_analytics_retry => '再試行';
+
+  @override
+  String get api_analytics_refresh => '更新';
+
+  @override
+  String get api_analytics_load_more => 'もっと読み込む';
+
+  @override
+  String get api_analytics_no_scrappable_selected => 'Scrappableが選択されていません';
+
+  @override
+  String get api_analytics_select_scrappable_hint =>
+      'リストからScrappableを選択して詳細な分析を表示してください';
+
+  @override
+  String get api_analytics_no_more_to_load => 'これ以上の分析データはありません';
+
+  @override
+  String get api_analytics_error_loading => '分析の読み込みエラー';
+
+  @override
+  String api_analytics_showing_count(int current, int total) {
+    return '$total件中$current件を表示';
+  }
+
+  @override
+  String api_analytics_items_count(int current, int total) {
+    return '$total件中$current件';
+  }
+
+  @override
+  String get api_analytics_status_success => '成功';
+
+  @override
+  String get api_analytics_status_client_error => 'クライアントエラー';
+
+  @override
+  String get api_analytics_status_server_error => 'サーバーエラー';
+
+  @override
+  String get api_analytics_status_insufficient_credits => 'クレジット不足';
+
+  @override
+  String get api_analytics_status_max_concurrency => '最大同時実行数';
+
+  @override
+  String get api_analytics_status_extract_rules_error => '抽出ルールエラー';
+
+  @override
+  String get api_analytics_status_4xx => '4xx';
+
+  @override
+  String get api_analytics_status_5xx => '5xx';
+
+  @override
+  String get api_analytics_status_2xx => '2xx';
+
+  @override
+  String get api_analytics_stat_no_credits => 'クレジットなし';
+
+  @override
+  String get api_analytics_stat_extract_rules_errors => '抽出ルールエラー';
+
+  @override
+  String get api_analytics_tooltip_success => '正常に完了したリクエスト';
+
+  @override
+  String get api_analytics_tooltip_client_error =>
+      'クライアントエラー - 無効なリクエストパラメータまたはデータ不足';
+
+  @override
+  String get api_analytics_tooltip_server_error => 'サーバーエラー - 対象ウェブサイトの問題';
+
+  @override
+  String get api_analytics_tooltip_extract_rules_error =>
+      'AI生成の抽出ルールがレスポンスを解析できませんでした';
+
+  @override
+  String get api_analytics_tooltip_insufficient_credits =>
+      'クレジット不足によりリクエストが失敗しました';
+
+  @override
+  String get api_analytics_tooltip_max_concurrency => '同時実行数制限によりリクエストが拒否されました';
+
+  @override
+  String get api_analytics_scope_last_hour => '過去1時間';
+
+  @override
+  String get api_analytics_scope_last_12_hours => '過去12時間';
+
+  @override
+  String get api_analytics_scope_last_24_hours => '過去24時間';
+
+  @override
+  String get api_analytics_scope_last_7_days => '過去7日間';
+
+  @override
+  String get api_analytics_scope_last_30_days => '過去30日間';
+
+  @override
+  String get api_analytics_column_5_minutes => '各列は5分を表します';
+
+  @override
+  String get api_analytics_column_1_hour => '各列は1時間を表します';
+
+  @override
+  String get api_analytics_column_2_hours => '各列は2時間を表します';
+
+  @override
+  String get api_analytics_column_1_day => '各列は1日を表します';
+
+  @override
+  String get api_analytics_request_delay_warning =>
+      'リクエストがここに表示されるまで最大10分かかる場合があります';
+
+  @override
+  String get api_analytics_no_requests => 'リクエストなし';
+
+  @override
+  String get api_analytics_max_concurrency_exceeded => '最大同時実行数超過';
+
+  @override
+  String get api_analytics_insufficient_credits_chip => 'クレジット不足';
+
+  @override
+  String get api_analytics_last_12_hours => '過去12時間';
+
+  @override
+  String api_analytics_total_requests(int count) {
+    return '合計: $count件のリクエスト';
+  }
+
+  @override
+  String api_analytics_tooltip_success_count(int count, String percentage) {
+    return '成功: $count件 ($percentage%)';
+  }
+
+  @override
+  String api_analytics_tooltip_4xx_count(int count, String percentage) {
+    return '4xx: $count件 ($percentage%)';
+  }
+
+  @override
+  String api_analytics_tooltip_5xx_count(int count, String percentage) {
+    return '5xx: $count件 ($percentage%)';
+  }
+
+  @override
+  String api_analytics_tooltip_scraping_bee_error(
+    int count,
+    String percentage,
+  ) {
+    return 'ScrapingBeeエラー: $count件 ($percentage%)';
+  }
+
+  @override
+  String api_analytics_tooltip_no_credits_count(int count, String percentage) {
+    return 'クレジットなし: $count件 ($percentage%)';
+  }
+
+  @override
+  String api_analytics_tooltip_max_concurrency_count(
+    int count,
+    String percentage,
+  ) {
+    return '最大同時実行数: $count件 ($percentage%)';
+  }
+
+  @override
+  String get api_analytics_show_less => '閉じる';
+
+  @override
+  String get api_analytics_show_details => '詳細を表示';
+
+  @override
+  String get api_analytics_detail_title => 'タイトル';
+
+  @override
+  String get api_analytics_detail_description => '説明';
+
+  @override
+  String get api_analytics_detail_error_object => 'エラーオブジェクト';
+
+  @override
+  String get api_analytics_detail_stack_trace => 'スタックトレース';
+
+  @override
+  String get api_analytics_detail_request_payload => 'リクエストペイロード';
+
+  @override
+  String get api_analytics_detail_response_data => 'レスポンスデータ';
+
+  @override
+  String get api_analytics_success_badge => '成功';
+
+  @override
+  String get api_analytics_collapse => '折りたたむ';
+
+  @override
+  String get api_analytics_expand => '展開';
+
+  @override
+  String api_analytics_copied_to_clipboard(String label) {
+    return '$labelをクリップボードにコピーしました';
+  }
+
+  @override
+  String api_analytics_copy_label(String label) {
+    return '$labelをコピー';
+  }
+
+  @override
+  String api_analytics_expand_more_lines(int count) {
+    return '展開をクリックして残り$count行以上を表示';
+  }
 }
