@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_validator/form_validator.dart';
 import 'package:lottie/lottie.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
@@ -157,7 +158,7 @@ class _HeroSectionState extends ConsumerState<HeroSection>
               children: [
                 // Headline
                 Text(
-                      'Web Scrapers That\nFix Themselves',
+                      AppLocalizations.of(context)!.landing_hero_title,
                       style: context.t.displayLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: context.c.onSurface,
@@ -173,7 +174,7 @@ class _HeroSectionState extends ConsumerState<HeroSection>
                 ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 520),
                       child: Text(
-                        'Describe what you want to extract. Our AI builds, tests, and maintains your scraper automatically. No code. No CSS selectors. No broken endpoints.',
+                        AppLocalizations.of(context)!.landing_hero_subtitle,
                         style: context.t.titleMedium?.copyWith(
                           color: context.c.onSurfaceVariant,
                           height: 1.6,
@@ -195,20 +196,20 @@ class _HeroSectionState extends ConsumerState<HeroSection>
                       children: [
                         ZenTextfield(
                               controller: _referenceLinkEC,
-                              labelText: 'Target URL',
-                              hintText: 'https://example.com/product/12345',
+                              labelText: AppLocalizations.of(context)!.landing_hero_target_url_label,
+                              hintText: AppLocalizations.of(context)!.landing_hero_target_url_hint,
                               onSubmitted: (_) => _submitForm(),
                               maxLines: 1,
                               validator: (s) =>
                                   ValidationBuilder()
-                                      .url('Please enter a valid URL')
+                                      .url(AppLocalizations.of(context)!.landing_hero_url_validation_invalid)
                                       .minLength(
                                         10,
-                                        'URL must be at least 10 characters',
+                                        AppLocalizations.of(context)!.landing_hero_url_validation_min_length,
                                       )
                                       .maxLength(
                                         500,
-                                        'URL must be less than 500 characters',
+                                        AppLocalizations.of(context)!.landing_hero_url_validation_max_length,
                                       )
                                       .build()(
                                     s?.startsWith('http') == true
@@ -241,9 +242,9 @@ class _HeroSectionState extends ConsumerState<HeroSection>
                                 },
                                 child: ZenTextfield(
                                   controller: _promptEC,
-                                  labelText: 'What do you want to extract?',
+                                  labelText: AppLocalizations.of(context)!.landing_hero_prompt_label,
                                   hintText:
-                                      'E.g. Extract product name, price, and images',
+                                      AppLocalizations.of(context)!.landing_hero_prompt_hint,
                                   expands: true,
                                   maxLines: null,
                                   minLines: null,
@@ -251,11 +252,11 @@ class _HeroSectionState extends ConsumerState<HeroSection>
                                   validator: ValidationBuilder()
                                       .minLength(
                                         10,
-                                        'Prompt must be at least 10 characters',
+                                        AppLocalizations.of(context)!.landing_hero_prompt_validation_min_length,
                                       )
                                       .maxLength(
                                         2200,
-                                        'Prompt must be less than 2200 characters',
+                                        AppLocalizations.of(context)!.landing_hero_prompt_validation_max_length,
                                       )
                                       .build(),
                                 ),
@@ -270,8 +271,8 @@ class _HeroSectionState extends ConsumerState<HeroSection>
                                 FilledButton.icon(
                                   onPressed: _submitForm,
                                   icon: const Icon(Icons.auto_awesome_rounded),
-                                  label: const Text(
-                                    'Create Your First Scraper',
+                                  label: Text(
+                                    AppLocalizations.of(context)!.landing_hero_cta_button,
                                   ),
                                   style: FilledButton.styleFrom(
                                     padding: const EdgeInsets.symmetric(
@@ -285,7 +286,7 @@ class _HeroSectionState extends ConsumerState<HeroSection>
                                 ),
                                 const SizedBox(width: 16),
                                 Text(
-                                  'Free',
+                                  AppLocalizations.of(context)!.landing_hero_free_label,
                                   style: context.t.labelLarge?.copyWith(
                                     color: context.c.primary,
                                     fontWeight: FontWeight.w600,

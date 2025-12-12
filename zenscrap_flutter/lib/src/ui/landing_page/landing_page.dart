@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 import 'package:simple_platform/simple_platform.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
@@ -482,7 +483,7 @@ class _LandingPageState extends ConsumerState<LandingPage>
                       child: Column(
                         children: [
                           Text(
-                            'Simple, Transparent Pricing',
+                            AppLocalizations.of(context)!.landing_pricing_title,
                             style: context.t.displaySmall?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: context.c.onSurface,
@@ -491,7 +492,7 @@ class _LandingPageState extends ConsumerState<LandingPage>
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            'Choose the plan that fits your needs. Scale as you grow.',
+                            AppLocalizations.of(context)!.landing_pricing_subtitle,
                             style: context.t.titleMedium?.copyWith(
                               color: context.c.onSurfaceVariant,
                             ),
@@ -556,7 +557,7 @@ class _LandingPageState extends ConsumerState<LandingPage>
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
-                                  'Learn more',
+                                  AppLocalizations.of(context)!.landing_learn_more,
                                   style: context.t.labelMedium?.copyWith(
                                     color: context.c.onSurfaceVariant,
                                   ),

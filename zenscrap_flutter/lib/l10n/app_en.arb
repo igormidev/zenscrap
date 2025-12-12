@@ -1,3 +1,425 @@
 {
-  "@@locale": "en"
+  "@@locale": "en",
+
+  "landing_nav_create_scrappable": "Create Scrappable",
+  "@landing_nav_create_scrappable": {
+    "description": "Navigation item for creating a new scrappable"
+  },
+  "landing_nav_how_it_works": "How It Works",
+  "@landing_nav_how_it_works": {
+    "description": "Navigation item for how it works section"
+  },
+  "landing_nav_auto_fix": "Auto-Fix",
+  "@landing_nav_auto_fix": {
+    "description": "Navigation item for auto-fix section"
+  },
+  "landing_nav_features": "Features",
+  "@landing_nav_features": {
+    "description": "Navigation item for features section"
+  },
+  "landing_nav_marketplace": "Marketplace",
+  "@landing_nav_marketplace": {
+    "description": "Navigation item for marketplace section"
+  },
+  "landing_nav_pricing": "Pricing",
+  "@landing_nav_pricing": {
+    "description": "Navigation item for pricing section"
+  },
+  "landing_sign_in": "Sign In",
+  "@landing_sign_in": {
+    "description": "Sign in button text"
+  },
+  "landing_app_name": "ZenScrap",
+  "@landing_app_name": {
+    "description": "Application name"
+  },
+  "landing_learn_more": "Learn more",
+  "@landing_learn_more": {
+    "description": "Learn more scroll indicator text"
+  },
+
+  "landing_hero_title": "Web Scrapers That\nFix Themselves",
+  "@landing_hero_title": {
+    "description": "Main hero section headline"
+  },
+  "landing_hero_subtitle": "Describe what you want to extract. Our AI builds, tests, and maintains your scraper automatically. No code. No CSS selectors. No broken endpoints.",
+  "@landing_hero_subtitle": {
+    "description": "Hero section subheadline"
+  },
+  "landing_hero_target_url_label": "Target URL",
+  "@landing_hero_target_url_label": {
+    "description": "Label for target URL input field"
+  },
+  "landing_hero_target_url_hint": "https://example.com/product/12345",
+  "@landing_hero_target_url_hint": {
+    "description": "Hint text for target URL input field"
+  },
+  "landing_hero_url_validation_invalid": "Please enter a valid URL",
+  "@landing_hero_url_validation_invalid": {
+    "description": "Validation error for invalid URL"
+  },
+  "landing_hero_url_validation_min_length": "URL must be at least 10 characters",
+  "@landing_hero_url_validation_min_length": {
+    "description": "Validation error for URL minimum length"
+  },
+  "landing_hero_url_validation_max_length": "URL must be less than 500 characters",
+  "@landing_hero_url_validation_max_length": {
+    "description": "Validation error for URL maximum length"
+  },
+  "landing_hero_prompt_label": "What do you want to extract?",
+  "@landing_hero_prompt_label": {
+    "description": "Label for prompt input field"
+  },
+  "landing_hero_prompt_hint": "E.g. Extract product name, price, and images",
+  "@landing_hero_prompt_hint": {
+    "description": "Hint text for prompt input field"
+  },
+  "landing_hero_prompt_validation_min_length": "Prompt must be at least 10 characters",
+  "@landing_hero_prompt_validation_min_length": {
+    "description": "Validation error for prompt minimum length"
+  },
+  "landing_hero_prompt_validation_max_length": "Prompt must be less than 2200 characters",
+  "@landing_hero_prompt_validation_max_length": {
+    "description": "Validation error for prompt maximum length"
+  },
+  "landing_hero_cta_button": "Create Your First Scraper",
+  "@landing_hero_cta_button": {
+    "description": "Call-to-action button text in hero section"
+  },
+  "landing_hero_free_label": "Free",
+  "@landing_hero_free_label": {
+    "description": "Free label next to CTA button"
+  },
+
+  "landing_trust_no_credit_card": "No credit card required",
+  "@landing_trust_no_credit_card": {
+    "description": "Trust badge - no credit card needed"
+  },
+  "landing_trust_no_signup": "No signup to test",
+  "@landing_trust_no_signup": {
+    "description": "Trust badge - no signup required"
+  },
+  "landing_trust_ready_in_minutes": "Ready in under 2 minutes",
+  "@landing_trust_ready_in_minutes": {
+    "description": "Trust badge - quick setup time"
+  },
+
+  "landing_problem_title": "Traditional Web Scraping is Broken",
+  "@landing_problem_title": {
+    "description": "Problem section main title"
+  },
+  "landing_problem_subtitle": "Hours lost to CSS selectors. Scrapers that break every week. Anti-bot systems that block your requests. Sound familiar?",
+  "@landing_problem_subtitle": {
+    "description": "Problem section subtitle"
+  },
+  "landing_problem_css_title": "CSS Selector Hell",
+  "@landing_problem_css_title": {
+    "description": "Problem card title - CSS selectors"
+  },
+  "landing_problem_css_description": "Hunting through HTML to find the right selectors, only to have them break when the site updates.",
+  "@landing_problem_css_description": {
+    "description": "Problem card description - CSS selectors"
+  },
+  "landing_problem_maintenance_title": "Constant Maintenance",
+  "@landing_problem_maintenance_title": {
+    "description": "Problem card title - maintenance"
+  },
+  "landing_problem_maintenance_description": "Websites change their structure constantly. Your scraper worked yesterday—today it returns empty data.",
+  "@landing_problem_maintenance_description": {
+    "description": "Problem card description - maintenance"
+  },
+  "landing_problem_antibot_title": "Anti-Bot Nightmares",
+  "@landing_problem_antibot_title": {
+    "description": "Problem card title - anti-bot"
+  },
+  "landing_problem_antibot_description": "CAPTCHAs, rate limits, IP bans. Fighting anti-bot systems is a full-time job.",
+  "@landing_problem_antibot_description": {
+    "description": "Problem card description - anti-bot"
+  },
+  "landing_problem_productivity_title": "Lost Productivity",
+  "@landing_problem_productivity_title": {
+    "description": "Problem card title - productivity"
+  },
+  "landing_problem_productivity_description": "Every hour debugging scrapers is an hour not spent on your actual business.",
+  "@landing_problem_productivity_description": {
+    "description": "Problem card description - productivity"
+  },
+
+  "landing_how_title": "Three Steps to Automated Data",
+  "@landing_how_title": {
+    "description": "How it works section main title"
+  },
+  "landing_how_subtitle": "No code. No configuration. Just describe what you need.",
+  "@landing_how_subtitle": {
+    "description": "How it works section subtitle"
+  },
+  "landing_how_step1_title": "Paste Your URL",
+  "@landing_how_step1_title": {
+    "description": "Step 1 title"
+  },
+  "landing_how_step1_description": "Drop the link to the page you want to extract data from. Any website, any complexity.",
+  "@landing_how_step1_description": {
+    "description": "Step 1 description"
+  },
+  "landing_how_step2_title": "Describe What You Want",
+  "@landing_how_step2_title": {
+    "description": "Step 2 title"
+  },
+  "landing_how_step2_description": "Tell our AI in plain language what data you need. Product prices, article content, user profiles—anything.",
+  "@landing_how_step2_description": {
+    "description": "Step 2 description"
+  },
+  "landing_how_step3_title": "Get Your Self-Healing API",
+  "@landing_how_step3_title": {
+    "description": "Step 3 title"
+  },
+  "landing_how_step3_description": "Receive a ready-to-use API endpoint that automatically adapts when the target site changes.",
+  "@landing_how_step3_description": {
+    "description": "Step 3 description"
+  },
+  "landing_how_ai_note": "AI automatically generates name, description, category, and URL patterns",
+  "@landing_how_ai_note": {
+    "description": "Note about AI capabilities"
+  },
+
+  "landing_autofix_badge": "INDUSTRY FIRST",
+  "@landing_autofix_badge": {
+    "description": "Auto-fix section badge text"
+  },
+  "landing_autofix_title": "The Self-Healing Web Scraper",
+  "@landing_autofix_title": {
+    "description": "Auto-fix section main title"
+  },
+  "landing_autofix_subtitle": "Websites change. Your scrapers don't have to break. Our AI automatically detects when a target site updates and fixes your extraction rules—before you even notice.",
+  "@landing_autofix_subtitle": {
+    "description": "Auto-fix section subtitle"
+  },
+  "landing_autofix_step1_title": "Site Changes Detected",
+  "@landing_autofix_step1_title": {
+    "description": "Auto-fix step 1 title"
+  },
+  "landing_autofix_step1_description": "Our system monitors your scrapers and detects when extraction rules start failing.",
+  "@landing_autofix_step1_description": {
+    "description": "Auto-fix step 1 description"
+  },
+  "landing_autofix_step2_title": "AI Analyzes & Adapts",
+  "@landing_autofix_step2_title": {
+    "description": "Auto-fix step 2 title"
+  },
+  "landing_autofix_step2_description": "The AI examines the new page structure and generates updated extraction rules.",
+  "@landing_autofix_step2_description": {
+    "description": "Auto-fix step 2 description"
+  },
+  "landing_autofix_step3_title": "Scraper Fixed",
+  "@landing_autofix_step3_title": {
+    "description": "Auto-fix step 3 title"
+  },
+  "landing_autofix_step3_description": "Your endpoint continues working seamlessly. You receive an email notification.",
+  "@landing_autofix_step3_description": {
+    "description": "Auto-fix step 3 description"
+  },
+  "landing_autofix_notifications_title": "Proactive Notifications",
+  "@landing_autofix_notifications_title": {
+    "description": "Notifications feature title"
+  },
+  "landing_autofix_notifications_description": "Get notified when a site changes and your scraper is being auto-fixed.",
+  "@landing_autofix_notifications_description": {
+    "description": "Notifications feature description"
+  },
+  "landing_autofix_without_title": "Without ZenScrap",
+  "@landing_autofix_without_title": {
+    "description": "Comparison column title - without"
+  },
+  "landing_autofix_without_item1": "Scraper breaks unexpectedly",
+  "@landing_autofix_without_item1": {
+    "description": "Without ZenScrap item 1"
+  },
+  "landing_autofix_without_item2": "Hours spent debugging",
+  "@landing_autofix_without_item2": {
+    "description": "Without ZenScrap item 2"
+  },
+  "landing_autofix_without_item3": "Lost data and revenue",
+  "@landing_autofix_without_item3": {
+    "description": "Without ZenScrap item 3"
+  },
+  "landing_autofix_without_item4": "Constant maintenance burden",
+  "@landing_autofix_without_item4": {
+    "description": "Without ZenScrap item 4"
+  },
+  "landing_autofix_with_title": "With ZenScrap",
+  "@landing_autofix_with_title": {
+    "description": "Comparison column title - with"
+  },
+  "landing_autofix_with_item1": "AI detects issues instantly",
+  "@landing_autofix_with_item1": {
+    "description": "With ZenScrap item 1"
+  },
+  "landing_autofix_with_item2": "Automatic fixes in minutes",
+  "@landing_autofix_with_item2": {
+    "description": "With ZenScrap item 2"
+  },
+  "landing_autofix_with_item3": "Zero data loss",
+  "@landing_autofix_with_item3": {
+    "description": "With ZenScrap item 3"
+  },
+  "landing_autofix_with_item4": "Set it and forget it",
+  "@landing_autofix_with_item4": {
+    "description": "With ZenScrap item 4"
+  },
+
+  "landing_features_title": "Built for the Modern Web",
+  "@landing_features_title": {
+    "description": "Features section main title"
+  },
+  "landing_features_subtitle": "Enterprise-grade infrastructure wrapped in a simple interface.",
+  "@landing_features_subtitle": {
+    "description": "Features section subtitle"
+  },
+  "landing_features_cost_title": "Smart Cost Optimization",
+  "@landing_features_cost_title": {
+    "description": "Feature card title - cost optimization"
+  },
+  "landing_features_cost_description": "AI automatically tests configurations and finds the cheapest option that works. No wasted credits.",
+  "@landing_features_cost_description": {
+    "description": "Feature card description - cost optimization"
+  },
+  "landing_features_antibot_title": "Anti-Bot Handled",
+  "@landing_features_antibot_title": {
+    "description": "Feature card title - anti-bot"
+  },
+  "landing_features_antibot_description": "CAPTCHAs, rate limits, fingerprinting—we handle all of it so you don't have to.",
+  "@landing_features_antibot_description": {
+    "description": "Feature card description - anti-bot"
+  },
+  "landing_features_geo_title": "Global Geo-Targeting",
+  "@landing_features_geo_title": {
+    "description": "Feature card title - geo-targeting"
+  },
+  "landing_features_geo_description": "Access region-locked content with automatic proxy selection based on target location.",
+  "@landing_features_geo_description": {
+    "description": "Feature card description - geo-targeting"
+  },
+  "landing_features_testing_title": "In-Platform Testing",
+  "@landing_features_testing_title": {
+    "description": "Feature card title - testing"
+  },
+  "landing_features_testing_description": "Test any scraper instantly without leaving the platform. No Postman needed.",
+  "@landing_features_testing_description": {
+    "description": "Feature card description - testing"
+  },
+  "landing_features_analytics_title": "Deep Analytics",
+  "@landing_features_analytics_title": {
+    "description": "Feature card title - analytics"
+  },
+  "landing_features_analytics_description": "Track every request, identify issues instantly, and monitor usage across time ranges.",
+  "@landing_features_analytics_description": {
+    "description": "Feature card description - analytics"
+  },
+  "landing_features_js_title": "JavaScript Rendering",
+  "@landing_features_js_title": {
+    "description": "Feature card title - JavaScript rendering"
+  },
+  "landing_features_js_description": "Full headless browser support for SPAs, dynamic content, and infinite scroll pages.",
+  "@landing_features_js_description": {
+    "description": "Feature card description - JavaScript rendering"
+  },
+
+  "landing_marketplace_badge": "COMMUNITY",
+  "@landing_marketplace_badge": {
+    "description": "Marketplace section badge text"
+  },
+  "landing_marketplace_title": "Don't Build What Already Exists",
+  "@landing_marketplace_title": {
+    "description": "Marketplace section main title"
+  },
+  "landing_marketplace_subtitle": "Browse our marketplace of pre-built scrapers for popular websites. Use them instantly or learn from how others solved similar challenges.",
+  "@landing_marketplace_subtitle": {
+    "description": "Marketplace section subtitle"
+  },
+  "landing_marketplace_prebuilt_title": "Pre-Built Scrapers",
+  "@landing_marketplace_prebuilt_title": {
+    "description": "Marketplace feature title - pre-built scrapers"
+  },
+  "landing_marketplace_prebuilt_description": "Amazon, eBay, LinkedIn, news sites—popular websites already have working scrapers ready to use.",
+  "@landing_marketplace_prebuilt_description": {
+    "description": "Marketplace feature description - pre-built scrapers"
+  },
+  "landing_marketplace_stats_title": "Usage Statistics",
+  "@landing_marketplace_stats_title": {
+    "description": "Marketplace feature title - usage statistics"
+  },
+  "landing_marketplace_stats_description": "See which scrapers are most popular and reliable based on real community usage data.",
+  "@landing_marketplace_stats_description": {
+    "description": "Marketplace feature description - usage statistics"
+  },
+  "landing_marketplace_testing_title": "Instant Testing",
+  "@landing_marketplace_testing_title": {
+    "description": "Marketplace feature title - instant testing"
+  },
+  "landing_marketplace_testing_description": "Try any marketplace scraper before using it. Test with your own parameters to verify results.",
+  "@landing_marketplace_testing_description": {
+    "description": "Marketplace feature description - instant testing"
+  },
+  "landing_marketplace_category_ecommerce": "E-Commerce",
+  "@landing_marketplace_category_ecommerce": {
+    "description": "Marketplace category - e-commerce"
+  },
+  "landing_marketplace_category_news": "News & Media",
+  "@landing_marketplace_category_news": {
+    "description": "Marketplace category - news and media"
+  },
+  "landing_marketplace_category_jobs": "Job Listings",
+  "@landing_marketplace_category_jobs": {
+    "description": "Marketplace category - job listings"
+  },
+  "landing_marketplace_category_social": "Social Media",
+  "@landing_marketplace_category_social": {
+    "description": "Marketplace category - social media"
+  },
+  "landing_marketplace_category_realestate": "Real Estate",
+  "@landing_marketplace_category_realestate": {
+    "description": "Marketplace category - real estate"
+  },
+  "landing_marketplace_category_finance": "Finance",
+  "@landing_marketplace_category_finance": {
+    "description": "Marketplace category - finance"
+  },
+  "landing_marketplace_category_sports": "Sports",
+  "@landing_marketplace_category_sports": {
+    "description": "Marketplace category - sports"
+  },
+  "landing_marketplace_category_more": "+ 25 more",
+  "@landing_marketplace_category_more": {
+    "description": "Marketplace category - more categories"
+  },
+
+  "landing_pricing_title": "Simple, Transparent Pricing",
+  "@landing_pricing_title": {
+    "description": "Pricing section main title"
+  },
+  "landing_pricing_subtitle": "Choose the plan that fits your needs. Scale as you grow.",
+  "@landing_pricing_subtitle": {
+    "description": "Pricing section subtitle"
+  },
+
+  "landing_cta_title": "Ready to Stop Babysitting\nYour Scrapers?",
+  "@landing_cta_title": {
+    "description": "Final CTA section main title"
+  },
+  "landing_cta_subtitle": "Join developers who've reclaimed their time. Build once, let AI maintain forever.",
+  "@landing_cta_subtitle": {
+    "description": "Final CTA section subtitle"
+  },
+  "landing_cta_create_button": "Create Your First Scraper",
+  "@landing_cta_create_button": {
+    "description": "Final CTA create scraper button"
+  },
+  "landing_cta_marketplace_button": "Browse Marketplace",
+  "@landing_cta_marketplace_button": {
+    "description": "Final CTA browse marketplace button"
+  },
+  "landing_footer_tagline": "AI-Powered Web Scraping",
+  "@landing_footer_tagline": {
+    "description": "Footer tagline text"
+  }
 }

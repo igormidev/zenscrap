@@ -3,19 +3,29 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 
 /// The navigation items in the landing page appbar.
 enum LandingSection {
-  createScrappable('Create Scrappable'),
-  howItWorks('How It Works'),
-  autoFix('Auto-Fix'),
-  features('Features'),
-  marketplace('Marketplace'),
-  pricing('Pricing');
+  createScrappable,
+  howItWorks,
+  autoFix,
+  features,
+  marketplace,
+  pricing;
 
-  final String label;
-  const LandingSection(this.label);
+  String getLabel(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return switch (this) {
+      LandingSection.createScrappable => l10n.landing_nav_create_scrappable,
+      LandingSection.howItWorks => l10n.landing_nav_how_it_works,
+      LandingSection.autoFix => l10n.landing_nav_auto_fix,
+      LandingSection.features => l10n.landing_nav_features,
+      LandingSection.marketplace => l10n.landing_nav_marketplace,
+      LandingSection.pricing => l10n.landing_nav_pricing,
+    };
+  }
 }
 
 /// Fixed floating appbar with blur effect for the landing page.
@@ -83,6 +93,7 @@ class LandingAppBar extends StatelessWidget {
 class _Logo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -100,7 +111,7 @@ class _Logo extends StatelessWidget {
         ),
         const SizedBox(width: 12),
         Text(
-          'ZenScrap',
+          l10n.landing_app_name,
           style: context.t.titleLarge?.copyWith(
             fontWeight: FontWeight.bold,
             color: context.c.onSurface,
@@ -181,7 +192,7 @@ class _NavItemState extends State<_NavItem> {
             borderRadius: BorderRadius.circular(24),
           ),
           child: Text(
-            widget.section.label,
+            widget.section.getLabel(context),
             style: context.t.labelLarge?.copyWith(
               color: widget.isActive
                   ? context.c.onPrimary
@@ -204,6 +215,7 @@ class _LoginButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return OutlinedButton(
       onPressed: () {
         onTap?.call();
@@ -212,7 +224,7 @@ class _LoginButton extends StatelessWidget {
       style: OutlinedButton.styleFrom(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       ),
-      child: const Text('Sign In'),
+      child: Text(l10n.landing_sign_in),
     ).animate().fadeIn(duration: 400.ms, delay: 200.ms);
   }
 }

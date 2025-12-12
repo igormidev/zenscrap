@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 
 /// Section highlighting the problems with traditional web scraping.
@@ -9,13 +10,14 @@ class ProblemSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 100, horizontal: 40),
       child: Column(
         children: [
           Text(
-            'Traditional Web Scraping is Broken',
+            l10n.landing_problem_title,
             style: context.t.displaySmall?.copyWith(
               fontWeight: FontWeight.bold,
               color: context.c.onSurface,
@@ -29,7 +31,7 @@ class ProblemSection extends StatelessWidget {
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 700),
             child: Text(
-              'Hours lost to CSS selectors. Scrapers that break every week. Anti-bot systems that block your requests. Sound familiar?',
+              l10n.landing_problem_subtitle,
               style: context.t.titleMedium?.copyWith(
                 color: context.c.onSurfaceVariant,
                 height: 1.6,
@@ -50,30 +52,26 @@ class ProblemSection extends StatelessWidget {
               children: [
                 _ProblemCard(
                   icon: Icons.code_off_rounded,
-                  title: 'CSS Selector Hell',
-                  description:
-                      'Hunting through HTML to find the right selectors, only to have them break when the site updates.',
+                  title: l10n.landing_problem_css_title,
+                  description: l10n.landing_problem_css_description,
                   delay: 300,
                 ),
                 _ProblemCard(
                   icon: Icons.build_circle_outlined,
-                  title: 'Constant Maintenance',
-                  description:
-                      'Websites change their structure constantly. Your scraper worked yesterday—today it returns empty data.',
+                  title: l10n.landing_problem_maintenance_title,
+                  description: l10n.landing_problem_maintenance_description,
                   delay: 400,
                 ),
                 _ProblemCard(
                   icon: Icons.shield_outlined,
-                  title: 'Anti-Bot Nightmares',
-                  description:
-                      'CAPTCHAs, rate limits, IP bans. Fighting anti-bot systems is a full-time job.',
+                  title: l10n.landing_problem_antibot_title,
+                  description: l10n.landing_problem_antibot_description,
                   delay: 500,
                 ),
                 _ProblemCard(
                   icon: Icons.timer_off_outlined,
-                  title: 'Lost Productivity',
-                  description:
-                      'Every hour debugging scrapers is an hour not spent on your actual business.',
+                  title: l10n.landing_problem_productivity_title,
+                  description: l10n.landing_problem_productivity_description,
                   delay: 600,
                 ),
               ],

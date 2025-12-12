@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 
 /// Section highlighting the marketplace feature.
@@ -9,6 +10,7 @@ class MarketplaceSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 100, horizontal: 40),
@@ -30,7 +32,7 @@ class MarketplaceSection extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  'COMMUNITY',
+                  l10n.landing_marketplace_badge,
                   style: context.t.labelSmall?.copyWith(
                     color: context.c.onSecondaryContainer,
                     fontWeight: FontWeight.bold,
@@ -45,7 +47,7 @@ class MarketplaceSection extends StatelessWidget {
               .scale(begin: const Offset(0.8, 0.8), end: const Offset(1, 1)),
           const SizedBox(height: 24),
           Text(
-            'Don\'t Build What Already Exists',
+            l10n.landing_marketplace_title,
             style: context.t.displaySmall?.copyWith(
               fontWeight: FontWeight.bold,
               color: context.c.onSurface,
@@ -59,7 +61,7 @@ class MarketplaceSection extends StatelessWidget {
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 700),
             child: Text(
-              'Browse our marketplace of pre-built scrapers for popular websites. Use them instantly or learn from how others solved similar challenges.',
+              l10n.landing_marketplace_subtitle,
               style: context.t.titleMedium?.copyWith(
                 color: context.c.onSurfaceVariant,
                 height: 1.6,
@@ -78,9 +80,8 @@ class MarketplaceSection extends StatelessWidget {
                 Expanded(
                   child: _MarketplaceFeature(
                     icon: Icons.store_rounded,
-                    title: 'Pre-Built Scrapers',
-                    description:
-                        'Amazon, eBay, LinkedIn, news sites—popular websites already have working scrapers ready to use.',
+                    title: l10n.landing_marketplace_prebuilt_title,
+                    description: l10n.landing_marketplace_prebuilt_description,
                     delay: 300,
                   ),
                 ),
@@ -88,9 +89,8 @@ class MarketplaceSection extends StatelessWidget {
                 Expanded(
                   child: _MarketplaceFeature(
                     icon: Icons.trending_up_rounded,
-                    title: 'Usage Statistics',
-                    description:
-                        'See which scrapers are most popular and reliable based on real community usage data.',
+                    title: l10n.landing_marketplace_stats_title,
+                    description: l10n.landing_marketplace_stats_description,
                     delay: 400,
                   ),
                 ),
@@ -98,9 +98,8 @@ class MarketplaceSection extends StatelessWidget {
                 Expanded(
                   child: _MarketplaceFeature(
                     icon: Icons.play_arrow_rounded,
-                    title: 'Instant Testing',
-                    description:
-                        'Try any marketplace scraper before using it. Test with your own parameters to verify results.',
+                    title: l10n.landing_marketplace_testing_title,
+                    description: l10n.landing_marketplace_testing_description,
                     delay: 500,
                   ),
                 ),
@@ -114,14 +113,14 @@ class MarketplaceSection extends StatelessWidget {
             runSpacing: 12,
             alignment: WrapAlignment.center,
             children: [
-              _CategoryChip(label: 'E-Commerce', delay: 600),
-              _CategoryChip(label: 'News & Media', delay: 650),
-              _CategoryChip(label: 'Job Listings', delay: 700),
-              _CategoryChip(label: 'Social Media', delay: 750),
-              _CategoryChip(label: 'Real Estate', delay: 800),
-              _CategoryChip(label: 'Finance', delay: 850),
-              _CategoryChip(label: 'Sports', delay: 900),
-              _CategoryChip(label: '+ 25 more', delay: 950, isMore: true),
+              _CategoryChip(label: l10n.landing_marketplace_category_ecommerce, delay: 600),
+              _CategoryChip(label: l10n.landing_marketplace_category_news, delay: 650),
+              _CategoryChip(label: l10n.landing_marketplace_category_jobs, delay: 700),
+              _CategoryChip(label: l10n.landing_marketplace_category_social, delay: 750),
+              _CategoryChip(label: l10n.landing_marketplace_category_realestate, delay: 800),
+              _CategoryChip(label: l10n.landing_marketplace_category_finance, delay: 850),
+              _CategoryChip(label: l10n.landing_marketplace_category_sports, delay: 900),
+              _CategoryChip(label: l10n.landing_marketplace_category_more, delay: 950, isMore: true),
             ],
           ),
         ],

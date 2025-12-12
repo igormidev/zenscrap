@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 
 /// Section showcasing the platform's key features in a grid layout.
@@ -9,6 +10,7 @@ class FeaturesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 100, horizontal: 40),
@@ -16,7 +18,7 @@ class FeaturesSection extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            'Built for the Modern Web',
+            l10n.landing_features_title,
             style: context.t.displaySmall?.copyWith(
               fontWeight: FontWeight.bold,
               color: context.c.onSurface,
@@ -30,7 +32,7 @@ class FeaturesSection extends StatelessWidget {
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 600),
             child: Text(
-              'Enterprise-grade infrastructure wrapped in a simple interface.',
+              l10n.landing_features_subtitle,
               style: context.t.titleMedium?.copyWith(
                 color: context.c.onSurfaceVariant,
                 height: 1.6,
@@ -51,44 +53,38 @@ class FeaturesSection extends StatelessWidget {
               children: [
                 _FeatureCard(
                   icon: Icons.savings_rounded,
-                  title: 'Smart Cost Optimization',
-                  description:
-                      'AI automatically tests configurations and finds the cheapest option that works. No wasted credits.',
+                  title: l10n.landing_features_cost_title,
+                  description: l10n.landing_features_cost_description,
                   delay: 300,
                 ),
                 _FeatureCard(
                   icon: Icons.shield_rounded,
-                  title: 'Anti-Bot Handled',
-                  description:
-                      'CAPTCHAs, rate limits, fingerprinting—we handle all of it so you don\'t have to.',
+                  title: l10n.landing_features_antibot_title,
+                  description: l10n.landing_features_antibot_description,
                   delay: 400,
                 ),
                 _FeatureCard(
                   icon: Icons.public_rounded,
-                  title: 'Global Geo-Targeting',
-                  description:
-                      'Access region-locked content with automatic proxy selection based on target location.',
+                  title: l10n.landing_features_geo_title,
+                  description: l10n.landing_features_geo_description,
                   delay: 500,
                 ),
                 _FeatureCard(
                   icon: Icons.play_circle_outline_rounded,
-                  title: 'In-Platform Testing',
-                  description:
-                      'Test any scraper instantly without leaving the platform. No Postman needed.',
+                  title: l10n.landing_features_testing_title,
+                  description: l10n.landing_features_testing_description,
                   delay: 600,
                 ),
                 _FeatureCard(
                   icon: Icons.analytics_outlined,
-                  title: 'Deep Analytics',
-                  description:
-                      'Track every request, identify issues instantly, and monitor usage across time ranges.',
+                  title: l10n.landing_features_analytics_title,
+                  description: l10n.landing_features_analytics_description,
                   delay: 700,
                 ),
                 _FeatureCard(
                   icon: Icons.javascript_rounded,
-                  title: 'JavaScript Rendering',
-                  description:
-                      'Full headless browser support for SPAs, dynamic content, and infinite scroll pages.',
+                  title: l10n.landing_features_js_title,
+                  description: l10n.landing_features_js_description,
                   delay: 800,
                 ),
               ],
