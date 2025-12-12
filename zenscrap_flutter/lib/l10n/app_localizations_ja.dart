@@ -343,4 +343,56 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get landing_footer_tagline => 'AI駆動のWebスクレイピング';
+
+  @override
+  String get account_title => 'アカウント';
+
+  @override
+  String get account_information_title => 'アカウント情報';
+
+  @override
+  String get account_user_name_label => 'ユーザー名';
+
+  @override
+  String get account_email_label => 'メールアドレス';
+
+  @override
+  String get account_subscription_plan_label => 'ご契約プラン';
+
+  @override
+  String get account_appearance_title => '外観';
+
+  @override
+  String get account_display_mode_title => '表示モード';
+
+  @override
+  String get account_display_mode_subtitle => 'ライトテーマとダークテーマから選択';
+
+  @override
+  String get account_accent_color_title => 'アクセントカラー';
+
+  @override
+  String get account_accent_color_subtitle => 'お好みの色でアプリをカスタマイズ';
+
+  @override
+  String get account_loading => '読み込み中...';
+
+  @override
+  String get account_change_image_tooltip => '画像を変更';
+
+  @override
+  String get account_brightness_light => 'ライト';
+
+  @override
+  String get account_brightness_dark => 'ダーク';
+
+  @override
+  String get account_beta_badge => 'ベータ版';
+
+  @override
+  String get account_dark_mode_title => 'ダークモード';
+
+  @override
+  String get account_dark_mode_beta_warning =>
+      '一部のUI要素が正しく表示されない場合があります。現在改善中です。';
 }

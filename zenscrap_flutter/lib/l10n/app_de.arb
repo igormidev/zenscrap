@@ -112,5 +112,23 @@
   "landing_cta_subtitle": "Schliessen Sie sich Entwicklern an, die ihre Zeit zurueckgewonnen haben. Einmal bauen, KI fuer immer warten lassen.",
   "landing_cta_create_button": "Ersten Scraper erstellen",
   "landing_cta_marketplace_button": "Marktplatz durchsuchen",
-  "landing_footer_tagline": "KI-gesteuertes Web Scraping"
+  "landing_footer_tagline": "KI-gesteuertes Web Scraping",
+
+  "account_title": "Konto",
+  "account_information_title": "Kontoinformationen",
+  "account_user_name_label": "Benutzername",
+  "account_email_label": "E-Mail",
+  "account_subscription_plan_label": "Ihr Abonnement",
+  "account_appearance_title": "Erscheinungsbild",
+  "account_display_mode_title": "Anzeigemodus",
+  "account_display_mode_subtitle": "Waehlen Sie zwischen hellem und dunklem Design",
+  "account_accent_color_title": "Akzentfarbe",
+  "account_accent_color_subtitle": "Personalisieren Sie die App mit Ihrer Lieblingsfarbe",
+  "account_loading": "Laden...",
+  "account_change_image_tooltip": "Bild aendern",
+  "account_brightness_light": "Hell",
+  "account_brightness_dark": "Dunkel",
+  "account_beta_badge": "BETA",
+  "account_dark_mode_title": "Dunkelmodus",
+  "account_dark_mode_beta_warning": "Einige UI-Elemente werden moeglicherweise nicht perfekt angezeigt. Wir arbeiten aktiv an Verbesserungen."
 }

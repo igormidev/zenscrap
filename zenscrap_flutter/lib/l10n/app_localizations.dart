@@ -724,6 +724,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'AI-Powered Web Scraping'**
   String get landing_footer_tagline;
+
+  /// Main title for the account page
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get account_title;
+
+  /// Section title for account information
+  ///
+  /// In en, this message translates to:
+  /// **'Account information'**
+  String get account_information_title;
+
+  /// Label for user name field
+  ///
+  /// In en, this message translates to:
+  /// **'User name'**
+  String get account_user_name_label;
+
+  /// Label for email field
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get account_email_label;
+
+  /// Label for subscription plan field
+  ///
+  /// In en, this message translates to:
+  /// **'Your subscription plan'**
+  String get account_subscription_plan_label;
+
+  /// Title for appearance/theme customization section
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get account_appearance_title;
+
+  /// Title for display mode (light/dark theme) card
+  ///
+  /// In en, this message translates to:
+  /// **'Display Mode'**
+  String get account_display_mode_title;
+
+  /// Subtitle for display mode card
+  ///
+  /// In en, this message translates to:
+  /// **'Choose between light and dark theme'**
+  String get account_display_mode_subtitle;
+
+  /// Title for accent color picker card
+  ///
+  /// In en, this message translates to:
+  /// **'Accent Color'**
+  String get account_accent_color_title;
+
+  /// Subtitle for accent color picker card
+  ///
+  /// In en, this message translates to:
+  /// **'Personalize the app with your favorite color'**
+  String get account_accent_color_subtitle;
+
+  /// Loading indicator text
+  ///
+  /// In en, this message translates to:
+  /// **'Loading...'**
+  String get account_loading;
+
+  /// Tooltip for change profile image button
+  ///
+  /// In en, this message translates to:
+  /// **'Change image'**
+  String get account_change_image_tooltip;
+
+  /// Label for light theme option
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get account_brightness_light;
+
+  /// Label for dark theme option
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get account_brightness_dark;
+
+  /// Beta badge text
+  ///
+  /// In en, this message translates to:
+  /// **'BETA'**
+  String get account_beta_badge;
+
+  /// Title in dark mode beta warning
+  ///
+  /// In en, this message translates to:
+  /// **'Dark Mode'**
+  String get account_dark_mode_title;
+
+  /// Warning message about dark mode being in beta
+  ///
+  /// In en, this message translates to:
+  /// **'Some UI elements may not display perfectly. We\'re actively improving it.'**
+  String get account_dark_mode_beta_warning;
 }
 
 class _AppLocalizationsDelegate

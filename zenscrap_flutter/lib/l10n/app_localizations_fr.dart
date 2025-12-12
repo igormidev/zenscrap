@@ -358,4 +358,58 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get landing_footer_tagline => 'Web Scraping propulse par l\'IA';
+
+  @override
+  String get account_title => 'Compte';
+
+  @override
+  String get account_information_title => 'Informations du compte';
+
+  @override
+  String get account_user_name_label => 'Nom d\'utilisateur';
+
+  @override
+  String get account_email_label => 'E-mail';
+
+  @override
+  String get account_subscription_plan_label => 'Votre abonnement';
+
+  @override
+  String get account_appearance_title => 'Apparence';
+
+  @override
+  String get account_display_mode_title => 'Mode d\'affichage';
+
+  @override
+  String get account_display_mode_subtitle =>
+      'Choisissez entre le theme clair et sombre';
+
+  @override
+  String get account_accent_color_title => 'Couleur d\'accent';
+
+  @override
+  String get account_accent_color_subtitle =>
+      'Personnalisez l\'application avec votre couleur preferee';
+
+  @override
+  String get account_loading => 'Chargement...';
+
+  @override
+  String get account_change_image_tooltip => 'Changer l\'image';
+
+  @override
+  String get account_brightness_light => 'Clair';
+
+  @override
+  String get account_brightness_dark => 'Sombre';
+
+  @override
+  String get account_beta_badge => 'BETA';
+
+  @override
+  String get account_dark_mode_title => 'Mode Sombre';
+
+  @override
+  String get account_dark_mode_beta_warning =>
+      'Certains elements de l\'interface peuvent ne pas s\'afficher parfaitement. Nous ameliorons activement.';
 }

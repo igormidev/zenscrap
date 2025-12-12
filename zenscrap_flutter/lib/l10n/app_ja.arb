@@ -112,5 +112,23 @@
   "landing_cta_subtitle": "時間を取り戻した開発者の仲間入りをしましょう。一度構築すれば、AIが永遠にメンテナンスします。",
   "landing_cta_create_button": "最初のスクレイパーを作成",
   "landing_cta_marketplace_button": "マーケットプレイスを見る",
-  "landing_footer_tagline": "AI駆動のWebスクレイピング"
+  "landing_footer_tagline": "AI駆動のWebスクレイピング",
+
+  "account_title": "アカウント",
+  "account_information_title": "アカウント情報",
+  "account_user_name_label": "ユーザー名",
+  "account_email_label": "メールアドレス",
+  "account_subscription_plan_label": "ご契約プラン",
+  "account_appearance_title": "外観",
+  "account_display_mode_title": "表示モード",
+  "account_display_mode_subtitle": "ライトテーマとダークテーマから選択",
+  "account_accent_color_title": "アクセントカラー",
+  "account_accent_color_subtitle": "お好みの色でアプリをカスタマイズ",
+  "account_loading": "読み込み中...",
+  "account_change_image_tooltip": "画像を変更",
+  "account_brightness_light": "ライト",
+  "account_brightness_dark": "ダーク",
+  "account_beta_badge": "ベータ版",
+  "account_dark_mode_title": "ダークモード",
+  "account_dark_mode_beta_warning": "一部のUI要素が正しく表示されない場合があります。現在改善中です。"
 }

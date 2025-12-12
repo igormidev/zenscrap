@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 
 class BrightnessPicker extends StatefulWidget {
@@ -27,14 +28,14 @@ class _BrightnessPickerState extends State<BrightnessPicker> {
           children: [
             _BrightnessOption(
               icon: Icons.light_mode_rounded,
-              label: 'Light',
+              label: AppLocalizations.of(context)!.account_brightness_light,
               isSelected: !isDark,
               onTap: () => widget.onBrightnessChanged(Brightness.light),
             ),
             const SizedBox(width: 12),
             _BrightnessOption(
               icon: Icons.dark_mode_rounded,
-              label: 'Dark',
+              label: AppLocalizations.of(context)!.account_brightness_dark,
               isSelected: isDark,
               onTap: () => widget.onBrightnessChanged(Brightness.dark),
               showBetaBadge: true,
@@ -42,7 +43,7 @@ class _BrightnessPickerState extends State<BrightnessPicker> {
           ],
         ),
         const SizedBox(height: 16),
-        const _DarkModeBetaWarning(),
+        _DarkModeBetaWarning(),
       ],
     );
   }
@@ -163,9 +164,9 @@ class _BrightnessOptionState extends State<_BrightnessOption> {
                           ),
                         ],
                       ),
-                      child: const Text(
-                        'BETA',
-                        style: TextStyle(
+                      child: Text(
+                        AppLocalizations.of(context)!.account_beta_badge,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 9,
                           fontWeight: FontWeight.bold,
@@ -234,7 +235,7 @@ class _DarkModeBetaWarning extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      'Dark Mode',
+                      AppLocalizations.of(context)!.account_dark_mode_title,
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.w600,
                             color: titleColor,
@@ -251,7 +252,7 @@ class _DarkModeBetaWarning extends StatelessWidget {
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        'BETA',
+                        AppLocalizations.of(context)!.account_beta_badge,
                         style: TextStyle(
                           color: isDark ? Colors.black87 : Colors.white,
                           fontSize: 9,
@@ -264,7 +265,7 @@ class _DarkModeBetaWarning extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Some UI elements may not display perfectly. We\'re actively improving it.',
+                  AppLocalizations.of(context)!.account_dark_mode_beta_warning,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: textColor,
                         height: 1.4,

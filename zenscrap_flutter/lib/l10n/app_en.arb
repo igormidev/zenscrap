@@ -421,5 +421,74 @@
   "landing_footer_tagline": "AI-Powered Web Scraping",
   "@landing_footer_tagline": {
     "description": "Footer tagline text"
+  },
+
+  "account_title": "Account",
+  "@account_title": {
+    "description": "Main title for the account page"
+  },
+  "account_information_title": "Account information",
+  "@account_information_title": {
+    "description": "Section title for account information"
+  },
+  "account_user_name_label": "User name",
+  "@account_user_name_label": {
+    "description": "Label for user name field"
+  },
+  "account_email_label": "Email",
+  "@account_email_label": {
+    "description": "Label for email field"
+  },
+  "account_subscription_plan_label": "Your subscription plan",
+  "@account_subscription_plan_label": {
+    "description": "Label for subscription plan field"
+  },
+  "account_appearance_title": "Appearance",
+  "@account_appearance_title": {
+    "description": "Title for appearance/theme customization section"
+  },
+  "account_display_mode_title": "Display Mode",
+  "@account_display_mode_title": {
+    "description": "Title for display mode (light/dark theme) card"
+  },
+  "account_display_mode_subtitle": "Choose between light and dark theme",
+  "@account_display_mode_subtitle": {
+    "description": "Subtitle for display mode card"
+  },
+  "account_accent_color_title": "Accent Color",
+  "@account_accent_color_title": {
+    "description": "Title for accent color picker card"
+  },
+  "account_accent_color_subtitle": "Personalize the app with your favorite color",
+  "@account_accent_color_subtitle": {
+    "description": "Subtitle for accent color picker card"
+  },
+  "account_loading": "Loading...",
+  "@account_loading": {
+    "description": "Loading indicator text"
+  },
+  "account_change_image_tooltip": "Change image",
+  "@account_change_image_tooltip": {
+    "description": "Tooltip for change profile image button"
+  },
+  "account_brightness_light": "Light",
+  "@account_brightness_light": {
+    "description": "Label for light theme option"
+  },
+  "account_brightness_dark": "Dark",
+  "@account_brightness_dark": {
+    "description": "Label for dark theme option"
+  },
+  "account_beta_badge": "BETA",
+  "@account_beta_badge": {
+    "description": "Beta badge text"
+  },
+  "account_dark_mode_title": "Dark Mode",
+  "@account_dark_mode_title": {
+    "description": "Title in dark mode beta warning"
+  },
+  "account_dark_mode_beta_warning": "Some UI elements may not display perfectly. We're actively improving it.",
+  "@account_dark_mode_beta_warning": {
+    "description": "Warning message about dark mode being in beta"
   }
 }

@@ -351,6 +351,60 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get landing_footer_tagline => 'AI-Powered Web Scraping';
+
+  @override
+  String get account_title => 'Account';
+
+  @override
+  String get account_information_title => 'Account information';
+
+  @override
+  String get account_user_name_label => 'User name';
+
+  @override
+  String get account_email_label => 'Email';
+
+  @override
+  String get account_subscription_plan_label => 'Your subscription plan';
+
+  @override
+  String get account_appearance_title => 'Appearance';
+
+  @override
+  String get account_display_mode_title => 'Display Mode';
+
+  @override
+  String get account_display_mode_subtitle =>
+      'Choose between light and dark theme';
+
+  @override
+  String get account_accent_color_title => 'Accent Color';
+
+  @override
+  String get account_accent_color_subtitle =>
+      'Personalize the app with your favorite color';
+
+  @override
+  String get account_loading => 'Loading...';
+
+  @override
+  String get account_change_image_tooltip => 'Change image';
+
+  @override
+  String get account_brightness_light => 'Light';
+
+  @override
+  String get account_brightness_dark => 'Dark';
+
+  @override
+  String get account_beta_badge => 'BETA';
+
+  @override
+  String get account_dark_mode_title => 'Dark Mode';
+
+  @override
+  String get account_dark_mode_beta_warning =>
+      'Some UI elements may not display perfectly. We\'re actively improving it.';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -704,4 +758,58 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get landing_footer_tagline => 'Web Scraping Potencializado por IA';
+
+  @override
+  String get account_title => 'Conta';
+
+  @override
+  String get account_information_title => 'Informacoes da conta';
+
+  @override
+  String get account_user_name_label => 'Nome de usuario';
+
+  @override
+  String get account_email_label => 'E-mail';
+
+  @override
+  String get account_subscription_plan_label => 'Seu plano de assinatura';
+
+  @override
+  String get account_appearance_title => 'Aparencia';
+
+  @override
+  String get account_display_mode_title => 'Modo de exibicao';
+
+  @override
+  String get account_display_mode_subtitle =>
+      'Escolha entre tema claro e escuro';
+
+  @override
+  String get account_accent_color_title => 'Cor de destaque';
+
+  @override
+  String get account_accent_color_subtitle =>
+      'Personalize o app com sua cor favorita';
+
+  @override
+  String get account_loading => 'Carregando...';
+
+  @override
+  String get account_change_image_tooltip => 'Alterar imagem';
+
+  @override
+  String get account_brightness_light => 'Claro';
+
+  @override
+  String get account_brightness_dark => 'Escuro';
+
+  @override
+  String get account_beta_badge => 'BETA';
+
+  @override
+  String get account_dark_mode_title => 'Modo Escuro';
+
+  @override
+  String get account_dark_mode_beta_warning =>
+      'Alguns elementos da interface podem nao ser exibidos perfeitamente. Estamos melhorando ativamente.';
 }

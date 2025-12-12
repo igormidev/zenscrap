@@ -112,5 +112,23 @@
   "landing_cta_subtitle": "Rejoignez les developpeurs qui ont recupere leur temps. Construisez une fois, laissez l'IA maintenir pour toujours.",
   "landing_cta_create_button": "Creez votre premier Scraper",
   "landing_cta_marketplace_button": "Parcourir le Marketplace",
-  "landing_footer_tagline": "Web Scraping propulse par l'IA"
+  "landing_footer_tagline": "Web Scraping propulse par l'IA",
+
+  "account_title": "Compte",
+  "account_information_title": "Informations du compte",
+  "account_user_name_label": "Nom d'utilisateur",
+  "account_email_label": "E-mail",
+  "account_subscription_plan_label": "Votre abonnement",
+  "account_appearance_title": "Apparence",
+  "account_display_mode_title": "Mode d'affichage",
+  "account_display_mode_subtitle": "Choisissez entre le theme clair et sombre",
+  "account_accent_color_title": "Couleur d'accent",
+  "account_accent_color_subtitle": "Personnalisez l'application avec votre couleur preferee",
+  "account_loading": "Chargement...",
+  "account_change_image_tooltip": "Changer l'image",
+  "account_brightness_light": "Clair",
+  "account_brightness_dark": "Sombre",
+  "account_beta_badge": "BETA",
+  "account_dark_mode_title": "Mode Sombre",
+  "account_dark_mode_beta_warning": "Certains elements de l'interface peuvent ne pas s'afficher parfaitement. Nous ameliorons activement."
 }
