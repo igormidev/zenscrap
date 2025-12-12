@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/core/consts.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/ui/ai_usage/widgets/ai_usage_card.dart';
@@ -28,16 +29,16 @@ class AiCreditsOverviewSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const AiUsageCardHeader(
+          AiUsageCardHeader(
             icon: Icons.auto_awesome,
-            title: 'AI Credits Overview',
+            title: AppLocalizations.of(context)!.ai_usage_credits_overview,
           ),
           const SizedBox(height: 20),
           Row(
             children: [
               Expanded(
                 child: _CreditStatCard(
-                  label: 'Remaining Credits',
+                  label: AppLocalizations.of(context)!.ai_usage_remaining_credits,
                   value: '\$${remainingCredits.toStringAsFixed(2)}',
                   valueColor: remainingCredits > 0
                       ? context.c.primary
@@ -47,7 +48,7 @@ class AiCreditsOverviewSection extends StatelessWidget {
               const SizedBox(width: 16),
               Expanded(
                 child: _CreditStatCard(
-                  label: 'Monthly Limit',
+                  label: AppLocalizations.of(context)!.ai_usage_monthly_limit,
                   value: '\$${totalCredits.toStringAsFixed(2)}',
                 ),
               ),
@@ -57,7 +58,9 @@ class AiCreditsOverviewSection extends StatelessWidget {
           _UsageProgressBar(usagePercentage: usagePercentage),
           const SizedBox(height: 8),
           Text(
-            '${(usagePercentage * 100).toStringAsFixed(1)}% used this month',
+            AppLocalizations.of(context)!.ai_usage_percentage_used(
+              (usagePercentage * 100).toStringAsFixed(1),
+            ),
             style: context.t.bodySmall?.copyWith(
               color: context.c.onSurface.withAlpha(150),
             ),
@@ -158,7 +161,7 @@ class _OwnApiKeyBadge extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Text(
-            'Using your own OpenAI API key',
+            AppLocalizations.of(context)!.ai_usage_using_own_api_key,
             style: context.t.bodySmall?.copyWith(
               color: context.c.primary,
               fontWeight: FontWeight.w600,

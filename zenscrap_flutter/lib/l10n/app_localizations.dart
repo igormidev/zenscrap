@@ -826,6 +826,276 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Some UI elements may not display perfectly. We\'re actively improving it.'**
   String get account_dark_mode_beta_warning;
+
+  /// Title for AI usage page
+  ///
+  /// In en, this message translates to:
+  /// **'AI Usage'**
+  String get ai_usage_title;
+
+  /// Refresh button label
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get ai_usage_refresh;
+
+  /// Retry button label
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get ai_usage_retry;
+
+  /// Credit history section title
+  ///
+  /// In en, this message translates to:
+  /// **'Credit History'**
+  String get ai_usage_credit_history;
+
+  /// Empty state title for credit history
+  ///
+  /// In en, this message translates to:
+  /// **'No credit history yet'**
+  String get ai_usage_no_credit_history;
+
+  /// Empty state description for credit history
+  ///
+  /// In en, this message translates to:
+  /// **'Your AI credit transactions will appear here'**
+  String get ai_usage_credit_history_empty_description;
+
+  /// Title for monthly AI credits transaction
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly AI Credits'**
+  String get ai_usage_monthly_ai_credits;
+
+  /// Free plan name
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get ai_usage_plan_name_free;
+
+  /// Plan subtitle with plan name
+  ///
+  /// In en, this message translates to:
+  /// **'{planName} plan'**
+  String ai_usage_plan_subtitle(String planName);
+
+  /// Fallback title for unknown transaction types
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown Transaction'**
+  String get ai_usage_unknown_transaction;
+
+  /// AI credits overview section title
+  ///
+  /// In en, this message translates to:
+  /// **'AI Credits Overview'**
+  String get ai_usage_credits_overview;
+
+  /// Label for remaining credits
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining Credits'**
+  String get ai_usage_remaining_credits;
+
+  /// Label for monthly limit
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Limit'**
+  String get ai_usage_monthly_limit;
+
+  /// Usage percentage text
+  ///
+  /// In en, this message translates to:
+  /// **'{percentage}% used this month'**
+  String ai_usage_percentage_used(String percentage);
+
+  /// Badge text when user has their own API key
+  ///
+  /// In en, this message translates to:
+  /// **'Using your own OpenAI API key'**
+  String get ai_usage_using_own_api_key;
+
+  /// Auto-fix sessions section title
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-Fix Sessions'**
+  String get ai_usage_autofix_sessions;
+
+  /// Empty state title for auto-fix sessions
+  ///
+  /// In en, this message translates to:
+  /// **'No auto-fix sessions yet'**
+  String get ai_usage_no_autofix_sessions;
+
+  /// Empty state description for auto-fix sessions
+  ///
+  /// In en, this message translates to:
+  /// **'When your scrappables break, our AI will automatically attempt to fix them. Those sessions will appear here.'**
+  String get ai_usage_autofix_empty_description;
+
+  /// Label for powerful AI model
+  ///
+  /// In en, this message translates to:
+  /// **'Powerful Model'**
+  String get ai_usage_powerful_model;
+
+  /// Label for normal AI model
+  ///
+  /// In en, this message translates to:
+  /// **'Normal Model'**
+  String get ai_usage_normal_model;
+
+  /// Token count display
+  ///
+  /// In en, this message translates to:
+  /// **'{count} tokens'**
+  String ai_usage_tokens_count(String count);
+
+  /// Scrappable identifier
+  ///
+  /// In en, this message translates to:
+  /// **'Scrappable #{id}'**
+  String ai_usage_scrappable_id(int id);
+
+  /// Pending status label
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get ai_usage_status_pending;
+
+  /// In progress status label
+  ///
+  /// In en, this message translates to:
+  /// **'In Progress'**
+  String get ai_usage_status_in_progress;
+
+  /// Success status label
+  ///
+  /// In en, this message translates to:
+  /// **'Success'**
+  String get ai_usage_status_success;
+
+  /// Failed status label
+  ///
+  /// In en, this message translates to:
+  /// **'Failed'**
+  String get ai_usage_status_failed;
+
+  /// Exhausted status label
+  ///
+  /// In en, this message translates to:
+  /// **'Exhausted'**
+  String get ai_usage_status_exhausted;
+
+  /// Cancelled status label
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get ai_usage_status_cancelled;
+
+  /// Label for triggered at detail
+  ///
+  /// In en, this message translates to:
+  /// **'Triggered at'**
+  String get ai_usage_triggered_at;
+
+  /// Consecutive errors detail value
+  ///
+  /// In en, this message translates to:
+  /// **'{count} consecutive errors (threshold: {threshold})'**
+  String ai_usage_consecutive_errors(int count, int threshold);
+
+  /// Label for API key detail
+  ///
+  /// In en, this message translates to:
+  /// **'API Key'**
+  String get ai_usage_api_key_label;
+
+  /// Value when using user's own API key
+  ///
+  /// In en, this message translates to:
+  /// **'Your own key'**
+  String get ai_usage_your_own_key;
+
+  /// Value when using platform API key
+  ///
+  /// In en, this message translates to:
+  /// **'Platform key'**
+  String get ai_usage_platform_key;
+
+  /// Label for tokens used detail
+  ///
+  /// In en, this message translates to:
+  /// **'Tokens used'**
+  String get ai_usage_tokens_used;
+
+  /// Label for cost detail
+  ///
+  /// In en, this message translates to:
+  /// **'Cost'**
+  String get ai_usage_cost;
+
+  /// Title for fix summary section
+  ///
+  /// In en, this message translates to:
+  /// **'Fix Summary'**
+  String get ai_usage_fix_summary;
+
+  /// Title for failure reason section
+  ///
+  /// In en, this message translates to:
+  /// **'Failure Reason'**
+  String get ai_usage_failure_reason;
+
+  /// Attempts section title with count
+  ///
+  /// In en, this message translates to:
+  /// **'Attempts ({count})'**
+  String ai_usage_attempts_count(int count);
+
+  /// Attempt in progress status
+  ///
+  /// In en, this message translates to:
+  /// **'In Progress'**
+  String get ai_usage_attempt_status_in_progress;
+
+  /// Attempt success status
+  ///
+  /// In en, this message translates to:
+  /// **'Success'**
+  String get ai_usage_attempt_status_success;
+
+  /// Attempt AI error status
+  ///
+  /// In en, this message translates to:
+  /// **'AI Error'**
+  String get ai_usage_attempt_status_ai_error;
+
+  /// Attempt API error status
+  ///
+  /// In en, this message translates to:
+  /// **'API Error'**
+  String get ai_usage_attempt_status_api_error;
+
+  /// Attempt validation failed status
+  ///
+  /// In en, this message translates to:
+  /// **'Validation Failed'**
+  String get ai_usage_attempt_status_validation_failed;
+
+  /// Short abbreviation for tokens
+  ///
+  /// In en, this message translates to:
+  /// **'tok'**
+  String get ai_usage_tokens_short;
+
+  /// Load more button label
+  ///
+  /// In en, this message translates to:
+  /// **'Load More'**
+  String get ai_usage_load_more;
 }
 
 class _AppLocalizationsDelegate

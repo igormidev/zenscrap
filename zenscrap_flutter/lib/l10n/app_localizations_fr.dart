@@ -412,4 +412,156 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get account_dark_mode_beta_warning =>
       'Certains elements de l\'interface peuvent ne pas s\'afficher parfaitement. Nous ameliorons activement.';
+
+  @override
+  String get ai_usage_title => 'Utilisation de l\'IA';
+
+  @override
+  String get ai_usage_refresh => 'Actualiser';
+
+  @override
+  String get ai_usage_retry => 'Reessayer';
+
+  @override
+  String get ai_usage_credit_history => 'Historique des Credits';
+
+  @override
+  String get ai_usage_no_credit_history =>
+      'Pas encore d\'historique de credits';
+
+  @override
+  String get ai_usage_credit_history_empty_description =>
+      'Vos transactions de credits IA apparaitront ici';
+
+  @override
+  String get ai_usage_monthly_ai_credits => 'Credits IA Mensuels';
+
+  @override
+  String get ai_usage_plan_name_free => 'Gratuit';
+
+  @override
+  String ai_usage_plan_subtitle(String planName) {
+    return 'Forfait $planName';
+  }
+
+  @override
+  String get ai_usage_unknown_transaction => 'Transaction Inconnue';
+
+  @override
+  String get ai_usage_credits_overview => 'Apercu des Credits IA';
+
+  @override
+  String get ai_usage_remaining_credits => 'Credits Restants';
+
+  @override
+  String get ai_usage_monthly_limit => 'Limite Mensuelle';
+
+  @override
+  String ai_usage_percentage_used(String percentage) {
+    return '$percentage% utilise ce mois';
+  }
+
+  @override
+  String get ai_usage_using_own_api_key =>
+      'Utilisation de votre propre cle API OpenAI';
+
+  @override
+  String get ai_usage_autofix_sessions => 'Sessions d\'Auto-Reparation';
+
+  @override
+  String get ai_usage_no_autofix_sessions =>
+      'Pas encore de sessions d\'auto-reparation';
+
+  @override
+  String get ai_usage_autofix_empty_description =>
+      'Lorsque vos scrappables cessent de fonctionner, notre IA tentera automatiquement de les reparer. Ces sessions apparaitront ici.';
+
+  @override
+  String get ai_usage_powerful_model => 'Modele Puissant';
+
+  @override
+  String get ai_usage_normal_model => 'Modele Normal';
+
+  @override
+  String ai_usage_tokens_count(String count) {
+    return '$count tokens';
+  }
+
+  @override
+  String ai_usage_scrappable_id(int id) {
+    return 'Scrappable #$id';
+  }
+
+  @override
+  String get ai_usage_status_pending => 'En attente';
+
+  @override
+  String get ai_usage_status_in_progress => 'En cours';
+
+  @override
+  String get ai_usage_status_success => 'Reussi';
+
+  @override
+  String get ai_usage_status_failed => 'Echoue';
+
+  @override
+  String get ai_usage_status_exhausted => 'Epuise';
+
+  @override
+  String get ai_usage_status_cancelled => 'Annule';
+
+  @override
+  String get ai_usage_triggered_at => 'Declenche a';
+
+  @override
+  String ai_usage_consecutive_errors(int count, int threshold) {
+    return '$count erreurs consecutives (seuil: $threshold)';
+  }
+
+  @override
+  String get ai_usage_api_key_label => 'Cle API';
+
+  @override
+  String get ai_usage_your_own_key => 'Votre propre cle';
+
+  @override
+  String get ai_usage_platform_key => 'Cle de la plateforme';
+
+  @override
+  String get ai_usage_tokens_used => 'Tokens utilises';
+
+  @override
+  String get ai_usage_cost => 'Cout';
+
+  @override
+  String get ai_usage_fix_summary => 'Resume de la Reparation';
+
+  @override
+  String get ai_usage_failure_reason => 'Raison de l\'Echec';
+
+  @override
+  String ai_usage_attempts_count(int count) {
+    return 'Tentatives ($count)';
+  }
+
+  @override
+  String get ai_usage_attempt_status_in_progress => 'En cours';
+
+  @override
+  String get ai_usage_attempt_status_success => 'Reussi';
+
+  @override
+  String get ai_usage_attempt_status_ai_error => 'Erreur IA';
+
+  @override
+  String get ai_usage_attempt_status_api_error => 'Erreur API';
+
+  @override
+  String get ai_usage_attempt_status_validation_failed => 'Validation echouee';
+
+  @override
+  String get ai_usage_tokens_short => 'tok';
+
+  @override
+  String get ai_usage_load_more => 'Charger plus';
 }

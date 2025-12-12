@@ -490,5 +490,219 @@
   "account_dark_mode_beta_warning": "Some UI elements may not display perfectly. We're actively improving it.",
   "@account_dark_mode_beta_warning": {
     "description": "Warning message about dark mode being in beta"
+  },
+
+  "ai_usage_title": "AI Usage",
+  "@ai_usage_title": {
+    "description": "Title for AI usage page"
+  },
+  "ai_usage_refresh": "Refresh",
+  "@ai_usage_refresh": {
+    "description": "Refresh button label"
+  },
+  "ai_usage_retry": "Retry",
+  "@ai_usage_retry": {
+    "description": "Retry button label"
+  },
+  "ai_usage_credit_history": "Credit History",
+  "@ai_usage_credit_history": {
+    "description": "Credit history section title"
+  },
+  "ai_usage_no_credit_history": "No credit history yet",
+  "@ai_usage_no_credit_history": {
+    "description": "Empty state title for credit history"
+  },
+  "ai_usage_credit_history_empty_description": "Your AI credit transactions will appear here",
+  "@ai_usage_credit_history_empty_description": {
+    "description": "Empty state description for credit history"
+  },
+  "ai_usage_monthly_ai_credits": "Monthly AI Credits",
+  "@ai_usage_monthly_ai_credits": {
+    "description": "Title for monthly AI credits transaction"
+  },
+  "ai_usage_plan_name_free": "Free",
+  "@ai_usage_plan_name_free": {
+    "description": "Free plan name"
+  },
+  "ai_usage_plan_subtitle": "{planName} plan",
+  "@ai_usage_plan_subtitle": {
+    "description": "Plan subtitle with plan name",
+    "placeholders": {
+      "planName": {
+        "type": "String"
+      }
+    }
+  },
+  "ai_usage_unknown_transaction": "Unknown Transaction",
+  "@ai_usage_unknown_transaction": {
+    "description": "Fallback title for unknown transaction types"
+  },
+  "ai_usage_credits_overview": "AI Credits Overview",
+  "@ai_usage_credits_overview": {
+    "description": "AI credits overview section title"
+  },
+  "ai_usage_remaining_credits": "Remaining Credits",
+  "@ai_usage_remaining_credits": {
+    "description": "Label for remaining credits"
+  },
+  "ai_usage_monthly_limit": "Monthly Limit",
+  "@ai_usage_monthly_limit": {
+    "description": "Label for monthly limit"
+  },
+  "ai_usage_percentage_used": "{percentage}% used this month",
+  "@ai_usage_percentage_used": {
+    "description": "Usage percentage text",
+    "placeholders": {
+      "percentage": {
+        "type": "String"
+      }
+    }
+  },
+  "ai_usage_using_own_api_key": "Using your own OpenAI API key",
+  "@ai_usage_using_own_api_key": {
+    "description": "Badge text when user has their own API key"
+  },
+  "ai_usage_autofix_sessions": "Auto-Fix Sessions",
+  "@ai_usage_autofix_sessions": {
+    "description": "Auto-fix sessions section title"
+  },
+  "ai_usage_no_autofix_sessions": "No auto-fix sessions yet",
+  "@ai_usage_no_autofix_sessions": {
+    "description": "Empty state title for auto-fix sessions"
+  },
+  "ai_usage_autofix_empty_description": "When your scrappables break, our AI will automatically attempt to fix them. Those sessions will appear here.",
+  "@ai_usage_autofix_empty_description": {
+    "description": "Empty state description for auto-fix sessions"
+  },
+  "ai_usage_powerful_model": "Powerful Model",
+  "@ai_usage_powerful_model": {
+    "description": "Label for powerful AI model"
+  },
+  "ai_usage_normal_model": "Normal Model",
+  "@ai_usage_normal_model": {
+    "description": "Label for normal AI model"
+  },
+  "ai_usage_tokens_count": "{count} tokens",
+  "@ai_usage_tokens_count": {
+    "description": "Token count display",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "ai_usage_scrappable_id": "Scrappable #{id}",
+  "@ai_usage_scrappable_id": {
+    "description": "Scrappable identifier",
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
+  "ai_usage_status_pending": "Pending",
+  "@ai_usage_status_pending": {
+    "description": "Pending status label"
+  },
+  "ai_usage_status_in_progress": "In Progress",
+  "@ai_usage_status_in_progress": {
+    "description": "In progress status label"
+  },
+  "ai_usage_status_success": "Success",
+  "@ai_usage_status_success": {
+    "description": "Success status label"
+  },
+  "ai_usage_status_failed": "Failed",
+  "@ai_usage_status_failed": {
+    "description": "Failed status label"
+  },
+  "ai_usage_status_exhausted": "Exhausted",
+  "@ai_usage_status_exhausted": {
+    "description": "Exhausted status label"
+  },
+  "ai_usage_status_cancelled": "Cancelled",
+  "@ai_usage_status_cancelled": {
+    "description": "Cancelled status label"
+  },
+  "ai_usage_triggered_at": "Triggered at",
+  "@ai_usage_triggered_at": {
+    "description": "Label for triggered at detail"
+  },
+  "ai_usage_consecutive_errors": "{count} consecutive errors (threshold: {threshold})",
+  "@ai_usage_consecutive_errors": {
+    "description": "Consecutive errors detail value",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "threshold": {
+        "type": "int"
+      }
+    }
+  },
+  "ai_usage_api_key_label": "API Key",
+  "@ai_usage_api_key_label": {
+    "description": "Label for API key detail"
+  },
+  "ai_usage_your_own_key": "Your own key",
+  "@ai_usage_your_own_key": {
+    "description": "Value when using user's own API key"
+  },
+  "ai_usage_platform_key": "Platform key",
+  "@ai_usage_platform_key": {
+    "description": "Value when using platform API key"
+  },
+  "ai_usage_tokens_used": "Tokens used",
+  "@ai_usage_tokens_used": {
+    "description": "Label for tokens used detail"
+  },
+  "ai_usage_cost": "Cost",
+  "@ai_usage_cost": {
+    "description": "Label for cost detail"
+  },
+  "ai_usage_fix_summary": "Fix Summary",
+  "@ai_usage_fix_summary": {
+    "description": "Title for fix summary section"
+  },
+  "ai_usage_failure_reason": "Failure Reason",
+  "@ai_usage_failure_reason": {
+    "description": "Title for failure reason section"
+  },
+  "ai_usage_attempts_count": "Attempts ({count})",
+  "@ai_usage_attempts_count": {
+    "description": "Attempts section title with count",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ai_usage_attempt_status_in_progress": "In Progress",
+  "@ai_usage_attempt_status_in_progress": {
+    "description": "Attempt in progress status"
+  },
+  "ai_usage_attempt_status_success": "Success",
+  "@ai_usage_attempt_status_success": {
+    "description": "Attempt success status"
+  },
+  "ai_usage_attempt_status_ai_error": "AI Error",
+  "@ai_usage_attempt_status_ai_error": {
+    "description": "Attempt AI error status"
+  },
+  "ai_usage_attempt_status_api_error": "API Error",
+  "@ai_usage_attempt_status_api_error": {
+    "description": "Attempt API error status"
+  },
+  "ai_usage_attempt_status_validation_failed": "Validation Failed",
+  "@ai_usage_attempt_status_validation_failed": {
+    "description": "Attempt validation failed status"
+  },
+  "ai_usage_tokens_short": "tok",
+  "@ai_usage_tokens_short": {
+    "description": "Short abbreviation for tokens"
+  },
+  "ai_usage_load_more": "Load More",
+  "@ai_usage_load_more": {
+    "description": "Load more button label"
   }
 }

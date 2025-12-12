@@ -395,4 +395,153 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get account_dark_mode_beta_warning =>
       '一部のUI要素が正しく表示されない場合があります。現在改善中です。';
+
+  @override
+  String get ai_usage_title => 'AI使用状況';
+
+  @override
+  String get ai_usage_refresh => '更新';
+
+  @override
+  String get ai_usage_retry => '再試行';
+
+  @override
+  String get ai_usage_credit_history => 'クレジット履歴';
+
+  @override
+  String get ai_usage_no_credit_history => 'クレジット履歴はまだありません';
+
+  @override
+  String get ai_usage_credit_history_empty_description =>
+      'AIクレジットの取引履歴がここに表示されます';
+
+  @override
+  String get ai_usage_monthly_ai_credits => '月間AIクレジット';
+
+  @override
+  String get ai_usage_plan_name_free => '無料';
+
+  @override
+  String ai_usage_plan_subtitle(String planName) {
+    return '$planNameプラン';
+  }
+
+  @override
+  String get ai_usage_unknown_transaction => '不明な取引';
+
+  @override
+  String get ai_usage_credits_overview => 'AIクレジット概要';
+
+  @override
+  String get ai_usage_remaining_credits => '残りクレジット';
+
+  @override
+  String get ai_usage_monthly_limit => '月間上限';
+
+  @override
+  String ai_usage_percentage_used(String percentage) {
+    return '今月$percentage%使用済み';
+  }
+
+  @override
+  String get ai_usage_using_own_api_key => '独自のOpenAI APIキーを使用中';
+
+  @override
+  String get ai_usage_autofix_sessions => '自動修復セッション';
+
+  @override
+  String get ai_usage_no_autofix_sessions => '自動修復セッションはまだありません';
+
+  @override
+  String get ai_usage_autofix_empty_description =>
+      'スクラッパブルが壊れた際、AIが自動的に修復を試みます。そのセッションがここに表示されます。';
+
+  @override
+  String get ai_usage_powerful_model => '高性能モデル';
+
+  @override
+  String get ai_usage_normal_model => '通常モデル';
+
+  @override
+  String ai_usage_tokens_count(String count) {
+    return '$countトークン';
+  }
+
+  @override
+  String ai_usage_scrappable_id(int id) {
+    return 'Scrappable #$id';
+  }
+
+  @override
+  String get ai_usage_status_pending => '保留中';
+
+  @override
+  String get ai_usage_status_in_progress => '処理中';
+
+  @override
+  String get ai_usage_status_success => '成功';
+
+  @override
+  String get ai_usage_status_failed => '失敗';
+
+  @override
+  String get ai_usage_status_exhausted => '使い果たし';
+
+  @override
+  String get ai_usage_status_cancelled => 'キャンセル';
+
+  @override
+  String get ai_usage_triggered_at => 'トリガー時点';
+
+  @override
+  String ai_usage_consecutive_errors(int count, int threshold) {
+    return '連続エラー$count回（閾値: $threshold）';
+  }
+
+  @override
+  String get ai_usage_api_key_label => 'APIキー';
+
+  @override
+  String get ai_usage_your_own_key => '独自のキー';
+
+  @override
+  String get ai_usage_platform_key => 'プラットフォームキー';
+
+  @override
+  String get ai_usage_tokens_used => '使用トークン';
+
+  @override
+  String get ai_usage_cost => 'コスト';
+
+  @override
+  String get ai_usage_fix_summary => '修復サマリー';
+
+  @override
+  String get ai_usage_failure_reason => '失敗理由';
+
+  @override
+  String ai_usage_attempts_count(int count) {
+    return '試行回数（$count）';
+  }
+
+  @override
+  String get ai_usage_attempt_status_in_progress => '処理中';
+
+  @override
+  String get ai_usage_attempt_status_success => '成功';
+
+  @override
+  String get ai_usage_attempt_status_ai_error => 'AIエラー';
+
+  @override
+  String get ai_usage_attempt_status_api_error => 'APIエラー';
+
+  @override
+  String get ai_usage_attempt_status_validation_failed => '検証失敗';
+
+  @override
+  String get ai_usage_tokens_short => 'トークン';
+
+  @override
+  String get ai_usage_load_more => 'もっと読み込む';
 }

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/states/ai_usage/ai_credit_history_provider.dart';
 import 'package:zenscrap_flutter/src/states/ai_usage/ai_credit_history_state.dart';
@@ -273,7 +274,7 @@ class _Header extends StatelessWidget {
       children: [
         Expanded(
           child: Text(
-            'AI Usage',
+            AppLocalizations.of(context)!.ai_usage_title,
             style: context.t.displaySmall?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -293,7 +294,7 @@ class _Header extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              label: const Text('Refresh'),
+              label: Text(AppLocalizations.of(context)!.ai_usage_refresh),
               icon: isRefresh
                   ? const CupertinoActivityIndicator(color: Colors.white)
                   : const Icon(Icons.refresh, size: 20),
@@ -345,7 +346,7 @@ class _ErrorState extends StatelessWidget {
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
-              label: const Text('Retry'),
+              label: Text(AppLocalizations.of(context)!.ai_usage_retry),
             ),
           ],
         ),

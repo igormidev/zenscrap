@@ -411,4 +411,156 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get account_dark_mode_beta_warning =>
       'Einige UI-Elemente werden moeglicherweise nicht perfekt angezeigt. Wir arbeiten aktiv an Verbesserungen.';
+
+  @override
+  String get ai_usage_title => 'KI-Nutzung';
+
+  @override
+  String get ai_usage_refresh => 'Aktualisieren';
+
+  @override
+  String get ai_usage_retry => 'Erneut versuchen';
+
+  @override
+  String get ai_usage_credit_history => 'Guthaben-Verlauf';
+
+  @override
+  String get ai_usage_no_credit_history => 'Noch kein Guthaben-Verlauf';
+
+  @override
+  String get ai_usage_credit_history_empty_description =>
+      'Ihre KI-Guthaben-Transaktionen werden hier angezeigt';
+
+  @override
+  String get ai_usage_monthly_ai_credits => 'Monatliches KI-Guthaben';
+
+  @override
+  String get ai_usage_plan_name_free => 'Kostenlos';
+
+  @override
+  String ai_usage_plan_subtitle(String planName) {
+    return '$planName-Plan';
+  }
+
+  @override
+  String get ai_usage_unknown_transaction => 'Unbekannte Transaktion';
+
+  @override
+  String get ai_usage_credits_overview => 'KI-Guthaben Uebersicht';
+
+  @override
+  String get ai_usage_remaining_credits => 'Verbleibendes Guthaben';
+
+  @override
+  String get ai_usage_monthly_limit => 'Monatliches Limit';
+
+  @override
+  String ai_usage_percentage_used(String percentage) {
+    return '$percentage% diesen Monat genutzt';
+  }
+
+  @override
+  String get ai_usage_using_own_api_key =>
+      'Eigener OpenAI API-Schluessel wird verwendet';
+
+  @override
+  String get ai_usage_autofix_sessions => 'Auto-Reparatur Sitzungen';
+
+  @override
+  String get ai_usage_no_autofix_sessions =>
+      'Noch keine Auto-Reparatur Sitzungen';
+
+  @override
+  String get ai_usage_autofix_empty_description =>
+      'Wenn Ihre Scrappables nicht mehr funktionieren, wird unsere KI automatisch versuchen, sie zu reparieren. Diese Sitzungen werden hier angezeigt.';
+
+  @override
+  String get ai_usage_powerful_model => 'Leistungsstarkes Modell';
+
+  @override
+  String get ai_usage_normal_model => 'Normales Modell';
+
+  @override
+  String ai_usage_tokens_count(String count) {
+    return '$count Token';
+  }
+
+  @override
+  String ai_usage_scrappable_id(int id) {
+    return 'Scrappable #$id';
+  }
+
+  @override
+  String get ai_usage_status_pending => 'Ausstehend';
+
+  @override
+  String get ai_usage_status_in_progress => 'In Bearbeitung';
+
+  @override
+  String get ai_usage_status_success => 'Erfolgreich';
+
+  @override
+  String get ai_usage_status_failed => 'Fehlgeschlagen';
+
+  @override
+  String get ai_usage_status_exhausted => 'Erschoepft';
+
+  @override
+  String get ai_usage_status_cancelled => 'Abgebrochen';
+
+  @override
+  String get ai_usage_triggered_at => 'Ausgeloest bei';
+
+  @override
+  String ai_usage_consecutive_errors(int count, int threshold) {
+    return '$count aufeinanderfolgende Fehler (Schwellenwert: $threshold)';
+  }
+
+  @override
+  String get ai_usage_api_key_label => 'API-Schluessel';
+
+  @override
+  String get ai_usage_your_own_key => 'Ihr eigener Schluessel';
+
+  @override
+  String get ai_usage_platform_key => 'Plattform-Schluessel';
+
+  @override
+  String get ai_usage_tokens_used => 'Verwendete Token';
+
+  @override
+  String get ai_usage_cost => 'Kosten';
+
+  @override
+  String get ai_usage_fix_summary => 'Reparatur-Zusammenfassung';
+
+  @override
+  String get ai_usage_failure_reason => 'Fehlergrund';
+
+  @override
+  String ai_usage_attempts_count(int count) {
+    return 'Versuche ($count)';
+  }
+
+  @override
+  String get ai_usage_attempt_status_in_progress => 'In Bearbeitung';
+
+  @override
+  String get ai_usage_attempt_status_success => 'Erfolgreich';
+
+  @override
+  String get ai_usage_attempt_status_ai_error => 'KI-Fehler';
+
+  @override
+  String get ai_usage_attempt_status_api_error => 'API-Fehler';
+
+  @override
+  String get ai_usage_attempt_status_validation_failed =>
+      'Validierung fehlgeschlagen';
+
+  @override
+  String get ai_usage_tokens_short => 'Tok';
+
+  @override
+  String get ai_usage_load_more => 'Mehr laden';
 }
