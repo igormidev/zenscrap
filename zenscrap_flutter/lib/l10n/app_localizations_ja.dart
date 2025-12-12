@@ -1306,4 +1306,210 @@ class AppLocalizationsJa extends AppLocalizations {
   String pricing_error_message(String error) {
     return 'エラー: $error';
   }
+
+  @override
+  String get marketplace_title => 'マーケットプレイス';
+
+  @override
+  String get marketplace_public_scrappables => '公開Scrappables';
+
+  @override
+  String get marketplace_refresh_page => 'ページを更新';
+
+  @override
+  String get marketplace_search_hint => '名前または説明でScrappablesを検索...';
+
+  @override
+  String get marketplace_error_loading => 'マーケットプレイスの読み込みエラー';
+
+  @override
+  String get marketplace_no_results_found => '結果が見つかりません';
+
+  @override
+  String get marketplace_no_scrappables_available => '利用可能なScrappablesがありません';
+
+  @override
+  String marketplace_no_scrappables_match(String searchQuery) {
+    return '「$searchQuery」に一致するScrappablesがありません。検索条件を調整してください。';
+  }
+
+  @override
+  String get marketplace_empty_message =>
+      '現在マーケットプレイスは空です。新しいScrappablesが追加されるのをお待ちください。';
+
+  @override
+  String get marketplace_clear_search => '検索をクリア';
+
+  @override
+  String marketplace_pagination_range(
+    int startItem,
+    int endItem,
+    int totalCount,
+  ) {
+    return '$totalCount件中$startItem-$endItem件';
+  }
+
+  @override
+  String get marketplace_usage_metrics_title => '使用状況メトリクス（過去30日間）';
+
+  @override
+  String get marketplace_failed_to_load_metrics => 'メトリクスの読み込みに失敗しました';
+
+  @override
+  String get marketplace_no_requests_last_30_days => '過去30日間のリクエストはありません';
+
+  @override
+  String get marketplace_metrics_success => '成功';
+
+  @override
+  String get marketplace_metrics_errors => 'エラー';
+
+  @override
+  String get marketplace_metrics_total => '合計';
+
+  @override
+  String get marketplace_select_api_key => 'APIキーを選択';
+
+  @override
+  String marketplace_api_key_created(String date) {
+    return '作成日: $date';
+  }
+
+  @override
+  String get marketplace_cancel => 'キャンセル';
+
+  @override
+  String get marketplace_clone_success_title => 'Scrappableのクローンが完了しました！';
+
+  @override
+  String marketplace_clone_success_message(String name) {
+    return '「$name」がエンドポイントに追加されました';
+  }
+
+  @override
+  String get marketplace_clone_private_notice =>
+      'クローンされたScrappableはデフォルトで非公開です。編集画面から公開に変更できます。';
+
+  @override
+  String get marketplace_go_to_endpoints => 'エンドポイントへ移動';
+
+  @override
+  String get marketplace_edit_scrappable => 'Scrappableを編集';
+
+  @override
+  String get marketplace_close => '閉じる';
+
+  @override
+  String get marketplace_example_response => 'サンプルレスポンス';
+
+  @override
+  String get marketplace_tab_result => '結果';
+
+  @override
+  String get marketplace_tab_html => 'HTML';
+
+  @override
+  String get marketplace_tab_screenshot => 'スクリーンショット';
+
+  @override
+  String get marketplace_reference_url => 'サンプルに使用された参照URL:';
+
+  @override
+  String get marketplace_open_url => 'URLを開く';
+
+  @override
+  String get marketplace_copy_url => 'URLをコピー';
+
+  @override
+  String get marketplace_no_example_response => 'サンプルレスポンスがありません';
+
+  @override
+  String get marketplace_copy => 'コピー';
+
+  @override
+  String get marketplace_increase_font_size => 'フォントサイズを拡大';
+
+  @override
+  String get marketplace_decrease_font_size => 'フォントサイズを縮小';
+
+  @override
+  String get marketplace_no_html_content => 'HTMLコンテンツがありません';
+
+  @override
+  String get marketplace_no_screenshot => 'スクリーンショットがありません';
+
+  @override
+  String get marketplace_result_copied => '結果をクリップボードにコピーしました';
+
+  @override
+  String get marketplace_html_copied => 'HTMLをクリップボードにコピーしました';
+
+  @override
+  String get marketplace_screenshot_info_copied => 'スクリーンショット情報をコピーしました';
+
+  @override
+  String get marketplace_target_url => '対象URL:';
+
+  @override
+  String get marketplace_change => '変更';
+
+  @override
+  String get marketplace_curl_command => 'Curlコマンド';
+
+  @override
+  String get marketplace_test_endpoint => 'エンドポイントをテスト';
+
+  @override
+  String get marketplace_copy_curl_command => 'テストcURLコマンドをコピー';
+
+  @override
+  String get marketplace_api_configuration => 'API設定とコスト';
+
+  @override
+  String marketplace_created_date(String date) {
+    return '作成日: $date';
+  }
+
+  @override
+  String marketplace_last_logic_modification(String date) {
+    return '最終ロジック変更: $date';
+  }
+
+  @override
+  String get marketplace_clone_to_my_endpoints => 'マイエンドポイントにクローン';
+
+  @override
+  String get marketplace_login_required => 'このScrappableを使用するにはログインしてください。';
+
+  @override
+  String get marketplace_no_api_keys =>
+      'APIキーが見つかりません。このScrappableを使用するには、まずAPIキーを作成してください。';
+
+  @override
+  String get marketplace_upgrade_required_title => 'アップグレードが必要です';
+
+  @override
+  String get marketplace_clone_feature_pro =>
+      'マーケットプレイスからのScrappableのクローンは、ProおよびUltraプランで利用可能です。';
+
+  @override
+  String get marketplace_upgrade_benefits_title => 'アップグレードで解除:';
+
+  @override
+  String get marketplace_benefit_clone => 'マーケットプレイスのScrappableをクローン';
+
+  @override
+  String get marketplace_benefit_more_credits => 'より多くのAPIクレジット';
+
+  @override
+  String get marketplace_benefit_concurrent => 'より多くの同時リクエスト';
+
+  @override
+  String get marketplace_benefit_endpoints => 'より多くのアクティブエンドポイント';
+
+  @override
+  String get marketplace_maybe_later => '後で検討';
+
+  @override
+  String get marketplace_view_plans => 'プランを見る';
 }

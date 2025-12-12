@@ -1371,4 +1371,218 @@ class AppLocalizationsDe extends AppLocalizations {
   String pricing_error_message(String error) {
     return 'Fehler: $error';
   }
+
+  @override
+  String get marketplace_title => 'Marktplatz';
+
+  @override
+  String get marketplace_public_scrappables => 'Oeffentliche Scrappables';
+
+  @override
+  String get marketplace_refresh_page => 'Seite aktualisieren';
+
+  @override
+  String get marketplace_search_hint =>
+      'Scrappables nach Name oder Beschreibung suchen...';
+
+  @override
+  String get marketplace_error_loading => 'Fehler beim Laden des Marktplatzes';
+
+  @override
+  String get marketplace_no_results_found => 'Keine Ergebnisse gefunden';
+
+  @override
+  String get marketplace_no_scrappables_available =>
+      'Keine Scrappables verfuegbar';
+
+  @override
+  String marketplace_no_scrappables_match(String searchQuery) {
+    return 'Keine Scrappables entsprechen \"$searchQuery\". Versuchen Sie, Ihre Suche anzupassen.';
+  }
+
+  @override
+  String get marketplace_empty_message =>
+      'Der Marktplatz ist derzeit leer. Schauen Sie spaeter nach neuen Scrappables.';
+
+  @override
+  String get marketplace_clear_search => 'Suche loeschen';
+
+  @override
+  String marketplace_pagination_range(
+    int startItem,
+    int endItem,
+    int totalCount,
+  ) {
+    return '$startItem-$endItem von $totalCount';
+  }
+
+  @override
+  String get marketplace_usage_metrics_title =>
+      'Nutzungsmetriken (letzte 30 Tage)';
+
+  @override
+  String get marketplace_failed_to_load_metrics =>
+      'Metriken konnten nicht geladen werden';
+
+  @override
+  String get marketplace_no_requests_last_30_days =>
+      'Keine Anfragen in den letzten 30 Tagen';
+
+  @override
+  String get marketplace_metrics_success => 'Erfolgreich';
+
+  @override
+  String get marketplace_metrics_errors => 'Fehler';
+
+  @override
+  String get marketplace_metrics_total => 'Gesamt';
+
+  @override
+  String get marketplace_select_api_key => 'API-Schluessel auswaehlen';
+
+  @override
+  String marketplace_api_key_created(String date) {
+    return 'Erstellt: $date';
+  }
+
+  @override
+  String get marketplace_cancel => 'Abbrechen';
+
+  @override
+  String get marketplace_clone_success_title =>
+      'Scrappable erfolgreich geklont!';
+
+  @override
+  String marketplace_clone_success_message(String name) {
+    return '\"$name\" wurde zu Ihren Endpunkten hinzugefuegt';
+  }
+
+  @override
+  String get marketplace_clone_private_notice =>
+      'Das geklonte Scrappable ist standardmaessig privat. Sie koennen es im Bearbeitungsbildschirm oeffentlich machen.';
+
+  @override
+  String get marketplace_go_to_endpoints => 'Zu Endpunkten gehen';
+
+  @override
+  String get marketplace_edit_scrappable => 'Scrappable bearbeiten';
+
+  @override
+  String get marketplace_close => 'Schliessen';
+
+  @override
+  String get marketplace_example_response => 'Beispielantwort';
+
+  @override
+  String get marketplace_tab_result => 'ERGEBNIS';
+
+  @override
+  String get marketplace_tab_html => 'HTML';
+
+  @override
+  String get marketplace_tab_screenshot => 'Screenshot';
+
+  @override
+  String get marketplace_reference_url => 'Referenz-URL fuer Beispiel:';
+
+  @override
+  String get marketplace_open_url => 'URL oeffnen';
+
+  @override
+  String get marketplace_copy_url => 'URL kopieren';
+
+  @override
+  String get marketplace_no_example_response =>
+      'Keine Beispielantwort verfuegbar';
+
+  @override
+  String get marketplace_copy => 'Kopieren';
+
+  @override
+  String get marketplace_increase_font_size => 'Schriftgroesse erhoehen';
+
+  @override
+  String get marketplace_decrease_font_size => 'Schriftgroesse verringern';
+
+  @override
+  String get marketplace_no_html_content => 'Kein HTML-Inhalt verfuegbar';
+
+  @override
+  String get marketplace_no_screenshot => 'Kein Screenshot verfuegbar';
+
+  @override
+  String get marketplace_result_copied => 'Ergebnis in Zwischenablage kopiert';
+
+  @override
+  String get marketplace_html_copied => 'HTML in Zwischenablage kopiert';
+
+  @override
+  String get marketplace_screenshot_info_copied => 'Screenshot-Info kopiert';
+
+  @override
+  String get marketplace_target_url => 'Ziel-URL:';
+
+  @override
+  String get marketplace_change => 'Aendern';
+
+  @override
+  String get marketplace_curl_command => 'Curl-Befehl';
+
+  @override
+  String get marketplace_test_endpoint => 'Endpunkt testen';
+
+  @override
+  String get marketplace_copy_curl_command => 'Test-cURL-Befehl kopieren';
+
+  @override
+  String get marketplace_api_configuration => 'API-Konfiguration & Kosten';
+
+  @override
+  String marketplace_created_date(String date) {
+    return 'Erstellt: $date';
+  }
+
+  @override
+  String marketplace_last_logic_modification(String date) {
+    return 'Letzte Logik-Aenderung: $date';
+  }
+
+  @override
+  String get marketplace_clone_to_my_endpoints => 'Zu meinen Endpunkten klonen';
+
+  @override
+  String get marketplace_login_required =>
+      'Bitte melden Sie sich an, um dieses Scrappable zu verwenden.';
+
+  @override
+  String get marketplace_no_api_keys =>
+      'Keine API-Schluessel gefunden. Bitte erstellen Sie zuerst einen API-Schluessel, um dieses Scrappable zu verwenden.';
+
+  @override
+  String get marketplace_upgrade_required_title => 'Upgrade erforderlich';
+
+  @override
+  String get marketplace_clone_feature_pro =>
+      'Das Klonen von Scrappables aus dem Marktplatz ist in den Pro- und Ultra-Plaenen verfuegbar.';
+
+  @override
+  String get marketplace_upgrade_benefits_title => 'Upgrade zum Freischalten:';
+
+  @override
+  String get marketplace_benefit_clone => 'Jedes Marktplatz-Scrappable klonen';
+
+  @override
+  String get marketplace_benefit_more_credits => 'Mehr API-Guthaben';
+
+  @override
+  String get marketplace_benefit_concurrent => 'Hoehere gleichzeitige Anfragen';
+
+  @override
+  String get marketplace_benefit_endpoints => 'Mehr aktive Endpunkte';
+
+  @override
+  String get marketplace_maybe_later => 'Vielleicht spaeter';
+
+  @override
+  String get marketplace_view_plans => 'Plaene anzeigen';
 }

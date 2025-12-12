@@ -7,6 +7,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/core/extensions/convert_extensions.dart';
 import 'package:zenscrap_flutter/src/core/extensions/string_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/elements/animated_switch.dart';
@@ -169,7 +170,7 @@ class _ExampleResponseDialogState extends ConsumerState<ExampleResponseDialog>
     return Stack(
       children: [
         AlertDialog(
-          title: const Text('Example Response'),
+          title: Text(AppLocalizations.of(context)!.marketplace_example_response),
           insetPadding: const EdgeInsets.symmetric(vertical: 20),
           titlePadding: const EdgeInsets.only(left: 24, right: 24, top: 24),
           contentPadding: EdgeInsets.zero,
@@ -189,10 +190,10 @@ class _ExampleResponseDialogState extends ConsumerState<ExampleResponseDialog>
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: ZenAnimatedSwitch(
                     tabController: _tabController,
-                    tabs: const [
-                      AnimatedSwitchItem('RESULT', fontSize: 16),
-                      AnimatedSwitchItem('HTML', fontSize: 16),
-                      AnimatedSwitchItem('Screenshot', fontSize: 16),
+                    tabs: [
+                      AnimatedSwitchItem(AppLocalizations.of(context)!.marketplace_tab_result, fontSize: 16),
+                      AnimatedSwitchItem(AppLocalizations.of(context)!.marketplace_tab_html, fontSize: 16),
+                      AnimatedSwitchItem(AppLocalizations.of(context)!.marketplace_tab_screenshot, fontSize: 16),
                     ],
                   ),
                 ),
@@ -218,7 +219,7 @@ class _ExampleResponseDialogState extends ConsumerState<ExampleResponseDialog>
                                       .convert(decodedJson);
                               Clipboard.setData(
                                   ClipboardData(text: jsonString));
-                              _showToastMessage('Result copied to clipboard');
+                              _showToastMessage(AppLocalizations.of(context)!.marketplace_result_copied);
                             }
                           },
                           onIncreaseFontSize: () {
@@ -254,7 +255,7 @@ class _ExampleResponseDialogState extends ConsumerState<ExampleResponseDialog>
                                   utf8.decode(_htmlData!.buffer.asUint8List());
                               Clipboard.setData(
                                   ClipboardData(text: htmlString));
-                              _showToastMessage('HTML copied to clipboard');
+                              _showToastMessage(AppLocalizations.of(context)!.marketplace_html_copied);
                             }
                           },
                           onIncreaseFontSize: () {
@@ -285,7 +286,7 @@ class _ExampleResponseDialogState extends ConsumerState<ExampleResponseDialog>
                           onHoverChanged: (value) =>
                               setState(() => _isScreenshotHovered = value),
                           onCopy: () {
-                            _showToastMessage('Screenshot info copied');
+                            _showToastMessage(AppLocalizations.of(context)!.marketplace_screenshot_info_copied);
                           },
                         ),
                       ),
@@ -398,7 +399,7 @@ class _ReferenceLinkWidgetState extends State<ReferenceLinkWidget> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   BabelSelectableText(
-                    'Reference url used for example:',
+                    AppLocalizations.of(context)!.marketplace_reference_url,
                     style: context.t.titleSmall
                         ?.copyWith(color: context.c.primary),
                   ),
@@ -430,7 +431,7 @@ class _ReferenceLinkWidgetState extends State<ReferenceLinkWidget> {
                           IconButton(
                             icon: const Icon(Icons.open_in_new, size: 16),
                             onPressed: _openUrl,
-                            tooltip: 'Open URL',
+                            tooltip: AppLocalizations.of(context)!.marketplace_open_url,
                             padding: const EdgeInsets.all(4),
                             constraints: const BoxConstraints(),
                           ),
@@ -438,7 +439,7 @@ class _ReferenceLinkWidgetState extends State<ReferenceLinkWidget> {
                           IconButton(
                             icon: const Icon(Icons.copy, size: 16),
                             onPressed: _copyToClipboard,
-                            tooltip: 'Copy URL',
+                            tooltip: AppLocalizations.of(context)!.marketplace_copy_url,
                             padding: const EdgeInsets.all(4),
                             constraints: const BoxConstraints(),
                           ),
@@ -480,7 +481,7 @@ class _ResultTab extends StatelessWidget {
     final decodedJson = tryDecode(result);
 
     if (result == null || result.isEmpty || decodedJson == null) {
-      return const _EmptyStateWidget(message: 'No example response available');
+      return _EmptyStateWidget(message: AppLocalizations.of(context)!.marketplace_no_example_response);
     }
 
     return MouseRegion(
@@ -544,13 +545,13 @@ class _HtmlTab extends StatelessWidget {
     }
 
     if (htmlData == null) {
-      return const _EmptyStateWidget(message: 'No HTML content available');
+      return _EmptyStateWidget(message: AppLocalizations.of(context)!.marketplace_no_html_content);
     }
 
     final htmlString = utf8.decode(htmlData!.buffer.asUint8List());
 
     if (htmlString.isEmpty) {
-      return const _EmptyStateWidget(message: 'No HTML content available');
+      return _EmptyStateWidget(message: AppLocalizations.of(context)!.marketplace_no_html_content);
     }
 
     return MouseRegion(
@@ -623,7 +624,7 @@ class _ScreenshotTabState extends State<_ScreenshotTab> {
     }
 
     if (widget.screenshotData == null) {
-      return const _EmptyStateWidget(message: 'No screenshot available');
+      return _EmptyStateWidget(message: AppLocalizations.of(context)!.marketplace_no_screenshot);
     }
 
     return MouseRegion(
@@ -694,7 +695,7 @@ class _HoverControls extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.copy, size: 18),
             onPressed: onCopy,
-            tooltip: 'Copy',
+            tooltip: AppLocalizations.of(context)!.marketplace_copy,
             padding: const EdgeInsets.all(4),
             constraints: const BoxConstraints(),
           ),
@@ -702,7 +703,7 @@ class _HoverControls extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.add, size: 18),
             onPressed: onIncreaseFontSize,
-            tooltip: 'Increase font size',
+            tooltip: AppLocalizations.of(context)!.marketplace_increase_font_size,
             padding: const EdgeInsets.all(4),
             constraints: const BoxConstraints(),
           ),
@@ -710,7 +711,7 @@ class _HoverControls extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.remove, size: 18),
             onPressed: onDecreaseFontSize,
-            tooltip: 'Decrease font size',
+            tooltip: AppLocalizations.of(context)!.marketplace_decrease_font_size,
             padding: const EdgeInsets.all(4),
             constraints: const BoxConstraints(),
           ),
@@ -745,7 +746,7 @@ class _ScreenshotControls extends StatelessWidget {
       child: IconButton(
         icon: const Icon(Icons.copy, size: 18),
         onPressed: onCopy,
-        tooltip: 'Copy',
+        tooltip: AppLocalizations.of(context)!.marketplace_copy,
         padding: const EdgeInsets.all(4),
         constraints: const BoxConstraints(),
       ),

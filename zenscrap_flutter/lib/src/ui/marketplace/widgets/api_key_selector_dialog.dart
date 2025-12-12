@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 
 class ApiKeySelectorDialog extends StatelessWidget {
@@ -15,7 +16,7 @@ class ApiKeySelectorDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Select API Key'),
+      title: Text(AppLocalizations.of(context)!.marketplace_select_api_key),
       content: SizedBox(
         width: double.maxFinite,
         child: ListView.builder(
@@ -62,7 +63,7 @@ class ApiKeySelectorDialog extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Created: ${_formatDate(apiKey.createdAt)}',
+                      AppLocalizations.of(context)!.marketplace_api_key_created(_formatDate(apiKey.createdAt)),
                       style: context.t.labelSmall?.copyWith(
                         color: context.c.onSurfaceVariant.withAlpha(179),
                       ),
@@ -83,7 +84,7 @@ class ApiKeySelectorDialog extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(AppLocalizations.of(context)!.marketplace_cancel),
         ),
       ],
     );

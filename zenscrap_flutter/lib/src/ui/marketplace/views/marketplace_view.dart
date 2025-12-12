@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/core/mixins/curl_builder_mixin.dart';
 import 'package:zenscrap_flutter/src/design_system/scrappables_listage_ui_template/scrappables_listage_template.dart';
 import 'package:zenscrap_flutter/src/design_system/scrappables_listage_ui_template/pagination_controls.dart';
@@ -114,7 +115,7 @@ class _MarketplaceViewState extends ConsumerState<MarketplaceView>
               },
               withError: (error) => EmptyScrappablesState(
                 isSearchResult: false,
-                title: 'Error loading marketplace',
+                title: AppLocalizations.of(context)!.marketplace_error_loading,
                 description: error.description,
                 icon: Icons.error_outline_rounded,
               ),

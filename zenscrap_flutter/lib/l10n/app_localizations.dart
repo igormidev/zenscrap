@@ -2479,6 +2479,382 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error: {error}'**
   String pricing_error_message(String error);
+
+  /// Main title for marketplace page
+  ///
+  /// In en, this message translates to:
+  /// **'Marketplace'**
+  String get marketplace_title;
+
+  /// Subtitle showing public scrappables
+  ///
+  /// In en, this message translates to:
+  /// **'Public Scrappables'**
+  String get marketplace_public_scrappables;
+
+  /// Tooltip for refresh button
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh page'**
+  String get marketplace_refresh_page;
+
+  /// Placeholder text for search input
+  ///
+  /// In en, this message translates to:
+  /// **'Search for scrappables by name or description...'**
+  String get marketplace_search_hint;
+
+  /// Error message when marketplace fails to load
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading marketplace'**
+  String get marketplace_error_loading;
+
+  /// Empty state title when search has no results
+  ///
+  /// In en, this message translates to:
+  /// **'No results found'**
+  String get marketplace_no_results_found;
+
+  /// Empty state title when marketplace is empty
+  ///
+  /// In en, this message translates to:
+  /// **'No scrappables available'**
+  String get marketplace_no_scrappables_available;
+
+  /// Empty state message when search has no results
+  ///
+  /// In en, this message translates to:
+  /// **'No scrappables match \"{searchQuery}\". Try adjusting your search.'**
+  String marketplace_no_scrappables_match(String searchQuery);
+
+  /// Empty state message when marketplace has no scrappables
+  ///
+  /// In en, this message translates to:
+  /// **'The marketplace is currently empty. Check back later for new scrappables.'**
+  String get marketplace_empty_message;
+
+  /// Button to clear search query
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Search'**
+  String get marketplace_clear_search;
+
+  /// Pagination range display
+  ///
+  /// In en, this message translates to:
+  /// **'{startItem}-{endItem} of {totalCount}'**
+  String marketplace_pagination_range(
+    int startItem,
+    int endItem,
+    int totalCount,
+  );
+
+  /// Title for usage metrics section
+  ///
+  /// In en, this message translates to:
+  /// **'Usage metrics (last 30 days)'**
+  String get marketplace_usage_metrics_title;
+
+  /// Error message when metrics fail to load
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load metrics'**
+  String get marketplace_failed_to_load_metrics;
+
+  /// Empty state for metrics
+  ///
+  /// In en, this message translates to:
+  /// **'No requests in the last 30 days'**
+  String get marketplace_no_requests_last_30_days;
+
+  /// Success label in metrics
+  ///
+  /// In en, this message translates to:
+  /// **'Success'**
+  String get marketplace_metrics_success;
+
+  /// Errors label in metrics
+  ///
+  /// In en, this message translates to:
+  /// **'Errors'**
+  String get marketplace_metrics_errors;
+
+  /// Total label in metrics
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get marketplace_metrics_total;
+
+  /// Title for API key selector dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Select API Key'**
+  String get marketplace_select_api_key;
+
+  /// API key creation date
+  ///
+  /// In en, this message translates to:
+  /// **'Created: {date}'**
+  String marketplace_api_key_created(String date);
+
+  /// Cancel button label
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get marketplace_cancel;
+
+  /// Title for clone success dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Scrappable Cloned Successfully!'**
+  String get marketplace_clone_success_title;
+
+  /// Message showing cloned scrappable name
+  ///
+  /// In en, this message translates to:
+  /// **'\"{name}\" has been added to your endpoints'**
+  String marketplace_clone_success_message(String name);
+
+  /// Notice about cloned scrappable being private
+  ///
+  /// In en, this message translates to:
+  /// **'The cloned scrappable is private by default. You can make it public from the edit screen.'**
+  String get marketplace_clone_private_notice;
+
+  /// Button to navigate to endpoints
+  ///
+  /// In en, this message translates to:
+  /// **'Go to Endpoints'**
+  String get marketplace_go_to_endpoints;
+
+  /// Button to edit scrappable
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Scrappable'**
+  String get marketplace_edit_scrappable;
+
+  /// Close button label
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get marketplace_close;
+
+  /// Title for example response dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Example Response'**
+  String get marketplace_example_response;
+
+  /// Result tab label
+  ///
+  /// In en, this message translates to:
+  /// **'RESULT'**
+  String get marketplace_tab_result;
+
+  /// HTML tab label
+  ///
+  /// In en, this message translates to:
+  /// **'HTML'**
+  String get marketplace_tab_html;
+
+  /// Screenshot tab label
+  ///
+  /// In en, this message translates to:
+  /// **'Screenshot'**
+  String get marketplace_tab_screenshot;
+
+  /// Label for reference URL
+  ///
+  /// In en, this message translates to:
+  /// **'Reference url used for example:'**
+  String get marketplace_reference_url;
+
+  /// Tooltip for open URL button
+  ///
+  /// In en, this message translates to:
+  /// **'Open URL'**
+  String get marketplace_open_url;
+
+  /// Tooltip for copy URL button
+  ///
+  /// In en, this message translates to:
+  /// **'Copy URL'**
+  String get marketplace_copy_url;
+
+  /// Empty state when no example response exists
+  ///
+  /// In en, this message translates to:
+  /// **'No example response available'**
+  String get marketplace_no_example_response;
+
+  /// Copy button tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get marketplace_copy;
+
+  /// Tooltip for increase font size button
+  ///
+  /// In en, this message translates to:
+  /// **'Increase font size'**
+  String get marketplace_increase_font_size;
+
+  /// Tooltip for decrease font size button
+  ///
+  /// In en, this message translates to:
+  /// **'Decrease font size'**
+  String get marketplace_decrease_font_size;
+
+  /// Empty state when no HTML content exists
+  ///
+  /// In en, this message translates to:
+  /// **'No HTML content available'**
+  String get marketplace_no_html_content;
+
+  /// Empty state when no screenshot exists
+  ///
+  /// In en, this message translates to:
+  /// **'No screenshot available'**
+  String get marketplace_no_screenshot;
+
+  /// Snackbar message when result is copied
+  ///
+  /// In en, this message translates to:
+  /// **'Result copied to clipboard'**
+  String get marketplace_result_copied;
+
+  /// Snackbar message when HTML is copied
+  ///
+  /// In en, this message translates to:
+  /// **'HTML copied to clipboard'**
+  String get marketplace_html_copied;
+
+  /// Snackbar message when screenshot info is copied
+  ///
+  /// In en, this message translates to:
+  /// **'Screenshot info copied'**
+  String get marketplace_screenshot_info_copied;
+
+  /// Label for target URL field
+  ///
+  /// In en, this message translates to:
+  /// **'Target URL:'**
+  String get marketplace_target_url;
+
+  /// Button to change target URL
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get marketplace_change;
+
+  /// Label for curl command section
+  ///
+  /// In en, this message translates to:
+  /// **'Curl Command'**
+  String get marketplace_curl_command;
+
+  /// Button to test endpoint
+  ///
+  /// In en, this message translates to:
+  /// **'Test Endpoint'**
+  String get marketplace_test_endpoint;
+
+  /// Tooltip for copy curl command button
+  ///
+  /// In en, this message translates to:
+  /// **'Copy the test cURL command'**
+  String get marketplace_copy_curl_command;
+
+  /// Section title for API configuration
+  ///
+  /// In en, this message translates to:
+  /// **'API Configuration & Costs'**
+  String get marketplace_api_configuration;
+
+  /// Scrappable creation date
+  ///
+  /// In en, this message translates to:
+  /// **'Created: {date}'**
+  String marketplace_created_date(String date);
+
+  /// Last modification date for extraction rules
+  ///
+  /// In en, this message translates to:
+  /// **'Last logic modification: {date}'**
+  String marketplace_last_logic_modification(String date);
+
+  /// Button to clone scrappable
+  ///
+  /// In en, this message translates to:
+  /// **'Clone to My Endpoints'**
+  String get marketplace_clone_to_my_endpoints;
+
+  /// Message when user needs to log in
+  ///
+  /// In en, this message translates to:
+  /// **'Please log in to use this scrappable.'**
+  String get marketplace_login_required;
+
+  /// Message when user has no API keys
+  ///
+  /// In en, this message translates to:
+  /// **'No API keys found. Please create an API key first to use this scrappable.'**
+  String get marketplace_no_api_keys;
+
+  /// Title for upgrade required dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade Required'**
+  String get marketplace_upgrade_required_title;
+
+  /// Message explaining clone feature requires upgrade
+  ///
+  /// In en, this message translates to:
+  /// **'Cloning scrappables from the marketplace is available on Pro and Ultra plans.'**
+  String get marketplace_clone_feature_pro;
+
+  /// Title for upgrade benefits list
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to unlock:'**
+  String get marketplace_upgrade_benefits_title;
+
+  /// Benefit item for cloning
+  ///
+  /// In en, this message translates to:
+  /// **'Clone any marketplace scrappable'**
+  String get marketplace_benefit_clone;
+
+  /// Benefit item for credits
+  ///
+  /// In en, this message translates to:
+  /// **'More API credits'**
+  String get marketplace_benefit_more_credits;
+
+  /// Benefit item for concurrent requests
+  ///
+  /// In en, this message translates to:
+  /// **'Higher concurrent requests'**
+  String get marketplace_benefit_concurrent;
+
+  /// Benefit item for endpoints
+  ///
+  /// In en, this message translates to:
+  /// **'More active endpoints'**
+  String get marketplace_benefit_endpoints;
+
+  /// Button to dismiss upgrade dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Maybe Later'**
+  String get marketplace_maybe_later;
+
+  /// Button to view pricing plans
+  ///
+  /// In en, this message translates to:
+  /// **'View Plans'**
+  String get marketplace_view_plans;
 }
 
 class _AppLocalizationsDelegate

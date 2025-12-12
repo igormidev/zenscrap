@@ -1375,4 +1375,222 @@ class AppLocalizationsFr extends AppLocalizations {
   String pricing_error_message(String error) {
     return 'Erreur: $error';
   }
+
+  @override
+  String get marketplace_title => 'Marketplace';
+
+  @override
+  String get marketplace_public_scrappables => 'Scrappables Publics';
+
+  @override
+  String get marketplace_refresh_page => 'Actualiser la page';
+
+  @override
+  String get marketplace_search_hint =>
+      'Rechercher des scrappables par nom ou description...';
+
+  @override
+  String get marketplace_error_loading =>
+      'Erreur lors du chargement du marketplace';
+
+  @override
+  String get marketplace_no_results_found => 'Aucun resultat trouve';
+
+  @override
+  String get marketplace_no_scrappables_available =>
+      'Aucun scrappable disponible';
+
+  @override
+  String marketplace_no_scrappables_match(String searchQuery) {
+    return 'Aucun scrappable ne correspond a \"$searchQuery\". Essayez d\'ajuster votre recherche.';
+  }
+
+  @override
+  String get marketplace_empty_message =>
+      'Le marketplace est actuellement vide. Revenez plus tard pour de nouveaux scrappables.';
+
+  @override
+  String get marketplace_clear_search => 'Effacer la recherche';
+
+  @override
+  String marketplace_pagination_range(
+    int startItem,
+    int endItem,
+    int totalCount,
+  ) {
+    return '$startItem-$endItem sur $totalCount';
+  }
+
+  @override
+  String get marketplace_usage_metrics_title =>
+      'Metriques d\'utilisation (30 derniers jours)';
+
+  @override
+  String get marketplace_failed_to_load_metrics =>
+      'Echec du chargement des metriques';
+
+  @override
+  String get marketplace_no_requests_last_30_days =>
+      'Aucune requete dans les 30 derniers jours';
+
+  @override
+  String get marketplace_metrics_success => 'Succes';
+
+  @override
+  String get marketplace_metrics_errors => 'Erreurs';
+
+  @override
+  String get marketplace_metrics_total => 'Total';
+
+  @override
+  String get marketplace_select_api_key => 'Selectionner une cle API';
+
+  @override
+  String marketplace_api_key_created(String date) {
+    return 'Creee: $date';
+  }
+
+  @override
+  String get marketplace_cancel => 'Annuler';
+
+  @override
+  String get marketplace_clone_success_title => 'Scrappable clone avec succes!';
+
+  @override
+  String marketplace_clone_success_message(String name) {
+    return '\"$name\" a ete ajoute a vos endpoints';
+  }
+
+  @override
+  String get marketplace_clone_private_notice =>
+      'Le scrappable clone est prive par defaut. Vous pouvez le rendre public depuis l\'ecran de modification.';
+
+  @override
+  String get marketplace_go_to_endpoints => 'Aller aux Endpoints';
+
+  @override
+  String get marketplace_edit_scrappable => 'Modifier le Scrappable';
+
+  @override
+  String get marketplace_close => 'Fermer';
+
+  @override
+  String get marketplace_example_response => 'Reponse d\'exemple';
+
+  @override
+  String get marketplace_tab_result => 'RESULTAT';
+
+  @override
+  String get marketplace_tab_html => 'HTML';
+
+  @override
+  String get marketplace_tab_screenshot => 'Capture d\'ecran';
+
+  @override
+  String get marketplace_reference_url =>
+      'URL de reference utilisee pour l\'exemple:';
+
+  @override
+  String get marketplace_open_url => 'Ouvrir l\'URL';
+
+  @override
+  String get marketplace_copy_url => 'Copier l\'URL';
+
+  @override
+  String get marketplace_no_example_response =>
+      'Aucune reponse d\'exemple disponible';
+
+  @override
+  String get marketplace_copy => 'Copier';
+
+  @override
+  String get marketplace_increase_font_size => 'Augmenter la taille de police';
+
+  @override
+  String get marketplace_decrease_font_size => 'Reduire la taille de police';
+
+  @override
+  String get marketplace_no_html_content => 'Aucun contenu HTML disponible';
+
+  @override
+  String get marketplace_no_screenshot => 'Aucune capture d\'ecran disponible';
+
+  @override
+  String get marketplace_result_copied =>
+      'Resultat copie dans le presse-papiers';
+
+  @override
+  String get marketplace_html_copied => 'HTML copie dans le presse-papiers';
+
+  @override
+  String get marketplace_screenshot_info_copied => 'Info de capture copiee';
+
+  @override
+  String get marketplace_target_url => 'URL cible:';
+
+  @override
+  String get marketplace_change => 'Modifier';
+
+  @override
+  String get marketplace_curl_command => 'Commande Curl';
+
+  @override
+  String get marketplace_test_endpoint => 'Tester l\'endpoint';
+
+  @override
+  String get marketplace_copy_curl_command => 'Copier la commande cURL de test';
+
+  @override
+  String get marketplace_api_configuration => 'Configuration API et Couts';
+
+  @override
+  String marketplace_created_date(String date) {
+    return 'Cree: $date';
+  }
+
+  @override
+  String marketplace_last_logic_modification(String date) {
+    return 'Derniere modification de logique: $date';
+  }
+
+  @override
+  String get marketplace_clone_to_my_endpoints => 'Cloner vers mes Endpoints';
+
+  @override
+  String get marketplace_login_required =>
+      'Veuillez vous connecter pour utiliser ce scrappable.';
+
+  @override
+  String get marketplace_no_api_keys =>
+      'Aucune cle API trouvee. Veuillez d\'abord creer une cle API pour utiliser ce scrappable.';
+
+  @override
+  String get marketplace_upgrade_required_title => 'Mise a niveau requise';
+
+  @override
+  String get marketplace_clone_feature_pro =>
+      'Le clonage de scrappables depuis le marketplace est disponible sur les forfaits Pro et Ultra.';
+
+  @override
+  String get marketplace_upgrade_benefits_title =>
+      'Mettez a niveau pour debloquer:';
+
+  @override
+  String get marketplace_benefit_clone =>
+      'Cloner n\'importe quel scrappable du marketplace';
+
+  @override
+  String get marketplace_benefit_more_credits => 'Plus de credits API';
+
+  @override
+  String get marketplace_benefit_concurrent => 'Plus de requetes simultanees';
+
+  @override
+  String get marketplace_benefit_endpoints => 'Plus d\'endpoints actifs';
+
+  @override
+  String get marketplace_maybe_later => 'Peut-etre plus tard';
+
+  @override
+  String get marketplace_view_plans => 'Voir les forfaits';
 }

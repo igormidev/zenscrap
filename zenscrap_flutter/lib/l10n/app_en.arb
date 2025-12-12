@@ -1776,5 +1776,290 @@
         "type": "String"
       }
     }
+  },
+
+  "marketplace_title": "Marketplace",
+  "@marketplace_title": {
+    "description": "Main title for marketplace page"
+  },
+  "marketplace_public_scrappables": "Public Scrappables",
+  "@marketplace_public_scrappables": {
+    "description": "Subtitle showing public scrappables"
+  },
+  "marketplace_refresh_page": "Refresh page",
+  "@marketplace_refresh_page": {
+    "description": "Tooltip for refresh button"
+  },
+  "marketplace_search_hint": "Search for scrappables by name or description...",
+  "@marketplace_search_hint": {
+    "description": "Placeholder text for search input"
+  },
+  "marketplace_error_loading": "Error loading marketplace",
+  "@marketplace_error_loading": {
+    "description": "Error message when marketplace fails to load"
+  },
+  "marketplace_no_results_found": "No results found",
+  "@marketplace_no_results_found": {
+    "description": "Empty state title when search has no results"
+  },
+  "marketplace_no_scrappables_available": "No scrappables available",
+  "@marketplace_no_scrappables_available": {
+    "description": "Empty state title when marketplace is empty"
+  },
+  "marketplace_no_scrappables_match": "No scrappables match \"{searchQuery}\". Try adjusting your search.",
+  "@marketplace_no_scrappables_match": {
+    "description": "Empty state message when search has no results",
+    "placeholders": {
+      "searchQuery": {
+        "type": "String"
+      }
+    }
+  },
+  "marketplace_empty_message": "The marketplace is currently empty. Check back later for new scrappables.",
+  "@marketplace_empty_message": {
+    "description": "Empty state message when marketplace has no scrappables"
+  },
+  "marketplace_clear_search": "Clear Search",
+  "@marketplace_clear_search": {
+    "description": "Button to clear search query"
+  },
+  "marketplace_pagination_range": "{startItem}-{endItem} of {totalCount}",
+  "@marketplace_pagination_range": {
+    "description": "Pagination range display",
+    "placeholders": {
+      "startItem": {
+        "type": "int"
+      },
+      "endItem": {
+        "type": "int"
+      },
+      "totalCount": {
+        "type": "int"
+      }
+    }
+  },
+  "marketplace_usage_metrics_title": "Usage metrics (last 30 days)",
+  "@marketplace_usage_metrics_title": {
+    "description": "Title for usage metrics section"
+  },
+  "marketplace_failed_to_load_metrics": "Failed to load metrics",
+  "@marketplace_failed_to_load_metrics": {
+    "description": "Error message when metrics fail to load"
+  },
+  "marketplace_no_requests_last_30_days": "No requests in the last 30 days",
+  "@marketplace_no_requests_last_30_days": {
+    "description": "Empty state for metrics"
+  },
+  "marketplace_metrics_success": "Success",
+  "@marketplace_metrics_success": {
+    "description": "Success label in metrics"
+  },
+  "marketplace_metrics_errors": "Errors",
+  "@marketplace_metrics_errors": {
+    "description": "Errors label in metrics"
+  },
+  "marketplace_metrics_total": "Total",
+  "@marketplace_metrics_total": {
+    "description": "Total label in metrics"
+  },
+  "marketplace_select_api_key": "Select API Key",
+  "@marketplace_select_api_key": {
+    "description": "Title for API key selector dialog"
+  },
+  "marketplace_api_key_created": "Created: {date}",
+  "@marketplace_api_key_created": {
+    "description": "API key creation date",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "marketplace_cancel": "Cancel",
+  "@marketplace_cancel": {
+    "description": "Cancel button label"
+  },
+  "marketplace_clone_success_title": "Scrappable Cloned Successfully!",
+  "@marketplace_clone_success_title": {
+    "description": "Title for clone success dialog"
+  },
+  "marketplace_clone_success_message": "\"{name}\" has been added to your endpoints",
+  "@marketplace_clone_success_message": {
+    "description": "Message showing cloned scrappable name",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "marketplace_clone_private_notice": "The cloned scrappable is private by default. You can make it public from the edit screen.",
+  "@marketplace_clone_private_notice": {
+    "description": "Notice about cloned scrappable being private"
+  },
+  "marketplace_go_to_endpoints": "Go to Endpoints",
+  "@marketplace_go_to_endpoints": {
+    "description": "Button to navigate to endpoints"
+  },
+  "marketplace_edit_scrappable": "Edit Scrappable",
+  "@marketplace_edit_scrappable": {
+    "description": "Button to edit scrappable"
+  },
+  "marketplace_close": "Close",
+  "@marketplace_close": {
+    "description": "Close button label"
+  },
+  "marketplace_example_response": "Example Response",
+  "@marketplace_example_response": {
+    "description": "Title for example response dialog"
+  },
+  "marketplace_tab_result": "RESULT",
+  "@marketplace_tab_result": {
+    "description": "Result tab label"
+  },
+  "marketplace_tab_html": "HTML",
+  "@marketplace_tab_html": {
+    "description": "HTML tab label"
+  },
+  "marketplace_tab_screenshot": "Screenshot",
+  "@marketplace_tab_screenshot": {
+    "description": "Screenshot tab label"
+  },
+  "marketplace_reference_url": "Reference url used for example:",
+  "@marketplace_reference_url": {
+    "description": "Label for reference URL"
+  },
+  "marketplace_open_url": "Open URL",
+  "@marketplace_open_url": {
+    "description": "Tooltip for open URL button"
+  },
+  "marketplace_copy_url": "Copy URL",
+  "@marketplace_copy_url": {
+    "description": "Tooltip for copy URL button"
+  },
+  "marketplace_no_example_response": "No example response available",
+  "@marketplace_no_example_response": {
+    "description": "Empty state when no example response exists"
+  },
+  "marketplace_copy": "Copy",
+  "@marketplace_copy": {
+    "description": "Copy button tooltip"
+  },
+  "marketplace_increase_font_size": "Increase font size",
+  "@marketplace_increase_font_size": {
+    "description": "Tooltip for increase font size button"
+  },
+  "marketplace_decrease_font_size": "Decrease font size",
+  "@marketplace_decrease_font_size": {
+    "description": "Tooltip for decrease font size button"
+  },
+  "marketplace_no_html_content": "No HTML content available",
+  "@marketplace_no_html_content": {
+    "description": "Empty state when no HTML content exists"
+  },
+  "marketplace_no_screenshot": "No screenshot available",
+  "@marketplace_no_screenshot": {
+    "description": "Empty state when no screenshot exists"
+  },
+  "marketplace_result_copied": "Result copied to clipboard",
+  "@marketplace_result_copied": {
+    "description": "Snackbar message when result is copied"
+  },
+  "marketplace_html_copied": "HTML copied to clipboard",
+  "@marketplace_html_copied": {
+    "description": "Snackbar message when HTML is copied"
+  },
+  "marketplace_screenshot_info_copied": "Screenshot info copied",
+  "@marketplace_screenshot_info_copied": {
+    "description": "Snackbar message when screenshot info is copied"
+  },
+  "marketplace_target_url": "Target URL:",
+  "@marketplace_target_url": {
+    "description": "Label for target URL field"
+  },
+  "marketplace_change": "Change",
+  "@marketplace_change": {
+    "description": "Button to change target URL"
+  },
+  "marketplace_curl_command": "Curl Command",
+  "@marketplace_curl_command": {
+    "description": "Label for curl command section"
+  },
+  "marketplace_test_endpoint": "Test Endpoint",
+  "@marketplace_test_endpoint": {
+    "description": "Button to test endpoint"
+  },
+  "marketplace_copy_curl_command": "Copy the test cURL command",
+  "@marketplace_copy_curl_command": {
+    "description": "Tooltip for copy curl command button"
+  },
+  "marketplace_api_configuration": "API Configuration & Costs",
+  "@marketplace_api_configuration": {
+    "description": "Section title for API configuration"
+  },
+  "marketplace_created_date": "Created: {date}",
+  "@marketplace_created_date": {
+    "description": "Scrappable creation date",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "marketplace_last_logic_modification": "Last logic modification: {date}",
+  "@marketplace_last_logic_modification": {
+    "description": "Last modification date for extraction rules",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "marketplace_clone_to_my_endpoints": "Clone to My Endpoints",
+  "@marketplace_clone_to_my_endpoints": {
+    "description": "Button to clone scrappable"
+  },
+  "marketplace_login_required": "Please log in to use this scrappable.",
+  "@marketplace_login_required": {
+    "description": "Message when user needs to log in"
+  },
+  "marketplace_no_api_keys": "No API keys found. Please create an API key first to use this scrappable.",
+  "@marketplace_no_api_keys": {
+    "description": "Message when user has no API keys"
+  },
+  "marketplace_upgrade_required_title": "Upgrade Required",
+  "@marketplace_upgrade_required_title": {
+    "description": "Title for upgrade required dialog"
+  },
+  "marketplace_clone_feature_pro": "Cloning scrappables from the marketplace is available on Pro and Ultra plans.",
+  "@marketplace_clone_feature_pro": {
+    "description": "Message explaining clone feature requires upgrade"
+  },
+  "marketplace_upgrade_benefits_title": "Upgrade to unlock:",
+  "@marketplace_upgrade_benefits_title": {
+    "description": "Title for upgrade benefits list"
+  },
+  "marketplace_benefit_clone": "Clone any marketplace scrappable",
+  "@marketplace_benefit_clone": {
+    "description": "Benefit item for cloning"
+  },
+  "marketplace_benefit_more_credits": "More API credits",
+  "@marketplace_benefit_more_credits": {
+    "description": "Benefit item for credits"
+  },
+  "marketplace_benefit_concurrent": "Higher concurrent requests",
+  "@marketplace_benefit_concurrent": {
+    "description": "Benefit item for concurrent requests"
+  },
+  "marketplace_benefit_endpoints": "More active endpoints",
+  "@marketplace_benefit_endpoints": {
+    "description": "Benefit item for endpoints"
+  },
+  "marketplace_maybe_later": "Maybe Later",
+  "@marketplace_maybe_later": {
+    "description": "Button to dismiss upgrade dialog"
+  },
+  "marketplace_view_plans": "View Plans",
+  "@marketplace_view_plans": {
+    "description": "Button to view pricing plans"
   }
 }

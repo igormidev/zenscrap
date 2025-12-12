@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/core/extensions/convert_extensions.dart';
 import 'package:zenscrap_flutter/src/core/extensions/date_time_extension.dart';
 import 'package:zenscrap_flutter/src/core/extensions/string_extension.dart';
@@ -192,7 +193,7 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
               Padding(
                 padding: horizontalPadding,
                 child: Text(
-                  'Target URL:',
+                  AppLocalizations.of(context)!.marketplace_target_url,
                   style: context.t.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -257,7 +258,7 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
                       TextButton.icon(
                         onPressed: _selectApiKey,
                         icon: const Icon(Icons.swap_horiz, size: 18),
-                        label: const Text('Change'),
+                        label: Text(AppLocalizations.of(context)!.marketplace_change),
                       ),
                     ]
                   ],
@@ -269,7 +270,7 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
                 child: Row(
                   children: [
                     Text(
-                      'Curl Command',
+                      AppLocalizations.of(context)!.marketplace_curl_command,
                       style: context.t.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -290,8 +291,8 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
                           icon: const Icon(Icons.science, size: 15),
                           label: Padding(
                             padding: const EdgeInsets.only(bottom: 2),
-                            child: const Text(
-                              'Test Endpoint',
+                            child: Text(
+                              AppLocalizations.of(context)!.marketplace_test_endpoint,
                               style: TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.w400),
                             ),
@@ -305,7 +306,7 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
               Padding(
                 padding: horizontalPadding,
                 child: CodeBlock(
-                  copyTooltipMessage: 'Copy the test cURL command',
+                  copyTooltipMessage: AppLocalizations.of(context)!.marketplace_copy_curl_command,
                   code: displayCurlCommand,
                   copyCode: copiableCurlCommand,
                   fontSize: 12,
@@ -316,7 +317,7 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
                 Padding(
                   padding: horizontalPadding,
                   child: Text(
-                    'API Configuration & Costs',
+                    AppLocalizations.of(context)!.marketplace_api_configuration,
                     style: context.t.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -360,7 +361,7 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'Please log in to use this scrappable.',
+                        AppLocalizations.of(context)!.marketplace_login_required,
                         style: context.t.bodyMedium?.copyWith(
                           color: context.c.onPrimaryContainer,
                         ),
@@ -390,7 +391,7 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'No API keys found. Please create an API key first to use this scrappable.',
+                        AppLocalizations.of(context)!.marketplace_no_api_keys,
                         style: context.t.bodyMedium?.copyWith(
                           color: context.c.error,
                         ),
@@ -404,7 +405,7 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
             Padding(
               padding: horizontalPadding,
               child: Text(
-                'Created: ${_formatFullDate(widget.scrappable.createdAt)}',
+                AppLocalizations.of(context)!.marketplace_created_date(_formatFullDate(widget.scrappable.createdAt)),
                 style: context.t.bodySmall?.copyWith(
                   color: context.c.onSurfaceVariant,
                 ),
@@ -414,7 +415,7 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
             Padding(
               padding: horizontalPadding,
               child: Text(
-                'Last logic modification: ${widget.scrappable.extractRulesUpdatedAt.formatToDisplay}',
+                AppLocalizations.of(context)!.marketplace_last_logic_modification(widget.scrappable.extractRulesUpdatedAt.formatToDisplay),
                 style: context.t.bodySmall?.copyWith(
                   color: context.c.onSurfaceVariant,
                 ),
@@ -427,7 +428,7 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
                 child: FilledButton.icon(
                   onPressed: () => _handleClone(context),
                   icon: const Icon(Icons.copy_rounded),
-                  label: const Text('Clone to My Endpoints'),
+                  label: Text(AppLocalizations.of(context)!.marketplace_clone_to_my_endpoints),
                 ),
               ),
             if (isMyScrappable != false) const SizedBox(height: 42)
