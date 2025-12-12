@@ -27,6 +27,7 @@ dependencies:
   flutter_native_splash: ^2.4.6
   flutter_web_plugins:
     sdk: flutter
+  seo: ^0.0.10
   zenscrap_client:
     path: ../zenscrap_client
   dio: ^5.9.0

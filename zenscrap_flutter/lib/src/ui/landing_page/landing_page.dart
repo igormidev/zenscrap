@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
+import 'package:seo/seo.dart';
 import 'package:simple_platform/simple_platform.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
@@ -409,7 +410,41 @@ class _LandingPageState extends ConsumerState<LandingPage>
       _trackSectionView('hero', 0);
     }
 
-    return Scaffold(
+    // SEO meta tags for the landing page
+    // Note: Open Graph and Twitter Card tags must be set in index.html
+    // as social media crawlers don't execute JavaScript
+    return Seo.head(
+      tags: [
+        // Primary meta tags for search engines
+        const MetaTag(
+          name: 'title',
+          content: 'ZenScrap - AI-Powered Web Scrapers That Fix Themselves',
+        ),
+        const MetaTag(
+          name: 'description',
+          content:
+              'Create self-healing web scrapers with AI. Describe what you want to extract and get a ready-to-use API endpoint. No code, no CSS selectors, no maintenance. Free to start.',
+        ),
+        const MetaTag(
+          name: 'keywords',
+          content:
+              'web scraping, AI scraper, self-healing scraper, web data extraction, API, no-code scraping, automated scraping, data extraction tool, web scraper API, scraping service',
+        ),
+        const MetaTag(name: 'author', content: 'ZenScrap'),
+        const MetaTag(name: 'robots', content: 'index, follow'),
+        const MetaTag(
+          name: 'googlebot',
+          content: 'index, follow, max-snippet:-1, max-image-preview:large',
+        ),
+        // Canonical URL to prevent duplicate content issues
+        const LinkTag(rel: 'canonical', href: 'https://zenscrap.com/'),
+        // Language and locale
+        const MetaTag(name: 'language', content: 'en'),
+        // Application metadata
+        const MetaTag(name: 'application-name', content: 'ZenScrap'),
+        const MetaTag(name: 'theme-color', content: '#607D8B'),
+      ],
+      child: Scaffold(
       // Make scaffold background transparent so Lottie shows through
       backgroundColor: Colors.transparent,
       body: LayoutBuilder(
@@ -586,6 +621,7 @@ class _LandingPageState extends ConsumerState<LandingPage>
           );
         },
       ),
-    );
+      ), // End of Seo.head child: Scaffold
+    ); // End of Seo.head
   }
 }

@@ -2,6 +2,7 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:seo/seo.dart';
 import 'package:serverpod_auth_shared_flutter/serverpod_auth_shared_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talker_flutter/talker_flutter.dart';
@@ -172,40 +173,47 @@ class _MyAppState extends ConsumerState<MyApp> {
     final seedColor = Color(themeState.colorValue);
     final locale = ref.watch(appLocaleProvider);
 
-    return MaterialApp.router(
-      title: 'Zen Scrap',
-      routeInformationProvider: router.routeInformationProvider,
-      routeInformationParser: router.routeInformationParser,
-      routerDelegate: router.routerDelegate,
-      locale: locale,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      theme: buildAppTheme(
-        seedColor: seedColor,
-        brightness: Brightness.light,
+    // SeoController enables SEO (meta, body tag) support on Web
+    // It listens to widget tree changes and updates the HTML document tree
+    // Use kIsWeb to only enable on web platform for performance
+    return SeoController(
+      enabled: kIsWeb,
+      tree: WidgetTree(context: context),
+      child: MaterialApp.router(
+        title: 'ZenScrap - AI-Powered Web Scraping',
+        routeInformationProvider: router.routeInformationProvider,
+        routeInformationParser: router.routeInformationParser,
+        routerDelegate: router.routerDelegate,
+        locale: locale,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        theme: buildAppTheme(
+          seedColor: seedColor,
+          brightness: Brightness.light,
+        ),
+        darkTheme: buildAppTheme(
+          seedColor: seedColor,
+          brightness: Brightness.dark,
+        ),
+        themeMode: themeModeFromBrightness(themeState.brightness),
+        builder: (context, child) {
+          return Consumer(
+            child: child,
+            builder: (context, ref, child) {
+              final isGlobalLoading = ref.watch(isGlobalLoadingProvider);
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  // Check if screen width is below 1000 pixels
+                  if (constraints.maxWidth < 1000) {
+                    return const _MobileNotAvailableScreen();
+                  }
+                  return IgnorePointer(ignoring: isGlobalLoading, child: child);
+                },
+              );
+            },
+          );
+        },
       ),
-      darkTheme: buildAppTheme(
-        seedColor: seedColor,
-        brightness: Brightness.dark,
-      ),
-      themeMode: themeModeFromBrightness(themeState.brightness),
-      builder: (context, child) {
-        return Consumer(
-          child: child,
-          builder: (context, ref, child) {
-            final isGlobalLoading = ref.watch(isGlobalLoadingProvider);
-            return LayoutBuilder(
-              builder: (context, constraints) {
-                // Check if screen width is below 1000 pixels
-                if (constraints.maxWidth < 1000) {
-                  return const _MobileNotAvailableScreen();
-                }
-                return IgnorePointer(ignoring: isGlobalLoading, child: child);
-              },
-            );
-          },
-        );
-      },
     );
   }
 }

@@ -5,6 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
+import 'package:seo/seo.dart';
 import 'package:serverpod_auth_email_flutter/serverpod_auth_email_flutter.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/core/mixins/edit_scrappable.dart';
@@ -107,9 +108,30 @@ class _AuthViewState extends ConsumerState<AuthView>
 
     final double screenWidth = MediaQuery.sizeOf(context).width;
     final bool isCompactSize = screenWidth < 1060.0;
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      body: Stack(
+
+    // SEO meta tags for the authentication page
+    return Seo.head(
+      tags: [
+        const MetaTag(
+          name: 'title',
+          content: 'Sign In | ZenScrap - AI-Powered Web Scraping Platform',
+        ),
+        const MetaTag(
+          name: 'description',
+          content:
+              'Sign in or create your ZenScrap account. Access AI-powered web scrapers, manage your endpoints, and start extracting data automatically.',
+        ),
+        const MetaTag(
+          name: 'keywords',
+          content:
+              'ZenScrap login, sign in, create account, web scraping account, API access',
+        ),
+        const MetaTag(name: 'robots', content: 'index, follow'),
+        const LinkTag(rel: 'canonical', href: 'https://zenscrap.com/auth'),
+      ],
+      child: Scaffold(
+        backgroundColor: Colors.grey[100],
+        body: Stack(
         children: [
           SizedBox.expand(
             child: Lottie.network(
@@ -314,7 +336,8 @@ class _AuthViewState extends ConsumerState<AuthView>
           ),
         ],
       ),
-    );
+      ), // End of Seo.head child: Scaffold
+    ); // End of Seo.head
   }
 }
 
