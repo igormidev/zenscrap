@@ -1761,4 +1761,41 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get scrap_session_close => 'Close';
+
+  @override
+  String get scrappables_empty_title =>
+      'You did not create any scrappables yet.';
+
+  @override
+  String get scrappables_create_first => 'Create your first scrappable';
+
+  @override
+  String get scrappables_search_hint =>
+      'Search your endpoints by name or description...';
+
+  @override
+  String get scrappables_error_loading => 'Error loading endpoints';
+
+  @override
+  String get scrappables_no_results => 'No endpoints found';
+
+  @override
+  String get scrappables_try_different_keywords =>
+      'Try searching with different keywords or adjust your filters.';
+
+  @override
+  String get scrappables_try_different_categories =>
+      'Try selecting different categories or clear your filters.';
+
+  @override
+  String get scrappables_selected_category => 'the selected category';
+
+  @override
+  String get scrappables_selected_categories => 'the selected categories';
+
+  @override
+  String get scrappables_your_endpoints => 'Your endpoints';
+
+  @override
+  String get scrappables_create_new => 'Create new endpoint';
 }

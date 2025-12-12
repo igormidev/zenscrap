@@ -1761,6 +1761,43 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get scrap_session_close => 'Close';
+
+  @override
+  String get scrappables_empty_title =>
+      'You did not create any scrappables yet.';
+
+  @override
+  String get scrappables_create_first => 'Create your first scrappable';
+
+  @override
+  String get scrappables_search_hint =>
+      'Search your endpoints by name or description...';
+
+  @override
+  String get scrappables_error_loading => 'Error loading endpoints';
+
+  @override
+  String get scrappables_no_results => 'No endpoints found';
+
+  @override
+  String get scrappables_try_different_keywords =>
+      'Try searching with different keywords or adjust your filters.';
+
+  @override
+  String get scrappables_try_different_categories =>
+      'Try selecting different categories or clear your filters.';
+
+  @override
+  String get scrappables_selected_category => 'the selected category';
+
+  @override
+  String get scrappables_selected_categories => 'the selected categories';
+
+  @override
+  String get scrappables_your_endpoints => 'Your endpoints';
+
+  @override
+  String get scrappables_create_new => 'Create new endpoint';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -3556,4 +3593,41 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get scrap_session_close => 'Fechar';
+
+  @override
+  String get scrappables_empty_title =>
+      'Voce ainda nao criou nenhum scrappable.';
+
+  @override
+  String get scrappables_create_first => 'Crie seu primeiro scrappable';
+
+  @override
+  String get scrappables_search_hint =>
+      'Pesquise seus endpoints por nome ou descricao...';
+
+  @override
+  String get scrappables_error_loading => 'Erro ao carregar endpoints';
+
+  @override
+  String get scrappables_no_results => 'Nenhum endpoint encontrado';
+
+  @override
+  String get scrappables_try_different_keywords =>
+      'Tente pesquisar com palavras-chave diferentes ou ajuste seus filtros.';
+
+  @override
+  String get scrappables_try_different_categories =>
+      'Tente selecionar categorias diferentes ou limpe seus filtros.';
+
+  @override
+  String get scrappables_selected_category => 'a categoria selecionada';
+
+  @override
+  String get scrappables_selected_categories => 'as categorias selecionadas';
+
+  @override
+  String get scrappables_your_endpoints => 'Seus endpoints';
+
+  @override
+  String get scrappables_create_new => 'Criar novo endpoint';
 }

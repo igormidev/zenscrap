@@ -535,5 +535,17 @@
   "scrap_session_missing_path_params": "不足しているパスパラメータ",
   "scrap_session_unused_path_params": "未使用のパスパラメータ",
   "scrap_session_request_updated": "Scrappableリクエストが正常に更新されました!",
-  "scrap_session_close": "閉じる"
+  "scrap_session_close": "閉じる",
+
+  "scrappables_empty_title": "まだスクラッパブルを作成していません。",
+  "scrappables_create_first": "最初のスクラッパブルを作成",
+  "scrappables_search_hint": "名前または説明でエンドポイントを検索...",
+  "scrappables_error_loading": "エンドポイントの読み込みエラー",
+  "scrappables_no_results": "エンドポイントが見つかりません",
+  "scrappables_try_different_keywords": "別のキーワードで検索するか、フィルターを調整してください。",
+  "scrappables_try_different_categories": "別のカテゴリを選択するか、フィルターをクリアしてください。",
+  "scrappables_selected_category": "選択したカテゴリ",
+  "scrappables_selected_categories": "選択したカテゴリ",
+  "scrappables_your_endpoints": "あなたのエンドポイント",
+  "scrappables_create_new": "新しいエンドポイントを作成"
 }

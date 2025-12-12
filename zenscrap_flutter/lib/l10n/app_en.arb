@@ -2317,5 +2317,50 @@
   "scrap_session_close": "Close",
   "@scrap_session_close": {
     "description": "Close button tooltip"
+  },
+
+  "scrappables_empty_title": "You did not create any scrappables yet.",
+  "@scrappables_empty_title": {
+    "description": "Title shown when user has no scrappables"
+  },
+  "scrappables_create_first": "Create your first scrappable",
+  "@scrappables_create_first": {
+    "description": "Button text to create first scrappable"
+  },
+  "scrappables_search_hint": "Search your endpoints by name or description...",
+  "@scrappables_search_hint": {
+    "description": "Hint text for search bar in user scrappables"
+  },
+  "scrappables_error_loading": "Error loading endpoints",
+  "@scrappables_error_loading": {
+    "description": "Error title when loading endpoints fails"
+  },
+  "scrappables_no_results": "No endpoints found",
+  "@scrappables_no_results": {
+    "description": "Title when no endpoints match search/filter"
+  },
+  "scrappables_try_different_keywords": "Try searching with different keywords or adjust your filters.",
+  "@scrappables_try_different_keywords": {
+    "description": "Description when search returns no results"
+  },
+  "scrappables_try_different_categories": "Try selecting different categories or clear your filters.",
+  "@scrappables_try_different_categories": {
+    "description": "Description when category filter returns no results"
+  },
+  "scrappables_selected_category": "the selected category",
+  "@scrappables_selected_category": {
+    "description": "Text for single selected category"
+  },
+  "scrappables_selected_categories": "the selected categories",
+  "@scrappables_selected_categories": {
+    "description": "Text for multiple selected categories"
+  },
+  "scrappables_your_endpoints": "Your endpoints",
+  "@scrappables_your_endpoints": {
+    "description": "Header title for user's endpoints list"
+  },
+  "scrappables_create_new": "Create new endpoint",
+  "@scrappables_create_new": {
+    "description": "Button text to create a new endpoint"
   }
 }

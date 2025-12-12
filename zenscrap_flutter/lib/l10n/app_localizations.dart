@@ -3215,6 +3215,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Close'**
   String get scrap_session_close;
+
+  /// Title shown when user has no scrappables
+  ///
+  /// In en, this message translates to:
+  /// **'You did not create any scrappables yet.'**
+  String get scrappables_empty_title;
+
+  /// Button text to create first scrappable
+  ///
+  /// In en, this message translates to:
+  /// **'Create your first scrappable'**
+  String get scrappables_create_first;
+
+  /// Hint text for search bar in user scrappables
+  ///
+  /// In en, this message translates to:
+  /// **'Search your endpoints by name or description...'**
+  String get scrappables_search_hint;
+
+  /// Error title when loading endpoints fails
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading endpoints'**
+  String get scrappables_error_loading;
+
+  /// Title when no endpoints match search/filter
+  ///
+  /// In en, this message translates to:
+  /// **'No endpoints found'**
+  String get scrappables_no_results;
+
+  /// Description when search returns no results
+  ///
+  /// In en, this message translates to:
+  /// **'Try searching with different keywords or adjust your filters.'**
+  String get scrappables_try_different_keywords;
+
+  /// Description when category filter returns no results
+  ///
+  /// In en, this message translates to:
+  /// **'Try selecting different categories or clear your filters.'**
+  String get scrappables_try_different_categories;
+
+  /// Text for single selected category
+  ///
+  /// In en, this message translates to:
+  /// **'the selected category'**
+  String get scrappables_selected_category;
+
+  /// Text for multiple selected categories
+  ///
+  /// In en, this message translates to:
+  /// **'the selected categories'**
+  String get scrappables_selected_categories;
+
+  /// Header title for user's endpoints list
+  ///
+  /// In en, this message translates to:
+  /// **'Your endpoints'**
+  String get scrappables_your_endpoints;
+
+  /// Button text to create a new endpoint
+  ///
+  /// In en, this message translates to:
+  /// **'Create new endpoint'**
+  String get scrappables_create_new;
 }
 
 class _AppLocalizationsDelegate

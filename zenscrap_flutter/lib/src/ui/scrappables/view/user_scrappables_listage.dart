@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
@@ -80,7 +81,7 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
           selectedCategories: data.selectedCategories,
           contentWidget: EmptyScrappablesState(
             isSearchResult: false,
-            title: 'Error loading endpoints',
+            title: AppLocalizations.of(context)!.scrappables_error_loading,
             description: data.error.description,
             icon: Icons.error_outline_rounded,
           ),
@@ -107,12 +108,15 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
         }
 
         // Content widget based on whether we have scrappables
+        final l10n = AppLocalizations.of(context)!;
         final contentWidget = scrappables.isEmpty
             ? EmptyScrappablesState(
                 isSearchResult: true,
                 searchQuery: searchQuery.isNotEmpty
                     ? searchQuery
-                    : 'the selected ${selectedCategories.length == 1 ? 'category' : 'categories'}',
+                    : (selectedCategories.length == 1
+                        ? l10n.scrappables_selected_category
+                        : l10n.scrappables_selected_categories),
                 onClearSearch: () {
                   if (searchQuery.isNotEmpty) {
                     ref.read(userScrappablesProvider.notifier).search('');
@@ -123,10 +127,10 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
                         .filterByCategories({});
                   }
                 },
-                title: 'No endpoints found',
+                title: l10n.scrappables_no_results,
                 description: searchQuery.isNotEmpty
-                    ? 'Try searching with different keywords or adjust your filters.'
-                    : 'Try selecting different categories or clear your filters.',
+                    ? l10n.scrappables_try_different_keywords
+                    : l10n.scrappables_try_different_categories,
               )
             : ScrappablesListageTemplate(
                 scrappables: scrappables,
@@ -193,6 +197,7 @@ class _UserScrappablesLayout extends ConsumerWidget {
 
     final maxAllowed = planTier.maxScrappables;
     final isAtLimit = totalUserScrappables >= maxAllowed;
+    final l10n = AppLocalizations.of(context)!;
 
     return Padding(
       padding: const EdgeInsets.only(right: 20),
@@ -202,7 +207,7 @@ class _UserScrappablesLayout extends ConsumerWidget {
           Row(
             children: [
               Text(
-                'Your endpoints',
+                l10n.scrappables_your_endpoints,
                 style: context.t.displaySmall,
               ),
               const Spacer(),
@@ -233,14 +238,14 @@ class _UserScrappablesLayout extends ConsumerWidget {
                         .getScrappables());
                   }
                 },
-                label: const Text('Create new endpoint'),
+                label: Text(l10n.scrappables_create_new),
                 icon: const Icon(Icons.add),
               ),
             ],
           ),
           const SizedBox(height: 16),
           ScrappablesSearchBar(
-            hintText: 'Search your endpoints by name or description...',
+            hintText: l10n.scrappables_search_hint,
             onSearch: (query) {
               ref.read(userScrappablesProvider.notifier).search(query);
             },

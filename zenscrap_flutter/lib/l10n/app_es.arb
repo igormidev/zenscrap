@@ -535,5 +535,17 @@
   "scrap_session_missing_path_params": "Parametros de Ruta Faltantes",
   "scrap_session_unused_path_params": "Parametros de Ruta No Usados",
   "scrap_session_request_updated": "Solicitud de scrappable actualizada exitosamente!",
-  "scrap_session_close": "Cerrar"
+  "scrap_session_close": "Cerrar",
+
+  "scrappables_empty_title": "Aun no has creado ningun scrappable.",
+  "scrappables_create_first": "Crea tu primer scrappable",
+  "scrappables_search_hint": "Busca tus endpoints por nombre o descripcion...",
+  "scrappables_error_loading": "Error al cargar endpoints",
+  "scrappables_no_results": "No se encontraron endpoints",
+  "scrappables_try_different_keywords": "Intenta buscar con palabras clave diferentes o ajusta tus filtros.",
+  "scrappables_try_different_categories": "Intenta seleccionar categorias diferentes o limpia tus filtros.",
+  "scrappables_selected_category": "la categoria seleccionada",
+  "scrappables_selected_categories": "las categorias seleccionadas",
+  "scrappables_your_endpoints": "Tus endpoints",
+  "scrappables_create_new": "Crear nuevo endpoint"
 }

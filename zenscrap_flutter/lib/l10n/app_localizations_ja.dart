@@ -1708,4 +1708,39 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get scrap_session_close => '閉じる';
+
+  @override
+  String get scrappables_empty_title => 'まだスクラッパブルを作成していません。';
+
+  @override
+  String get scrappables_create_first => '最初のスクラッパブルを作成';
+
+  @override
+  String get scrappables_search_hint => '名前または説明でエンドポイントを検索...';
+
+  @override
+  String get scrappables_error_loading => 'エンドポイントの読み込みエラー';
+
+  @override
+  String get scrappables_no_results => 'エンドポイントが見つかりません';
+
+  @override
+  String get scrappables_try_different_keywords =>
+      '別のキーワードで検索するか、フィルターを調整してください。';
+
+  @override
+  String get scrappables_try_different_categories =>
+      '別のカテゴリを選択するか、フィルターをクリアしてください。';
+
+  @override
+  String get scrappables_selected_category => '選択したカテゴリ';
+
+  @override
+  String get scrappables_selected_categories => '選択したカテゴリ';
+
+  @override
+  String get scrappables_your_endpoints => 'あなたのエンドポイント';
+
+  @override
+  String get scrappables_create_new => '新しいエンドポイントを作成';
 }

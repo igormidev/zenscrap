@@ -535,5 +535,17 @@
   "scrap_session_missing_path_params": "Fehlende Pfadparameter",
   "scrap_session_unused_path_params": "Nicht verwendete Pfadparameter",
   "scrap_session_request_updated": "Scrappable-Anfrage erfolgreich aktualisiert!",
-  "scrap_session_close": "Schliessen"
+  "scrap_session_close": "Schliessen",
+
+  "scrappables_empty_title": "Sie haben noch keine Scrappables erstellt.",
+  "scrappables_create_first": "Erstellen Sie Ihr erstes Scrappable",
+  "scrappables_search_hint": "Suchen Sie Ihre Endpoints nach Name oder Beschreibung...",
+  "scrappables_error_loading": "Fehler beim Laden der Endpoints",
+  "scrappables_no_results": "Keine Endpoints gefunden",
+  "scrappables_try_different_keywords": "Versuchen Sie es mit anderen Suchbegriffen oder passen Sie Ihre Filter an.",
+  "scrappables_try_different_categories": "Versuchen Sie andere Kategorien auszuwaehlen oder setzen Sie Ihre Filter zurueck.",
+  "scrappables_selected_category": "die ausgewaehlte Kategorie",
+  "scrappables_selected_categories": "die ausgewaehlten Kategorien",
+  "scrappables_your_endpoints": "Ihre Endpoints",
+  "scrappables_create_new": "Neuen Endpoint erstellen"
 }
