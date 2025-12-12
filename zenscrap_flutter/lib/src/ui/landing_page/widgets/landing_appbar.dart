@@ -82,7 +82,10 @@ class LandingAppBar extends StatelessWidget {
               ),
               const Spacer(),
               // Language selector
-              const LanguageSelector().animate().fadeIn(duration: 400.ms, delay: 150.ms),
+              SizedBox(
+                height: 34,
+                child: const LanguageSelector(),
+              ).animate().fadeIn(duration: 400.ms, delay: 150.ms),
               const SizedBox(width: 12),
               // Login button
               _LoginButton(onTap: onSignInTap),
@@ -130,10 +133,7 @@ class _NavigationBar extends StatelessWidget {
   final LandingSection? activeSection;
   final void Function(LandingSection section)? onSectionTap;
 
-  const _NavigationBar({
-    this.activeSection,
-    this.onSectionTap,
-  });
+  const _NavigationBar({this.activeSection, this.onSectionTap});
 
   @override
   Widget build(BuildContext context) {
@@ -191,8 +191,8 @@ class _NavItemState extends State<_NavItem> {
             color: widget.isActive
                 ? context.c.primary
                 : (_isHovered
-                    ? context.c.primary.withAlpha(30)
-                    : Colors.transparent),
+                      ? context.c.primary.withAlpha(30)
+                      : Colors.transparent),
             borderRadius: BorderRadius.circular(24),
           ),
           child: Text(
@@ -201,8 +201,8 @@ class _NavItemState extends State<_NavItem> {
               color: widget.isActive
                   ? context.c.onPrimary
                   : (_isHovered
-                      ? context.c.primary
-                      : context.c.onSurfaceVariant),
+                        ? context.c.primary
+                        : context.c.onSurfaceVariant),
               fontWeight: widget.isActive ? FontWeight.w600 : FontWeight.normal,
             ),
           ),

@@ -1,6 +1,6 @@
 I want to add better SEO for this my saas. I will ask claude code to do this, could you please write a prompt for me inside a readme file that tells how claude code should do this task? Please mention files (use "@" in the front of files names that is the way claude code recognizes file mentioning) and also mention file names. You should ultrathink to be the master of prompt engeniring so the task is really well defined - you can suggest things as well. I am asking this to you instead of me writing the prompt myself because I think you will do a better prompt engeniring job.
 
-In your prompt you should ask claude code to spawn new instances of claude code to do 3 tasks - this is because I want the main claude instance to be only the conductor since each one of the tasks in very heavly to do and will require a lot of web reseach. So one task alone would already end the context of that claude instance and it will start to compact and then start to deliver worse responses - so a better approach for this kind of task that will require multiple tasks that are context-heavly it is better to create a brand new instance with a clean context and with a focused prompt for only one task - so it will do that task with excelence since it is focused only on it... ask ai to "ultrathink" in the good rich prompts for each sub ai he will create and ask it to give reference of files and functions as well in those prompts...
+In your prompt you should ask claude code to spawn new instances of claude code to do some tasks - this is because I want the main claude instance to be only the conductor since each one of the tasks in very heavly to do and will require a lot of web reseach. So one task alone would already end the context of that claude instance and it will start to compact and then start to deliver worse responses - so a better approach for this kind of task that will require multiple tasks that are context-heavly it is better to create a brand new instance with a clean context and with a focused prompt for only one task - so it will do that task with excelence since it is focused only on it... ask ai to "ultrathink" in the good rich prompts for each sub ai he will create and ask it to give reference of files and functions as well in those prompts...
 
 That was the hole arquiteture of the prompt - low lets go to the task itself that I want you to create a prompt for me to run with claude code: I want to enhance the SEO so my site is more easly finded by robots (search engines and AI)
 
@@ -76,6 +76,8 @@ So it will work! So in your tests, run with the `wasm` flag to ensure everything
 I want to deploy my site. Currently, I am hosting my serverpod in scloud.
 Guide in the prompt the claude code to pass to the instance the deploy documentation link of scloud at link "https://docs.serverpod.cloud/guides/deployment/deploying-your-application" but basicly you just need to run "scloud deploy" since everything is already configured and the cli is already logged in. Then, put a timer of 5 minutes and run "scloud deployment list" to see if the deployment had apear as finished (if not, should sleep more 5 minutes and try again... try this 4 times until its done). When deployed, open the site and see if there is any error in the console log and if there is any error ask that instance to spawn a other instance to fix that error...
 
+Also, MANDATORY: Say to the ai to use serverpod mcp and ask him how to deploy WITH SERVERPOD 3. This is very important, the document needs to be based in the brand new serverpod 3 and not in previous values.
+
 ## DEPLOY GUIDELINE: Use wasm
 Use wasm to enhance perfomance. I already checked and the "seo" package works with web assembly sites.
 
@@ -94,3 +96,10 @@ const Icon(Icons.home)
 // ❌ Bad - prevents tree-shaking
 Icon(IconData(someVariable))
 ```
+
+## Write a deploy script at the end
+You MUST (mandatory) write a script to generate. This script will enter the files run the commands like the flutter build and then move things from one place to other and generate with all the flags like "wasm" and then in the end run the "scloud deploy" command. This way next time I want to deploy I can just do that.
+Currently there is a deploy script in `@scripts/build_flutter_web` but I built it when we where using serverpod 2.9.2 and bellow, we are now in version 3 that changed a LOT of things related to hosting so I think it does not work anymore but you can use it as reference if you want - but delete it in the end of everything.
+
+# Important: 
+DO NOT FORGET TO SPAWN one claude code instance for each task and use opus 4.5 for each one of them and ask IA to "ultrathink" for each one of them as well...
