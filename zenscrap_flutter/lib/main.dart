@@ -1,6 +1,6 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:serverpod_auth_shared_flutter/serverpod_auth_shared_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -176,11 +176,8 @@ class _MyAppState extends ConsumerState<MyApp> {
       routeInformationParser: router.routeInformationParser,
       routerDelegate: router.routerDelegate,
       locale: const Locale('en'),
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       theme: buildAppTheme(
         seedColor: seedColor,
         brightness: Brightness.light,

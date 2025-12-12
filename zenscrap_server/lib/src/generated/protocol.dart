@@ -73,13 +73,14 @@ import 'entities/scrappable/scrappable.dart' as _i49;
 import 'entities/scrappable/scrappable_analytics.dart' as _i50;
 import 'entities/scrappable/scrappable_request.dart' as _i51;
 import 'entities/scrappable/scrapping_bee_extract_logic.dart' as _i52;
+import 'entities/supported_language.dart' as _i53;
 import 'entities/user_scrappables/user_paginated_scrappable_response.dart'
-    as _i53;
-import 'entities/zenscrap_exception.dart' as _i54;
+    as _i54;
+import 'entities/zenscrap_exception.dart' as _i55;
 import 'package:zenscrap_server/src/generated/entities/account/account_api_key.dart'
-    as _i55;
-import 'package:zenscrap_server/src/generated/entities/scrappable/scraper_category.dart'
     as _i56;
+import 'package:zenscrap_server/src/generated/entities/scrappable/scraper_category.dart'
+    as _i57;
 export 'entities/account/account.dart';
 export 'entities/account/account_api_key.dart';
 export 'entities/account/ai_usage/account_ai_usage.dart';
@@ -129,6 +130,7 @@ export 'entities/scrappable/scrappable.dart';
 export 'entities/scrappable/scrappable_analytics.dart';
 export 'entities/scrappable/scrappable_request.dart';
 export 'entities/scrappable/scrapping_bee_extract_logic.dart';
+export 'entities/supported_language.dart';
 export 'entities/user_scrappables/user_paginated_scrappable_response.dart';
 export 'entities/zenscrap_exception.dart';
 
@@ -2249,11 +2251,14 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i52.ScrappingBeeExtractLogic) {
       return _i52.ScrappingBeeExtractLogic.fromJson(data) as T;
     }
-    if (t == _i53.UserPaginatedScrappableResponse) {
-      return _i53.UserPaginatedScrappableResponse.fromJson(data) as T;
+    if (t == _i53.SupportedLanguage) {
+      return _i53.SupportedLanguage.fromJson(data) as T;
     }
-    if (t == _i54.ZenScrapException) {
-      return _i54.ZenScrapException.fromJson(data) as T;
+    if (t == _i54.UserPaginatedScrappableResponse) {
+      return _i54.UserPaginatedScrappableResponse.fromJson(data) as T;
+    }
+    if (t == _i55.ZenScrapException) {
+      return _i55.ZenScrapException.fromJson(data) as T;
     }
     if (t == _i1.getType<_i4.AccountInfo?>()) {
       return (data != null ? _i4.AccountInfo.fromJson(data) : null) as T;
@@ -2515,14 +2520,17 @@ class Protocol extends _i1.SerializationManagerServer {
               : null)
           as T;
     }
-    if (t == _i1.getType<_i53.UserPaginatedScrappableResponse?>()) {
+    if (t == _i1.getType<_i53.SupportedLanguage?>()) {
+      return (data != null ? _i53.SupportedLanguage.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i54.UserPaginatedScrappableResponse?>()) {
       return (data != null
-              ? _i53.UserPaginatedScrappableResponse.fromJson(data)
+              ? _i54.UserPaginatedScrappableResponse.fromJson(data)
               : null)
           as T;
     }
-    if (t == _i1.getType<_i54.ZenScrapException?>()) {
-      return (data != null ? _i54.ZenScrapException.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i55.ZenScrapException?>()) {
+      return (data != null ? _i55.ZenScrapException.fromJson(data) : null) as T;
     }
     if (t == List<_i49.Scrappable>) {
       return (data as List).map((e) => deserialize<_i49.Scrappable>(e)).toList()
@@ -2654,9 +2662,9 @@ class Protocol extends _i1.SerializationManagerServer {
               : null)
           as T;
     }
-    if (t == List<_i55.AccountApiKey>) {
+    if (t == List<_i56.AccountApiKey>) {
       return (data as List)
-              .map((e) => deserialize<_i55.AccountApiKey>(e))
+              .map((e) => deserialize<_i56.AccountApiKey>(e))
               .toList()
           as T;
     }
@@ -2675,16 +2683,16 @@ class Protocol extends _i1.SerializationManagerServer {
           )
           as T;
     }
-    if (t == List<_i56.ScraperCategory>) {
+    if (t == List<_i57.ScraperCategory>) {
       return (data as List)
-              .map((e) => deserialize<_i56.ScraperCategory>(e))
+              .map((e) => deserialize<_i57.ScraperCategory>(e))
               .toList()
           as T;
     }
-    if (t == _i1.getType<List<_i56.ScraperCategory>?>()) {
+    if (t == _i1.getType<List<_i57.ScraperCategory>?>()) {
       return (data != null
               ? (data as List)
-                    .map((e) => deserialize<_i56.ScraperCategory>(e))
+                    .map((e) => deserialize<_i57.ScraperCategory>(e))
                     .toList()
               : null)
           as T;
@@ -2776,8 +2784,9 @@ class Protocol extends _i1.SerializationManagerServer {
       _i50.ScrappableAnalytics => 'ScrappableAnalytics',
       _i51.ScrappableRequest => 'ScrappableRequest',
       _i52.ScrappingBeeExtractLogic => 'ScrappingBeeExtractLogic',
-      _i53.UserPaginatedScrappableResponse => 'UserPaginatedScrappableResponse',
-      _i54.ZenScrapException => 'ZenScrapException',
+      _i53.SupportedLanguage => 'SupportedLanguage',
+      _i54.UserPaginatedScrappableResponse => 'UserPaginatedScrappableResponse',
+      _i55.ZenScrapException => 'ZenScrapException',
       _ => null,
     };
   }
@@ -2912,9 +2921,11 @@ class Protocol extends _i1.SerializationManagerServer {
         return 'ScrappableRequest';
       case _i52.ScrappingBeeExtractLogic():
         return 'ScrappingBeeExtractLogic';
-      case _i53.UserPaginatedScrappableResponse():
+      case _i53.SupportedLanguage():
+        return 'SupportedLanguage';
+      case _i54.UserPaginatedScrappableResponse():
         return 'UserPaginatedScrappableResponse';
-      case _i54.ZenScrapException():
+      case _i55.ZenScrapException():
         return 'ZenScrapException';
     }
     className = _i2.Protocol().getClassNameForObject(data);
@@ -3118,11 +3129,14 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName == 'ScrappingBeeExtractLogic') {
       return deserialize<_i52.ScrappingBeeExtractLogic>(data['data']);
     }
+    if (dataClassName == 'SupportedLanguage') {
+      return deserialize<_i53.SupportedLanguage>(data['data']);
+    }
     if (dataClassName == 'UserPaginatedScrappableResponse') {
-      return deserialize<_i53.UserPaginatedScrappableResponse>(data['data']);
+      return deserialize<_i54.UserPaginatedScrappableResponse>(data['data']);
     }
     if (dataClassName == 'ZenScrapException') {
-      return deserialize<_i54.ZenScrapException>(data['data']);
+      return deserialize<_i55.ZenScrapException>(data['data']);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);
