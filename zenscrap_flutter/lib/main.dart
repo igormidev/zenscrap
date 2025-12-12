@@ -14,6 +14,7 @@ import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 import 'package:zenscrap_flutter/src/core/web/url_strategy.dart';
 import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 import 'package:zenscrap_flutter/src/providers/go_router_providers.dart';
+import 'package:zenscrap_flutter/src/providers/language_provider.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/providers/shared_preferences_provider.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
@@ -169,13 +170,14 @@ class _MyAppState extends ConsumerState<MyApp> {
     final router = ref.watch(routerProvider);
     final themeState = ref.watch(themeProvider);
     final seedColor = Color(themeState.colorValue);
+    final locale = ref.watch(appLocaleProvider);
 
     return MaterialApp.router(
       title: 'Zen Scrap',
       routeInformationProvider: router.routeInformationProvider,
       routeInformationParser: router.routeInformationParser,
       routerDelegate: router.routerDelegate,
-      locale: const Locale('en'),
+      locale: locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       theme: buildAppTheme(

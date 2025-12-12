@@ -5,6 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/widgets/language_selector.dart';
 
 /// The navigation items in the landing page appbar.
 enum LandingSection {
@@ -80,6 +81,9 @@ class LandingAppBar extends StatelessWidget {
                 onSectionTap: onSectionTap,
               ),
               const Spacer(),
+              // Language selector
+              const LanguageSelector().animate().fadeIn(duration: 400.ms, delay: 150.ms),
+              const SizedBox(width: 12),
               // Login button
               _LoginButton(onTap: onSignInTap),
             ],

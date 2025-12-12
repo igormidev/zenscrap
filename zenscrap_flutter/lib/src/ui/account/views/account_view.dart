@@ -6,6 +6,7 @@ import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/core/extensions/plan_tier_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/contact_support_button.dart';
+import 'package:zenscrap_flutter/src/design_system/widgets/language_selector.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
@@ -237,6 +238,9 @@ class _ThemeCustomizationSection extends ConsumerWidget {
             onColorSelected: themeNotifier.selectColor,
           ),
         ),
+        const SizedBox(height: 27),
+        // Language Card
+        const LanguageSelectorCard(),
       ],
     );
   }

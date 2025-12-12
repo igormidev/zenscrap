@@ -40,11 +40,7 @@ class CreditsOverviewSection extends StatelessWidget {
                 l10n.api_usage_credits_overview,
                 style: context.t.titleLarge,
               ),
-              Icon(
-                Icons.generating_tokens,
-                color: context.c.primary,
-                size: 28,
-              ),
+              Icon(Icons.generating_tokens, color: context.c.primary, size: 28),
             ],
           ),
           const SizedBox(height: 16),
@@ -133,14 +129,8 @@ class CreditItem extends StatelessWidget {
             : context.c.surfaceContainerHighest.withAlpha(50),
         borderRadius: BorderRadius.circular(12),
         border: isHighlighted
-            ? Border.all(
-                color: context.c.primary.withAlpha(100),
-                width: 1.5,
-              )
-            : Border.all(
-                color: context.c.outline.withAlpha(30),
-                width: 1,
-              ),
+            ? Border.all(color: context.c.primary.withAlpha(100), width: 1.5)
+            : Border.all(color: context.c.outline.withAlpha(30), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
