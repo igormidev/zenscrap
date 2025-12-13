@@ -13,6 +13,8 @@ import 'package:serverpod_auth_server/serverpod_auth_server.dart' as auth;
 import 'package:zenscrap_server/src/endpoints/public/scrappable_chat_session.dart';
 import 'package:zenscrap_server/src/routes/scrappable_api_route.dart';
 import 'package:zenscrap_server/src/webhooks/stripe_webhook.dart';
+import 'package:zenscrap_server/src/web/routes/terms_of_service_route.dart';
+import 'package:zenscrap_server/src/web/routes/privacy_policy_route.dart';
 import 'src/generated/protocol.dart';
 import 'src/generated/endpoints.dart';
 
@@ -46,6 +48,10 @@ void run(List<String> args) async {
     StaticRoute.directory(Directory('web/static')),
     '/static/**',
   );
+
+  // Register legal pages (Terms of Service and Privacy Policy)
+  pod.webServer.addRoute(TermsOfServiceRoute(), '/terms-of-service');
+  pod.webServer.addRoute(PrivacyPolicyRoute(), '/privacy-policy');
 
   // Setup Flutter web app using Serverpod 3.0 FlutterRoute (catch-all for remaining routes)
   // FlutterRoute is designed for Flutter WASM apps and automatically:
