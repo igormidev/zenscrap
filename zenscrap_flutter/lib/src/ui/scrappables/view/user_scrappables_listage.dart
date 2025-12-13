@@ -44,9 +44,9 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
   @override
   Widget build(BuildContext context) {
     final analytics = ref.read(analyticsServiceProvider);
-    final accountId = ref.watch(accountProvider).mapOrNull(
-          withData: (value) => value.accountInfo.id,
-        );
+    final accountId = ref
+        .watch(accountProvider)
+        .mapOrNull(withData: (value) => value.accountInfo.id);
     final state = ref.watch(userScrappablesProvider);
 
     return state.map(
@@ -115,8 +115,8 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
                 searchQuery: searchQuery.isNotEmpty
                     ? searchQuery
                     : (selectedCategories.length == 1
-                        ? l10n.scrappables_selected_category
-                        : l10n.scrappables_selected_categories),
+                          ? l10n.scrappables_selected_category
+                          : l10n.scrappables_selected_categories),
                 onClearSearch: () {
                   if (searchQuery.isNotEmpty) {
                     ref.read(userScrappablesProvider.notifier).search('');
@@ -181,14 +181,14 @@ class _UserScrappablesLayout extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Get account info for plan tier
     final accountState = ref.watch(accountProvider);
-    final planTier = accountState.mapOrNull(
-          withData: (data) => data.accountInfo.planTier,
-        ) ??
+    final planTier =
+        accountState.mapOrNull(withData: (data) => data.accountInfo.planTier) ??
         PlanTier.none;
 
     // Get total user scrappables count from state
     final scrappablesState = ref.watch(userScrappablesProvider);
-    final totalUserScrappables = scrappablesState.mapOrNull(
+    final totalUserScrappables =
+        scrappablesState.mapOrNull(
           withData: (data) => data.response.pagination.totalUserScrappables,
           loading: (data) => data.response?.pagination.totalUserScrappables,
           withError: (data) => data.response?.pagination.totalUserScrappables,
@@ -226,16 +226,18 @@ class _UserScrappablesLayout extends ConsumerWidget {
                       currentPlan: planTier,
                       nextPlan: planTier.nextTier,
                     );
-                    return;
+                    // return;
                   }
 
                   ref.read(scrapChatProvider.notifier).reset();
                   if (!context.mounted) return;
                   final result = await context.push('/scrappable-form');
                   if (result == true) {
-                    unawaited(ref
-                        .read(userScrappablesProvider.notifier)
-                        .getScrappables());
+                    unawaited(
+                      ref
+                          .read(userScrappablesProvider.notifier)
+                          .getScrappables(),
+                    );
                   }
                 },
                 label: Text(l10n.scrappables_create_new),
