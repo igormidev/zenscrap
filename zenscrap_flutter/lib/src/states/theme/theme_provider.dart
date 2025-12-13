@@ -4,7 +4,7 @@ import 'package:zenscrap_flutter/src/providers/shared_preferences_provider.dart'
 import 'package:zenscrap_flutter/src/states/theme/theme_state.dart';
 
 const _colorKey = 'theme_color_value';
-const _brightnessKey = 'theme_brightness';
+const _brightnessKey = 'theme_brightness_value';
 
 /// Notifier for managing theme state.
 /// Migrated from StateNotifierProvider to NotifierProvider for Riverpod 3.0.
@@ -14,7 +14,8 @@ class ThemeStateNotifier extends Notifier<ThemeState> {
     final prefs = ref.watch(sharedPreferencesProvider);
     // ignore: deprecated_member_use
     final colorValue = prefs.getInt(_colorKey) ?? Colors.blue.value;
-    final brightnessIndex = prefs.getInt(_brightnessKey) ?? 0;
+    final brightnessIndex =
+        prefs.getInt(_brightnessKey) ?? Brightness.light.index;
     return ThemeState(
       colorValue: colorValue,
       brightness: Brightness.values[brightnessIndex],
@@ -36,11 +37,13 @@ class ThemeStateNotifier extends Notifier<ThemeState> {
   }
 
   void toggleBrightness() {
-    final newBrightness =
-        state.brightness == Brightness.light ? Brightness.dark : Brightness.light;
+    final newBrightness = state.brightness == Brightness.light
+        ? Brightness.dark
+        : Brightness.light;
     selectBrightness(newBrightness);
   }
 }
 
-final themeProvider =
-    NotifierProvider<ThemeStateNotifier, ThemeState>(ThemeStateNotifier.new);
+final themeProvider = NotifierProvider<ThemeStateNotifier, ThemeState>(
+  ThemeStateNotifier.new,
+);
