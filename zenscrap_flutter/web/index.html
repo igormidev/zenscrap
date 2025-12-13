@@ -525,6 +525,10 @@
      * Called when Flutter's first frame is rendered.
      */
     function removeSplashFromWeb() {
+      // Prevent multiple calls
+      if (window._splashRemoved) return;
+      window._splashRemoved = true;
+
       const splashContainer = document.getElementById("splash-container");
 
       if (splashContainer) {
@@ -537,6 +541,8 @@
           // Clean up legacy elements if they exist
           document.getElementById("splash")?.remove();
           document.getElementById("splash-branding")?.remove();
+          // Remove splash styles to free memory
+          document.getElementById("splash-screen-style")?.remove();
           // Reset body background for Flutter
           document.body.style.background = "transparent";
         }, 500); // Match CSS transition duration
@@ -546,6 +552,67 @@
         document.getElementById("splash-branding")?.remove();
         document.body.style.background = "transparent";
       }
+    }
+
+    /**
+     * Listen for Flutter's first frame event (works for dart2js builds).
+     * See: https://github.com/flutter/flutter/issues/66066
+     */
+    window.addEventListener('flutter-first-frame', removeSplashFromWeb);
+
+    /**
+     * For WASM/Skwasm builds, the flutter-first-frame event may not fire.
+     * Use polling to detect when Flutter's view element is fully ready.
+     * This is a reliable cross-renderer approach.
+     */
+    function startFlutterDetection() {
+      function checkFlutterReady() {
+        // Check if Flutter's view element exists and has content
+        var flutterView = document.querySelector('flutter-view');
+        var glassPane = document.querySelector('flt-glass-pane');
+
+        if (flutterView && glassPane && !window._splashRemoved) {
+          // Give Flutter a brief moment to render the first frame
+          setTimeout(function() {
+            if (!window._splashRemoved) {
+              removeSplashFromWeb();
+            }
+          }, 150);
+          return true; // Stop polling
+        }
+        return false;
+      }
+
+      // Check immediately in case Flutter already loaded
+      if (!checkFlutterReady()) {
+        // Poll every 100ms until Flutter is ready or timeout
+        var pollInterval = setInterval(function() {
+          if (checkFlutterReady() || window._splashRemoved) {
+            clearInterval(pollInterval);
+          }
+        }, 100);
+
+        // Stop polling after 20 seconds
+        setTimeout(function() {
+          clearInterval(pollInterval);
+        }, 20000);
+      }
+
+      // Ultimate fallback timeout in case all other methods fail
+      setTimeout(function() {
+        if (!window._splashRemoved) {
+          console.warn('Flutter detection did not trigger within 15s. Removing splash as fallback.');
+          removeSplashFromWeb();
+        }
+      }, 15000);
+    }
+
+    // Start detection after DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', startFlutterDetection);
+    } else {
+      // DOM already loaded, start immediately
+      startFlutterDetection();
     }
   </script>
   <script>
