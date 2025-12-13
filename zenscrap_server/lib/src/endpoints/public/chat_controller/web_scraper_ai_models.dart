@@ -1,5 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'dart:convert';
+
 // Simple data models used by the OpenAI chat controller to keep the server
 // independent from the removed external generator packages.
 
@@ -316,12 +318,37 @@ WebScrapperChatAIResponse parseStructuredResponse(
       ScrappingBeeFetchSettings? fetchSettings;
       if (scrappingBeeFetchSettingsData != null) {
         try {
+          // Handle extract_rules - AI might return as object instead of JSON string
+          final extractRulesRaw =
+              scrappingBeeFetchSettingsData['extract_rules'];
+          final String extractRules;
+          if (extractRulesRaw is String) {
+            extractRules = extractRulesRaw;
+          } else if (extractRulesRaw is Map) {
+            extractRules = jsonEncode(extractRulesRaw);
+          } else {
+            return const WebScrapperChatAIResponseErrorMessage(
+              'Invalid response: extract_rules must be a string or object',
+            );
+          }
+
+          // Handle js_scenario - AI might return as object instead of JSON string
+          final jsScenarioRaw = scrappingBeeFetchSettingsData['js_scenario'];
+          final String? jsScenario;
+          if (jsScenarioRaw == null) {
+            jsScenario = null;
+          } else if (jsScenarioRaw is String) {
+            jsScenario = jsScenarioRaw;
+          } else if (jsScenarioRaw is Map || jsScenarioRaw is List) {
+            jsScenario = jsonEncode(jsScenarioRaw);
+          } else {
+            jsScenario = null;
+          }
+
           fetchSettings = ScrappingBeeFetchSettings(
             url: scrappingBeeFetchSettingsData['url'] as String,
-            extract_rules:
-                scrappingBeeFetchSettingsData['extract_rules'] as String,
-            js_scenario:
-                scrappingBeeFetchSettingsData['js_scenario'] as String?,
+            extract_rules: extractRules,
+            js_scenario: jsScenario,
             render_js: scrappingBeeFetchSettingsData['render_js'] as bool,
             premium_proxy:
                 scrappingBeeFetchSettingsData['premium_proxy'] as bool,
