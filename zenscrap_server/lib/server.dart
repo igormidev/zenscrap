@@ -47,14 +47,21 @@ void run(List<String> args) async {
     '/static/**',
   );
 
-  // Setup single page app using Serverpod 3.0 SpaRoute (catch-all for remaining routes)
-  pod.webServer.addRoute(
-    SpaRoute(
-      Directory('web/app'),
-      fallback: File('web/app/index.html'),
-    ),
-    '/**',
-  );
+  // Setup Flutter web app using Serverpod 3.0 FlutterRoute (catch-all for remaining routes)
+  // FlutterRoute is designed for Flutter WASM apps and automatically:
+  // - Handles SPA-style routing (falls back to index.html)
+  // - Adds WASM multi-threading headers (Cross-Origin-Opener-Policy, Cross-Origin-Embedder-Policy)
+  final flutterAppDir = Directory('web/app');
+  if (flutterAppDir.existsSync()) {
+    // Add explicit route for root path '/' to serve index.html
+    // This is needed because '/**' pattern may not match the root path in some versions
+    pod.webServer.addRoute(FlutterRoute(flutterAppDir), '/');
+    pod.webServer.addRoute(FlutterRoute(flutterAppDir), '/**');
+  } else {
+    // ignore: avoid_print
+    print(
+        '[Zenscrap] Warning: Flutter web app not found at ${flutterAppDir.path}');
+  }
 
   auth.AuthConfig.set(auth.AuthConfig(
     sendValidationEmail: onSendValidationEmail,
