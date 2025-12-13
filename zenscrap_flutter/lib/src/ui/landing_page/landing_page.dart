@@ -20,7 +20,7 @@ import 'package:zenscrap_flutter/src/ui/landing_page/sections/marketplace_sectio
 import 'package:zenscrap_flutter/src/ui/landing_page/sections/problem_section.dart';
 import 'package:zenscrap_flutter/src/ui/landing_page/widgets/landing_appbar.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/view/scrappable_edit_session.dart';
-import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/ai_thinking_stream_view.dart';
+import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/creating_scrappable_dialog.dart';
 import 'package:zenscrap_flutter/src/design_system/elements/ip_limit_error_view.dart';
 import 'package:zenscrap_flutter/src/design_system/elements/zen_tab.dart';
 
@@ -60,6 +60,9 @@ class _LandingPageState extends ConsumerState<LandingPage>
   int _navClicksCount = 0;
   int _ctaClicksCount = 0;
   bool _hasTrackedPageView = false;
+
+  // Dialog state tracking
+  bool _isCreatingDialogShowing = false;
 
   @override
   void initState() {
@@ -368,17 +371,24 @@ class _LandingPageState extends ConsumerState<LandingPage>
   Widget build(BuildContext context) {
     final scrapChatState = ref.watch(scrapChatProvider);
 
-    // If user has started creating a scrappable, show the appropriate view
+    // Listen for state changes to show/hide the creating scrappable dialog
+    ref.listen(scrapChatProvider, (previous, next) {
+      // Check if we're entering the creatingScrappable state
+      final isCreating = next.maybeWhen(
+        creatingScrappable: (referenceLink, chunks, grounding) => true,
+        orElse: () => false,
+      );
+
+      if (isCreating && !_isCreatingDialogShowing) {
+        _isCreatingDialogShowing = true;
+        CreatingScrappableDialog.show(context).then((_) {
+          _isCreatingDialogShowing = false;
+        });
+      }
+    });
+
+    // Show the appropriate view based on state
     return scrapChatState.maybeWhen(
-      creatingScrappable: (referenceLink, thinkingChunks, groundingMetadata) {
-        return Scaffold(
-          body: AiThinkingStreamView(
-            referenceLink: referenceLink,
-            thinkingChunks: thinkingChunks,
-            groundingMetadata: groundingMetadata,
-          ),
-        );
-      },
       standard:
           (scrappable, testExpirationDate, sessionUuid, llmThinkingStream) {
             return Scaffold(
@@ -395,6 +405,8 @@ class _LandingPageState extends ConsumerState<LandingPage>
         }
         return Scaffold(body: ZenErrorTab(exception));
       },
+      // For blank, creatingSessionState, and creatingScrappable states, show landing page
+      // The creatingScrappable state will have the dialog shown on top via the listener
       orElse: () => _buildLandingPage(context),
     );
   }

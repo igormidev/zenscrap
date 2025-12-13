@@ -11,7 +11,7 @@ import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_stat
 import 'package:zenscrap_flutter/src/design_system/widgets/fullscreen_loading_page.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/pages/initial_chat_page.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/view/scrappable_edit_session.dart';
-import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/ai_thinking_stream_view.dart';
+import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/creating_scrappable_dialog.dart';
 
 class InitialChatView extends ConsumerStatefulWidget {
   final int? scrappableId;
@@ -27,6 +27,7 @@ class InitialChatView extends ConsumerStatefulWidget {
 
 class _InitialChatViewState extends ConsumerState<InitialChatView> {
   final Completer<void> _initializationCompleter = Completer<void>();
+  bool _isCreatingDialogShowing = false;
 
   @override
   void initState() {
@@ -49,6 +50,21 @@ class _InitialChatViewState extends ConsumerState<InitialChatView> {
   Widget build(BuildContext context) {
     final ScrapChatSessionState scrapChatState = ref.watch(scrapChatProvider);
 
+    // Listen for state changes to show/hide the creating scrappable dialog
+    ref.listen(scrapChatProvider, (previous, next) {
+      final isCreating = next.maybeWhen(
+        creatingScrappable: (referenceLink, chunks, grounding) => true,
+        orElse: () => false,
+      );
+
+      if (isCreating && !_isCreatingDialogShowing) {
+        _isCreatingDialogShowing = true;
+        CreatingScrappableDialog.show(context).then((_) {
+          _isCreatingDialogShowing = false;
+        });
+      }
+    });
+
     return PopScope(
       canPop: false,
       child: Scaffold(
@@ -64,7 +80,7 @@ class _InitialChatViewState extends ConsumerState<InitialChatView> {
               );
             }
 
-            return scrapChatState.when(
+            return scrapChatState.maybeWhen(
               withError: (exception) {
                 // Check if this is an IP limit error
                 if (exception.title == 'Usage Limit Reached') {
@@ -72,19 +88,6 @@ class _InitialChatViewState extends ConsumerState<InitialChatView> {
                 }
                 // Default error handling for other errors
                 return ZenErrorTab(exception);
-              },
-              creatingSessionState: () => InitialChatPage(),
-              blank: () => InitialChatPage(),
-              creatingScrappable: (
-                String referenceLink,
-                List<String> thinkingChunks,
-                GroundingMetadataInfo? groundingMetadata,
-              ) {
-                return AiThinkingStreamView(
-                  referenceLink: referenceLink,
-                  thinkingChunks: thinkingChunks,
-                  groundingMetadata: groundingMetadata,
-                );
               },
               standard: (
                 Scrappable scrappable,
@@ -98,6 +101,9 @@ class _InitialChatViewState extends ConsumerState<InitialChatView> {
                   llmThinkingStream: llmThinkingStream,
                 );
               },
+              // For blank, creatingSessionState, and creatingScrappable states
+              // Show the initial chat page (dialog will show on top for creatingScrappable)
+              orElse: () => InitialChatPage(),
             );
           },
         ),
