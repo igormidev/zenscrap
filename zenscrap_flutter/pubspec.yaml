@@ -57,11 +57,11 @@ dependencies:
   talker_flutter: ^5.1.5
   talker_riverpod_logger: ^5.1.5
 
-  serverpod_flutter: 3.0.0
-  serverpod_auth_client: 3.0.0
-  serverpod_auth_shared_flutter: 3.0.0
-  serverpod_auth_email_flutter: 3.0.0
-  serverpod_auth_google_flutter: 3.0.0
+  serverpod_flutter: 3.0.1
+  serverpod_auth_client: 3.0.1
+  serverpod_auth_shared_flutter: 3.0.1
+  serverpod_auth_email_flutter: 3.0.1
+  serverpod_auth_google_flutter: 3.0.1
 
   freezed_annotation: ^3.1.0
   json_annotation: ^4.9.0
