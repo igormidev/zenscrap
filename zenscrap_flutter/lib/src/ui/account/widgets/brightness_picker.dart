@@ -17,33 +17,91 @@ class BrightnessPicker extends StatefulWidget {
 }
 
 class _BrightnessPickerState extends State<BrightnessPicker> {
+  Future<void> _handleDarkModeSelection() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        icon: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.amber.shade100,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            Icons.science_rounded,
+            size: 32,
+            color: Colors.amber.shade700,
+          ),
+        ),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(AppLocalizations.of(dialogContext)!.account_dark_mode_title),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.amber.shade600,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                AppLocalizations.of(dialogContext)!.account_beta_badge,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 400),
+          child: Text(
+            AppLocalizations.of(dialogContext)!.account_dark_mode_beta_warning,
+            style: Theme.of(dialogContext).textTheme.bodyMedium,
+            textAlign: TextAlign.center,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(MaterialLocalizations.of(dialogContext).cancelButtonLabel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(MaterialLocalizations.of(dialogContext).okButtonLabel),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      widget.onBrightnessChanged(Brightness.dark);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = widget.brightness == Brightness.dark;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
       children: [
-        Row(
-          children: [
-            _BrightnessOption(
-              icon: Icons.light_mode_rounded,
-              label: AppLocalizations.of(context)!.account_brightness_light,
-              isSelected: !isDark,
-              onTap: () => widget.onBrightnessChanged(Brightness.light),
-            ),
-            const SizedBox(width: 12),
-            _BrightnessOption(
-              icon: Icons.dark_mode_rounded,
-              label: AppLocalizations.of(context)!.account_brightness_dark,
-              isSelected: isDark,
-              onTap: () => widget.onBrightnessChanged(Brightness.dark),
-              showBetaBadge: true,
-            ),
-          ],
+        _BrightnessOption(
+          icon: Icons.light_mode_rounded,
+          label: AppLocalizations.of(context)!.account_brightness_light,
+          isSelected: !isDark,
+          onTap: () => widget.onBrightnessChanged(Brightness.light),
         ),
-        const SizedBox(height: 16),
-        _DarkModeBetaWarning(),
+        const SizedBox(width: 12),
+        _BrightnessOption(
+          icon: Icons.dark_mode_rounded,
+          label: AppLocalizations.of(context)!.account_brightness_dark,
+          isSelected: isDark,
+          onTap: isDark ? null : _handleDarkModeSelection,
+          showBetaBadge: true,
+        ),
       ],
     );
   }
@@ -53,14 +111,14 @@ class _BrightnessOption extends StatefulWidget {
   final IconData icon;
   final String label;
   final bool isSelected;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final bool showBetaBadge;
 
   const _BrightnessOption({
     required this.icon,
     required this.label,
     required this.isSelected,
-    required this.onTap,
+    this.onTap,
     this.showBetaBadge = false,
   });
 
@@ -73,11 +131,13 @@ class _BrightnessOptionState extends State<_BrightnessOption> {
 
   @override
   Widget build(BuildContext context) {
+    final isClickable = widget.onTap != null;
+
     return Expanded(
       child: MouseRegion(
         onEnter: (_) => setState(() => _isHovered = true),
         onExit: (_) => setState(() => _isHovered = false),
-        cursor: SystemMouseCursors.click,
+        cursor: isClickable ? SystemMouseCursors.click : SystemMouseCursors.basic,
         child: GestureDetector(
           onTap: widget.onTap,
           child: AnimatedContainer(
@@ -179,102 +239,6 @@ class _BrightnessOptionState extends State<_BrightnessOption> {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _DarkModeBetaWarning extends StatelessWidget {
-  const _DarkModeBetaWarning();
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    // Theme-aware colors
-    final warningColor = isDark ? Colors.amber.shade400 : Colors.amber.shade700;
-    final backgroundColor = isDark
-        ? Colors.amber.shade900.withAlpha(40)
-        : Colors.amber.shade50;
-    final borderColor = isDark
-        ? Colors.amber.shade700.withAlpha(60)
-        : Colors.amber.shade200;
-    final titleColor = isDark ? Colors.amber.shade300 : Colors.amber.shade800;
-    final textColor = isDark ? Colors.amber.shade200 : Colors.amber.shade900;
-
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: borderColor,
-          width: 1,
-        ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: warningColor.withAlpha(isDark ? 40 : 30),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              Icons.science_rounded,
-              color: warningColor,
-              size: 18,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      AppLocalizations.of(context)!.account_dark_mode_title,
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: titleColor,
-                          ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: warningColor,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        AppLocalizations.of(context)!.account_beta_badge,
-                        style: TextStyle(
-                          color: isDark ? Colors.black87 : Colors.white,
-                          fontSize: 9,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  AppLocalizations.of(context)!.account_dark_mode_beta_warning,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: textColor,
-                        height: 1.4,
-                      ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }

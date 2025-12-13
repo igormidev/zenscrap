@@ -108,7 +108,11 @@ class AccountView extends ConsumerWidget {
             const SizedBox(width: 24),
             // Theme Customization Column
             Expanded(
-              child: _ThemeCustomizationSection(),
+              child: ListView(
+                children: [
+                  _ThemeCustomizationSection(),
+                ],
+              ),
             ),
           ],
         ),
