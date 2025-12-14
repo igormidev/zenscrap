@@ -126,14 +126,16 @@ class EditScrappableEndpoint extends Endpoint {
 
         if (hasAutoFixChanges) {
           // Validate consecutive error threshold if provided
+          // Minimum: 25 errors (to avoid triggering auto-fix too frequently)
+          // Maximum: 5000 errors (reasonable upper bound)
           if (autoFixConsecutiveErrorThreshold != null) {
-            if (autoFixConsecutiveErrorThreshold < 1) {
+            if (autoFixConsecutiveErrorThreshold < 25) {
               throw createTranslatedException(
                 'auto_fix_threshold_too_low',
                 language,
               );
             }
-            if (autoFixConsecutiveErrorThreshold > 1000) {
+            if (autoFixConsecutiveErrorThreshold > 5000) {
               throw createTranslatedException(
                 'auto_fix_threshold_too_high',
                 language,

@@ -1199,10 +1199,14 @@ class AutoFixConfigSection extends StatefulWidget {
 }
 
 class _AutoFixConfigSectionState extends State<AutoFixConfigSection> {
+  static const int _minThreshold = 25;
+  static const int _maxThreshold = 5000;
+
   late bool _enabled;
   late int _threshold;
   late _AiModelOption _selectedAiModel;
   late TextEditingController _thresholdController;
+  String? _thresholdError;
 
   @override
   void initState() {
@@ -1337,75 +1341,142 @@ class _AutoFixConfigSectionState extends State<AutoFixConfigSection> {
                 // Error threshold setting
                 Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Row(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(
-                        Icons.error_outline_rounded,
-                        color: context.c.onSurfaceVariant,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Error Threshold',
-                              style: context.t.titleSmall?.copyWith(
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.error_outline_rounded,
+                            color: context.c.onSurfaceVariant,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Error Threshold',
+                                  style: context.t.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Consecutive errors before triggering auto-fix',
+                                  style: context.t.bodySmall?.copyWith(
+                                    color: context.c.onSurfaceVariant.withAlpha(180),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          SizedBox(
+                            width: 90,
+                            child: TextFormField(
+                              controller: _thresholdController,
+                              keyboardType: TextInputType.number,
+                              textAlign: TextAlign.center,
+                              style: context.t.bodyMedium?.copyWith(
                                 fontWeight: FontWeight.w600,
+                                color: _thresholdError != null
+                                    ? context.c.error
+                                    : null,
                               ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              'Consecutive errors before triggering auto-fix',
-                              style: context.t.bodySmall?.copyWith(
-                                color: context.c.onSurfaceVariant.withAlpha(180),
+                              decoration: InputDecoration(
+                                isDense: true,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 10,
+                                ),
+                                filled: true,
+                                fillColor: _thresholdError != null
+                                    ? context.c.errorContainer.withAlpha(30)
+                                    : context.c.surface,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide(
+                                    color: _thresholdError != null
+                                        ? context.c.error
+                                        : context.c.outline.withAlpha(50),
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide(
+                                    color: _thresholdError != null
+                                        ? context.c.error
+                                        : context.c.outline.withAlpha(50),
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide(
+                                    color: _thresholdError != null
+                                        ? context.c.error
+                                        : context.c.primary,
+                                    width: 2,
+                                  ),
+                                ),
                               ),
+                              onChanged: (value) {
+                                final parsed = int.tryParse(value);
+                                String? error;
+
+                                if (parsed == null && value.isNotEmpty) {
+                                  error = 'Invalid number';
+                                } else if (parsed != null && parsed < _minThreshold) {
+                                  error = 'Min: $_minThreshold';
+                                } else if (parsed != null && parsed > _maxThreshold) {
+                                  error = 'Max: $_maxThreshold';
+                                }
+
+                                setState(() {
+                                  _thresholdError = error;
+                                  if (parsed != null && error == null) {
+                                    _threshold = parsed;
+                                  }
+                                });
+
+                                // Only notify changes if valid
+                                if (parsed != null && error == null) {
+                                  _notifyChanges();
+                                }
+                              },
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 12),
-                      SizedBox(
-                        width: 80,
-                        child: TextFormField(
-                          controller: _thresholdController,
-                          keyboardType: TextInputType.number,
-                          textAlign: TextAlign.center,
-                          style: context.t.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                          decoration: InputDecoration(
-                            isDense: true,
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 10,
+                      // Validation message and range hint
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          const SizedBox(width: 32), // Align with text above
+                          if (_thresholdError != null) ...[
+                            Icon(
+                              Icons.error_outline,
+                              size: 14,
+                              color: context.c.error,
                             ),
-                            filled: true,
-                            fillColor: context.c.surface,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(
-                                color: context.c.outline.withAlpha(50),
+                            const SizedBox(width: 4),
+                            Text(
+                              _thresholdError!,
+                              style: context.t.bodySmall?.copyWith(
+                                color: context.c.error,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(
-                                color: context.c.outline.withAlpha(50),
-                              ),
+                            const SizedBox(width: 8),
+                          ],
+                          Text(
+                            'Range: $_minThreshold - $_maxThreshold',
+                            style: context.t.bodySmall?.copyWith(
+                              color: context.c.onSurfaceVariant.withAlpha(150),
                             ),
                           ),
-                          onChanged: (value) {
-                            final parsed = int.tryParse(value);
-                            if (parsed != null && parsed >= 1 && parsed <= 1000) {
-                              setState(() {
-                                _threshold = parsed;
-                              });
-                              _notifyChanges();
-                            }
-                          },
-                        ),
+                        ],
                       ),
                     ],
                   ),
