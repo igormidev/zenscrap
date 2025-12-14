@@ -517,6 +517,24 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.ptBR: 'Scrappable Nao Encontrado',
     SupportedLanguage.ja: 'Scrappableが見つかりません',
   },
+
+  // Auto-fix configuration errors
+  'auto_fix_threshold_too_low': {
+    SupportedLanguage.en: 'Invalid Threshold',
+    SupportedLanguage.es: 'Umbral Invalido',
+    SupportedLanguage.de: 'Unzultiger Schwellenwert',
+    SupportedLanguage.fr: 'Seuil invalide',
+    SupportedLanguage.ptBR: 'Limite Invalido',
+    SupportedLanguage.ja: '無効なしきい値',
+  },
+  'auto_fix_threshold_too_high': {
+    SupportedLanguage.en: 'Threshold Too High',
+    SupportedLanguage.es: 'Umbral Muy Alto',
+    SupportedLanguage.de: 'Schwellenwert zu hoch',
+    SupportedLanguage.fr: 'Seuil trop eleve',
+    SupportedLanguage.ptBR: 'Limite Muito Alto',
+    SupportedLanguage.ja: 'しきい値が高すぎます',
+  },
 };
 
 // ============================================================================
@@ -1126,5 +1144,23 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.fr: 'Cela pourrait etre une erreur interne, veuillez contacter le support.',
     SupportedLanguage.ptBR: 'Isso pode ser um erro interno, por favor entre em contato com o suporte.',
     SupportedLanguage.ja: 'これは内部エラーの可能性があります。サポートにお問い合わせください。',
+  },
+
+  // Auto-fix configuration error descriptions
+  'auto_fix_threshold_too_low': {
+    SupportedLanguage.en: 'Auto-fix error threshold must be at least 25.',
+    SupportedLanguage.es: 'El umbral de errores de auto-fix debe ser al menos 25.',
+    SupportedLanguage.de: 'Der Auto-Fix-Fehlerschwellenwert muss mindestens 25 sein.',
+    SupportedLanguage.fr: 'Le seuil d\'erreurs auto-fix doit etre d\'au moins 25.',
+    SupportedLanguage.ptBR: 'O limite de erros do auto-fix deve ser pelo menos 25.',
+    SupportedLanguage.ja: '自動修正のエラーしきい値は25以上である必要があります。',
+  },
+  'auto_fix_threshold_too_high': {
+    SupportedLanguage.en: 'Auto-fix error threshold cannot exceed 5000.',
+    SupportedLanguage.es: 'El umbral de errores de auto-fix no puede superar 5000.',
+    SupportedLanguage.de: 'Der Auto-Fix-Fehlerschwellenwert darf 5000 nicht uberschreiten.',
+    SupportedLanguage.fr: 'Le seuil d\'erreurs auto-fix ne peut pas depasser 5000.',
+    SupportedLanguage.ptBR: 'O limite de erros do auto-fix nao pode exceder 5000.',
+    SupportedLanguage.ja: '自動修正のエラーしきい値は5000を超えることはできません。',
   },
 };

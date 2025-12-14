@@ -12,14 +12,24 @@ class EditScrappableEndpoint extends Endpoint {
     required SupportedLanguage language,
     ScraperCategory? category,
     bool? willHideFromMarketplace,
+    // Auto-fix configuration parameters
+    bool? autoFixEnabled,
+    int? autoFixConsecutiveErrorThreshold,
+    AiModel? autoFixPreferredAiModel,
+    // Special value to indicate "auto mode" (null preference) for AI model
+    // When true, sets preferredAiModel to null (auto mode)
+    bool? autoFixUseAutoAiModel,
   }) async {
     // Get the authenticated user ID (might be null if not logged in)
     final userId = session.authenticated?.userId;
 
-    // Find the scrappable
+    // Find the scrappable with its AutoFixConfig
     final scrappable = await Scrappable.db.findById(
       session,
       scrappableId,
+      include: Scrappable.include(
+        autoFixConfig: AutoFixConfig.include(),
+      ),
     );
 
     if (scrappable == null) {
@@ -105,12 +115,71 @@ class EditScrappableEndpoint extends Endpoint {
 
     try {
       await Scrappable.db.updateRow(session, scrappable);
+
+      // Update AutoFixConfig if parameters provided and config exists
+      final autoFixConfig = scrappable.autoFixConfig;
+      if (autoFixConfig != null) {
+        final hasAutoFixChanges = autoFixEnabled != null ||
+            autoFixConsecutiveErrorThreshold != null ||
+            autoFixPreferredAiModel != null ||
+            autoFixUseAutoAiModel != null;
+
+        if (hasAutoFixChanges) {
+          // Validate consecutive error threshold if provided
+          // Minimum: 25 errors (to avoid triggering auto-fix too frequently)
+          // Maximum: 5000 errors (reasonable upper bound)
+          if (autoFixConsecutiveErrorThreshold != null) {
+            if (autoFixConsecutiveErrorThreshold < 25) {
+              throw createTranslatedException(
+                'auto_fix_threshold_too_low',
+                language,
+              );
+            }
+            if (autoFixConsecutiveErrorThreshold > 5000) {
+              throw createTranslatedException(
+                'auto_fix_threshold_too_high',
+                language,
+              );
+            }
+          }
+
+          // Update the config fields
+          if (autoFixEnabled != null) {
+            autoFixConfig.enabled = autoFixEnabled;
+          }
+          if (autoFixConsecutiveErrorThreshold != null) {
+            autoFixConfig.consecutiveErrorThreshold =
+                autoFixConsecutiveErrorThreshold;
+          }
+          // Handle AI model preference
+          if (autoFixUseAutoAiModel == true) {
+            // Set to null for auto mode
+            autoFixConfig.preferredAiModel = null;
+          } else if (autoFixPreferredAiModel != null) {
+            autoFixConfig.preferredAiModel = autoFixPreferredAiModel;
+          }
+
+          await AutoFixConfig.db.updateRow(session, autoFixConfig);
+
+          session.log(
+            'Updated AutoFixConfig for scrappable ${scrappable.id}: '
+            'enabled=${autoFixConfig.enabled}, '
+            'threshold=${autoFixConfig.consecutiveErrorThreshold}, '
+            'aiModel=${autoFixConfig.preferredAiModel}',
+            level: LogLevel.info,
+          );
+        }
+      }
+
       return true;
     } catch (e) {
       session.log(
         'Failed to update scrappable: $e',
         level: LogLevel.error,
       );
+      if (e is ZenScrapException) {
+        rethrow;
+      }
       throw createTranslatedException('update_failed', language);
     }
   }

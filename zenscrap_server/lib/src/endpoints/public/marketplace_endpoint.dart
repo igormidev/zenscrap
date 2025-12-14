@@ -85,6 +85,7 @@ class MarketplaceEndpoint extends Endpoint {
         targetRequest: ScrappableRequest.include(),
         scrappingBeeExtractRules: ScrappingBeeExtractLogic.include(),
         referenceTestData: ReferenceTestData.include(),
+        autoFixConfig: AutoFixConfig.include(),
       ),
     );
 

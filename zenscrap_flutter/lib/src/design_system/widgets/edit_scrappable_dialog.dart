@@ -267,8 +267,16 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
                 shouldPopOnEnd: true,
                 key: ValueKey('edit_form_${widget.scrappable.id}'),
                 scrappable: widget.scrappable,
-                onSave: (name, description, category,
-                    willHideFromMarketplace) async {
+                onSave: (
+                  name,
+                  description,
+                  category,
+                  willHideFromMarketplace, {
+                  bool? autoFixEnabled,
+                  int? autoFixThreshold,
+                  AiModel? autoFixAiModel,
+                  bool? autoFixUseAutoAiModel,
+                }) async {
                   return onEditScrappable(
                     widget.scrappable,
                     name,
@@ -288,6 +296,10 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
                             category: category,
                           );
                     },
+                    autoFixEnabled: autoFixEnabled,
+                    autoFixConsecutiveErrorThreshold: autoFixThreshold,
+                    autoFixPreferredAiModel: autoFixAiModel,
+                    autoFixUseAutoAiModel: autoFixUseAutoAiModel,
                   );
                 },
                 onHasChangesUpdated: (hasChanges) =>
@@ -412,8 +424,16 @@ class _EditScrappableDialogState extends ConsumerState<EditScrappableDialog>
 
 class ScrappableEditForm extends StatefulWidget {
   final Scrappable scrappable;
-  final Future<bool> Function(String name, String description,
-      ScraperCategory category, bool? willHideFromMarketplace) onSave;
+  final Future<bool> Function(
+    String name,
+    String description,
+    ScraperCategory category,
+    bool? willHideFromMarketplace, {
+    bool? autoFixEnabled,
+    int? autoFixThreshold,
+    AiModel? autoFixAiModel,
+    bool? autoFixUseAutoAiModel,
+  }) onSave;
   final bool shouldPopOnEnd;
   final List<Widget> children;
   final void Function(bool hasChanges)? onHasChangesUpdated;
@@ -442,6 +462,12 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
   bool _isLoading = false;
   bool _hasChanges = false;
 
+  // Auto-fix config state
+  bool? _autoFixEnabled;
+  int? _autoFixThreshold;
+  AiModel? _autoFixAiModel;
+  bool? _autoFixUseAutoAiModel;
+
   @override
   void initState() {
     super.initState();
@@ -467,10 +493,17 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
   }
 
   void _checkForChanges() {
-    final hasChanges = _nameController.text != _initialName ||
+    final hasBasicChanges = _nameController.text != _initialName ||
         _descriptionController.text != _initialDescription ||
         _selectedCategory != _initialCategory ||
         _willHideFromMarketplace != _initialWillHideFromMarketplace;
+
+    final hasAutoFixChanges = _autoFixEnabled != null ||
+        _autoFixThreshold != null ||
+        _autoFixAiModel != null ||
+        _autoFixUseAutoAiModel != null;
+
+    final hasChanges = hasBasicChanges || hasAutoFixChanges;
 
     if (hasChanges != _hasChanges) {
       setState(() {
@@ -483,6 +516,21 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
   void setWillHideFromMarketplace(bool value) {
     setState(() {
       _willHideFromMarketplace = value;
+    });
+    _checkForChanges();
+  }
+
+  void setAutoFixConfig({
+    bool? enabled,
+    int? threshold,
+    AiModel? aiModel,
+    bool? useAutoAiModel,
+  }) {
+    setState(() {
+      _autoFixEnabled = enabled;
+      _autoFixThreshold = threshold;
+      _autoFixAiModel = aiModel;
+      _autoFixUseAutoAiModel = useAutoAiModel;
     });
     _checkForChanges();
   }
@@ -514,6 +562,10 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
         _willHideFromMarketplace != _initialWillHideFromMarketplace
             ? _willHideFromMarketplace
             : null,
+        autoFixEnabled: _autoFixEnabled,
+        autoFixThreshold: _autoFixThreshold,
+        autoFixAiModel: _autoFixAiModel,
+        autoFixUseAutoAiModel: _autoFixUseAutoAiModel,
       );
 
       if (success && mounted) {
@@ -802,6 +854,22 @@ class _ScrappableEditFormState extends State<ScrappableEditForm> {
                         .fadeIn(delay: 200.ms)
                         .slideX(begin: -0.1, end: 0),
                   ),
+                  // Auto-Fix Configuration Section
+                  if (widget.scrappable.autoFixConfig != null)
+                    AutoFixConfigSection(
+                      initialConfig: widget.scrappable.autoFixConfig!,
+                      onChanged: ({enabled, threshold, aiModel, useAutoAiModel}) {
+                        setAutoFixConfig(
+                          enabled: enabled,
+                          threshold: threshold,
+                          aiModel: aiModel,
+                          useAutoAiModel: useAutoAiModel,
+                        );
+                      },
+                    )
+                        .animate()
+                        .fadeIn(delay: 250.ms)
+                        .slideX(begin: -0.1, end: 0),
                   if (widget.scrappable.scrappingBeeExtractRules != null) ...[
                     if (widget.children.isNotEmpty) SizedBox(height: 12),
                     Text(
@@ -1108,3 +1176,424 @@ class _HideFromMarketplaceToggleState
     );
   }
 }
+
+/// Configuration section for Auto-Fix settings.
+/// Displays only when autoFixConfig is not null.
+class AutoFixConfigSection extends StatefulWidget {
+  final AutoFixConfig initialConfig;
+  final void Function({
+    bool? enabled,
+    int? threshold,
+    AiModel? aiModel,
+    bool? useAutoAiModel,
+  }) onChanged;
+
+  const AutoFixConfigSection({
+    super.key,
+    required this.initialConfig,
+    required this.onChanged,
+  });
+
+  @override
+  State<AutoFixConfigSection> createState() => _AutoFixConfigSectionState();
+}
+
+class _AutoFixConfigSectionState extends State<AutoFixConfigSection> {
+  static const int _minThreshold = 25;
+  static const int _maxThreshold = 5000;
+
+  late bool _enabled;
+  late int _threshold;
+  late _AiModelOption _selectedAiModel;
+  late TextEditingController _thresholdController;
+  String? _thresholdError;
+
+  @override
+  void initState() {
+    super.initState();
+    _enabled = widget.initialConfig.enabled;
+    _threshold = widget.initialConfig.consecutiveErrorThreshold;
+    _selectedAiModel = _aiModelFromConfig(widget.initialConfig.preferredAiModel);
+    _thresholdController = TextEditingController(text: _threshold.toString());
+  }
+
+  @override
+  void dispose() {
+    _thresholdController.dispose();
+    super.dispose();
+  }
+
+  _AiModelOption _aiModelFromConfig(AiModel? model) {
+    if (model == null) return _AiModelOption.auto;
+    return switch (model) {
+      AiModel.normal => _AiModelOption.normal,
+      AiModel.powerful => _AiModelOption.powerful,
+    };
+  }
+
+  void _notifyChanges() {
+    final useAutoAiModel = _selectedAiModel == _AiModelOption.auto;
+    final aiModel = useAutoAiModel
+        ? null
+        : (_selectedAiModel == _AiModelOption.normal
+            ? AiModel.normal
+            : AiModel.powerful);
+
+    widget.onChanged(
+      enabled: _enabled != widget.initialConfig.enabled ? _enabled : null,
+      threshold:
+          _threshold != widget.initialConfig.consecutiveErrorThreshold
+              ? _threshold
+              : null,
+      aiModel: aiModel,
+      useAutoAiModel: useAutoAiModel &&
+              widget.initialConfig.preferredAiModel != null
+          ? true
+          : null,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 20),
+        Text(
+          'Auto-Fix Configuration',
+          style: context.t.labelLarge?.copyWith(
+            color: context.c.onSurface,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 8),
+        // Main container with settings
+        Container(
+          decoration: BoxDecoration(
+            color: context.c.surfaceContainerHighest.withAlpha(51),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: context.c.outline.withAlpha(50),
+            ),
+          ),
+          child: Column(
+            children: [
+              // Enable/Disable toggle
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: _enabled
+                            ? context.c.primaryContainer
+                            : context.c.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.auto_fix_high_rounded,
+                        color: _enabled
+                            ? context.c.onPrimaryContainer
+                            : context.c.onSurfaceVariant,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Enable Auto-Fix',
+                            style: context.t.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'AI will automatically repair broken extraction rules',
+                            style: context.t.bodySmall?.copyWith(
+                              color: context.c.onSurfaceVariant.withAlpha(180),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Switch(
+                      value: _enabled,
+                      onChanged: (value) {
+                        setState(() {
+                          _enabled = value;
+                        });
+                        _notifyChanges();
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              // Divider
+              if (_enabled) ...[
+                Divider(
+                  height: 1,
+                  color: context.c.outline.withAlpha(30),
+                ),
+                // Error threshold setting
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.error_outline_rounded,
+                            color: context.c.onSurfaceVariant,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Error Threshold',
+                                  style: context.t.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Consecutive errors before triggering auto-fix',
+                                  style: context.t.bodySmall?.copyWith(
+                                    color: context.c.onSurfaceVariant.withAlpha(180),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          SizedBox(
+                            width: 90,
+                            child: TextFormField(
+                              controller: _thresholdController,
+                              keyboardType: TextInputType.number,
+                              textAlign: TextAlign.center,
+                              style: context.t.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: _thresholdError != null
+                                    ? context.c.error
+                                    : null,
+                              ),
+                              decoration: InputDecoration(
+                                isDense: true,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 10,
+                                ),
+                                filled: true,
+                                fillColor: _thresholdError != null
+                                    ? context.c.errorContainer.withAlpha(30)
+                                    : context.c.surface,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide(
+                                    color: _thresholdError != null
+                                        ? context.c.error
+                                        : context.c.outline.withAlpha(50),
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide(
+                                    color: _thresholdError != null
+                                        ? context.c.error
+                                        : context.c.outline.withAlpha(50),
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide(
+                                    color: _thresholdError != null
+                                        ? context.c.error
+                                        : context.c.primary,
+                                    width: 2,
+                                  ),
+                                ),
+                              ),
+                              onChanged: (value) {
+                                final parsed = int.tryParse(value);
+                                String? error;
+
+                                if (parsed == null && value.isNotEmpty) {
+                                  error = 'Invalid number';
+                                } else if (parsed != null && parsed < _minThreshold) {
+                                  error = 'Min: $_minThreshold';
+                                } else if (parsed != null && parsed > _maxThreshold) {
+                                  error = 'Max: $_maxThreshold';
+                                }
+
+                                setState(() {
+                                  _thresholdError = error;
+                                  if (parsed != null && error == null) {
+                                    _threshold = parsed;
+                                  }
+                                });
+
+                                // Only notify changes if valid
+                                if (parsed != null && error == null) {
+                                  _notifyChanges();
+                                }
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      // Validation message and range hint
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          const SizedBox(width: 32), // Align with text above
+                          if (_thresholdError != null) ...[
+                            Icon(
+                              Icons.error_outline,
+                              size: 14,
+                              color: context.c.error,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              _thresholdError!,
+                              style: context.t.bodySmall?.copyWith(
+                                color: context.c.error,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                          ],
+                          Text(
+                            'Range: $_minThreshold - $_maxThreshold',
+                            style: context.t.bodySmall?.copyWith(
+                              color: context.c.onSurfaceVariant.withAlpha(150),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Divider(
+                  height: 1,
+                  color: context.c.outline.withAlpha(30),
+                ),
+                // AI Model selection
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.psychology_outlined,
+                            color: context.c.onSurfaceVariant,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'AI Model',
+                                  style: context.t.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Select which AI model to use for repairs',
+                                  style: context.t.bodySmall?.copyWith(
+                                    color: context.c.onSurfaceVariant.withAlpha(180),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      _buildAiModelSelector(context),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+        // Info text about current status
+        if (widget.initialConfig.currentConsecutiveErrors > 0) ...[
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: context.c.errorContainer.withAlpha(50),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.warning_amber_rounded,
+                  color: context.c.error,
+                  size: 18,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Current errors: ${widget.initialConfig.currentConsecutiveErrors} / ${widget.initialConfig.consecutiveErrorThreshold}',
+                    style: context.t.bodySmall?.copyWith(
+                      color: context.c.onErrorContainer,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildAiModelSelector(BuildContext context) {
+    return SegmentedButton<_AiModelOption>(
+      segments: [
+        ButtonSegment<_AiModelOption>(
+          value: _AiModelOption.auto,
+          label: Text('Auto'),
+          icon: Icon(Icons.auto_awesome, size: 18),
+        ),
+        ButtonSegment<_AiModelOption>(
+          value: _AiModelOption.normal,
+          label: Text('Fast'),
+          icon: Icon(Icons.speed, size: 18),
+        ),
+        ButtonSegment<_AiModelOption>(
+          value: _AiModelOption.powerful,
+          label: Text('Powerful'),
+          icon: Icon(Icons.rocket_launch, size: 18),
+        ),
+      ],
+      selected: {_selectedAiModel},
+      onSelectionChanged: (selection) {
+        setState(() {
+          _selectedAiModel = selection.first;
+        });
+        _notifyChanges();
+      },
+      style: ButtonStyle(
+        visualDensity: VisualDensity.compact,
+      ),
+    );
+  }
+}
+
+enum _AiModelOption { auto, normal, powerful }

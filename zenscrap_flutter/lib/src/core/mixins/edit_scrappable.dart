@@ -16,8 +16,13 @@ mixin EditScrappable<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     String description,
     ScraperCategory category,
     bool? willHideFromMarketplace,
-    void Function() onSuccess,
-  ) async {
+    void Function() onSuccess, {
+    // Auto-fix configuration parameters
+    bool? autoFixEnabled,
+    int? autoFixConsecutiveErrorThreshold,
+    AiModel? autoFixPreferredAiModel,
+    bool? autoFixUseAutoAiModel,
+  }) async {
     final client = ref.read(clientProvider);
     final language = ref.read(currentLanguageProvider);
     final result = await client
@@ -27,6 +32,10 @@ mixin EditScrappable<T extends ConsumerStatefulWidget> on ConsumerState<T> {
           description: description,
           category: category,
           willHideFromMarketplace: willHideFromMarketplace,
+          autoFixEnabled: autoFixEnabled,
+          autoFixConsecutiveErrorThreshold: autoFixConsecutiveErrorThreshold,
+          autoFixPreferredAiModel: autoFixPreferredAiModel,
+          autoFixUseAutoAiModel: autoFixUseAutoAiModel,
           language: language,
         )
         .toResult;
