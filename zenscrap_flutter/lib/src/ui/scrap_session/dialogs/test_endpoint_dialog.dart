@@ -51,6 +51,13 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
   String? _responseJson;
   String? _errorMessage;
   bool _hasTestedOnce = false;
+  int? _statusCode;
+  int? _responseTimeMs;
+
+  // Live elapsed time tracking
+  final Stopwatch _stopwatch = Stopwatch();
+  Timer? _elapsedTimer;
+  final ValueNotifier<int> _elapsedMs = ValueNotifier<int>(0);
 
   @override
   void initState() {
@@ -97,7 +104,25 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
     for (final controller in _queryParamControllers.values) {
       controller.dispose();
     }
+    _elapsedTimer?.cancel();
+    _elapsedMs.dispose();
     super.dispose();
+  }
+
+  void _startElapsedTimer() {
+    _stopwatch.reset();
+    _stopwatch.start();
+    _elapsedMs.value = 0;
+    _elapsedTimer?.cancel();
+    _elapsedTimer = Timer.periodic(const Duration(milliseconds: 100), (_) {
+      _elapsedMs.value = _stopwatch.elapsedMilliseconds;
+    });
+  }
+
+  void _stopElapsedTimer() {
+    _stopwatch.stop();
+    _elapsedTimer?.cancel();
+    _elapsedMs.value = _stopwatch.elapsedMilliseconds;
   }
 
   Future<void> _handleTest() async {
@@ -105,7 +130,11 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
       _isLoading = true;
       _errorMessage = null;
       _responseJson = null;
+      _statusCode = null;
+      _responseTimeMs = null;
     });
+
+    _startElapsedTimer();
 
     try {
       // Build payload from controller values
@@ -158,6 +187,8 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
         ),
       );
 
+      _stopElapsedTimer();
+
       if (mounted) {
         if (response.statusCode == 200) {
           // Success response
@@ -165,27 +196,78 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
           setState(() {
             _isLoading = false;
             _hasTestedOnce = true;
+            _statusCode = response.statusCode;
+            _responseTimeMs = _stopwatch.elapsedMilliseconds;
             // Pretty-print the JSON response
             const encoder = JsonEncoder.withIndent('  ');
             _responseJson = encoder.convert(data);
           });
         } else {
           // Error response
-          final error = response.data['error'] as Map<String, dynamic>?;
+          String errorMessage;
+          final responseData = response.data;
+          if (responseData is Map<String, dynamic>) {
+            final error = responseData['error'] as Map<String, dynamic>?;
+            errorMessage = error != null
+                ? '${error['title']}: ${error['description']}'
+                : 'Request failed with status ${response.statusCode}';
+          } else {
+            // Unexpected response format
+            errorMessage =
+                'Request failed with status ${response.statusCode}: $responseData';
+          }
           setState(() {
             _isLoading = false;
             _hasTestedOnce = true;
-            _errorMessage = error != null
-                ? '${error['title']}: ${error['description']}'
-                : 'Request failed with status ${response.statusCode}';
+            _statusCode = response.statusCode;
+            _responseTimeMs = _stopwatch.elapsedMilliseconds;
+            _errorMessage = errorMessage;
           });
         }
       }
+    } on DioException catch (e) {
+      _stopElapsedTimer();
+
+      if (mounted) {
+        // DioException provides more context about HTTP errors
+        final statusCode = e.response?.statusCode;
+        String errorMessage;
+
+        if (e.type == DioExceptionType.connectionTimeout ||
+            e.type == DioExceptionType.sendTimeout ||
+            e.type == DioExceptionType.receiveTimeout) {
+          errorMessage = 'Request timed out: ${e.message}';
+        } else if (e.response != null) {
+          final responseData = e.response?.data;
+          if (responseData is Map<String, dynamic>) {
+            final error = responseData['error'] as Map<String, dynamic>?;
+            errorMessage = error != null
+                ? '${error['title']}: ${error['description']}'
+                : 'Server error: ${e.message}';
+          } else {
+            errorMessage = 'Server error (${e.response?.statusCode}): $responseData';
+          }
+        } else {
+          errorMessage = 'Network error: ${e.message}';
+        }
+
+        setState(() {
+          _isLoading = false;
+          _hasTestedOnce = true;
+          _statusCode = statusCode;
+          _responseTimeMs = _stopwatch.elapsedMilliseconds;
+          _errorMessage = errorMessage;
+        });
+      }
     } catch (e) {
+      _stopElapsedTimer();
+
       if (mounted) {
         setState(() {
           _isLoading = false;
           _hasTestedOnce = true;
+          _statusCode = null; // null indicates local error
+          _responseTimeMs = _stopwatch.elapsedMilliseconds;
           _errorMessage = 'An unexpected error occurred: $e';
         });
       }
@@ -231,6 +313,9 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
                       responseJson: _responseJson,
                       errorMessage: _errorMessage,
                       hasTestedOnce: _hasTestedOnce,
+                      statusCode: _statusCode,
+                      responseTimeMs: _responseTimeMs,
+                      elapsedMsNotifier: _elapsedMs,
                     ),
                   ),
                 ],
@@ -593,13 +678,26 @@ class _ResponsePanel extends StatelessWidget {
   final String? responseJson;
   final String? errorMessage;
   final bool hasTestedOnce;
+  final int? statusCode;
+  final int? responseTimeMs;
+  final ValueNotifier<int> elapsedMsNotifier;
 
   const _ResponsePanel({
     required this.isLoading,
     required this.responseJson,
     required this.errorMessage,
     required this.hasTestedOnce,
+    required this.elapsedMsNotifier,
+    this.statusCode,
+    this.responseTimeMs,
   });
+
+  static String _formatTime(int ms) {
+    if (ms >= 1000) {
+      return '${(ms / 1000).toStringAsFixed(2)}s';
+    }
+    return '${ms}ms';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -617,6 +715,49 @@ class _ResponsePanel extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
+            const Spacer(),
+            // Live elapsed time display
+            ValueListenableBuilder<int>(
+              valueListenable: elapsedMsNotifier,
+              builder: (context, elapsedMs, _) {
+                // Only show if there's elapsed time (test has been run)
+                if (elapsedMs == 0 && !hasTestedOnce) {
+                  return const SizedBox.shrink();
+                }
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: isLoading
+                        ? context.c.primary.withAlpha(20)
+                        : context.c.onSurfaceVariant.withAlpha(20),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.timer_outlined,
+                        size: 14,
+                        color: isLoading
+                            ? context.c.primary
+                            : context.c.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        _formatTime(elapsedMs),
+                        style: context.t.labelMedium?.copyWith(
+                          color: isLoading
+                              ? context.c.primary
+                              : context.c.onSurfaceVariant,
+                          fontWeight: FontWeight.w600,
+                          fontFeatures: const [FontFeature.tabularFigures()],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           ],
         ),
         const SizedBox(height: 16),
@@ -627,6 +768,7 @@ class _ResponsePanel extends StatelessWidget {
             responseJson: responseJson,
             errorMessage: errorMessage,
             hasTestedOnce: hasTestedOnce,
+            statusCode: statusCode,
           ),
         ),
       ],
@@ -639,12 +781,14 @@ class _ResponseContent extends StatelessWidget {
   final String? responseJson;
   final String? errorMessage;
   final bool hasTestedOnce;
+  final int? statusCode;
 
   const _ResponseContent({
     required this.isLoading,
     required this.responseJson,
     required this.errorMessage,
     required this.hasTestedOnce,
+    this.statusCode,
   });
 
   @override
@@ -654,11 +798,17 @@ class _ResponseContent extends StatelessWidget {
     }
 
     if (errorMessage != null) {
-      return _ErrorState(errorMessage: errorMessage!);
+      return _ErrorState(
+        errorMessage: errorMessage!,
+        statusCode: statusCode,
+      );
     }
 
     if (responseJson != null) {
-      return _SuccessState(responseJson: responseJson!);
+      return _SuccessState(
+        responseJson: responseJson!,
+        statusCode: statusCode,
+      );
     }
 
     return _EmptyState(hasTestedOnce: hasTestedOnce);
@@ -708,11 +858,18 @@ class _LoadingState extends StatelessWidget {
 
 class _ErrorState extends StatelessWidget {
   final String errorMessage;
+  final int? statusCode;
 
-  const _ErrorState({required this.errorMessage});
+  const _ErrorState({
+    required this.errorMessage,
+    this.statusCode,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final isLocalError = statusCode == null;
+    final statusText = isLocalError ? 'Local Error' : '$statusCode';
+
     return Container(
       decoration: BoxDecoration(
         color: context.c.errorContainer.withAlpha(30),
@@ -741,6 +898,33 @@ class _ErrorState extends StatelessWidget {
             style: context.t.titleMedium?.copyWith(
               color: context.c.error,
               fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Status code chip
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: context.c.error.withAlpha(20),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  isLocalError ? Icons.computer_rounded : Icons.http_rounded,
+                  size: 14,
+                  color: context.c.error,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  statusText,
+                  style: context.t.labelMedium?.copyWith(
+                    color: context.c.error,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 16),
@@ -772,8 +956,12 @@ class _ErrorState extends StatelessWidget {
 
 class _SuccessState extends StatelessWidget {
   final String responseJson;
+  final int? statusCode;
 
-  const _SuccessState({required this.responseJson});
+  const _SuccessState({
+    required this.responseJson,
+    this.statusCode,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -836,6 +1024,24 @@ class _SuccessState extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
+                // Status code chip
+                if (statusCode != null) ...[
+                  const SizedBox(width: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: context.c.tertiary.withAlpha(20),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '$statusCode',
+                      style: context.t.labelSmall?.copyWith(
+                        color: context.c.tertiary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
                 const Spacer(),
                 IconButton(
                   icon: Icon(
