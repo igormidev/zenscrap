@@ -7,6 +7,8 @@ import 'package:zenscrap_server/src/core/stripe/stripe_config.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class StripeWebhookRoute extends Route {
+  StripeWebhookRoute() : super(methods: {Method.post});
+
   @override
   FutureOr<Result> handleCall(Session session, Request request) async {
     try {
