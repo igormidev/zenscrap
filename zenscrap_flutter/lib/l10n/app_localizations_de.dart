@@ -1831,4 +1831,27 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get scrappables_create_new => 'Neuen Endpoint erstellen';
+
+  @override
+  String get scrappables_create_dialog_title => 'Create New Scraper';
+
+  @override
+  String get scrappables_create_dialog_subtitle => 'AI-powered data extraction';
+
+  @override
+  String get scrappables_create_dialog_description =>
+      'Enter the URL you want to scrape and describe what data you want to extract. Our AI will analyze the page and create a custom scraper for you.';
+
+  @override
+  String get scrappables_create_dialog_hint =>
+      'Be specific about the data you need';
+
+  @override
+  String get scrappables_create_dialog_cancel => 'Cancel';
+
+  @override
+  String get scrappables_create_dialog_create => 'Create Scraper';
+
+  @override
+  String get scrappables_create_dialog_creating => 'Creating...';
 }

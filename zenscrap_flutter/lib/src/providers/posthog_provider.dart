@@ -848,6 +848,21 @@ class AnalyticsService {
     );
   }
 
+  /// Track when user submits the create scrappable dialog
+  Future<void> trackUserScrappablesCreateNewDialogSubmit({
+    required String targetUrl,
+    required int promptLength,
+  }) async {
+    await _safeCapture(
+      eventName: 'user_scrappables:create_dialog_submit',
+      properties: {
+        'target_url': targetUrl,
+        'prompt_length': promptLength,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
   /// Track when user starts searching their scrappables
   Future<void> trackUserScrappablesSearchStart({
     required String searchQuery,

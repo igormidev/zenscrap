@@ -43,7 +43,8 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
 
       // Add search filter
       if (searchQuery != null && searchQuery.isNotEmpty) {
-        where = where &
+        where =
+            where &
             (t.name.ilike('%$searchQuery%') |
                 t.description.ilike('%$searchQuery%'));
       }
@@ -67,10 +68,7 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
     }
 
     // Get total count for pagination (filtered)
-    final totalCount = await Scrappable.db.count(
-      session,
-      where: whereClause,
-    );
+    final totalCount = await Scrappable.db.count(session, where: whereClause);
 
     // Get total user scrappables count (unfiltered) for limit checking
     final totalUserScrappables = await Scrappable.db.count(
@@ -98,6 +96,7 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
         targetRequest: ScrappableRequest.include(),
         scrappingBeeExtractRules: ScrappingBeeExtractLogic.include(),
         referenceTestData: ReferenceTestData.include(),
+        autoFixConfig: AutoFixConfig.include(),
       ),
     );
 

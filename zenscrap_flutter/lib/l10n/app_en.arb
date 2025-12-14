@@ -2362,5 +2362,33 @@
   "scrappables_create_new": "Create new endpoint",
   "@scrappables_create_new": {
     "description": "Button text to create a new endpoint"
+  },
+  "scrappables_create_dialog_title": "Create New Scraper",
+  "@scrappables_create_dialog_title": {
+    "description": "Title for the create scrappable dialog"
+  },
+  "scrappables_create_dialog_subtitle": "AI-powered data extraction",
+  "@scrappables_create_dialog_subtitle": {
+    "description": "Subtitle for the create scrappable dialog"
+  },
+  "scrappables_create_dialog_description": "Enter the URL you want to scrape and describe what data you want to extract. Our AI will analyze the page and create a custom scraper for you.",
+  "@scrappables_create_dialog_description": {
+    "description": "Description text explaining how the dialog works"
+  },
+  "scrappables_create_dialog_hint": "Be specific about the data you need",
+  "@scrappables_create_dialog_hint": {
+    "description": "Hint text shown near the create button"
+  },
+  "scrappables_create_dialog_cancel": "Cancel",
+  "@scrappables_create_dialog_cancel": {
+    "description": "Cancel button text"
+  },
+  "scrappables_create_dialog_create": "Create Scraper",
+  "@scrappables_create_dialog_create": {
+    "description": "Create button text"
+  },
+  "scrappables_create_dialog_creating": "Creating...",
+  "@scrappables_create_dialog_creating": {
+    "description": "Creating button text when loading"
   }
 }

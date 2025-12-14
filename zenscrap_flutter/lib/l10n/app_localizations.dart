@@ -3280,6 +3280,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Create new endpoint'**
   String get scrappables_create_new;
+
+  /// Title for the create scrappable dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Create New Scraper'**
+  String get scrappables_create_dialog_title;
+
+  /// Subtitle for the create scrappable dialog
+  ///
+  /// In en, this message translates to:
+  /// **'AI-powered data extraction'**
+  String get scrappables_create_dialog_subtitle;
+
+  /// Description text explaining how the dialog works
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the URL you want to scrape and describe what data you want to extract. Our AI will analyze the page and create a custom scraper for you.'**
+  String get scrappables_create_dialog_description;
+
+  /// Hint text shown near the create button
+  ///
+  /// In en, this message translates to:
+  /// **'Be specific about the data you need'**
+  String get scrappables_create_dialog_hint;
+
+  /// Cancel button text
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get scrappables_create_dialog_cancel;
+
+  /// Create button text
+  ///
+  /// In en, this message translates to:
+  /// **'Create Scraper'**
+  String get scrappables_create_dialog_create;
+
+  /// Creating button text when loading
+  ///
+  /// In en, this message translates to:
+  /// **'Creating...'**
+  String get scrappables_create_dialog_creating;
 }
 
 class _AppLocalizationsDelegate

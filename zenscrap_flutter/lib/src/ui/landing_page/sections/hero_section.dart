@@ -5,9 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_validator/form_validator.dart';
 import 'package:lottie/lottie.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
+import 'package:zenscrap_flutter/src/core/mixins/create_scrappable_mixin.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
-import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
 import 'package:zenscrap_flutter/src/ui/landing_page/widgets/trust_badges_row.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/zen_textfield.dart';
@@ -34,7 +34,7 @@ class HeroSection extends ConsumerStatefulWidget {
 }
 
 class _HeroSectionState extends ConsumerState<HeroSection>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, CreateScrappableMixin {
   final _formKey = GlobalKey<FormState>();
   bool _hasStartedUrlInput = false;
   bool _hasStartedPromptInput = false;
@@ -76,37 +76,20 @@ class _HeroSectionState extends ConsumerState<HeroSection>
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
     final analytics = ref.read(analyticsServiceProvider);
-    final targetUrl = _referenceLinkEC.text;
 
-    // Track as landing page CTA click
-    await analytics.trackLandingCtaClick(
-      buttonLabel: 'Create Your First Scraper',
-      sectionName: 'hero',
-      scrollPosition: 0.0, // Hero section is at the top
+    await createScrappableWithTracking(
+      targetUrl: _referenceLinkEC.text,
+      userPrompt: _promptEC.text,
+      onSuccess: widget.onFormSubmitted,
+      onBeforeCreate: () async {
+        // Track as landing page CTA click (hero section specific)
+        await analytics.trackLandingCtaClick(
+          buttonLabel: 'Create Your First Scraper',
+          sectionName: 'hero',
+          scrollPosition: 0.0, // Hero section is at the top
+        );
+      },
     );
-
-    await analytics.trackScrappableCreationAttempt(
-      targetUrl: targetUrl,
-      promptLength: _promptEC.text.length,
-    );
-
-    try {
-      await ref
-          .read(scrapChatProvider.notifier)
-          .createScrappable(targetUrl: targetUrl, userPrompt: _promptEC.text);
-
-      await analytics.trackScrappableCreationSuccess(
-        targetUrl: targetUrl,
-        scrappableId: 0,
-      );
-
-      widget.onFormSubmitted?.call();
-    } catch (e) {
-      await analytics.trackScrappableCreationFailure(
-        targetUrl: targetUrl,
-        errorMessage: e.toString(),
-      );
-    }
   }
 
   @override
