@@ -345,6 +345,12 @@ WebScrapperChatAIResponse parseStructuredResponse(
             jsScenario = null;
           }
 
+          // Handle wait - AI might return as string instead of int
+          final waitRaw = scrappingBeeFetchSettingsData['wait'];
+          final int? wait = waitRaw is int
+              ? waitRaw
+              : (waitRaw is String ? int.tryParse(waitRaw) : null);
+
           fetchSettings = ScrappingBeeFetchSettings(
             url: scrappingBeeFetchSettingsData['url'] as String,
             extract_rules: extractRules,
@@ -354,7 +360,7 @@ WebScrapperChatAIResponse parseStructuredResponse(
                 scrappingBeeFetchSettingsData['premium_proxy'] as bool,
             stealth_proxy:
                 scrappingBeeFetchSettingsData['stealth_proxy'] as bool,
-            wait: scrappingBeeFetchSettingsData['wait'] as int?,
+            wait: wait,
             wait_for: scrappingBeeFetchSettingsData['wait_for'] as String?,
             wait_browser:
                 scrappingBeeFetchSettingsData['wait_browser'] as String?,
