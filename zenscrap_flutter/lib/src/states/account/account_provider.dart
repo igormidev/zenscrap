@@ -35,10 +35,11 @@ class AccountStateNotifier extends Notifier<AccountState> {
         );
 
     final scrappableId = scrappable?.id ?? scrappableIdToBeAttached;
+    final language = ref.read(currentLanguageProvider);
     final result = await ref
         .read(clientProvider)
         .privateAccount
-        .getAccountInfo(initialScrappableId: scrappableId)
+        .getAccountInfo(initialScrappableId: scrappableId, language: language)
         .toResult;
 
     await result.fold(
@@ -54,10 +55,11 @@ class AccountStateNotifier extends Notifier<AccountState> {
   }
 
   Future<AccountInfo> getUser() async {
+    final language = ref.read(currentLanguageProvider);
     return await ref
         .read(clientProvider)
         .privateAccount
-        .getAccountInfo(initialScrappableId: null);
+        .getAccountInfo(initialScrappableId: null, language: language);
   }
 
   void setUser(AccountInfo accountInfo) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/states/analytics/analytics_provider.dart';
 import 'package:zenscrap_flutter/src/states/analytics/analytics_state.dart';
@@ -104,6 +105,7 @@ class _AnalyticsListHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -122,14 +124,14 @@ class _AnalyticsListHeader extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           Text(
-            'API Analytics',
+            l10n.api_analytics_title,
             style: context.t.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
           const Spacer(),
           Text(
-            '${data.items.length} of ${data.totalCount}',
+            l10n.api_analytics_items_count(data.items.length, data.totalCount),
             style: context.t.bodySmall?.copyWith(
               color: context.c.onSurface.withAlpha(150),
             ),
@@ -149,12 +151,13 @@ class _AnalyticsLoadMoreButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     if (!data.hasNextPage) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 16),
         child: Center(
           child: Text(
-            'No more analytics to load',
+            l10n.api_analytics_no_more_to_load,
             style: context.t.bodyMedium?.copyWith(
               color: context.c.onSurface.withAlpha(150),
             ),
@@ -184,7 +187,7 @@ class _AnalyticsLoadMoreButton extends ConsumerWidget {
                   ref.read(analyticsProvider.notifier).loadMoreAnalytics();
                 },
                 icon: const Icon(Icons.add),
-                label: const Text('Load More'),
+                label: Text(l10n.api_analytics_load_more),
               ),
       ),
     );

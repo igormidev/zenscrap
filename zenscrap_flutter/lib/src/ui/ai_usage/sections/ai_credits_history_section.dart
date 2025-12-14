@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/ui/ai_usage/widgets/ai_usage_card.dart';
 import 'package:zenscrap_flutter/src/ui/ai_usage/widgets/load_more_button.dart';
@@ -27,11 +28,11 @@ class AiCreditsHistorySection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.all(20),
+          Padding(
+            padding: const EdgeInsets.all(20),
             child: AiUsageCardHeader(
               icon: Icons.history,
-              title: 'Credit History',
+              title: AppLocalizations.of(context)!.ai_usage_credit_history,
             ),
           ),
           Expanded(
@@ -104,14 +105,14 @@ class _EmptyHistoryState extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'No credit history yet',
+              AppLocalizations.of(context)!.ai_usage_no_credit_history,
               style: context.t.bodyLarge?.copyWith(
                 color: context.c.onSurface.withAlpha(150),
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Your AI credit transactions will appear here',
+              AppLocalizations.of(context)!.ai_usage_credit_history_empty_description,
               style: context.t.bodySmall?.copyWith(
                 color: context.c.onSurface.withAlpha(100),
               ),
@@ -145,15 +146,15 @@ class _CreditHistoryItem extends StatelessWidget {
       icon = Icons.calendar_month;
       final deposit = item.monthlySubscriptionAICreditDeposit!;
       final planName = deposit.planTier == PlanTier.none
-          ? 'Free'
+          ? AppLocalizations.of(context)!.ai_usage_plan_name_free
           : deposit.planTier.name.toUpperCase();
-      title = 'Monthly AI Credits';
-      subtitle = '$planName plan';
+      title = AppLocalizations.of(context)!.ai_usage_monthly_ai_credits;
+      subtitle = AppLocalizations.of(context)!.ai_usage_plan_subtitle(planName);
       color = context.c.primary;
       amount = '+\$${deposit.creditsAmountInDollars.toStringAsFixed(2)}';
     } else {
       icon = Icons.help_outline;
-      title = 'Unknown Transaction';
+      title = AppLocalizations.of(context)!.ai_usage_unknown_transaction;
       subtitle = dateStr;
       color = context.c.onSurface.withAlpha(150);
       amount = null;

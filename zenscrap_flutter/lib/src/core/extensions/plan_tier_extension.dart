@@ -10,6 +10,15 @@ extension PlanTierExtension on PlanTier {
     };
   }
 
+  int get apiCreditsAddedPerMonthInt {
+    return switch (this) {
+      PlanTier.none => 0,
+      PlanTier.basic => 50000,
+      PlanTier.pro => 200000,
+      PlanTier.ultra => 1000000,
+    };
+  }
+
   String get displayName {
     return switch (this) {
       PlanTier.none => 'None',

@@ -2,6 +2,7 @@ import 'package:dart_debouncer/dart_debouncer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/elements/zen_tab.dart';
 import 'package:zenscrap_flutter/src/providers/shared_preferences_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
@@ -167,59 +168,63 @@ class DashboardTemplateState extends ConsumerState<DashboardView> {
 
 enum DashboardNavigationType {
   userEndpoints(
-    label: 'Your endpoints',
     activeIcon: Icons.api,
     inactiveIcon: Icons.api_outlined,
     routeOnClick: '/endpoints',
   ),
   marketPlace(
-    label: 'Marketplace',
     activeIcon: Icons.hub,
     inactiveIcon: Icons.hub_outlined,
     routeOnClick: '/marketplace',
   ),
   usage(
-    label: 'Credits & Keys',
     activeIcon: Icons.key,
     inactiveIcon: Icons.key_outlined,
     routeOnClick: '/credits-keys',
   ),
   analytics(
-    label: 'Api analytics',
     activeIcon: Icons.analytics,
     inactiveIcon: Icons.analytics_outlined,
     routeOnClick: '/api-analytics',
   ),
   account(
-    label: 'Account',
     activeIcon: Icons.person,
     inactiveIcon: Icons.person_outline,
     routeOnClick: '/account',
   ),
   logOut(
-    label: 'Log out',
     activeIcon: Icons.logout,
     inactiveIcon: Icons.logout,
     routeOnClick: null,
   ),
   pricingPage(
-    label: 'Subscription',
     activeIcon: Icons.workspace_premium,
     inactiveIcon: Icons.workspace_premium_outlined,
     routeOnClick: '/subscription',
   );
 
-  final String label;
   final IconData activeIcon;
   final IconData inactiveIcon;
   final String? routeOnClick;
 
   const DashboardNavigationType({
-    required this.label,
     required this.activeIcon,
     required this.inactiveIcon,
     required this.routeOnClick,
   });
+
+  String getLocalizedLabel(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return switch (this) {
+      DashboardNavigationType.userEndpoints => l10n.dashboard_nav_your_endpoints,
+      DashboardNavigationType.marketPlace => l10n.dashboard_nav_marketplace,
+      DashboardNavigationType.usage => l10n.dashboard_nav_credits_keys,
+      DashboardNavigationType.analytics => l10n.dashboard_nav_api_analytics,
+      DashboardNavigationType.account => l10n.dashboard_nav_account,
+      DashboardNavigationType.logOut => l10n.dashboard_nav_log_out,
+      DashboardNavigationType.pricingPage => l10n.dashboard_nav_subscription,
+    };
+  }
 }
 
 enum NavigationType { rail, drawer }

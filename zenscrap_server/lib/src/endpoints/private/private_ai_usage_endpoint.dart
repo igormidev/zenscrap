@@ -1,6 +1,6 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart';
-import 'package:zenscrap_server/src/core/default_classes.dart';
+import 'package:zenscrap_server/src/core/translations/error_translations.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class PrivateAiUsageEndpoint extends Endpoint {
@@ -11,10 +11,11 @@ class PrivateAiUsageEndpoint extends Endpoint {
   Future<PaginatedAICreditHistoryResponse> getAiCreditHistory(
     Session session, {
     int page = 1,
+    SupportedLanguage language = SupportedLanguage.en,
   }) async {
     final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
-      throw defaultAuthenticationException;
+      throw _authenticationFailed(language);
     }
 
     final userId = authenticationInfo.userId;
@@ -25,10 +26,7 @@ class PrivateAiUsageEndpoint extends Endpoint {
     );
 
     if (accountInfo == null) {
-      throw ZenScrapException(
-        title: 'Account Not Found',
-        description: 'Unable to find account information.',
-      );
+      throw _accountNotFound(language);
     }
 
     const int pageSize = 6;
@@ -78,11 +76,12 @@ class PrivateAiUsageEndpoint extends Endpoint {
 
   /// Returns the AI usage info for the authenticated user.
   Future<AccountAIUsage> getAiUsageInfo(
-    Session session,
-  ) async {
+    Session session, {
+    SupportedLanguage language = SupportedLanguage.en,
+  }) async {
     final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
-      throw defaultAuthenticationException;
+      throw _authenticationFailed(language);
     }
 
     final userId = authenticationInfo.userId;
@@ -96,10 +95,7 @@ class PrivateAiUsageEndpoint extends Endpoint {
     );
 
     if (accountInfo == null || accountInfo.accountAIUsage == null) {
-      throw ZenScrapException(
-        title: 'Account Not Found',
-        description: 'Unable to find account information.',
-      );
+      throw _accountNotFound(language);
     }
 
     return accountInfo.accountAIUsage!;
@@ -112,10 +108,11 @@ class PrivateAiUsageEndpoint extends Endpoint {
   Future<PaginatedAutoFixSessionResponse> getAutoFixSessions(
     Session session, {
     int page = 1,
+    SupportedLanguage language = SupportedLanguage.en,
   }) async {
     final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
-      throw defaultAuthenticationException;
+      throw _authenticationFailed(language);
     }
 
     final userId = authenticationInfo.userId;
@@ -126,10 +123,7 @@ class PrivateAiUsageEndpoint extends Endpoint {
     );
 
     if (accountInfo == null) {
-      throw ZenScrapException(
-        title: 'Account Not Found',
-        description: 'Unable to find account information.',
-      );
+      throw _accountNotFound(language);
     }
 
     const int pageSize = 10;
@@ -200,3 +194,13 @@ class PrivateAiUsageEndpoint extends Endpoint {
     );
   }
 }
+
+// ============================================================================
+// Error-returning functions
+// ============================================================================
+
+ZenScrapException _authenticationFailed(SupportedLanguage lang) =>
+    createTranslatedException('authentication_failed', lang);
+
+ZenScrapException _accountNotFound(SupportedLanguage lang) =>
+    createTranslatedException('account_not_found', lang);

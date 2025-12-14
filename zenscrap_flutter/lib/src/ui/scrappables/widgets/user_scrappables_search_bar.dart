@@ -1,5 +1,6 @@
 import 'package:dart_debouncer/dart_debouncer.dart';
 import 'package:flutter/material.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
@@ -56,7 +57,7 @@ class _UserScrappablesSearchBarState
         onChanged: _onSearchChanged,
         style: context.t.bodyMedium,
         decoration: InputDecoration(
-          hintText: 'Search your endpoints by name or description...',
+          hintText: AppLocalizations.of(context)!.scrappables_search_hint,
           hintStyle: context.t.bodyMedium?.copyWith(
             color: context.c.onSurfaceVariant.withAlpha(179),
           ),

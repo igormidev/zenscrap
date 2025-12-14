@@ -2,12 +2,14 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:serverpod_auth_email_flutter/serverpod_auth_email_flutter.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 import 'package:zenscrap_flutter/src/states/session/user_model.dart';
 import 'package:zenscrap_flutter/src/ui/auth/templates/auth_form_template.dart';
+import 'package:zenscrap_flutter/src/ui/auth/widgets/google_sign_in_button.dart';
 
 class LoginPage extends ConsumerWidget {
   final EmailAuthController emailAuth;
@@ -21,17 +23,18 @@ class LoginPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final analytics = ref.read(analyticsServiceProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     // Track view when the login form is visible
     analytics.trackAuthLoginViewed();
 
     FormBuilderValidators.email().and(FormBuilderValidators.minLength(8));
     return AuthFormTemplate<UserModel>(
-      submitText: 'Log In',
+      submitText: l10n.auth_log_in_button,
       items: [
         AuthFormItem(
-          hintText: 'Enter your email',
-          labelText: 'Email',
+          hintText: l10n.auth_email_hint,
+          labelText: l10n.auth_email_label,
           autofillHints: AutofillHints.email,
           keyboardType: TextInputType.emailAddress,
           validator: FormBuilderValidators.compose([
@@ -41,8 +44,8 @@ class LoginPage extends ConsumerWidget {
           ]),
         ),
         AuthFormItem(
-          hintText: 'Enter your password',
-          labelText: 'Password',
+          hintText: l10n.auth_password_hint,
+          labelText: l10n.auth_password_label,
           autofillHints: AutofillHints.password,
           keyboardType: TextInputType.visiblePassword,
           obscureText: true,
@@ -90,6 +93,11 @@ class LoginPage extends ConsumerWidget {
           imageUrl: user?.imageUrl,
         );
       },
+      children: const [
+        SizedBox(height: 8),
+        ZenScrapGoogleSignInButton(),
+        SizedBox(height: 16),
+      ],
     );
   }
 }

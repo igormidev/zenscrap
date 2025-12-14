@@ -22,8 +22,10 @@ class ApiCreditHistoryNotifier extends Notifier<ApiCreditHistoryState> {
       _currentPage = 1;
       _allHistory = [];
 
+      final language = ref.read(currentLanguageProvider);
       final response = await _client.privateApiUsage.getApiCreditHistory(
         page: 1,
+        language: language,
       );
 
       _allHistory = response.data;
@@ -74,8 +76,10 @@ class ApiCreditHistoryNotifier extends Notifier<ApiCreditHistoryState> {
       );
 
       _currentPage++;
+      final language = ref.read(currentLanguageProvider);
       final response = await _client.privateApiUsage.getApiCreditHistory(
         page: _currentPage,
+        language: language,
       );
 
       _allHistory.addAll(response.data);

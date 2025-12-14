@@ -5,12 +5,14 @@ import 'package:zenscrap_server/src/core/consts.dart';
 import 'package:zenscrap_server/src/core/docs/scrappable_request_structure_guide.dart';
 import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';
 import 'package:zenscrap_server/src/core/gemini_client.dart';
+import 'package:zenscrap_server/src/core/translations/error_translations.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class CreateScrappableEndpoint extends Endpoint {
   Stream<CreateScrappableStreamItem> call(
     Session session, {
     required String referenceLink,
+    required SupportedLanguage language,
   }) async* {
     final userId = session.authenticated?.userId;
 
@@ -31,11 +33,13 @@ class CreateScrappableEndpoint extends Endpoint {
         final maxAllowed = accountInfo.planTier.maxScrappables;
 
         if (currentScrappablesCount >= maxAllowed) {
-          throw ZenScrapException(
-            title: 'Endpoint Limit Reached',
-            description:
-                'You have reached the maximum number of endpoints ($maxAllowed) for your ${accountInfo.planTier.name} plan. '
-                'Please upgrade your plan to create more endpoints.',
+          throw createTranslatedException(
+            'endpoint_limit_reached',
+            language,
+            params: {
+              'maxAllowed': maxAllowed.toString(),
+              'planName': accountInfo.planTier.name,
+            },
           );
         }
       }
@@ -68,12 +72,13 @@ class CreateScrappableEndpoint extends Endpoint {
                   ? '$hours hours, $minutes minutes'
                   : '$minutes minutes';
 
-          throw ZenScrapException(
-            title: 'Usage Limit Reached',
-            description:
-                'You have reached the spending limit for your IP address '
-                '(\$${kAnonymousIpSpendingLimitInDollars.toStringAsFixed(2)}). '
-                'This limit resets in $timeStr, or you can create an account to get monthly AI credits.',
+          throw createTranslatedException(
+            'usage_limit_reached',
+            language,
+            params: {
+              'limit': '\$${kAnonymousIpSpendingLimitInDollars.toStringAsFixed(2)}',
+              'timeStr': timeStr,
+            },
           );
         }
       }
@@ -155,17 +160,16 @@ class CreateScrappableEndpoint extends Endpoint {
           'Gemini API error: ${error.message}',
           level: LogLevel.error,
           stackTrace: stackTrace);
+      // Note: Gemini API error messages are technical and not translated
       throw ZenScrapException(
-          title: 'AI Generation Failed',
+          title: getErrorTitle('ai_generation_failed', language),
           description: error.message);
     } catch (error, stackTrace) {
       session.log(
           'Error during Gemini streaming:\n$error',
           level: LogLevel.error,
           stackTrace: stackTrace);
-      throw ZenScrapException(
-          title: 'Gemini AI could not generate the scrappable data.',
-          description: 'An unexpected error occurred. Try again later.');
+      throw createTranslatedException('ai_generation_failed', language);
     }
 
     // Create the scrappable in the database

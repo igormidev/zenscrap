@@ -22,8 +22,10 @@ class AutoFixSessionsNotifier extends Notifier<AutoFixSessionsState> {
       _currentPage = 1;
       _allSessions = [];
 
+      final language = ref.read(currentLanguageProvider);
       final response = await _client.privateAiUsage.getAutoFixSessions(
         page: 1,
+        language: language,
       );
 
       _allSessions = response.data;
@@ -73,8 +75,10 @@ class AutoFixSessionsNotifier extends Notifier<AutoFixSessionsState> {
       );
 
       _currentPage++;
+      final language = ref.read(currentLanguageProvider);
       final response = await _client.privateAiUsage.getAutoFixSessions(
         page: _currentPage,
+        language: language,
       );
 
       _allSessions.addAll(response.data);

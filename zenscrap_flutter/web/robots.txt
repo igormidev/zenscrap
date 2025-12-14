@@ -1,0 +1,437 @@
+# =============================================================================
+# robots.txt for zenscrap.com
+# AI-Powered Web Scraping Rule Generator - SaaS Application
+# Last updated: 2025-01-01
+# =============================================================================
+
+# =============================================================================
+# SEARCH ENGINES - Allow full access to public pages
+# =============================================================================
+# Major search engines are allowed to crawl and index public content
+# This ensures discoverability and organic traffic acquisition
+
+User-agent: Googlebot
+Allow: /
+Allow: /auth
+Allow: /scrappable-form
+Disallow: /splash
+Disallow: /endpoints
+Disallow: /marketplace
+Disallow: /credits-keys
+Disallow: /api-analytics
+Disallow: /account
+Disallow: /subscription
+Disallow: /api/
+Disallow: /stripe/
+Disallow: /googlesignin
+Disallow: /static/
+
+User-agent: Bingbot
+Allow: /
+Allow: /auth
+Allow: /scrappable-form
+Disallow: /splash
+Disallow: /endpoints
+Disallow: /marketplace
+Disallow: /credits-keys
+Disallow: /api-analytics
+Disallow: /account
+Disallow: /subscription
+Disallow: /api/
+Disallow: /stripe/
+Disallow: /googlesignin
+Disallow: /static/
+
+User-agent: DuckDuckBot
+Allow: /
+Allow: /auth
+Allow: /scrappable-form
+Disallow: /splash
+Disallow: /endpoints
+Disallow: /marketplace
+Disallow: /credits-keys
+Disallow: /api-analytics
+Disallow: /account
+Disallow: /subscription
+Disallow: /api/
+Disallow: /stripe/
+Disallow: /googlesignin
+Disallow: /static/
+
+User-agent: Yandex
+Allow: /
+Allow: /auth
+Allow: /scrappable-form
+Disallow: /splash
+Disallow: /endpoints
+Disallow: /marketplace
+Disallow: /credits-keys
+Disallow: /api-analytics
+Disallow: /account
+Disallow: /subscription
+Disallow: /api/
+Disallow: /stripe/
+Disallow: /googlesignin
+Disallow: /static/
+
+User-agent: Baiduspider
+Allow: /
+Allow: /auth
+Allow: /scrappable-form
+Disallow: /splash
+Disallow: /endpoints
+Disallow: /marketplace
+Disallow: /credits-keys
+Disallow: /api-analytics
+Disallow: /account
+Disallow: /subscription
+Disallow: /api/
+Disallow: /stripe/
+Disallow: /googlesignin
+Disallow: /static/
+
+# =============================================================================
+# AI SEARCH ASSISTANTS - Allow for discovery and recommendations
+# =============================================================================
+# These AI-powered search tools can drive qualified traffic to the site
+# by recommending Zenscrap when users ask about web scraping solutions
+
+# OpenAI's GPTBot - Powers ChatGPT search and browsing features
+User-agent: GPTBot
+Allow: /
+Allow: /auth
+Allow: /scrappable-form
+Disallow: /splash
+Disallow: /endpoints
+Disallow: /marketplace
+Disallow: /credits-keys
+Disallow: /api-analytics
+Disallow: /account
+Disallow: /subscription
+Disallow: /api/
+Disallow: /stripe/
+Disallow: /googlesignin
+Disallow: /static/
+
+# OpenAI Search Bot - Specifically for search features
+User-agent: OAI-SearchBot
+Allow: /
+Allow: /auth
+Allow: /scrappable-form
+Disallow: /splash
+Disallow: /endpoints
+Disallow: /marketplace
+Disallow: /credits-keys
+Disallow: /api-analytics
+Disallow: /account
+Disallow: /subscription
+Disallow: /api/
+Disallow: /stripe/
+Disallow: /googlesignin
+Disallow: /static/
+
+# Anthropic's Claude bots - Powers Claude search and recommendations
+User-agent: ClaudeBot
+Allow: /
+Allow: /auth
+Allow: /scrappable-form
+Disallow: /splash
+Disallow: /endpoints
+Disallow: /marketplace
+Disallow: /credits-keys
+Disallow: /api-analytics
+Disallow: /account
+Disallow: /subscription
+Disallow: /api/
+Disallow: /stripe/
+Disallow: /googlesignin
+Disallow: /static/
+
+User-agent: Claude-Web
+Allow: /
+Allow: /auth
+Allow: /scrappable-form
+Disallow: /splash
+Disallow: /endpoints
+Disallow: /marketplace
+Disallow: /credits-keys
+Disallow: /api-analytics
+Disallow: /account
+Disallow: /subscription
+Disallow: /api/
+Disallow: /stripe/
+Disallow: /googlesignin
+Disallow: /static/
+
+User-agent: Claude-SearchBot
+Allow: /
+Allow: /auth
+Allow: /scrappable-form
+Disallow: /splash
+Disallow: /endpoints
+Disallow: /marketplace
+Disallow: /credits-keys
+Disallow: /api-analytics
+Disallow: /account
+Disallow: /subscription
+Disallow: /api/
+Disallow: /stripe/
+Disallow: /googlesignin
+Disallow: /static/
+
+# Perplexity AI - AI-powered search engine
+User-agent: PerplexityBot
+Allow: /
+Allow: /auth
+Allow: /scrappable-form
+Disallow: /splash
+Disallow: /endpoints
+Disallow: /marketplace
+Disallow: /credits-keys
+Disallow: /api-analytics
+Disallow: /account
+Disallow: /subscription
+Disallow: /api/
+Disallow: /stripe/
+Disallow: /googlesignin
+Disallow: /static/
+
+User-agent: Perplexity-User
+Allow: /
+Allow: /auth
+Allow: /scrappable-form
+Disallow: /splash
+Disallow: /endpoints
+Disallow: /marketplace
+Disallow: /credits-keys
+Disallow: /api-analytics
+Disallow: /account
+Disallow: /subscription
+Disallow: /api/
+Disallow: /stripe/
+Disallow: /googlesignin
+Disallow: /static/
+
+# DuckDuckGo AI assistant
+User-agent: DuckAssistBot
+Allow: /
+Allow: /auth
+Allow: /scrappable-form
+Disallow: /splash
+Disallow: /endpoints
+Disallow: /marketplace
+Disallow: /credits-keys
+Disallow: /api-analytics
+Disallow: /account
+Disallow: /subscription
+Disallow: /api/
+Disallow: /stripe/
+Disallow: /googlesignin
+Disallow: /static/
+
+# =============================================================================
+# AI TRAINING CRAWLERS - BLOCKED
+# =============================================================================
+# These crawlers are primarily used for AI model training rather than search
+# Blocking them protects proprietary content while maintaining search visibility
+
+# Common Crawl - Major data source for AI training datasets
+User-agent: CCBot
+Disallow: /
+
+# Google's AI training crawler (separate from search indexing)
+User-agent: Google-Extended
+Disallow: /
+
+# Apple's AI training extension
+User-agent: Applebot-Extended
+Disallow: /
+
+# Meta/Facebook AI crawlers
+User-agent: FacebookBot
+Disallow: /
+
+User-agent: Meta-ExternalAgent
+Disallow: /
+
+User-agent: Meta-ExternalFetcher
+Disallow: /
+
+# ByteDance crawlers (TikTok, AI training)
+User-agent: Bytespider
+Disallow: /
+
+User-agent: TikTokSpider
+Disallow: /
+
+# Diffbot - AI-powered web scraping (potential competitor)
+User-agent: Diffbot
+Disallow: /
+
+User-agent: diffbot
+Disallow: /
+
+# Amazon AI crawler
+User-agent: Amazonbot
+Disallow: /
+
+# Cohere AI training crawlers
+User-agent: cohere-ai
+Disallow: /
+
+User-agent: cohere-training-data-crawler
+Disallow: /
+
+# Huawei AI crawlers
+User-agent: Petalbot
+Disallow: /
+
+User-agent: PanguBot
+Disallow: /
+
+# Allen Institute AI research crawlers
+User-agent: AI2Bot
+Disallow: /
+
+User-agent: AI2Bot-Dolma
+Disallow: /
+
+# Other AI training and data collection bots
+User-agent: img2dataset
+Disallow: /
+
+User-agent: DataForSeoBot
+Disallow: /
+
+User-agent: SemrushBot-OCOB
+Disallow: /
+
+User-agent: Scrapy
+Disallow: /
+
+User-agent: aiHitBot
+Disallow: /
+
+User-agent: FirecrawlAgent
+Disallow: /
+
+User-agent: VelenPublicWebCrawler
+Disallow: /
+
+User-agent: ICC-Crawler
+Disallow: /
+
+User-agent: Timpibot
+Disallow: /
+
+User-agent: Youbot
+Disallow: /
+
+User-agent: ImagesiftBot
+Disallow: /
+
+# =============================================================================
+# SEO ANALYSIS TOOLS - Limited access for monitoring
+# =============================================================================
+# Allow SEO tools to crawl public pages for site analysis
+
+User-agent: Screaming Frog SEO Spider
+Allow: /
+Allow: /auth
+Allow: /scrappable-form
+Disallow: /splash
+Disallow: /endpoints
+Disallow: /marketplace
+Disallow: /credits-keys
+Disallow: /api-analytics
+Disallow: /account
+Disallow: /subscription
+Disallow: /api/
+Disallow: /stripe/
+Disallow: /googlesignin
+Disallow: /static/
+
+User-agent: AhrefsBot
+Allow: /
+Allow: /auth
+Allow: /scrappable-form
+Disallow: /splash
+Disallow: /endpoints
+Disallow: /marketplace
+Disallow: /credits-keys
+Disallow: /api-analytics
+Disallow: /account
+Disallow: /subscription
+Disallow: /api/
+Disallow: /stripe/
+Disallow: /googlesignin
+Disallow: /static/
+
+User-agent: SemrushBot
+Allow: /
+Allow: /auth
+Allow: /scrappable-form
+Disallow: /splash
+Disallow: /endpoints
+Disallow: /marketplace
+Disallow: /credits-keys
+Disallow: /api-analytics
+Disallow: /account
+Disallow: /subscription
+Disallow: /api/
+Disallow: /stripe/
+Disallow: /googlesignin
+Disallow: /static/
+
+User-agent: MJ12bot
+Allow: /
+Allow: /auth
+Allow: /scrappable-form
+Disallow: /splash
+Disallow: /endpoints
+Disallow: /marketplace
+Disallow: /credits-keys
+Disallow: /api-analytics
+Disallow: /account
+Disallow: /subscription
+Disallow: /api/
+Disallow: /stripe/
+Disallow: /googlesignin
+Disallow: /static/
+
+# =============================================================================
+# DEFAULT RULE - All other bots
+# =============================================================================
+# Restrictive default: block authenticated areas while allowing public pages
+# This catches any crawlers not explicitly listed above
+
+User-agent: *
+Allow: /
+Allow: /auth
+Allow: /scrappable-form
+Disallow: /splash
+Disallow: /endpoints
+Disallow: /marketplace
+Disallow: /credits-keys
+Disallow: /api-analytics
+Disallow: /account
+Disallow: /subscription
+Disallow: /api/
+Disallow: /stripe/
+Disallow: /googlesignin
+Disallow: /static/
+
+# =============================================================================
+# SITEMAP REFERENCE
+# =============================================================================
+Sitemap: https://zenscrap.com/sitemap.xml
+
+# =============================================================================
+# NOTES
+# =============================================================================
+# - This file follows the Robots Exclusion Protocol (RFC 9309)
+# - Crawl-delay is not used as major search engines (Google) don't support it
+# - For security-sensitive routes, server-side authentication is enforced
+# - robots.txt is for crawler guidance only, not access control
+# - Test this file at: https://www.google.com/webmasters/tools/robots-testing-tool
+# =============================================================================

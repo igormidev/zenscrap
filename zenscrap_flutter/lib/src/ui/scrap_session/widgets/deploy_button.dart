@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
@@ -46,6 +47,7 @@ class _DeployButtonState extends ConsumerState<DeployButton> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isChatLoading = ref.watch(isChatLoadingProvider);
     final isLoggedIn =
         ref.watch(sessionProvider.select((value) => value.maybeMap(
@@ -53,8 +55,7 @@ class _DeployButtonState extends ConsumerState<DeployButton> {
               notSignedIn: (_) => false,
             )));
     return Tooltip(
-      message:
-          'Continue to edit/use this scrappable\nendpoint by deploying it!',
+      message: l10n.scrap_session_deploy_tooltip,
       child: ValueListenableBuilder(
           valueListenable: _isDeployingVN,
           builder: (context, isDeploying, child) {
@@ -138,7 +139,7 @@ class _DeployButtonState extends ConsumerState<DeployButton> {
                         }
                       });
                     },
-              label: Text('DEPLOY ENDPOINT'),
+              label: Text(l10n.scrap_session_deploy_endpoint),
               iconAlignment: IconAlignment.end,
               icon: isDeploying
                   ? CupertinoActivityIndicator()

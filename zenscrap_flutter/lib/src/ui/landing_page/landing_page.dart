@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
+import 'package:seo/seo.dart';
 import 'package:simple_platform/simple_platform.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
@@ -17,9 +19,8 @@ import 'package:zenscrap_flutter/src/ui/landing_page/sections/how_it_works_secti
 import 'package:zenscrap_flutter/src/ui/landing_page/sections/marketplace_section.dart';
 import 'package:zenscrap_flutter/src/ui/landing_page/sections/problem_section.dart';
 import 'package:zenscrap_flutter/src/ui/landing_page/widgets/landing_appbar.dart';
-import 'package:zenscrap_flutter/src/ui/legal/terms_of_service_dialog.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/view/scrappable_edit_session.dart';
-import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/ai_thinking_stream_view.dart';
+import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/creating_scrappable_dialog.dart';
 import 'package:zenscrap_flutter/src/design_system/elements/ip_limit_error_view.dart';
 import 'package:zenscrap_flutter/src/design_system/elements/zen_tab.dart';
 
@@ -59,6 +60,9 @@ class _LandingPageState extends ConsumerState<LandingPage>
   int _navClicksCount = 0;
   int _ctaClicksCount = 0;
   bool _hasTrackedPageView = false;
+
+  // Dialog state tracking
+  bool _isCreatingDialogShowing = false;
 
   @override
   void initState() {
@@ -367,17 +371,24 @@ class _LandingPageState extends ConsumerState<LandingPage>
   Widget build(BuildContext context) {
     final scrapChatState = ref.watch(scrapChatProvider);
 
-    // If user has started creating a scrappable, show the appropriate view
+    // Listen for state changes to show/hide the creating scrappable dialog
+    ref.listen(scrapChatProvider, (previous, next) {
+      // Check if we're entering the creatingScrappable state
+      final isCreating = next.maybeWhen(
+        creatingScrappable: (referenceLink, chunks, grounding) => true,
+        orElse: () => false,
+      );
+
+      if (isCreating && !_isCreatingDialogShowing) {
+        _isCreatingDialogShowing = true;
+        CreatingScrappableDialog.show(context).then((_) {
+          _isCreatingDialogShowing = false;
+        });
+      }
+    });
+
+    // Show the appropriate view based on state
     return scrapChatState.maybeWhen(
-      creatingScrappable: (referenceLink, thinkingChunks, groundingMetadata) {
-        return Scaffold(
-          body: AiThinkingStreamView(
-            referenceLink: referenceLink,
-            thinkingChunks: thinkingChunks,
-            groundingMetadata: groundingMetadata,
-          ),
-        );
-      },
       standard:
           (scrappable, testExpirationDate, sessionUuid, llmThinkingStream) {
             return Scaffold(
@@ -394,6 +405,8 @@ class _LandingPageState extends ConsumerState<LandingPage>
         }
         return Scaffold(body: ZenErrorTab(exception));
       },
+      // For blank, creatingSessionState, and creatingScrappable states, show landing page
+      // The creatingScrappable state will have the dialog shown on top via the listener
       orElse: () => _buildLandingPage(context),
     );
   }
@@ -409,7 +422,41 @@ class _LandingPageState extends ConsumerState<LandingPage>
       _trackSectionView('hero', 0);
     }
 
-    return Scaffold(
+    // SEO meta tags for the landing page
+    // Note: Open Graph and Twitter Card tags must be set in index.html
+    // as social media crawlers don't execute JavaScript
+    return Seo.head(
+      tags: [
+        // Primary meta tags for search engines
+        const MetaTag(
+          name: 'title',
+          content: 'ZenScrap - AI-Powered Web Scrapers That Fix Themselves',
+        ),
+        const MetaTag(
+          name: 'description',
+          content:
+              'Create self-healing web scrapers with AI. Describe what you want to extract and get a ready-to-use API endpoint. No code, no CSS selectors, no maintenance. Free to start.',
+        ),
+        const MetaTag(
+          name: 'keywords',
+          content:
+              'web scraping, AI scraper, self-healing scraper, web data extraction, API, no-code scraping, automated scraping, data extraction tool, web scraper API, scraping service',
+        ),
+        const MetaTag(name: 'author', content: 'ZenScrap'),
+        const MetaTag(name: 'robots', content: 'index, follow'),
+        const MetaTag(
+          name: 'googlebot',
+          content: 'index, follow, max-snippet:-1, max-image-preview:large',
+        ),
+        // Canonical URL to prevent duplicate content issues
+        const LinkTag(rel: 'canonical', href: 'https://zenscrap.com/'),
+        // Language and locale
+        const MetaTag(name: 'language', content: 'en'),
+        // Application metadata
+        const MetaTag(name: 'application-name', content: 'ZenScrap'),
+        const MetaTag(name: 'theme-color', content: '#607D8B'),
+      ],
+      child: Scaffold(
       // Make scaffold background transparent so Lottie shows through
       backgroundColor: Colors.transparent,
       body: LayoutBuilder(
@@ -483,7 +530,7 @@ class _LandingPageState extends ConsumerState<LandingPage>
                       child: Column(
                         children: [
                           Text(
-                            'Simple, Transparent Pricing',
+                            AppLocalizations.of(context)!.landing_pricing_title,
                             style: context.t.displaySmall?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: context.c.onSurface,
@@ -492,7 +539,7 @@ class _LandingPageState extends ConsumerState<LandingPage>
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            'Choose the plan that fits your needs. Scale as you grow.',
+                            AppLocalizations.of(context)!.landing_pricing_subtitle,
                             style: context.t.titleMedium?.copyWith(
                               color: context.c.onSurfaceVariant,
                             ),
@@ -557,7 +604,7 @@ class _LandingPageState extends ConsumerState<LandingPage>
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
-                                  'Learn more',
+                                  AppLocalizations.of(context)!.landing_learn_more,
                                   style: context.t.labelMedium?.copyWith(
                                     color: context.c.onSurfaceVariant,
                                   ),
@@ -582,16 +629,11 @@ class _LandingPageState extends ConsumerState<LandingPage>
                   ),
                 ),
 
-              // Terms of Service link - bottom right corner
-              Positioned(
-                bottom: 16,
-                right: 16,
-                child: const TermsOfServiceLink(),
-              ),
             ],
           );
         },
       ),
-    );
+      ), // End of Seo.head child: Scaffold
+    ); // End of Seo.head
   }
 }

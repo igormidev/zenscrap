@@ -3,6 +3,7 @@ import 'package:serverpod_auth_client/serverpod_auth_client.dart';
 import 'package:serverpod_auth_shared_flutter/serverpod_auth_shared_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
@@ -45,7 +46,7 @@ class _UserEditableProfileImageState
               if (value) {
                 return Center(
                   child: Text(
-                    'Loading...',
+                    AppLocalizations.of(context)!.account_loading,
                     style: context.t.displaySmall,
                   ),
                 );
@@ -66,7 +67,7 @@ class _UserEditableProfileImageState
               ),
               padding: const EdgeInsets.all(8),
               child: Tooltip(
-                message: 'Change image',
+                message: AppLocalizations.of(context)!.account_change_image_tooltip,
                 child: InkWell(
                   onTap: () async {
                     final analytics = ref.read(analyticsServiceProvider);

@@ -28,11 +28,13 @@ class MarketplaceNotifier extends Notifier<MarketplaceState> {
       _currentSearchQuery = searchQuery;
       _currentCategories = categories ?? _currentCategories;
 
+      final language = ref.read(currentLanguageProvider);
       final response = await _client.marketplace.getItems(
         page: page,
         searchQuery: searchQuery.isNotEmpty ? searchQuery : null,
         categories:
             _currentCategories.isEmpty ? null : _currentCategories.toList(),
+        language: language,
       );
 
       state = MarketplaceState.loaded(

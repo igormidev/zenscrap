@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/core/extensions/convert_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 
@@ -25,7 +26,7 @@ class _AnalyticsItemCardState extends State<AnalyticsItemCard> {
 
   @override
   Widget build(BuildContext context) {
-    final statusInfo = _getStatusInfo();
+    final statusInfo = _getStatusInfo(context);
     final hasDetails = widget.analytics.details != null;
 
     return Container(
@@ -75,43 +76,44 @@ class _AnalyticsItemCardState extends State<AnalyticsItemCard> {
     );
   }
 
-  _StatusInfo _getStatusInfo() {
+  _StatusInfo _getStatusInfo(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     switch (widget.analytics.requestStatus) {
       case RequestStatus.success:
         return _StatusInfo(
           color: Colors.green,
           icon: Icons.check_circle,
-          text: 'Success',
+          text: l10n.api_analytics_status_success,
         );
       case RequestStatus.clientError:
         return _StatusInfo(
           color: Colors.orange,
           icon: Icons.warning,
-          text: 'Client Error',
+          text: l10n.api_analytics_status_client_error,
         );
       case RequestStatus.serverError:
         return _StatusInfo(
           color: Colors.red,
           icon: Icons.error,
-          text: 'Server Error',
+          text: l10n.api_analytics_status_server_error,
         );
       case RequestStatus.insufficientCredits:
         return _StatusInfo(
           color: Colors.purple,
           icon: Icons.credit_card_off,
-          text: 'Insufficient Credits',
+          text: l10n.api_analytics_status_insufficient_credits,
         );
       case RequestStatus.maxConcurrencyExceeded:
         return _StatusInfo(
           color: Colors.cyan,
           icon: Icons.traffic,
-          text: 'Max Concurrency',
+          text: l10n.api_analytics_status_max_concurrency,
         );
       case RequestStatus.failedAtScrappingBee:
         return _StatusInfo(
           color: const Color(0xFFE91E63),
           icon: Icons.bug_report,
-          text: 'Extract Rules Error',
+          text: l10n.api_analytics_status_extract_rules_error,
         );
     }
   }
@@ -180,13 +182,18 @@ class _MainRow extends StatelessWidget {
           // Expand/collapse button
           if (hasDetails) ...[
             const SizedBox(width: 8),
-            IconButton(
-              onPressed: onToggleExpand,
-              icon: Icon(
-                isExpanded ? Icons.expand_less : Icons.expand_more,
-                color: statusInfo.color,
-              ),
-              tooltip: isExpanded ? 'Show less' : 'Show details',
+            Builder(
+              builder: (context) {
+                final l10n = AppLocalizations.of(context)!;
+                return IconButton(
+                  onPressed: onToggleExpand,
+                  icon: Icon(
+                    isExpanded ? Icons.expand_less : Icons.expand_more,
+                    color: statusInfo.color,
+                  ),
+                  tooltip: isExpanded ? l10n.api_analytics_show_less : l10n.api_analytics_show_details,
+                );
+              }
             ),
           ],
         ],
@@ -206,6 +213,7 @@ class _DetailsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: ListView(
@@ -214,7 +222,7 @@ class _DetailsSection extends StatelessWidget {
           // Title if present
           if (details.title != null) ...[
             _DetailField(
-              label: 'Title',
+              label: l10n.api_analytics_detail_title,
               value: details.title!,
               statusColor: statusColor,
             ),
@@ -224,7 +232,7 @@ class _DetailsSection extends StatelessWidget {
           // Description if present
           if (details.description != null) ...[
             _DetailField(
-              label: 'Description',
+              label: l10n.api_analytics_detail_description,
               value: details.description!,
               statusColor: statusColor,
             ),
@@ -234,7 +242,7 @@ class _DetailsSection extends StatelessWidget {
           // Error object if present
           if (details.errorObjectAsString != null) ...[
             _DetailField(
-              label: 'Error Object',
+              label: l10n.api_analytics_detail_error_object,
               value: details.errorObjectAsString!,
               statusColor: statusColor,
               isError: true,
@@ -245,7 +253,7 @@ class _DetailsSection extends StatelessWidget {
           // Stack trace if present
           if (details.errorStackTraceAsString != null) ...[
             _DetailField(
-              label: 'Stack Trace',
+              label: l10n.api_analytics_detail_stack_trace,
               value: details.errorStackTraceAsString!,
               statusColor: statusColor,
               isError: true,
@@ -256,7 +264,7 @@ class _DetailsSection extends StatelessWidget {
 
           // Payload (always present)
           _JsonField(
-            label: 'Request Payload',
+            label: l10n.api_analytics_detail_request_payload,
             icon: Icons.upload_outlined,
             json: details.stringifiedPayload,
             statusColor: statusColor,
@@ -266,7 +274,7 @@ class _DetailsSection extends StatelessWidget {
           if (details.stringifiedResponse != null) ...[
             const SizedBox(height: 16),
             _JsonField(
-              label: 'Response Data',
+              label: l10n.api_analytics_detail_response_data,
               icon: Icons.download_outlined,
               json: details.stringifiedResponse!,
               statusColor: statusColor,
@@ -394,6 +402,7 @@ class _JsonFieldState extends State<_JsonField> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final formattedJson = _formatJson();
     final lineCount = formattedJson.split('\n').length;
     final shouldCollapse = lineCount > 10;
@@ -427,7 +436,7 @@ class _JsonFieldState extends State<_JsonField> {
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
-                  'SUCCESS',
+                  l10n.api_analytics_success_badge,
                   style: context.t.labelSmall?.copyWith(
                     color: Colors.green,
                     fontWeight: FontWeight.bold,
@@ -444,7 +453,7 @@ class _JsonFieldState extends State<_JsonField> {
                   size: 18,
                 ),
                 onPressed: () => setState(() => _isExpanded = !_isExpanded),
-                tooltip: _isExpanded ? 'Collapse' : 'Expand',
+                tooltip: _isExpanded ? l10n.api_analytics_collapse : l10n.api_analytics_expand,
               ),
             IconButton(
               icon: const Icon(Icons.copy, size: 18),
@@ -452,14 +461,14 @@ class _JsonFieldState extends State<_JsonField> {
                 Clipboard.setData(ClipboardData(text: formattedJson));
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('${widget.label} copied to clipboard'),
+                    content: Text(l10n.api_analytics_copied_to_clipboard(widget.label)),
                     duration: const Duration(seconds: 2),
                     behavior: SnackBarBehavior.floating,
                     backgroundColor: displayColor,
                   ),
                 );
               },
-              tooltip: 'Copy ${widget.label.toLowerCase()}',
+              tooltip: l10n.api_analytics_copy_label(widget.label.toLowerCase()),
             ),
           ],
         ),
@@ -522,7 +531,7 @@ class _JsonFieldState extends State<_JsonField> {
                     ),
                     child: Center(
                       child: Text(
-                        'Click expand to see ${lineCount - 10}+ more lines',
+                        l10n.api_analytics_expand_more_lines(lineCount - 10),
                         style: context.t.labelSmall?.copyWith(
                           color: context.c.onSurface.withAlpha(150),
                         ),

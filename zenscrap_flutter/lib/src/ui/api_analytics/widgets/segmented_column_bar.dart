@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/core/extensions/request_status_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 
@@ -54,7 +55,7 @@ class SegmentedColumnBar extends StatelessWidget {
         timeScope.failedAtScrappingBeeCount / totalCount;
 
     return Tooltip(
-      message: _buildTooltipMessage(),
+      message: _buildTooltipMessage(context),
       preferBelow: true,
       verticalOffset: 20,
       child: LayoutBuilder(
@@ -162,7 +163,8 @@ class SegmentedColumnBar extends StatelessWidget {
 );
   }
 
-  String _buildTooltipMessage() {
+  String _buildTooltipMessage(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final dateFormat = DateFormat('MMM d, HH:mm');
     final totalCount = timeScope.successCount +
         timeScope.clientErrorCount +
@@ -173,43 +175,43 @@ class SegmentedColumnBar extends StatelessWidget {
 
     final buffer = StringBuffer();
     buffer.writeln('${dateFormat.format(timeScope.start)} - ${dateFormat.format(timeScope.end)}');
-    buffer.writeln('Total: $totalCount requests');
+    buffer.writeln(l10n.api_analytics_total_requests(totalCount));
     buffer.writeln('');
 
     if (timeScope.successCount > 0) {
       final percentage =
           (timeScope.successCount / totalCount * 100).toStringAsFixed(1);
-      buffer.writeln('✓ Success: ${timeScope.successCount} ($percentage%)');
+      buffer.writeln('${l10n.api_analytics_tooltip_success_count(timeScope.successCount, percentage)}');
     }
     if (timeScope.clientErrorCount > 0) {
       final percentage =
           (timeScope.clientErrorCount / totalCount * 100).toStringAsFixed(1);
-      buffer.writeln('⚠ 4xx: ${timeScope.clientErrorCount} ($percentage%)');
+      buffer.writeln('${l10n.api_analytics_tooltip_4xx_count(timeScope.clientErrorCount, percentage)}');
     }
     if (timeScope.serverErrorCount > 0) {
       final percentage =
           (timeScope.serverErrorCount / totalCount * 100).toStringAsFixed(1);
-      buffer.writeln('✗ 5xx: ${timeScope.serverErrorCount} ($percentage%)');
+      buffer.writeln('${l10n.api_analytics_tooltip_5xx_count(timeScope.serverErrorCount, percentage)}');
     }
     if (timeScope.failedAtScrappingBeeCount > 0) {
       final percentage =
           (timeScope.failedAtScrappingBeeCount / totalCount * 100)
               .toStringAsFixed(1);
       buffer.writeln(
-          '🐝 ScrapingBee Error: ${timeScope.failedAtScrappingBeeCount} ($percentage%)');
+          '${l10n.api_analytics_tooltip_scraping_bee_error(timeScope.failedAtScrappingBeeCount, percentage)}');
     }
     if (timeScope.insufficientCreditsCount > 0) {
       final percentage = (timeScope.insufficientCreditsCount / totalCount * 100)
           .toStringAsFixed(1);
       buffer.writeln(
-          '\$ No Credits: ${timeScope.insufficientCreditsCount} ($percentage%)');
+          '${l10n.api_analytics_tooltip_no_credits_count(timeScope.insufficientCreditsCount, percentage)}');
     }
     if (timeScope.maxConcurrencyExceededCount > 0) {
       final percentage =
           (timeScope.maxConcurrencyExceededCount / totalCount * 100)
               .toStringAsFixed(1);
       buffer.writeln(
-          '⚡ Max Concurrency: ${timeScope.maxConcurrencyExceededCount} ($percentage%)');
+          '${l10n.api_analytics_tooltip_max_concurrency_count(timeScope.maxConcurrencyExceededCount, percentage)}');
     }
 
     return buffer.toString().trim();

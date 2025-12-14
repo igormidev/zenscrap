@@ -3,6 +3,7 @@ import 'package:serverpod_auth_server/serverpod_auth_server.dart';
 import 'package:zenscrap_server/src/core/mixins/api_helper_mixin.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_api.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_config.dart';
+import 'package:zenscrap_server/src/core/translations/error_translations.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class PrivateSubscriptionEndpoint extends Endpoint {
@@ -13,11 +14,12 @@ class PrivateSubscriptionEndpoint extends Endpoint {
     Session session, {
     required String planTier,
     required bool isYearly,
+    SupportedLanguage language = SupportedLanguage.en,
   }) async {
     // Get authenticated user
     final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
-      throw Exception('User not authenticated');
+      throw _authenticationFailed(language);
     }
     final authenticatedUserId = authenticationInfo.userId;
 
@@ -31,17 +33,17 @@ class PrivateSubscriptionEndpoint extends Endpoint {
     );
 
     if (accountInfo == null) {
-      throw Exception('Account info not found');
+      throw _accountNotFound(language);
     }
 
     if (accountInfo.userInfo?.email == null) {
-      throw Exception('User email not found');
+      throw _userEmailNotFound(language);
     }
 
     // Check if user already has an active subscription
     if (accountInfo.stripeSubscriptionId != null &&
         accountInfo.subscriptionStatus == 'active') {
-      throw Exception('User already has an active subscription');
+      throw _alreadySubscribed(language);
     }
 
     try {
@@ -63,15 +65,18 @@ class PrivateSubscriptionEndpoint extends Endpoint {
       return checkoutSession['url'] as String;
     } catch (e) {
       session.log('Failed to create checkout session: $e');
-      throw Exception('Failed to create checkout session: $e');
+      throw _subscriptionCheckoutFailed(language);
     }
   }
 
-  Future<Map<String, dynamic>> getSubscriptionStatus(Session session) async {
+  Future<Map<String, dynamic>> getSubscriptionStatus(
+    Session session, {
+    SupportedLanguage language = SupportedLanguage.en,
+  }) async {
     // Get authenticated user
     final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
-      throw Exception('User not authenticated');
+      throw _authenticationFailed(language);
     }
     final authenticatedUserId = authenticationInfo.userId;
 
@@ -82,7 +87,7 @@ class PrivateSubscriptionEndpoint extends Endpoint {
     );
 
     if (accountInfo == null) {
-      throw Exception('Account info not found');
+      throw _accountNotFound(language);
     }
 
     return {
@@ -93,11 +98,14 @@ class PrivateSubscriptionEndpoint extends Endpoint {
     };
   }
 
-  Future<bool> cancelSubscription(Session session) async {
+  Future<bool> cancelSubscription(
+    Session session, {
+    SupportedLanguage language = SupportedLanguage.en,
+  }) async {
     // Get authenticated user
     final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
-      throw Exception('User not authenticated');
+      throw _authenticationFailed(language);
     }
     final authenticatedUserId = authenticationInfo.userId;
 
@@ -108,11 +116,11 @@ class PrivateSubscriptionEndpoint extends Endpoint {
     );
 
     if (accountInfo == null) {
-      throw Exception('Account info not found');
+      throw _accountNotFound(language);
     }
 
     if (accountInfo.stripeSubscriptionId == null) {
-      throw Exception('No active subscription found');
+      throw _noActiveSubscription(language);
     }
 
     try {
@@ -138,15 +146,18 @@ class PrivateSubscriptionEndpoint extends Endpoint {
       return true;
     } catch (e) {
       session.log('Failed to cancel subscription: $e');
-      throw Exception('Failed to cancel subscription: $e');
+      throw _subscriptionCancelFailed(language);
     }
   }
 
-  Future<String> createCustomerPortalSession(Session session) async {
+  Future<String> createCustomerPortalSession(
+    Session session, {
+    SupportedLanguage language = SupportedLanguage.en,
+  }) async {
     // Get authenticated user
     final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) {
-      throw Exception('User not authenticated');
+      throw _authenticationFailed(language);
     }
     final authenticatedUserId = authenticationInfo.userId;
 
@@ -157,12 +168,11 @@ class PrivateSubscriptionEndpoint extends Endpoint {
     );
 
     if (accountInfo == null) {
-      throw Exception('Account info not found');
+      throw _accountNotFound(language);
     }
 
     if (accountInfo.stripeCustomerId == null) {
-      throw Exception(
-          'No Stripe customer found. Please subscribe to a plan first.');
+      throw _noStripeCustomer(language);
     }
 
     try {
@@ -177,7 +187,38 @@ class PrivateSubscriptionEndpoint extends Endpoint {
       return portalSession['url'] as String;
     } catch (e) {
       session.log('Failed to create customer portal session: $e');
-      throw Exception('Failed to create customer portal session: $e');
+      throw _customerPortalFailed(language);
     }
   }
 }
+
+// ============================================================================
+// Error-returning functions
+// ============================================================================
+
+ZenScrapException _authenticationFailed(SupportedLanguage lang) =>
+    createTranslatedException('authentication_failed', lang);
+
+ZenScrapException _accountNotFound(SupportedLanguage lang) =>
+    createTranslatedException('account_not_found', lang);
+
+ZenScrapException _userEmailNotFound(SupportedLanguage lang) =>
+    createTranslatedException('user_email_not_found', lang);
+
+ZenScrapException _alreadySubscribed(SupportedLanguage lang) =>
+    createTranslatedException('already_subscribed', lang);
+
+ZenScrapException _subscriptionCheckoutFailed(SupportedLanguage lang) =>
+    createTranslatedException('subscription_checkout_failed', lang);
+
+ZenScrapException _noActiveSubscription(SupportedLanguage lang) =>
+    createTranslatedException('no_active_subscription', lang);
+
+ZenScrapException _subscriptionCancelFailed(SupportedLanguage lang) =>
+    createTranslatedException('subscription_cancel_failed', lang);
+
+ZenScrapException _noStripeCustomer(SupportedLanguage lang) =>
+    createTranslatedException('no_stripe_customer', lang);
+
+ZenScrapException _customerPortalFailed(SupportedLanguage lang) =>
+    createTranslatedException('customer_portal_failed', lang);

@@ -20,12 +20,14 @@ class AnalyticsNotifier extends Notifier<AnalyticsState> {
     state = AnalyticsState.loading();
 
     try {
+      final language = ref.read(currentLanguageProvider);
       final result = await ref
           .read(clientProvider)
           .privateScrappableAnalytics
           .getScrappableAnalyticsWithScope(
             page: _currentPage,
             scope: _currentScope,
+            language: language,
           );
 
       if (result.items.isEmpty) {
@@ -56,12 +58,14 @@ class AnalyticsNotifier extends Notifier<AnalyticsState> {
 
     try {
       _currentPage++;
+      final language = ref.read(currentLanguageProvider);
       final result = await ref
           .read(clientProvider)
           .privateScrappableAnalytics
           .getScrappableAnalyticsWithScope(
             page: _currentPage,
             scope: _currentScope,
+            language: language,
           );
 
       // Merge the new data with existing data

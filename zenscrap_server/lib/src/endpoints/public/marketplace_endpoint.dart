@@ -11,6 +11,7 @@ class MarketplaceEndpoint extends Endpoint {
     int page = 1,
     String? searchQuery,
     List<ScraperCategory>? categories,
+    SupportedLanguage language = SupportedLanguage.en,
   }) async {
     final now = DateTime.now();
     const int pageSize = 12;
@@ -31,7 +32,8 @@ class MarketplaceEndpoint extends Endpoint {
 
       // Add search filter
       if (searchQuery != null && searchQuery.isNotEmpty) {
-        where = where &
+        where =
+            where &
             (t.name.ilike('%$searchQuery%') |
                 t.description.ilike('%$searchQuery%'));
       }
@@ -55,10 +57,7 @@ class MarketplaceEndpoint extends Endpoint {
     }
 
     // Get total count for pagination
-    final totalCount = await Scrappable.db.count(
-      session,
-      where: whereClause,
-    );
+    final totalCount = await Scrappable.db.count(session, where: whereClause);
 
     // Calculate pagination metadata
     final totalPages = (totalCount / pageSize).ceil();
@@ -96,7 +95,8 @@ class MarketplaceEndpoint extends Endpoint {
 
       final DateTime? dataCache = _usageCountDateCache[scrappable.id!];
 
-      final bool isCacheOutdated = dataCache == null ||
+      final bool isCacheOutdated =
+          dataCache == null ||
           dataCache.isBefore(now.subtract(const Duration(hours: 2)));
       if (isCacheOutdated == false) {
         final int? usageCount = _usageCountCache[scrappable.id!];
@@ -115,10 +115,9 @@ class MarketplaceEndpoint extends Endpoint {
         _usageCountDateCache[scrappable.id!] = now;
       }
 
-      items.add(MarketPlacePaginatedItem(
-        scrappable: scrappable,
-        usageCount: count,
-      ));
+      items.add(
+        MarketPlacePaginatedItem(scrappable: scrappable, usageCount: count),
+      );
     }
 
     return PaginatedScrappableResponse(

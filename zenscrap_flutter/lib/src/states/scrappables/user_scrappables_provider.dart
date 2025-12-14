@@ -43,6 +43,7 @@ class UserScrappablesNotifier extends Notifier<UserScrappablesState> {
         selectedCategories: _currentCategories,
       );
 
+      final language = ref.read(currentLanguageProvider);
       final result = await ref
           .read(clientProvider)
           .privateUserScrappables(
@@ -51,6 +52,7 @@ class UserScrappablesNotifier extends Notifier<UserScrappablesState> {
             categories: _currentCategories.isEmpty
                 ? null
                 : _currentCategories.toList(),
+            language: language,
           )
           .toResult;
 

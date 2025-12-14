@@ -14,52 +14,54 @@ import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import 'dart:async' as _i2;
 import 'package:zenscrap_client/src/protocol/entities/account/account.dart'
     as _i3;
-import 'package:zenscrap_client/src/protocol/entities/account/ai_usage/ai_credit_history/paginated_ai_credit_history_response.dart'
+import 'package:zenscrap_client/src/protocol/entities/supported_language.dart'
     as _i4;
-import 'package:zenscrap_client/src/protocol/entities/account/ai_usage/account_ai_usage.dart'
+import 'package:zenscrap_client/src/protocol/entities/account/ai_usage/ai_credit_history/paginated_ai_credit_history_response.dart'
     as _i5;
-import 'package:zenscrap_client/src/protocol/entities/scrappable/auto_fix/paginated_auto_fix_session_response.dart'
+import 'package:zenscrap_client/src/protocol/entities/account/ai_usage/account_ai_usage.dart'
     as _i6;
-import 'package:zenscrap_client/src/protocol/entities/account/api_usage/api_credit_history/paginated_api_credit_history_response.dart'
+import 'package:zenscrap_client/src/protocol/entities/scrappable/auto_fix/paginated_auto_fix_session_response.dart'
     as _i7;
-import 'package:zenscrap_client/src/protocol/entities/account/account_api_key.dart'
+import 'package:zenscrap_client/src/protocol/entities/account/api_usage/api_credit_history/paginated_api_credit_history_response.dart'
     as _i8;
-import 'package:zenscrap_client/src/protocol/entities/account/api_usage/account_api_usage.dart'
+import 'package:zenscrap_client/src/protocol/entities/account/account_api_key.dart'
     as _i9;
-import 'package:zenscrap_client/src/protocol/entities/api_key_response.dart'
+import 'package:zenscrap_client/src/protocol/entities/account/api_usage/account_api_usage.dart'
     as _i10;
-import 'package:zenscrap_client/src/protocol/entities/account/credit_purchase_option.dart'
+import 'package:zenscrap_client/src/protocol/entities/api_key_response.dart'
     as _i11;
-import 'package:zenscrap_client/src/protocol/entities/scrappable/scrappable.dart'
+import 'package:zenscrap_client/src/protocol/entities/account/credit_purchase_option.dart'
     as _i12;
-import 'package:zenscrap_client/src/protocol/entities/analytics/paginated_scrappable_requests_analytics.dart'
+import 'package:zenscrap_client/src/protocol/entities/scrappable/scrappable.dart'
     as _i13;
-import 'package:zenscrap_client/src/protocol/entities/analytics/analytics_time_scope.dart'
+import 'package:zenscrap_client/src/protocol/entities/analytics/paginated_scrappable_requests_analytics.dart'
     as _i14;
-import 'package:zenscrap_client/src/protocol/entities/analytics/paginated_scrappable_analytics.dart'
+import 'package:zenscrap_client/src/protocol/entities/analytics/analytics_time_scope.dart'
     as _i15;
-import 'package:zenscrap_client/src/protocol/entities/analytics/scrappable_usage_metrics.dart'
+import 'package:zenscrap_client/src/protocol/entities/analytics/paginated_scrappable_analytics.dart'
     as _i16;
-import 'package:zenscrap_client/src/protocol/entities/user_scrappables/user_paginated_scrappable_response.dart'
+import 'package:zenscrap_client/src/protocol/entities/analytics/scrappable_usage_metrics.dart'
     as _i17;
-import 'package:zenscrap_client/src/protocol/entities/scrappable/scraper_category.dart'
+import 'package:zenscrap_client/src/protocol/entities/user_scrappables/user_paginated_scrappable_response.dart'
     as _i18;
-import 'package:zenscrap_client/src/protocol/entities/create_scrappable_stream/create_scrappable_stream_item.dart'
+import 'package:zenscrap_client/src/protocol/entities/scrappable/scraper_category.dart'
     as _i19;
-import 'package:zenscrap_client/src/protocol/entities/marketplace/paginated_scrappable_response.dart'
+import 'package:zenscrap_client/src/protocol/entities/create_scrappable_stream/create_scrappable_stream_item.dart'
     as _i20;
-import 'package:zenscrap_client/src/protocol/entities/scrappable/byte_test_data.dart'
+import 'package:zenscrap_client/src/protocol/entities/marketplace/paginated_scrappable_response.dart'
     as _i21;
-import 'package:zenscrap_client/src/protocol/entities/account/plan_tier.dart'
+import 'package:zenscrap_client/src/protocol/entities/scrappable/byte_test_data.dart'
     as _i22;
-import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/create_session_response.dart'
+import 'package:zenscrap_client/src/protocol/entities/account/plan_tier.dart'
     as _i23;
-import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/chat_response.dart'
+import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/create_session_response.dart'
     as _i24;
-import 'package:zenscrap_client/src/protocol/entities/scrappable/ai_model.dart'
+import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/chat_response.dart'
     as _i25;
-import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i26;
-import 'protocol.dart' as _i27;
+import 'package:zenscrap_client/src/protocol/entities/scrappable/ai_model.dart'
+    as _i26;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i27;
+import 'protocol.dart' as _i28;
 
 /// {@category Endpoint}
 class EndpointPrivateAccount extends _i1.EndpointRef {
@@ -70,10 +72,14 @@ class EndpointPrivateAccount extends _i1.EndpointRef {
 
   _i2.Future<_i3.AccountInfo> getAccountInfo({
     required int? initialScrappableId,
+    required _i4.SupportedLanguage language,
   }) => caller.callServerEndpoint<_i3.AccountInfo>(
     'privateAccount',
     'getAccountInfo',
-    {'initialScrappableId': initialScrappableId},
+    {
+      'initialScrappableId': initialScrappableId,
+      'language': language,
+    },
   );
 }
 
@@ -85,32 +91,41 @@ class EndpointPrivateAiUsage extends _i1.EndpointRef {
   String get name => 'privateAiUsage';
 
   /// Returns paginated AI credit history for the authenticated user.
-  _i2.Future<_i4.PaginatedAICreditHistoryResponse> getAiCreditHistory({
+  _i2.Future<_i5.PaginatedAICreditHistoryResponse> getAiCreditHistory({
     required int page,
-  }) => caller.callServerEndpoint<_i4.PaginatedAICreditHistoryResponse>(
+    required _i4.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i5.PaginatedAICreditHistoryResponse>(
     'privateAiUsage',
     'getAiCreditHistory',
-    {'page': page},
+    {
+      'page': page,
+      'language': language,
+    },
   );
 
   /// Returns the AI usage info for the authenticated user.
-  _i2.Future<_i5.AccountAIUsage> getAiUsageInfo() =>
-      caller.callServerEndpoint<_i5.AccountAIUsage>(
-        'privateAiUsage',
-        'getAiUsageInfo',
-        {},
-      );
+  _i2.Future<_i6.AccountAIUsage> getAiUsageInfo({
+    required _i4.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i6.AccountAIUsage>(
+    'privateAiUsage',
+    'getAiUsageInfo',
+    {'language': language},
+  );
 
   /// Returns paginated auto-fix sessions for scrappables owned by the authenticated user.
   ///
   /// This includes all auto-fix repair attempts across all of the user's scrappables,
   /// ordered by most recent first.
-  _i2.Future<_i6.PaginatedAutoFixSessionResponse> getAutoFixSessions({
+  _i2.Future<_i7.PaginatedAutoFixSessionResponse> getAutoFixSessions({
     required int page,
-  }) => caller.callServerEndpoint<_i6.PaginatedAutoFixSessionResponse>(
+    required _i4.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i7.PaginatedAutoFixSessionResponse>(
     'privateAiUsage',
     'getAutoFixSessions',
-    {'page': page},
+    {
+      'page': page,
+      'language': language,
+    },
   );
 }
 
@@ -121,62 +136,84 @@ class EndpointPrivateApiUsage extends _i1.EndpointRef {
   @override
   String get name => 'privateApiUsage';
 
-  _i2.Future<_i7.PaginatedApiCreditHistoryResponse> getApiCreditHistory({
+  _i2.Future<_i8.PaginatedApiCreditHistoryResponse> getApiCreditHistory({
     required int page,
-  }) => caller.callServerEndpoint<_i7.PaginatedApiCreditHistoryResponse>(
+    required _i4.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i8.PaginatedApiCreditHistoryResponse>(
     'privateApiUsage',
     'getApiCreditHistory',
-    {'page': page},
+    {
+      'page': page,
+      'language': language,
+    },
   );
 
-  _i2.Future<_i8.AccountApiKey> createApiKey({required String name}) =>
-      caller.callServerEndpoint<_i8.AccountApiKey>(
-        'privateApiUsage',
-        'createApiKey',
-        {'name': name},
-      );
+  _i2.Future<_i9.AccountApiKey> createApiKey({
+    required String name,
+    required _i4.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i9.AccountApiKey>(
+    'privateApiUsage',
+    'createApiKey',
+    {
+      'name': name,
+      'language': language,
+    },
+  );
 
-  _i2.Future<bool> deactivateApiKey({required int apiKeyId}) =>
-      caller.callServerEndpoint<bool>(
-        'privateApiUsage',
-        'deactivateApiKey',
-        {'apiKeyId': apiKeyId},
-      );
+  _i2.Future<bool> deactivateApiKey({
+    required int apiKeyId,
+    required _i4.SupportedLanguage language,
+  }) => caller.callServerEndpoint<bool>(
+    'privateApiUsage',
+    'deactivateApiKey',
+    {
+      'apiKeyId': apiKeyId,
+      'language': language,
+    },
+  );
 
-  _i2.Future<List<_i8.AccountApiKey>> getActiveApiKeys() =>
-      caller.callServerEndpoint<List<_i8.AccountApiKey>>(
-        'privateApiUsage',
-        'getActiveApiKeys',
-        {},
-      );
+  _i2.Future<List<_i9.AccountApiKey>> getActiveApiKeys({
+    required _i4.SupportedLanguage language,
+  }) => caller.callServerEndpoint<List<_i9.AccountApiKey>>(
+    'privateApiUsage',
+    'getActiveApiKeys',
+    {'language': language},
+  );
 
-  _i2.Future<Map<int, int>> getApiKeyUsageStats() =>
-      caller.callServerEndpoint<Map<int, int>>(
-        'privateApiUsage',
-        'getApiKeyUsageStats',
-        {},
-      );
+  _i2.Future<Map<int, int>> getApiKeyUsageStats({
+    required _i4.SupportedLanguage language,
+  }) => caller.callServerEndpoint<Map<int, int>>(
+    'privateApiUsage',
+    'getApiKeyUsageStats',
+    {'language': language},
+  );
 
-  _i2.Future<_i9.AccountApiUsage> getApiUsageInfo() =>
-      caller.callServerEndpoint<_i9.AccountApiUsage>(
-        'privateApiUsage',
-        'getApiUsageInfo',
-        {},
-      );
+  _i2.Future<_i10.AccountApiUsage> getApiUsageInfo({
+    required _i4.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i10.AccountApiUsage>(
+    'privateApiUsage',
+    'getApiUsageInfo',
+    {'language': language},
+  );
 
-  _i2.Future<_i10.ApiKeyResponse> getApiKeysWithStats() =>
-      caller.callServerEndpoint<_i10.ApiKeyResponse>(
-        'privateApiUsage',
-        'getApiKeysWithStats',
-        {},
-      );
+  _i2.Future<_i11.ApiKeyResponse> getApiKeysWithStats({
+    required _i4.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i11.ApiKeyResponse>(
+    'privateApiUsage',
+    'getApiKeysWithStats',
+    {'language': language},
+  );
 
   _i2.Future<String> createCreditPurchaseCheckout({
-    required _i11.CreditPurchaseOption creditPackage,
+    required _i12.CreditPurchaseOption creditPackage,
+    required _i4.SupportedLanguage language,
   }) => caller.callServerEndpoint<String>(
     'privateApiUsage',
     'createCreditPurchaseCheckout',
-    {'creditPackage': creditPackage},
+    {
+      'creditPackage': creditPackage,
+      'language': language,
+    },
   );
 }
 
@@ -187,12 +224,16 @@ class EndpointPrivateCloneScrappable extends _i1.EndpointRef {
   @override
   String get name => 'privateCloneScrappable';
 
-  _i2.Future<_i12.Scrappable> cloneFromMarketplace({
+  _i2.Future<_i13.Scrappable> cloneFromMarketplace({
     required int scrappableId,
-  }) => caller.callServerEndpoint<_i12.Scrappable>(
+    required _i4.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i13.Scrappable>(
     'privateCloneScrappable',
     'cloneFromMarketplace',
-    {'scrappableId': scrappableId},
+    {
+      'scrappableId': scrappableId,
+      'language': language,
+    },
   );
 }
 
@@ -203,39 +244,47 @@ class EndpointPrivateScrappableAnalytics extends _i1.EndpointRef {
   @override
   String get name => 'privateScrappableAnalytics';
 
-  _i2.Future<_i13.PaginatedScrappableRequestsAnalytics>
+  _i2.Future<_i14.PaginatedScrappableRequestsAnalytics>
   getScrappableAnalyticsWithScope({
     required int page,
-    required _i14.AnalyticsTimeScope scope,
-  }) => caller.callServerEndpoint<_i13.PaginatedScrappableRequestsAnalytics>(
+    required _i15.AnalyticsTimeScope scope,
+    required _i4.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i14.PaginatedScrappableRequestsAnalytics>(
     'privateScrappableAnalytics',
     'getScrappableAnalyticsWithScope',
     {
       'page': page,
       'scope': scope,
+      'language': language,
     },
   );
 
-  _i2.Future<_i15.PaginatedScrappableAnalytics> getScrappableAnalytics({
+  _i2.Future<_i16.PaginatedScrappableAnalytics> getScrappableAnalytics({
     required int scrappableId,
     required int page,
-  }) => caller.callServerEndpoint<_i15.PaginatedScrappableAnalytics>(
+    required _i4.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i16.PaginatedScrappableAnalytics>(
     'privateScrappableAnalytics',
     'getScrappableAnalytics',
     {
       'scrappableId': scrappableId,
       'page': page,
+      'language': language,
     },
   );
 
   /// Get usage metrics for a scrappable in the last 30 days
   /// This includes ALL requests from ANY user who called this scrappable
-  _i2.Future<_i16.ScrappableUsageMetrics> getScrappableUsageMetrics({
+  _i2.Future<_i17.ScrappableUsageMetrics> getScrappableUsageMetrics({
     required int scrappableId,
-  }) => caller.callServerEndpoint<_i16.ScrappableUsageMetrics>(
+    required _i4.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i17.ScrappableUsageMetrics>(
     'privateScrappableAnalytics',
     'getScrappableUsageMetrics',
-    {'scrappableId': scrappableId},
+    {
+      'scrappableId': scrappableId,
+      'language': language,
+    },
   );
 }
 
@@ -249,34 +298,40 @@ class EndpointPrivateSubscription extends _i1.EndpointRef {
   _i2.Future<String> createCheckoutSession({
     required String planTier,
     required bool isYearly,
+    required _i4.SupportedLanguage language,
   }) => caller.callServerEndpoint<String>(
     'privateSubscription',
     'createCheckoutSession',
     {
       'planTier': planTier,
       'isYearly': isYearly,
+      'language': language,
     },
   );
 
-  _i2.Future<Map<String, dynamic>> getSubscriptionStatus() =>
-      caller.callServerEndpoint<Map<String, dynamic>>(
-        'privateSubscription',
-        'getSubscriptionStatus',
-        {},
-      );
-
-  _i2.Future<bool> cancelSubscription() => caller.callServerEndpoint<bool>(
+  _i2.Future<Map<String, dynamic>> getSubscriptionStatus({
+    required _i4.SupportedLanguage language,
+  }) => caller.callServerEndpoint<Map<String, dynamic>>(
     'privateSubscription',
-    'cancelSubscription',
-    {},
+    'getSubscriptionStatus',
+    {'language': language},
   );
 
-  _i2.Future<String> createCustomerPortalSession() =>
-      caller.callServerEndpoint<String>(
-        'privateSubscription',
-        'createCustomerPortalSession',
-        {},
-      );
+  _i2.Future<bool> cancelSubscription({
+    required _i4.SupportedLanguage language,
+  }) => caller.callServerEndpoint<bool>(
+    'privateSubscription',
+    'cancelSubscription',
+    {'language': language},
+  );
+
+  _i2.Future<String> createCustomerPortalSession({
+    required _i4.SupportedLanguage language,
+  }) => caller.callServerEndpoint<String>(
+    'privateSubscription',
+    'createCustomerPortalSession',
+    {'language': language},
+  );
 }
 
 /// {@category Endpoint}
@@ -286,26 +341,33 @@ class EndpointPrivateUserScrappables extends _i1.EndpointRef {
   @override
   String get name => 'privateUserScrappables';
 
-  _i2.Future<_i17.UserPaginatedScrappableResponse> call({
+  _i2.Future<_i18.UserPaginatedScrappableResponse> call({
     required int page,
     String? searchQuery,
-    List<_i18.ScraperCategory>? categories,
-  }) => caller.callServerEndpoint<_i17.UserPaginatedScrappableResponse>(
+    List<_i19.ScraperCategory>? categories,
+    required _i4.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i18.UserPaginatedScrappableResponse>(
     'privateUserScrappables',
     'call',
     {
       'page': page,
       'searchQuery': searchQuery,
       'categories': categories,
+      'language': language,
     },
   );
 
-  _i2.Future<_i12.Scrappable> getScrappableById(int scrappableId) =>
-      caller.callServerEndpoint<_i12.Scrappable>(
-        'privateUserScrappables',
-        'getScrappableById',
-        {'scrappableId': scrappableId},
-      );
+  _i2.Future<_i13.Scrappable> getScrappableById(
+    int scrappableId, {
+    required _i4.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i13.Scrappable>(
+    'privateUserScrappables',
+    'getScrappableById',
+    {
+      'scrappableId': scrappableId,
+      'language': language,
+    },
+  );
 }
 
 /// {@category Endpoint}
@@ -315,16 +377,20 @@ class EndpointCreateScrappable extends _i1.EndpointRef {
   @override
   String get name => 'createScrappable';
 
-  _i2.Stream<_i19.CreateScrappableStreamItem> call({
+  _i2.Stream<_i20.CreateScrappableStreamItem> call({
     required String referenceLink,
+    required _i4.SupportedLanguage language,
   }) =>
       caller.callStreamingServerEndpoint<
-        _i2.Stream<_i19.CreateScrappableStreamItem>,
-        _i19.CreateScrappableStreamItem
+        _i2.Stream<_i20.CreateScrappableStreamItem>,
+        _i20.CreateScrappableStreamItem
       >(
         'createScrappable',
         'call',
-        {'referenceLink': referenceLink},
+        {
+          'referenceLink': referenceLink,
+          'language': language,
+        },
         {},
       );
 }
@@ -336,12 +402,17 @@ class EndpointDeleteScrappable extends _i1.EndpointRef {
   @override
   String get name => 'deleteScrappable';
 
-  _i2.Future<bool> call({required int scrappableId}) =>
-      caller.callServerEndpoint<bool>(
-        'deleteScrappable',
-        'call',
-        {'scrappableId': scrappableId},
-      );
+  _i2.Future<bool> call({
+    required int scrappableId,
+    required _i4.SupportedLanguage language,
+  }) => caller.callServerEndpoint<bool>(
+    'deleteScrappable',
+    'call',
+    {
+      'scrappableId': scrappableId,
+      'language': language,
+    },
+  );
 }
 
 /// {@category Endpoint}
@@ -355,7 +426,8 @@ class EndpointEditScrappable extends _i1.EndpointRef {
     required int scrappableId,
     required String name,
     required String description,
-    _i18.ScraperCategory? category,
+    required _i4.SupportedLanguage language,
+    _i19.ScraperCategory? category,
     bool? willHideFromMarketplace,
   }) => caller.callServerEndpoint<bool>(
     'editScrappable',
@@ -364,6 +436,7 @@ class EndpointEditScrappable extends _i1.EndpointRef {
       'scrappableId': scrappableId,
       'name': name,
       'description': description,
+      'language': language,
       'category': category,
       'willHideFromMarketplace': willHideFromMarketplace,
     },
@@ -377,17 +450,19 @@ class EndpointMarketplace extends _i1.EndpointRef {
   @override
   String get name => 'marketplace';
 
-  _i2.Future<_i20.PaginatedScrappableResponse> getItems({
+  _i2.Future<_i21.PaginatedScrappableResponse> getItems({
     required int page,
     String? searchQuery,
-    List<_i18.ScraperCategory>? categories,
-  }) => caller.callServerEndpoint<_i20.PaginatedScrappableResponse>(
+    List<_i19.ScraperCategory>? categories,
+    required _i4.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i21.PaginatedScrappableResponse>(
     'marketplace',
     'getItems',
     {
       'page': page,
       'searchQuery': searchQuery,
       'categories': categories,
+      'language': language,
     },
   );
 }
@@ -401,12 +476,17 @@ class EndpointPublicScrappable extends _i1.EndpointRef {
 
   /// Retrieves ByteTestData for a scrappable
   /// This is a public endpoint to allow viewing test data in the marketplace
-  _i2.Future<_i21.ByteTestData?> getByteTestData(int scrappableId) =>
-      caller.callServerEndpoint<_i21.ByteTestData?>(
-        'publicScrappable',
-        'getByteTestData',
-        {'scrappableId': scrappableId},
-      );
+  _i2.Future<_i22.ByteTestData?> getByteTestData(
+    int scrappableId, {
+    required _i4.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i22.ByteTestData?>(
+    'publicScrappable',
+    'getByteTestData',
+    {
+      'scrappableId': scrappableId,
+      'language': language,
+    },
+  );
 }
 
 /// {@category Endpoint}
@@ -419,7 +499,7 @@ class EndpointPublicTier extends _i1.EndpointRef {
   _i2.Future<void> updatePlayerTier({
     required String email,
     required String tierManipulationKey,
-    required _i22.PlanTier planTier,
+    required _i23.PlanTier planTier,
   }) => caller.callServerEndpoint<void>(
     'publicTier',
     'updatePlayerTier',
@@ -438,12 +518,17 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
   @override
   String get name => 'scrappableChatSession';
 
-  _i2.Future<void> commitCurrentEditState({required String sessionUuid}) =>
-      caller.callServerEndpoint<void>(
-        'scrappableChatSession',
-        'commitCurrentEditState',
-        {'sessionUuid': sessionUuid},
-      );
+  _i2.Future<void> commitCurrentEditState({
+    required String sessionUuid,
+    required _i4.SupportedLanguage language,
+  }) => caller.callServerEndpoint<void>(
+    'scrappableChatSession',
+    'commitCurrentEditState',
+    {
+      'sessionUuid': sessionUuid,
+      'language': language,
+    },
+  );
 
   _i2.Future<void> disposeSession({required String sessionId}) =>
       caller.callServerEndpoint<void>(
@@ -466,12 +551,14 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
   _i2.Future<void> updateUserApiKey({
     required String sessionId,
     required String openAiApiKey,
+    required _i4.SupportedLanguage language,
   }) => caller.callServerEndpoint<void>(
     'scrappableChatSession',
     'updateUserApiKey',
     {
       'sessionId': sessionId,
       'openAiApiKey': openAiApiKey,
+      'language': language,
     },
   );
 
@@ -480,6 +567,7 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
     required String url,
     required List<String> pathParams,
     required Map<String, String?> queryParams,
+    required _i4.SupportedLanguage language,
   }) => caller.callServerEndpoint<void>(
     'scrappableChatSession',
     'updateScrappableRequest',
@@ -488,51 +576,64 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
       'url': url,
       'pathParams': pathParams,
       'queryParams': queryParams,
+      'language': language,
     },
   );
 
-  _i2.Future<_i23.CreateSessionResponse> createSession({
+  _i2.Future<_i24.CreateSessionResponse> createSession({
     required int scrappableId,
-  }) => caller.callServerEndpoint<_i23.CreateSessionResponse>(
+    required _i4.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i24.CreateSessionResponse>(
     'scrappableChatSession',
     'createSession',
-    {'scrappableId': scrappableId},
+    {
+      'scrappableId': scrappableId,
+      'language': language,
+    },
   );
 
-  _i2.Stream<_i24.ChatResponse> listenToScrappableRedraftSession({
+  _i2.Stream<_i25.ChatResponse> listenToScrappableRedraftSession({
     required String sessionUuid,
+    required _i4.SupportedLanguage language,
   }) =>
       caller.callStreamingServerEndpoint<
-        _i2.Stream<_i24.ChatResponse>,
-        _i24.ChatResponse
+        _i2.Stream<_i25.ChatResponse>,
+        _i25.ChatResponse
       >(
         'scrappableChatSession',
         'listenToScrappableRedraftSession',
-        {'sessionUuid': sessionUuid},
+        {
+          'sessionUuid': sessionUuid,
+          'language': language,
+        },
         {},
       );
 
   _i2.Future<void> changeChatModel({
     required String sessionUuid,
-    required _i25.AiModel aiModel,
+    required _i26.AiModel aiModel,
+    required _i4.SupportedLanguage language,
   }) => caller.callServerEndpoint<void>(
     'scrappableChatSession',
     'changeChatModel',
     {
       'sessionUuid': sessionUuid,
       'aiModel': aiModel,
+      'language': language,
     },
   );
 
   _i2.Stream<String> sendPromptMessage({
     required String sessionId,
     required String userPrompt,
+    required _i4.SupportedLanguage language,
   }) => caller.callStreamingServerEndpoint<_i2.Stream<String>, String>(
     'scrappableChatSession',
     'sendPromptMessage',
     {
       'sessionId': sessionId,
       'userPrompt': userPrompt,
+      'language': language,
     },
     {},
   );
@@ -540,10 +641,10 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
 
 class Modules {
   Modules(Client client) {
-    auth = _i26.Caller(client);
+    auth = _i27.Caller(client);
   }
 
-  late final _i26.Caller auth;
+  late final _i27.Caller auth;
 }
 
 class Client extends _i1.ServerpodClientShared {
@@ -566,7 +667,7 @@ class Client extends _i1.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
          host,
-         _i27.Protocol(),
+         _i28.Protocol(),
          securityContext: securityContext,
          streamingConnectionTimeout: streamingConnectionTimeout,
          connectionTimeout: connectionTimeout,

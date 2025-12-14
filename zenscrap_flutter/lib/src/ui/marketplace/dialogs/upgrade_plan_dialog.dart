@@ -29,8 +29,9 @@ class _UpgradePlanDialogState extends ConsumerState<_UpgradePlanDialog> {
 
     try {
       final client = ref.read(clientProvider);
+      final language = ref.read(currentLanguageProvider);
       final portalUrl =
-          await client.privateSubscription.createCustomerPortalSession();
+          await client.privateSubscription.createCustomerPortalSession(language: language);
 
       if (await canLaunchUrl(Uri.parse(portalUrl))) {
         await launchUrl(Uri.parse(portalUrl));

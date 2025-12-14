@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 
@@ -38,6 +39,7 @@ class _ApiKeyCardState extends ConsumerState<ApiKeyCard> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final dateFormatter = DateFormat('MMM dd, yyyy');
     final isActive = widget.apiKey.isActive;
 
@@ -116,7 +118,7 @@ class _ApiKeyCardState extends ConsumerState<ApiKeyCard> {
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
-                                'INACTIVE',
+                                l10n.api_usage_inactive,
                                 style: context.t.labelSmall?.copyWith(
                                   color: context.c.error,
                                   fontWeight: FontWeight.bold,
@@ -127,7 +129,7 @@ class _ApiKeyCardState extends ConsumerState<ApiKeyCard> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Created ${dateFormatter.format(widget.apiKey.createdAt)}',
+                        l10n.api_usage_created_date(dateFormatter.format(widget.apiKey.createdAt)),
                         style: context.t.bodySmall?.copyWith(
                           color: context.c.onSurface.withAlpha(150),
                         ),
@@ -137,7 +139,7 @@ class _ApiKeyCardState extends ConsumerState<ApiKeyCard> {
                 ),
                 if (isActive && widget.canDelete)
                   IconButton(
-                    tooltip: 'Deactivate API Key',
+                    tooltip: l10n.api_usage_deactivate_api_key,
                     icon: Icon(
                       Icons.delete,
                       color: context.c.error,
@@ -152,8 +154,8 @@ class _ApiKeyCardState extends ConsumerState<ApiKeyCard> {
                 _buildStatChip(
                   context,
                   Icons.analytics,
-                  '${widget.usageCount} requests',
-                  'Last 30 days',
+                  l10n.api_usage_requests_count(widget.usageCount),
+                  l10n.api_usage_last_30_days,
                   context.c.primary,
                 ),
                 const SizedBox(width: 8),
@@ -174,7 +176,7 @@ class _ApiKeyCardState extends ConsumerState<ApiKeyCard> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'API Key',
+                              l10n.api_usage_api_key_label,
                               style: context.t.labelMedium?.copyWith(
                                 color: context.c.onSurface.withAlpha(150),
                               ),
@@ -207,12 +209,12 @@ class _ApiKeyCardState extends ConsumerState<ApiKeyCard> {
                             );
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('API key copied to clipboard'),
+                                content: Text(l10n.api_usage_api_key_copied),
                                 duration: const Duration(seconds: 2),
                               ),
                             );
                           },
-                          tooltip: 'Copy API Key',
+                          tooltip: l10n.api_usage_copy_api_key,
                         ),
                       ],
                     ),

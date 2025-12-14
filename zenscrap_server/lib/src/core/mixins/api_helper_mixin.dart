@@ -6,6 +6,7 @@ import 'package:serverpod/serverpod.dart' hide Result;
 import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';
 import 'package:zenscrap_server/src/core/extension/scrapping_bee_extract_logic_extension.dart';
 import 'package:zenscrap_server/src/core/scraping_bee.dart';
+import 'package:zenscrap_server/src/core/translations/error_translations.dart';
 import 'package:zenscrap_server/src/endpoints/public/marketplace_endpoint.dart';
 import 'package:zenscrap_server/src/endpoints/public/scrappable_chat_session.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
@@ -84,7 +85,7 @@ mixin ApiHelperMixin {
     String? nanoId;
     if (apiKey != null) {
       final splitted = apiKey.split('::');
-      if (splitted.length != 2) throw _invalidApiKeyFormat;
+      if (splitted.length != 2) throw _invalidApiKeyFormat();
       nanoId = splitted[0];
     }
 
@@ -106,7 +107,7 @@ mixin ApiHelperMixin {
           cacheScrappable != null &&
           _pendingAnalytics[scrappableId]?[nanoId]?[apiKey] != null) {
         final cachePlanTier = _currentAccountPlanTierCache[nanoId];
-        if (cachePlanTier == null) throw _invalidApiKey;
+        if (cachePlanTier == null) throw _invalidApiKey();
         return (
           nanoId: nanoId,
           scrappable: cacheScrappable,
@@ -129,8 +130,8 @@ mixin ApiHelperMixin {
       final PlanTier? newPlanTier = accountInfo?.planTier;
       final CreditUsage? creditUsage =
           accountInfo?.accountApiUsage?.creditUsage;
-      if (newPlanTier == null) throw _invalidApiKey;
-      if (creditUsage == null) throw _invalidApiKey;
+      if (newPlanTier == null) throw _invalidApiKey();
+      if (creditUsage == null) throw _invalidApiKey();
       _currentAccountPlanTierCache[nanoId] = newPlanTier;
       _currentCreditUsage[nanoId] = creditUsage;
       cachePlanTier = newPlanTier;
@@ -198,7 +199,7 @@ mixin ApiHelperMixin {
     if (nanoId == null) return;
     final maxConcurrentRequests =
         planTier?.numberOfConcurrentRequestsAllowedByPlan;
-    if (maxConcurrentRequests == null) throw _invalidApiKey;
+    if (maxConcurrentRequests == null) throw _invalidApiKey();
 
     final canIncrease =
         (_currentConcurrencyRequests[nanoId] ?? 0) + 1 <= maxConcurrentRequests;
@@ -224,7 +225,7 @@ mixin ApiHelperMixin {
     if (isTest) {
       final testExpiry = scrappable.testEndpointAvailableUntil;
       if (testExpiry == null || testExpiry.isBefore(DateTime.now())) {
-        throw _testPeriodExpired;
+        throw _testPeriodExpired();
       }
     }
   }
@@ -237,10 +238,10 @@ mixin ApiHelperMixin {
     for (final String pathParam in scrappableRequest.pathParams) {
       final String? payloadParam = payload[pathParam];
       if (payloadParam == null) {
-        throw ZenScrapException(
-          title: 'Missing Path Parameter',
-          description:
-              'Required path parameter "$pathParam" was not provided in the payload.',
+        throw createTranslatedException(
+          'missing_path_parameter',
+          SupportedLanguage.en,
+          params: {'pathParam': pathParam},
         );
       }
       targetUrl = targetUrl.replaceAll('{$pathParam}', payloadParam);
@@ -285,7 +286,7 @@ mixin ApiHelperMixin {
         ),
       );
       if (accountApiUsage == null || accountApiUsage.creditUsage == null) {
-        throw _noApiFound;
+        throw _noApiFound();
       }
 
       _currentCreditUsage[nanoId] = accountApiUsage.creditUsage!;
@@ -299,7 +300,7 @@ mixin ApiHelperMixin {
     // Check if we have enough credits in total
     final totalCredits = subscriptionCredits + purchasedCredits;
     if (totalCredits < creditCost) {
-      throw _insufficientCredits;
+      throw _insufficientCredits();
     }
 
     // First, try to deduct from subscription credits
@@ -327,7 +328,7 @@ mixin ApiHelperMixin {
       return;
     }
 
-    throw _insufficientCredits;
+    throw _insufficientCredits();
   }
 
   Future<ScrappingBeeExtractLogic> _getExtractRules(Session session,
@@ -336,7 +337,7 @@ mixin ApiHelperMixin {
     if (isTest) {
       final testSessionExtractRule = getTestExtractRules(scrappable.id!);
       if (testSessionExtractRule == null) {
-        throw _noActiveTestSessionFinded;
+        throw _noActiveTestSessionFinded();
       }
 
       return testSessionExtractRule;
@@ -345,7 +346,7 @@ mixin ApiHelperMixin {
     final ScrappingBeeExtractLogic? extractRules =
         scrappable.scrappingBeeExtractRules;
 
-    if (extractRules == null) throw _missingExtractRules;
+    if (extractRules == null) throw _missingExtractRules();
 
     return extractRules;
   }
@@ -402,7 +403,7 @@ mixin ApiHelperMixin {
       return await call(nanoId, scrappable);
     } on ApiError catch (error, stackTrace) {
       session.log(
-        '[${error.status.name.toUpperCase()}] ${_noApiFound.exception.title}',
+        '[${error.status.name.toUpperCase()}] ${error.exception.title}',
         exception: error.exception,
         stackTrace: stackTrace,
         level: LogLevel.error,
@@ -460,18 +461,15 @@ mixin ApiHelperMixin {
             time: now,
             status: RequestStatus.serverError,
             stringifiedPayload: stringifiedPayload,
-            title: 'Unexpected Error',
-            description: 'An unexpected error occurred',
+            title: getErrorTitle('unexpected_error', SupportedLanguage.en),
+            description: getErrorDescription('unexpected_error', SupportedLanguage.en),
             errorObjectAsString: error.toString(),
             errorStackTraceAsString: stackTrace.toString(),
           ),
         );
       }
       // Handle any other exceptions
-      throw ZenScrapException(
-        title: 'Unexpected Error',
-        description: 'An unexpected error occurred: ${error.toString()}',
-      );
+      throw createTranslatedException('unexpected_error', SupportedLanguage.en);
     } finally {
       decreaseConcurrency(nanoId);
     }
@@ -541,11 +539,8 @@ mixin ApiHelperMixin {
           if (currentTestData == null) {
             return ApiError(
               RequestStatus.serverError,
-              ZenScrapException(
-                title: 'Test Data Not Found',
-                description:
-                    'No reference test data found for this scrappable session.',
-              ),
+              createTranslatedException(
+                  'test_data_not_found', SupportedLanguage.en),
             ).toFailure();
           }
 
@@ -727,57 +722,56 @@ mixin ApiHelperMixin {
       );
       return ApiError(
         RequestStatus.serverError,
-        ZenScrapException(
-          title: 'Unexpected Error',
-          description: 'An unexpected error occurred: ${error.toString()}',
-        ),
+        createTranslatedException('unexpected_error', SupportedLanguage.en),
       ).toFailure();
     }
   }
 }
 
-ApiError _noCreditUsageModelFound(ApiKey apiKey) => ApiError(
+ApiError _noCreditUsageModelFound(
+  ApiKey apiKey, [
+  SupportedLanguage lang = SupportedLanguage.en,
+]) =>
+    ApiError(
       RequestStatus.clientError,
-      ZenScrapException(
-        title: 'No Credit Usage Model Found',
-        description:
-            'No credit usage model found for the provided API key: $apiKey.\n'
-            'It could be that the account was deleted or has no plan assigned - check in your api key tab on ZenScrap site.',
+      createTranslatedException(
+        'no_credit_usage_model',
+        lang,
+        params: {'apiKey': apiKey},
       ),
     );
-ApiError _apiKeyNotFound(ApiKey apiKey) => ApiError(
+
+ApiError _apiKeyNotFound(
+  ApiKey apiKey, [
+  SupportedLanguage lang = SupportedLanguage.en,
+]) =>
+    ApiError(
       RequestStatus.clientError,
-      ZenScrapException(
-        title: 'Valid API Key Not Found',
-        description:
-            'There is no active API key matching the provided value: $apiKey.\n'
-            'It could be that the key was deleted or deactivated - check in your api key tab on ZenScrap site.',
+      createTranslatedException(
+        'api_key_not_found_active',
+        lang,
+        params: {'apiKey': apiKey},
       ),
     );
-final _noActiveTestSessionFinded = ApiError(
-  RequestStatus.clientError,
-  ZenScrapException(
-    title: 'No Active Test Session Found',
-    description:
-        'There is no active test session found for the provided scrappable.',
-  ),
-);
-final _testPeriodExpired = ApiError(
-  RequestStatus.clientError,
-  ZenScrapException(
-    title: 'Test Period Expired',
-    description:
-        'The test period for this scrappable has expired.\nYou can:\n- Start a new testing session, that will start a new test period\n- Call the production endpoint with a valid API key if you have an account',
-  ),
-);
-final _noApiFound = ApiError(
-  RequestStatus.clientError,
-  ZenScrapException(
-    title: 'API Key Not Found',
-    description:
-        'No account API key matched the provided value (key not found in database).',
-  ),
-);
+ApiError _noActiveTestSessionFinded([
+  SupportedLanguage lang = SupportedLanguage.en,
+]) =>
+    ApiError(
+      RequestStatus.clientError,
+      createTranslatedException('no_active_test_session', lang),
+    );
+
+ApiError _testPeriodExpired([SupportedLanguage lang = SupportedLanguage.en]) =>
+    ApiError(
+      RequestStatus.clientError,
+      createTranslatedException('test_period_expired', lang),
+    );
+
+ApiError _noApiFound([SupportedLanguage lang = SupportedLanguage.en]) =>
+    ApiError(
+      RequestStatus.clientError,
+      createTranslatedException('api_key_database_not_found', lang),
+    );
 // final _scrappableDataDissasociated = ApiError(
 //   RequestStatus.serverError,
 //   ZenScrapException(
@@ -786,50 +780,62 @@ final _noApiFound = ApiError(
 //         'The scrappable data is dissasociated the current stack. This is a rare error that can happen after a server migration - your next scrapping request should work fine. If the error persists, contact support.',
 //   ),
 // );
-final _insufficientCredits = ApiError(
-    RequestStatus.insufficientCredits,
-    ZenScrapException(
-      title: 'Insufficient Credits',
-      description:
-          'Your account has no remaining credits. Purchase or allocate more credits to continue making requests.',
-    ));
-final _missingExtractRules = ApiError(
-    RequestStatus.clientError,
-    ZenScrapException(
-      title: 'Missing Extract Rules',
-      description:
-          'No extract rules are defined for this scrappable. Please define extraction rules before invoking this endpoint.',
-    ));
-final _invalidApiKey = ApiError(
-  RequestStatus.clientError,
-  ZenScrapException(
-    title: 'Invalid API Key',
-    description: 'The provided API key does not have a user account.',
-  ),
-);
-ApiError _maxConcurrencyReached(int maxQuantityOfParallelRequests) => ApiError(
-    RequestStatus.maxConcurrencyExceeded,
-    ZenScrapException(
-      title: 'Concurrency Limit Exceeded',
-      description:
-          '''You have reached the maximum number of concurrent requests allowed for your plan tier.'''
-          ''' (Max allowed concurrent requests: $maxQuantityOfParallelRequests)''',
-    ));
-ApiError _noScrappableFound(String scrappableId) => ApiError(
-    RequestStatus.clientError,
-    ZenScrapException(
-      title: 'Scrappable Not Found',
-      description:
-          'The scrappable resource with id $scrappableId does not exist or has no target request configured.',
-    ));
 
-final _invalidApiKeyFormat = ApiError(
-  RequestStatus.clientError,
-  ZenScrapException(
-    title: 'Invalid API Key Format',
-    description: 'API Key must be in the format "nanoId::apiKey".',
-  ),
-);
+ApiError _insufficientCredits([
+  SupportedLanguage lang = SupportedLanguage.en,
+]) =>
+    ApiError(
+      RequestStatus.insufficientCredits,
+      createTranslatedException('insufficient_credits', lang),
+    );
+
+ApiError _missingExtractRules([
+  SupportedLanguage lang = SupportedLanguage.en,
+]) =>
+    ApiError(
+      RequestStatus.clientError,
+      createTranslatedException('missing_extract_rules', lang),
+    );
+
+ApiError _invalidApiKey([SupportedLanguage lang = SupportedLanguage.en]) =>
+    ApiError(
+      RequestStatus.clientError,
+      createTranslatedException('invalid_api_key_account', lang),
+    );
+
+ApiError _maxConcurrencyReached(
+  int maxQuantityOfParallelRequests, [
+  SupportedLanguage lang = SupportedLanguage.en,
+]) =>
+    ApiError(
+      RequestStatus.maxConcurrencyExceeded,
+      createTranslatedException(
+        'concurrency_limit_exceeded',
+        lang,
+        params: {'maxConcurrentRequests': maxQuantityOfParallelRequests.toString()},
+      ),
+    );
+
+ApiError _noScrappableFound(
+  String scrappableId, [
+  SupportedLanguage lang = SupportedLanguage.en,
+]) =>
+    ApiError(
+      RequestStatus.clientError,
+      createTranslatedException(
+        'api_scrappable_not_found',
+        lang,
+        params: {'scrappableId': scrappableId},
+      ),
+    );
+
+ApiError _invalidApiKeyFormat([
+  SupportedLanguage lang = SupportedLanguage.en,
+]) =>
+    ApiError(
+      RequestStatus.clientError,
+      createTranslatedException('invalid_api_key_format', lang),
+    );
 
 class ApiError {
   final RequestStatus status;

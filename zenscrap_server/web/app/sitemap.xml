@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Sitemap for zenscrap.com
+  AI-Powered Web Scraping Rule Generator - SaaS Application
+
+  This sitemap includes only publicly accessible pages that should be indexed.
+  Authenticated dashboard pages are excluded as they require login.
+
+  Last updated: 2025-01-01
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+                            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+  <!--
+    Landing Page - Main entry point for the application
+    This is the primary page for SEO and user acquisition.
+    Features: AI-powered web scraping rule generator, product showcase
+  -->
+  <url>
+    <loc>https://zenscrap.com/</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!--
+    Scrappable Form - Alternative URL for landing page
+    When accessed without an ID parameter, shows the same landing page.
+    Canonical URL is the root path, but this URL may receive direct traffic.
+  -->
+  <url>
+    <loc>https://zenscrap.com/scrappable-form</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!--
+    Authentication Page - User sign-in and registration
+    Important for users who want to access their dashboard.
+    Lower priority as it's a utility page, not a content destination.
+  -->
+  <url>
+    <loc>https://zenscrap.com/auth</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+</urlset>

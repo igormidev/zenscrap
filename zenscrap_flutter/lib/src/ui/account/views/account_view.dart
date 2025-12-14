@@ -2,9 +2,11 @@ import 'package:babel_text/babel_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/core/extensions/plan_tier_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/contact_support_button.dart';
+import 'package:zenscrap_flutter/src/design_system/widgets/language_selector.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
@@ -50,7 +52,7 @@ class AccountView extends ConsumerWidget {
               child: ListView(
                 children: [
                   const SizedBox(height: 60),
-                  Text('Account',
+                  Text(AppLocalizations.of(context)!.account_title,
                       style: Theme.of(context).textTheme.displayMedium),
                   const SizedBox(height: 24),
                   Container(
@@ -70,24 +72,24 @@ class AccountView extends ConsumerWidget {
                         UserEditableProfileImage(user: user),
                         const SizedBox(height: 20),
                         Text(
-                          'Account information',
+                          AppLocalizations.of(context)!.account_information_title,
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                         const SizedBox(height: 16),
                         AccountDisplayTime(
-                          title: 'User name',
+                          title: AppLocalizations.of(context)!.account_user_name_label,
                           content: session.user.userName,
                           analytics: analytics,
                         ),
                         const SizedBox(height: 16),
                         AccountDisplayTime(
-                          title: 'Email',
+                          title: AppLocalizations.of(context)!.account_email_label,
                           content: session.user.email,
                           analytics: analytics,
                         ),
                         const SizedBox(height: 16),
                         AccountDisplayTime(
-                          title: 'Your subscription plan',
+                          title: AppLocalizations.of(context)!.account_subscription_plan_label,
                           content: accountInfo.planTier.displayName,
                           analytics: analytics,
                         ),
@@ -106,7 +108,11 @@ class AccountView extends ConsumerWidget {
             const SizedBox(width: 24),
             // Theme Customization Column
             Expanded(
-              child: _ThemeCustomizationSection(),
+              child: ListView(
+                children: [
+                  _ThemeCustomizationSection(),
+                ],
+              ),
             ),
           ],
         ),
@@ -211,15 +217,15 @@ class _ThemeCustomizationSection extends ConsumerWidget {
       children: [
         const SizedBox(height: 60),
         Text(
-          'Appearance',
+          AppLocalizations.of(context)!.account_appearance_title,
           style: Theme.of(context).textTheme.displayMedium,
         ),
         const SizedBox(height: 24),
         // Brightness Card
         _ThemeCard(
           icon: Icons.brightness_6_rounded,
-          title: 'Display Mode',
-          subtitle: 'Choose between light and dark theme',
+          title: AppLocalizations.of(context)!.account_display_mode_title,
+          subtitle: AppLocalizations.of(context)!.account_display_mode_subtitle,
           child: BrightnessPicker(
             brightness: themeState.brightness,
             onBrightnessChanged: themeNotifier.selectBrightness,
@@ -229,13 +235,16 @@ class _ThemeCustomizationSection extends ConsumerWidget {
         // Color Card
         _ThemeCard(
           icon: Icons.palette_rounded,
-          title: 'Accent Color',
-          subtitle: 'Personalize the app with your favorite color',
+          title: AppLocalizations.of(context)!.account_accent_color_title,
+          subtitle: AppLocalizations.of(context)!.account_accent_color_subtitle,
           child: _ColorPaletteGrid(
             selectedColor: themeState.seedColor,
             onColorSelected: themeNotifier.selectColor,
           ),
         ),
+        const SizedBox(height: 27),
+        // Language Card
+        const LanguageSelectorCard(),
       ],
     );
   }

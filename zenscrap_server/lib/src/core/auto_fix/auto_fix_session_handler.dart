@@ -39,10 +39,10 @@ class AutoFixFailure extends AutoFixResult {
 }
 
 /// Maps AiModel enum to OpenAI model name
-String _getModelName(AiModel model) {
+String getModelName(AiModel model) {
   return switch (model) {
-    AiModel.normal => 'gpt-5-mini',
-    AiModel.powerful => 'gpt-5.1',
+    AiModel.normal => 'gpt-5.1-codex-mini',
+    AiModel.powerful => 'gpt-5.2',
   };
 }
 
@@ -76,15 +76,15 @@ class AutoFixSessionHandler {
     required List<ScrappableAnalytics> recentAnalytics,
     required AiModel aiModel,
     required int autoFixSessionId,
-  })  : _session = session,
-        _openAiApiKey = openAiApiKey,
-        _scrappable = scrappable,
-        _scrappableRequest = scrappableRequest,
-        _extractLogic = extractLogic,
-        _referenceTestData = referenceTestData,
-        _recentAnalytics = recentAnalytics,
-        _aiModel = aiModel,
-        _autoFixSessionId = autoFixSessionId;
+  }) : _session = session,
+       _openAiApiKey = openAiApiKey,
+       _scrappable = scrappable,
+       _scrappableRequest = scrappableRequest,
+       _extractLogic = extractLogic,
+       _referenceTestData = referenceTestData,
+       _recentAnalytics = recentAnalytics,
+       _aiModel = aiModel,
+       _autoFixSessionId = autoFixSessionId;
 
   /// Attempts to automatically fix the broken scrappable using AI.
   ///
@@ -106,7 +106,7 @@ class AutoFixSessionHandler {
     try {
       _session.log(
         'Starting auto-fix attempt for scrappable ${_scrappable.id} (${_scrappable.name}) '
-        'using model ${_getModelName(_aiModel)}',
+        'using model ${getModelName(_aiModel)}',
         level: LogLevel.info,
       );
 
@@ -129,12 +129,18 @@ class AutoFixSessionHandler {
             _scrappableRequest.queryParamsNotRelatedToUrl,
         pathParams: _scrappableRequest.pathParams,
       );
-      final extractionRulesGuide =
-          buildExtractionRulesGuide(webScrapperRequest);
+      final extractionRulesGuide = buildExtractionRulesGuide(
+        webScrapperRequest,
+      );
 
       // Call OpenAI with the auto-fix prompts
-      final (result, thinkingLog, inputTokens, outputTokens, reasoningTokens) =
-          await _callOpenAI(
+      final (
+        result,
+        thinkingLog,
+        inputTokens,
+        outputTokens,
+        reasoningTokens,
+      ) = await _callOpenAI(
         systemPrompt: systemPrompt,
         contextPrompt: contextPrompt,
         extractionRulesGuide: extractionRulesGuide,
@@ -192,14 +198,14 @@ class AutoFixSessionHandler {
             reasoningTokens: reasoningTokens,
           ),
         WebScrapperChatAIResponseOnlyRequestModified() => await _handleAiError(
-            attempt: attempt,
-            errorMessage:
-                'AI modified request structure but not extract rules - cannot auto-fix',
-            thinkingLog: thinkingLog,
-            inputTokens: inputTokens,
-            outputTokens: outputTokens,
-            reasoningTokens: reasoningTokens,
-          ),
+          attempt: attempt,
+          errorMessage:
+              'AI modified request structure but not extract rules - cannot auto-fix',
+          thinkingLog: thinkingLog,
+          inputTokens: inputTokens,
+          outputTokens: outputTokens,
+          reasoningTokens: reasoningTokens,
+        ),
         WebScrapperChatAIResponseBothModified(
           :final resumeActionMessage,
           :final fetchSettings,
@@ -336,11 +342,11 @@ class AutoFixSessionHandler {
     );
 
     // Test the fix with ScrapingBee
-    final ExtractDataByRule extractResult =
-        await scrappingBee.extractByRulesWithLogic(
-      targetUrl: _referenceTestData.referenceLinkUsed,
-      scrappingBeeExtractLogic: fixedExtractLogic,
-    );
+    final ExtractDataByRule extractResult = await scrappingBee
+        .extractByRulesWithLogic(
+          targetUrl: _referenceTestData.referenceLinkUsed,
+          scrappingBeeExtractLogic: fixedExtractLogic,
+        );
 
     return extractResult.when(
       withData: (scrapedData) async {
@@ -416,14 +422,7 @@ class AutoFixSessionHandler {
   /// Calls OpenAI API with the auto-fix prompts
   ///
   /// Returns a tuple of (result, thinkingLog, inputTokens, outputTokens, reasoningTokens)
-  Future<
-      (
-        Map<String, dynamic>?,
-        String?,
-        int,
-        int,
-        int,
-      )> _callOpenAI({
+  Future<(Map<String, dynamic>?, String?, int, int, int)> _callOpenAI({
     required String systemPrompt,
     required String contextPrompt,
     required String extractionRulesGuide,
@@ -470,13 +469,10 @@ class AutoFixSessionHandler {
     }
 
     // Add web search for documentation lookup
-    tools.add({
-      'type': 'web_search',
-      'search_context_size': 'medium',
-    });
+    tools.add({'type': 'web_search', 'search_context_size': 'medium'});
 
     // Use the resolved AI model
-    final modelName = _getModelName(_aiModel);
+    final modelName = getModelName(_aiModel);
 
     final requestBody = {
       'model': modelName,
@@ -485,9 +481,7 @@ class AutoFixSessionHandler {
         'effort': 'high', // Always use high thinking effort for auto-fix
       },
       'tools': tools,
-      'text': {
-        'format': responseFormat,
-      },
+      'text': {'format': responseFormat},
       'input': messages,
       'max_output_tokens': 128000,
     };
@@ -499,10 +493,7 @@ class AutoFixSessionHandler {
     int reasoningTokens = 0;
 
     try {
-      final request = http.Request(
-        'POST',
-        Uri.parse(_openAiResponsesUrl),
-      )
+      final request = http.Request('POST', Uri.parse(_openAiResponsesUrl))
         ..headers.addAll({
           'Authorization': 'Bearer $_openAiApiKey',
           'Content-Type': 'application/json',
@@ -581,7 +572,7 @@ class AutoFixSessionHandler {
             thinkingBuffer.isNotEmpty ? thinkingBuffer.toString() : null,
             inputTokens,
             outputTokens,
-            reasoningTokens
+            reasoningTokens,
           );
         }
       }
@@ -597,7 +588,7 @@ class AutoFixSessionHandler {
         thinkingBuffer.isNotEmpty ? thinkingBuffer.toString() : null,
         inputTokens,
         outputTokens,
-        reasoningTokens
+        reasoningTokens,
       );
     } finally {
       client.close();

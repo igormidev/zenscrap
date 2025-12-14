@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:serverpod/serverpod.dart';
+import 'package:zenscrap_server/src/core/auto_fix/auto_fix_session_handler.dart';
 import 'package:zenscrap_server/src/core/consts.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_handler_mixin.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/i_chat_controller.dart';
@@ -61,8 +62,8 @@ class ChatControllerOpenAiSdkImpl extends IChatController
     required String contextPrompt,
     required String extractionRulesGuide,
     required String model,
-  })  : _openAiApiKey = openAiApiKey,
-        _model = model {
+  }) : _openAiApiKey = openAiApiKey,
+       _model = model {
     // ScrapingBee API key is now configured server-side in the MCP,
     // so we don't need to pass it in the prompt anymore
     final systemPrompt = buildSystemPrompt();
@@ -85,9 +86,7 @@ class ChatControllerOpenAiSdkImpl extends IChatController
   /// - scrappable_request_structure_guide.md
   ///
   /// The file_search tool will be used to search these documents during chat sessions.
-  static Future<void> init({
-    required String openAiApiKey,
-  }) async {
+  static Future<void> init({required String openAiApiKey}) async {
     if (OpenAiFileManager.isInitialized) {
       return; // Already initialized
     }
@@ -155,19 +154,19 @@ class ChatControllerOpenAiSdkImpl extends IChatController
   }) async {
     final request = http.MultipartRequest('POST', Uri.parse(_openAiFilesUrl))
       ..headers['Authorization'] = 'Bearer $apiKey'
-      ..fields['purpose'] = 'assistants' // Required for Vector Store
-      ..files.add(http.MultipartFile.fromString(
-        'file',
-        content,
-        filename: filename,
-      ));
+      ..fields['purpose'] =
+          'assistants' // Required for Vector Store
+      ..files.add(
+        http.MultipartFile.fromString('file', content, filename: filename),
+      );
 
     final response = await request.send();
     final responseBody = await response.stream.bytesToString();
 
     if (response.statusCode != 200) {
       throw Exception(
-          'Failed to upload file $filename: ${response.statusCode} - $responseBody');
+        'Failed to upload file $filename: ${response.statusCode} - $responseBody',
+      );
     }
 
     final json = jsonDecode(responseBody) as Map<String, dynamic>;
@@ -191,7 +190,8 @@ class ChatControllerOpenAiSdkImpl extends IChatController
 
     if (response.statusCode != 200) {
       throw Exception(
-          'Failed to create Vector Store: ${response.statusCode} - ${response.body}');
+        'Failed to create Vector Store: ${response.statusCode} - ${response.body}',
+      );
     }
 
     final json = jsonDecode(response.body) as Map<String, dynamic>;
@@ -216,7 +216,8 @@ class ChatControllerOpenAiSdkImpl extends IChatController
 
     if (response.statusCode != 200) {
       throw Exception(
-          'Failed to add file $fileId to Vector Store: ${response.statusCode} - ${response.body}');
+        'Failed to add file $fileId to Vector Store: ${response.statusCode} - ${response.body}',
+      );
     }
   }
 
@@ -240,7 +241,8 @@ class ChatControllerOpenAiSdkImpl extends IChatController
 
       if (response.statusCode != 200) {
         throw Exception(
-            'Failed to check Vector Store files: ${response.statusCode} - ${response.body}');
+          'Failed to check Vector Store files: ${response.statusCode} - ${response.body}',
+        );
       }
 
       final json = jsonDecode(response.body) as Map<String, dynamic>;
@@ -271,7 +273,8 @@ class ChatControllerOpenAiSdkImpl extends IChatController
 
       if (failedCount > 0) {
         throw Exception(
-            'Some files failed to process in Vector Store: $failedCount failed');
+          'Some files failed to process in Vector Store: $failedCount failed',
+        );
       }
 
       // Still processing, wait and retry
@@ -279,7 +282,8 @@ class ChatControllerOpenAiSdkImpl extends IChatController
     }
 
     throw Exception(
-        'Timeout waiting for Vector Store files to be ready after $maxAttempts attempts');
+      'Timeout waiting for Vector Store files to be ready after $maxAttempts attempts',
+    );
   }
 
   factory ChatControllerOpenAiSdkImpl.startChat({
@@ -321,14 +325,7 @@ class ChatControllerOpenAiSdkImpl extends IChatController
   final List<OpenAiMessage> _history = [];
 
   static String _mapModel(AiModel aiModel) {
-    switch (aiModel) {
-      case AiModel.normal:
-        // GPT-5.1-mini: mid-tier model optimized for speed and
-        return 'gpt-5-mini';
-      case AiModel.powerful:
-        // GPT-5.1: flagship model for maximum intelligence
-        return 'gpt-5.1';
-    }
+    return getModelName(aiModel);
   }
 
   /// Returns max_output_tokens limit for the current model.
@@ -558,19 +555,14 @@ class ChatControllerOpenAiSdkImpl extends IChatController
         'effort': 'high', // Maximize reasoning depth for web scraping accuracy
       },
       'tools': tools,
-      'text': {
-        'format': responseFormat,
-      },
+      'text': {'format': responseFormat},
       'input': input,
       // Set max_output_tokens for mini models to prevent truncation
       if (_maxOutputTokens != null) 'max_output_tokens': _maxOutputTokens,
     };
 
     final client = http.Client();
-    final request = http.Request(
-      'POST',
-      Uri.parse(_openAiResponsesUrl),
-    )
+    final request = http.Request('POST', Uri.parse(_openAiResponsesUrl))
       ..headers.addAll({
         'Authorization': 'Bearer $_openAiApiKey',
         'Content-Type': 'application/json',
@@ -609,9 +601,7 @@ class ChatControllerOpenAiSdkImpl extends IChatController
         }
       }
 
-      throw Exception(
-        'OpenAI error ${streamedResponse.statusCode}: $body',
-      );
+      throw Exception('OpenAI error ${streamedResponse.statusCode}: $body');
     }
 
     final lines = streamedResponse.stream
@@ -633,8 +623,10 @@ class ChatControllerOpenAiSdkImpl extends IChatController
       try {
         event = jsonDecode(data) as Map<String, dynamic>;
       } catch (e) {
-        session.log('Failed to parse SSE event: $e, data: $data',
-            level: LogLevel.warning);
+        session.log(
+          'Failed to parse SSE event: $e, data: $data',
+          level: LogLevel.warning,
+        );
         continue;
       }
 
@@ -669,8 +661,10 @@ class ChatControllerOpenAiSdkImpl extends IChatController
         }
       } else if (type == 'error' || type == 'response.failed') {
         final errorData = event['error'] ?? event['message'] ?? event;
-        session.log('OpenAI API error event: $errorData',
-            level: LogLevel.error);
+        session.log(
+          'OpenAI API error event: $errorData',
+          level: LogLevel.error,
+        );
 
         // Check for insufficient_quota error in streaming events
         if (errorData is Map<String, dynamic>) {
@@ -691,9 +685,7 @@ class ChatControllerOpenAiSdkImpl extends IChatController
           );
         }
 
-        throw Exception(
-          'OpenAI streaming error: $errorData',
-        );
+        throw Exception('OpenAI streaming error: $errorData');
       } else if (type != null && type.contains('mcp')) {
         // Handle MCP-related events - stream them as thinking progress
         final mcpInfo = _extractMcpEventInfo(event, type);
@@ -725,11 +717,13 @@ class ChatControllerOpenAiSdkImpl extends IChatController
     client.close();
 
     session.log(
-        'Stream completed. Event types received: ${receivedEventTypes.join(", ")}',
-        level: LogLevel.info);
+      'Stream completed. Event types received: ${receivedEventTypes.join(", ")}',
+      level: LogLevel.info,
+    );
     session.log(
-        'Buffers: jsonBuffer=${jsonBuffer.length} chars, thinkingBuffer=${thinkingBuffer.length} chars',
-        level: LogLevel.debug);
+      'Buffers: jsonBuffer=${jsonBuffer.length} chars, thinkingBuffer=${thinkingBuffer.length} chars',
+      level: LogLevel.debug,
+    );
 
     // Try to get JSON from multiple sources in order of preference
     Map<String, dynamic>? parsedJson = parsedFromCompletion;
@@ -755,8 +749,9 @@ JSON Buffer (${jsonContent.length} chars): ${jsonContent.isEmpty ? "(empty)" : j
 Thinking Buffer (${thinkingContent.length} chars): ${thinkingContent.isEmpty ? "(empty)" : thinkingContent.substring(0, thinkingContent.length.clamp(0, 500))}
 ''', level: LogLevel.error);
       throw Exception(
-          'Failed to parse structured response from OpenAI. Event types: ${receivedEventTypes.join(", ")}. '
-          'JSON buffer: ${jsonContent.length} chars, Thinking buffer: ${thinkingContent.length} chars.');
+        'Failed to parse structured response from OpenAI. Event types: ${receivedEventTypes.join(", ")}. '
+        'JSON buffer: ${jsonContent.length} chars, Thinking buffer: ${thinkingContent.length} chars.',
+      );
     }
 
     final structured = parseStructuredResponse(parsedJson);
@@ -838,7 +833,8 @@ Thinking Buffer (${thinkingContent.length} chars): ${thinkingContent.isEmpty ? "
         if (output != null && output.isNotEmpty) {
           final buffer = StringBuffer();
           buffer.writeln(
-              '✅ $name completed${serverLabel.isNotEmpty ? " ($serverLabel)" : ""}:');
+            '✅ $name completed${serverLabel.isNotEmpty ? " ($serverLabel)" : ""}:',
+          );
 
           for (final outputItem in output) {
             if (outputItem is Map<String, dynamic>) {
@@ -915,8 +911,10 @@ Thinking Buffer (${thinkingContent.length} chars): ${thinkingContent.isEmpty ? "
     Session session,
   ) {
     // Log the response structure for debugging
-    session.log('Extracting parsed response from: ${response.keys.join(", ")}',
-        level: LogLevel.debug);
+    session.log(
+      'Extracting parsed response from: ${response.keys.join(", ")}',
+      level: LogLevel.debug,
+    );
 
     // Try multiple extraction paths
     final output = response['output'];
@@ -949,8 +947,10 @@ Thinking Buffer (${thinkingContent.length} chars): ${thinkingContent.isEmpty ? "
             if (parsed is String) {
               final decoded = _tryDecodeJson(parsed);
               if (decoded != null) {
-                session.log('Decoded JSON string from parsed field',
-                    level: LogLevel.debug);
+                session.log(
+                  'Decoded JSON string from parsed field',
+                  level: LogLevel.debug,
+                );
                 return decoded;
               }
             }
@@ -960,8 +960,10 @@ Thinking Buffer (${thinkingContent.length} chars): ${thinkingContent.isEmpty ? "
             if (itemText is String && itemText.isNotEmpty) {
               final decoded = _tryExtractJsonFromText(itemText);
               if (decoded != null) {
-                session.log('Found JSON in content.text',
-                    level: LogLevel.debug);
+                session.log(
+                  'Found JSON in content.text',
+                  level: LogLevel.debug,
+                );
                 return decoded;
               }
             }
@@ -983,8 +985,10 @@ Thinking Buffer (${thinkingContent.length} chars): ${thinkingContent.isEmpty ? "
       }
     }
 
-    session.log('Could not extract parsed response from completion event',
-        level: LogLevel.warning);
+    session.log(
+      'Could not extract parsed response from completion event',
+      level: LogLevel.warning,
+    );
     return null;
   }
 
@@ -993,13 +997,13 @@ Thinking Buffer (${thinkingContent.length} chars): ${thinkingContent.isEmpty ? "
   ) {
     return switch (response) {
       WebScrapperChatAIResponseJustMessage(:final message) => {
-          'responseType': 'message',
-          'message': message,
-        },
+        'responseType': 'message',
+        'message': message,
+      },
       WebScrapperChatAIResponseErrorMessage(:final errorDescription) => {
-          'responseType': 'error',
-          'errorMessage': errorDescription,
-        },
+        'responseType': 'error',
+        'errorMessage': errorDescription,
+      },
       WebScrapperChatAIResponseOnlyExtractRulesModified(
         :final resumeActionMessage,
         :final fetchSettings,
@@ -1103,10 +1107,7 @@ class OpenAiMessage {
   final String role;
   final String content;
 
-  OpenAiMessage({
-    required this.role,
-    required this.content,
-  });
+  OpenAiMessage({required this.role, required this.content});
 
   Map<String, String> toMap() => {'role': role, 'content': content};
 }
@@ -1154,10 +1155,12 @@ class _TokenUsage {
 
     final inputTokens = json['input_tokens'] as int? ?? 0;
     final outputTokens = json['output_tokens'] as int? ?? 0;
-    final totalTokens = json['total_tokens'] as int? ?? (inputTokens + outputTokens);
+    final totalTokens =
+        json['total_tokens'] as int? ?? (inputTokens + outputTokens);
 
     // Extract reasoning tokens from output_tokens_details
-    final outputDetails = json['output_tokens_details'] as Map<String, dynamic>?;
+    final outputDetails =
+        json['output_tokens_details'] as Map<String, dynamic>?;
     final reasoningTokens = outputDetails?['reasoning_tokens'] as int? ?? 0;
 
     return _TokenUsage(

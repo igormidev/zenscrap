@@ -1,5 +1,6 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart';
+import 'package:zenscrap_server/src/core/translations/error_translations.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class PrivateUserScrappablesEndpoint extends Endpoint {
@@ -11,13 +12,11 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
     int page = 1,
     String? searchQuery,
     List<ScraperCategory>? categories,
+    SupportedLanguage language = SupportedLanguage.en,
   }) async {
     final userId = session.authenticated?.userId;
     if (userId == null) {
-      throw ZenScrapException(
-        title: 'User Not Authenticated',
-        description: 'You must be logged in to access your scrappables.',
-      );
+      throw _userNotAuthenticated(language);
     }
 
     // Get account info to verify user and get accountId
@@ -26,10 +25,7 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
       where: (p0) => p0.userInfoId.equals(userId),
     );
     if (accountInfo == null) {
-      throw ZenScrapException(
-        title: 'Account Not Found',
-        description: 'No account found for the authenticated user.',
-      );
+      throw _accountNotFoundForUser(language);
     }
 
     const int pageSize = 12;
@@ -47,7 +43,8 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
 
       // Add search filter
       if (searchQuery != null && searchQuery.isNotEmpty) {
-        where = where &
+        where =
+            where &
             (t.name.ilike('%$searchQuery%') |
                 t.description.ilike('%$searchQuery%'));
       }
@@ -71,10 +68,7 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
     }
 
     // Get total count for pagination (filtered)
-    final totalCount = await Scrappable.db.count(
-      session,
-      where: whereClause,
-    );
+    final totalCount = await Scrappable.db.count(session, where: whereClause);
 
     // Get total user scrappables count (unfiltered) for limit checking
     final totalUserScrappables = await Scrappable.db.count(
@@ -102,6 +96,7 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
         targetRequest: ScrappableRequest.include(),
         scrappingBeeExtractRules: ScrappingBeeExtractLogic.include(),
         referenceTestData: ReferenceTestData.include(),
+        autoFixConfig: AutoFixConfig.include(),
       ),
     );
 
@@ -120,13 +115,13 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
   }
 
   Future<Scrappable> getScrappableById(
-      Session session, int scrappableId) async {
+    Session session,
+    int scrappableId, {
+    SupportedLanguage language = SupportedLanguage.en,
+  }) async {
     final userId = session.authenticated?.userId;
     if (userId == null) {
-      throw ZenScrapException(
-        title: 'User Not Authenticated',
-        description: 'You must be logged in to access your scrappables.',
-      );
+      throw _userNotAuthenticated(language);
     }
 
     // First check if the user owns this scrappable
@@ -136,10 +131,7 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
     );
 
     if (accountInfo == null) {
-      throw ZenScrapException(
-        title: 'Account Not Found',
-        description: 'No account found for the authenticated user.',
-      );
+      throw _accountNotFoundForUser(language);
     }
 
     // Find the scrappable with all necessary includes
@@ -156,28 +148,35 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
     );
 
     if (scrappable == null) {
-      throw ZenScrapException(
-        title: 'Scrappable Not Found',
-        description: 'The requested scrappable does not exist.',
-      );
+      throw _scrappableNotFound(language);
     }
 
     // Check if scrappable is deleted
     if (scrappable.isDeleted == true) {
-      throw ZenScrapException(
-        title: 'Scrappable Not Found',
-        description: 'The requested scrappable does not exist.',
-      );
+      throw _scrappableNotFound(language);
     }
 
     // Verify the user owns this scrappable
     if (scrappable.accountId != accountInfo.id) {
-      throw ZenScrapException(
-        title: 'Access Denied',
-        description: 'You do not have permission to access this scrappable.',
-      );
+      throw _accessDeniedPermission(language);
     }
 
     return scrappable;
   }
 }
+
+// ============================================================================
+// Error-returning functions
+// ============================================================================
+
+ZenScrapException _userNotAuthenticated(SupportedLanguage lang) =>
+    createTranslatedException('user_not_authenticated', lang);
+
+ZenScrapException _accountNotFoundForUser(SupportedLanguage lang) =>
+    createTranslatedException('account_not_found_for_user', lang);
+
+ZenScrapException _scrappableNotFound(SupportedLanguage lang) =>
+    createTranslatedException('scrappable_not_found', lang);
+
+ZenScrapException _accessDeniedPermission(SupportedLanguage lang) =>
+    createTranslatedException('access_denied_permission', lang);

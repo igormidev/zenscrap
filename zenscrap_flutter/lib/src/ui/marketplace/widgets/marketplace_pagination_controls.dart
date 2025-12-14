@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/marketplace/marketplace_provider.dart';
@@ -233,7 +234,7 @@ class MarketplacePaginationControls extends ConsumerWidget {
     final startItem = ((pagination.currentPage - 1) * pagination.pageSize) + 1;
     final endItem = (pagination.currentPage * pagination.pageSize)
         .clamp(0, pagination.totalCount);
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
@@ -241,7 +242,7 @@ class MarketplacePaginationControls extends ConsumerWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
-        '$startItem-$endItem of ${pagination.totalCount}',
+        AppLocalizations.of(context)!.marketplace_pagination_range(startItem, endItem, pagination.totalCount),
         style: context.t.bodySmall?.copyWith(
           color: context.c.onSurfaceVariant,
           fontWeight: FontWeight.w500,

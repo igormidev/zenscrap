@@ -51,7 +51,8 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
       Scrappable? createdScrappable;
       GroundingMetadataInfo? groundingMetadata;
 
-      await for (final item in ref.read(clientProvider).createScrappable(referenceLink: targetUrl)) {
+      final language = ref.read(currentLanguageProvider);
+      await for (final item in ref.read(clientProvider).createScrappable(referenceLink: targetUrl, language: language)) {
         if (item is CreateScrappableThinkingChunk) {
           // Update state with new thinking chunk
           state.mapOrNull(creatingScrappable: (current) {
@@ -97,10 +98,11 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
     final sessionUuid = state.mapOrNull(standard: (value) => value.sessionUuid);
     if (sessionUuid == null) return;
 
+    final language = ref.read(currentLanguageProvider);
     await ref
         .read(clientProvider)
         .scrappableChatSession
-        .sendPromptMessage(sessionId: sessionUuid, userPrompt: userPrompt)
+        .sendPromptMessage(sessionId: sessionUuid, userPrompt: userPrompt, language: language)
         .toRawResult(
       (Stream<String> llmThinkingStream) {
         _aiCurrentThinkingSubscription = llmThinkingStream.listen(
@@ -216,10 +218,11 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
 
   Future<void> createSessionWithScrappableId(int scrappableId) async {
     // First fetch the scrappable by ID
+    final language = ref.read(currentLanguageProvider);
     final scrappableResult = await ref
         .read(clientProvider)
         .privateUserScrappables
-        .getScrappableById(scrappableId)
+        .getScrappableById(scrappableId, language: language)
         .toResult;
 
     await scrappableResult.fold(
@@ -233,10 +236,11 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
   }
 
   Future<void> createSessionWithScrappable(Scrappable scrappable) async {
+    final language = ref.read(currentLanguageProvider);
     final sessionResult = await ref
         .read(clientProvider)
         .scrappableChatSession
-        .createSession(scrappableId: scrappable.id!)
+        .createSession(scrappableId: scrappable.id!, language: language)
         .toResult;
 
     await sessionResult.fold((createdSessionResponse) async {
@@ -245,7 +249,7 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
             .read(clientProvider)
             .scrappableChatSession
             .listenToScrappableRedraftSession(
-                sessionUuid: createdSessionResponse.sessionId)
+                sessionUuid: createdSessionResponse.sessionId, language: language)
             .listen(onChange);
 
         final Duration timeUntilExpire = createdSessionResponse.expiresIn;
@@ -274,10 +278,11 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
     final sessionUuid = state.mapOrNull(standard: (value) => value.sessionUuid);
     if (sessionUuid == null) return Failure(defaultException);
 
+    final language = ref.read(currentLanguageProvider);
     return ref
         .read(clientProvider)
         .scrappableChatSession
-        .commitCurrentEditState(sessionUuid: sessionUuid)
+        .commitCurrentEditState(sessionUuid: sessionUuid, language: language)
         .toResult;
   }
 
@@ -287,10 +292,11 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
     final sessionUuid = state.mapOrNull(standard: (value) => value.sessionUuid);
     if (sessionUuid == null) return;
 
+    final language = ref.read(currentLanguageProvider);
     await ref
         .read(clientProvider)
         .scrappableChatSession
-        .updateUserApiKey(sessionId: sessionUuid, openAiApiKey: apiKey);
+        .updateUserApiKey(sessionId: sessionUuid, openAiApiKey: apiKey, language: language);
   }
 }
 

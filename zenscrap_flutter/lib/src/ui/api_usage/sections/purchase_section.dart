@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
@@ -15,6 +16,7 @@ class PurchaseSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       decoration: BoxDecoration(
         color: context.c.surface,
@@ -29,7 +31,7 @@ class PurchaseSection extends ConsumerWidget {
             children: [
               const SizedBox(width: 20),
               Text(
-                'Purchase API Credits',
+                l10n.api_usage_purchase_credits,
                 style: context.t.titleLarge,
               ),
               const Spacer(),
@@ -62,7 +64,7 @@ class PurchaseSection extends ConsumerWidget {
                   credits: '1M',
                   price: '\$199',
                   unitPrice: '\$0.20/1K',
-                  badge: 'BEST VALUE',
+                  badge: l10n.api_usage_best_value,
                   isHighlighted: true,
                   onTap: () => _handlePurchase(
                       context, ref, CreditPurchaseOption.medium),
@@ -73,7 +75,7 @@ class PurchaseSection extends ConsumerWidget {
                   credits: '2.5M',
                   price: '\$399',
                   unitPrice: '\$0.16/1K',
-                  badge: 'BULK DISCOUNT',
+                  badge: l10n.api_usage_bulk_discount,
                   onTap: () =>
                       _handlePurchase(context, ref, CreditPurchaseOption.large),
                 ),
@@ -93,8 +95,7 @@ class PurchaseSection extends ConsumerWidget {
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    'Credits never expire • Instant activation',
-                    // 'Ultra plan exclusive • Credits never expire • Instant activation',
+                    l10n.api_usage_credits_never_expire,
                     style: context.t.labelSmall?.copyWith(
                       color: context.c.onSurfaceVariant.withAlpha(150),
                     ),
@@ -132,7 +133,7 @@ class PurchaseSection extends ConsumerWidget {
 
     if (accountInfo == null) {
       showSnackbar(
-          context, 'Unable to verify account status. Please try again.');
+          context, AppLocalizations.of(context)!.api_usage_unable_to_verify_account);
       return;
     }
 
@@ -149,6 +150,7 @@ class PurchaseSection extends ConsumerWidget {
   }
 
   static Future<void> _showUltraRequiredDialog(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
     await showDialog(
       context: context,
       barrierDismissible: false,
@@ -158,14 +160,14 @@ class PurchaseSection extends ConsumerWidget {
           size: 48,
           color: context.c.primary,
         ),
-        title: const Text('Ultra Plan Required'),
+        title: Text(l10n.api_usage_ultra_plan_required),
         content: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 400),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Credit packages are an exclusive benefit for Ultra plan subscribers.',
+                l10n.api_usage_ultra_exclusive_benefit,
                 style: context.t.bodyMedium,
               ),
               const SizedBox(height: 16),
@@ -190,7 +192,7 @@ class PurchaseSection extends ConsumerWidget {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'Credits that never expire',
+                            l10n.api_usage_credits_never_expire_benefit,
                             style: context.t.bodySmall?.copyWith(
                               color: context.c.primary,
                               fontWeight: FontWeight.w600,
@@ -210,7 +212,7 @@ class PurchaseSection extends ConsumerWidget {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'Perfect for traffic spikes',
+                            l10n.api_usage_perfect_for_traffic_spikes,
                             style: context.t.bodySmall?.copyWith(
                               color: context.c.primary,
                               fontWeight: FontWeight.w600,
@@ -228,18 +230,17 @@ class PurchaseSection extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Maybe Later'),
+            child: Text(l10n.api_usage_maybe_later),
           ),
           FilledButton(
             onPressed: () {
               Navigator.of(dialogContext).pop();
               showUltraPlanUpgradeDialog(
                 context,
-                mainCTAText:
-                    'Unlock the ability to purchase additional credits that never expire. Perfect for handling traffic spikes and seasonal demands.',
+                mainCTAText: l10n.api_usage_unlock_credits_message,
               );
             },
-            child: const Text('Upgrade to Ultra'),
+            child: Text(l10n.api_usage_upgrade_to_ultra),
           ),
         ],
       ),
@@ -349,7 +350,7 @@ class _CreditPackageCard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'Unit price: $unitPrice',
+                AppLocalizations.of(context)!.api_usage_unit_price(unitPrice),
                 style: context.t.labelSmall?.copyWith(
                   color: context.c.onSurfaceVariant.withAlpha(150),
                 ),
@@ -371,6 +372,7 @@ class _CreditPurchaseExplanationDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
@@ -421,7 +423,7 @@ class _CreditPurchaseExplanationDialog extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Get Credits That Never Expire',
+                    l10n.api_usage_get_credits_title,
                     style: context.t.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: context.c.primary,
@@ -430,7 +432,7 @@ class _CreditPurchaseExplanationDialog extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Perfect for traffic spikes & long-term planning',
+                    l10n.api_usage_traffic_spikes_subtitle,
                     style: context.t.bodyMedium?.copyWith(
                       color: context.c.onSurfaceVariant,
                     ),
@@ -448,23 +450,20 @@ class _CreditPurchaseExplanationDialog extends StatelessWidget {
                   // Benefits
                   _BenefitItem(
                     icon: Icons.all_inclusive_rounded,
-                    title: 'Credits Never Expire',
-                    description:
-                        'Unlike subscription credits that reset monthly, purchased credits stay in your account forever while your Ultra plan is active.',
+                    title: l10n.api_usage_credits_never_expire_title,
+                    description: l10n.api_usage_credits_never_expire_description,
                   ),
                   const SizedBox(height: 12),
                   _BenefitItem(
                     icon: Icons.bolt_rounded,
-                    title: 'Instant Activation',
-                    description:
-                        'Credits are added to your account immediately after payment - no waiting, no delays.',
+                    title: l10n.api_usage_instant_activation_title,
+                    description: l10n.api_usage_instant_activation_description,
                   ),
                   const SizedBox(height: 12),
                   _BenefitItem(
                     icon: Icons.trending_up_rounded,
-                    title: 'Scale Without Limits',
-                    description:
-                        'Handle traffic spikes, seasonal demands, or special projects without upgrading your monthly plan.',
+                    title: l10n.api_usage_scale_without_limits_title,
+                    description: l10n.api_usage_scale_without_limits_description,
                   ),
                   const SizedBox(height: 24),
 
@@ -481,7 +480,7 @@ class _CreditPurchaseExplanationDialog extends StatelessWidget {
                     child: Column(
                       children: [
                         Text(
-                          'Choose Your Package',
+                          l10n.api_usage_choose_package,
                           style: context.t.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -490,30 +489,30 @@ class _CreditPurchaseExplanationDialog extends StatelessWidget {
                         _PackageOption(
                           isSelected:
                               selectedPackage == CreditPurchaseOption.small,
-                          credits: '100,000 credits',
+                          credits: l10n.api_usage_100k_credits,
                           price: '\$59',
                           unitPrice: '\$0.59 per 1K',
-                          description: 'Great for testing and small projects',
+                          description: l10n.api_usage_small_package_description,
                         ),
                         const SizedBox(height: 8),
                         _PackageOption(
                           isSelected:
                               selectedPackage == CreditPurchaseOption.medium,
-                          credits: '1,000,000 credits',
+                          credits: l10n.api_usage_1m_credits,
                           price: '\$199',
                           unitPrice: '\$0.20 per 1K',
-                          description: 'Best value for growing applications',
-                          badge: 'MOST POPULAR',
+                          description: l10n.api_usage_medium_package_description,
+                          badge: l10n.api_usage_most_popular,
                         ),
                         const SizedBox(height: 8),
                         _PackageOption(
                           isSelected:
                               selectedPackage == CreditPurchaseOption.large,
-                          credits: '2,500,000 credits',
+                          credits: l10n.api_usage_2_5m_credits,
                           price: '\$399',
                           unitPrice: '\$0.16 per 1K',
-                          description: 'Maximum savings for enterprise needs',
-                          badge: 'BEST DEAL',
+                          description: l10n.api_usage_large_package_description,
+                          badge: l10n.api_usage_best_deal,
                         ),
                       ],
                     ),
@@ -532,7 +531,7 @@ class _CreditPurchaseExplanationDialog extends StatelessWidget {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        'Secure payment via Stripe',
+                        l10n.api_usage_secure_payment_stripe,
                         style: context.t.labelMedium?.copyWith(
                           color: context.c.primary,
                         ),
@@ -545,7 +544,7 @@ class _CreditPurchaseExplanationDialog extends StatelessWidget {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        'Instant delivery',
+                        l10n.api_usage_instant_delivery,
                         style: context.t.labelMedium?.copyWith(
                           color: context.c.primary,
                         ),
@@ -572,7 +571,7 @@ class _CreditPurchaseExplanationDialog extends StatelessWidget {
                     child: TextButton(
                       onPressed: () => Navigator.of(context).pop(false),
                       child: Text(
-                        'Not Now',
+                        l10n.api_usage_not_now,
                         style: context.t.bodyLarge?.copyWith(
                           color: context.c.onSurfaceVariant,
                         ),
@@ -596,7 +595,7 @@ class _CreditPurchaseExplanationDialog extends StatelessWidget {
                         color: context.c.onPrimary,
                       ),
                       label: Text(
-                        _getButtonText(selectedPackage),
+                        _getButtonText(context, selectedPackage),
                         style: context.t.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: context.c.onPrimary,
@@ -613,14 +612,15 @@ class _CreditPurchaseExplanationDialog extends StatelessWidget {
     );
   }
 
-  String _getButtonText(CreditPurchaseOption package) {
+  String _getButtonText(BuildContext context, CreditPurchaseOption package) {
+    final l10n = AppLocalizations.of(context)!;
     switch (package) {
       case CreditPurchaseOption.small:
-        return 'Get 100K Credits';
+        return l10n.api_usage_get_100k_credits;
       case CreditPurchaseOption.medium:
-        return 'Get 1M Credits';
+        return l10n.api_usage_get_1m_credits;
       case CreditPurchaseOption.large:
-        return 'Get 2.5M Credits';
+        return l10n.api_usage_get_2_5m_credits;
     }
   }
 }
@@ -820,8 +820,9 @@ class _CheckoutLoadingDialogState
   Future<void> _initiateCheckout() async {
     try {
       final client = widget.ref.read(clientProvider);
+      final language = widget.ref.read(currentLanguageProvider);
       final checkoutUrl = await client.privateApiUsage
-          .createCreditPurchaseCheckout(creditPackage: widget.package);
+          .createCreditPurchaseCheckout(creditPackage: widget.package, language: language);
 
       if (!mounted) return;
 
@@ -852,6 +853,7 @@ class _CheckoutLoadingDialogState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return PopScope(
       canPop: false,
       child: Dialog(
@@ -868,14 +870,14 @@ class _CheckoutLoadingDialogState
                 const CupertinoActivityIndicator(radius: 20),
                 const SizedBox(height: 24),
                 Text(
-                  'Preparing checkout...',
+                  l10n.api_usage_preparing_checkout,
                   style: context.t.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'You\'ll be redirected to Stripe in a moment',
+                  l10n.api_usage_redirect_to_stripe,
                   style: context.t.bodyMedium?.copyWith(
                     color: context.c.onSurfaceVariant,
                   ),
@@ -889,7 +891,7 @@ class _CheckoutLoadingDialogState
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Checkout Failed',
+                  l10n.api_usage_checkout_failed,
                   style: context.t.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: context.c.error,
@@ -897,7 +899,7 @@ class _CheckoutLoadingDialogState
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  _errorMessage ?? 'An unexpected error occurred',
+                  _errorMessage ?? l10n.api_usage_unexpected_error,
                   style: context.t.bodyMedium?.copyWith(
                     color: context.c.onSurfaceVariant,
                   ),
@@ -906,7 +908,7 @@ class _CheckoutLoadingDialogState
                 const SizedBox(height: 24),
                 FilledButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Close'),
+                  child: Text(l10n.api_usage_close),
                 ),
               ] else ...[
                 Container(
@@ -923,7 +925,7 @@ class _CheckoutLoadingDialogState
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  'Complete Your Purchase',
+                  l10n.api_usage_complete_purchase,
                   style: context.t.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -947,7 +949,7 @@ class _CheckoutLoadingDialogState
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'Checkout opened in a new tab',
+                        l10n.api_usage_checkout_opened,
                         style: context.t.titleSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: context.c.primary,
@@ -955,7 +957,7 @@ class _CheckoutLoadingDialogState
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Complete your purchase in the Stripe checkout page, then refresh this page to see your new credits.',
+                        l10n.api_usage_complete_in_stripe,
                         style: context.t.bodySmall?.copyWith(
                           color: context.c.onSurfaceVariant,
                         ),
@@ -975,7 +977,7 @@ class _CheckoutLoadingDialogState
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      'Secure payment powered by Stripe',
+                      l10n.api_usage_secure_payment_powered_by_stripe,
                       style: context.t.labelSmall?.copyWith(
                         color: context.c.onSurfaceVariant.withAlpha(150),
                       ),
@@ -991,11 +993,11 @@ class _CheckoutLoadingDialogState
                         .getAccountInfo(force: true);
                     if (context.mounted) {
                       Navigator.of(context).pop();
-                      showSnackbar(context, 'Account refreshed');
+                      showSnackbar(context, l10n.api_usage_account_refreshed);
                     }
                   },
                   icon: const Icon(Icons.refresh_rounded),
-                  label: const Text('Refresh & Close'),
+                  label: Text(l10n.api_usage_refresh_and_close),
                 ),
               ],
             ],

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/ui/legal/terms_of_service_dialog.dart';
+import 'package:zenscrap_flutter/src/ui/legal/privacy_policy_dialog.dart';
 
 /// Final call-to-action section at the bottom of the landing page.
 /// Drives urgency and provides a clear path to action.
@@ -23,6 +26,7 @@ class FinalCtaSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 100, horizontal: 40),
@@ -30,7 +34,7 @@ class FinalCtaSection extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            'Ready to Stop Babysitting\nYour Scrapers?',
+            l10n.landing_cta_title,
             style: context.t.displaySmall?.copyWith(
               fontWeight: FontWeight.bold,
               color: context.c.onSurface,
@@ -45,7 +49,7 @@ class FinalCtaSection extends StatelessWidget {
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 600),
             child: Text(
-              'Join developers who\'ve reclaimed their time. Build once, let AI maintain forever.',
+              l10n.landing_cta_subtitle,
               style: context.t.titleMedium?.copyWith(
                 color: context.c.onSurfaceVariant,
                 height: 1.6,
@@ -66,7 +70,7 @@ class FinalCtaSection extends StatelessWidget {
                   onScrollToTop?.call();
                 },
                 icon: const Icon(Icons.rocket_launch_rounded),
-                label: const Text('Create Your First Scraper'),
+                label: Text(l10n.landing_cta_create_button),
                 style: FilledButton.styleFrom(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
@@ -82,7 +86,7 @@ class FinalCtaSection extends StatelessWidget {
                   // Navigate to marketplace - handled by parent
                 },
                 icon: const Icon(Icons.store_outlined),
-                label: const Text('Browse Marketplace'),
+                label: Text(l10n.landing_cta_marketplace_button),
                 style: OutlinedButton.styleFrom(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
@@ -101,19 +105,19 @@ class FinalCtaSection extends StatelessWidget {
             children: [
               _TrustIndicator(
                 icon: Icons.credit_card_off_rounded,
-                text: 'No credit card required',
+                text: l10n.landing_trust_no_credit_card,
                 delay: 400,
               ),
               const SizedBox(width: 32),
               _TrustIndicator(
                 icon: Icons.person_off_rounded,
-                text: 'No signup to test',
+                text: l10n.landing_trust_no_signup,
                 delay: 500,
               ),
               const SizedBox(width: 32),
               _TrustIndicator(
                 icon: Icons.flash_on_rounded,
-                text: 'Ready in under 2 minutes',
+                text: l10n.landing_trust_ready_in_minutes,
                 delay: 600,
               ),
             ],
@@ -133,7 +137,7 @@ class FinalCtaSection extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'ZenScrap',
+                  l10n.landing_app_name,
                   style: context.t.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: context.c.primary,
@@ -141,11 +145,29 @@ class FinalCtaSection extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '• AI-Powered Web Scraping',
+                  '• ${l10n.landing_footer_tagline}',
                   style: context.t.bodyMedium?.copyWith(
                     color: context.c.onSurfaceVariant,
                   ),
                 ),
+                const SizedBox(width: 16),
+                Text(
+                  '•',
+                  style: context.t.bodyMedium?.copyWith(
+                    color: context.c.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                const TermsOfServiceLink(),
+                const SizedBox(width: 16),
+                Text(
+                  '|',
+                  style: context.t.bodyMedium?.copyWith(
+                    color: context.c.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                const PrivacyPolicyLink(),
               ],
             ),
           )

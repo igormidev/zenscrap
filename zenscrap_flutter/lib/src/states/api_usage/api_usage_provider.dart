@@ -13,8 +13,9 @@ class ApiUsageNotifier extends Notifier<ApiUsageState> {
     state = const ApiUsageState.loading();
 
     final client = ref.read(clientProvider);
+    final language = ref.read(currentLanguageProvider);
     final apiUsageResult =
-        await client.privateApiUsage.getApiUsageInfo().toResult;
+        await client.privateApiUsage.getApiUsageInfo(language: language).toResult;
 
     state = apiUsageResult.fold(
       (apiUsage) => ApiUsageState.loaded(apiUsage: apiUsage),

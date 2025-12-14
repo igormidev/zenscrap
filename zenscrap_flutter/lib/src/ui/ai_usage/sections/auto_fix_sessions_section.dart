@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/ui/ai_usage/widgets/ai_usage_card.dart';
 import 'package:zenscrap_flutter/src/ui/ai_usage/widgets/load_more_button.dart';
@@ -28,11 +29,11 @@ class AutoFixSessionsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.all(20),
+          Padding(
+            padding: const EdgeInsets.all(20),
             child: AiUsageCardHeader(
               icon: Icons.auto_fix_high,
-              title: 'Auto-Fix Sessions',
+              title: AppLocalizations.of(context)!.ai_usage_autofix_sessions,
             ),
           ),
           Expanded(
@@ -105,14 +106,14 @@ class _EmptySessionsState extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'No auto-fix sessions yet',
+              AppLocalizations.of(context)!.ai_usage_no_autofix_sessions,
               style: context.t.bodyLarge?.copyWith(
                 color: context.c.onSurface.withAlpha(150),
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'When your scrappables break, our AI will automatically attempt to fix them. Those sessions will appear here.',
+              AppLocalizations.of(context)!.ai_usage_autofix_empty_description,
               style: context.t.bodySmall?.copyWith(
                 color: context.c.onSurface.withAlpha(100),
               ),
@@ -141,12 +142,14 @@ class _AutoFixSessionItem extends StatelessWidget {
 
     // Build model label
     final modelLabel = session.usedAiModel == AiModel.powerful
-        ? 'Powerful Model'
-        : 'Normal Model';
+        ? AppLocalizations.of(context)!.ai_usage_powerful_model
+        : AppLocalizations.of(context)!.ai_usage_normal_model;
 
     // Token usage info
     final totalTokens = session.totalInputTokens + session.totalOutputTokens;
-    final tokenInfo = totalTokens > 0 ? '${_formatTokens(totalTokens)} tokens' : null;
+    final tokenInfo = totalTokens > 0
+        ? AppLocalizations.of(context)!.ai_usage_tokens_count(_formatTokens(totalTokens))
+        : null;
 
     // Cost info (only if not using user's own API key)
     final costInfo = !session.usedUserApiKey && session.totalCostUsd > 0
@@ -184,7 +187,7 @@ class _AutoFixSessionItem extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                'Scrappable #${session.scrappableId}',
+                AppLocalizations.of(context)!.ai_usage_scrappable_id(session.scrappableId),
                 style: context.t.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -221,32 +224,32 @@ class _AutoFixSessionItem extends StatelessWidget {
       AutoFixSessionStatus.pending => (
           Icons.hourglass_empty,
           context.c.tertiary,
-          'Pending',
+          AppLocalizations.of(context)!.ai_usage_status_pending,
         ),
       AutoFixSessionStatus.in_progress => (
           Icons.sync,
           context.c.primary,
-          'In Progress',
+          AppLocalizations.of(context)!.ai_usage_status_in_progress,
         ),
       AutoFixSessionStatus.success => (
           Icons.check_circle,
           Colors.green,
-          'Success',
+          AppLocalizations.of(context)!.ai_usage_status_success,
         ),
       AutoFixSessionStatus.failed => (
           Icons.error,
           context.c.error,
-          'Failed',
+          AppLocalizations.of(context)!.ai_usage_status_failed,
         ),
       AutoFixSessionStatus.exhausted => (
           Icons.block,
           context.c.error,
-          'Exhausted',
+          AppLocalizations.of(context)!.ai_usage_status_exhausted,
         ),
       AutoFixSessionStatus.cancelled => (
           Icons.cancel,
           context.c.onSurface.withAlpha(150),
-          'Cancelled',
+          AppLocalizations.of(context)!.ai_usage_status_cancelled,
         ),
     };
   }
@@ -305,22 +308,33 @@ class _SessionDetails extends StatelessWidget {
         const Divider(height: 24),
         // Trigger info
         _DetailRow(
-          label: 'Triggered at',
-          value: '${session.triggeredAtErrorCount} consecutive errors (threshold: ${session.configuredThreshold})',
+          label: AppLocalizations.of(context)!.ai_usage_triggered_at,
+          value: AppLocalizations.of(context)!.ai_usage_consecutive_errors(
+            session.triggeredAtErrorCount,
+            session.configuredThreshold,
+          ),
         ),
         const SizedBox(height: 8),
         // API key info
         _DetailRow(
-          label: 'API Key',
-          value: session.usedUserApiKey ? 'Your own key' : 'Platform key',
+          label: AppLocalizations.of(context)!.ai_usage_api_key_label,
+          value: session.usedUserApiKey
+              ? AppLocalizations.of(context)!.ai_usage_your_own_key
+              : AppLocalizations.of(context)!.ai_usage_platform_key,
         ),
         if (tokenInfo != null) ...[
           const SizedBox(height: 8),
-          _DetailRow(label: 'Tokens used', value: tokenInfo!),
+          _DetailRow(
+            label: AppLocalizations.of(context)!.ai_usage_tokens_used,
+            value: tokenInfo!,
+          ),
         ],
         if (costInfo != null) ...[
           const SizedBox(height: 8),
-          _DetailRow(label: 'Cost', value: costInfo!),
+          _DetailRow(
+            label: AppLocalizations.of(context)!.ai_usage_cost,
+            value: costInfo!,
+          ),
         ],
         // Success summary or failure reason
         if (session.successSummary != null) ...[
@@ -336,7 +350,7 @@ class _SessionDetails extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Fix Summary',
+                  AppLocalizations.of(context)!.ai_usage_fix_summary,
                   style: context.t.labelMedium?.copyWith(
                     color: Colors.green.shade700,
                     fontWeight: FontWeight.w600,
@@ -366,7 +380,7 @@ class _SessionDetails extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Failure Reason',
+                  AppLocalizations.of(context)!.ai_usage_failure_reason,
                   style: context.t.labelMedium?.copyWith(
                     color: context.c.error,
                     fontWeight: FontWeight.w600,
@@ -387,7 +401,7 @@ class _SessionDetails extends StatelessWidget {
         if (session.attempts != null && session.attempts!.isNotEmpty) ...[
           const SizedBox(height: 16),
           Text(
-            'Attempts (${session.attempts!.length})',
+            AppLocalizations.of(context)!.ai_usage_attempts_count(session.attempts!.length),
             style: context.t.labelMedium?.copyWith(
               fontWeight: FontWeight.w600,
             ),
@@ -449,11 +463,11 @@ class _AttemptItem extends StatelessWidget {
     };
 
     final statusLabel = switch (attempt.status) {
-      AutoFixAttemptStatus.in_progress => 'In Progress',
-      AutoFixAttemptStatus.success => 'Success',
-      AutoFixAttemptStatus.ai_error => 'AI Error',
-      AutoFixAttemptStatus.api_error => 'API Error',
-      AutoFixAttemptStatus.validation_failed => 'Validation Failed',
+      AutoFixAttemptStatus.in_progress => AppLocalizations.of(context)!.ai_usage_attempt_status_in_progress,
+      AutoFixAttemptStatus.success => AppLocalizations.of(context)!.ai_usage_attempt_status_success,
+      AutoFixAttemptStatus.ai_error => AppLocalizations.of(context)!.ai_usage_attempt_status_ai_error,
+      AutoFixAttemptStatus.api_error => AppLocalizations.of(context)!.ai_usage_attempt_status_api_error,
+      AutoFixAttemptStatus.validation_failed => AppLocalizations.of(context)!.ai_usage_attempt_status_validation_failed,
     };
 
     return Container(
@@ -511,7 +525,7 @@ class _AttemptItem extends StatelessWidget {
           ),
           if (attempt.inputTokens > 0 || attempt.outputTokens > 0)
             Text(
-              '${attempt.inputTokens + attempt.outputTokens} tok',
+              '${attempt.inputTokens + attempt.outputTokens} ${AppLocalizations.of(context)!.ai_usage_tokens_short}',
               style: context.t.labelSmall?.copyWith(
                 color: context.c.onSurface.withAlpha(150),
               ),

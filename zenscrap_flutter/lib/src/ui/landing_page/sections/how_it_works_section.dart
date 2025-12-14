@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 
 /// Section explaining the 3-step process to create a scraper.
@@ -9,13 +10,14 @@ class HowItWorksSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 100, horizontal: 40),
       child: Column(
         children: [
           Text(
-            'Three Steps to Automated Data',
+            l10n.landing_how_title,
             style: context.t.displaySmall?.copyWith(
               fontWeight: FontWeight.bold,
               color: context.c.onSurface,
@@ -29,7 +31,7 @@ class HowItWorksSection extends StatelessWidget {
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 600),
             child: Text(
-              'No code. No configuration. Just describe what you need.',
+              l10n.landing_how_subtitle,
               style: context.t.titleMedium?.copyWith(
                 color: context.c.onSurfaceVariant,
                 height: 1.6,
@@ -50,9 +52,8 @@ class HowItWorksSection extends StatelessWidget {
                   child: _StepCard(
                     stepNumber: '1',
                     icon: Icons.link_rounded,
-                    title: 'Paste Your URL',
-                    description:
-                        'Drop the link to the page you want to extract data from. Any website, any complexity.',
+                    title: l10n.landing_how_step1_title,
+                    description: l10n.landing_how_step1_description,
                     delay: 300,
                   ),
                 ),
@@ -61,9 +62,8 @@ class HowItWorksSection extends StatelessWidget {
                   child: _StepCard(
                     stepNumber: '2',
                     icon: Icons.chat_bubble_outline_rounded,
-                    title: 'Describe What You Want',
-                    description:
-                        'Tell our AI in plain language what data you need. Product prices, article content, user profiles—anything.',
+                    title: l10n.landing_how_step2_title,
+                    description: l10n.landing_how_step2_description,
                     delay: 500,
                   ),
                 ),
@@ -72,9 +72,8 @@ class HowItWorksSection extends StatelessWidget {
                   child: _StepCard(
                     stepNumber: '3',
                     icon: Icons.auto_fix_high_rounded,
-                    title: 'Get Your Self-Healing API',
-                    description:
-                        'Receive a ready-to-use API endpoint that automatically adapts when the target site changes.',
+                    title: l10n.landing_how_step3_title,
+                    description: l10n.landing_how_step3_description,
                     delay: 700,
                     isHighlighted: true,
                   ),
@@ -103,7 +102,7 @@ class HowItWorksSection extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  'AI automatically generates name, description, category, and URL patterns',
+                  l10n.landing_how_ai_note,
                   style: context.t.bodyLarge?.copyWith(
                     color: context.c.onSurface,
                     fontWeight: FontWeight.w500,

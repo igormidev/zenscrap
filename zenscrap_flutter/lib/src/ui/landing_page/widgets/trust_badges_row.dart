@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 
 /// A row of trust badges displaying key selling points.
@@ -9,23 +10,24 @@ class TrustBadgesRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
         _TrustBadge(
           icon: Icons.credit_card_off_outlined,
-          text: 'No credit card required',
+          text: l10n.landing_trust_no_credit_card,
         ),
         const SizedBox(width: 32),
         _TrustBadge(
           icon: Icons.person_off_outlined,
-          text: 'No signup to test',
+          text: l10n.landing_trust_no_signup,
         ),
         const SizedBox(width: 32),
         _TrustBadge(
           icon: Icons.bolt_outlined,
-          text: 'Ready in under 2 minutes',
+          text: l10n.landing_trust_ready_in_minutes,
         ),
       ],
     );

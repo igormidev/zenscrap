@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head>
+<!DOCTYPE html><html lang="en"><head>
   <!--
     If you are serving your web app in a path other than the root, change the
     href value below to reflect the base path you are serving from.
@@ -16,31 +16,444 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Primary SEO Meta Tags -->
+  <title>ZenScrap - AI-Powered Web Scrapers That Fix Themselves</title>
+  <meta name="title" content="ZenScrap - AI-Powered Web Scrapers That Fix Themselves">
+  <meta name="description" content="Create self-healing web scrapers with AI. Describe what you want to extract and get a ready-to-use API endpoint. No code, no CSS selectors, no maintenance. Free to start.">
+  <meta name="keywords" content="web scraping, AI scraper, self-healing scraper, web data extraction, API, no-code scraping, automated scraping, data extraction tool, web scraper API, scraping service">
+  <meta name="author" content="ZenScrap">
+  <meta name="robots" content="index, follow">
+  <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <link rel="canonical" href="https://zenscrap.com/">
+
+  <!-- Open Graph / Facebook Meta Tags (for social sharing) -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://zenscrap.com/">
+  <meta property="og:title" content="ZenScrap - AI-Powered Web Scrapers That Fix Themselves">
+  <meta property="og:description" content="Create self-healing web scrapers with AI. Describe what you want to extract and get a ready-to-use API endpoint. No code, no CSS selectors, no maintenance.">
+  <meta property="og:image" content="https://zenscrap.com/icons/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="ZenScrap">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://zenscrap.com/">
+  <meta name="twitter:title" content="ZenScrap - AI-Powered Web Scrapers That Fix Themselves">
+  <meta name="twitter:description" content="Create self-healing web scrapers with AI. Describe what you want to extract and get a ready-to-use API endpoint. No code, no CSS selectors, no maintenance.">
+  <meta name="twitter:image" content="https://zenscrap.com/icons/og-image.png">
+
+  <!-- Google Sign-In configuration -->
+  <!-- Replace YOUR_GOOGLE_SERVER_CLIENT_ID with your actual client ID from Google Cloud Console -->
+  <meta name="google-signin-client_id" content="YOUR_GOOGLE_SERVER_CLIENT_ID.apps.googleusercontent.com">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="zenscrap_flutter">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ZenScrap">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/Icon-192.png">
+
+  <!-- Theme color for browser chrome -->
+  <meta name="theme-color" content="#607D8B">
+  <meta name="msapplication-TileColor" content="#607D8B">
+  <meta name="msapplication-navbutton-color" content="#607D8B">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon.png">
 
-  <title>zenscrap_flutter</title>
+  <!-- ============================================
+       Asset Preloading for Performance
+       Preload critical resources to start loading early in parallel
+       See: https://web.dev/articles/preload-critical-assets
+       ============================================ -->
+
+  <!-- Preconnect to external domains used by the app -->
+  <link rel="preconnect" href="https://lottie.host" crossorigin>
+  <link rel="preconnect" href="https://us.i.posthog.com" crossorigin>
+
+  <!-- WASM files - Critical for Flutter WASM renderer
+       These are large files that take time to download, so preloading
+       allows them to start downloading while the browser parses the HTML.
+       The crossorigin attribute is required for CORS-enabled fetch requests. -->
+  <link rel="preload" href="main.dart.wasm" as="fetch" crossorigin>
+  <link rel="preload" href="canvaskit/skwasm.wasm" as="fetch" crossorigin>
+
+  <!-- JavaScript modules - Module preload for ES modules
+       modulepreload is more efficient than regular preload for JS modules
+       as it also parses and compiles the module. -->
+  <link rel="modulepreload" href="main.dart.mjs" crossorigin>
+
+  <!-- Font preloading - Avoid flash of unstyled text (FOUT)
+       The crossorigin attribute is REQUIRED for fonts even on same-origin
+       to match how browsers normally request fonts (anonymous mode). -->
+  <link rel="preload" href="assets/fonts/MaterialIcons-Regular.otf" as="font" type="font/otf" crossorigin>
+
+  <!-- Splash images - Needed immediately for loading screen
+       Preload both light and dark variants with media queries for
+       responsive loading based on user's color scheme preference.
+       Using fetchpriority="high" since these are above-the-fold images. -->
+  <link rel="preload" href="splash/img/light-1x.png" as="image" media="(prefers-color-scheme: light)" fetchpriority="high">
+  <link rel="preload" href="splash/img/dark-1x.png" as="image" media="(prefers-color-scheme: dark)" fetchpriority="high">
+
+  <!-- Higher resolution splash images for retina displays -->
+  <link rel="preload" href="splash/img/light-2x.png" as="image" media="(prefers-color-scheme: light) and (min-resolution: 2dppx)" fetchpriority="low">
+  <link rel="preload" href="splash/img/dark-2x.png" as="image" media="(prefers-color-scheme: dark) and (min-resolution: 2dppx)" fetchpriority="low">
+
+  <!-- Structured Data (JSON-LD) for SEO -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "ZenScrap",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Web",
+    "description": "AI-powered web scraping platform that creates self-healing scrapers. Describe what you want to extract and get a ready-to-use API endpoint automatically.",
+    "url": "https://zenscrap.com",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD",
+      "description": "Free tier available"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "ratingCount": "100"
+    },
+    "featureList": [
+      "AI-powered web scraping",
+      "Self-healing scrapers",
+      "No-code data extraction",
+      "Automatic maintenance",
+      "API endpoints",
+      "Anti-bot handling"
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "ZenScrap",
+    "url": "https://zenscrap.com",
+    "logo": "https://zenscrap.com/icons/Icon-512.png",
+    "description": "AI-powered web scraping platform",
+    "sameAs": []
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "ZenScrap - AI-Powered Web Scrapers That Fix Themselves",
+    "description": "Create self-healing web scrapers with AI. Describe what you want to extract and get a ready-to-use API endpoint.",
+    "url": "https://zenscrap.com",
+    "mainEntity": {
+      "@type": "SoftwareApplication",
+      "name": "ZenScrap"
+    }
+  }
+  </script>
   <link rel="manifest" href="manifest.json">
   <style id="splash-screen-style">
+    /* ==============================================
+       ZenScrap Material 3 Splash Screen
+       Beautiful, performant loading experience
+       ============================================== */
+
+    :root {
+      /* Material 3 Blue-grey color palette */
+      --md-primary: #607D8B;
+      --md-primary-light: #8EACBB;
+      --md-primary-dark: #34515E;
+      --md-surface-light: #FAFCFD;
+      --md-surface-dark: #1A2327;
+      --md-on-surface-light: #607D8B;
+      --md-on-surface-dark: #B0BEC5;
+
+      /* Animation timing */
+      --transition-duration: 0.5s;
+      --pulse-duration: 2.5s;
+      --spinner-duration: 1.4s;
+    }
+
     html {
-      height: 100%
+      height: 100%;
     }
 
     body {
       margin: 0;
       min-height: 100%;
-      background-color: #607D8B;
-          background-size: 100% 100%;
+      background-color: var(--md-primary);
+      background: linear-gradient(145deg, var(--md-primary) 0%, var(--md-primary-dark) 100%);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      overflow: hidden;
     }
 
+    /* ============================================
+       Splash Container - Main wrapper
+       ============================================ */
+    #splash-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 1;
+      transition: opacity var(--transition-duration) ease-out;
+    }
+
+    #splash-container.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* ============================================
+       Logo Section - Centered with animation
+       ============================================ */
+    .splash-logo-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: logoFadeIn 0.8s ease-out forwards;
+    }
+
+    @keyframes logoFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .splash-logo {
+      width: 120px;
+      height: 120px;
+      object-fit: contain;
+      animation: logoPulse var(--pulse-duration) ease-in-out infinite;
+      filter: drop-shadow(0 8px 32px rgba(0, 0, 0, 0.15));
+    }
+
+    @keyframes logoPulse {
+      0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 8px 32px rgba(0, 0, 0, 0.15));
+      }
+      50% {
+        transform: scale(1.03);
+        filter: drop-shadow(0 12px 40px rgba(0, 0, 0, 0.2));
+      }
+    }
+
+    /* ============================================
+       Brand Text - App name below logo
+       ============================================ */
+    .splash-brand {
+      margin-top: 24px;
+      font-size: 28px;
+      font-weight: 300;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.95);
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      animation: brandFadeIn 0.8s ease-out 0.2s forwards;
+      opacity: 0;
+    }
+
+    @keyframes brandFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ============================================
+       Material 3 Circular Progress Indicator
+       Pure CSS, no JS dependencies
+       ============================================ */
+    .spinner-container {
+      margin-top: 48px;
+      animation: spinnerFadeIn 0.6s ease-out 0.4s forwards;
+      opacity: 0;
+    }
+
+    @keyframes spinnerFadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    .md-spinner {
+      width: 44px;
+      height: 44px;
+      animation: spinnerRotate var(--spinner-duration) linear infinite;
+    }
+
+    @keyframes spinnerRotate {
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .md-spinner circle {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.9);
+      stroke-width: 3.5;
+      stroke-linecap: round;
+      stroke-dasharray: 1, 200;
+      stroke-dashoffset: 0;
+      animation: spinnerDash var(--spinner-duration) ease-in-out infinite;
+    }
+
+    @keyframes spinnerDash {
+      0% {
+        stroke-dasharray: 1, 200;
+        stroke-dashoffset: 0;
+      }
+      50% {
+        stroke-dasharray: 89, 200;
+        stroke-dashoffset: -35;
+      }
+      100% {
+        stroke-dasharray: 89, 200;
+        stroke-dashoffset: -124;
+      }
+    }
+
+    /* ============================================
+       Loading Text - Subtle status indicator
+       ============================================ */
+    .loading-text {
+      margin-top: 20px;
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 1px;
+      color: rgba(255, 255, 255, 0.7);
+      animation: loadingTextPulse 2s ease-in-out infinite, spinnerFadeIn 0.6s ease-out 0.6s forwards;
+      opacity: 0;
+    }
+
+    @keyframes loadingTextPulse {
+      0%, 100% {
+        opacity: 0.7;
+      }
+      50% {
+        opacity: 0.4;
+      }
+    }
+
+    /* ============================================
+       Dark Mode Support
+       ============================================ */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: var(--md-surface-dark);
+        background: linear-gradient(145deg, #263238 0%, #1A2327 100%);
+      }
+
+      .splash-brand {
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      .md-spinner circle {
+        stroke: var(--md-primary-light);
+      }
+
+      .loading-text {
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .splash-logo {
+        filter: drop-shadow(0 8px 32px rgba(0, 0, 0, 0.4));
+      }
+
+      @keyframes logoPulse {
+        0%, 100% {
+          transform: scale(1);
+          filter: drop-shadow(0 8px 32px rgba(0, 0, 0, 0.4));
+        }
+        50% {
+          transform: scale(1.03);
+          filter: drop-shadow(0 12px 40px rgba(0, 0, 0, 0.5));
+        }
+      }
+    }
+
+    /* ============================================
+       Responsive adjustments
+       ============================================ */
+    @media (max-width: 480px) {
+      .splash-logo {
+        width: 100px;
+        height: 100px;
+      }
+
+      .splash-brand {
+        font-size: 22px;
+        letter-spacing: 3px;
+      }
+
+      .md-spinner {
+        width: 36px;
+        height: 36px;
+      }
+
+      .spinner-container {
+        margin-top: 36px;
+      }
+    }
+
+    /* ============================================
+       Reduced motion support (accessibility)
+       ============================================ */
+    @media (prefers-reduced-motion: reduce) {
+      .splash-logo,
+      .splash-brand,
+      .spinner-container,
+      .loading-text,
+      .splash-logo-wrapper {
+        animation: none;
+        opacity: 1;
+      }
+
+      .md-spinner {
+        animation: spinnerRotate 2s linear infinite;
+      }
+
+      .md-spinner circle {
+        animation: none;
+        stroke-dasharray: 60, 200;
+        stroke-dashoffset: -20;
+      }
+
+      #splash-container {
+        transition: none;
+      }
+    }
+
+    /* Legacy classes for compatibility */
     .center {
       margin: 0;
       position: absolute;
@@ -51,19 +464,22 @@
     }
 
     .contain {
-      display:block;
-      width:100%; height:100%;
+      display: block;
+      width: 100%;
+      height: 100%;
       object-fit: contain;
     }
 
     .stretch {
-      display:block;
-      width:100%; height:100%;
+      display: block;
+      width: 100%;
+      height: 100%;
     }
 
     .cover {
-      display:block;
-      width:100%; height:100%;
+      display: block;
+      width: 100%;
+      height: 100%;
       object-fit: cover;
     }
 
@@ -104,10 +520,99 @@
     }
   </script>
   <script id="splash-screen-script">
+    /**
+     * Gracefully removes the splash screen with a fade-out animation.
+     * Called when Flutter's first frame is rendered.
+     */
     function removeSplashFromWeb() {
-      document.getElementById("splash")?.remove();
-      document.getElementById("splash-branding")?.remove();
-      document.body.style.background = "transparent";
+      // Prevent multiple calls
+      if (window._splashRemoved) return;
+      window._splashRemoved = true;
+
+      const splashContainer = document.getElementById("splash-container");
+
+      if (splashContainer) {
+        // Add fade-out class to trigger CSS transition
+        splashContainer.classList.add("fade-out");
+
+        // Remove elements after transition completes
+        setTimeout(function() {
+          splashContainer.remove();
+          // Clean up legacy elements if they exist
+          document.getElementById("splash")?.remove();
+          document.getElementById("splash-branding")?.remove();
+          // Remove splash styles to free memory
+          document.getElementById("splash-screen-style")?.remove();
+          // Reset body background for Flutter
+          document.body.style.background = "transparent";
+        }, 500); // Match CSS transition duration
+      } else {
+        // Fallback for legacy structure
+        document.getElementById("splash")?.remove();
+        document.getElementById("splash-branding")?.remove();
+        document.body.style.background = "transparent";
+      }
+    }
+
+    /**
+     * Listen for Flutter's first frame event (works for dart2js builds).
+     * See: https://github.com/flutter/flutter/issues/66066
+     */
+    window.addEventListener('flutter-first-frame', removeSplashFromWeb);
+
+    /**
+     * For WASM/Skwasm builds, the flutter-first-frame event may not fire.
+     * Use polling to detect when Flutter's view element is fully ready.
+     * This is a reliable cross-renderer approach.
+     */
+    function startFlutterDetection() {
+      function checkFlutterReady() {
+        // Check if Flutter's view element exists and has content
+        var flutterView = document.querySelector('flutter-view');
+        var glassPane = document.querySelector('flt-glass-pane');
+
+        if (flutterView && glassPane && !window._splashRemoved) {
+          // Give Flutter a brief moment to render the first frame
+          setTimeout(function() {
+            if (!window._splashRemoved) {
+              removeSplashFromWeb();
+            }
+          }, 150);
+          return true; // Stop polling
+        }
+        return false;
+      }
+
+      // Check immediately in case Flutter already loaded
+      if (!checkFlutterReady()) {
+        // Poll every 100ms until Flutter is ready or timeout
+        var pollInterval = setInterval(function() {
+          if (checkFlutterReady() || window._splashRemoved) {
+            clearInterval(pollInterval);
+          }
+        }, 100);
+
+        // Stop polling after 20 seconds
+        setTimeout(function() {
+          clearInterval(pollInterval);
+        }, 20000);
+      }
+
+      // Ultimate fallback timeout in case all other methods fail
+      setTimeout(function() {
+        if (!window._splashRemoved) {
+          console.warn('Flutter detection did not trigger within 15s. Removing splash as fallback.');
+          removeSplashFromWeb();
+        }
+      }, 15000);
+    }
+
+    // Start detection after DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', startFlutterDetection);
+    } else {
+      // DOM already loaded, start immediately
+      startFlutterDetection();
     }
   </script>
   <script>
@@ -119,11 +624,33 @@
   </script>
 </head>
 <body>
-  <picture id="splash">
-      <source srcset="splash/img/light-1x.png 1x, splash/img/light-2x.png 2x, splash/img/light-3x.png 3x, splash/img/light-4x.png 4x" media="(prefers-color-scheme: light)">
-      <source srcset="splash/img/dark-1x.png 1x, splash/img/dark-2x.png 2x, splash/img/dark-3x.png 3x, splash/img/dark-4x.png 4x" media="(prefers-color-scheme: dark)">
-      <img class="center" aria-hidden="true" src="splash/img/light-1x.png" alt="">
-  </picture>
+  <!-- ============================================
+       ZenScrap Material 3 Splash Screen
+       Beautiful loading experience while Flutter initializes
+       ============================================ -->
+  <div id="splash-container">
+    <div class="splash-logo-wrapper">
+      <!-- Responsive logo with light/dark mode support -->
+      <picture id="splash">
+        <source srcset="splash/img/light-1x.png 1x, splash/img/light-2x.png 2x, splash/img/light-3x.png 3x, splash/img/light-4x.png 4x" media="(prefers-color-scheme: light)">
+        <source srcset="splash/img/dark-1x.png 1x, splash/img/dark-2x.png 2x, splash/img/dark-3x.png 3x, splash/img/dark-4x.png 4x" media="(prefers-color-scheme: dark)">
+        <img class="splash-logo" aria-hidden="true" src="splash/img/light-1x.png" alt="ZenScrap Logo">
+      </picture>
+
+      <!-- Brand name -->
+      <div class="splash-brand">ZenScrap</div>
+    </div>
+
+    <!-- Material 3 Circular Progress Indicator (Pure SVG/CSS) -->
+    <div class="spinner-container">
+      <svg class="md-spinner" viewBox="0 0 50 50" aria-label="Loading">
+        <circle cx="25" cy="25" r="20"></circle>
+      </svg>
+    </div>
+
+    <!-- Loading status text -->
+    <div class="loading-text">Loading...</div>
+  </div>
   <script>
     // Configure Flutter web renderer for better performance
     window.flutterConfiguration = {

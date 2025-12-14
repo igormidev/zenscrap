@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
@@ -128,10 +129,10 @@ class _ChangeAiModelButtonState extends ConsumerState<ChangeAiModelButton> {
 
       // Check if user has at least Pro plan
       if (planTier == PlanTier.none || planTier == PlanTier.basic) {
+        final l10n = AppLocalizations.of(context)!;
         await showProPlanUpgradeDialog(
           context,
-          mainCTAText:
-              'Unlock access to the Powerful AI model for superior extraction accuracy and better understanding of complex web pages. Perfect for advanced scraping needs.',
+          mainCTAText: l10n.scrap_session_powerful_model_upgrade,
         );
         return;
       }
@@ -142,6 +143,7 @@ class _ChangeAiModelButtonState extends ConsumerState<ChangeAiModelButton> {
   }
 
   Future<void> _showSignInDialog() async {
+    final l10n = AppLocalizations.of(context)!;
     await showDialog(
       context: context,
       barrierDismissible: false,
@@ -151,14 +153,14 @@ class _ChangeAiModelButtonState extends ConsumerState<ChangeAiModelButton> {
           size: 48,
           color: context.c.primary,
         ),
-        title: const Text('Sign In Required'),
+        title: Text(l10n.scrap_session_sign_in_required),
         content: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 400),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Sign in to unlock powerful features:',
+                l10n.scrap_session_sign_in_unlock_features,
                 style: context.t.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -166,26 +168,26 @@ class _ChangeAiModelButtonState extends ConsumerState<ChangeAiModelButton> {
               const SizedBox(height: 16),
               _SignInBenefit(
                 icon: Icons.psychology_rounded,
-                title: 'Advanced AI Models',
-                description: 'Access Powerful AI models and other premium features',
+                title: l10n.scrap_session_advanced_ai_models,
+                description: l10n.scrap_session_advanced_ai_models_desc,
               ),
               const SizedBox(height: 12),
               _SignInBenefit(
                 icon: Icons.timer_off_rounded,
-                title: 'No Time Limits',
-                description: 'Endpoints never expire with a subscription',
+                title: l10n.scrap_session_no_time_limits,
+                description: l10n.scrap_session_no_time_limits_desc,
               ),
               const SizedBox(height: 12),
               _SignInBenefit(
                 icon: Icons.api_rounded,
-                title: 'More API Credits',
-                description: 'Get thousands of API credits per month',
+                title: l10n.scrap_session_more_api_credits,
+                description: l10n.scrap_session_more_api_credits_desc,
               ),
               const SizedBox(height: 12),
               _SignInBenefit(
                 icon: Icons.hub_rounded,
-                title: 'Multiple Endpoints',
-                description: 'Create and manage multiple scraping endpoints',
+                title: l10n.scrap_session_multiple_endpoints,
+                description: l10n.scrap_session_multiple_endpoints_desc,
               ),
             ],
           ),
@@ -193,7 +195,7 @@ class _ChangeAiModelButtonState extends ConsumerState<ChangeAiModelButton> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Maybe Later'),
+            child: Text(l10n.scrap_session_maybe_later),
           ),
           FilledButton.icon(
             onPressed: () async {
@@ -201,7 +203,7 @@ class _ChangeAiModelButtonState extends ConsumerState<ChangeAiModelButton> {
               await context.push('/auth');
             },
             icon: const Icon(Icons.login_rounded),
-            label: const Text('Sign In'),
+            label: Text(l10n.scrap_session_sign_in),
           ),
         ],
       ),
@@ -218,10 +220,11 @@ class _ChangeAiModelButtonState extends ConsumerState<ChangeAiModelButton> {
     _isChangingVN.value = true;
     await ref.globalLoadingSetter(() async {
       await Future.delayed(const Duration(milliseconds: 600));
+      final language = ref.read(currentLanguageProvider);
       final changeResult = await ref
           .read(clientProvider)
           .scrappableChatSession
-          .changeChatModel(sessionUuid: sessionUuid, aiModel: aiModel)
+          .changeChatModel(sessionUuid: sessionUuid, aiModel: aiModel, language: language)
           .toResult;
       _isChangingVN.value = false;
 
@@ -231,8 +234,9 @@ class _ChangeAiModelButtonState extends ConsumerState<ChangeAiModelButton> {
         setState(() {
           this.aiModel = aiModel;
         });
+        final l10n = AppLocalizations.of(context)!;
         showSnackbar(
-            context, '✅ Scrap AI model changed to ${aiModel.displayName}');
+            context, l10n.scrap_session_model_changed(aiModel.displayName));
       }, (failure) {
         handleBabelException(context, failure);
       });
@@ -304,6 +308,7 @@ class _AiModelDropdownMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final availableModels = AiModel.values;
@@ -386,7 +391,7 @@ class _AiModelDropdownMenu extends StatelessWidget {
                                               BorderRadius.circular(4),
                                         ),
                                         child: Text(
-                                          'Current',
+                                          l10n.scrap_session_current,
                                           style: theme.textTheme.labelSmall
                                               ?.copyWith(
                                             color: colorScheme.onPrimary,

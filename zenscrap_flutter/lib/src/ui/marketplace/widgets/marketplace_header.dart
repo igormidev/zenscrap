@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/scrappables_listage_ui_template/scrappables_search_bar.dart';
 import 'package:zenscrap_flutter/src/design_system/scrappables_listage_ui_template/category_filter_section.dart';
@@ -26,7 +27,7 @@ class MarketplaceHeader extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              'Marketplace',
+              AppLocalizations.of(context)!.marketplace_title,
               style: context.t.displaySmall,
             ),
             const SizedBox(width: 16),
@@ -41,7 +42,7 @@ class MarketplaceHeader extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
-                'Public Scrappables',
+                AppLocalizations.of(context)!.marketplace_public_scrappables,
                 style: context.t.labelLarge?.copyWith(
                   color: context.c.tertiary,
                   fontWeight: FontWeight.w600,
@@ -50,7 +51,7 @@ class MarketplaceHeader extends ConsumerWidget {
             ),
             const Spacer(),
             IconButton(
-              tooltip: 'Refresh page',
+              tooltip: AppLocalizations.of(context)!.marketplace_refresh_page,
               onPressed: () {
                 // Track refresh click
                 ref
@@ -70,7 +71,7 @@ class MarketplaceHeader extends ConsumerWidget {
         SizedBox(
           width: double.infinity,
           child: ScrappablesSearchBar(
-            hintText: 'Search for scrappables by name or description...',
+            hintText: AppLocalizations.of(context)!.marketplace_search_hint,
             onSearch: (query) {
               ref.read(marketplaceProvider.notifier).search(query);
             },

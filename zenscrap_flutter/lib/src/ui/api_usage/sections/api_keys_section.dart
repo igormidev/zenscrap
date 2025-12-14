@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/ui/api_usage/widgets/api_key_card.dart';
 
@@ -34,13 +35,13 @@ class ApiKeysSection extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'API Keys',
+                AppLocalizations.of(context)!.api_usage_api_keys,
                 style: context.t.titleLarge,
               ),
               ElevatedButton.icon(
                 onPressed: onShowCreateApiKeyDialog,
                 icon: const Icon(Icons.add),
-                label: const Text('Create Key'),
+                label: Text(AppLocalizations.of(context)!.api_usage_create_key),
               ),
             ],
           ),
@@ -58,7 +59,7 @@ class ApiKeysSection extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'No API keys yet',
+                      AppLocalizations.of(context)!.api_usage_no_api_keys,
                       style: context.t.bodyLarge?.copyWith(
                         color: context.c.onSurface.withAlpha(150),
                       ),

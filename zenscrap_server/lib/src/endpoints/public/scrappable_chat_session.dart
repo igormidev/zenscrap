@@ -5,6 +5,7 @@ import 'package:rxdart/subjects.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/core/consts.dart';
 import 'package:zenscrap_server/src/core/default_classes.dart';
+import 'package:zenscrap_server/src/core/translations/error_translations.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_openai_sdk_impl.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/i_chat_controller.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
@@ -88,6 +89,7 @@ class ScrappableChatSession extends Endpoint {
   Future<void> commitCurrentEditState(
     Session session, {
     required RedraftSrappableSessionId sessionUuid,
+    required SupportedLanguage language,
   }) async {
     final int? scrappableId = _cacheScrappableIds[sessionUuid];
     if (scrappableId == null) {
@@ -208,30 +210,22 @@ class ScrappableChatSession extends Endpoint {
     Session session, {
     required RedraftSrappableSessionId sessionId,
     required String openAiApiKey,
+    required SupportedLanguage language,
   }) async {
     // Validate session exists
     if (!_scrapRedraftSessions.containsKey(sessionId)) {
-      throw ZenScrapException(
-        title: 'Session Not Found',
-        description: 'No active session found with ID $sessionId.',
-      );
+      throw createTranslatedException('session_not_found', language);
     }
 
     // Validate user is authenticated
     final int? userId = session.authenticated?.userId;
     if (userId == null) {
-      throw ZenScrapException(
-        title: 'Authentication Required',
-        description: 'You must be logged in to add an API key.',
-      );
+      throw createTranslatedException('authentication_required_api_key', language);
     }
 
     // Validate API key format (basic check)
     if (openAiApiKey.trim().isEmpty) {
-      throw ZenScrapException(
-        title: 'Invalid API Key',
-        description: 'Please provide a valid OpenAI API key.',
-      );
+      throw createTranslatedException('invalid_api_key', language);
     }
 
     // Get or create AccountAIUsage for this session
@@ -246,10 +240,7 @@ class ScrappableChatSession extends Endpoint {
       );
 
       if (accountInfo == null) {
-        throw ZenScrapException(
-          title: 'Account Not Found',
-          description: 'Could not find your account information.',
-        );
+        throw createTranslatedException('account_not_found', language);
       }
 
       accountAIUsage = accountInfo.accountAIUsage;
@@ -259,10 +250,7 @@ class ScrappableChatSession extends Endpoint {
       );
 
       if (accountAIUsage == null) {
-        throw ZenScrapException(
-          title: 'AI Usage Record Not Found',
-          description: 'Could not find your AI usage record.',
-        );
+        throw createTranslatedException('ai_usage_record_not_found', language);
       }
     }
 
@@ -282,10 +270,7 @@ class ScrappableChatSession extends Endpoint {
         stackTrace: s,
         level: LogLevel.error,
       );
-      throw ZenScrapException(
-        title: 'Failed to Save API Key',
-        description: 'Could not save your API key. Please try again.',
-      );
+      throw createTranslatedException('failed_to_save_api_key', language);
     }
 
     // Send success response to chat stream
@@ -307,17 +292,16 @@ class ScrappableChatSession extends Endpoint {
     required String url,
     required List<String> pathParams,
     required Map<String, String?> queryParams,
+    required SupportedLanguage language,
   }) async {
     final sessionId = _scrappableOpenedSessionsIds[scrappableId];
     if (sessionId == null) {
-      throw ZenScrapException(
-        title: 'Session Not Found',
-        description: 'No active session found for scrappable $scrappableId.',
-      );
+      throw createTranslatedException('session_not_found', language);
     }
 
     final ScrappableRequest? cachedRequest = _cacheScrappableRequest[sessionId];
     if (cachedRequest == null) {
+      // Internal error - scrappable request should exist in cache
       throw ZenScrapException(
         title: 'Scrappable Request Not Found',
         description: 'No scrappable request found for session $sessionId.',
@@ -349,6 +333,7 @@ class ScrappableChatSession extends Endpoint {
   Future<CreateSessionResponse> createSession(
     Session session, {
     required int scrappableId,
+    required SupportedLanguage language,
   }) async {
     final int? userId = session.authenticated?.userId;
     final bool isLoggedIn = userId != null;
@@ -374,10 +359,7 @@ class ScrappableChatSession extends Endpoint {
         'No scrappable found with id $scrappableId.',
         level: LogLevel.error,
       );
-      throw ZenScrapException(
-        title: 'Scrappable Not Found',
-        description: 'No scrappable found with id $scrappableId.',
-      );
+      throw createTranslatedException('scrappable_not_found', language);
     }
 
     // Variables for AI usage tracking
@@ -392,11 +374,7 @@ class ScrappableChatSession extends Endpoint {
         include: AccountInfo.include(accountAIUsage: AccountAIUsage.include()),
       );
       if (accountInfo == null || accountInfo.id != scrappable.accountId) {
-        throw ZenScrapException(
-          title: 'Authentication Required',
-          description:
-              'You must be the owner of this scrappable to create a session for it.',
-        );
+        throw createTranslatedException('authentication_required_session', language);
       }
 
       // Get AI usage for logged-in user
@@ -416,11 +394,10 @@ class ScrappableChatSession extends Endpoint {
       if (!usesOwnApiKey && accountAIUsage != null) {
         final remainingCredits = accountAIUsage.totalDollarsSpentFromTotalInUSD;
         if (remainingCredits <= 0) {
-          throw ZenScrapException(
-            title: 'AI Credits Exhausted',
-            description:
-                'You have used all your AI credits for this month (\$${kDefaultMonthlyAICreditsInDollars.toStringAsFixed(2)} limit). '
-                'Credits will reset next month, or you can add your own OpenAI API key in account settings to continue without limits.',
+          throw createTranslatedException(
+            'ai_credits_exhausted',
+            language,
+            params: {'limit': '\$${kDefaultMonthlyAICreditsInDollars.toStringAsFixed(2)}'},
           );
         }
       }
@@ -447,11 +424,10 @@ class ScrappableChatSession extends Endpoint {
           final remainingCredits =
               accountAIUsage.totalDollarsSpentFromTotalInUSD;
           if (remainingCredits <= 0) {
-            throw ZenScrapException(
-              title: 'AI Credits Exhausted',
-              description:
-                  'You have used all your AI credits for this month (\$${kDefaultMonthlyAICreditsInDollars.toStringAsFixed(2)} limit). '
-                  'Credits will reset next month, or you can add your own OpenAI API key in account settings to continue without limits.',
+            throw createTranslatedException(
+              'ai_credits_exhausted',
+              language,
+              params: {'limit': '\$${kDefaultMonthlyAICreditsInDollars.toStringAsFixed(2)}'},
             );
           }
         }
@@ -484,11 +460,7 @@ class ScrappableChatSession extends Endpoint {
     final bool isAlreadyAnyOpenedSession = _scrappableOpenedSessionsIds
         .containsKey(scrappable.id!);
     if (isAlreadyAnyOpenedSession) {
-      throw ZenScrapException(
-        title: 'Session Already Opened',
-        description:
-            'There is already an opened session for this scrappable.\nPlease close the existing session before creating a new one.',
-      );
+      throw createTranslatedException('session_already_opened', language);
     }
 
     final RedraftSrappableSessionId sessionUuid = uuid.v4();
@@ -570,6 +542,7 @@ class ScrappableChatSession extends Endpoint {
   Stream<ChatResponse> listenToScrappableRedraftSession(
     Session session, {
     required RedraftSrappableSessionId sessionUuid,
+    required SupportedLanguage language,
   }) {
     session.log('Listening to session $sessionUuid');
     session.addWillCloseListener((session) async {
@@ -577,10 +550,7 @@ class ScrappableChatSession extends Endpoint {
     });
     final subject = _scrapRedraftSessions[sessionUuid];
     if (subject == null) {
-      throw ZenScrapException(
-        title: 'Session Not Found',
-        description: 'No active session found for uuid $sessionUuid.',
-      );
+      throw createTranslatedException('session_not_found', language);
     }
     return subject.stream;
   }
@@ -589,29 +559,23 @@ class ScrappableChatSession extends Endpoint {
     Session session, {
     required RedraftSrappableSessionId sessionUuid,
     required AiModel aiModel,
+    required SupportedLanguage language,
   }) async {
-    final sessionNotFount = ZenScrapException(
-      title: 'Session Not Found',
-      description: 'No active session found for uuid $sessionUuid.',
-    );
     if (_chatSessions.containsKey(sessionUuid) == false) {
-      throw sessionNotFount;
+      throw createTranslatedException('session_not_found', language);
     }
     final scrappableId = _scrappableOpenedSessionsIds.entries
         .firstWhereOrNull((element) => element.value == sessionUuid)
         ?.key;
     if (scrappableId == null) {
-      throw sessionNotFount;
+      throw createTranslatedException('session_not_found', language);
     }
 
     // Validate plan for powerful model
     if (aiModel == AiModel.powerful) {
       final authenticationInfo = session.authenticated;
       if (authenticationInfo == null) {
-        throw ZenScrapException(
-          title: 'Authentication Required',
-          description: 'You must be logged in to use Gemini 2.5 Pro.',
-        );
+        throw createTranslatedException('authentication_required_ai_model', language);
       }
 
       final userId = authenticationInfo.userId;
@@ -621,20 +585,13 @@ class ScrappableChatSession extends Endpoint {
       );
 
       if (account == null) {
-        throw ZenScrapException(
-          title: 'Account Not Found',
-          description: 'Could not find account information.',
-        );
+        throw createTranslatedException('account_not_found', language);
       }
 
       // Check if user has at least Pro plan
       if (account.planTier == PlanTier.none ||
           account.planTier == PlanTier.basic) {
-        throw ZenScrapException(
-          title: 'Upgrade Required',
-          description:
-              'You need at least a Pro plan to use Gemini 2.5 Pro. Upgrade your plan to access advanced AI models.',
-        );
+        throw createTranslatedException('upgrade_required_ai_model', language);
       }
     }
 
@@ -646,19 +603,18 @@ class ScrappableChatSession extends Endpoint {
     Session session, {
     required RedraftSrappableSessionId sessionId,
     required String userPrompt,
+    required SupportedLanguage language,
   }) async* {
     session.log('Received message for session $sessionId');
     final chatController = _chatSessions[sessionId];
     if (chatController == null) {
-      throw ZenScrapException(
-        title: 'Session Not Found',
-        description: 'No active session found for uuid $sessionId.',
-      );
+      throw createTranslatedException('session_not_found', language);
     }
 
     if (!_cacheRefTestData.containsKey(sessionId) ||
         !_cacheScrappableRequest.containsKey(sessionId) ||
         !_cacheScrappingBeeExtractLogic.containsKey(sessionId)) {
+      // Internal cache error - not translated as it's a technical issue
       throw ZenScrapException(
         title: 'Cache Test Data Not Found',
         description: 'No cache test data found for session $sessionId.',

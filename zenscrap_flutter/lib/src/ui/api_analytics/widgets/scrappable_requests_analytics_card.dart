@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:intl/intl.dart';
 
@@ -48,6 +49,7 @@ class ScrappableRequestsAnalyticsCard extends StatelessWidget {
   }
   
   Widget _buildHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
         Expanded(
@@ -81,7 +83,7 @@ class ScrappableRequestsAnalyticsCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
-            'Last 12 hours',
+            l10n.api_analytics_last_12_hours,
             style: context.t.bodySmall,
           ),
         ),
@@ -90,6 +92,7 @@ class ScrappableRequestsAnalyticsCard extends StatelessWidget {
   }
   
   Widget _buildStatusChips(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Wrap(
       spacing: 8,
       runSpacing: 8,
@@ -97,34 +100,34 @@ class ScrappableRequestsAnalyticsCard extends StatelessWidget {
         if (item.maxConcurrencyExceededTotalCount > 0)
           _buildStatusChip(
             context: context,
-            label: 'Max concurrency exceeded',
+            label: l10n.api_analytics_max_concurrency_exceeded,
             count: item.maxConcurrencyExceededTotalCount,
             color: Colors.cyan,
           ),
         if (item.insufficientCreditsTotalCount > 0)
           _buildStatusChip(
             context: context,
-            label: 'Insufficient credits',
+            label: l10n.api_analytics_insufficient_credits_chip,
             count: item.insufficientCreditsTotalCount,
             color: Colors.purple,
           ),
         _buildStatusChip(
           context: context,
-          label: '2xx',
+          label: l10n.api_analytics_status_2xx,
           count: item.successTotalCount,
           color: Colors.green,
         ),
         if (item.clientErrorTotalCount > 0)
           _buildStatusChip(
             context: context,
-            label: '4xx',
+            label: l10n.api_analytics_status_4xx,
             count: item.clientErrorTotalCount,
             color: Colors.orange,
           ),
         if (item.serverErrorTotalCount > 0)
           _buildStatusChip(
             context: context,
-            label: '5xx',
+            label: l10n.api_analytics_status_5xx,
             count: item.serverErrorTotalCount,
             color: Colors.red,
           ),

@@ -13,6 +13,8 @@ import 'package:serverpod_auth_server/serverpod_auth_server.dart' as auth;
 import 'package:zenscrap_server/src/endpoints/public/scrappable_chat_session.dart';
 import 'package:zenscrap_server/src/routes/scrappable_api_route.dart';
 import 'package:zenscrap_server/src/webhooks/stripe_webhook.dart';
+import 'package:zenscrap_server/src/web/routes/terms_of_service_route.dart';
+import 'package:zenscrap_server/src/web/routes/privacy_policy_route.dart';
 import 'src/generated/protocol.dart';
 import 'src/generated/endpoints.dart';
 
@@ -32,6 +34,9 @@ void run(List<String> args) async {
   // Register API routes FIRST (before catch-all routes)
   pod.webServer.addRoute(StripeWebhookRoute(), '/stripe/webhook');
 
+  // Register Google Sign In route for web authentication
+  pod.webServer.addRoute(auth.RouteGoogleSignIn(), '/googlesignin');
+
   // Register Scrappable API routes
   pod.webServer
       .addRoute(ScrappableApiRoute(isProd: false), '/api/scrappable/test');
@@ -44,14 +49,25 @@ void run(List<String> args) async {
     '/static/**',
   );
 
-  // Setup single page app using Serverpod 3.0 SpaRoute (catch-all for remaining routes)
-  pod.webServer.addRoute(
-    SpaRoute(
-      Directory('web/app'),
-      fallback: File('web/app/index.html'),
-    ),
-    '/**',
-  );
+  // Register legal pages (Terms of Service and Privacy Policy)
+  pod.webServer.addRoute(TermsOfServiceRoute(), '/terms-of-service');
+  pod.webServer.addRoute(PrivacyPolicyRoute(), '/privacy-policy');
+
+  // Setup Flutter web app using Serverpod 3.0 FlutterRoute (catch-all for remaining routes)
+  // FlutterRoute is designed for Flutter WASM apps and automatically:
+  // - Handles SPA-style routing (falls back to index.html)
+  // - Adds WASM multi-threading headers (Cross-Origin-Opener-Policy, Cross-Origin-Embedder-Policy)
+  final flutterAppDir = Directory('web/app');
+  if (flutterAppDir.existsSync()) {
+    // Add explicit route for root path '/' to serve index.html
+    // This is needed because '/**' pattern may not match the root path in some versions
+    pod.webServer.addRoute(FlutterRoute(flutterAppDir), '/');
+    pod.webServer.addRoute(FlutterRoute(flutterAppDir), '/**');
+  } else {
+    // ignore: avoid_print
+    print(
+        '[Zenscrap] Warning: Flutter web app not found at ${flutterAppDir.path}');
+  }
 
   auth.AuthConfig.set(auth.AuthConfig(
     sendValidationEmail: onSendValidationEmail,

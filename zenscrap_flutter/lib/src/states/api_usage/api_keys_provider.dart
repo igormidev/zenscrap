@@ -19,7 +19,8 @@ class ApiKeysNotifier extends Notifier<ApiKeysState> {
     try {
       state = const ApiKeysState.loading();
 
-      final response = await _client.privateApiUsage.getApiKeysWithStats();
+      final language = ref.read(currentLanguageProvider);
+      final response = await _client.privateApiUsage.getApiKeysWithStats(language: language);
 
       state = ApiKeysState.loaded(
         apiKeys: response.apiKeys,
@@ -45,7 +46,8 @@ class ApiKeysNotifier extends Notifier<ApiKeysState> {
 
   Future<AccountApiKey?> createApiKey(BuildContext context, String name) async {
     try {
-      final newKey = await _client.privateApiUsage.createApiKey(name: name);
+      final language = ref.read(currentLanguageProvider);
+      final newKey = await _client.privateApiUsage.createApiKey(name: name, language: language);
 
       // Reload data to get updated stats
       await loadApiKeys();
@@ -90,7 +92,8 @@ class ApiKeysNotifier extends Notifier<ApiKeysState> {
 
   Future<bool> deactivateApiKey(BuildContext context, int keyId) async {
     try {
-      await _client.privateApiUsage.deactivateApiKey(apiKeyId: keyId);
+      final language = ref.read(currentLanguageProvider);
+      await _client.privateApiUsage.deactivateApiKey(apiKeyId: keyId, language: language);
       await loadApiKeys();
 
       if (context.mounted) {

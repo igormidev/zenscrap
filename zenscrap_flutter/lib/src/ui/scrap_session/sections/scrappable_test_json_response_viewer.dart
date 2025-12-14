@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:lottie/lottie.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
@@ -48,10 +49,11 @@ class _ScrappableTestJsonResponseViewerState
   void _copyToClipboard(String text) async {
     await Clipboard.setData(ClipboardData(text: text));
     if (mounted) {
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Copied to clipboard'),
-          duration: Duration(seconds: 1),
+        SnackBar(
+          content: Text(l10n.scrap_session_copied_to_clipboard),
+          duration: const Duration(seconds: 1),
         ),
       );
     }
@@ -77,18 +79,21 @@ class _ScrappableTestJsonResponseViewerState
                   topRight: Radius.circular(7),
                 ),
               ),
-              child: TabBar(
-                controller: _tabController,
-                labelColor: context.c.primary,
-                unselectedLabelColor: context.c.onSurfaceVariant,
-                indicatorColor: context.c.primary,
-                indicatorWeight: 3,
-                tabs: const [
-                  Tab(text: 'RESULT'),
-                  Tab(text: 'HTML'),
-                  Tab(text: 'Screenshot'),
-                ],
-              ),
+              child: Builder(builder: (context) {
+                final l10n = AppLocalizations.of(context)!;
+                return TabBar(
+                  controller: _tabController,
+                  labelColor: context.c.primary,
+                  unselectedLabelColor: context.c.onSurfaceVariant,
+                  indicatorColor: context.c.primary,
+                  indicatorWeight: 3,
+                  tabs: [
+                    Tab(text: l10n.scrap_session_tab_result),
+                    Tab(text: l10n.scrap_session_tab_html),
+                    Tab(text: l10n.scrap_session_tab_screenshot),
+                  ],
+                );
+              }),
             ),
             Expanded(
               child: ClipRRect(
@@ -180,8 +185,9 @@ class _JsonTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (testResponse == null || testResponse!.isEmpty) {
-      return const _EmptyStateWidget(message: 'No JSON response available');
+      return _EmptyStateWidget(message: l10n.scrap_session_no_json_response);
     }
 
     return MouseRegion(
@@ -240,14 +246,15 @@ class _HtmlTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (htmlData == null) {
-      return const _EmptyStateWidget(message: 'No HTML content available');
+      return _EmptyStateWidget(message: l10n.scrap_session_no_html_content);
     }
 
     final htmlString = utf8.decode(htmlData!.buffer.asUint8List());
 
     if (htmlString.isEmpty) {
-      return const _EmptyStateWidget(message: 'No HTML content available');
+      return _EmptyStateWidget(message: l10n.scrap_session_no_html_content);
     }
 
     return MouseRegion(
@@ -305,8 +312,9 @@ class _ScreenshotTabState extends State<_ScreenshotTab> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (widget.screenshotData == null) {
-      return const _EmptyStateWidget(message: 'No screenshot available');
+      return _EmptyStateWidget(message: l10n.scrap_session_no_screenshot);
     }
 
     return InteractiveViewer(
@@ -342,6 +350,7 @@ class _HoverControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -361,7 +370,7 @@ class _HoverControls extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.copy, size: 18),
             onPressed: onCopy,
-            tooltip: 'Copy',
+            tooltip: l10n.scrap_session_copy,
             padding: const EdgeInsets.all(4),
             constraints: const BoxConstraints(),
           ),
@@ -369,7 +378,7 @@ class _HoverControls extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.add, size: 18),
             onPressed: onIncreaseFontSize,
-            tooltip: 'Increase font size',
+            tooltip: l10n.scrap_session_increase_font_size,
             padding: const EdgeInsets.all(4),
             constraints: const BoxConstraints(),
           ),
@@ -377,7 +386,7 @@ class _HoverControls extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.remove, size: 18),
             onPressed: onDecreaseFontSize,
-            tooltip: 'Decrease font size',
+            tooltip: l10n.scrap_session_decrease_font_size,
             padding: const EdgeInsets.all(4),
             constraints: const BoxConstraints(),
           ),

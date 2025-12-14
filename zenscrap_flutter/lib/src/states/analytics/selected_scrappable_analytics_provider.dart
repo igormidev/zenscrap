@@ -23,12 +23,14 @@ class SelectedScrappableAnalyticsNotifier
     state = SelectedScrappableAnalyticsState.loading();
 
     try {
+      final language = ref.read(currentLanguageProvider);
       final result = await ref
           .read(clientProvider)
           .privateScrappableAnalytics
           .getScrappableAnalytics(
             scrappableId: scrappable.id!,
             page: _currentPage,
+            language: language,
           );
 
       state = SelectedScrappableAnalyticsState.withData(data: result);
@@ -52,12 +54,14 @@ class SelectedScrappableAnalyticsNotifier
 
     try {
       _currentPage++;
+      final language = ref.read(currentLanguageProvider);
       final result = await ref
           .read(clientProvider)
           .privateScrappableAnalytics
           .getScrappableAnalytics(
             scrappableId: currentData.scrappable.id!,
             page: _currentPage,
+            language: language,
           );
 
       // Merge the new data with existing data

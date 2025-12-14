@@ -2,7 +2,7 @@
 import 'package:serverpod_auth_server/serverpod_auth_server.dart';
 
 import 'package:serverpod/serverpod.dart';
-import 'package:zenscrap_server/src/core/default_classes.dart';
+import 'package:zenscrap_server/src/core/translations/error_translations.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class PrivateScrappableAnalyticsEndpoint extends Endpoint {
@@ -14,20 +14,18 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
     Session session, {
     int page = 1,
     AnalyticsTimeScope scope = AnalyticsTimeScope.last12Hours,
+    SupportedLanguage language = SupportedLanguage.en,
   }) async {
     const int pageSize = 20; // Fixed page size
     final authenticationInfo = session.authenticated;
-    if (authenticationInfo == null) throw defaultAuthenticationException;
+    if (authenticationInfo == null) throw _authenticationFailed(language);
     final userId = authenticationInfo.userId;
     final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
       session,
       where: (t) => t.userInfoId.equals(userId),
     );
     if (accountInfo == null) {
-      throw ZenScrapException(
-        title: 'Account Not Found',
-        description: 'No account information found for the authenticated user.',
-      );
+      throw _accountNotFoundForUser(language);
     }
     final now = DateTime.now();
 
@@ -157,31 +155,25 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
     Session session, {
     required int scrappableId,
     int page = 1,
+    SupportedLanguage language = SupportedLanguage.en,
   }) async {
     const int daysBack = 7;
     const int pageSize = 30; // Fixed page size
     final authenticationInfo = session.authenticated;
-    if (authenticationInfo == null) throw defaultAuthenticationException;
+    if (authenticationInfo == null) throw _authenticationFailed(language);
     final userId = authenticationInfo.userId;
     final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
       session,
       where: (t) => t.userInfoId.equals(userId),
     );
     if (accountInfo == null) {
-      throw ZenScrapException(
-        title: 'Account Not Found',
-        description: 'No account information found for the authenticated user.',
-      );
+      throw _accountNotFoundForUser(language);
     }
 
     // Verify scrappable ownership
     final scrappable = await Scrappable.db.findById(session, scrappableId);
     if (scrappable == null || scrappable.accountId != accountInfo.id) {
-      throw ZenScrapException(
-        title: 'Scrappable Not Found',
-        description:
-            'The requested scrappable was not found or you do not have access to it.',
-      );
+      throw _scrappableNotFoundOrNoAccess(language);
     }
 
     final now = DateTime.now();
@@ -226,14 +218,12 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
   Future<ScrappableUsageMetrics> getScrappableUsageMetrics(
     Session session, {
     required int scrappableId,
+    SupportedLanguage language = SupportedLanguage.en,
   }) async {
     // Verify scrappable exists
     final scrappable = await Scrappable.db.findById(session, scrappableId);
     if (scrappable == null) {
-      throw ZenScrapException(
-        title: 'Scrappable Not Found',
-        description: 'The requested scrappable was not found.',
-      );
+      throw _scrappableNotFound(language);
     }
 
     final now = DateTime.now();
@@ -279,3 +269,19 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
 }
 
 const int MAX_DAYS_ALLOWED = 30;
+
+// ============================================================================
+// Error-returning functions
+// ============================================================================
+
+ZenScrapException _authenticationFailed(SupportedLanguage lang) =>
+    createTranslatedException('authentication_failed', lang);
+
+ZenScrapException _accountNotFoundForUser(SupportedLanguage lang) =>
+    createTranslatedException('account_not_found_for_user', lang);
+
+ZenScrapException _scrappableNotFoundOrNoAccess(SupportedLanguage lang) =>
+    createTranslatedException('scrappable_not_found_or_no_access', lang);
+
+ZenScrapException _scrappableNotFound(SupportedLanguage lang) =>
+    createTranslatedException('scrappable_not_found', lang);

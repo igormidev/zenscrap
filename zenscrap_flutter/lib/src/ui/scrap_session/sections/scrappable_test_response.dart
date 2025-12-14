@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/convert_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/elements/animated_switch.dart';
@@ -31,6 +32,7 @@ class _ScrappableTestResponseState extends State<ScrappableTestResponse>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final testData = widget.testData;
     if (testData == null) return SizedBox.fromSize();
     final String? extractedJsonResult = widget.testData?.scrapResultJson;
@@ -43,8 +45,8 @@ class _ScrappableTestResponseState extends State<ScrappableTestResponse>
         ZenAnimatedSwitch(
           tabController: tabController,
           tabs: [
-            AnimatedSwitchItem("Test suite"),
-            AnimatedSwitchItem("Scrappable info"),
+            AnimatedSwitchItem(l10n.scrap_session_test_suite),
+            AnimatedSwitchItem(l10n.scrap_session_scrappable_info),
           ],
         ),
         SizedBox(height: 8),

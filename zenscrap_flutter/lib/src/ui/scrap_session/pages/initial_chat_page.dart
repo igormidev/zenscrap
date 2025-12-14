@@ -6,6 +6,7 @@ import 'package:form_validator/form_validator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 import 'package:simple_platform/simple_platform.dart';
+import 'package:zenscrap_flutter/src/core/mixins/create_scrappable_mixin.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
@@ -22,7 +23,7 @@ class InitialChatPage extends ConsumerStatefulWidget {
 }
 
 class _ChatViewPageState extends ConsumerState<InitialChatPage>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, CreateScrappableMixin {
   late AnimationController _controller;
   final _formKey = GlobalKey<FormState>();
   bool _hasStartedUrlInput = false;
@@ -70,35 +71,12 @@ class _ChatViewPageState extends ConsumerState<InitialChatPage>
   Future<void> _submitForm() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
-    final analytics = ref.read(analyticsServiceProvider);
-    final targetUrl = _referenceLinkEC.text;
-
-    // Track creation attempt
-    await analytics.trackScrappableCreationAttempt(
-      targetUrl: targetUrl,
-      promptLength: _promptEC.text.length,
+    // This will navigate to the creatingScrappable state which shows
+    // the AI thinking stream view
+    await createScrappableWithTracking(
+      targetUrl: _referenceLinkEC.text,
+      userPrompt: _promptEC.text,
     );
-
-    try {
-      // This will now navigate to the creatingScrappable state which shows
-      // the AI thinking stream view
-      await ref
-          .read(scrapChatProvider.notifier)
-          .createScrappable(targetUrl: targetUrl, userPrompt: _promptEC.text);
-
-      // Track success
-      // Note: scrappableId will be 0 here as the state might not be updated yet
-      await analytics.trackScrappableCreationSuccess(
-        targetUrl: targetUrl,
-        scrappableId: 0,
-      );
-    } catch (e) {
-      // Track failure
-      await analytics.trackScrappableCreationFailure(
-        targetUrl: targetUrl,
-        errorMessage: e.toString(),
-      );
-    }
   }
 
   @override

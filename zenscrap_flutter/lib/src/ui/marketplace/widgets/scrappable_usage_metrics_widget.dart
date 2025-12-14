@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 
@@ -38,8 +39,9 @@ class _ScrappableUsageMetricsWidgetState
 
     try {
       final client = ref.read(clientProvider);
+      final language = ref.read(currentLanguageProvider);
       final metrics = await client.privateScrappableAnalytics
-          .getScrappableUsageMetrics(scrappableId: widget.scrappableId);
+          .getScrappableUsageMetrics(scrappableId: widget.scrappableId, language: language);
 
       if (mounted) {
         setState(() {
@@ -63,7 +65,7 @@ class _ScrappableUsageMetricsWidgetState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Usage metrics (last 30 days)',
+          AppLocalizations.of(context)!.marketplace_usage_metrics_title,
           style: context.t.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -96,7 +98,7 @@ class _ScrappableUsageMetricsWidgetState
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Failed to load metrics',
+                    AppLocalizations.of(context)!.marketplace_failed_to_load_metrics,
                     style: context.t.bodySmall?.copyWith(
                       color: context.c.error,
                     ),
@@ -142,7 +144,7 @@ class _MetricsDisplay extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Text(
-              'No requests in the last 30 days',
+              AppLocalizations.of(context)!.marketplace_no_requests_last_30_days,
               style: context.t.bodyMedium?.copyWith(
                 color: context.c.onSurfaceVariant,
               ),
@@ -196,7 +198,7 @@ class _MetricsNumbers extends StatelessWidget {
         _MetricRow(
           icon: Icons.check_circle,
           iconColor: const Color(0xFF81C784), // Pastel green
-          label: 'Success',
+          label: AppLocalizations.of(context)!.marketplace_metrics_success,
           count: metrics.successCount,
           percentage: successRate,
         ),
@@ -204,7 +206,7 @@ class _MetricsNumbers extends StatelessWidget {
         _MetricRow(
           icon: Icons.error,
           iconColor: const Color(0xFFE57373), // Pastel red
-          label: 'Errors',
+          label: AppLocalizations.of(context)!.marketplace_metrics_errors,
           count: metrics.errorCount,
           percentage: errorRate,
         ),
@@ -220,7 +222,7 @@ class _MetricsNumbers extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Text(
-              'Total',
+              AppLocalizations.of(context)!.marketplace_metrics_total,
               style: context.t.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: context.c.onSurface,

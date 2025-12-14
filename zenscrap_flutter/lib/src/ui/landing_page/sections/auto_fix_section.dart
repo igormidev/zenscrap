@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 
 /// Section highlighting the unique auto-fix feature.
@@ -9,6 +10,7 @@ class AutoFixSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 100, horizontal: 40),
@@ -32,7 +34,7 @@ class AutoFixSection extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  'INDUSTRY FIRST',
+                  l10n.landing_autofix_badge,
                   style: context.t.labelSmall?.copyWith(
                     color: context.c.onTertiary,
                     fontWeight: FontWeight.bold,
@@ -47,7 +49,7 @@ class AutoFixSection extends StatelessWidget {
               .scale(begin: const Offset(0.8, 0.8), end: const Offset(1, 1)),
           const SizedBox(height: 24),
           Text(
-            'The Self-Healing Web Scraper',
+            l10n.landing_autofix_title,
             style: context.t.displaySmall?.copyWith(
               fontWeight: FontWeight.bold,
               color: context.c.onSurface,
@@ -61,7 +63,7 @@ class AutoFixSection extends StatelessWidget {
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 700),
             child: Text(
-              'Websites change. Your scrapers don\'t have to break. Our AI automatically detects when a target site updates and fixes your extraction rules—before you even notice.',
+              l10n.landing_autofix_subtitle,
               style: context.t.titleMedium?.copyWith(
                 color: context.c.onSurfaceVariant,
                 height: 1.6,
@@ -81,9 +83,8 @@ class AutoFixSection extends StatelessWidget {
                   child: _AutoFixStep(
                     icon: Icons.warning_amber_rounded,
                     iconColor: context.c.error,
-                    title: 'Site Changes Detected',
-                    description:
-                        'Our system monitors your scrapers and detects when extraction rules start failing.',
+                    title: l10n.landing_autofix_step1_title,
+                    description: l10n.landing_autofix_step1_description,
                     delay: 300,
                   ),
                 ),
@@ -92,9 +93,8 @@ class AutoFixSection extends StatelessWidget {
                   child: _AutoFixStep(
                     icon: Icons.psychology_rounded,
                     iconColor: context.c.tertiary,
-                    title: 'AI Analyzes & Adapts',
-                    description:
-                        'The AI examines the new page structure and generates updated extraction rules.',
+                    title: l10n.landing_autofix_step2_title,
+                    description: l10n.landing_autofix_step2_description,
                     delay: 500,
                   ),
                 ),
@@ -103,9 +103,8 @@ class AutoFixSection extends StatelessWidget {
                   child: _AutoFixStep(
                     icon: Icons.check_circle_rounded,
                     iconColor: Colors.green,
-                    title: 'Scraper Fixed',
-                    description:
-                        'Your endpoint continues working seamlessly. You receive an email notification.',
+                    title: l10n.landing_autofix_step3_title,
+                    description: l10n.landing_autofix_step3_description,
                     delay: 700,
                   ),
                 ),
@@ -142,7 +141,7 @@ class AutoFixSection extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Proactive Notifications',
+                      l10n.landing_autofix_notifications_title,
                       style: context.t.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: context.c.onSurface,
@@ -150,7 +149,7 @@ class AutoFixSection extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Get notified when a site changes and your scraper is being auto-fixed.',
+                      l10n.landing_autofix_notifications_description,
                       style: context.t.bodyMedium?.copyWith(
                         color: context.c.onSurfaceVariant,
                       ),
@@ -171,13 +170,13 @@ class AutoFixSection extends StatelessWidget {
               children: [
                 Expanded(
                   child: _ComparisonColumn(
-                    title: 'Without ZenScrap',
+                    title: l10n.landing_autofix_without_title,
                     isNegative: true,
-                    items: const [
-                      'Scraper breaks unexpectedly',
-                      'Hours spent debugging',
-                      'Lost data and revenue',
-                      'Constant maintenance burden',
+                    items: [
+                      l10n.landing_autofix_without_item1,
+                      l10n.landing_autofix_without_item2,
+                      l10n.landing_autofix_without_item3,
+                      l10n.landing_autofix_without_item4,
                     ],
                     delay: 1000,
                   ),
@@ -185,13 +184,13 @@ class AutoFixSection extends StatelessWidget {
                 const SizedBox(width: 24),
                 Expanded(
                   child: _ComparisonColumn(
-                    title: 'With ZenScrap',
+                    title: l10n.landing_autofix_with_title,
                     isNegative: false,
-                    items: const [
-                      'AI detects issues instantly',
-                      'Automatic fixes in minutes',
-                      'Zero data loss',
-                      'Set it and forget it',
+                    items: [
+                      l10n.landing_autofix_with_item1,
+                      l10n.landing_autofix_with_item2,
+                      l10n.landing_autofix_with_item3,
+                      l10n.landing_autofix_with_item4,
                     ],
                     delay: 1100,
                   ),

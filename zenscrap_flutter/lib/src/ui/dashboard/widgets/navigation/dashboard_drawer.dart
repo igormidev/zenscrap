@@ -53,7 +53,7 @@ class DashboardDrawer extends ConsumerWidget {
                   enabled: isActive,
                   icon: Icon(item.inactiveIcon),
                   selectedIcon: Icon(item.activeIcon),
-                  label: Text(item.label),
+                  label: Text(item.getLocalizedLabel(context)),
                 );
               }),
             ],

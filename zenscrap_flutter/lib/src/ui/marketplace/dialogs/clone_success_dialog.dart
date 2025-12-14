@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 
 class CloneSuccessDialog extends StatelessWidget {
@@ -50,17 +51,17 @@ class CloneSuccessDialog extends StatelessWidget {
             
             // Title
             Text(
-              'Scrappable Cloned Successfully!',
+              AppLocalizations.of(context)!.marketplace_clone_success_title,
               style: context.t.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),
-            
+
             // Description
             Text(
-              '"${clonedScrappable.name}" has been added to your endpoints',
+              AppLocalizations.of(context)!.marketplace_clone_success_message(clonedScrappable.name),
               style: context.t.bodyMedium?.copyWith(
                 color: context.c.onSurfaceVariant,
               ),
@@ -88,7 +89,7 @@ class CloneSuccessDialog extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'The cloned scrappable is private by default. You can make it public from the edit screen.',
+                      AppLocalizations.of(context)!.marketplace_clone_private_notice,
                       style: context.t.bodySmall?.copyWith(
                         color: context.c.primary,
                       ),
@@ -112,7 +113,7 @@ class CloneSuccessDialog extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                     icon: const Icon(Icons.folder_open_rounded),
-                    label: const Text('Go to Endpoints'),
+                    label: Text(AppLocalizations.of(context)!.marketplace_go_to_endpoints),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -126,7 +127,7 @@ class CloneSuccessDialog extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                     icon: const Icon(Icons.edit_rounded),
-                    label: const Text('Edit Scrappable'),
+                    label: Text(AppLocalizations.of(context)!.marketplace_edit_scrappable),
                   ),
                 ),
               ],
@@ -135,7 +136,7 @@ class CloneSuccessDialog extends StatelessWidget {
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
               child: Text(
-                'Close',
+                AppLocalizations.of(context)!.marketplace_close,
                 style: context.t.bodyMedium?.copyWith(
                   color: context.c.onSurfaceVariant,
                 ),

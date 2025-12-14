@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/ui/api_usage/widgets/credit_history_list.dart';
 
@@ -30,7 +31,7 @@ class HistorySection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Credit History',
+            AppLocalizations.of(context)!.api_usage_credit_history,
             style: context.t.titleLarge,
           ),
           const SizedBox(height: 16),

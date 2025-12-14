@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/serverpod_to_result.dart';
@@ -64,14 +65,15 @@ class _EditScrappableRequestDialogState
   }
 
   Future<void> _handleAddPathParam() async {
+    final l10n = AppLocalizations.of(context)!;
     final paramName = await showAddPathParameterDialog(context);
     if (paramName != null && paramName.isNotEmpty) {
       if (_pathParams.contains(paramName)) {
         if (mounted) {
           await showErrorDialog(
             context,
-            title: 'Duplicate Parameter',
-            description: 'This path parameter already exists.',
+            title: l10n.scrap_session_duplicate_param,
+            description: l10n.scrap_session_duplicate_path_param,
           );
         }
         return;
@@ -100,14 +102,15 @@ class _EditScrappableRequestDialogState
   }
 
   Future<void> _handleAddQueryParam() async {
+    final l10n = AppLocalizations.of(context)!;
     final result = await showQueryParameterDialog(context);
     if (result != null) {
       if (_queryParams.containsKey(result.key)) {
         if (mounted) {
           await showErrorDialog(
             context,
-            title: 'Duplicate Parameter',
-            description: 'This query parameter already exists.',
+            title: l10n.scrap_session_duplicate_param,
+            description: l10n.scrap_session_duplicate_query_param,
           );
         }
         return;
@@ -153,13 +156,14 @@ class _EditScrappableRequestDialogState
     final url = _urlController.text;
     final urlPathParams = _extractPathParamsFromUrl(url);
 
+    final l10n = AppLocalizations.of(context)!;
     // Check if all path params in URL are in the pathParams list
     final missingParams =
         urlPathParams.where((param) => !_pathParams.contains(param)).toList();
     if (missingParams.isNotEmpty) {
       await showErrorDialog(
         context,
-        title: 'Missing Path Parameters',
+        title: l10n.scrap_session_missing_path_params,
         description:
             'The following path parameters are used in the URL but not defined: ${missingParams.join(", ")}\n\nPlease add them to the path parameters section or remove them from the URL.',
       );
@@ -172,7 +176,7 @@ class _EditScrappableRequestDialogState
     if (unusedParams.isNotEmpty) {
       await showErrorDialog(
         context,
-        title: 'Unused Path Parameters',
+        title: l10n.scrap_session_unused_path_params,
         description:
             'The following path parameters are defined but not used in the URL: ${unusedParams.join(", ")}\n\nPlease use them in the URL as {paramName} or remove them from the path parameters section.',
       );
@@ -181,12 +185,14 @@ class _EditScrappableRequestDialogState
 
     // Call API to update the scrappable request
     final client = ref.read(clientProvider);
+    final language = ref.read(currentLanguageProvider);
     final result = await client.scrappableChatSession
         .updateScrappableRequest(
           scrappableId: widget.scrappableId,
           url: url,
           pathParams: _pathParams,
           queryParams: _queryParams,
+          language: language,
         )
         .toResult;
 
@@ -194,8 +200,8 @@ class _EditScrappableRequestDialogState
       (_) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Scrappable request updated successfully!'),
+            SnackBar(
+              content: Text(l10n.scrap_session_request_updated),
             ),
           );
           Navigator.of(context).pop();
@@ -217,6 +223,7 @@ class _EditScrappableRequestDialogState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Dialog(
       child: Container(
         width: MediaQuery.of(context).size.width * 0.7,
@@ -246,14 +253,14 @@ class _EditScrappableRequestDialogState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Edit Scrappable Request',
+                        l10n.scrap_session_edit_request_title,
                         style: context.t.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Customize the URL template, path parameters, and query parameters',
+                        l10n.scrap_session_edit_request_subtitle,
                         style: context.t.bodyMedium?.copyWith(
                           color: context.c.onSurfaceVariant,
                         ),
@@ -264,7 +271,7 @@ class _EditScrappableRequestDialogState
                 IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () => Navigator.of(context).pop(),
-                  tooltip: 'Close',
+                  tooltip: l10n.scrap_session_close,
                 ),
               ],
             ),
@@ -290,7 +297,7 @@ class _EditScrappableRequestDialogState
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'Path parameters should be wrapped in curly braces like {userId} or {postId}. They represent dynamic segments in the URL that will be replaced with actual values.',
+                      l10n.scrap_session_path_params_hint('postId', 'userId'),
                       style: context.t.bodySmall?.copyWith(
                         color: context.c.onSurface,
                       ),
@@ -321,7 +328,7 @@ class _EditScrappableRequestDialogState
                                 horizontal: 16,
                                 vertical: 12,
                               ),
-                              helperText: 'Use {paramName} for path parameters',
+                              helperText: l10n.scrap_session_use_param_name('{paramName}'),
                               helperMaxLines: 2,
                             ),
                             style: context.t.bodyMedium?.copyWith(
@@ -338,7 +345,7 @@ class _EditScrappableRequestDialogState
                           child: FilledButton.icon(
                             onPressed: _hasChanges ? _handleSave : null,
                             icon: const Icon(Icons.save),
-                            label: const Text('Save Changes'),
+                            label: Text(l10n.scrap_session_save_changes),
                             style: FilledButton.styleFrom(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 24,

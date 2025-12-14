@@ -1,6 +1,7 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart';
 import 'package:zenscrap_server/src/core/default_classes.dart';
+import 'package:zenscrap_server/src/core/translations/error_translations.dart';
 import 'package:zenscrap_server/src/endpoints/public/scrappable_chat_session.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
@@ -11,13 +12,10 @@ mixin DeployEndpointMixin {
     required ReferenceTestData testData,
     required ScrappingBeeExtractLogic scrappingBeeExtractLogic,
     required ScrappableRequest scrappableRequest,
+    SupportedLanguage language = SupportedLanguage.en,
   }) async {
     if (testData.byteData == null) {
-      throw ZenScrapException(
-        title: 'No byte data to deploy',
-        description:
-            'You cannot deploy reference test data that does not have any byte data yet',
-      );
+      throw createTranslatedException('no_byte_data_to_deploy', language);
     }
 
     final int? userId = session.authenticated?.userId;
@@ -40,7 +38,7 @@ mixin DeployEndpointMixin {
         transaction: transaction,
       );
       if (accountInfo == null) {
-        throw defaultAuthenticationException;
+        throw createDefaultAuthenticationException(language);
       }
       scrappable = await Scrappable.db.findFirstRow(
         session,
@@ -55,11 +53,8 @@ mixin DeployEndpointMixin {
     }
 
     if (scrappable == null) {
-      throw ZenScrapException(
-        title: 'Authentication Required or Reference Data does not exist',
-        description:
-            'You probably must be authenticated to modify this reference test data - or you misstyped the id of it',
-      );
+      throw createTranslatedException(
+          'authentication_or_reference_data', language);
     }
 
     await Scrappable.db.updateRow(

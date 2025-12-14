@@ -1,5 +1,6 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart';
+import 'package:zenscrap_server/src/core/translations/error_translations.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class EditScrappableEndpoint extends Endpoint {
@@ -8,6 +9,7 @@ class EditScrappableEndpoint extends Endpoint {
     required int scrappableId,
     required String name,
     required String description,
+    required SupportedLanguage language,
     ScraperCategory? category,
     bool? willHideFromMarketplace,
   }) async {
@@ -21,20 +23,14 @@ class EditScrappableEndpoint extends Endpoint {
     );
 
     if (scrappable == null) {
-      throw ZenScrapException(
-        title: 'Scrappable Not Found',
-        description: 'The scrappable with the provided ID does not exist.',
-      );
+      throw createTranslatedException('scrappable_not_found', language);
     }
 
     // Check permissions
     if (scrappable.accountId != null) {
       // Scrappable has an owner - check if current user is the owner
       if (userId == null) {
-        throw ZenScrapException(
-          title: 'Authentication Required',
-          description: 'You must be logged in to edit this scrappable.',
-        );
+        throw createTranslatedException('authentication_required_edit', language);
       }
 
       // Get the account info for the logged-in user
@@ -44,10 +40,7 @@ class EditScrappableEndpoint extends Endpoint {
       );
 
       if (userAccount == null || userAccount.id != scrappable.accountId) {
-        throw ZenScrapException(
-          title: 'Permission Denied',
-          description: 'You do not have permission to edit this scrappable.',
-        );
+        throw createTranslatedException('permission_denied_edit', language);
       }
     }
     // If scrappable.accountId is null, anyone can edit it (no owner)
@@ -57,30 +50,26 @@ class EditScrappableEndpoint extends Endpoint {
     final trimmedDescription = description.trim();
 
     if (trimmedName.isEmpty) {
-      throw ZenScrapException(
-        title: 'Invalid Name',
-        description: 'Scrappable name cannot be empty.',
-      );
+      throw createTranslatedException('invalid_name', language);
     }
 
     if (trimmedName.length > 50) {
-      throw ZenScrapException(
-        title: 'Name Too Long',
-        description: 'Scrappable name must be 50 characters or less.',
+      throw createTranslatedException(
+        'name_too_long',
+        language,
+        params: {'maxLength': '50'},
       );
     }
 
     if (trimmedDescription.isEmpty) {
-      throw ZenScrapException(
-        title: 'Invalid Description',
-        description: 'Scrappable description cannot be empty.',
-      );
+      throw createTranslatedException('invalid_description', language);
     }
 
     if (trimmedDescription.length > 220) {
-      throw ZenScrapException(
-        title: 'Description Too Long',
-        description: 'Scrappable description must be 220 characters or less.',
+      throw createTranslatedException(
+        'description_too_long',
+        language,
+        params: {'maxLength': '220'},
       );
     }
 
@@ -98,11 +87,7 @@ class EditScrappableEndpoint extends Endpoint {
     if (willHideFromMarketplace != null) {
       // Check if user has Ultra plan permission
       if (userId == null) {
-        throw ZenScrapException(
-          title: 'Authentication Required',
-          description:
-              'You must be logged in to hide scrappables from marketplace.',
-        );
+        throw createTranslatedException('authentication_required_marketplace', language);
       }
 
       // Get the account info for plan check
@@ -112,11 +97,7 @@ class EditScrappableEndpoint extends Endpoint {
       );
 
       if (userAccount == null || userAccount.planTier != PlanTier.ultra) {
-        throw ZenScrapException(
-          title: 'Ultra Plan Required',
-          description:
-              'Hiding scrappables from marketplace is only available for Ultra plan users.',
-        );
+        throw createTranslatedException('ultra_plan_required_marketplace', language);
       }
 
       scrappable.willHideFromMarketplace = willHideFromMarketplace;
@@ -130,10 +111,7 @@ class EditScrappableEndpoint extends Endpoint {
         'Failed to update scrappable: $e',
         level: LogLevel.error,
       );
-      throw ZenScrapException(
-        title: 'Update Failed',
-        description: 'Failed to update the scrappable. Please try again.',
-      );
+      throw createTranslatedException('update_failed', language);
     }
   }
 }

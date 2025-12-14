@@ -5,7 +5,9 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
+import 'package:seo/seo.dart';
 import 'package:serverpod_auth_email_flutter/serverpod_auth_email_flutter.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/core/mixins/edit_scrappable.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/contact_support_button.dart';
@@ -19,6 +21,7 @@ import 'package:zenscrap_flutter/src/design_system/widgets/scrappable_card_indic
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_state.dart';
 import 'package:zenscrap_flutter/src/ui/legal/terms_of_service_dialog.dart';
+import 'package:zenscrap_flutter/src/ui/legal/privacy_policy_dialog.dart';
 
 class AuthView extends ConsumerStatefulWidget {
   const AuthView({super.key});
@@ -74,11 +77,12 @@ class _AuthViewState extends ConsumerState<AuthView>
   }
 
   Future<void> _onSuccessConfirmEmail() async {
+    final l10n = AppLocalizations.of(context)!;
     await showOkAlertDialog(
       context: context,
-      title: 'Email confirmed!',
-      message: 'Now you can log in with your email and password.',
-      okLabel: 'OK',
+      title: l10n.auth_email_confirmed_title,
+      message: l10n.auth_email_confirmed_message,
+      okLabel: l10n.auth_ok_button,
       barrierDismissible: true,
       useRootNavigator: false,
     );
@@ -105,9 +109,30 @@ class _AuthViewState extends ConsumerState<AuthView>
 
     final double screenWidth = MediaQuery.sizeOf(context).width;
     final bool isCompactSize = screenWidth < 1060.0;
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      body: Stack(
+
+    // SEO meta tags for the authentication page
+    return Seo.head(
+      tags: [
+        const MetaTag(
+          name: 'title',
+          content: 'Sign In | ZenScrap - AI-Powered Web Scraping Platform',
+        ),
+        const MetaTag(
+          name: 'description',
+          content:
+              'Sign in or create your ZenScrap account. Access AI-powered web scrapers, manage your endpoints, and start extracting data automatically.',
+        ),
+        const MetaTag(
+          name: 'keywords',
+          content:
+              'ZenScrap login, sign in, create account, web scraping account, API access',
+        ),
+        const MetaTag(name: 'robots', content: 'index, follow'),
+        const LinkTag(rel: 'canonical', href: 'https://zenscrap.com/auth'),
+      ],
+      child: Scaffold(
+        backgroundColor: Colors.grey[100],
+        body: Stack(
         children: [
           SizedBox.expand(
             child: Lottie.network(
@@ -123,16 +148,29 @@ class _AuthViewState extends ConsumerState<AuthView>
                 duration: const Duration(seconds: 1),
                 delay: const Duration(milliseconds: 800),
               ),
-          // Terms of Service link - bottom right corner
+          // Terms of Service and Privacy Policy links - bottom right corner
           Positioned(
             bottom: 16,
             right: 16,
-            child: TermsOfServiceLink(
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.grey[600],
-                    decoration: TextDecoration.underline,
-                    decorationColor: Colors.grey[600],
-                  ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TermsOfServiceLink(
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Colors.grey[600],
+                        decoration: TextDecoration.underline,
+                        decorationColor: Colors.grey[600],
+                      ),
+                ),
+                const SizedBox(width: 16),
+                PrivacyPolicyLink(
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Colors.grey[600],
+                        decoration: TextDecoration.underline,
+                        decorationColor: Colors.grey[600],
+                      ),
+                ),
+              ],
             ),
           ),
           Center(
@@ -172,7 +210,7 @@ class _AuthViewState extends ConsumerState<AuthView>
                                     ),
                                   ),
                                 Text(
-                                  'Welcome',
+                                  AppLocalizations.of(context)!.auth_welcome,
                                   style: Theme.of(
                                     context,
                                   ).textTheme.displayMedium,
@@ -239,7 +277,7 @@ class _AuthViewState extends ConsumerState<AuthView>
                                   SizedBox(height: 8),
                                 ],
                                 Text(
-                                  'Welcome',
+                                  AppLocalizations.of(context)!.auth_welcome,
                                   style: Theme.of(
                                     context,
                                   ).textTheme.displayLarge,
@@ -312,7 +350,8 @@ class _AuthViewState extends ConsumerState<AuthView>
           ),
         ],
       ),
-    );
+      ), // End of Seo.head child: Scaffold
+    ); // End of Seo.head
   }
 }
 
@@ -364,17 +403,18 @@ class AuthContainer extends StatelessWidget {
                 builder: (context, String? passwordEmail, child) {
                   final isPasswordEmail = passwordEmail != null;
                   final isHover = isEmailActivated || isPasswordEmail;
+                  final l10n = AppLocalizations.of(context)!;
                   return IgnorePointer(
                     ignoring: isHover,
                     child: Opacity(
                       opacity: isHover ? 0.7 : 1,
                       child: TabBar(
                         controller: tabController,
-                        tabs: const [
-                          Tab(text: 'Login', icon: Icon(Icons.login)),
-                          Tab(text: 'Sign In', icon: Icon(Icons.person_add)),
+                        tabs: [
+                          Tab(text: l10n.auth_login_tab, icon: Icon(Icons.login)),
+                          Tab(text: l10n.auth_sign_up_tab, icon: Icon(Icons.person_add)),
                           Tab(
-                            text: 'Password Reset',
+                            text: l10n.auth_password_reset_tab,
                             icon: Icon(Icons.vpn_key),
                           ),
                         ],

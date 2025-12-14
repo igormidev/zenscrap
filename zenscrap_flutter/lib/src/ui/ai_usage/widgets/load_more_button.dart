@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 
 /// A styled "Load More" button for paginated lists.
 class LoadMoreButton extends StatelessWidget {
   final bool isLoading;
   final VoidCallback onPressed;
-  final String label;
+  final String? label;
 
   const LoadMoreButton({
     super.key,
     required this.isLoading,
     required this.onPressed,
-    this.label = 'Load More',
+    this.label,
   });
 
   @override
   Widget build(BuildContext context) {
+    final displayLabel = label ?? AppLocalizations.of(context)!.ai_usage_load_more;
+
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton(
@@ -45,7 +48,7 @@ class LoadMoreButton extends StatelessWidget {
                 children: [
                   const Icon(Icons.expand_more, size: 20),
                   const SizedBox(width: 8),
-                  Text(label),
+                  Text(displayLabel),
                 ],
               ),
       ),

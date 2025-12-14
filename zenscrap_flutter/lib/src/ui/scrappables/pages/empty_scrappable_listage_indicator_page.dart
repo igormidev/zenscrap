@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pricing_page/pricing_page.dart';
@@ -25,7 +26,7 @@ class EmptyScrappableListageIndicatorPage extends StatelessWidget {
           ).animate().fadeIn(delay: 500.ms),
           SizedBox(height: 20),
           Text(
-            'You did not create any scrappables yet.',
+            AppLocalizations.of(context)!.scrappables_empty_title,
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 32),
@@ -34,7 +35,7 @@ class EmptyScrappableListageIndicatorPage extends StatelessWidget {
               context.push('/scrappable-form');
             },
             icon: const Icon(Icons.add),
-            label: const Text('Create your first scrappable'),
+            label: Text(AppLocalizations.of(context)!.scrappables_create_first),
           ),
           const SizedBox(height: 32),
         ],

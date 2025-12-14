@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/plan_tier_extension.dart';
 import 'package:zenscrap_flutter/src/core/mixins/edit_scrappable.dart';
@@ -20,6 +21,7 @@ import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_prov
 import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables_provider.dart';
 import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables_state.dart';
 import 'package:zenscrap_flutter/src/ui/marketplace/dialogs/upgrade_plan_dialog.dart';
+import 'package:zenscrap_flutter/src/ui/scrappables/dialogs/create_scrappable_dialog.dart';
 import 'package:zenscrap_flutter/src/ui/scrappables/pages/empty_scrappable_listage_indicator_page.dart';
 
 class UserScrappablesListage extends ConsumerStatefulWidget {
@@ -43,9 +45,9 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
   @override
   Widget build(BuildContext context) {
     final analytics = ref.read(analyticsServiceProvider);
-    final accountId = ref.watch(accountProvider).mapOrNull(
-          withData: (value) => value.accountInfo.id,
-        );
+    final accountId = ref
+        .watch(accountProvider)
+        .mapOrNull(withData: (value) => value.accountInfo.id);
     final state = ref.watch(userScrappablesProvider);
 
     return state.map(
@@ -80,7 +82,7 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
           selectedCategories: data.selectedCategories,
           contentWidget: EmptyScrappablesState(
             isSearchResult: false,
-            title: 'Error loading endpoints',
+            title: AppLocalizations.of(context)!.scrappables_error_loading,
             description: data.error.description,
             icon: Icons.error_outline_rounded,
           ),
@@ -107,12 +109,15 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
         }
 
         // Content widget based on whether we have scrappables
+        final l10n = AppLocalizations.of(context)!;
         final contentWidget = scrappables.isEmpty
             ? EmptyScrappablesState(
                 isSearchResult: true,
                 searchQuery: searchQuery.isNotEmpty
                     ? searchQuery
-                    : 'the selected ${selectedCategories.length == 1 ? 'category' : 'categories'}',
+                    : (selectedCategories.length == 1
+                          ? l10n.scrappables_selected_category
+                          : l10n.scrappables_selected_categories),
                 onClearSearch: () {
                   if (searchQuery.isNotEmpty) {
                     ref.read(userScrappablesProvider.notifier).search('');
@@ -123,10 +128,10 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
                         .filterByCategories({});
                   }
                 },
-                title: 'No endpoints found',
+                title: l10n.scrappables_no_results,
                 description: searchQuery.isNotEmpty
-                    ? 'Try searching with different keywords or adjust your filters.'
-                    : 'Try selecting different categories or clear your filters.',
+                    ? l10n.scrappables_try_different_keywords
+                    : l10n.scrappables_try_different_categories,
               )
             : ScrappablesListageTemplate(
                 scrappables: scrappables,
@@ -177,14 +182,14 @@ class _UserScrappablesLayout extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Get account info for plan tier
     final accountState = ref.watch(accountProvider);
-    final planTier = accountState.mapOrNull(
-          withData: (data) => data.accountInfo.planTier,
-        ) ??
+    final planTier =
+        accountState.mapOrNull(withData: (data) => data.accountInfo.planTier) ??
         PlanTier.none;
 
     // Get total user scrappables count from state
     final scrappablesState = ref.watch(userScrappablesProvider);
-    final totalUserScrappables = scrappablesState.mapOrNull(
+    final totalUserScrappables =
+        scrappablesState.mapOrNull(
           withData: (data) => data.response.pagination.totalUserScrappables,
           loading: (data) => data.response?.pagination.totalUserScrappables,
           withError: (data) => data.response?.pagination.totalUserScrappables,
@@ -193,6 +198,7 @@ class _UserScrappablesLayout extends ConsumerWidget {
 
     final maxAllowed = planTier.maxScrappables;
     final isAtLimit = totalUserScrappables >= maxAllowed;
+    final l10n = AppLocalizations.of(context)!;
 
     return Padding(
       padding: const EdgeInsets.only(right: 20),
@@ -202,45 +208,23 @@ class _UserScrappablesLayout extends ConsumerWidget {
           Row(
             children: [
               Text(
-                'Your endpoints',
+                l10n.scrappables_your_endpoints,
                 style: context.t.displaySmall,
               ),
               const Spacer(),
-              FilledButton.tonalIcon(
-                onPressed: () async {
-                  // Track create new click
-                  await analytics.trackUserScrappablesCreateNewClick();
-
-                  // Check if user is at their endpoint limit
-                  if (isAtLimit) {
-                    if (!context.mounted) return;
-                    await showEndpointLimitUpgradeDialog(
-                      context,
-                      currentCount: totalUserScrappables,
-                      maxAllowed: maxAllowed,
-                      currentPlan: planTier,
-                      nextPlan: planTier.nextTier,
-                    );
-                    return;
-                  }
-
-                  ref.read(scrapChatProvider.notifier).reset();
-                  if (!context.mounted) return;
-                  final result = await context.push('/scrappable-form');
-                  if (result == true) {
-                    unawaited(ref
-                        .read(userScrappablesProvider.notifier)
-                        .getScrappables());
-                  }
-                },
-                label: const Text('Create new endpoint'),
-                icon: const Icon(Icons.add),
+              CreateNewScrappable(
+                analytics: analytics,
+                isAtLimit: isAtLimit,
+                totalUserScrappables: totalUserScrappables,
+                maxAllowed: maxAllowed,
+                planTier: planTier,
+                l10n: l10n,
               ),
             ],
           ),
           const SizedBox(height: 16),
           ScrappablesSearchBar(
-            hintText: 'Search your endpoints by name or description...',
+            hintText: l10n.scrappables_search_hint,
             onSearch: (query) {
               ref.read(userScrappablesProvider.notifier).search(query);
             },
@@ -267,6 +251,62 @@ class _UserScrappablesLayout extends ConsumerWidget {
           Expanded(child: contentWidget),
         ],
       ),
+    );
+  }
+}
+
+class CreateNewScrappable extends ConsumerWidget {
+  const CreateNewScrappable({
+    super.key,
+    required this.analytics,
+    required this.isAtLimit,
+    required this.totalUserScrappables,
+    required this.maxAllowed,
+    required this.planTier,
+    required this.l10n,
+  });
+
+  final dynamic analytics;
+  final bool isAtLimit;
+  final int totalUserScrappables;
+  final int maxAllowed;
+  final PlanTier planTier;
+  final AppLocalizations l10n;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return FilledButton.tonalIcon(
+      onPressed: () async {
+        // Track create new click
+        await analytics.trackUserScrappablesCreateNewClick();
+
+        // Check if user is at their endpoint limit
+        if (isAtLimit) {
+          if (!context.mounted) return;
+          await showEndpointLimitUpgradeDialog(
+            context,
+            currentCount: totalUserScrappables,
+            maxAllowed: maxAllowed,
+            currentPlan: planTier,
+            nextPlan: planTier.nextTier,
+          );
+          // return;
+        }
+
+        ref.read(scrapChatProvider.notifier).reset();
+        if (!context.mounted) return;
+
+        // Show the create scrappable dialog
+        final result = await CreateScrappableDialog.show(context);
+        if (result == true && context.mounted) {
+          // Navigate to /scrappable-form which shows LandingPage
+          // LandingPage handles the creatingScrappable state (shows AI thinking dialog)
+          // and switches to ScrappableEditSessionView when state becomes standard
+          context.go('/scrappable-form');
+        }
+      },
+      label: Text(l10n.scrappables_create_new),
+      icon: const Icon(Icons.add),
     );
   }
 }

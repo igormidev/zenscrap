@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/states/marketplace/marketplace_provider.dart';
 
@@ -39,8 +40,8 @@ class EmptyMarketplacePage extends ConsumerWidget {
             const SizedBox(height: 24),
             Text(
               isSearchResult
-                  ? 'No results found'
-                  : 'No scrappables available',
+                  ? AppLocalizations.of(context)!.marketplace_no_results_found
+                  : AppLocalizations.of(context)!.marketplace_no_scrappables_available,
               style: context.t.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -48,8 +49,8 @@ class EmptyMarketplacePage extends ConsumerWidget {
             const SizedBox(height: 12),
             Text(
               isSearchResult
-                  ? 'No scrappables match "$searchQuery". Try adjusting your search.'
-                  : 'The marketplace is currently empty. Check back later for new scrappables.',
+                  ? AppLocalizations.of(context)!.marketplace_no_scrappables_match(searchQuery)
+                  : AppLocalizations.of(context)!.marketplace_empty_message,
               style: context.t.bodyMedium?.copyWith(
                 color: context.c.onSurfaceVariant,
               ),
@@ -62,7 +63,7 @@ class EmptyMarketplacePage extends ConsumerWidget {
                   ref.read(marketplaceProvider.notifier).search('');
                 },
                 icon: const Icon(Icons.clear_rounded),
-                label: const Text('Clear Search'),
+                label: Text(AppLocalizations.of(context)!.marketplace_clear_search),
               ),
             ],
           ],

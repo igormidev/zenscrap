@@ -1,0 +1,8 @@
+enum: SupportedLanguage
+values:
+  - en
+  - es
+  - de
+  - fr
+  - ptBR
+  - ja

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
 
@@ -21,7 +22,7 @@ class VersionIndicator extends StatelessWidget {
         return Center(
           child: Text(
             versionText?.call(currentVersionString) ??
-                'App version: $currentVersionString',
+                AppLocalizations.of(context)!.dashboard_app_version(currentVersionString),
           ),
         );
       },
@@ -62,7 +63,7 @@ class ExpandButton extends StatelessWidget {
             }),
             Text(switch (selectedNavigationType) {
               NavigationType.rail => '',
-              NavigationType.drawer => 'Collapse tab',
+              NavigationType.drawer => AppLocalizations.of(context)!.dashboard_collapse_tab,
             }),
             const SizedBox(width: 8),
           ],
