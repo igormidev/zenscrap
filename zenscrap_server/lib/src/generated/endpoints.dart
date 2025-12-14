@@ -34,9 +34,9 @@ import 'package:zenscrap_server/src/generated/entities/analytics/analytics_time_
     as _i19;
 import 'package:zenscrap_server/src/generated/entities/scrappable/scraper_category.dart'
     as _i20;
-import 'package:zenscrap_server/src/generated/entities/account/plan_tier.dart'
-    as _i21;
 import 'package:zenscrap_server/src/generated/entities/scrappable/ai_model.dart'
+    as _i21;
+import 'package:zenscrap_server/src/generated/entities/account/plan_tier.dart'
     as _i22;
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i23;
 
@@ -842,6 +842,26 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<bool?>(),
               nullable: true,
             ),
+            'autoFixEnabled': _i1.ParameterDescription(
+              name: 'autoFixEnabled',
+              type: _i1.getType<bool?>(),
+              nullable: true,
+            ),
+            'autoFixConsecutiveErrorThreshold': _i1.ParameterDescription(
+              name: 'autoFixConsecutiveErrorThreshold',
+              type: _i1.getType<int?>(),
+              nullable: true,
+            ),
+            'autoFixPreferredAiModel': _i1.ParameterDescription(
+              name: 'autoFixPreferredAiModel',
+              type: _i1.getType<_i21.AiModel?>(),
+              nullable: true,
+            ),
+            'autoFixUseAutoAiModel': _i1.ParameterDescription(
+              name: 'autoFixUseAutoAiModel',
+              type: _i1.getType<bool?>(),
+              nullable: true,
+            ),
           },
           call:
               (
@@ -858,6 +878,12 @@ class Endpoints extends _i1.EndpointDispatch {
                         category: params['category'],
                         willHideFromMarketplace:
                             params['willHideFromMarketplace'],
+                        autoFixEnabled: params['autoFixEnabled'],
+                        autoFixConsecutiveErrorThreshold:
+                            params['autoFixConsecutiveErrorThreshold'],
+                        autoFixPreferredAiModel:
+                            params['autoFixPreferredAiModel'],
+                        autoFixUseAutoAiModel: params['autoFixUseAutoAiModel'],
                       ),
         ),
       },
@@ -957,7 +983,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'planTier': _i1.ParameterDescription(
               name: 'planTier',
-              type: _i1.getType<_i21.PlanTier>(),
+              type: _i1.getType<_i22.PlanTier>(),
               nullable: false,
             ),
           },
@@ -1142,7 +1168,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'aiModel': _i1.ParameterDescription(
               name: 'aiModel',
-              type: _i1.getType<_i22.AiModel>(),
+              type: _i1.getType<_i21.AiModel>(),
               nullable: false,
             ),
             'language': _i1.ParameterDescription(

@@ -33,7 +33,16 @@ class _ScrappableEditVisualizationState
       child: ScrappableEditForm(
         scrappable: widget.scrappable,
         shouldPopOnEnd: false,
-        onSave: (name, description, category, willHideFromMarketplace) async {
+        onSave: (
+          name,
+          description,
+          category,
+          willHideFromMarketplace, {
+          bool? autoFixEnabled,
+          int? autoFixThreshold,
+          AiModel? autoFixAiModel,
+          bool? autoFixUseAutoAiModel,
+        }) async {
           return onEditScrappable(
             widget.scrappable,
             name,
@@ -48,6 +57,10 @@ class _ScrappableEditVisualizationState
                     category: category,
                   );
             },
+            autoFixEnabled: autoFixEnabled,
+            autoFixConsecutiveErrorThreshold: autoFixThreshold,
+            autoFixPreferredAiModel: autoFixAiModel,
+            autoFixUseAutoAiModel: autoFixUseAutoAiModel,
           );
         },
       ),

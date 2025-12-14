@@ -48,17 +48,17 @@ import 'package:zenscrap_client/src/protocol/entities/scrappable/scraper_categor
     as _i19;
 import 'package:zenscrap_client/src/protocol/entities/create_scrappable_stream/create_scrappable_stream_item.dart'
     as _i20;
-import 'package:zenscrap_client/src/protocol/entities/marketplace/paginated_scrappable_response.dart'
-    as _i21;
-import 'package:zenscrap_client/src/protocol/entities/scrappable/byte_test_data.dart'
-    as _i22;
-import 'package:zenscrap_client/src/protocol/entities/account/plan_tier.dart'
-    as _i23;
-import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/create_session_response.dart'
-    as _i24;
-import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/chat_response.dart'
-    as _i25;
 import 'package:zenscrap_client/src/protocol/entities/scrappable/ai_model.dart'
+    as _i21;
+import 'package:zenscrap_client/src/protocol/entities/marketplace/paginated_scrappable_response.dart'
+    as _i22;
+import 'package:zenscrap_client/src/protocol/entities/scrappable/byte_test_data.dart'
+    as _i23;
+import 'package:zenscrap_client/src/protocol/entities/account/plan_tier.dart'
+    as _i24;
+import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/create_session_response.dart'
+    as _i25;
+import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/chat_response.dart'
     as _i26;
 import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i27;
 import 'protocol.dart' as _i28;
@@ -429,6 +429,10 @@ class EndpointEditScrappable extends _i1.EndpointRef {
     required _i4.SupportedLanguage language,
     _i19.ScraperCategory? category,
     bool? willHideFromMarketplace,
+    bool? autoFixEnabled,
+    int? autoFixConsecutiveErrorThreshold,
+    _i21.AiModel? autoFixPreferredAiModel,
+    bool? autoFixUseAutoAiModel,
   }) => caller.callServerEndpoint<bool>(
     'editScrappable',
     'call',
@@ -439,6 +443,10 @@ class EndpointEditScrappable extends _i1.EndpointRef {
       'language': language,
       'category': category,
       'willHideFromMarketplace': willHideFromMarketplace,
+      'autoFixEnabled': autoFixEnabled,
+      'autoFixConsecutiveErrorThreshold': autoFixConsecutiveErrorThreshold,
+      'autoFixPreferredAiModel': autoFixPreferredAiModel,
+      'autoFixUseAutoAiModel': autoFixUseAutoAiModel,
     },
   );
 }
@@ -450,12 +458,12 @@ class EndpointMarketplace extends _i1.EndpointRef {
   @override
   String get name => 'marketplace';
 
-  _i2.Future<_i21.PaginatedScrappableResponse> getItems({
+  _i2.Future<_i22.PaginatedScrappableResponse> getItems({
     required int page,
     String? searchQuery,
     List<_i19.ScraperCategory>? categories,
     required _i4.SupportedLanguage language,
-  }) => caller.callServerEndpoint<_i21.PaginatedScrappableResponse>(
+  }) => caller.callServerEndpoint<_i22.PaginatedScrappableResponse>(
     'marketplace',
     'getItems',
     {
@@ -476,10 +484,10 @@ class EndpointPublicScrappable extends _i1.EndpointRef {
 
   /// Retrieves ByteTestData for a scrappable
   /// This is a public endpoint to allow viewing test data in the marketplace
-  _i2.Future<_i22.ByteTestData?> getByteTestData(
+  _i2.Future<_i23.ByteTestData?> getByteTestData(
     int scrappableId, {
     required _i4.SupportedLanguage language,
-  }) => caller.callServerEndpoint<_i22.ByteTestData?>(
+  }) => caller.callServerEndpoint<_i23.ByteTestData?>(
     'publicScrappable',
     'getByteTestData',
     {
@@ -499,7 +507,7 @@ class EndpointPublicTier extends _i1.EndpointRef {
   _i2.Future<void> updatePlayerTier({
     required String email,
     required String tierManipulationKey,
-    required _i23.PlanTier planTier,
+    required _i24.PlanTier planTier,
   }) => caller.callServerEndpoint<void>(
     'publicTier',
     'updatePlayerTier',
@@ -580,10 +588,10 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
     },
   );
 
-  _i2.Future<_i24.CreateSessionResponse> createSession({
+  _i2.Future<_i25.CreateSessionResponse> createSession({
     required int scrappableId,
     required _i4.SupportedLanguage language,
-  }) => caller.callServerEndpoint<_i24.CreateSessionResponse>(
+  }) => caller.callServerEndpoint<_i25.CreateSessionResponse>(
     'scrappableChatSession',
     'createSession',
     {
@@ -592,13 +600,13 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
     },
   );
 
-  _i2.Stream<_i25.ChatResponse> listenToScrappableRedraftSession({
+  _i2.Stream<_i26.ChatResponse> listenToScrappableRedraftSession({
     required String sessionUuid,
     required _i4.SupportedLanguage language,
   }) =>
       caller.callStreamingServerEndpoint<
-        _i2.Stream<_i25.ChatResponse>,
-        _i25.ChatResponse
+        _i2.Stream<_i26.ChatResponse>,
+        _i26.ChatResponse
       >(
         'scrappableChatSession',
         'listenToScrappableRedraftSession',
@@ -611,7 +619,7 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
 
   _i2.Future<void> changeChatModel({
     required String sessionUuid,
-    required _i26.AiModel aiModel,
+    required _i21.AiModel aiModel,
     required _i4.SupportedLanguage language,
   }) => caller.callServerEndpoint<void>(
     'scrappableChatSession',
