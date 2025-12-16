@@ -10,6 +10,7 @@ final possibleNavigationsProvider =
     DashboardNavigationType.marketPlace,
     DashboardNavigationType.usage,
     DashboardNavigationType.analytics,
+    DashboardNavigationType.aiUsage,
     DashboardNavigationType.account,
     DashboardNavigationType.logOut,
   ];

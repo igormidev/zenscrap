@@ -211,6 +211,32 @@ class Endpoints extends _i1.EndpointDispatch {
                         language: params['language'],
                       ),
         ),
+        'updateOpenAiApiKey': _i1.MethodConnector(
+          name: 'updateOpenAiApiKey',
+          params: {
+            'apiKey': _i1.ParameterDescription(
+              name: 'apiKey',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i16.SupportedLanguage>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['privateAiUsage'] as _i3.PrivateAiUsageEndpoint)
+                      .updateOpenAiApiKey(
+                        session,
+                        apiKey: params['apiKey'],
+                        language: params['language'],
+                      ),
+        ),
         'getAutoFixSessions': _i1.MethodConnector(
           name: 'getAutoFixSessions',
           params: {

@@ -565,6 +565,70 @@ class AppLocalizationsDe extends AppLocalizations {
   String get ai_usage_load_more => 'Mehr laden';
 
   @override
+  String get ai_usage_api_key_section_title => 'OpenAI API-Schluessel';
+
+  @override
+  String get ai_usage_api_key_description =>
+      'Verwenden Sie Ihren eigenen OpenAI API-Schluessel, um monatliche Kreditlimits zu umgehen. Ihr Schluessel wird sicher gespeichert.';
+
+  @override
+  String get ai_usage_api_key_configured => 'API-Schluessel konfiguriert';
+
+  @override
+  String get ai_usage_api_key_not_configured =>
+      'Kein API-Schluessel konfiguriert';
+
+  @override
+  String get ai_usage_api_key_add => 'API-Schluessel hinzufuegen';
+
+  @override
+  String get ai_usage_api_key_edit => 'Bearbeiten';
+
+  @override
+  String get ai_usage_api_key_remove => 'Entfernen';
+
+  @override
+  String get ai_usage_api_key_dialog_title => 'OpenAI API-Schluessel';
+
+  @override
+  String get ai_usage_api_key_dialog_hint => 'sk-...';
+
+  @override
+  String get ai_usage_api_key_dialog_description =>
+      'Geben Sie Ihren OpenAI API-Schluessel ein. Der Schluessel wird vor dem Speichern validiert.';
+
+  @override
+  String get ai_usage_api_key_show => 'API-Schluessel anzeigen';
+
+  @override
+  String get ai_usage_api_key_hide => 'API-Schluessel verbergen';
+
+  @override
+  String get ai_usage_api_key_save => 'Speichern';
+
+  @override
+  String get ai_usage_api_key_cancel => 'Abbrechen';
+
+  @override
+  String get ai_usage_api_key_remove_confirm_title =>
+      'API-Schluessel entfernen?';
+
+  @override
+  String get ai_usage_api_key_remove_confirm_message =>
+      'Sind Sie sicher, dass Sie Ihren OpenAI API-Schluessel entfernen moechten? Sie werden stattdessen die monatlichen Plattform-Guthaben verwenden.';
+
+  @override
+  String get ai_usage_api_key_updated =>
+      'API-Schluessel erfolgreich aktualisiert';
+
+  @override
+  String get ai_usage_api_key_removed => 'API-Schluessel erfolgreich entfernt';
+
+  @override
+  String get ai_usage_api_key_error =>
+      'API-Schluessel konnte nicht aktualisiert werden';
+
+  @override
   String get api_analytics_title => 'API-Analytik';
 
   @override
@@ -1281,6 +1345,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get dashboard_nav_subscription => 'Abonnement';
+
+  @override
+  String get dashboard_nav_ai_usage => 'KI-Nutzung';
 
   @override
   String get dashboard_collapse_tab => 'Tab zuklappen';

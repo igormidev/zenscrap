@@ -7,6 +7,7 @@ import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 import 'package:zenscrap_flutter/src/ui/account/views/account_view.dart';
+import 'package:zenscrap_flutter/src/ui/ai_usage/views/ai_usage_view.dart';
 import 'package:zenscrap_flutter/src/ui/api_analytics/view/api_analytics_view.dart';
 import 'package:zenscrap_flutter/src/ui/api_usage/views/api_usage_view.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
@@ -116,6 +117,10 @@ class RouterNotifier extends Notifier<GoRouter> {
             GoRoute(
               path: DashboardNavigationType.analytics.routeOnClick!,
               builder: (context, state) => ApiAnalyticsView(),
+            ),
+            GoRoute(
+              path: DashboardNavigationType.aiUsage.routeOnClick!,
+              builder: (context, state) => const AiUsageView(),
             ),
             GoRoute(
               path: DashboardNavigationType.account.routeOnClick!,

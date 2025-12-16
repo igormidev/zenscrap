@@ -1,3 +1,4 @@
+import 'package:http/http.dart' as http;
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart';
 import 'package:zenscrap_server/src/core/translations/error_translations.dart';
@@ -99,6 +100,91 @@ class PrivateAiUsageEndpoint extends Endpoint {
     }
 
     return accountInfo.accountAIUsage!;
+  }
+
+  /// Updates the user's OpenAI API key.
+  /// Pass null or empty string to remove the API key.
+  /// The key is validated against OpenAI's API before being saved.
+  Future<AccountAIUsage> updateOpenAiApiKey(
+    Session session, {
+    String? apiKey,
+    SupportedLanguage language = SupportedLanguage.en,
+  }) async {
+    final authenticationInfo = session.authenticated;
+    if (authenticationInfo == null) {
+      throw _authenticationFailed(language);
+    }
+
+    final userId = authenticationInfo.userId;
+
+    final accountInfo = await AccountInfo.db.findFirstRow(
+      session,
+      where: (p0) => p0.userInfoId.equals(userId),
+      include: AccountInfo.include(
+        accountAIUsage: AccountAIUsage.include(),
+      ),
+    );
+
+    if (accountInfo == null || accountInfo.accountAIUsage == null) {
+      throw _accountNotFound(language);
+    }
+
+    final accountAIUsage = accountInfo.accountAIUsage!;
+
+    // Normalize empty string to null
+    final normalizedApiKey =
+        (apiKey != null && apiKey.trim().isEmpty) ? null : apiKey?.trim();
+
+    // Validate the API key if provided
+    if (normalizedApiKey != null) {
+      await _validateOpenAiApiKey(normalizedApiKey, language);
+    }
+
+    // Update the API key
+    final updatedAccountAIUsage = accountAIUsage.copyWith(
+      userOpenAiApiKey: normalizedApiKey,
+    );
+
+    await AccountAIUsage.db.updateRow(session, updatedAccountAIUsage);
+
+    return updatedAccountAIUsage;
+  }
+
+  /// Validates an OpenAI API key by calling the models endpoint.
+  /// Throws [ZenScrapException] if the key is invalid or validation fails.
+  Future<void> _validateOpenAiApiKey(
+    String apiKey,
+    SupportedLanguage language,
+  ) async {
+    try {
+      final response = await http.get(
+        Uri.parse('https://api.openai.com/v1/models'),
+        headers: {
+          'Authorization': 'Bearer $apiKey',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 401) {
+        // Authentication failed - invalid API key
+        throw createTranslatedException('openai_api_key_invalid', language);
+      }
+
+      if (response.statusCode != 200) {
+        // Other error - validation failed
+        throw createTranslatedException(
+            'openai_api_key_validation_failed', language);
+      }
+
+      // Success - key is valid
+    } catch (e) {
+      if (e is ZenScrapException) {
+        rethrow;
+      }
+      // Network or other error
+      throw createTranslatedException(
+          'openai_api_key_validation_failed', language);
+    }
   }
 
   /// Returns paginated auto-fix sessions for scrappables owned by the authenticated user.

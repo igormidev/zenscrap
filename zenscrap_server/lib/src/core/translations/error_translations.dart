@@ -489,6 +489,22 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.ptBR: 'Formato de Chave API Invalido',
     SupportedLanguage.ja: '無効なAPIキー形式',
   },
+  'openai_api_key_invalid': {
+    SupportedLanguage.en: 'Invalid OpenAI API Key',
+    SupportedLanguage.es: 'Clave API de OpenAI Invalida',
+    SupportedLanguage.de: 'Ungueltiger OpenAI API-Schluessel',
+    SupportedLanguage.fr: 'Cle API OpenAI invalide',
+    SupportedLanguage.ptBR: 'Chave API OpenAI Invalida',
+    SupportedLanguage.ja: '無効なOpenAI APIキー',
+  },
+  'openai_api_key_validation_failed': {
+    SupportedLanguage.en: 'API Key Validation Failed',
+    SupportedLanguage.es: 'Error en la Validacion de la Clave API',
+    SupportedLanguage.de: 'API-Schluessel-Validierung fehlgeschlagen',
+    SupportedLanguage.fr: 'Echec de la validation de la cle API',
+    SupportedLanguage.ptBR: 'Falha na Validacao da Chave API',
+    SupportedLanguage.ja: 'APIキーの検証に失敗しました',
+  },
 
   // Deploy endpoint errors
   'no_byte_data_to_deploy': {
@@ -1116,6 +1132,22 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.fr: 'La cle API doit etre au format "nanoId::apiKey".',
     SupportedLanguage.ptBR: 'A chave API deve estar no formato "nanoId::apiKey".',
     SupportedLanguage.ja: 'APIキーは "nanoId::apiKey" の形式である必要があります。',
+  },
+  'openai_api_key_invalid': {
+    SupportedLanguage.en: 'The OpenAI API key you provided is invalid. Please check your key and try again.',
+    SupportedLanguage.es: 'La clave API de OpenAI que proporcionaste es invalida. Por favor, verifica tu clave e intenta de nuevo.',
+    SupportedLanguage.de: 'Der von Ihnen angegebene OpenAI API-Schluessel ist ungueltig. Bitte ueberpruefen Sie Ihren Schluessel und versuchen Sie es erneut.',
+    SupportedLanguage.fr: 'La cle API OpenAI que vous avez fournie est invalide. Veuillez verifier votre cle et reessayer.',
+    SupportedLanguage.ptBR: 'A chave API OpenAI que voce forneceu e invalida. Por favor, verifique sua chave e tente novamente.',
+    SupportedLanguage.ja: '入力されたOpenAI APIキーは無効です。キーを確認して再度お試しください。',
+  },
+  'openai_api_key_validation_failed': {
+    SupportedLanguage.en: 'Could not validate the OpenAI API key. Please check your internet connection and try again.',
+    SupportedLanguage.es: 'No se pudo validar la clave API de OpenAI. Por favor, verifica tu conexion a internet e intenta de nuevo.',
+    SupportedLanguage.de: 'Der OpenAI API-Schluessel konnte nicht validiert werden. Bitte ueberpruefen Sie Ihre Internetverbindung und versuchen Sie es erneut.',
+    SupportedLanguage.fr: 'Impossible de valider la cle API OpenAI. Veuillez verifier votre connexion internet et reessayer.',
+    SupportedLanguage.ptBR: 'Nao foi possivel validar a chave API OpenAI. Por favor, verifique sua conexao com a internet e tente novamente.',
+    SupportedLanguage.ja: 'OpenAI APIキーを検証できませんでした。インターネット接続を確認して再度お試しください。',
   },
 
   // Deploy endpoint error descriptions

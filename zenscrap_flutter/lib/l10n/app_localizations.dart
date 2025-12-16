@@ -1096,6 +1096,120 @@ abstract class AppLocalizations {
   /// **'Load More'**
   String get ai_usage_load_more;
 
+  /// Title for the API key management section
+  ///
+  /// In en, this message translates to:
+  /// **'OpenAI API Key'**
+  String get ai_usage_api_key_section_title;
+
+  /// Description explaining what the API key is for
+  ///
+  /// In en, this message translates to:
+  /// **'Use your own OpenAI API key to bypass monthly credit limits. Your key is stored securely.'**
+  String get ai_usage_api_key_description;
+
+  /// Status text when API key is set
+  ///
+  /// In en, this message translates to:
+  /// **'API key configured'**
+  String get ai_usage_api_key_configured;
+
+  /// Status text when no API key is set
+  ///
+  /// In en, this message translates to:
+  /// **'No API key configured'**
+  String get ai_usage_api_key_not_configured;
+
+  /// Button to add API key
+  ///
+  /// In en, this message translates to:
+  /// **'Add API Key'**
+  String get ai_usage_api_key_add;
+
+  /// Button to edit API key
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get ai_usage_api_key_edit;
+
+  /// Button to remove API key
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get ai_usage_api_key_remove;
+
+  /// Dialog title for API key input
+  ///
+  /// In en, this message translates to:
+  /// **'OpenAI API Key'**
+  String get ai_usage_api_key_dialog_title;
+
+  /// Hint text for API key input field
+  ///
+  /// In en, this message translates to:
+  /// **'sk-...'**
+  String get ai_usage_api_key_dialog_hint;
+
+  /// Description in the API key dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your OpenAI API key. The key will be validated before saving.'**
+  String get ai_usage_api_key_dialog_description;
+
+  /// Tooltip for showing the API key
+  ///
+  /// In en, this message translates to:
+  /// **'Show API key'**
+  String get ai_usage_api_key_show;
+
+  /// Tooltip for hiding the API key
+  ///
+  /// In en, this message translates to:
+  /// **'Hide API key'**
+  String get ai_usage_api_key_hide;
+
+  /// Save button label
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get ai_usage_api_key_save;
+
+  /// Cancel button label
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get ai_usage_api_key_cancel;
+
+  /// Confirmation dialog title for removing API key
+  ///
+  /// In en, this message translates to:
+  /// **'Remove API Key?'**
+  String get ai_usage_api_key_remove_confirm_title;
+
+  /// Confirmation dialog message for removing API key
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to remove your OpenAI API key? You will use the platform\'s monthly credits instead.'**
+  String get ai_usage_api_key_remove_confirm_message;
+
+  /// Success message when API key is updated
+  ///
+  /// In en, this message translates to:
+  /// **'API key updated successfully'**
+  String get ai_usage_api_key_updated;
+
+  /// Success message when API key is removed
+  ///
+  /// In en, this message translates to:
+  /// **'API key removed successfully'**
+  String get ai_usage_api_key_removed;
+
+  /// Error message when API key update fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update API key'**
+  String get ai_usage_api_key_error;
+
   /// Main title for API analytics page
   ///
   /// In en, this message translates to:
@@ -2334,6 +2448,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Subscription'**
   String get dashboard_nav_subscription;
+
+  /// Navigation label for AI usage page
+  ///
+  /// In en, this message translates to:
+  /// **'AI Usage'**
+  String get dashboard_nav_ai_usage;
 
   /// Button text to collapse navigation sidebar
   ///

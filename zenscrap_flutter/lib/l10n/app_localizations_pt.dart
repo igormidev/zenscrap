@@ -556,6 +556,66 @@ class AppLocalizationsPt extends AppLocalizations {
   String get ai_usage_load_more => 'Load More';
 
   @override
+  String get ai_usage_api_key_section_title => 'OpenAI API Key';
+
+  @override
+  String get ai_usage_api_key_description =>
+      'Use your own OpenAI API key to bypass monthly credit limits. Your key is stored securely.';
+
+  @override
+  String get ai_usage_api_key_configured => 'API key configured';
+
+  @override
+  String get ai_usage_api_key_not_configured => 'No API key configured';
+
+  @override
+  String get ai_usage_api_key_add => 'Add API Key';
+
+  @override
+  String get ai_usage_api_key_edit => 'Edit';
+
+  @override
+  String get ai_usage_api_key_remove => 'Remove';
+
+  @override
+  String get ai_usage_api_key_dialog_title => 'OpenAI API Key';
+
+  @override
+  String get ai_usage_api_key_dialog_hint => 'sk-...';
+
+  @override
+  String get ai_usage_api_key_dialog_description =>
+      'Enter your OpenAI API key. The key will be validated before saving.';
+
+  @override
+  String get ai_usage_api_key_show => 'Show API key';
+
+  @override
+  String get ai_usage_api_key_hide => 'Hide API key';
+
+  @override
+  String get ai_usage_api_key_save => 'Save';
+
+  @override
+  String get ai_usage_api_key_cancel => 'Cancel';
+
+  @override
+  String get ai_usage_api_key_remove_confirm_title => 'Remove API Key?';
+
+  @override
+  String get ai_usage_api_key_remove_confirm_message =>
+      'Are you sure you want to remove your OpenAI API key? You will use the platform\'s monthly credits instead.';
+
+  @override
+  String get ai_usage_api_key_updated => 'API key updated successfully';
+
+  @override
+  String get ai_usage_api_key_removed => 'API key removed successfully';
+
+  @override
+  String get ai_usage_api_key_error => 'Failed to update API key';
+
+  @override
   String get api_analytics_title => 'API Analytics';
 
   @override
@@ -1259,6 +1319,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get dashboard_nav_subscription => 'Subscription';
+
+  @override
+  String get dashboard_nav_ai_usage => 'AI Usage';
 
   @override
   String get dashboard_collapse_tab => 'Collapse tab';
@@ -2380,6 +2443,66 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get ai_usage_load_more => 'Carregar Mais';
 
   @override
+  String get ai_usage_api_key_section_title => 'Chave API OpenAI';
+
+  @override
+  String get ai_usage_api_key_description =>
+      'Use sua propria chave API OpenAI para ignorar os limites de creditos mensais. Sua chave e armazenada com seguranca.';
+
+  @override
+  String get ai_usage_api_key_configured => 'Chave API configurada';
+
+  @override
+  String get ai_usage_api_key_not_configured => 'Nenhuma chave API configurada';
+
+  @override
+  String get ai_usage_api_key_add => 'Adicionar Chave API';
+
+  @override
+  String get ai_usage_api_key_edit => 'Editar';
+
+  @override
+  String get ai_usage_api_key_remove => 'Remover';
+
+  @override
+  String get ai_usage_api_key_dialog_title => 'Chave API OpenAI';
+
+  @override
+  String get ai_usage_api_key_dialog_hint => 'sk-...';
+
+  @override
+  String get ai_usage_api_key_dialog_description =>
+      'Digite sua chave API OpenAI. A chave sera validada antes de salvar.';
+
+  @override
+  String get ai_usage_api_key_show => 'Mostrar chave API';
+
+  @override
+  String get ai_usage_api_key_hide => 'Ocultar chave API';
+
+  @override
+  String get ai_usage_api_key_save => 'Salvar';
+
+  @override
+  String get ai_usage_api_key_cancel => 'Cancelar';
+
+  @override
+  String get ai_usage_api_key_remove_confirm_title => 'Remover Chave API?';
+
+  @override
+  String get ai_usage_api_key_remove_confirm_message =>
+      'Tem certeza de que deseja remover sua chave API OpenAI? Voce usara os creditos mensais da plataforma em vez disso.';
+
+  @override
+  String get ai_usage_api_key_updated => 'Chave API atualizada com sucesso';
+
+  @override
+  String get ai_usage_api_key_removed => 'Chave API removida com sucesso';
+
+  @override
+  String get ai_usage_api_key_error => 'Falha ao atualizar a chave API';
+
+  @override
   String get api_analytics_title => 'Analytics de API';
 
   @override
@@ -3098,6 +3221,9 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get dashboard_nav_subscription => 'Assinatura';
+
+  @override
+  String get dashboard_nav_ai_usage => 'Uso de IA';
 
   @override
   String get dashboard_collapse_tab => 'Recolher aba';

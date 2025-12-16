@@ -563,6 +563,66 @@ class AppLocalizationsEs extends AppLocalizations {
   String get ai_usage_load_more => 'Cargar Mas';
 
   @override
+  String get ai_usage_api_key_section_title => 'Clave API de OpenAI';
+
+  @override
+  String get ai_usage_api_key_description =>
+      'Usa tu propia clave API de OpenAI para evitar los limites de creditos mensuales. Tu clave se almacena de forma segura.';
+
+  @override
+  String get ai_usage_api_key_configured => 'Clave API configurada';
+
+  @override
+  String get ai_usage_api_key_not_configured => 'Sin clave API configurada';
+
+  @override
+  String get ai_usage_api_key_add => 'Agregar Clave API';
+
+  @override
+  String get ai_usage_api_key_edit => 'Editar';
+
+  @override
+  String get ai_usage_api_key_remove => 'Eliminar';
+
+  @override
+  String get ai_usage_api_key_dialog_title => 'Clave API de OpenAI';
+
+  @override
+  String get ai_usage_api_key_dialog_hint => 'sk-...';
+
+  @override
+  String get ai_usage_api_key_dialog_description =>
+      'Ingresa tu clave API de OpenAI. La clave sera validada antes de guardar.';
+
+  @override
+  String get ai_usage_api_key_show => 'Mostrar clave API';
+
+  @override
+  String get ai_usage_api_key_hide => 'Ocultar clave API';
+
+  @override
+  String get ai_usage_api_key_save => 'Guardar';
+
+  @override
+  String get ai_usage_api_key_cancel => 'Cancelar';
+
+  @override
+  String get ai_usage_api_key_remove_confirm_title => 'Eliminar Clave API?';
+
+  @override
+  String get ai_usage_api_key_remove_confirm_message =>
+      'Estas seguro de que quieres eliminar tu clave API de OpenAI? Usaras los creditos mensuales de la plataforma en su lugar.';
+
+  @override
+  String get ai_usage_api_key_updated => 'Clave API actualizada exitosamente';
+
+  @override
+  String get ai_usage_api_key_removed => 'Clave API eliminada exitosamente';
+
+  @override
+  String get ai_usage_api_key_error => 'Error al actualizar la clave API';
+
+  @override
   String get api_analytics_title => 'Analiticas de API';
 
   @override
@@ -1278,6 +1338,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get dashboard_nav_subscription => 'Suscripcion';
+
+  @override
+  String get dashboard_nav_ai_usage => 'Uso de IA';
 
   @override
   String get dashboard_collapse_tab => 'Colapsar pestana';
