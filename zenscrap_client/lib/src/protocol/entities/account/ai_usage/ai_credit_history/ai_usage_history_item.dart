@@ -11,15 +11,18 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
-import '../../../../entities/account/ai_usage/ai_credit_history/monthly_subscription_ai_credit_deposit.dart'
+import '../../../../entities/account/ai_usage/ai_credit_history/ai_credit_transaction_type.dart'
     as _i2;
-import '../../../../entities/account/ai_usage/account_ai_usage.dart' as _i3;
-import 'package:zenscrap_client/src/protocol/protocol.dart' as _i4;
+import '../../../../entities/account/ai_usage/ai_credit_history/monthly_subscription_ai_credit_deposit.dart'
+    as _i3;
+import '../../../../entities/account/ai_usage/account_ai_usage.dart' as _i4;
+import 'package:zenscrap_client/src/protocol/protocol.dart' as _i5;
 
 abstract class AICreditHistoryItem implements _i1.SerializableModel {
   AICreditHistoryItem._({
     this.id,
     required this.date,
+    required this.transactionType,
     this.monthlySubscriptionAICreditDepositId,
     this.monthlySubscriptionAICreditDeposit,
     required this.accountAIUsageId,
@@ -29,28 +32,32 @@ abstract class AICreditHistoryItem implements _i1.SerializableModel {
   factory AICreditHistoryItem({
     int? id,
     required DateTime date,
+    required _i2.AICreditTransactionType transactionType,
     int? monthlySubscriptionAICreditDepositId,
-    _i2.MonthlySubscriptionAICreditDeposit? monthlySubscriptionAICreditDeposit,
+    _i3.MonthlySubscriptionAICreditDeposit? monthlySubscriptionAICreditDeposit,
     required int accountAIUsageId,
-    _i3.AccountAIUsage? accountAIUsage,
+    _i4.AccountAIUsage? accountAIUsage,
   }) = _AICreditHistoryItemImpl;
 
   factory AICreditHistoryItem.fromJson(Map<String, dynamic> jsonSerialization) {
     return AICreditHistoryItem(
       id: jsonSerialization['id'] as int?,
       date: _i1.DateTimeJsonExtension.fromJson(jsonSerialization['date']),
+      transactionType: _i2.AICreditTransactionType.fromJson(
+        (jsonSerialization['transactionType'] as String),
+      ),
       monthlySubscriptionAICreditDepositId:
           jsonSerialization['monthlySubscriptionAICreditDepositId'] as int?,
       monthlySubscriptionAICreditDeposit:
           jsonSerialization['monthlySubscriptionAICreditDeposit'] == null
           ? null
-          : _i4.Protocol().deserialize<_i2.MonthlySubscriptionAICreditDeposit>(
+          : _i5.Protocol().deserialize<_i3.MonthlySubscriptionAICreditDeposit>(
               jsonSerialization['monthlySubscriptionAICreditDeposit'],
             ),
       accountAIUsageId: jsonSerialization['accountAIUsageId'] as int,
       accountAIUsage: jsonSerialization['accountAIUsage'] == null
           ? null
-          : _i4.Protocol().deserialize<_i3.AccountAIUsage>(
+          : _i5.Protocol().deserialize<_i4.AccountAIUsage>(
               jsonSerialization['accountAIUsage'],
             ),
     );
@@ -63,13 +70,15 @@ abstract class AICreditHistoryItem implements _i1.SerializableModel {
 
   DateTime date;
 
+  _i2.AICreditTransactionType transactionType;
+
   int? monthlySubscriptionAICreditDepositId;
 
-  _i2.MonthlySubscriptionAICreditDeposit? monthlySubscriptionAICreditDeposit;
+  _i3.MonthlySubscriptionAICreditDeposit? monthlySubscriptionAICreditDeposit;
 
   int accountAIUsageId;
 
-  _i3.AccountAIUsage? accountAIUsage;
+  _i4.AccountAIUsage? accountAIUsage;
 
   /// Returns a shallow copy of this [AICreditHistoryItem]
   /// with some or all fields replaced by the given arguments.
@@ -77,10 +86,11 @@ abstract class AICreditHistoryItem implements _i1.SerializableModel {
   AICreditHistoryItem copyWith({
     int? id,
     DateTime? date,
+    _i2.AICreditTransactionType? transactionType,
     int? monthlySubscriptionAICreditDepositId,
-    _i2.MonthlySubscriptionAICreditDeposit? monthlySubscriptionAICreditDeposit,
+    _i3.MonthlySubscriptionAICreditDeposit? monthlySubscriptionAICreditDeposit,
     int? accountAIUsageId,
-    _i3.AccountAIUsage? accountAIUsage,
+    _i4.AccountAIUsage? accountAIUsage,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -88,6 +98,7 @@ abstract class AICreditHistoryItem implements _i1.SerializableModel {
       '__className__': 'AICreditHistoryItem',
       if (id != null) 'id': id,
       'date': date.toJson(),
+      'transactionType': transactionType.toJson(),
       if (monthlySubscriptionAICreditDepositId != null)
         'monthlySubscriptionAICreditDepositId':
             monthlySubscriptionAICreditDepositId,
@@ -111,13 +122,15 @@ class _AICreditHistoryItemImpl extends AICreditHistoryItem {
   _AICreditHistoryItemImpl({
     int? id,
     required DateTime date,
+    required _i2.AICreditTransactionType transactionType,
     int? monthlySubscriptionAICreditDepositId,
-    _i2.MonthlySubscriptionAICreditDeposit? monthlySubscriptionAICreditDeposit,
+    _i3.MonthlySubscriptionAICreditDeposit? monthlySubscriptionAICreditDeposit,
     required int accountAIUsageId,
-    _i3.AccountAIUsage? accountAIUsage,
+    _i4.AccountAIUsage? accountAIUsage,
   }) : super._(
          id: id,
          date: date,
+         transactionType: transactionType,
          monthlySubscriptionAICreditDepositId:
              monthlySubscriptionAICreditDepositId,
          monthlySubscriptionAICreditDeposit: monthlySubscriptionAICreditDeposit,
@@ -132,6 +145,7 @@ class _AICreditHistoryItemImpl extends AICreditHistoryItem {
   AICreditHistoryItem copyWith({
     Object? id = _Undefined,
     DateTime? date,
+    _i2.AICreditTransactionType? transactionType,
     Object? monthlySubscriptionAICreditDepositId = _Undefined,
     Object? monthlySubscriptionAICreditDeposit = _Undefined,
     int? accountAIUsageId,
@@ -140,17 +154,18 @@ class _AICreditHistoryItemImpl extends AICreditHistoryItem {
     return AICreditHistoryItem(
       id: id is int? ? id : this.id,
       date: date ?? this.date,
+      transactionType: transactionType ?? this.transactionType,
       monthlySubscriptionAICreditDepositId:
           monthlySubscriptionAICreditDepositId is int?
           ? monthlySubscriptionAICreditDepositId
           : this.monthlySubscriptionAICreditDepositId,
       monthlySubscriptionAICreditDeposit:
           monthlySubscriptionAICreditDeposit
-              is _i2.MonthlySubscriptionAICreditDeposit?
+              is _i3.MonthlySubscriptionAICreditDeposit?
           ? monthlySubscriptionAICreditDeposit
           : this.monthlySubscriptionAICreditDeposit?.copyWith(),
       accountAIUsageId: accountAIUsageId ?? this.accountAIUsageId,
-      accountAIUsage: accountAIUsage is _i3.AccountAIUsage?
+      accountAIUsage: accountAIUsage is _i4.AccountAIUsage?
           ? accountAIUsage
           : this.accountAIUsage?.copyWith(),
     );

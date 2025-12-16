@@ -520,6 +520,14 @@
   "@ai_usage_monthly_ai_credits": {
     "description": "Title for monthly AI credits transaction"
   },
+  "ai_usage_initial_credit": "Initial Credit",
+  "@ai_usage_initial_credit": {
+    "description": "Title for initial account AI credit"
+  },
+  "ai_usage_welcome_bonus": "Welcome bonus",
+  "@ai_usage_welcome_bonus": {
+    "description": "Subtitle for initial account AI credit"
+  },
   "ai_usage_plan_name_free": "Free",
   "@ai_usage_plan_name_free": {
     "description": "Free plan name"
@@ -1522,6 +1530,14 @@
   "api_usage_monthly_subscription": "Monthly Subscription",
   "@api_usage_monthly_subscription": {
     "description": "Monthly subscription transaction title"
+  },
+  "api_usage_initial_credit": "Initial Credit",
+  "@api_usage_initial_credit": {
+    "description": "Title for initial account API credit"
+  },
+  "api_usage_welcome_bonus": "Welcome bonus",
+  "@api_usage_welcome_bonus": {
+    "description": "Subtitle for initial account API credit"
   },
   "api_usage_plan_date_subtitle": "{planName} plan • {date}",
   "@api_usage_plan_date_subtitle": {

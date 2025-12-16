@@ -434,6 +434,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get ai_usage_monthly_ai_credits => 'Creditos de IA Mensuales';
 
   @override
+  String get ai_usage_initial_credit => 'Credito Inicial';
+
+  @override
+  String get ai_usage_welcome_bonus => 'Bono de bienvenida';
+
+  @override
   String get ai_usage_plan_name_free => 'Gratis';
 
   @override
@@ -1183,6 +1189,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get api_usage_monthly_subscription => 'Suscripcion Mensual';
+
+  @override
+  String get api_usage_initial_credit => 'Credito Inicial';
+
+  @override
+  String get api_usage_welcome_bonus => 'Bono de bienvenida';
 
   @override
   String api_usage_plan_date_subtitle(String planName, String date) {

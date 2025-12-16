@@ -13,18 +13,21 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
-import '../../../../entities/account/api_usage/api_credit_history/monthly_subscription_api_credit_deposit.dart'
+import '../../../../entities/account/api_usage/api_credit_history/api_credit_transaction_type.dart'
     as _i2;
-import '../../../../entities/account/api_usage/api_credit_history/api_credit_package_purchase.dart'
+import '../../../../entities/account/api_usage/api_credit_history/monthly_subscription_api_credit_deposit.dart'
     as _i3;
-import '../../../../entities/account/api_usage/account_api_usage.dart' as _i4;
-import 'package:zenscrap_server/src/generated/protocol.dart' as _i5;
+import '../../../../entities/account/api_usage/api_credit_history/api_credit_package_purchase.dart'
+    as _i4;
+import '../../../../entities/account/api_usage/account_api_usage.dart' as _i5;
+import 'package:zenscrap_server/src/generated/protocol.dart' as _i6;
 
 abstract class ApiCreditHistoryItem
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   ApiCreditHistoryItem._({
     this.id,
     required this.date,
+    required this.transactionType,
     this.monthlySubscriptionApiCreditDepositId,
     this.monthlySubscriptionApiCreditDeposit,
     this.apiCreditPackagePurchaseId,
@@ -36,13 +39,14 @@ abstract class ApiCreditHistoryItem
   factory ApiCreditHistoryItem({
     int? id,
     required DateTime date,
+    required _i2.ApiCreditTransactionType transactionType,
     int? monthlySubscriptionApiCreditDepositId,
-    _i2.MonthlySubscriptionApiCreditDeposit?
+    _i3.MonthlySubscriptionApiCreditDeposit?
     monthlySubscriptionApiCreditDeposit,
     int? apiCreditPackagePurchaseId,
-    _i3.ApiCreditPackagePurchase? apiCreditPackagePurchase,
+    _i4.ApiCreditPackagePurchase? apiCreditPackagePurchase,
     required int accountApiUsageId,
-    _i4.AccountApiUsage? accountApiUsage,
+    _i5.AccountApiUsage? accountApiUsage,
   }) = _ApiCreditHistoryItemImpl;
 
   factory ApiCreditHistoryItem.fromJson(
@@ -51,12 +55,15 @@ abstract class ApiCreditHistoryItem
     return ApiCreditHistoryItem(
       id: jsonSerialization['id'] as int?,
       date: _i1.DateTimeJsonExtension.fromJson(jsonSerialization['date']),
+      transactionType: _i2.ApiCreditTransactionType.fromJson(
+        (jsonSerialization['transactionType'] as String),
+      ),
       monthlySubscriptionApiCreditDepositId:
           jsonSerialization['monthlySubscriptionApiCreditDepositId'] as int?,
       monthlySubscriptionApiCreditDeposit:
           jsonSerialization['monthlySubscriptionApiCreditDeposit'] == null
           ? null
-          : _i5.Protocol().deserialize<_i2.MonthlySubscriptionApiCreditDeposit>(
+          : _i6.Protocol().deserialize<_i3.MonthlySubscriptionApiCreditDeposit>(
               jsonSerialization['monthlySubscriptionApiCreditDeposit'],
             ),
       apiCreditPackagePurchaseId:
@@ -64,13 +71,13 @@ abstract class ApiCreditHistoryItem
       apiCreditPackagePurchase:
           jsonSerialization['apiCreditPackagePurchase'] == null
           ? null
-          : _i5.Protocol().deserialize<_i3.ApiCreditPackagePurchase>(
+          : _i6.Protocol().deserialize<_i4.ApiCreditPackagePurchase>(
               jsonSerialization['apiCreditPackagePurchase'],
             ),
       accountApiUsageId: jsonSerialization['accountApiUsageId'] as int,
       accountApiUsage: jsonSerialization['accountApiUsage'] == null
           ? null
-          : _i5.Protocol().deserialize<_i4.AccountApiUsage>(
+          : _i6.Protocol().deserialize<_i5.AccountApiUsage>(
               jsonSerialization['accountApiUsage'],
             ),
     );
@@ -85,17 +92,19 @@ abstract class ApiCreditHistoryItem
 
   DateTime date;
 
+  _i2.ApiCreditTransactionType transactionType;
+
   int? monthlySubscriptionApiCreditDepositId;
 
-  _i2.MonthlySubscriptionApiCreditDeposit? monthlySubscriptionApiCreditDeposit;
+  _i3.MonthlySubscriptionApiCreditDeposit? monthlySubscriptionApiCreditDeposit;
 
   int? apiCreditPackagePurchaseId;
 
-  _i3.ApiCreditPackagePurchase? apiCreditPackagePurchase;
+  _i4.ApiCreditPackagePurchase? apiCreditPackagePurchase;
 
   int accountApiUsageId;
 
-  _i4.AccountApiUsage? accountApiUsage;
+  _i5.AccountApiUsage? accountApiUsage;
 
   @override
   _i1.Table<int?> get table => t;
@@ -106,13 +115,14 @@ abstract class ApiCreditHistoryItem
   ApiCreditHistoryItem copyWith({
     int? id,
     DateTime? date,
+    _i2.ApiCreditTransactionType? transactionType,
     int? monthlySubscriptionApiCreditDepositId,
-    _i2.MonthlySubscriptionApiCreditDeposit?
+    _i3.MonthlySubscriptionApiCreditDeposit?
     monthlySubscriptionApiCreditDeposit,
     int? apiCreditPackagePurchaseId,
-    _i3.ApiCreditPackagePurchase? apiCreditPackagePurchase,
+    _i4.ApiCreditPackagePurchase? apiCreditPackagePurchase,
     int? accountApiUsageId,
-    _i4.AccountApiUsage? accountApiUsage,
+    _i5.AccountApiUsage? accountApiUsage,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -120,6 +130,7 @@ abstract class ApiCreditHistoryItem
       '__className__': 'ApiCreditHistoryItem',
       if (id != null) 'id': id,
       'date': date.toJson(),
+      'transactionType': transactionType.toJson(),
       if (monthlySubscriptionApiCreditDepositId != null)
         'monthlySubscriptionApiCreditDepositId':
             monthlySubscriptionApiCreditDepositId,
@@ -141,6 +152,7 @@ abstract class ApiCreditHistoryItem
       '__className__': 'ApiCreditHistoryItem',
       if (id != null) 'id': id,
       'date': date.toJson(),
+      'transactionType': transactionType.toJson(),
       if (monthlySubscriptionApiCreditDepositId != null)
         'monthlySubscriptionApiCreditDepositId':
             monthlySubscriptionApiCreditDepositId,
@@ -159,10 +171,10 @@ abstract class ApiCreditHistoryItem
   }
 
   static ApiCreditHistoryItemInclude include({
-    _i2.MonthlySubscriptionApiCreditDepositInclude?
+    _i3.MonthlySubscriptionApiCreditDepositInclude?
     monthlySubscriptionApiCreditDeposit,
-    _i3.ApiCreditPackagePurchaseInclude? apiCreditPackagePurchase,
-    _i4.AccountApiUsageInclude? accountApiUsage,
+    _i4.ApiCreditPackagePurchaseInclude? apiCreditPackagePurchase,
+    _i5.AccountApiUsageInclude? accountApiUsage,
   }) {
     return ApiCreditHistoryItemInclude._(
       monthlySubscriptionApiCreditDeposit: monthlySubscriptionApiCreditDeposit,
@@ -203,16 +215,18 @@ class _ApiCreditHistoryItemImpl extends ApiCreditHistoryItem {
   _ApiCreditHistoryItemImpl({
     int? id,
     required DateTime date,
+    required _i2.ApiCreditTransactionType transactionType,
     int? monthlySubscriptionApiCreditDepositId,
-    _i2.MonthlySubscriptionApiCreditDeposit?
+    _i3.MonthlySubscriptionApiCreditDeposit?
     monthlySubscriptionApiCreditDeposit,
     int? apiCreditPackagePurchaseId,
-    _i3.ApiCreditPackagePurchase? apiCreditPackagePurchase,
+    _i4.ApiCreditPackagePurchase? apiCreditPackagePurchase,
     required int accountApiUsageId,
-    _i4.AccountApiUsage? accountApiUsage,
+    _i5.AccountApiUsage? accountApiUsage,
   }) : super._(
          id: id,
          date: date,
+         transactionType: transactionType,
          monthlySubscriptionApiCreditDepositId:
              monthlySubscriptionApiCreditDepositId,
          monthlySubscriptionApiCreditDeposit:
@@ -230,6 +244,7 @@ class _ApiCreditHistoryItemImpl extends ApiCreditHistoryItem {
   ApiCreditHistoryItem copyWith({
     Object? id = _Undefined,
     DateTime? date,
+    _i2.ApiCreditTransactionType? transactionType,
     Object? monthlySubscriptionApiCreditDepositId = _Undefined,
     Object? monthlySubscriptionApiCreditDeposit = _Undefined,
     Object? apiCreditPackagePurchaseId = _Undefined,
@@ -240,24 +255,25 @@ class _ApiCreditHistoryItemImpl extends ApiCreditHistoryItem {
     return ApiCreditHistoryItem(
       id: id is int? ? id : this.id,
       date: date ?? this.date,
+      transactionType: transactionType ?? this.transactionType,
       monthlySubscriptionApiCreditDepositId:
           monthlySubscriptionApiCreditDepositId is int?
           ? monthlySubscriptionApiCreditDepositId
           : this.monthlySubscriptionApiCreditDepositId,
       monthlySubscriptionApiCreditDeposit:
           monthlySubscriptionApiCreditDeposit
-              is _i2.MonthlySubscriptionApiCreditDeposit?
+              is _i3.MonthlySubscriptionApiCreditDeposit?
           ? monthlySubscriptionApiCreditDeposit
           : this.monthlySubscriptionApiCreditDeposit?.copyWith(),
       apiCreditPackagePurchaseId: apiCreditPackagePurchaseId is int?
           ? apiCreditPackagePurchaseId
           : this.apiCreditPackagePurchaseId,
       apiCreditPackagePurchase:
-          apiCreditPackagePurchase is _i3.ApiCreditPackagePurchase?
+          apiCreditPackagePurchase is _i4.ApiCreditPackagePurchase?
           ? apiCreditPackagePurchase
           : this.apiCreditPackagePurchase?.copyWith(),
       accountApiUsageId: accountApiUsageId ?? this.accountApiUsageId,
-      accountApiUsage: accountApiUsage is _i4.AccountApiUsage?
+      accountApiUsage: accountApiUsage is _i5.AccountApiUsage?
           ? accountApiUsage
           : this.accountApiUsage?.copyWith(),
     );
@@ -270,6 +286,12 @@ class ApiCreditHistoryItemUpdateTable
 
   _i1.ColumnValue<DateTime, DateTime> date(DateTime value) => _i1.ColumnValue(
     table.date,
+    value,
+  );
+
+  _i1.ColumnValue<_i2.ApiCreditTransactionType, _i2.ApiCreditTransactionType>
+  transactionType(_i2.ApiCreditTransactionType value) => _i1.ColumnValue(
+    table.transactionType,
     value,
   );
 
@@ -299,6 +321,11 @@ class ApiCreditHistoryItemTable extends _i1.Table<int?> {
       'date',
       this,
     );
+    transactionType = _i1.ColumnEnum(
+      'transactionType',
+      this,
+      _i1.EnumSerialization.byName,
+    );
     monthlySubscriptionApiCreditDepositId = _i1.ColumnInt(
       'monthlySubscriptionApiCreditDepositId',
       this,
@@ -317,59 +344,61 @@ class ApiCreditHistoryItemTable extends _i1.Table<int?> {
 
   late final _i1.ColumnDateTime date;
 
+  late final _i1.ColumnEnum<_i2.ApiCreditTransactionType> transactionType;
+
   late final _i1.ColumnInt monthlySubscriptionApiCreditDepositId;
 
-  _i2.MonthlySubscriptionApiCreditDepositTable?
+  _i3.MonthlySubscriptionApiCreditDepositTable?
   _monthlySubscriptionApiCreditDeposit;
 
   late final _i1.ColumnInt apiCreditPackagePurchaseId;
 
-  _i3.ApiCreditPackagePurchaseTable? _apiCreditPackagePurchase;
+  _i4.ApiCreditPackagePurchaseTable? _apiCreditPackagePurchase;
 
   late final _i1.ColumnInt accountApiUsageId;
 
-  _i4.AccountApiUsageTable? _accountApiUsage;
+  _i5.AccountApiUsageTable? _accountApiUsage;
 
-  _i2.MonthlySubscriptionApiCreditDepositTable
+  _i3.MonthlySubscriptionApiCreditDepositTable
   get monthlySubscriptionApiCreditDeposit {
     if (_monthlySubscriptionApiCreditDeposit != null)
       return _monthlySubscriptionApiCreditDeposit!;
     _monthlySubscriptionApiCreditDeposit = _i1.createRelationTable(
       relationFieldName: 'monthlySubscriptionApiCreditDeposit',
       field: ApiCreditHistoryItem.t.monthlySubscriptionApiCreditDepositId,
-      foreignField: _i2.MonthlySubscriptionApiCreditDeposit.t.id,
+      foreignField: _i3.MonthlySubscriptionApiCreditDeposit.t.id,
       tableRelation: tableRelation,
       createTable: (foreignTableRelation) =>
-          _i2.MonthlySubscriptionApiCreditDepositTable(
+          _i3.MonthlySubscriptionApiCreditDepositTable(
             tableRelation: foreignTableRelation,
           ),
     );
     return _monthlySubscriptionApiCreditDeposit!;
   }
 
-  _i3.ApiCreditPackagePurchaseTable get apiCreditPackagePurchase {
+  _i4.ApiCreditPackagePurchaseTable get apiCreditPackagePurchase {
     if (_apiCreditPackagePurchase != null) return _apiCreditPackagePurchase!;
     _apiCreditPackagePurchase = _i1.createRelationTable(
       relationFieldName: 'apiCreditPackagePurchase',
       field: ApiCreditHistoryItem.t.apiCreditPackagePurchaseId,
-      foreignField: _i3.ApiCreditPackagePurchase.t.id,
+      foreignField: _i4.ApiCreditPackagePurchase.t.id,
       tableRelation: tableRelation,
-      createTable: (foreignTableRelation) => _i3.ApiCreditPackagePurchaseTable(
+      createTable: (foreignTableRelation) => _i4.ApiCreditPackagePurchaseTable(
         tableRelation: foreignTableRelation,
       ),
     );
     return _apiCreditPackagePurchase!;
   }
 
-  _i4.AccountApiUsageTable get accountApiUsage {
+  _i5.AccountApiUsageTable get accountApiUsage {
     if (_accountApiUsage != null) return _accountApiUsage!;
     _accountApiUsage = _i1.createRelationTable(
       relationFieldName: 'accountApiUsage',
       field: ApiCreditHistoryItem.t.accountApiUsageId,
-      foreignField: _i4.AccountApiUsage.t.id,
+      foreignField: _i5.AccountApiUsage.t.id,
       tableRelation: tableRelation,
       createTable: (foreignTableRelation) =>
-          _i4.AccountApiUsageTable(tableRelation: foreignTableRelation),
+          _i5.AccountApiUsageTable(tableRelation: foreignTableRelation),
     );
     return _accountApiUsage!;
   }
@@ -378,6 +407,7 @@ class ApiCreditHistoryItemTable extends _i1.Table<int?> {
   List<_i1.Column> get columns => [
     id,
     date,
+    transactionType,
     monthlySubscriptionApiCreditDepositId,
     apiCreditPackagePurchaseId,
     accountApiUsageId,
@@ -400,22 +430,22 @@ class ApiCreditHistoryItemTable extends _i1.Table<int?> {
 
 class ApiCreditHistoryItemInclude extends _i1.IncludeObject {
   ApiCreditHistoryItemInclude._({
-    _i2.MonthlySubscriptionApiCreditDepositInclude?
+    _i3.MonthlySubscriptionApiCreditDepositInclude?
     monthlySubscriptionApiCreditDeposit,
-    _i3.ApiCreditPackagePurchaseInclude? apiCreditPackagePurchase,
-    _i4.AccountApiUsageInclude? accountApiUsage,
+    _i4.ApiCreditPackagePurchaseInclude? apiCreditPackagePurchase,
+    _i5.AccountApiUsageInclude? accountApiUsage,
   }) {
     _monthlySubscriptionApiCreditDeposit = monthlySubscriptionApiCreditDeposit;
     _apiCreditPackagePurchase = apiCreditPackagePurchase;
     _accountApiUsage = accountApiUsage;
   }
 
-  _i2.MonthlySubscriptionApiCreditDepositInclude?
+  _i3.MonthlySubscriptionApiCreditDepositInclude?
   _monthlySubscriptionApiCreditDeposit;
 
-  _i3.ApiCreditPackagePurchaseInclude? _apiCreditPackagePurchase;
+  _i4.ApiCreditPackagePurchaseInclude? _apiCreditPackagePurchase;
 
-  _i4.AccountApiUsageInclude? _accountApiUsage;
+  _i5.AccountApiUsageInclude? _accountApiUsage;
 
   @override
   Map<String, _i1.Include?> get includes => {
@@ -721,7 +751,7 @@ class ApiCreditHistoryItemAttachRowRepository {
   Future<void> monthlySubscriptionApiCreditDeposit(
     _i1.Session session,
     ApiCreditHistoryItem apiCreditHistoryItem,
-    _i2.MonthlySubscriptionApiCreditDeposit
+    _i3.MonthlySubscriptionApiCreditDeposit
     monthlySubscriptionApiCreditDeposit, {
     _i1.Transaction? transaction,
   }) async {
@@ -748,7 +778,7 @@ class ApiCreditHistoryItemAttachRowRepository {
   Future<void> apiCreditPackagePurchase(
     _i1.Session session,
     ApiCreditHistoryItem apiCreditHistoryItem,
-    _i3.ApiCreditPackagePurchase apiCreditPackagePurchase, {
+    _i4.ApiCreditPackagePurchase apiCreditPackagePurchase, {
     _i1.Transaction? transaction,
   }) async {
     if (apiCreditHistoryItem.id == null) {
@@ -773,7 +803,7 @@ class ApiCreditHistoryItemAttachRowRepository {
   Future<void> accountApiUsage(
     _i1.Session session,
     ApiCreditHistoryItem apiCreditHistoryItem,
-    _i4.AccountApiUsage accountApiUsage, {
+    _i5.AccountApiUsage accountApiUsage, {
     _i1.Transaction? transaction,
   }) async {
     if (apiCreditHistoryItem.id == null) {

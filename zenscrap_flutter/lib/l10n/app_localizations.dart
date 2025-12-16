@@ -868,6 +868,18 @@ abstract class AppLocalizations {
   /// **'Monthly AI Credits'**
   String get ai_usage_monthly_ai_credits;
 
+  /// Title for initial account AI credit
+  ///
+  /// In en, this message translates to:
+  /// **'Initial Credit'**
+  String get ai_usage_initial_credit;
+
+  /// Subtitle for initial account AI credit
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome bonus'**
+  String get ai_usage_welcome_bonus;
+
   /// Free plan name
   ///
   /// In en, this message translates to:
@@ -2166,6 +2178,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Monthly Subscription'**
   String get api_usage_monthly_subscription;
+
+  /// Title for initial account API credit
+  ///
+  /// In en, this message translates to:
+  /// **'Initial Credit'**
+  String get api_usage_initial_credit;
+
+  /// Subtitle for initial account API credit
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome bonus'**
+  String get api_usage_welcome_bonus;
 
   /// Plan and date subtitle
   ///

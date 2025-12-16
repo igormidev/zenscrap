@@ -435,6 +435,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get ai_usage_monthly_ai_credits => 'Monatliches KI-Guthaben';
 
   @override
+  String get ai_usage_initial_credit => 'Anfangsguthaben';
+
+  @override
+  String get ai_usage_welcome_bonus => 'Willkommensbonus';
+
+  @override
   String get ai_usage_plan_name_free => 'Kostenlos';
 
   @override
@@ -1190,6 +1196,12 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get api_usage_monthly_subscription => 'Monatliches Abonnement';
+
+  @override
+  String get api_usage_initial_credit => 'Anfangsguthaben';
+
+  @override
+  String get api_usage_welcome_bonus => 'Willkommensbonus';
 
   @override
   String api_usage_plan_date_subtitle(String planName, String date) {

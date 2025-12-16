@@ -124,8 +124,6 @@ class CreditHistoryList extends ConsumerWidget {
 
   Widget _buildHistoryItem(BuildContext context, ApiCreditHistoryItem item) {
     final l10n = AppLocalizations.of(context)!;
-    final isSubscription = item.monthlySubscriptionApiCreditDeposit != null;
-    final isPurchase = item.apiCreditPackagePurchase != null;
 
     // Format date
     final dateFormatter = DateFormat('MMM d, y h:mm a');
@@ -137,28 +135,39 @@ class CreditHistoryList extends ConsumerWidget {
     Color color;
     String? amount;
 
-    if (isSubscription) {
-      icon = Icons.calendar_month;
-      final deposit = item.monthlySubscriptionApiCreditDeposit!;
-      final planName = deposit.planTier == PlanTier.none
-          ? l10n.api_usage_plan_free
-          : deposit.planTier.name.toUpperCase();
-      title = l10n.api_usage_monthly_subscription;
-      subtitle = l10n.api_usage_plan_date_subtitle(planName, dateStr);
-      color = context.c.primary;
-      amount = '+${deposit.creditsAmount}';
-    } else if (isPurchase) {
-      icon = Icons.shopping_cart;
-      title = l10n.api_usage_credit_purchase;
-      subtitle = dateStr;
-      color = context.c.secondary;
-      amount = '+${item.apiCreditPackagePurchase!.value.toInt()}';
-    } else {
-      icon = Icons.help_outline;
-      title = l10n.api_usage_unknown_transaction;
-      subtitle = dateStr;
-      color = context.c.onSurface.withAlpha(150);
-      amount = null;
+    switch (item.transactionType) {
+      case ApiCreditTransactionType.initialAccountCredit:
+        icon = Icons.card_giftcard;
+        title = l10n.api_usage_initial_credit;
+        subtitle = l10n.api_usage_welcome_bonus;
+        color = context.c.tertiary;
+        final deposit = item.monthlySubscriptionApiCreditDeposit;
+        amount = deposit != null ? '+${deposit.creditsAmount}' : null;
+
+      case ApiCreditTransactionType.monthlySubscriptionDeposit:
+        icon = Icons.calendar_month;
+        final deposit = item.monthlySubscriptionApiCreditDeposit;
+        if (deposit != null) {
+          final planName = deposit.planTier == PlanTier.none
+              ? l10n.api_usage_plan_free
+              : deposit.planTier.name.toUpperCase();
+          title = l10n.api_usage_monthly_subscription;
+          subtitle = l10n.api_usage_plan_date_subtitle(planName, dateStr);
+          amount = '+${deposit.creditsAmount}';
+        } else {
+          title = l10n.api_usage_monthly_subscription;
+          subtitle = dateStr;
+          amount = null;
+        }
+        color = context.c.primary;
+
+      case ApiCreditTransactionType.creditPackagePurchase:
+        icon = Icons.shopping_cart;
+        title = l10n.api_usage_credit_purchase;
+        subtitle = dateStr;
+        color = context.c.secondary;
+        final purchase = item.apiCreditPackagePurchase;
+        amount = purchase != null ? '+${purchase.value.toInt()}' : null;
     }
 
     return ListTile(

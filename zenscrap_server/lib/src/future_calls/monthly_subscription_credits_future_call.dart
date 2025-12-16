@@ -76,28 +76,28 @@ class MonthlySubscriptionCreditsFutureCall extends FutureCall {
           );
 
           // Create monthly subscription API credit deposit record
-          final monthlyApiDeposit = MonthlySubscriptionApiCreditDeposit(
-            creditsAmount: creditsToAdd,
-            planTier: accountInfo.planTier,
-          );
-          await MonthlySubscriptionApiCreditDeposit.db.insertRow(
+          final insertedApiDeposit =
+              await MonthlySubscriptionApiCreditDeposit.db.insertRow(
             session,
-            monthlyApiDeposit,
+            MonthlySubscriptionApiCreditDeposit(
+              creditsAmount: creditsToAdd,
+              planTier: accountInfo.planTier,
+            ),
             transaction: transaction,
           );
 
           // Create API credit history item
-          final apiCreditHistoryItem = ApiCreditHistoryItem(
-            date: DateTime.now(),
-            monthlySubscriptionApiCreditDepositId: monthlyApiDeposit.id,
-            monthlySubscriptionApiCreditDeposit: monthlyApiDeposit,
-            apiCreditPackagePurchaseId: null,
-            apiCreditPackagePurchase: null,
-            accountApiUsageId: currentApiUsage.id!,
-          );
           await ApiCreditHistoryItem.db.insertRow(
             session,
-            apiCreditHistoryItem,
+            ApiCreditHistoryItem(
+              date: DateTime.now(),
+              transactionType: ApiCreditTransactionType.monthlySubscriptionDeposit,
+              monthlySubscriptionApiCreditDepositId: insertedApiDeposit.id,
+              monthlySubscriptionApiCreditDeposit: insertedApiDeposit,
+              apiCreditPackagePurchaseId: null,
+              apiCreditPackagePurchase: null,
+              accountApiUsageId: currentApiUsage.id!,
+            ),
             transaction: transaction,
           );
 
@@ -130,26 +130,26 @@ class MonthlySubscriptionCreditsFutureCall extends FutureCall {
             );
 
             // Create monthly subscription AI credit deposit record
-            final monthlyAiDeposit = MonthlySubscriptionAICreditDeposit(
-              creditsAmountInDollars: kDefaultMonthlyAICreditsInDollars,
-              planTier: accountInfo.planTier,
-            );
-            await MonthlySubscriptionAICreditDeposit.db.insertRow(
+            final insertedAiDeposit =
+                await MonthlySubscriptionAICreditDeposit.db.insertRow(
               session,
-              monthlyAiDeposit,
+              MonthlySubscriptionAICreditDeposit(
+                creditsAmountInDollars: kDefaultMonthlyAICreditsInDollars,
+                planTier: accountInfo.planTier,
+              ),
               transaction: transaction,
             );
 
             // Create AI credit history item
-            final aiCreditHistoryItem = AICreditHistoryItem(
-              date: DateTime.now(),
-              monthlySubscriptionAICreditDepositId: monthlyAiDeposit.id,
-              monthlySubscriptionAICreditDeposit: monthlyAiDeposit,
-              accountAIUsageId: aiUsage.id!,
-            );
             await AICreditHistoryItem.db.insertRow(
               session,
-              aiCreditHistoryItem,
+              AICreditHistoryItem(
+                date: DateTime.now(),
+                transactionType: AICreditTransactionType.monthlySubscriptionDeposit,
+                monthlySubscriptionAICreditDepositId: insertedAiDeposit.id,
+                monthlySubscriptionAICreditDeposit: insertedAiDeposit,
+                accountAIUsageId: aiUsage.id!,
+              ),
               transaction: transaction,
             );
 

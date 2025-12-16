@@ -1,0 +1,9 @@
+# AICreditTransactionType
+#
+# Enum representing the type of AI credit transaction.
+# Used to display appropriate text in the UI based on the transaction type.
+enum: AICreditTransactionType
+serialized: byName
+values:
+  - initialAccountCredit  # First credit deposit when account is created
+  - monthlySubscriptionDeposit  # Monthly recurring credit deposit

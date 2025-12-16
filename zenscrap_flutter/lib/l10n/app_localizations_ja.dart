@@ -419,6 +419,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get ai_usage_monthly_ai_credits => '月間AIクレジット';
 
   @override
+  String get ai_usage_initial_credit => '初期クレジット';
+
+  @override
+  String get ai_usage_welcome_bonus => 'ウェルカムボーナス';
+
+  @override
   String get ai_usage_plan_name_free => '無料';
 
   @override
@@ -1136,6 +1142,12 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get api_usage_monthly_subscription => '月額サブスクリプション';
+
+  @override
+  String get api_usage_initial_credit => '初期クレジット';
+
+  @override
+  String get api_usage_welcome_bonus => 'ウェルカムボーナス';
 
   @override
   String api_usage_plan_date_subtitle(String planName, String date) {

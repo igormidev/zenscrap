@@ -429,6 +429,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get ai_usage_monthly_ai_credits => 'Monthly AI Credits';
 
   @override
+  String get ai_usage_initial_credit => 'Initial Credit';
+
+  @override
+  String get ai_usage_welcome_bonus => 'Welcome bonus';
+
+  @override
   String get ai_usage_plan_name_free => 'Free';
 
   @override
@@ -1166,6 +1172,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get api_usage_monthly_subscription => 'Monthly Subscription';
+
+  @override
+  String get api_usage_initial_credit => 'Initial Credit';
+
+  @override
+  String get api_usage_welcome_bonus => 'Welcome bonus';
 
   @override
   String api_usage_plan_date_subtitle(String planName, String date) {
@@ -2315,6 +2327,12 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get ai_usage_monthly_ai_credits => 'Creditos de IA Mensais';
 
   @override
+  String get ai_usage_initial_credit => 'Credito Inicial';
+
+  @override
+  String get ai_usage_welcome_bonus => 'Bonus de boas-vindas';
+
+  @override
   String get ai_usage_plan_name_free => 'Gratis';
 
   @override
@@ -3066,6 +3084,12 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get api_usage_monthly_subscription => 'Assinatura Mensal';
+
+  @override
+  String get api_usage_initial_credit => 'Credito Inicial';
+
+  @override
+  String get api_usage_welcome_bonus => 'Bonus de boas-vindas';
 
   @override
   String api_usage_plan_date_subtitle(String planName, String date) {
