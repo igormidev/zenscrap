@@ -2,6 +2,7 @@
 import 'package:serverpod_auth_server/serverpod_auth_server.dart';
 
 import 'package:serverpod/serverpod.dart';
+import 'package:zenscrap_server/src/core/consts.dart';
 import 'package:zenscrap_server/src/core/translations/error_translations.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
@@ -16,7 +17,7 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
     AnalyticsTimeScope scope = AnalyticsTimeScope.last12Hours,
     SupportedLanguage language = SupportedLanguage.en,
   }) async {
-    const int pageSize = 20; // Fixed page size
+    const int pageSize = kAnalyticsSummaryPageSize;
     final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) throw _authenticationFailed(language);
     final userId = authenticationInfo.userId;
@@ -181,7 +182,7 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
     SupportedLanguage language = SupportedLanguage.en,
   }) async {
     const int daysBack = 7;
-    const int pageSize = 30; // Fixed page size
+    const int pageSize = kAnalyticsDetailPageSize;
     final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) throw _authenticationFailed(language);
     final userId = authenticationInfo.userId;

@@ -1,6 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart';
+import 'package:zenscrap_server/src/core/consts.dart';
 import 'package:zenscrap_server/src/core/translations/error_translations.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
@@ -30,7 +31,7 @@ class PrivateAiUsageEndpoint extends Endpoint {
       throw _accountNotFound(language);
     }
 
-    const int pageSize = 6;
+    const int pageSize = kCreditHistoryPageSize;
 
     // Ensure page is at least 1
     page = page < 1 ? 1 : page;
@@ -212,7 +213,7 @@ class PrivateAiUsageEndpoint extends Endpoint {
       throw _accountNotFound(language);
     }
 
-    const int pageSize = 10;
+    const int pageSize = kAutoFixSessionPageSize;
 
     // Ensure page is at least 1
     page = page < 1 ? 1 : page;

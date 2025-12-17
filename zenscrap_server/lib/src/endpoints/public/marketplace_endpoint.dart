@@ -1,4 +1,5 @@
 import 'package:serverpod/serverpod.dart';
+import 'package:zenscrap_server/src/core/consts.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 typedef ScrappableId = int;
@@ -14,7 +15,7 @@ class MarketplaceEndpoint extends Endpoint {
     SupportedLanguage language = SupportedLanguage.en,
   }) async {
     final now = DateTime.now();
-    const int pageSize = 12;
+    const int pageSize = kScrappableGridPageSize;
 
     // Ensure page is at least 1
     page = page < 1 ? 1 : page;

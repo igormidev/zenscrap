@@ -1,5 +1,6 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart';
+import 'package:zenscrap_server/src/core/consts.dart';
 import 'package:zenscrap_server/src/core/translations/error_translations.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
@@ -28,7 +29,7 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
       throw _accountNotFoundForUser(language);
     }
 
-    const int pageSize = 12;
+    const int pageSize = kScrappableGridPageSize;
 
     // Ensure page is at least 1
     page = page < 1 ? 1 : page;

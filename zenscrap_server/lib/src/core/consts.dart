@@ -37,3 +37,25 @@ const double kGpt5InputPricePerMillionTokens = 1.25;
 
 /// GPT-5 output token price per million tokens ($10.00) - same as GPT-5.1
 const double kGpt5OutputPricePerMillionTokens = 10.00;
+
+// =============================================================================
+// Pagination Constants
+// =============================================================================
+
+/// Page size for scrappable analytics summary view (grid of scrappables with
+/// aggregated request counts per time scope).
+const int kAnalyticsSummaryPageSize = 20;
+
+/// Page size for detailed analytics view (individual request logs for a
+/// specific scrappable).
+const int kAnalyticsDetailPageSize = 30;
+
+/// Page size for credit history views (API credits and AI credits).
+/// Used in both API usage and AI usage history endpoints.
+const int kCreditHistoryPageSize = 6;
+
+/// Page size for auto-fix session history.
+const int kAutoFixSessionPageSize = 10;
+
+/// Page size for scrappable grid views (marketplace and user scrappables).
+const int kScrappableGridPageSize = 12;

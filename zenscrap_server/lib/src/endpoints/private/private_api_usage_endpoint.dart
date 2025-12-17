@@ -1,6 +1,7 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as auth;
 import 'package:serverpod_auth_server/serverpod_auth_server.dart';
+import 'package:zenscrap_server/src/core/consts.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_api.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_config.dart';
 import 'package:zenscrap_server/src/core/translations/error_translations.dart';
@@ -33,7 +34,7 @@ class PrivateApiUsageEndpoint extends Endpoint {
       throw _accountNotFound(language);
     }
 
-    const int pageSize = 6;
+    const int pageSize = kCreditHistoryPageSize;
 
     // Ensure page is at least 1
     page = page < 1 ? 1 : page;
