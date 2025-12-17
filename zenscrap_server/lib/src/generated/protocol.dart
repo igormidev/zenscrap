@@ -1817,6 +1817,19 @@ class Protocol extends _i1.SerializationManagerServer {
           isPrimary: true,
         ),
         _i2.IndexDefinition(
+          indexName: 'scrappable_analytics_scrappable_id_idx',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'scrappableId',
+            ),
+          ],
+          type: 'btree',
+          isUnique: false,
+          isPrimary: false,
+        ),
+        _i2.IndexDefinition(
           indexName: 'scrappable_analytics_attached_nanoid_idx',
           tableSpace: null,
           elements: [

@@ -11,6 +11,8 @@ fields:
   duration: Duration?
 
 indexes:
+  scrappable_analytics_scrappable_id_idx:
+    fields: scrappableId
   scrappable_analytics_attached_nanoid_idx:
     fields: attachedNanoId
   scrappable_analytics_attached_apikey_idx:
