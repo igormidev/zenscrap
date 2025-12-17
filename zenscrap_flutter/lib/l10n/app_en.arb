@@ -520,6 +520,14 @@
   "@ai_usage_monthly_ai_credits": {
     "description": "Title for monthly AI credits transaction"
   },
+  "ai_usage_initial_credit": "Initial Credit",
+  "@ai_usage_initial_credit": {
+    "description": "Title for initial account AI credit"
+  },
+  "ai_usage_welcome_bonus": "Welcome bonus",
+  "@ai_usage_welcome_bonus": {
+    "description": "Subtitle for initial account AI credit"
+  },
   "ai_usage_plan_name_free": "Free",
   "@ai_usage_plan_name_free": {
     "description": "Free plan name"
@@ -704,6 +712,82 @@
   "ai_usage_load_more": "Load More",
   "@ai_usage_load_more": {
     "description": "Load more button label"
+  },
+  "ai_usage_api_key_section_title": "OpenAI API Key",
+  "@ai_usage_api_key_section_title": {
+    "description": "Title for the API key management section"
+  },
+  "ai_usage_api_key_description": "Use your own OpenAI API key to bypass monthly credit limits. Your key is stored securely.",
+  "@ai_usage_api_key_description": {
+    "description": "Description explaining what the API key is for"
+  },
+  "ai_usage_api_key_configured": "API key configured",
+  "@ai_usage_api_key_configured": {
+    "description": "Status text when API key is set"
+  },
+  "ai_usage_api_key_not_configured": "No API key configured",
+  "@ai_usage_api_key_not_configured": {
+    "description": "Status text when no API key is set"
+  },
+  "ai_usage_api_key_add": "Add API Key",
+  "@ai_usage_api_key_add": {
+    "description": "Button to add API key"
+  },
+  "ai_usage_api_key_edit": "Edit",
+  "@ai_usage_api_key_edit": {
+    "description": "Button to edit API key"
+  },
+  "ai_usage_api_key_remove": "Remove",
+  "@ai_usage_api_key_remove": {
+    "description": "Button to remove API key"
+  },
+  "ai_usage_api_key_dialog_title": "OpenAI API Key",
+  "@ai_usage_api_key_dialog_title": {
+    "description": "Dialog title for API key input"
+  },
+  "ai_usage_api_key_dialog_hint": "sk-...",
+  "@ai_usage_api_key_dialog_hint": {
+    "description": "Hint text for API key input field"
+  },
+  "ai_usage_api_key_dialog_description": "Enter your OpenAI API key. The key will be validated before saving.",
+  "@ai_usage_api_key_dialog_description": {
+    "description": "Description in the API key dialog"
+  },
+  "ai_usage_api_key_show": "Show API key",
+  "@ai_usage_api_key_show": {
+    "description": "Tooltip for showing the API key"
+  },
+  "ai_usage_api_key_hide": "Hide API key",
+  "@ai_usage_api_key_hide": {
+    "description": "Tooltip for hiding the API key"
+  },
+  "ai_usage_api_key_save": "Save",
+  "@ai_usage_api_key_save": {
+    "description": "Save button label"
+  },
+  "ai_usage_api_key_cancel": "Cancel",
+  "@ai_usage_api_key_cancel": {
+    "description": "Cancel button label"
+  },
+  "ai_usage_api_key_remove_confirm_title": "Remove API Key?",
+  "@ai_usage_api_key_remove_confirm_title": {
+    "description": "Confirmation dialog title for removing API key"
+  },
+  "ai_usage_api_key_remove_confirm_message": "Are you sure you want to remove your OpenAI API key? You will use the platform's monthly credits instead.",
+  "@ai_usage_api_key_remove_confirm_message": {
+    "description": "Confirmation dialog message for removing API key"
+  },
+  "ai_usage_api_key_updated": "API key updated successfully",
+  "@ai_usage_api_key_updated": {
+    "description": "Success message when API key is updated"
+  },
+  "ai_usage_api_key_removed": "API key removed successfully",
+  "@ai_usage_api_key_removed": {
+    "description": "Success message when API key is removed"
+  },
+  "ai_usage_api_key_error": "Failed to update API key",
+  "@ai_usage_api_key_error": {
+    "description": "Error message when API key update fails"
   },
 
   "api_analytics_title": "API Analytics",
@@ -1037,6 +1121,38 @@
         "type": "int"
       }
     }
+  },
+  "api_analytics_subtitle": "Endpoints you've called in the selected time period",
+  "@api_analytics_subtitle": {
+    "description": "Subtitle explaining what endpoints are shown"
+  },
+  "api_analytics_scope_tooltip": "Shows endpoints you've interacted with during this time period",
+  "@api_analytics_scope_tooltip": {
+    "description": "Tooltip for time scope selector"
+  },
+  "api_analytics_badge_yours": "Yours",
+  "@api_analytics_badge_yours": {
+    "description": "Badge label for user's own endpoints"
+  },
+  "api_analytics_badge_marketplace": "Marketplace",
+  "@api_analytics_badge_marketplace": {
+    "description": "Badge label for marketplace endpoints"
+  },
+  "api_analytics_api_key_label": "API Key:",
+  "@api_analytics_api_key_label": {
+    "description": "Label for API key in analytics details"
+  },
+  "api_analytics_api_key_deleted": "API Key (deleted)",
+  "@api_analytics_api_key_deleted": {
+    "description": "Placeholder shown when API key was deleted"
+  },
+  "api_analytics_api_key_copied": "API key copied to clipboard",
+  "@api_analytics_api_key_copied": {
+    "description": "Snackbar message when API key is copied"
+  },
+  "api_analytics_copy_button": "Copy",
+  "@api_analytics_copy_button": {
+    "description": "Copy button label"
   },
 
   "api_usage_page_title": "Api Credits & Keys",
@@ -1447,6 +1563,14 @@
   "@api_usage_monthly_subscription": {
     "description": "Monthly subscription transaction title"
   },
+  "api_usage_initial_credit": "Initial Credit",
+  "@api_usage_initial_credit": {
+    "description": "Title for initial account API credit"
+  },
+  "api_usage_welcome_bonus": "Welcome bonus",
+  "@api_usage_welcome_bonus": {
+    "description": "Subtitle for initial account API credit"
+  },
   "api_usage_plan_date_subtitle": "{planName} plan • {date}",
   "@api_usage_plan_date_subtitle": {
     "description": "Plan and date subtitle",
@@ -1649,6 +1773,10 @@
   "dashboard_nav_subscription": "Subscription",
   "@dashboard_nav_subscription": {
     "description": "Navigation label for subscription/pricing page"
+  },
+  "dashboard_nav_ai_usage": "AI Usage",
+  "@dashboard_nav_ai_usage": {
+    "description": "Navigation label for AI usage page"
   },
   "dashboard_collapse_tab": "Collapse tab",
   "@dashboard_collapse_tab": {

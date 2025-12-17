@@ -187,6 +187,11 @@ enum DashboardNavigationType {
     inactiveIcon: Icons.analytics_outlined,
     routeOnClick: '/api-analytics',
   ),
+  aiUsage(
+    activeIcon: Icons.smart_toy,
+    inactiveIcon: Icons.smart_toy_outlined,
+    routeOnClick: '/ai-usage',
+  ),
   account(
     activeIcon: Icons.person,
     inactiveIcon: Icons.person_outline,
@@ -220,6 +225,7 @@ enum DashboardNavigationType {
       DashboardNavigationType.marketPlace => l10n.dashboard_nav_marketplace,
       DashboardNavigationType.usage => l10n.dashboard_nav_credits_keys,
       DashboardNavigationType.analytics => l10n.dashboard_nav_api_analytics,
+      DashboardNavigationType.aiUsage => l10n.dashboard_nav_ai_usage,
       DashboardNavigationType.account => l10n.dashboard_nav_account,
       DashboardNavigationType.logOut => l10n.dashboard_nav_log_out,
       DashboardNavigationType.pricingPage => l10n.dashboard_nav_subscription,

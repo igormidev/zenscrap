@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
+import 'package:zenscrap_flutter/src/core/extensions/request_status_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/ui/api_analytics/widgets/stat_card.dart';
 
@@ -48,86 +49,85 @@ class AnalyticsStatsSummary extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: context.c.surfaceContainerHighest.withAlpha(50),
+        color: context.c.surfaceContainerHighest.withAlpha(30),
       ),
       child: Column(
         children: [
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           SizedBox(
-            height: 60,
+            height: 64,
             child: ListView(
               shrinkWrap: true,
               scrollDirection: Axis.horizontal,
               padding: EdgeInsets.zero,
               children: [
-                SizedBox(width: 16),
+                const SizedBox(width: 16),
                 StatCard(
                   label: l10n.api_analytics_status_success,
                   count: totalSuccess,
-                  color: Colors.green,
+                  color: RequestStatus.success.color,
                   tooltip: l10n.api_analytics_tooltip_success,
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 StatCard(
                   label: l10n.api_analytics_status_4xx,
                   count: totalClientError,
-                  color: Colors.orange,
+                  color: RequestStatus.clientError.color,
                   tooltip: l10n.api_analytics_tooltip_client_error,
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 StatCard(
                   label: l10n.api_analytics_status_5xx,
                   count: totalServerError,
-                  color: Colors.red,
+                  color: RequestStatus.serverError.color,
                   tooltip: l10n.api_analytics_tooltip_server_error,
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 StatCard(
                   label: l10n.api_analytics_stat_extract_rules_errors,
                   count: totalFailedAtScrappingBee,
-                  color: const Color(0xFFE91E63),
+                  color: RequestStatus.failedAtScrappingBee.color,
                   tooltip: l10n.api_analytics_tooltip_extract_rules_error,
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 StatCard(
                   label: l10n.api_analytics_stat_no_credits,
                   count: totalInsufficientCredits,
-                  color: Colors.purple,
+                  color: RequestStatus.insufficientCredits.color,
                   tooltip: l10n.api_analytics_tooltip_insufficient_credits,
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 StatCard(
                   label: l10n.api_analytics_status_max_concurrency,
                   count: totalMaxConcurrency,
-                  color: Colors.cyan,
+                  color: RequestStatus.maxConcurrencyExceeded.color,
                   tooltip: l10n.api_analytics_tooltip_max_concurrency,
                 ),
               ],
             ),
           ),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           Align(
             alignment: Alignment.centerRight,
             child: Container(
               margin: const EdgeInsets.only(right: 16),
               decoration: BoxDecoration(
-                color: context.c.surface.withAlpha(30),
-                borderRadius: BorderRadius.circular(8),
+                color: context.c.surfaceContainerLow.withAlpha(80),
+                borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: context.c.outline.withAlpha(100),
+                  color: context.c.outline.withAlpha(40),
                 ),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
-                    Icons.info,
-                    // Icons.storage_outlined,
-                    color: context.c.onSurface.withAlpha(150),
-                    size: 16,
+                    Icons.info_outline,
+                    color: context.c.onSurface.withAlpha(120),
+                    size: 14,
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: 6),
                   Text(
                     l10n.api_analytics_showing_count(data.items.length, data.totalCount),
                     style: context.t.bodySmall?.copyWith(

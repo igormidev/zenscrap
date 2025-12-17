@@ -309,10 +309,10 @@ packages:
     dependency: transitive
     description:
       name: googleapis
-      sha256: "5c9e0f25be1dec13d8d2158263141104c51b5ba83487537c17a2330581e505ee"
+      sha256: "692fb9e90c321b61a7a2123de0353ec8a20691cd979db2553d8d732f710f6535"
       url: "https://pub.dev"
     source: hosted
-    version: "14.0.0"
+    version: "15.0.0"
   googleapis_auth:
     dependency: transitive
     description:
@@ -357,10 +357,10 @@ packages:
     dependency: transitive
     description:
       name: image
-      sha256: "4e973fcf4caae1a4be2fa0a13157aa38a8f9cb049db6529aa00b4d71abc4d928"
+      sha256: "51555e36056541237b15b57afc31a0f53d4f9aefd9bd00873a6dc0090e54e332"
       url: "https://pub.dev"
     source: hosted
-    version: "4.5.4"
+    version: "4.6.0"
   intl:
     dependency: transitive
     description:
@@ -477,10 +477,10 @@ packages:
     dependency: transitive
     description:
       name: openid_client
-      sha256: "9f09d107a8bcb540e0c5d3aa5601440c5eea7043a665dfbf8bcff10383049e03"
+      sha256: d7c229b849eaf4ff0ac77c22f8f1c4c522f6830b8c58d7b73953514ad6980954
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.9+1"
+    version: "0.4.9+2"
   package_config:
     dependency: transitive
     description:

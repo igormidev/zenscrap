@@ -429,6 +429,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ai_usage_monthly_ai_credits => 'Monthly AI Credits';
 
   @override
+  String get ai_usage_initial_credit => 'Initial Credit';
+
+  @override
+  String get ai_usage_welcome_bonus => 'Welcome bonus';
+
+  @override
   String get ai_usage_plan_name_free => 'Free';
 
   @override
@@ -554,6 +560,66 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ai_usage_load_more => 'Load More';
+
+  @override
+  String get ai_usage_api_key_section_title => 'OpenAI API Key';
+
+  @override
+  String get ai_usage_api_key_description =>
+      'Use your own OpenAI API key to bypass monthly credit limits. Your key is stored securely.';
+
+  @override
+  String get ai_usage_api_key_configured => 'API key configured';
+
+  @override
+  String get ai_usage_api_key_not_configured => 'No API key configured';
+
+  @override
+  String get ai_usage_api_key_add => 'Add API Key';
+
+  @override
+  String get ai_usage_api_key_edit => 'Edit';
+
+  @override
+  String get ai_usage_api_key_remove => 'Remove';
+
+  @override
+  String get ai_usage_api_key_dialog_title => 'OpenAI API Key';
+
+  @override
+  String get ai_usage_api_key_dialog_hint => 'sk-...';
+
+  @override
+  String get ai_usage_api_key_dialog_description =>
+      'Enter your OpenAI API key. The key will be validated before saving.';
+
+  @override
+  String get ai_usage_api_key_show => 'Show API key';
+
+  @override
+  String get ai_usage_api_key_hide => 'Hide API key';
+
+  @override
+  String get ai_usage_api_key_save => 'Save';
+
+  @override
+  String get ai_usage_api_key_cancel => 'Cancel';
+
+  @override
+  String get ai_usage_api_key_remove_confirm_title => 'Remove API Key?';
+
+  @override
+  String get ai_usage_api_key_remove_confirm_message =>
+      'Are you sure you want to remove your OpenAI API key? You will use the platform\'s monthly credits instead.';
+
+  @override
+  String get ai_usage_api_key_updated => 'API key updated successfully';
+
+  @override
+  String get ai_usage_api_key_removed => 'API key removed successfully';
+
+  @override
+  String get ai_usage_api_key_error => 'Failed to update API key';
 
   @override
   String get api_analytics_title => 'API Analytics';
@@ -780,6 +846,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String api_analytics_expand_more_lines(int count) {
     return 'Click expand to see $count+ more lines';
   }
+
+  @override
+  String get api_analytics_subtitle =>
+      'Endpoints you\'ve called in the selected time period';
+
+  @override
+  String get api_analytics_scope_tooltip =>
+      'Shows endpoints you\'ve interacted with during this time period';
+
+  @override
+  String get api_analytics_badge_yours => 'Yours';
+
+  @override
+  String get api_analytics_badge_marketplace => 'Marketplace';
+
+  @override
+  String get api_analytics_api_key_label => 'API Key:';
+
+  @override
+  String get api_analytics_api_key_deleted => 'API Key (deleted)';
+
+  @override
+  String get api_analytics_api_key_copied => 'API key copied to clipboard';
+
+  @override
+  String get api_analytics_copy_button => 'Copy';
 
   @override
   String get api_usage_page_title => 'Api Credits & Keys';
@@ -1108,6 +1200,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get api_usage_monthly_subscription => 'Monthly Subscription';
 
   @override
+  String get api_usage_initial_credit => 'Initial Credit';
+
+  @override
+  String get api_usage_welcome_bonus => 'Welcome bonus';
+
+  @override
   String api_usage_plan_date_subtitle(String planName, String date) {
     return '$planName plan • $date';
   }
@@ -1259,6 +1357,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dashboard_nav_subscription => 'Subscription';
+
+  @override
+  String get dashboard_nav_ai_usage => 'AI Usage';
 
   @override
   String get dashboard_collapse_tab => 'Collapse tab';

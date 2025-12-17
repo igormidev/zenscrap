@@ -112,6 +112,21 @@ class EndpointPrivateAiUsage extends _i1.EndpointRef {
     {'language': language},
   );
 
+  /// Updates the user's OpenAI API key.
+  /// Pass null or empty string to remove the API key.
+  /// The key is validated against OpenAI's API before being saved.
+  _i2.Future<_i6.AccountAIUsage> updateOpenAiApiKey({
+    String? apiKey,
+    required _i4.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i6.AccountAIUsage>(
+    'privateAiUsage',
+    'updateOpenAiApiKey',
+    {
+      'apiKey': apiKey,
+      'language': language,
+    },
+  );
+
   /// Returns paginated auto-fix sessions for scrappables owned by the authenticated user.
   ///
   /// This includes all auto-fix repair attempts across all of the user's scrappables,

@@ -1,0 +1,10 @@
+# ApiCreditTransactionType
+#
+# Enum representing the type of API credit transaction.
+# Used to display appropriate text in the UI based on the transaction type.
+enum: ApiCreditTransactionType
+serialized: byName
+values:
+  - initialAccountCredit  # First credit deposit when account is created
+  - monthlySubscriptionDeposit  # Monthly recurring credit deposit
+  - creditPackagePurchase  # One-time credit package purchase

@@ -155,9 +155,21 @@ class _ScrappablesGridViewState extends ConsumerState<ScrappablesGridView> {
           Row(
             children: [
               Expanded(
-                child: Text(
-                  l10n.api_analytics_title,
-                  style: context.t.displaySmall,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.api_analytics_title,
+                      style: context.t.displaySmall,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      l10n.api_analytics_subtitle,
+                      style: context.t.bodyMedium?.copyWith(
+                        color: context.c.onSurface.withAlpha(150),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               ValueListenableBuilder(
@@ -202,22 +214,22 @@ class _ScrappablesGridViewState extends ConsumerState<ScrappablesGridView> {
             children: [
               Container(
                 decoration: BoxDecoration(
-                  color: context.c.primaryContainer.withAlpha(60),
-                  borderRadius: BorderRadius.circular(8),
+                  color: context.c.primaryContainer.withAlpha(40),
+                  borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: context.c.primary.withAlpha(60),
+                    color: context.c.primary.withAlpha(40),
                   ),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
-                      Icons.warning_rounded,
-                      color: context.c.primary.withAlpha(150),
-                      size: 16,
+                      Icons.schedule_outlined,
+                      color: context.c.primary.withAlpha(180),
+                      size: 14,
                     ),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: 6),
                     Text(
                       l10n.api_analytics_request_delay_warning,
                       style: context.t.bodySmall?.copyWith(
@@ -227,35 +239,31 @@ class _ScrappablesGridViewState extends ConsumerState<ScrappablesGridView> {
                   ],
                 ),
               ),
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               Container(
                 decoration: BoxDecoration(
-                  color: context.c.surface.withAlpha(30),
-                  borderRadius: BorderRadius.circular(8),
+                  color: context.c.surfaceContainerLow.withAlpha(60),
+                  borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: context.c.outline.withAlpha(100),
+                    color: context.c.outline.withAlpha(40),
                   ),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Icon(
-                      Icons.info,
-                      color: context.c.onSurface.withAlpha(150),
+                      Icons.info_outline,
+                      color: context.c.onSurface.withAlpha(120),
                       size: 14,
                     ),
-                    const SizedBox(width: 4),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 1),
-                      child: Text(
-                        _getScopeExplanation(context),
-                        // 'A request can take up to 10 minutes to appear here',
-                        style: context.t.bodySmall?.copyWith(
-                          color: context.c.onSurface.withAlpha(150),
-                          fontSize: 11,
-                        ),
+                    const SizedBox(width: 6),
+                    Text(
+                      _getScopeExplanation(context),
+                      style: context.t.bodySmall?.copyWith(
+                        color: context.c.onSurface.withAlpha(150),
+                        fontSize: 11,
                       ),
                     ),
                   ],

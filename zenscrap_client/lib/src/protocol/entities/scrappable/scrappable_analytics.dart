@@ -14,7 +14,8 @@ import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import '../../entities/scrappable/request_status.dart' as _i2;
 import '../../entities/scrappable/scrappable.dart' as _i3;
 import '../../entities/analytics/analytics_request_details.dart' as _i4;
-import 'package:zenscrap_client/src/protocol/protocol.dart' as _i5;
+import '../../entities/account/account_api_key.dart' as _i5;
+import 'package:zenscrap_client/src/protocol/protocol.dart' as _i6;
 
 abstract class ScrappableAnalytics implements _i1.SerializableModel {
   ScrappableAnalytics._({
@@ -27,6 +28,8 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
     this.scrappable,
     this.detailsId,
     this.details,
+    this.apiKeyId,
+    this.apiKey,
   });
 
   factory ScrappableAnalytics({
@@ -39,6 +42,8 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
     _i3.Scrappable? scrappable,
     int? detailsId,
     _i4.AnalyticsRequestDetails? details,
+    int? apiKeyId,
+    _i5.AccountApiKey? apiKey,
   }) = _ScrappableAnalyticsImpl;
 
   factory ScrappableAnalytics.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -55,14 +60,20 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
       scrappableId: jsonSerialization['scrappableId'] as int,
       scrappable: jsonSerialization['scrappable'] == null
           ? null
-          : _i5.Protocol().deserialize<_i3.Scrappable>(
+          : _i6.Protocol().deserialize<_i3.Scrappable>(
               jsonSerialization['scrappable'],
             ),
       detailsId: jsonSerialization['detailsId'] as int?,
       details: jsonSerialization['details'] == null
           ? null
-          : _i5.Protocol().deserialize<_i4.AnalyticsRequestDetails>(
+          : _i6.Protocol().deserialize<_i4.AnalyticsRequestDetails>(
               jsonSerialization['details'],
+            ),
+      apiKeyId: jsonSerialization['apiKeyId'] as int?,
+      apiKey: jsonSerialization['apiKey'] == null
+          ? null
+          : _i6.Protocol().deserialize<_i5.AccountApiKey>(
+              jsonSerialization['apiKey'],
             ),
     );
   }
@@ -88,6 +99,10 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
 
   _i4.AnalyticsRequestDetails? details;
 
+  int? apiKeyId;
+
+  _i5.AccountApiKey? apiKey;
+
   /// Returns a shallow copy of this [ScrappableAnalytics]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
@@ -101,6 +116,8 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
     _i3.Scrappable? scrappable,
     int? detailsId,
     _i4.AnalyticsRequestDetails? details,
+    int? apiKeyId,
+    _i5.AccountApiKey? apiKey,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -115,6 +132,8 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
       if (scrappable != null) 'scrappable': scrappable?.toJson(),
       if (detailsId != null) 'detailsId': detailsId,
       if (details != null) 'details': details?.toJson(),
+      if (apiKeyId != null) 'apiKeyId': apiKeyId,
+      if (apiKey != null) 'apiKey': apiKey?.toJson(),
     };
   }
 
@@ -137,6 +156,8 @@ class _ScrappableAnalyticsImpl extends ScrappableAnalytics {
     _i3.Scrappable? scrappable,
     int? detailsId,
     _i4.AnalyticsRequestDetails? details,
+    int? apiKeyId,
+    _i5.AccountApiKey? apiKey,
   }) : super._(
          id: id,
          requestStatus: requestStatus,
@@ -147,6 +168,8 @@ class _ScrappableAnalyticsImpl extends ScrappableAnalytics {
          scrappable: scrappable,
          detailsId: detailsId,
          details: details,
+         apiKeyId: apiKeyId,
+         apiKey: apiKey,
        );
 
   /// Returns a shallow copy of this [ScrappableAnalytics]
@@ -163,6 +186,8 @@ class _ScrappableAnalyticsImpl extends ScrappableAnalytics {
     Object? scrappable = _Undefined,
     Object? detailsId = _Undefined,
     Object? details = _Undefined,
+    Object? apiKeyId = _Undefined,
+    Object? apiKey = _Undefined,
   }) {
     return ScrappableAnalytics(
       id: id is int? ? id : this.id,
@@ -178,6 +203,8 @@ class _ScrappableAnalyticsImpl extends ScrappableAnalytics {
       details: details is _i4.AnalyticsRequestDetails?
           ? details
           : this.details?.copyWith(),
+      apiKeyId: apiKeyId is int? ? apiKeyId : this.apiKeyId,
+      apiKey: apiKey is _i5.AccountApiKey? ? apiKey : this.apiKey?.copyWith(),
     );
   }
 }

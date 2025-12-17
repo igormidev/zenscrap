@@ -437,6 +437,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get ai_usage_monthly_ai_credits => 'Credits IA Mensuels';
 
   @override
+  String get ai_usage_initial_credit => 'Credit Initial';
+
+  @override
+  String get ai_usage_welcome_bonus => 'Bonus de bienvenue';
+
+  @override
   String get ai_usage_plan_name_free => 'Gratuit';
 
   @override
@@ -564,6 +570,66 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get ai_usage_load_more => 'Charger plus';
+
+  @override
+  String get ai_usage_api_key_section_title => 'Cle API OpenAI';
+
+  @override
+  String get ai_usage_api_key_description =>
+      'Utilisez votre propre cle API OpenAI pour contourner les limites de credits mensuels. Votre cle est stockee en toute securite.';
+
+  @override
+  String get ai_usage_api_key_configured => 'Cle API configuree';
+
+  @override
+  String get ai_usage_api_key_not_configured => 'Aucune cle API configuree';
+
+  @override
+  String get ai_usage_api_key_add => 'Ajouter une Cle API';
+
+  @override
+  String get ai_usage_api_key_edit => 'Modifier';
+
+  @override
+  String get ai_usage_api_key_remove => 'Supprimer';
+
+  @override
+  String get ai_usage_api_key_dialog_title => 'Cle API OpenAI';
+
+  @override
+  String get ai_usage_api_key_dialog_hint => 'sk-...';
+
+  @override
+  String get ai_usage_api_key_dialog_description =>
+      'Entrez votre cle API OpenAI. La cle sera validee avant l\'enregistrement.';
+
+  @override
+  String get ai_usage_api_key_show => 'Afficher la cle API';
+
+  @override
+  String get ai_usage_api_key_hide => 'Masquer la cle API';
+
+  @override
+  String get ai_usage_api_key_save => 'Enregistrer';
+
+  @override
+  String get ai_usage_api_key_cancel => 'Annuler';
+
+  @override
+  String get ai_usage_api_key_remove_confirm_title => 'Supprimer la Cle API?';
+
+  @override
+  String get ai_usage_api_key_remove_confirm_message =>
+      'Etes-vous sur de vouloir supprimer votre cle API OpenAI? Vous utiliserez les credits mensuels de la plateforme a la place.';
+
+  @override
+  String get ai_usage_api_key_updated => 'Cle API mise a jour avec succes';
+
+  @override
+  String get ai_usage_api_key_removed => 'Cle API supprimee avec succes';
+
+  @override
+  String get ai_usage_api_key_error => 'Echec de la mise a jour de la cle API';
 
   @override
   String get api_analytics_title => 'Analytiques API';
@@ -795,6 +861,32 @@ class AppLocalizationsFr extends AppLocalizations {
   String api_analytics_expand_more_lines(int count) {
     return 'Cliquez sur developper pour voir $count+ lignes supplementaires';
   }
+
+  @override
+  String get api_analytics_subtitle =>
+      'Endpoints you\'ve called in the selected time period';
+
+  @override
+  String get api_analytics_scope_tooltip =>
+      'Shows endpoints you\'ve interacted with during this time period';
+
+  @override
+  String get api_analytics_badge_yours => 'Yours';
+
+  @override
+  String get api_analytics_badge_marketplace => 'Marketplace';
+
+  @override
+  String get api_analytics_api_key_label => 'API Key:';
+
+  @override
+  String get api_analytics_api_key_deleted => 'API Key (deleted)';
+
+  @override
+  String get api_analytics_api_key_copied => 'API key copied to clipboard';
+
+  @override
+  String get api_analytics_copy_button => 'Copy';
 
   @override
   String get api_usage_page_title => 'Credits et Cles API';
@@ -1132,6 +1224,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get api_usage_monthly_subscription => 'Abonnement Mensuel';
 
   @override
+  String get api_usage_initial_credit => 'Credit Initial';
+
+  @override
+  String get api_usage_welcome_bonus => 'Bonus de bienvenue';
+
+  @override
   String api_usage_plan_date_subtitle(String planName, String date) {
     return 'Forfait $planName • $date';
   }
@@ -1285,6 +1383,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get dashboard_nav_subscription => 'Abonnement';
+
+  @override
+  String get dashboard_nav_ai_usage => 'Utilisation de l\'IA';
 
   @override
   String get dashboard_collapse_tab => 'Reduire l\'onglet';

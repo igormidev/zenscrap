@@ -419,6 +419,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get ai_usage_monthly_ai_credits => '月間AIクレジット';
 
   @override
+  String get ai_usage_initial_credit => '初期クレジット';
+
+  @override
+  String get ai_usage_welcome_bonus => 'ウェルカムボーナス';
+
+  @override
   String get ai_usage_plan_name_free => '無料';
 
   @override
@@ -544,6 +550,66 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get ai_usage_load_more => 'もっと読み込む';
+
+  @override
+  String get ai_usage_api_key_section_title => 'OpenAI APIキー';
+
+  @override
+  String get ai_usage_api_key_description =>
+      '独自のOpenAI APIキーを使用して、月間クレジット制限を回避できます。キーは安全に保存されます。';
+
+  @override
+  String get ai_usage_api_key_configured => 'APIキーが設定されています';
+
+  @override
+  String get ai_usage_api_key_not_configured => 'APIキーが設定されていません';
+
+  @override
+  String get ai_usage_api_key_add => 'APIキーを追加';
+
+  @override
+  String get ai_usage_api_key_edit => '編集';
+
+  @override
+  String get ai_usage_api_key_remove => '削除';
+
+  @override
+  String get ai_usage_api_key_dialog_title => 'OpenAI APIキー';
+
+  @override
+  String get ai_usage_api_key_dialog_hint => 'sk-...';
+
+  @override
+  String get ai_usage_api_key_dialog_description =>
+      'OpenAI APIキーを入力してください。保存前にキーが検証されます。';
+
+  @override
+  String get ai_usage_api_key_show => 'APIキーを表示';
+
+  @override
+  String get ai_usage_api_key_hide => 'APIキーを隠す';
+
+  @override
+  String get ai_usage_api_key_save => '保存';
+
+  @override
+  String get ai_usage_api_key_cancel => 'キャンセル';
+
+  @override
+  String get ai_usage_api_key_remove_confirm_title => 'APIキーを削除しますか?';
+
+  @override
+  String get ai_usage_api_key_remove_confirm_message =>
+      'OpenAI APIキーを削除してもよろしいですか? 代わりにプラットフォームの月間クレジットを使用することになります。';
+
+  @override
+  String get ai_usage_api_key_updated => 'APIキーが正常に更新されました';
+
+  @override
+  String get ai_usage_api_key_removed => 'APIキーが正常に削除されました';
+
+  @override
+  String get ai_usage_api_key_error => 'APIキーの更新に失敗しました';
 
   @override
   String get api_analytics_title => 'API分析';
@@ -765,6 +831,32 @@ class AppLocalizationsJa extends AppLocalizations {
   String api_analytics_expand_more_lines(int count) {
     return '展開をクリックして残り$count行以上を表示';
   }
+
+  @override
+  String get api_analytics_subtitle =>
+      'Endpoints you\'ve called in the selected time period';
+
+  @override
+  String get api_analytics_scope_tooltip =>
+      'Shows endpoints you\'ve interacted with during this time period';
+
+  @override
+  String get api_analytics_badge_yours => 'Yours';
+
+  @override
+  String get api_analytics_badge_marketplace => 'Marketplace';
+
+  @override
+  String get api_analytics_api_key_label => 'API Key:';
+
+  @override
+  String get api_analytics_api_key_deleted => 'API Key (deleted)';
+
+  @override
+  String get api_analytics_api_key_copied => 'API key copied to clipboard';
+
+  @override
+  String get api_analytics_copy_button => 'Copy';
 
   @override
   String get api_usage_page_title => 'APIクレジット＆キー';
@@ -1078,6 +1170,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get api_usage_monthly_subscription => '月額サブスクリプション';
 
   @override
+  String get api_usage_initial_credit => '初期クレジット';
+
+  @override
+  String get api_usage_welcome_bonus => 'ウェルカムボーナス';
+
+  @override
   String api_usage_plan_date_subtitle(String planName, String date) {
     return '$planNameプラン • $date';
   }
@@ -1222,6 +1320,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get dashboard_nav_subscription => 'サブスクリプション';
+
+  @override
+  String get dashboard_nav_ai_usage => 'AI使用状況';
 
   @override
   String get dashboard_collapse_tab => 'タブを折りたたむ';

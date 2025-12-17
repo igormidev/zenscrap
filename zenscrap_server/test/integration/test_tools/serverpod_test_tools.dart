@@ -389,6 +389,41 @@ class _PrivateAiUsageEndpoint {
     });
   }
 
+  _i3.Future<_i7.AccountAIUsage> updateOpenAiApiKey(
+    _i1.TestSessionBuilder sessionBuilder, {
+    String? apiKey,
+    required _i5.SupportedLanguage language,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'privateAiUsage',
+            method: 'updateOpenAiApiKey',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'privateAiUsage',
+          methodName: 'updateOpenAiApiKey',
+          parameters: _i1.testObjectToJson({
+            'apiKey': apiKey,
+            'language': language,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i7.AccountAIUsage>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
   _i3.Future<_i8.PaginatedAutoFixSessionResponse> getAutoFixSessions(
     _i1.TestSessionBuilder sessionBuilder, {
     required int page,

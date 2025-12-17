@@ -132,7 +132,7 @@ class _CreditHistoryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isSubscription = item.monthlySubscriptionAICreditDeposit != null;
+    final l10n = AppLocalizations.of(context)!;
     final dateFormatter = DateFormat('MMM d, y h:mm a');
     final dateStr = dateFormatter.format(item.date);
 
@@ -142,22 +142,32 @@ class _CreditHistoryItem extends StatelessWidget {
     Color color;
     String? amount;
 
-    if (isSubscription) {
-      icon = Icons.calendar_month;
-      final deposit = item.monthlySubscriptionAICreditDeposit!;
-      final planName = deposit.planTier == PlanTier.none
-          ? AppLocalizations.of(context)!.ai_usage_plan_name_free
-          : deposit.planTier.name.toUpperCase();
-      title = AppLocalizations.of(context)!.ai_usage_monthly_ai_credits;
-      subtitle = AppLocalizations.of(context)!.ai_usage_plan_subtitle(planName);
-      color = context.c.primary;
-      amount = '+\$${deposit.creditsAmountInDollars.toStringAsFixed(2)}';
-    } else {
-      icon = Icons.help_outline;
-      title = AppLocalizations.of(context)!.ai_usage_unknown_transaction;
-      subtitle = dateStr;
-      color = context.c.onSurface.withAlpha(150);
-      amount = null;
+    switch (item.transactionType) {
+      case AICreditTransactionType.initialAccountCredit:
+        icon = Icons.card_giftcard;
+        title = l10n.ai_usage_initial_credit;
+        subtitle = l10n.ai_usage_welcome_bonus;
+        color = context.c.tertiary;
+        final deposit = item.monthlySubscriptionAICreditDeposit;
+        amount = deposit != null
+            ? '+\$${deposit.creditsAmountInDollars.toStringAsFixed(2)}'
+            : null;
+
+      case AICreditTransactionType.monthlySubscriptionDeposit:
+        icon = Icons.calendar_month;
+        title = l10n.ai_usage_monthly_ai_credits;
+        final deposit = item.monthlySubscriptionAICreditDeposit;
+        if (deposit != null) {
+          final planName = deposit.planTier == PlanTier.none
+              ? l10n.ai_usage_plan_name_free
+              : deposit.planTier.name.toUpperCase();
+          subtitle = l10n.ai_usage_plan_subtitle(planName);
+          amount = '+\$${deposit.creditsAmountInDollars.toStringAsFixed(2)}';
+        } else {
+          subtitle = dateStr;
+          amount = null;
+        }
+        color = context.c.primary;
     }
 
     return Container(

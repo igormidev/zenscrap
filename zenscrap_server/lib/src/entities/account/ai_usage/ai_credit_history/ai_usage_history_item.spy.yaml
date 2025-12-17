@@ -2,5 +2,6 @@ class: AICreditHistoryItem
 table: ai_credit_history_item
 fields:
   date: DateTime
+  transactionType: AICreditTransactionType
   monthlySubscriptionAICreditDeposit: MonthlySubscriptionAICreditDeposit?, relation(optional)
   accountAIUsage: AccountAIUsage?, relation(name=ai_usage_history)

@@ -12,6 +12,7 @@ import 'package:zenscrap_flutter/src/states/ai_usage/auto_fix_sessions_provider.
 import 'package:zenscrap_flutter/src/states/ai_usage/auto_fix_sessions_state.dart';
 import 'package:zenscrap_flutter/src/ui/ai_usage/sections/ai_credits_history_section.dart';
 import 'package:zenscrap_flutter/src/ui/ai_usage/sections/ai_credits_overview_section.dart';
+import 'package:zenscrap_flutter/src/ui/ai_usage/sections/api_key_section.dart';
 import 'package:zenscrap_flutter/src/ui/ai_usage/sections/auto_fix_sessions_section.dart';
 
 class AiUsageView extends ConsumerStatefulWidget {
@@ -187,11 +188,13 @@ class _AiUsageViewState extends ConsumerState<AiUsageView> {
                           return Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Left column: Overview + History
+                              // Left column: Overview + API Key + History
                               Expanded(
                                 child: Column(
                                   children: [
                                     AiCreditsOverviewSection(aiUsage: aiUsage),
+                                    const SizedBox(height: 20),
+                                    ApiKeySection(aiUsage: aiUsage),
                                     const SizedBox(height: 20),
                                     Expanded(
                                       child: AiCreditsHistorySection(
@@ -223,6 +226,8 @@ class _AiUsageViewState extends ConsumerState<AiUsageView> {
                           child: Column(
                             children: [
                               AiCreditsOverviewSection(aiUsage: aiUsage),
+                              const SizedBox(height: 20),
+                              ApiKeySection(aiUsage: aiUsage),
                               const SizedBox(height: 20),
                               SizedBox(
                                 height: 400,

@@ -1,4 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:result_dart/result_dart.dart';
+import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/serverpod_to_result.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/ai_usage/ai_usage_state.dart';
@@ -25,6 +27,25 @@ class AIUsageNotifier extends Notifier<AIUsageState> {
 
   Future<void> refresh() async {
     await loadAiUsage();
+  }
+
+  /// Updates the user's OpenAI API key.
+  /// Pass null or empty string to remove the API key.
+  /// Returns a Result with the updated AccountAIUsage or a ZenScrapException.
+  Future<ResultDart<AccountAIUsage, ZenScrapException>> updateOpenAiApiKey(
+      String? apiKey) async {
+    final client = ref.read(clientProvider);
+    final language = ref.read(currentLanguageProvider);
+
+    final result = await client.privateAiUsage
+        .updateOpenAiApiKey(apiKey: apiKey, language: language)
+        .toResult;
+
+    result.onSuccess((updatedAiUsage) {
+      state = AIUsageState.loaded(aiUsage: updatedAiUsage);
+    });
+
+    return result;
   }
 }
 

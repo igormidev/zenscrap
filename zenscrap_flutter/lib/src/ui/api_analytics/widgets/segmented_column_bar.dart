@@ -33,10 +33,10 @@ class SegmentedColumnBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Container(
-            height: 2,
+            height: 3,
             decoration: BoxDecoration(
-              color: context.c.outline.withAlpha(50),
-              borderRadius: BorderRadius.circular(1),
+              color: context.c.outline.withAlpha(30),
+              borderRadius: BorderRadius.circular(2),
             ),
           ),
         ],
@@ -71,18 +71,18 @@ class SegmentedColumnBar extends StatelessWidget {
                 height: barHeight,
                 decoration: BoxDecoration(
                   borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(4),
-                    topRight: Radius.circular(4),
+                    topLeft: Radius.circular(6),
+                    topRight: Radius.circular(6),
                   ),
                   border: Border.all(
-                    color: context.c.outline.withAlpha(30),
+                    color: context.c.outline.withAlpha(20),
                     width: 0.5,
                   ),
                 ),
             child: ClipRRect(
               borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(4),
-                topRight: Radius.circular(4),
+                topLeft: Radius.circular(6),
+                topRight: Radius.circular(6),
               ),
               child: Column(
                 children: [
@@ -246,9 +246,9 @@ class _BarSegmentState extends State<_BarSegment> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
         decoration: BoxDecoration(
-          color: _isHovered ? widget.color : widget.color.withAlpha(200),
+          color: _isHovered ? widget.color : widget.color.withAlpha(180),
           border: _isHovered
-              ? Border.all(color: Colors.white.withAlpha(100), width: 1)
+              ? Border.all(color: Colors.white.withAlpha(80), width: 1)
               : null,
         ),
       ),

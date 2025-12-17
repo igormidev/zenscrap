@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/core/extensions/convert_extensions.dart';
+import 'package:zenscrap_flutter/src/core/extensions/request_status_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 
 class AnalyticsItemCard extends StatefulWidget {
@@ -30,16 +31,25 @@ class _AnalyticsItemCardState extends State<AnalyticsItemCard> {
     final hasDetails = widget.analytics.details != null;
 
     return Container(
-      // height: _isExpanded ? 500 : 72, // Fixed height when no details to show
+      // height: _isExpanded ? 500 : 72; // Fixed height when no details to show
       decoration: BoxDecoration(
         color: context.c.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: _isExpanded
-              ? statusInfo.color.withAlpha(100)
-              : context.c.outline.withAlpha(50),
-          // width: _isExpanded ? 2 : 2,
+              ? statusInfo.color.withAlpha(80)
+              : context.c.outline.withAlpha(30),
+          width: _isExpanded ? 1.5 : 1,
         ),
+        boxShadow: _isExpanded
+            ? [
+                BoxShadow(
+                  color: statusInfo.color.withAlpha(15),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ]
+            : null,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,6 +77,7 @@ class _AnalyticsItemCardState extends State<AnalyticsItemCard> {
                 child: _DetailsSection(
                   details: widget.analytics.details!,
                   statusColor: statusInfo.color,
+                  apiKey: widget.analytics.apiKey,
                 ),
               ),
             ),
@@ -78,41 +89,42 @@ class _AnalyticsItemCardState extends State<AnalyticsItemCard> {
 
   _StatusInfo _getStatusInfo(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    switch (widget.analytics.requestStatus) {
+    final status = widget.analytics.requestStatus;
+    switch (status) {
       case RequestStatus.success:
         return _StatusInfo(
-          color: Colors.green,
-          icon: Icons.check_circle,
+          color: status.color,
+          icon: status.icon,
           text: l10n.api_analytics_status_success,
         );
       case RequestStatus.clientError:
         return _StatusInfo(
-          color: Colors.orange,
-          icon: Icons.warning,
+          color: status.color,
+          icon: status.icon,
           text: l10n.api_analytics_status_client_error,
         );
       case RequestStatus.serverError:
         return _StatusInfo(
-          color: Colors.red,
-          icon: Icons.error,
+          color: status.color,
+          icon: status.icon,
           text: l10n.api_analytics_status_server_error,
         );
       case RequestStatus.insufficientCredits:
         return _StatusInfo(
-          color: Colors.purple,
-          icon: Icons.credit_card_off,
+          color: status.color,
+          icon: status.icon,
           text: l10n.api_analytics_status_insufficient_credits,
         );
       case RequestStatus.maxConcurrencyExceeded:
         return _StatusInfo(
-          color: Colors.cyan,
-          icon: Icons.traffic,
+          color: status.color,
+          icon: status.icon,
           text: l10n.api_analytics_status_max_concurrency,
         );
       case RequestStatus.failedAtScrappingBee:
         return _StatusInfo(
-          color: const Color(0xFFE91E63),
-          icon: Icons.bug_report,
+          color: status.color,
+          icon: status.icon,
           text: l10n.api_analytics_status_extract_rules_error,
         );
     }
@@ -152,18 +164,18 @@ class _MainRow extends StatelessWidget {
 
           // Status badge
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
             decoration: BoxDecoration(
-              color: statusInfo.color.withAlpha(30),
-              borderRadius: BorderRadius.circular(6),
+              color: statusInfo.color.withAlpha(20),
+              borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: statusInfo.color.withAlpha(80),
+                color: statusInfo.color.withAlpha(50),
               ),
             ),
             child: Text(
               statusInfo.text,
               style: context.t.bodyMedium?.copyWith(
-                color: statusInfo.color,
+                color: statusInfo.color.withAlpha(220),
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -205,10 +217,12 @@ class _MainRow extends StatelessWidget {
 class _DetailsSection extends StatelessWidget {
   final AnalyticsRequestDetails details;
   final Color statusColor;
+  final AccountApiKey? apiKey;
 
   const _DetailsSection({
     required this.details,
     required this.statusColor,
+    this.apiKey,
   });
 
   @override
@@ -219,6 +233,10 @@ class _DetailsSection extends StatelessWidget {
       child: ListView(
         // crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // API Key section
+          _ApiKeySection(apiKey: apiKey),
+          const SizedBox(height: 16),
+
           // Title if present
           if (details.title != null) ...[
             _DetailField(
@@ -407,7 +425,7 @@ class _JsonFieldState extends State<_JsonField> {
     final lineCount = formattedJson.split('\n').length;
     final shouldCollapse = lineCount > 10;
     final displayColor =
-        widget.isSuccess ? Colors.green : widget.statusColor;
+        widget.isSuccess ? RequestStatus.success.color : widget.statusColor;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -430,15 +448,15 @@ class _JsonFieldState extends State<_JsonField> {
             if (widget.isSuccess) ...[
               const SizedBox(width: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: Colors.green.withAlpha(30),
-                  borderRadius: BorderRadius.circular(4),
+                  color: RequestStatus.success.color.withAlpha(20),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   l10n.api_analytics_success_badge,
                   style: context.t.labelSmall?.copyWith(
-                    color: Colors.green,
+                    color: RequestStatus.success.color,
                     fontWeight: FontWeight.bold,
                     fontSize: 10,
                   ),
@@ -481,13 +499,13 @@ class _JsonFieldState extends State<_JsonField> {
           ),
           decoration: BoxDecoration(
             color: widget.isSuccess
-                ? Colors.green.withAlpha(15)
-                : context.c.surfaceContainerHighest.withAlpha(77),
-            borderRadius: BorderRadius.circular(8),
+                ? RequestStatus.success.color.withAlpha(12)
+                : context.c.surfaceContainerHighest.withAlpha(50),
+            borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: widget.isSuccess
-                  ? Colors.green.withAlpha(51)
-                  : context.c.outline.withAlpha(51),
+                  ? RequestStatus.success.color.withAlpha(40)
+                  : context.c.outline.withAlpha(30),
             ),
           ),
           child: Stack(
@@ -515,18 +533,18 @@ class _JsonFieldState extends State<_JsonField> {
                         end: Alignment.bottomCenter,
                         colors: [
                           (widget.isSuccess
-                                  ? Colors.green.withAlpha(15)
+                                  ? RequestStatus.success.color.withAlpha(12)
                                   : context.c.surfaceContainerHighest
-                                      .withAlpha(77))
+                                      .withAlpha(50))
                               .withAlpha(0),
                           widget.isSuccess
-                              ? Colors.green.withAlpha(15)
-                              : context.c.surfaceContainerHighest.withAlpha(77),
+                              ? RequestStatus.success.color.withAlpha(12)
+                              : context.c.surfaceContainerHighest.withAlpha(50),
                         ],
                       ),
                       borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.circular(8),
-                        bottomRight: Radius.circular(8),
+                        bottomLeft: Radius.circular(12),
+                        bottomRight: Radius.circular(12),
                       ),
                     ),
                     child: Center(
@@ -557,4 +575,154 @@ class _StatusInfo {
     required this.icon,
     required this.text,
   });
+}
+
+/// Censors an API key showing only first 4 and last 4 characters
+String _censorApiKey(String key) {
+  if (key.length <= 8) return '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022';
+  return '${key.substring(0, 4)}...${key.substring(key.length - 4)}';
+}
+
+class _ApiKeySection extends StatelessWidget {
+  final AccountApiKey? apiKey;
+
+  const _ApiKeySection({this.apiKey});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    // If API key is null (deleted), show a placeholder
+    if (apiKey == null) {
+      return Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: context.c.surfaceContainerHighest.withAlpha(50),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: context.c.outline.withAlpha(30),
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.vpn_key_outlined,
+              size: 18,
+              color: context.c.onSurface.withAlpha(100),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              l10n.api_analytics_api_key_deleted,
+              style: context.t.bodyMedium?.copyWith(
+                color: context.c.onSurface.withAlpha(100),
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final censoredKey = _censorApiKey(apiKey!.apiKey);
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: context.c.primaryContainer.withAlpha(30),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: context.c.primary.withAlpha(40),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // API Key name row
+          Row(
+            children: [
+              Icon(
+                Icons.vpn_key,
+                size: 18,
+                color: context.c.primary,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                l10n.api_analytics_api_key_label,
+                style: context.t.labelMedium?.copyWith(
+                  color: context.c.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  apiKey!.name,
+                  style: context.t.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // Censored key value with copy button
+          Row(
+            children: [
+              const SizedBox(width: 26), // Align with name above
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: context.c.surface,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: context.c.outline.withAlpha(30),
+                  ),
+                ),
+                child: Text(
+                  censoredKey,
+                  style: context.t.bodySmall?.copyWith(
+                    fontFamily: 'monospace',
+                    color: context.c.onSurface.withAlpha(180),
+                    letterSpacing: 1,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              SizedBox(
+                height: 32,
+                child: TextButton.icon(
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: apiKey!.apiKey));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(l10n.api_analytics_api_key_copied),
+                        duration: const Duration(seconds: 2),
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: context.c.primary,
+                      ),
+                    );
+                  },
+                  icon: Icon(
+                    Icons.copy,
+                    size: 16,
+                    color: context.c.primary,
+                  ),
+                  label: Text(
+                    l10n.api_analytics_copy_button,
+                    style: context.t.labelSmall?.copyWith(
+                      color: context.c.primary,
+                    ),
+                  ),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }

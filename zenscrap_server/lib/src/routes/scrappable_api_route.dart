@@ -7,7 +7,7 @@ import 'package:zenscrap_server/src/generated/protocol.dart';
 class ScrappableApiRoute extends Route with ApiHelperMixin {
   final bool isProd;
 
-  ScrappableApiRoute({required this.isProd});
+  ScrappableApiRoute({required this.isProd}) : super(methods: {Method.post});
 
   @override
   FutureOr<Result> handleCall(Session session, Request request) async {

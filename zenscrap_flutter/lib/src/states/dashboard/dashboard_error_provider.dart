@@ -48,6 +48,7 @@ final dashboardErrorProvider = Provider<ZenScrapException?>((ref) {
           ),
         ],
         DashboardNavigationType.usage => [],
+        DashboardNavigationType.aiUsage => [],
         DashboardNavigationType.account => [],
         DashboardNavigationType.logOut => [],
         DashboardNavigationType.pricingPage => [],

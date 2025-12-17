@@ -41,7 +41,8 @@ class AutoFixFailure extends AutoFixResult {
 /// Maps AiModel enum to OpenAI model name
 String getModelName(AiModel model) {
   return switch (model) {
-    AiModel.normal => 'gpt-5.1-codex-mini',
+    AiModel.normal => 'gpt-5-mini',
+    // AiModel.normal => 'gpt-5.1',
     AiModel.powerful => 'gpt-5.2',
   };
 }

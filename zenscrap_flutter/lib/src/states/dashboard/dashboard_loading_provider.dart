@@ -37,6 +37,7 @@ final dashboardLoadingProvider = Provider<HaveAnyActiveLoading>((ref) {
             value.maybeMap(loading: (loading) => true, orElse: () => false))),
       ],
     DashboardNavigationType.usage => [],
+    DashboardNavigationType.aiUsage => [],
     DashboardNavigationType.account => [],
     DashboardNavigationType.logOut => [],
     DashboardNavigationType.pricingPage => [],

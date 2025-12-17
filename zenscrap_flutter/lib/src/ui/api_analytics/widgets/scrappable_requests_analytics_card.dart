@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
+import 'package:zenscrap_flutter/src/core/extensions/request_status_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:intl/intl.dart';
 
@@ -20,15 +21,25 @@ class ScrappableRequestsAnalyticsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final maxCount = _calculateMaxCount();
-    
+
     return Card(
-      elevation: isSelected ? 4 : 1,
-      color: isSelected 
-          ? context.c.primaryContainer.withAlpha(50)
+      elevation: isSelected ? 2 : 0,
+      shadowColor: isSelected ? context.c.primary.withAlpha(50) : Colors.transparent,
+      color: isSelected
+          ? context.c.primaryContainer.withAlpha(40)
           : context.c.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: isSelected
+              ? context.c.primary.withAlpha(100)
+              : context.c.outline.withAlpha(30),
+          width: isSelected ? 1.5 : 1,
+        ),
+      ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -102,34 +113,34 @@ class ScrappableRequestsAnalyticsCard extends StatelessWidget {
             context: context,
             label: l10n.api_analytics_max_concurrency_exceeded,
             count: item.maxConcurrencyExceededTotalCount,
-            color: Colors.cyan,
+            color: RequestStatus.maxConcurrencyExceeded.color,
           ),
         if (item.insufficientCreditsTotalCount > 0)
           _buildStatusChip(
             context: context,
             label: l10n.api_analytics_insufficient_credits_chip,
             count: item.insufficientCreditsTotalCount,
-            color: Colors.purple,
+            color: RequestStatus.insufficientCredits.color,
           ),
         _buildStatusChip(
           context: context,
           label: l10n.api_analytics_status_2xx,
           count: item.successTotalCount,
-          color: Colors.green,
+          color: RequestStatus.success.color,
         ),
         if (item.clientErrorTotalCount > 0)
           _buildStatusChip(
             context: context,
             label: l10n.api_analytics_status_4xx,
             count: item.clientErrorTotalCount,
-            color: Colors.orange,
+            color: RequestStatus.clientError.color,
           ),
         if (item.serverErrorTotalCount > 0)
           _buildStatusChip(
             context: context,
             label: l10n.api_analytics_status_5xx,
             count: item.serverErrorTotalCount,
-            color: Colors.red,
+            color: RequestStatus.serverError.color,
           ),
       ],
     );
@@ -144,17 +155,17 @@ class ScrappableRequestsAnalyticsCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withAlpha(30),
-        borderRadius: BorderRadius.circular(6),
+        color: color.withAlpha(25),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: color.withAlpha(100),
-          width: 1.5,
+          color: color.withAlpha(60),
+          width: 1,
         ),
       ),
       child: Text(
         '$label: $count',
         style: context.t.bodySmall?.copyWith(
-          color: color,
+          color: color.withAlpha(220),
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -202,31 +213,31 @@ class ScrappableRequestsAnalyticsCard extends StatelessWidget {
           Container(
             height: barHeight,
             decoration: BoxDecoration(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(2)),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
               gradient: LinearGradient(
                 begin: Alignment.bottomCenter,
                 end: Alignment.topCenter,
                 colors: [
                   if (hourData.serverErrorCount > 0)
-                    Colors.red.withAlpha(150)
+                    RequestStatus.serverError.color.withAlpha(150)
                   else if (hourData.clientErrorCount > 0)
-                    Colors.orange.withAlpha(150)
+                    RequestStatus.clientError.color.withAlpha(150)
                   else if (hourData.insufficientCreditsCount > 0)
-                    Colors.purple.withAlpha(150)
+                    RequestStatus.insufficientCredits.color.withAlpha(150)
                   else if (hourData.maxConcurrencyExceededCount > 0)
-                    Colors.cyan.withAlpha(150)
+                    RequestStatus.maxConcurrencyExceeded.color.withAlpha(150)
                   else
-                    Colors.green.withAlpha(150),
+                    RequestStatus.success.color.withAlpha(150),
                   if (hourData.serverErrorCount > 0)
-                    Colors.red
+                    RequestStatus.serverError.color
                   else if (hourData.clientErrorCount > 0)
-                    Colors.orange
+                    RequestStatus.clientError.color
                   else if (hourData.insufficientCreditsCount > 0)
-                    Colors.purple
+                    RequestStatus.insufficientCredits.color
                   else if (hourData.maxConcurrencyExceededCount > 0)
-                    Colors.cyan
+                    RequestStatus.maxConcurrencyExceeded.color
                   else
-                    Colors.green,
+                    RequestStatus.success.color,
                 ],
               ),
             ),
@@ -236,35 +247,35 @@ class ScrappableRequestsAnalyticsCard extends StatelessWidget {
                   height: barHeight,
                   value: hourData.successCount,
                   total: totalRequests,
-                  color: Colors.green,
+                  color: RequestStatus.success.color,
                   isBottom: true,
                 ),
                 _buildBarSegment(
                   height: barHeight,
                   value: hourData.clientErrorCount,
                   total: totalRequests,
-                  color: Colors.orange,
+                  color: RequestStatus.clientError.color,
                   offset: hourData.successCount,
                 ),
                 _buildBarSegment(
                   height: barHeight,
                   value: hourData.serverErrorCount,
                   total: totalRequests,
-                  color: Colors.red,
+                  color: RequestStatus.serverError.color,
                   offset: hourData.successCount + hourData.clientErrorCount,
                 ),
                 _buildBarSegment(
                   height: barHeight,
                   value: hourData.insufficientCreditsCount,
                   total: totalRequests,
-                  color: Colors.purple,
+                  color: RequestStatus.insufficientCredits.color,
                   offset: hourData.successCount + hourData.clientErrorCount + hourData.serverErrorCount,
                 ),
                 _buildBarSegment(
                   height: barHeight,
                   value: hourData.maxConcurrencyExceededCount,
                   total: totalRequests,
-                  color: Colors.cyan,
+                  color: RequestStatus.maxConcurrencyExceeded.color,
                   offset: hourData.successCount + hourData.clientErrorCount + hourData.serverErrorCount + hourData.insufficientCreditsCount,
                 ),
               ],

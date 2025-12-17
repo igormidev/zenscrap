@@ -7,6 +7,8 @@ import 'package:zenscrap_server/src/core/stripe/stripe_config.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class StripeWebhookRoute extends Route {
+  StripeWebhookRoute() : super(methods: {Method.post});
+
   @override
   FutureOr<Result> handleCall(Session session, Request request) async {
     try {
@@ -232,28 +234,27 @@ class StripeWebhookRoute extends Route {
         );
 
         // Create API credit package purchase record
-        final apiCreditPurchase = ApiCreditPackagePurchase(
-          value: creditAmount.toDouble(),
-          stripePurchaseId: paymentIntentId,
-        );
-        await ApiCreditPackagePurchase.db.insertRow(
+        final insertedPurchase = await ApiCreditPackagePurchase.db.insertRow(
           session,
-          apiCreditPurchase,
+          ApiCreditPackagePurchase(
+            value: creditAmount.toDouble(),
+            stripePurchaseId: paymentIntentId,
+          ),
           transaction: transaction,
         );
 
         // Create API credit history item
-        final apiCreditHistoryItem = ApiCreditHistoryItem(
-          date: DateTime.now(),
-          monthlySubscriptionApiCreditDepositId: null,
-          monthlySubscriptionApiCreditDeposit: null,
-          apiCreditPackagePurchaseId: apiCreditPurchase.id,
-          apiCreditPackagePurchase: apiCreditPurchase,
-          accountApiUsageId: apiUsage.id!,
-        );
         await ApiCreditHistoryItem.db.insertRow(
           session,
-          apiCreditHistoryItem,
+          ApiCreditHistoryItem(
+            date: DateTime.now(),
+            transactionType: ApiCreditTransactionType.creditPackagePurchase,
+            monthlySubscriptionApiCreditDepositId: null,
+            monthlySubscriptionApiCreditDeposit: null,
+            apiCreditPackagePurchaseId: insertedPurchase.id,
+            apiCreditPackagePurchase: insertedPurchase,
+            accountApiUsageId: apiUsage.id!,
+          ),
           transaction: transaction,
         );
 

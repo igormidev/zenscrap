@@ -868,6 +868,18 @@ abstract class AppLocalizations {
   /// **'Monthly AI Credits'**
   String get ai_usage_monthly_ai_credits;
 
+  /// Title for initial account AI credit
+  ///
+  /// In en, this message translates to:
+  /// **'Initial Credit'**
+  String get ai_usage_initial_credit;
+
+  /// Subtitle for initial account AI credit
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome bonus'**
+  String get ai_usage_welcome_bonus;
+
   /// Free plan name
   ///
   /// In en, this message translates to:
@@ -1095,6 +1107,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Load More'**
   String get ai_usage_load_more;
+
+  /// Title for the API key management section
+  ///
+  /// In en, this message translates to:
+  /// **'OpenAI API Key'**
+  String get ai_usage_api_key_section_title;
+
+  /// Description explaining what the API key is for
+  ///
+  /// In en, this message translates to:
+  /// **'Use your own OpenAI API key to bypass monthly credit limits. Your key is stored securely.'**
+  String get ai_usage_api_key_description;
+
+  /// Status text when API key is set
+  ///
+  /// In en, this message translates to:
+  /// **'API key configured'**
+  String get ai_usage_api_key_configured;
+
+  /// Status text when no API key is set
+  ///
+  /// In en, this message translates to:
+  /// **'No API key configured'**
+  String get ai_usage_api_key_not_configured;
+
+  /// Button to add API key
+  ///
+  /// In en, this message translates to:
+  /// **'Add API Key'**
+  String get ai_usage_api_key_add;
+
+  /// Button to edit API key
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get ai_usage_api_key_edit;
+
+  /// Button to remove API key
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get ai_usage_api_key_remove;
+
+  /// Dialog title for API key input
+  ///
+  /// In en, this message translates to:
+  /// **'OpenAI API Key'**
+  String get ai_usage_api_key_dialog_title;
+
+  /// Hint text for API key input field
+  ///
+  /// In en, this message translates to:
+  /// **'sk-...'**
+  String get ai_usage_api_key_dialog_hint;
+
+  /// Description in the API key dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your OpenAI API key. The key will be validated before saving.'**
+  String get ai_usage_api_key_dialog_description;
+
+  /// Tooltip for showing the API key
+  ///
+  /// In en, this message translates to:
+  /// **'Show API key'**
+  String get ai_usage_api_key_show;
+
+  /// Tooltip for hiding the API key
+  ///
+  /// In en, this message translates to:
+  /// **'Hide API key'**
+  String get ai_usage_api_key_hide;
+
+  /// Save button label
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get ai_usage_api_key_save;
+
+  /// Cancel button label
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get ai_usage_api_key_cancel;
+
+  /// Confirmation dialog title for removing API key
+  ///
+  /// In en, this message translates to:
+  /// **'Remove API Key?'**
+  String get ai_usage_api_key_remove_confirm_title;
+
+  /// Confirmation dialog message for removing API key
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to remove your OpenAI API key? You will use the platform\'s monthly credits instead.'**
+  String get ai_usage_api_key_remove_confirm_message;
+
+  /// Success message when API key is updated
+  ///
+  /// In en, this message translates to:
+  /// **'API key updated successfully'**
+  String get ai_usage_api_key_updated;
+
+  /// Success message when API key is removed
+  ///
+  /// In en, this message translates to:
+  /// **'API key removed successfully'**
+  String get ai_usage_api_key_removed;
+
+  /// Error message when API key update fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update API key'**
+  String get ai_usage_api_key_error;
 
   /// Main title for API analytics page
   ///
@@ -1470,6 +1596,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Click expand to see {count}+ more lines'**
   String api_analytics_expand_more_lines(int count);
+
+  /// Subtitle explaining what endpoints are shown
+  ///
+  /// In en, this message translates to:
+  /// **'Endpoints you\'ve called in the selected time period'**
+  String get api_analytics_subtitle;
+
+  /// Tooltip for time scope selector
+  ///
+  /// In en, this message translates to:
+  /// **'Shows endpoints you\'ve interacted with during this time period'**
+  String get api_analytics_scope_tooltip;
+
+  /// Badge label for user's own endpoints
+  ///
+  /// In en, this message translates to:
+  /// **'Yours'**
+  String get api_analytics_badge_yours;
+
+  /// Badge label for marketplace endpoints
+  ///
+  /// In en, this message translates to:
+  /// **'Marketplace'**
+  String get api_analytics_badge_marketplace;
+
+  /// Label for API key in analytics details
+  ///
+  /// In en, this message translates to:
+  /// **'API Key:'**
+  String get api_analytics_api_key_label;
+
+  /// Placeholder shown when API key was deleted
+  ///
+  /// In en, this message translates to:
+  /// **'API Key (deleted)'**
+  String get api_analytics_api_key_deleted;
+
+  /// Snackbar message when API key is copied
+  ///
+  /// In en, this message translates to:
+  /// **'API key copied to clipboard'**
+  String get api_analytics_api_key_copied;
+
+  /// Copy button label
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get api_analytics_copy_button;
 
   /// Main title for API usage page
   ///
@@ -2053,6 +2227,18 @@ abstract class AppLocalizations {
   /// **'Monthly Subscription'**
   String get api_usage_monthly_subscription;
 
+  /// Title for initial account API credit
+  ///
+  /// In en, this message translates to:
+  /// **'Initial Credit'**
+  String get api_usage_initial_credit;
+
+  /// Subtitle for initial account API credit
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome bonus'**
+  String get api_usage_welcome_bonus;
+
   /// Plan and date subtitle
   ///
   /// In en, this message translates to:
@@ -2334,6 +2520,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Subscription'**
   String get dashboard_nav_subscription;
+
+  /// Navigation label for AI usage page
+  ///
+  /// In en, this message translates to:
+  /// **'AI Usage'**
+  String get dashboard_nav_ai_usage;
 
   /// Button text to collapse navigation sidebar
   ///

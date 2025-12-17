@@ -51,7 +51,11 @@ redis:
 maxRequestSize: 2097152 # The maximum size of requests allowed in bytes (2MB)
 
 sessionLogs:
-  consoleEnabled: false
+  consoleEnabled: true
+  # Disable query logging to avoid logging large base64 ByteData values
+  # which creates huge log entries for byte_test_data inserts
+  queryLogging:
+    enabled: false
 # persistentEnabled: true
 # consoleLogFormat: json # Defaults to "json", options are "text" or "json"
 
