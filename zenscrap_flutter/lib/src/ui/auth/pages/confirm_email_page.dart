@@ -1,11 +1,16 @@
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:serverpod_auth_email_flutter/serverpod_auth_email_flutter.dart';
+import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
+import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
+import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
+import 'package:zenscrap_flutter/src/states/session/session_state.dart';
+import 'package:zenscrap_flutter/src/states/session/user_model.dart';
+import 'package:zenscrap_flutter/src/ui/auth/pages/sign_in_page.dart';
 import 'package:zenscrap_flutter/src/ui/auth/templates/auth_form_template.dart';
 
 class ConfirmEmailPage extends ConsumerWidget {
@@ -41,22 +46,59 @@ class ConfirmEmailPage extends ConsumerWidget {
       },
       onSubmit: (items) async {
         final verificationCode = items[0];
-        final user = await emailAuth.validateAccount(email, verificationCode);
 
-        final userEmail = user?.email;
-        final userName = user?.userName;
-        if (userEmail == null || userName == null) {
+        // Set verification code on the controller
+        emailAuth.verificationCodeController.text = verificationCode;
+
+        try {
+          // Verify the registration code
+          await emailAuth.verifyRegistrationCode();
+
+          // Set the password from the stored pending data
+          final password = PendingRegistrationData.password;
+          final userName = PendingRegistrationData.userName;
+          if (password != null) {
+            emailAuth.passwordController.text = password;
+          }
+
+          // Complete the registration
+          await emailAuth.finishRegistration();
+
+          // Clear the pending data
+          PendingRegistrationData.clear();
+
+          // Check if authenticated
+          final client = ref.read(clientProvider);
+          final isAuthenticated = client.auth.isAuthenticated;
+
+          if (!isAuthenticated) {
+            if (context.mounted) {
+              showErrorSnackbar(context);
+            }
+            return null;
+          }
+
+          // Update session state using the data we collected from the form
+          ref.read(sessionProvider.notifier).setState(
+                SessionState.logged(
+                  user: UserModel(
+                    email: email,
+                    userName: userName ?? 'User',
+                    imageUrl: null,
+                  ),
+                ),
+              );
+
+          // Track successful email confirmation
+          await analytics.trackAuthEmailConfirmationSuccess(email: email);
+
+          return true;
+        } catch (e) {
           if (context.mounted) {
             showErrorSnackbar(context);
           }
-
           return null;
         }
-
-        // Track successful email confirmation
-        await analytics.trackAuthEmailConfirmationSuccess(email: email);
-
-        return true;
       },
       children: [
         Text(

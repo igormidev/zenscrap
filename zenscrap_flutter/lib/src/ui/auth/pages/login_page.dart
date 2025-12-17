@@ -1,10 +1,11 @@
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:serverpod_auth_email_flutter/serverpod_auth_email_flutter.dart';
+import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
+import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 import 'package:zenscrap_flutter/src/states/session/user_model.dart';
@@ -64,14 +65,52 @@ class LoginPage extends ConsumerWidget {
         // Track login attempt
         await analytics.trackAuthLoginAttempt(email: email);
 
-        final user = await emailAuth.signIn(email, password);
-        final userEmail = user?.email;
-        final userName = user?.userName;
-        if (userEmail == null || userName == null) {
+        // Set email and password on the controller
+        emailAuth.emailController.text = email;
+        emailAuth.passwordController.text = password;
+
+        try {
+          // Attempt login using the new IDP system
+          await emailAuth.login();
+
+          // Check if authenticated
+          final client = ref.read(clientProvider);
+          final isAuthenticated = client.auth.isAuthenticated;
+
+          if (!isAuthenticated) {
+            // Track login failure
+            await analytics.trackAuthLoginFailure(
+              email: email,
+              errorMessage: 'Invalid credentials or user not found',
+            );
+
+            if (context.mounted) {
+              showErrorSnackbar(context);
+            }
+
+            return null;
+          }
+
+          // We use the email from the form since AuthSuccess doesn't contain user profile info
+          // Username can be fetched from server later or we use a default
+          const userName = 'User';
+
+          // Track successful login
+          await analytics.trackAuthLoginSuccess(
+            email: email,
+            userName: userName,
+          );
+
+          return UserModel(
+            email: email,
+            userName: userName,
+            imageUrl: null,
+          );
+        } catch (e) {
           // Track login failure
           await analytics.trackAuthLoginFailure(
             email: email,
-            errorMessage: 'Invalid credentials or user not found',
+            errorMessage: e.toString(),
           );
 
           if (context.mounted) {
@@ -80,18 +119,6 @@ class LoginPage extends ConsumerWidget {
 
           return null;
         }
-
-        // Track successful login
-        await analytics.trackAuthLoginSuccess(
-          email: email,
-          userName: userName,
-        );
-
-        return UserModel(
-          email: email,
-          userName: userName,
-          imageUrl: user?.imageUrl,
-        );
       },
       children: const [
         SizedBox(height: 8),

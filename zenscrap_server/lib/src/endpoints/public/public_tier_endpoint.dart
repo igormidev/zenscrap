@@ -1,5 +1,5 @@
 import 'package:serverpod/serverpod.dart';
-import 'package:serverpod_auth_server/serverpod_auth_server.dart';
+import 'package:serverpod_auth_idp_server/core.dart';
 import 'package:zenscrap_server/src/core/mixins/api_helper_mixin.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
@@ -16,16 +16,17 @@ class PublicTierEndpoint extends Endpoint {
         description: 'The key you provided is invalid. Please contact support',
       );
     }
-    final user = await UserInfo.db
+    // Find user profile by email using the new IDP system
+    final userProfile = await UserProfile.db
         .findFirstRow(session, where: (p0) => p0.email.ilike(email));
-    if (user == null) {
+    if (userProfile == null) {
       throw ZenScrapException(
         title: 'User not found',
         description: 'User with email $email not found',
       );
     }
     final account = await AccountInfo.db
-        .findFirstRow(session, where: (p0) => p0.userInfoId.equals(user.id));
+        .findFirstRow(session, where: (p0) => p0.authUserId.equals(userProfile.authUserId));
     if (account == null) {
       throw ZenScrapException(
         title: 'Account not found',

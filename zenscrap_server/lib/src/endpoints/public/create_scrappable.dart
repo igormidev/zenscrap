@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:serverpod_auth_server/serverpod_auth_server.dart';
+import 'package:serverpod_auth_idp_server/core.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/core/consts.dart';
 import 'package:zenscrap_server/src/core/docs/scrappable_request_structure_guide.dart';
@@ -14,13 +14,13 @@ class CreateScrappableEndpoint extends Endpoint {
     required String referenceLink,
     required SupportedLanguage language,
   }) async* {
-    final userId = session.authenticated?.userId;
+    final userId = session.authenticated?.authUserId;
 
     // Validate scrappable limit for authenticated users
     if (userId != null) {
       final accountInfo = await AccountInfo.db.findFirstRow(
         session,
-        where: (p0) => p0.userInfoId.equals(userId),
+        where: (p0) => p0.authUserId.equals(userId),
       );
 
       if (accountInfo != null) {
@@ -177,7 +177,7 @@ class CreateScrappableEndpoint extends Endpoint {
       final accountApiUsage = userId == null
           ? null
           : await AccountApiUsage.db.findFirstRow(session,
-              where: (p0) => p0.accountInfo.userInfoId.equals(userId),
+              where: (p0) => p0.accountInfo.authUserId.equals(userId),
               include: AccountApiUsage.include(
                 accountInfo: AccountInfo.include(),
               ),

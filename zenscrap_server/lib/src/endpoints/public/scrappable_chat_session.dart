@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:serverpod_auth_server/serverpod_auth_server.dart';
+import 'package:serverpod_auth_idp_server/core.dart';
 import 'package:collection/collection.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:serverpod/serverpod.dart';
@@ -98,7 +98,7 @@ class ScrappableChatSession extends Endpoint {
         description: 'No cache scrappable ID found for session $sessionUuid.',
       );
     }
-    final int? userId = session.authenticated?.userId;
+    final userId = session.authenticated?.authUserId;
     final ReferenceTestData? testData = _cacheRefTestData[sessionUuid];
     final ScrappingBeeExtractLogic? scrappingBeeExtractLogic =
         _cacheScrappingBeeExtractLogic[sessionUuid];
@@ -125,7 +125,7 @@ class ScrappableChatSession extends Endpoint {
         } else {
           final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
             session,
-            where: (p0) => p0.userInfoId.equals(userId),
+            where: (p0) => p0.authUserId.equals(userId),
             transaction: transaction,
           );
           final accountId = accountInfo?.id;
@@ -218,7 +218,7 @@ class ScrappableChatSession extends Endpoint {
     }
 
     // Validate user is authenticated
-    final int? userId = session.authenticated?.userId;
+    final userId = session.authenticated?.authUserId;
     if (userId == null) {
       throw createTranslatedException('authentication_required_api_key', language);
     }
@@ -235,7 +235,7 @@ class ScrappableChatSession extends Endpoint {
       // Load from database if not in cache
       final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
         session,
-        where: (p0) => p0.userInfoId.equals(userId),
+        where: (p0) => p0.authUserId.equals(userId),
         include: AccountInfo.include(accountAIUsage: AccountAIUsage.include()),
       );
 
@@ -335,7 +335,7 @@ class ScrappableChatSession extends Endpoint {
     required int scrappableId,
     required SupportedLanguage language,
   }) async {
-    final int? userId = session.authenticated?.userId;
+    final userId = session.authenticated?.authUserId;
     final bool isLoggedIn = userId != null;
 
     final Scrappable? scrappable = await Scrappable.db.findById(
@@ -370,7 +370,7 @@ class ScrappableChatSession extends Endpoint {
     if (doesScrappableHasOwner) {
       final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
         session,
-        where: (p0) => p0.userInfoId.equals(userId),
+        where: (p0) => p0.authUserId.equals(userId),
         include: AccountInfo.include(accountAIUsage: AccountAIUsage.include()),
       );
       if (accountInfo == null || accountInfo.id != scrappable.accountId) {
@@ -405,7 +405,7 @@ class ScrappableChatSession extends Endpoint {
       // User is logged in but scrappable has no owner - get their AI usage anyway
       final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
         session,
-        where: (p0) => p0.userInfoId.equals(userId),
+        where: (p0) => p0.authUserId.equals(userId),
         include: AccountInfo.include(accountAIUsage: AccountAIUsage.include()),
       );
 
@@ -578,10 +578,10 @@ class ScrappableChatSession extends Endpoint {
         throw createTranslatedException('authentication_required_ai_model', language);
       }
 
-      final userId = authenticationInfo.userId;
+      final userId = authenticationInfo.authUserId;
       final account = await AccountInfo.db.findFirstRow(
         session,
-        where: (t) => t.userInfoId.equals(userId),
+        where: (t) => t.authUserId.equals(userId),
       );
 
       if (account == null) {

@@ -1,12 +1,24 @@
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:serverpod_auth_email_flutter/serverpod_auth_email_flutter.dart';
+import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/ui/auth/templates/auth_form_template.dart';
 import 'package:zenscrap_flutter/src/ui/auth/widgets/google_sign_in_button.dart';
+
+/// Stores pending registration data between startRegistration and finishRegistration.
+/// This is needed because the new IDP system splits registration into multiple steps.
+class PendingRegistrationData {
+  static String? userName;
+  static String? password;
+
+  static void clear() {
+    userName = null;
+    password = null;
+  }
+}
 
 class SignInPage extends ConsumerWidget {
   final EmailAuthController emailAuth;
@@ -83,32 +95,38 @@ class SignInPage extends ConsumerWidget {
           userName: userName,
         );
 
-        final bool success = await emailAuth.createAccountRequest(
-          userName,
-          email,
-          password,
-        );
+        // Store the user name and password for later use in finishRegistration
+        PendingRegistrationData.userName = userName;
+        PendingRegistrationData.password = password;
 
-        if (!success) {
+        // Set email on the controller
+        emailAuth.emailController.text = email;
+
+        try {
+          // Start registration - this sends a verification code to the email
+          await emailAuth.startRegistration();
+
+          // Track successful sign up initiation
+          await analytics.trackAuthSignUpSuccess(
+            email: email,
+            userName: userName,
+          );
+
+          return email;
+        } catch (e) {
           // Track sign up failure
           await analytics.trackAuthSignUpFailure(
             email: email,
-            errorMessage: 'Failed to create account',
+            errorMessage: e.toString(),
           );
+
+          PendingRegistrationData.clear();
 
           if (context.mounted) {
             showErrorSnackbar(context);
           }
           return null;
         }
-
-        // Track successful sign up
-        await analytics.trackAuthSignUpSuccess(
-          email: email,
-          userName: userName,
-        );
-
-        return email;
       },
       children: const [
         SizedBox(height: 8),

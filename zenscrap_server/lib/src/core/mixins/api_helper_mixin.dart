@@ -8,7 +8,6 @@ import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';
 import 'package:zenscrap_server/src/core/extension/scrapping_bee_extract_logic_extension.dart';
 import 'package:zenscrap_server/src/core/scraping_bee.dart';
 import 'package:zenscrap_server/src/core/translations/error_translations.dart';
-import 'package:zenscrap_server/src/endpoints/public/marketplace_endpoint.dart';
 import 'package:zenscrap_server/src/endpoints/public/scrappable_chat_session.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 import 'package:zenscrap_server/src/notifications/auto_fix_notification_service.dart';

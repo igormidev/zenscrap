@@ -1,7 +1,7 @@
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:serverpod_auth_email_flutter/serverpod_auth_email_flutter.dart';
+import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/dialog_message.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
@@ -63,17 +63,31 @@ class PasswordResetValidateCodePage extends ConsumerWidget {
         final verificationCode = items[0];
         final newPassword = items[1];
 
-        final success = await emailAuth.resetPassword(
-          email,
-          verificationCode,
-          newPassword,
-        );
+        // Set verification code on the controller
+        emailAuth.verificationCodeController.text = verificationCode;
 
-        if (!success) {
+        try {
+          // Verify the password reset code
+          await emailAuth.verifyPasswordResetCode();
+
+          // Set the new password on the controller
+          emailAuth.passwordController.text = newPassword;
+
+          // Complete the password reset
+          await emailAuth.finishPasswordReset();
+
+          // Track successful password reset completion
+          await analytics.trackAuthPasswordResetComplete(email: email);
+
+          if (context.mounted) {
+            return true;
+          }
+          return null;
+        } catch (e) {
           // Track password reset failure
           await analytics.trackAuthPasswordResetFailure(
             email: email,
-            errorMessage: 'Invalid verification code or password reset failed',
+            errorMessage: e.toString(),
           );
 
           if (context.mounted) {
@@ -81,14 +95,6 @@ class PasswordResetValidateCodePage extends ConsumerWidget {
           }
           return null;
         }
-
-        // Track successful password reset completion
-        await analytics.trackAuthPasswordResetComplete(email: email);
-
-        if (context.mounted) {
-          return true;
-        }
-        return null;
       },
     );
   }

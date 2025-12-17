@@ -1,5 +1,5 @@
 import 'package:serverpod/serverpod.dart';
-import 'package:serverpod_auth_server/serverpod_auth_server.dart';
+import 'package:serverpod_auth_idp_server/core.dart';
 import 'package:zenscrap_server/src/core/translations/error_translations.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
@@ -10,7 +10,7 @@ class DeleteScrappableEndpoint extends Endpoint {
     required SupportedLanguage language,
   }) async {
     // Get the authenticated user ID (might be null if not logged in)
-    final userId = session.authenticated?.userId;
+    final userId = session.authenticated?.authUserId;
 
     // Find the scrappable
     final scrappable = await Scrappable.db.findById(
@@ -37,7 +37,7 @@ class DeleteScrappableEndpoint extends Endpoint {
       // Get the account info for the logged-in user
       final userAccount = await AccountInfo.db.findFirstRow(
         session,
-        where: (p) => p.userInfoId.equals(userId),
+        where: (p) => p.authUserId.equals(userId),
       );
 
       if (userAccount == null || userAccount.id != scrappable.accountId) {

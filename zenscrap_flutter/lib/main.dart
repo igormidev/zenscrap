@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:seo/seo.dart';
-import 'package:serverpod_auth_shared_flutter/serverpod_auth_shared_flutter.dart';
+import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
@@ -61,16 +61,19 @@ void main() async {
     serverUrl,
     connectionTimeout: Duration(minutes: 3),
   )
-    ..authKeyProvider = FlutterAuthenticationKeyManager()
-    ..connectivityMonitor = FlutterConnectivityMonitor();
+    ..connectivityMonitor = FlutterConnectivityMonitor()
+    ..authSessionManager = FlutterAuthSessionManager();
+
+  // Initialize authentication services
+  await client.auth.initialize();
+
+  // Initialize Google Sign-In service
+  client.auth.initializeGoogleSignIn();
 
   AdaptiveDialog.instance.updateConfiguration(
     defaultStyle:
         DeviceUtils.isApple ? AdaptiveStyle.iOS : AdaptiveStyle.material,
   );
-
-  final sessionManager = SessionManager(caller: client.modules.auth);
-  await sessionManager.initialize();
 
   final pref = await SharedPreferences.getInstance();
 
@@ -78,7 +81,6 @@ void main() async {
     RestartableApp(
       key: restartableAppKey, // Use the GlobalKey here
       client: client,
-      sessionManager: sessionManager,
       sharedPreferences: pref,
     ),
   );
@@ -90,13 +92,11 @@ final GlobalKey<RestartableAppState> restartableAppKey =
 
 class RestartableApp extends StatefulWidget {
   final Client client;
-  final SessionManager sessionManager;
   final SharedPreferences sharedPreferences;
 
   const RestartableApp({
     super.key, // Pass the key to the StatefulWidget
     required this.client,
-    required this.sessionManager,
     required this.sharedPreferences,
   });
 
@@ -135,7 +135,6 @@ class RestartableAppState extends State<RestartableApp> {
         ],
         overrides: [
           clientProvider.overrideWithValue(widget.client),
-          sessionManagerProvider.overrideWithValue(widget.sessionManager),
           sharedPreferencesProvider.overrideWithValue(widget.sharedPreferences),
         ],
         child: const MyApp(), // MyApp and its providers will be reset

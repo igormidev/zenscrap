@@ -1,6 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'package:serverpod/serverpod.dart';
-import 'package:serverpod_auth_server/serverpod_auth_server.dart';
+import 'package:serverpod_auth_idp_server/core.dart';
 import 'package:zenscrap_server/src/core/consts.dart';
 import 'package:zenscrap_server/src/core/translations/error_translations.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
@@ -20,11 +20,11 @@ class PrivateAiUsageEndpoint extends Endpoint {
       throw _authenticationFailed(language);
     }
 
-    final userId = authenticationInfo.userId;
+    final userId = authenticationInfo.authUserId;
 
     final accountInfo = await AccountInfo.db.findFirstRow(
       session,
-      where: (p0) => p0.userInfoId.equals(userId),
+      where: (p0) => p0.authUserId.equals(userId),
     );
 
     if (accountInfo == null) {
@@ -86,11 +86,11 @@ class PrivateAiUsageEndpoint extends Endpoint {
       throw _authenticationFailed(language);
     }
 
-    final userId = authenticationInfo.userId;
+    final userId = authenticationInfo.authUserId;
 
     final accountInfo = await AccountInfo.db.findFirstRow(
       session,
-      where: (p0) => p0.userInfoId.equals(userId),
+      where: (p0) => p0.authUserId.equals(userId),
       include: AccountInfo.include(
         accountAIUsage: AccountAIUsage.include(),
       ),
@@ -116,11 +116,11 @@ class PrivateAiUsageEndpoint extends Endpoint {
       throw _authenticationFailed(language);
     }
 
-    final userId = authenticationInfo.userId;
+    final userId = authenticationInfo.authUserId;
 
     final accountInfo = await AccountInfo.db.findFirstRow(
       session,
-      where: (p0) => p0.userInfoId.equals(userId),
+      where: (p0) => p0.authUserId.equals(userId),
       include: AccountInfo.include(
         accountAIUsage: AccountAIUsage.include(),
       ),
@@ -202,11 +202,11 @@ class PrivateAiUsageEndpoint extends Endpoint {
       throw _authenticationFailed(language);
     }
 
-    final userId = authenticationInfo.userId;
+    final userId = authenticationInfo.authUserId;
 
     final accountInfo = await AccountInfo.db.findFirstRow(
       session,
-      where: (p0) => p0.userInfoId.equals(userId),
+      where: (p0) => p0.authUserId.equals(userId),
     );
 
     if (accountInfo == null) {

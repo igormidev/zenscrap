@@ -8,7 +8,6 @@ import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.d
 import 'package:zenscrap_flutter/src/design_system/widgets/contact_support_button.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/language_selector.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
-import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_state.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
@@ -17,7 +16,6 @@ import 'package:zenscrap_flutter/src/states/theme/theme_provider.dart';
 import 'package:zenscrap_flutter/src/states/theme/theme_state.dart';
 import 'package:zenscrap_flutter/src/ui/account/widgets/brightness_picker.dart';
 import 'package:zenscrap_flutter/src/ui/account/widgets/color_option.dart';
-import 'package:zenscrap_flutter/src/ui/account/widgets/user_editable_profile_image.dart';
 
 class AccountView extends ConsumerWidget {
   const AccountView({super.key});
@@ -25,7 +23,6 @@ class AccountView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final analytics = ref.read(analyticsServiceProvider);
-    final user = ref.read(sessionManagerProvider).signedInUser;
 
     final accountInfo = ref
         .watch(accountProvider)
@@ -74,7 +71,8 @@ class AccountView extends ConsumerWidget {
                     child: Column(
                       children: [
                         const SizedBox(height: 20),
-                        UserEditableProfileImage(user: user),
+                        // Profile image editing not available in new IDP system
+                        // UserEditableProfileImage is disabled until we have a way to update profile
                         const SizedBox(height: 20),
                         Text(
                           AppLocalizations.of(

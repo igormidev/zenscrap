@@ -1,5 +1,5 @@
 import 'package:serverpod/serverpod.dart';
-import 'package:serverpod_auth_server/serverpod_auth_server.dart';
+import 'package:serverpod_auth_idp_server/core.dart';
 import 'package:zenscrap_server/src/core/default_classes.dart';
 import 'package:zenscrap_server/src/core/translations/error_translations.dart';
 import 'package:zenscrap_server/src/endpoints/public/scrappable_chat_session.dart';
@@ -18,7 +18,7 @@ mixin DeployEndpointMixin {
       throw createTranslatedException('no_byte_data_to_deploy', language);
     }
 
-    final int? userId = session.authenticated?.userId;
+    final userId = session.authenticated?.authUserId;
     final Scrappable? scrappable;
     if (userId == null) {
       // If not autenticated, should only be able to modify scrappables that are not attached to any account
@@ -34,7 +34,7 @@ mixin DeployEndpointMixin {
     } else {
       final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
         session,
-        where: (p0) => p0.userInfoId.equals(userId),
+        where: (p0) => p0.authUserId.equals(userId),
         transaction: transaction,
       );
       if (accountInfo == null) {

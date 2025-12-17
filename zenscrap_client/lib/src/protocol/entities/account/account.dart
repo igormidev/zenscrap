@@ -12,7 +12,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import '../../entities/scrappable/scrappable.dart' as _i2;
-import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i3;
+import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
+    as _i3;
 import '../../entities/account/api_usage/account_api_usage.dart' as _i4;
 import '../../entities/account/plan_tier.dart' as _i5;
 import '../../entities/account/ai_usage/account_ai_usage.dart' as _i6;
@@ -22,8 +23,8 @@ abstract class AccountInfo implements _i1.SerializableModel {
   AccountInfo._({
     this.id,
     this.scrappables,
-    required this.userInfoId,
-    this.userInfo,
+    required this.authUserId,
+    this.authUser,
     required this.accountApiUsageId,
     this.accountApiUsage,
     required this.planTier,
@@ -38,8 +39,8 @@ abstract class AccountInfo implements _i1.SerializableModel {
   factory AccountInfo({
     int? id,
     List<_i2.Scrappable>? scrappables,
-    required int userInfoId,
-    _i3.UserInfo? userInfo,
+    required _i1.UuidValue authUserId,
+    _i3.AuthUser? authUser,
     required int accountApiUsageId,
     _i4.AccountApiUsage? accountApiUsage,
     required _i5.PlanTier planTier,
@@ -59,11 +60,13 @@ abstract class AccountInfo implements _i1.SerializableModel {
           : _i7.Protocol().deserialize<List<_i2.Scrappable>>(
               jsonSerialization['scrappables'],
             ),
-      userInfoId: jsonSerialization['userInfoId'] as int,
-      userInfo: jsonSerialization['userInfo'] == null
+      authUserId: _i1.UuidValueJsonExtension.fromJson(
+        jsonSerialization['authUserId'],
+      ),
+      authUser: jsonSerialization['authUser'] == null
           ? null
-          : _i7.Protocol().deserialize<_i3.UserInfo>(
-              jsonSerialization['userInfo'],
+          : _i7.Protocol().deserialize<_i3.AuthUser>(
+              jsonSerialization['authUser'],
             ),
       accountApiUsageId: jsonSerialization['accountApiUsageId'] as int,
       accountApiUsage: jsonSerialization['accountApiUsage'] == null
@@ -97,9 +100,9 @@ abstract class AccountInfo implements _i1.SerializableModel {
 
   List<_i2.Scrappable>? scrappables;
 
-  int userInfoId;
+  _i1.UuidValue authUserId;
 
-  _i3.UserInfo? userInfo;
+  _i3.AuthUser? authUser;
 
   int accountApiUsageId;
 
@@ -125,8 +128,8 @@ abstract class AccountInfo implements _i1.SerializableModel {
   AccountInfo copyWith({
     int? id,
     List<_i2.Scrappable>? scrappables,
-    int? userInfoId,
-    _i3.UserInfo? userInfo,
+    _i1.UuidValue? authUserId,
+    _i3.AuthUser? authUser,
     int? accountApiUsageId,
     _i4.AccountApiUsage? accountApiUsage,
     _i5.PlanTier? planTier,
@@ -144,8 +147,8 @@ abstract class AccountInfo implements _i1.SerializableModel {
       if (id != null) 'id': id,
       if (scrappables != null)
         'scrappables': scrappables?.toJson(valueToJson: (v) => v.toJson()),
-      'userInfoId': userInfoId,
-      if (userInfo != null) 'userInfo': userInfo?.toJson(),
+      'authUserId': authUserId.toJson(),
+      if (authUser != null) 'authUser': authUser?.toJson(),
       'accountApiUsageId': accountApiUsageId,
       if (accountApiUsage != null) 'accountApiUsage': accountApiUsage?.toJson(),
       'planTier': planTier.toJson(),
@@ -172,8 +175,8 @@ class _AccountInfoImpl extends AccountInfo {
   _AccountInfoImpl({
     int? id,
     List<_i2.Scrappable>? scrappables,
-    required int userInfoId,
-    _i3.UserInfo? userInfo,
+    required _i1.UuidValue authUserId,
+    _i3.AuthUser? authUser,
     required int accountApiUsageId,
     _i4.AccountApiUsage? accountApiUsage,
     required _i5.PlanTier planTier,
@@ -186,8 +189,8 @@ class _AccountInfoImpl extends AccountInfo {
   }) : super._(
          id: id,
          scrappables: scrappables,
-         userInfoId: userInfoId,
-         userInfo: userInfo,
+         authUserId: authUserId,
+         authUser: authUser,
          accountApiUsageId: accountApiUsageId,
          accountApiUsage: accountApiUsage,
          planTier: planTier,
@@ -206,8 +209,8 @@ class _AccountInfoImpl extends AccountInfo {
   AccountInfo copyWith({
     Object? id = _Undefined,
     Object? scrappables = _Undefined,
-    int? userInfoId,
-    Object? userInfo = _Undefined,
+    _i1.UuidValue? authUserId,
+    Object? authUser = _Undefined,
     int? accountApiUsageId,
     Object? accountApiUsage = _Undefined,
     _i5.PlanTier? planTier,
@@ -223,10 +226,10 @@ class _AccountInfoImpl extends AccountInfo {
       scrappables: scrappables is List<_i2.Scrappable>?
           ? scrappables
           : this.scrappables?.map((e0) => e0.copyWith()).toList(),
-      userInfoId: userInfoId ?? this.userInfoId,
-      userInfo: userInfo is _i3.UserInfo?
-          ? userInfo
-          : this.userInfo?.copyWith(),
+      authUserId: authUserId ?? this.authUserId,
+      authUser: authUser is _i3.AuthUser?
+          ? authUser
+          : this.authUser?.copyWith(),
       accountApiUsageId: accountApiUsageId ?? this.accountApiUsageId,
       accountApiUsage: accountApiUsage is _i4.AccountApiUsage?
           ? accountApiUsage

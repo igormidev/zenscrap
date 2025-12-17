@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
@@ -24,31 +25,23 @@ class _SplashViewState extends ConsumerState<SplashView> {
   }
 
   void _getUserAuthState() async {
-    final sessionManager = ref.read(sessionManagerProvider);
-    final signedInUser = sessionManager.signedInUser;
-    if (signedInUser == null) {
+    final client = ref.read(clientProvider);
+    final isAuthenticated = client.auth.isAuthenticated;
+
+    if (!isAuthenticated) {
       ref.read(sessionProvider.notifier).setState(SessionState.notSignedIn());
       // Redirect to landing page for unauthenticated users
       if (mounted) {
         context.go('/scrappable-form');
       }
     } else {
-      final email = signedInUser.email;
-      final userName = signedInUser.userName;
-      if (email == null || userName == null) {
-        await sessionManager.signOutAllDevices();
-        ref.read(sessionProvider.notifier).setState(SessionState.notSignedIn());
-        if (mounted) {
-          context.go('/scrappable-form');
-        }
-        return;
-      }
-
+      // User is authenticated - we don't have user profile info from AuthSuccess
+      // so we use placeholder values that will be updated when account info is fetched
       ref.read(sessionProvider.notifier).setState(SessionState.logged(
         user: UserModel(
-          email: email,
-          userName: userName,
-          imageUrl: signedInUser.imageUrl,
+          email: 'user@zenscrap.com',
+          userName: 'User',
+          imageUrl: null,
         ),
       ));
       // Redirect to dashboard for authenticated users

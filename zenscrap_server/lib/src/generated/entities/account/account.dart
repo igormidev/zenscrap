@@ -14,7 +14,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../entities/scrappable/scrappable.dart' as _i2;
-import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i3;
+import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
+    as _i3;
 import '../../entities/account/api_usage/account_api_usage.dart' as _i4;
 import '../../entities/account/plan_tier.dart' as _i5;
 import '../../entities/account/ai_usage/account_ai_usage.dart' as _i6;
@@ -25,8 +26,8 @@ abstract class AccountInfo
   AccountInfo._({
     this.id,
     this.scrappables,
-    required this.userInfoId,
-    this.userInfo,
+    required this.authUserId,
+    this.authUser,
     required this.accountApiUsageId,
     this.accountApiUsage,
     required this.planTier,
@@ -41,8 +42,8 @@ abstract class AccountInfo
   factory AccountInfo({
     int? id,
     List<_i2.Scrappable>? scrappables,
-    required int userInfoId,
-    _i3.UserInfo? userInfo,
+    required _i1.UuidValue authUserId,
+    _i3.AuthUser? authUser,
     required int accountApiUsageId,
     _i4.AccountApiUsage? accountApiUsage,
     required _i5.PlanTier planTier,
@@ -62,11 +63,13 @@ abstract class AccountInfo
           : _i7.Protocol().deserialize<List<_i2.Scrappable>>(
               jsonSerialization['scrappables'],
             ),
-      userInfoId: jsonSerialization['userInfoId'] as int,
-      userInfo: jsonSerialization['userInfo'] == null
+      authUserId: _i1.UuidValueJsonExtension.fromJson(
+        jsonSerialization['authUserId'],
+      ),
+      authUser: jsonSerialization['authUser'] == null
           ? null
-          : _i7.Protocol().deserialize<_i3.UserInfo>(
-              jsonSerialization['userInfo'],
+          : _i7.Protocol().deserialize<_i3.AuthUser>(
+              jsonSerialization['authUser'],
             ),
       accountApiUsageId: jsonSerialization['accountApiUsageId'] as int,
       accountApiUsage: jsonSerialization['accountApiUsage'] == null
@@ -102,9 +105,9 @@ abstract class AccountInfo
 
   List<_i2.Scrappable>? scrappables;
 
-  int userInfoId;
+  _i1.UuidValue authUserId;
 
-  _i3.UserInfo? userInfo;
+  _i3.AuthUser? authUser;
 
   int accountApiUsageId;
 
@@ -133,8 +136,8 @@ abstract class AccountInfo
   AccountInfo copyWith({
     int? id,
     List<_i2.Scrappable>? scrappables,
-    int? userInfoId,
-    _i3.UserInfo? userInfo,
+    _i1.UuidValue? authUserId,
+    _i3.AuthUser? authUser,
     int? accountApiUsageId,
     _i4.AccountApiUsage? accountApiUsage,
     _i5.PlanTier? planTier,
@@ -152,8 +155,8 @@ abstract class AccountInfo
       if (id != null) 'id': id,
       if (scrappables != null)
         'scrappables': scrappables?.toJson(valueToJson: (v) => v.toJson()),
-      'userInfoId': userInfoId,
-      if (userInfo != null) 'userInfo': userInfo?.toJson(),
+      'authUserId': authUserId.toJson(),
+      if (authUser != null) 'authUser': authUser?.toJson(),
       'accountApiUsageId': accountApiUsageId,
       if (accountApiUsage != null) 'accountApiUsage': accountApiUsage?.toJson(),
       'planTier': planTier.toJson(),
@@ -177,8 +180,8 @@ abstract class AccountInfo
         'scrappables': scrappables?.toJson(
           valueToJson: (v) => v.toJsonForProtocol(),
         ),
-      'userInfoId': userInfoId,
-      if (userInfo != null) 'userInfo': userInfo?.toJsonForProtocol(),
+      'authUserId': authUserId.toJson(),
+      if (authUser != null) 'authUser': authUser?.toJsonForProtocol(),
       'accountApiUsageId': accountApiUsageId,
       if (accountApiUsage != null)
         'accountApiUsage': accountApiUsage?.toJsonForProtocol(),
@@ -197,13 +200,13 @@ abstract class AccountInfo
 
   static AccountInfoInclude include({
     _i2.ScrappableIncludeList? scrappables,
-    _i3.UserInfoInclude? userInfo,
+    _i3.AuthUserInclude? authUser,
     _i4.AccountApiUsageInclude? accountApiUsage,
     _i6.AccountAIUsageInclude? accountAIUsage,
   }) {
     return AccountInfoInclude._(
       scrappables: scrappables,
-      userInfo: userInfo,
+      authUser: authUser,
       accountApiUsage: accountApiUsage,
       accountAIUsage: accountAIUsage,
     );
@@ -241,8 +244,8 @@ class _AccountInfoImpl extends AccountInfo {
   _AccountInfoImpl({
     int? id,
     List<_i2.Scrappable>? scrappables,
-    required int userInfoId,
-    _i3.UserInfo? userInfo,
+    required _i1.UuidValue authUserId,
+    _i3.AuthUser? authUser,
     required int accountApiUsageId,
     _i4.AccountApiUsage? accountApiUsage,
     required _i5.PlanTier planTier,
@@ -255,8 +258,8 @@ class _AccountInfoImpl extends AccountInfo {
   }) : super._(
          id: id,
          scrappables: scrappables,
-         userInfoId: userInfoId,
-         userInfo: userInfo,
+         authUserId: authUserId,
+         authUser: authUser,
          accountApiUsageId: accountApiUsageId,
          accountApiUsage: accountApiUsage,
          planTier: planTier,
@@ -275,8 +278,8 @@ class _AccountInfoImpl extends AccountInfo {
   AccountInfo copyWith({
     Object? id = _Undefined,
     Object? scrappables = _Undefined,
-    int? userInfoId,
-    Object? userInfo = _Undefined,
+    _i1.UuidValue? authUserId,
+    Object? authUser = _Undefined,
     int? accountApiUsageId,
     Object? accountApiUsage = _Undefined,
     _i5.PlanTier? planTier,
@@ -292,10 +295,10 @@ class _AccountInfoImpl extends AccountInfo {
       scrappables: scrappables is List<_i2.Scrappable>?
           ? scrappables
           : this.scrappables?.map((e0) => e0.copyWith()).toList(),
-      userInfoId: userInfoId ?? this.userInfoId,
-      userInfo: userInfo is _i3.UserInfo?
-          ? userInfo
-          : this.userInfo?.copyWith(),
+      authUserId: authUserId ?? this.authUserId,
+      authUser: authUser is _i3.AuthUser?
+          ? authUser
+          : this.authUser?.copyWith(),
       accountApiUsageId: accountApiUsageId ?? this.accountApiUsageId,
       accountApiUsage: accountApiUsage is _i4.AccountApiUsage?
           ? accountApiUsage
@@ -324,8 +327,10 @@ class _AccountInfoImpl extends AccountInfo {
 class AccountInfoUpdateTable extends _i1.UpdateTable<AccountInfoTable> {
   AccountInfoUpdateTable(super.table);
 
-  _i1.ColumnValue<int, int> userInfoId(int value) => _i1.ColumnValue(
-    table.userInfoId,
+  _i1.ColumnValue<_i1.UuidValue, _i1.UuidValue> authUserId(
+    _i1.UuidValue value,
+  ) => _i1.ColumnValue(
+    table.authUserId,
     value,
   );
 
@@ -373,8 +378,8 @@ class AccountInfoUpdateTable extends _i1.UpdateTable<AccountInfoTable> {
 class AccountInfoTable extends _i1.Table<int?> {
   AccountInfoTable({super.tableRelation}) : super(tableName: 'account_info') {
     updateTable = AccountInfoUpdateTable(this);
-    userInfoId = _i1.ColumnInt(
-      'userInfoId',
+    authUserId = _i1.ColumnUuid(
+      'authUserId',
       this,
     );
     accountApiUsageId = _i1.ColumnInt(
@@ -414,9 +419,9 @@ class AccountInfoTable extends _i1.Table<int?> {
 
   _i1.ManyRelation<_i2.ScrappableTable>? _scrappables;
 
-  late final _i1.ColumnInt userInfoId;
+  late final _i1.ColumnUuid authUserId;
 
-  _i3.UserInfoTable? _userInfo;
+  _i3.AuthUserTable? _authUser;
 
   late final _i1.ColumnInt accountApiUsageId;
 
@@ -449,17 +454,17 @@ class AccountInfoTable extends _i1.Table<int?> {
     return ___scrappables!;
   }
 
-  _i3.UserInfoTable get userInfo {
-    if (_userInfo != null) return _userInfo!;
-    _userInfo = _i1.createRelationTable(
-      relationFieldName: 'userInfo',
-      field: AccountInfo.t.userInfoId,
-      foreignField: _i3.UserInfo.t.id,
+  _i3.AuthUserTable get authUser {
+    if (_authUser != null) return _authUser!;
+    _authUser = _i1.createRelationTable(
+      relationFieldName: 'authUser',
+      field: AccountInfo.t.authUserId,
+      foreignField: _i3.AuthUser.t.id,
       tableRelation: tableRelation,
       createTable: (foreignTableRelation) =>
-          _i3.UserInfoTable(tableRelation: foreignTableRelation),
+          _i3.AuthUserTable(tableRelation: foreignTableRelation),
     );
-    return _userInfo!;
+    return _authUser!;
   }
 
   _i4.AccountApiUsageTable get accountApiUsage {
@@ -510,7 +515,7 @@ class AccountInfoTable extends _i1.Table<int?> {
   @override
   List<_i1.Column> get columns => [
     id,
-    userInfoId,
+    authUserId,
     accountApiUsageId,
     planTier,
     stripeCustomerId,
@@ -525,8 +530,8 @@ class AccountInfoTable extends _i1.Table<int?> {
     if (relationField == 'scrappables') {
       return __scrappables;
     }
-    if (relationField == 'userInfo') {
-      return userInfo;
+    if (relationField == 'authUser') {
+      return authUser;
     }
     if (relationField == 'accountApiUsage') {
       return accountApiUsage;
@@ -541,19 +546,19 @@ class AccountInfoTable extends _i1.Table<int?> {
 class AccountInfoInclude extends _i1.IncludeObject {
   AccountInfoInclude._({
     _i2.ScrappableIncludeList? scrappables,
-    _i3.UserInfoInclude? userInfo,
+    _i3.AuthUserInclude? authUser,
     _i4.AccountApiUsageInclude? accountApiUsage,
     _i6.AccountAIUsageInclude? accountAIUsage,
   }) {
     _scrappables = scrappables;
-    _userInfo = userInfo;
+    _authUser = authUser;
     _accountApiUsage = accountApiUsage;
     _accountAIUsage = accountAIUsage;
   }
 
   _i2.ScrappableIncludeList? _scrappables;
 
-  _i3.UserInfoInclude? _userInfo;
+  _i3.AuthUserInclude? _authUser;
 
   _i4.AccountApiUsageInclude? _accountApiUsage;
 
@@ -562,7 +567,7 @@ class AccountInfoInclude extends _i1.IncludeObject {
   @override
   Map<String, _i1.Include?> get includes => {
     'scrappables': _scrappables,
-    'userInfo': _userInfo,
+    'authUser': _authUser,
     'accountApiUsage': _accountApiUsage,
     'accountAIUsage': _accountAIUsage,
   };
@@ -890,25 +895,25 @@ class AccountInfoAttachRepository {
 class AccountInfoAttachRowRepository {
   const AccountInfoAttachRowRepository._();
 
-  /// Creates a relation between the given [AccountInfo] and [UserInfo]
-  /// by setting the [AccountInfo]'s foreign key `userInfoId` to refer to the [UserInfo].
-  Future<void> userInfo(
+  /// Creates a relation between the given [AccountInfo] and [AuthUser]
+  /// by setting the [AccountInfo]'s foreign key `authUserId` to refer to the [AuthUser].
+  Future<void> authUser(
     _i1.Session session,
     AccountInfo accountInfo,
-    _i3.UserInfo userInfo, {
+    _i3.AuthUser authUser, {
     _i1.Transaction? transaction,
   }) async {
     if (accountInfo.id == null) {
       throw ArgumentError.notNull('accountInfo.id');
     }
-    if (userInfo.id == null) {
-      throw ArgumentError.notNull('userInfo.id');
+    if (authUser.id == null) {
+      throw ArgumentError.notNull('authUser.id');
     }
 
-    var $accountInfo = accountInfo.copyWith(userInfoId: userInfo.id);
+    var $accountInfo = accountInfo.copyWith(authUserId: authUser.id);
     await session.db.updateRow<AccountInfo>(
       $accountInfo,
-      columns: [AccountInfo.t.userInfoId],
+      columns: [AccountInfo.t.authUserId],
       transaction: transaction,
     );
   }

@@ -1,6 +1,5 @@
 import 'package:serverpod/serverpod.dart';
-import 'package:serverpod_auth_server/serverpod_auth_server.dart' as auth;
-import 'package:serverpod_auth_server/serverpod_auth_server.dart';
+import 'package:serverpod_auth_idp_server/core.dart';
 import 'package:zenscrap_server/src/core/consts.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_api.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_config.dart';
@@ -23,11 +22,11 @@ class PrivateApiUsageEndpoint extends Endpoint {
       throw _authenticationFailed(language);
     }
 
-    final userId = authenticationInfo.userId;
+    final userId = authenticationInfo.authUserId;
 
     final accountInfo = await AccountInfo.db.findFirstRow(
       session,
-      where: (p0) => p0.userInfoId.equals(userId),
+      where: (p0) => p0.authUserId.equals(userId),
     );
 
     if (accountInfo == null) {
@@ -90,11 +89,11 @@ class PrivateApiUsageEndpoint extends Endpoint {
       throw _authenticationFailed(language);
     }
 
-    final userId = authenticationInfo.userId;
+    final userId = authenticationInfo.authUserId;
 
     final accountInfo = await AccountInfo.db.findFirstRow(
       session,
-      where: (p0) => p0.userInfoId.equals(userId),
+      where: (p0) => p0.authUserId.equals(userId),
       include: AccountInfo.include(
         accountApiUsage: AccountApiUsage.include(),
       ),
@@ -141,12 +140,12 @@ class PrivateApiUsageEndpoint extends Endpoint {
       throw _authenticationFailed(language);
     }
 
-    final userId = authenticationInfo.userId;
+    final userId = authenticationInfo.authUserId;
 
     // First check if user owns this API key and count active keys
     final accountInfo = await AccountInfo.db.findFirstRow(
       session,
-      where: (p0) => p0.userInfoId.equals(userId),
+      where: (p0) => p0.authUserId.equals(userId),
       include: AccountInfo.include(
         accountApiUsage: AccountApiUsage.include(
           apiKeys: AccountApiKey.includeList(
@@ -189,11 +188,11 @@ class PrivateApiUsageEndpoint extends Endpoint {
       throw _authenticationFailed(language);
     }
 
-    final userId = authenticationInfo.userId;
+    final userId = authenticationInfo.authUserId;
 
     final accountInfo = await AccountInfo.db.findFirstRow(
       session,
-      where: (p0) => p0.userInfoId.equals(userId),
+      where: (p0) => p0.authUserId.equals(userId),
       include: AccountInfo.include(
         accountApiUsage: AccountApiUsage.include(
           creditUsage: CreditUsage.include(),
@@ -222,11 +221,11 @@ class PrivateApiUsageEndpoint extends Endpoint {
       throw _authenticationFailed(language);
     }
 
-    final userId = authenticationInfo.userId;
+    final userId = authenticationInfo.authUserId;
 
     final accountInfo = await AccountInfo.db.findFirstRow(
       session,
-      where: (p0) => p0.userInfoId.equals(userId),
+      where: (p0) => p0.authUserId.equals(userId),
       include: AccountInfo.include(
         accountApiUsage: AccountApiUsage.include(
           apiKeys: AccountApiKey.includeList(
@@ -268,11 +267,11 @@ class PrivateApiUsageEndpoint extends Endpoint {
       throw _authenticationFailed(language);
     }
 
-    final userId = authenticationInfo.userId;
+    final userId = authenticationInfo.authUserId;
 
     final accountInfo = await AccountInfo.db.findFirstRow(
       session,
-      where: (p0) => p0.userInfoId.equals(userId),
+      where: (p0) => p0.authUserId.equals(userId),
       include: AccountInfo.include(
         accountApiUsage: AccountApiUsage.include(
           creditUsage: CreditUsage.include(),
@@ -301,11 +300,11 @@ class PrivateApiUsageEndpoint extends Endpoint {
       throw _authenticationFailed(language);
     }
 
-    final userId = authenticationInfo.userId;
+    final userId = authenticationInfo.authUserId;
 
     final accountInfo = await AccountInfo.db.findFirstRow(
       session,
-      where: (p0) => p0.userInfoId.equals(userId),
+      where: (p0) => p0.authUserId.equals(userId),
       include: AccountInfo.include(
         accountApiUsage: AccountApiUsage.include(
           creditUsage: CreditUsage.include(),
@@ -357,18 +356,15 @@ class PrivateApiUsageEndpoint extends Endpoint {
       throw _authenticationFailed(language);
     }
 
-    final userId = authenticationInfo.userId;
+    final userId = authenticationInfo.authUserId;
 
     // Get account info
     final accountInfo = await AccountInfo.db.findFirstRow(
       session,
-      where: (p0) => p0.userInfoId.equals(userId),
-      include: AccountInfo.include(
-        userInfo: auth.UserInfo.include(),
-      ),
+      where: (p0) => p0.authUserId.equals(userId),
     );
 
-    if (accountInfo == null || accountInfo.userInfo == null) {
+    if (accountInfo == null) {
       throw _accountNotFound(language);
     }
 
@@ -376,6 +372,10 @@ class PrivateApiUsageEndpoint extends Endpoint {
     if (accountInfo.planTier != PlanTier.ultra) {
       throw _ultraPlanRequired(language);
     }
+
+    // Get user profile for email
+    final userProfile = await session.authenticated?.userProfile(session);
+    final customerEmail = userProfile?.email ?? '';
 
     // Get price ID and credit amount based on the package
     final packageName = creditPackage.name;
@@ -386,7 +386,7 @@ class PrivateApiUsageEndpoint extends Endpoint {
     final checkoutSession = await StripeApi.createCreditPurchaseCheckoutSession(
       secretKey: StripeConfig.secretKey,
       priceId: priceId,
-      customerEmail: accountInfo.userInfo!.email ?? '',
+      customerEmail: customerEmail,
       successUrl: StripeConfig.successUrl,
       cancelUrl: StripeConfig.cancelUrl,
       accountInfoId: accountInfo.id!,

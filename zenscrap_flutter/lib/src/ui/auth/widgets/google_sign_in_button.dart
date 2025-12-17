@@ -1,8 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:serverpod_auth_google_flutter/serverpod_auth_google_flutter.dart';
-import 'package:serverpod_flutter/serverpod_flutter.dart' show localhost;
+import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
@@ -25,6 +24,7 @@ class ZenScrapGoogleSignInButton extends ConsumerStatefulWidget {
 class _ZenScrapGoogleSignInButtonState
     extends ConsumerState<ZenScrapGoogleSignInButton> {
   bool _isLoading = false;
+  GoogleAuthController? _googleAuthController;
 
   // Server Client ID from Google Cloud Console (Web application credentials)
   // This should match the client_id in google_client_secret.json on the server
@@ -37,12 +37,10 @@ class _ZenScrapGoogleSignInButtonState
   // Check if Google Sign-In is configured
   bool get _isConfigured => _googleServerClientId.isNotEmpty;
 
-  // Redirect URI for web - must be registered in Google Cloud Console
-  Uri get _redirectUri {
-    if (kDebugMode) {
-      return Uri.parse('http://$localhost:8082/googlesignin');
-    }
-    return Uri.parse('https://api.zenscrap.com/googlesignin');
+  @override
+  void dispose() {
+    _googleAuthController?.dispose();
+    super.dispose();
   }
 
   @override
@@ -104,35 +102,50 @@ class _ZenScrapGoogleSignInButtonState
                         eventName: 'auth_google_attempt',
                       );
 
-                      // Use the signInWithGoogle function from serverpod_auth_google_flutter
-                      final sessionManager = ref.read(sessionManagerProvider);
-                      final userInfo = await signInWithGoogle(
-                        client.modules.auth,
-                        serverClientId: _googleServerClientId,
-                        redirectUri: _redirectUri,
+                      // Create GoogleAuthController for the new IDP system
+                      _googleAuthController?.dispose();
+                      _googleAuthController = GoogleAuthController(
+                        client: client,
+                        onAuthenticated: () {
+                          // Authentication successful - handle in the callback
+                        },
+                        onError: (error) {
+                          // Error handled below
+                        },
+                        attemptLightweightSignIn: true,
+                        scopes: const [
+                          'https://www.googleapis.com/auth/userinfo.email',
+                          'https://www.googleapis.com/auth/userinfo.profile',
+                        ],
                       );
 
-                      if (userInfo != null) {
+                      // Attempt Google sign-in
+                      await _googleAuthController!.signIn();
+
+                      // Check if authenticated
+                      final isAuthenticated = client.auth.isAuthenticated;
+
+                      if (isAuthenticated) {
                         // Track successful Google sign-in
+                        // Note: We don't have user email/name directly from AuthSuccess
+                        // It needs to be fetched from the server separately
                         await analytics.trackEvent(
                           eventName: 'auth_google_success',
                           properties: {
-                            'email': userInfo.email ?? 'unknown',
-                            'user_name': userInfo.userName ?? 'unknown',
+                            'email': 'google_user',
+                            'user_name': 'Google User',
                           },
                         );
 
-                        // Refresh session manager to get the new session
-                        await sessionManager.initialize();
-
                         // Update session state
+                        // For Google sign-in, we'll use a placeholder name and fetch the real info later
                         if (context.mounted) {
                           ref.read(sessionProvider.notifier).setState(
                                 SessionState.logged(
                                   user: UserModel(
-                                    email: userInfo.email ?? '',
-                                    userName: userInfo.userName ?? 'User',
-                                    imageUrl: userInfo.imageUrl,
+                                    email: 'google_user@google.com',
+                                    userName: 'Google User',
+                                    imageUrl: null,
                                   ),
                                 ),
                               );

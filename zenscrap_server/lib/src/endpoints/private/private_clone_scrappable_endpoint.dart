@@ -1,5 +1,5 @@
 import 'package:serverpod/serverpod.dart';
-import 'package:serverpod_auth_server/serverpod_auth_server.dart';
+import 'package:serverpod_auth_idp_server/core.dart';
 import 'package:zenscrap_server/src/core/translations/error_translations.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
@@ -17,12 +17,12 @@ class PrivateCloneScrappableEndpoint extends Endpoint {
       throw _authenticationFailed(language);
     }
 
-    final authenticatedUserId = authenticationInfo.userId;
+    final authenticatedUserId = authenticationInfo.authUserId;
 
     // Get account info with plan tier
     final accountInfo = await AccountInfo.db.findFirstRow(
       session,
-      where: (t) => t.userInfoId.equals(authenticatedUserId),
+      where: (t) => t.authUserId.equals(authenticatedUserId),
       include: AccountInfo.include(
         accountApiUsage: AccountApiUsage.include(),
       ),

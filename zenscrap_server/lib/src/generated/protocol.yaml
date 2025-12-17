@@ -1,3 +1,15 @@
+emailIdp:
+  - login:
+  - startRegistration:
+  - verifyRegistrationCode:
+  - finishRegistration:
+  - startPasswordReset:
+  - verifyPasswordResetCode:
+  - finishPasswordReset:
+googleIdp:
+  - login:
+refreshJwtTokens:
+  - refreshAccessToken:
 privateAccount:
   - getAccountInfo:
 privateAiUsage:

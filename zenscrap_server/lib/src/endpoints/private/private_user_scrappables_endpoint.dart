@@ -1,5 +1,5 @@
 import 'package:serverpod/serverpod.dart';
-import 'package:serverpod_auth_server/serverpod_auth_server.dart';
+import 'package:serverpod_auth_idp_server/core.dart';
 import 'package:zenscrap_server/src/core/consts.dart';
 import 'package:zenscrap_server/src/core/translations/error_translations.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
@@ -15,7 +15,7 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
     List<ScraperCategory>? categories,
     SupportedLanguage language = SupportedLanguage.en,
   }) async {
-    final userId = session.authenticated?.userId;
+    final userId = session.authenticated?.authUserId;
     if (userId == null) {
       throw _userNotAuthenticated(language);
     }
@@ -23,7 +23,7 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
     // Get account info to verify user and get accountId
     final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
       session,
-      where: (p0) => p0.userInfoId.equals(userId),
+      where: (p0) => p0.authUserId.equals(userId),
     );
     if (accountInfo == null) {
       throw _accountNotFoundForUser(language);
@@ -121,7 +121,7 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
     int scrappableId, {
     SupportedLanguage language = SupportedLanguage.en,
   }) async {
-    final userId = session.authenticated?.userId;
+    final userId = session.authenticated?.authUserId;
     if (userId == null) {
       throw _userNotAuthenticated(language);
     }
@@ -129,7 +129,7 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
     // First check if the user owns this scrappable
     final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
       session,
-      where: (p0) => p0.userInfoId.equals(userId),
+      where: (p0) => p0.authUserId.equals(userId),
     );
 
     if (accountInfo == null) {

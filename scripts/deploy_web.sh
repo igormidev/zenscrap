@@ -14,6 +14,10 @@ set -e  # Exit on any error
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
+# Google OAuth Client ID for web authentication
+# This is the Web application client ID from Google Cloud Console
+GOOGLE_SERVER_CLIENT_ID="602145347765-dafncgl6jkbmnc3mf62qk1o0oeic5861.apps.googleusercontent.com"
+
 echo "=== ZenScrap Web Deployment Script ==="
 echo "Project root: $PROJECT_ROOT"
 echo ""
@@ -38,7 +42,9 @@ flutter analyze --no-fatal-infos || {
 echo ""
 echo "[4/6] Building with WASM, release mode, and tree-shaking..."
 echo "      This may take a few minutes..."
-flutter build web --wasm --release --tree-shake-icons
+echo "      Google Client ID: $GOOGLE_SERVER_CLIENT_ID"
+flutter build web --wasm --release --tree-shake-icons \
+  --dart-define=GOOGLE_SERVER_CLIENT_ID="$GOOGLE_SERVER_CLIENT_ID"
 
 # Check build size
 echo ""

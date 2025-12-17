@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
@@ -24,7 +25,7 @@ class ScrappableEditSessionView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Track edit session view
     final analytics = ref.read(analyticsServiceProvider);
-    final isAuthenticated = ref.read(sessionManagerProvider).isSignedIn;
+    final isAuthenticated = ref.read(clientProvider).auth.isAuthenticated;
 
     analytics.trackScrappableEditSessionView(
       scrappableId: scrappable.id ?? 0,

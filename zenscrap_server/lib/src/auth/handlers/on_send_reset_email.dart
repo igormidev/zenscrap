@@ -1,26 +1,26 @@
 import 'package:serverpod/serverpod.dart';
-import 'package:serverpod_auth_server/module.dart';
 import 'package:zenscrap_server/src/auth/get_html_messages.dart';
 import 'package:zenscrap_server/src/auth/send_email.dart';
 
-Future<bool> onSendResetEmail(
-  Session session,
-  UserInfo userInfo,
-  String validationCode,
-) async {
-  session.log('Validation code: $validationCode');
-  final email = userInfo.email;
-  if (email == null) {
-    session.log('Email not found for ${userInfo.id}');
-    return false;
-  }
+/// Callback for sending password reset verification code emails
+/// Used by EmailIdpConfig in Serverpod 3.1 IDP system
+Future<void> onSendPasswordResetVerificationCode(
+  Session session, {
+  required String email,
+  required UuidValue passwordResetRequestId,
+  required String verificationCode,
+  required Transaction? transaction,
+}) async {
+  session.log('Password reset verification code for $email: $verificationCode');
+
   final htmlText = getHTMLEmailTemplate(
     title: 'Reset password code',
     description:
-        'Enter the following code bellow in the verfication code field.',
-    code: validationCode,
+        'Enter the following code below in the verification code field.',
+    code: verificationCode,
   );
-  return sendEmail(
+
+  await sendEmail(
     destinyEmail: email,
     subject: 'Zen Scrap | Reset your password',
     htmlMessage: htmlText,

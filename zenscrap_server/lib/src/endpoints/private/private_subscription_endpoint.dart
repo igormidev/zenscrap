@@ -1,5 +1,5 @@
 import 'package:serverpod/serverpod.dart';
-import 'package:serverpod_auth_server/serverpod_auth_server.dart';
+import 'package:serverpod_auth_idp_server/core.dart';
 import 'package:zenscrap_server/src/core/mixins/api_helper_mixin.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_api.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_config.dart';
@@ -21,22 +21,23 @@ class PrivateSubscriptionEndpoint extends Endpoint {
     if (authenticationInfo == null) {
       throw _authenticationFailed(language);
     }
-    final authenticatedUserId = authenticationInfo.userId;
+    final authenticatedUserId = authenticationInfo.authUserId;
 
     // Get account info
     final accountInfo = await AccountInfo.db.findFirstRow(
       session,
-      where: (t) => t.userInfoId.equals(authenticatedUserId),
-      include: AccountInfo.include(
-        userInfo: UserInfo.include(),
-      ),
+      where: (t) => t.authUserId.equals(authenticatedUserId),
     );
 
     if (accountInfo == null) {
       throw _accountNotFound(language);
     }
 
-    if (accountInfo.userInfo?.email == null) {
+    // Get user profile for email
+    final userProfile = await session.authenticated?.userProfile(session);
+    final customerEmail = userProfile?.email;
+
+    if (customerEmail == null) {
       throw _userEmailNotFound(language);
     }
 
@@ -54,7 +55,7 @@ class PrivateSubscriptionEndpoint extends Endpoint {
       final checkoutSession = await StripeApi.createCheckoutSession(
         secretKey: StripeConfig.secretKey,
         priceId: priceId,
-        customerEmail: accountInfo.userInfo!.email!,
+        customerEmail: customerEmail,
         successUrl:
             '${StripeConfig.successUrl}?session_id={CHECKOUT_SESSION_ID}',
         cancelUrl: StripeConfig.cancelUrl,
@@ -78,12 +79,12 @@ class PrivateSubscriptionEndpoint extends Endpoint {
     if (authenticationInfo == null) {
       throw _authenticationFailed(language);
     }
-    final authenticatedUserId = authenticationInfo.userId;
+    final authenticatedUserId = authenticationInfo.authUserId;
 
     // Get account info
     final accountInfo = await AccountInfo.db.findFirstRow(
       session,
-      where: (t) => t.userInfoId.equals(authenticatedUserId),
+      where: (t) => t.authUserId.equals(authenticatedUserId),
     );
 
     if (accountInfo == null) {
@@ -107,12 +108,12 @@ class PrivateSubscriptionEndpoint extends Endpoint {
     if (authenticationInfo == null) {
       throw _authenticationFailed(language);
     }
-    final authenticatedUserId = authenticationInfo.userId;
+    final authenticatedUserId = authenticationInfo.authUserId;
 
     // Get account info
     final accountInfo = await AccountInfo.db.findFirstRow(
       session,
-      where: (t) => t.userInfoId.equals(authenticatedUserId),
+      where: (t) => t.authUserId.equals(authenticatedUserId),
     );
 
     if (accountInfo == null) {
@@ -159,12 +160,12 @@ class PrivateSubscriptionEndpoint extends Endpoint {
     if (authenticationInfo == null) {
       throw _authenticationFailed(language);
     }
-    final authenticatedUserId = authenticationInfo.userId;
+    final authenticatedUserId = authenticationInfo.authUserId;
 
     // Get account info
     final accountInfo = await AccountInfo.db.findFirstRow(
       session,
-      where: (t) => t.userInfoId.equals(authenticatedUserId),
+      where: (t) => t.authUserId.equals(authenticatedUserId),
     );
 
     if (accountInfo == null) {

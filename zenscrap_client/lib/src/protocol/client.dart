@@ -10,70 +10,317 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:serverpod_client/serverpod_client.dart' as _i1;
-import 'dart:async' as _i2;
-import 'package:zenscrap_client/src/protocol/entities/account/account.dart'
-    as _i3;
-import 'package:zenscrap_client/src/protocol/entities/supported_language.dart'
+import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
+    as _i1;
+import 'package:serverpod_client/serverpod_client.dart' as _i2;
+import 'dart:async' as _i3;
+import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _i4;
-import 'package:zenscrap_client/src/protocol/entities/account/ai_usage/ai_credit_history/paginated_ai_credit_history_response.dart'
+import 'package:zenscrap_client/src/protocol/entities/account/account.dart'
     as _i5;
-import 'package:zenscrap_client/src/protocol/entities/account/ai_usage/account_ai_usage.dart'
+import 'package:zenscrap_client/src/protocol/entities/supported_language.dart'
     as _i6;
-import 'package:zenscrap_client/src/protocol/entities/scrappable/auto_fix/paginated_auto_fix_session_response.dart'
+import 'package:zenscrap_client/src/protocol/entities/account/ai_usage/ai_credit_history/paginated_ai_credit_history_response.dart'
     as _i7;
-import 'package:zenscrap_client/src/protocol/entities/account/api_usage/api_credit_history/paginated_api_credit_history_response.dart'
+import 'package:zenscrap_client/src/protocol/entities/account/ai_usage/account_ai_usage.dart'
     as _i8;
-import 'package:zenscrap_client/src/protocol/entities/account/account_api_key.dart'
+import 'package:zenscrap_client/src/protocol/entities/scrappable/auto_fix/paginated_auto_fix_session_response.dart'
     as _i9;
-import 'package:zenscrap_client/src/protocol/entities/account/api_usage/account_api_usage.dart'
+import 'package:zenscrap_client/src/protocol/entities/account/api_usage/api_credit_history/paginated_api_credit_history_response.dart'
     as _i10;
-import 'package:zenscrap_client/src/protocol/entities/api_key_response.dart'
+import 'package:zenscrap_client/src/protocol/entities/account/account_api_key.dart'
     as _i11;
-import 'package:zenscrap_client/src/protocol/entities/account/credit_purchase_option.dart'
+import 'package:zenscrap_client/src/protocol/entities/account/api_usage/account_api_usage.dart'
     as _i12;
-import 'package:zenscrap_client/src/protocol/entities/scrappable/scrappable.dart'
+import 'package:zenscrap_client/src/protocol/entities/api_key_response.dart'
     as _i13;
-import 'package:zenscrap_client/src/protocol/entities/analytics/paginated_scrappable_requests_analytics.dart'
+import 'package:zenscrap_client/src/protocol/entities/account/credit_purchase_option.dart'
     as _i14;
-import 'package:zenscrap_client/src/protocol/entities/analytics/analytics_time_scope.dart'
+import 'package:zenscrap_client/src/protocol/entities/scrappable/scrappable.dart'
     as _i15;
-import 'package:zenscrap_client/src/protocol/entities/analytics/paginated_scrappable_analytics.dart'
+import 'package:zenscrap_client/src/protocol/entities/analytics/paginated_scrappable_requests_analytics.dart'
     as _i16;
-import 'package:zenscrap_client/src/protocol/entities/analytics/scrappable_usage_metrics.dart'
+import 'package:zenscrap_client/src/protocol/entities/analytics/analytics_time_scope.dart'
     as _i17;
-import 'package:zenscrap_client/src/protocol/entities/user_scrappables/user_paginated_scrappable_response.dart'
+import 'package:zenscrap_client/src/protocol/entities/analytics/paginated_scrappable_analytics.dart'
     as _i18;
-import 'package:zenscrap_client/src/protocol/entities/scrappable/scraper_category.dart'
+import 'package:zenscrap_client/src/protocol/entities/analytics/scrappable_usage_metrics.dart'
     as _i19;
-import 'package:zenscrap_client/src/protocol/entities/create_scrappable_stream/create_scrappable_stream_item.dart'
+import 'package:zenscrap_client/src/protocol/entities/user_scrappables/user_paginated_scrappable_response.dart'
     as _i20;
-import 'package:zenscrap_client/src/protocol/entities/scrappable/ai_model.dart'
+import 'package:zenscrap_client/src/protocol/entities/scrappable/scraper_category.dart'
     as _i21;
-import 'package:zenscrap_client/src/protocol/entities/marketplace/paginated_scrappable_response.dart'
+import 'package:zenscrap_client/src/protocol/entities/create_scrappable_stream/create_scrappable_stream_item.dart'
     as _i22;
-import 'package:zenscrap_client/src/protocol/entities/scrappable/byte_test_data.dart'
+import 'package:zenscrap_client/src/protocol/entities/scrappable/ai_model.dart'
     as _i23;
-import 'package:zenscrap_client/src/protocol/entities/account/plan_tier.dart'
+import 'package:zenscrap_client/src/protocol/entities/marketplace/paginated_scrappable_response.dart'
     as _i24;
-import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/create_session_response.dart'
+import 'package:zenscrap_client/src/protocol/entities/scrappable/byte_test_data.dart'
     as _i25;
-import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/chat_response.dart'
+import 'package:zenscrap_client/src/protocol/entities/account/plan_tier.dart'
     as _i26;
-import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i27;
-import 'protocol.dart' as _i28;
+import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/create_session_response.dart'
+    as _i27;
+import 'package:zenscrap_client/src/protocol/entities/redraft_scrappable_session/chat_response.dart'
+    as _i28;
+import 'protocol.dart' as _i29;
+
+/// Email Identity Provider Endpoint
+/// Exposes email/password authentication endpoints for the client
+/// Handles registration, login, password reset, and email verification
+/// Required by Serverpod 3.1 IDP authentication system
+/// {@category Endpoint}
+class EndpointEmailIdp extends _i1.EndpointEmailIdpBase {
+  EndpointEmailIdp(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'emailIdp';
+
+  /// Logs in the user and returns a new session.
+  ///
+  /// Throws an [EmailAccountLoginException] in case of errors, with reason:
+  /// - [EmailAccountLoginExceptionReason.invalidCredentials] if the email or
+  ///   password is incorrect.
+  /// - [EmailAccountLoginExceptionReason.tooManyAttempts] if there have been
+  ///   too many failed login attempts.
+  ///
+  /// Throws an [AuthUserBlockedException] if the auth user is blocked.
+  @override
+  _i3.Future<_i4.AuthSuccess> login({
+    required String email,
+    required String password,
+  }) => caller.callServerEndpoint<_i4.AuthSuccess>(
+    'emailIdp',
+    'login',
+    {
+      'email': email,
+      'password': password,
+    },
+  );
+
+  /// Starts the registration for a new user account with an email-based login
+  /// associated to it.
+  ///
+  /// Upon successful completion of this method, an email will have been
+  /// sent to [email] with a verification link, which the user must open to
+  /// complete the registration.
+  ///
+  /// Always returns a account request ID, which can be used to complete the
+  /// registration. If the email is already registered, the returned ID will not
+  /// be valid.
+  @override
+  _i3.Future<_i2.UuidValue> startRegistration({required String email}) =>
+      caller.callServerEndpoint<_i2.UuidValue>(
+        'emailIdp',
+        'startRegistration',
+        {'email': email},
+      );
+
+  /// Verifies an account request code and returns a token
+  /// that can be used to complete the account creation.
+  ///
+  /// Throws an [EmailAccountRequestException] in case of errors, with reason:
+  /// - [EmailAccountRequestExceptionReason.expired] if the account request has
+  ///   already expired.
+  /// - [EmailAccountRequestExceptionReason.policyViolation] if the password
+  ///   does not comply with the password policy.
+  /// - [EmailAccountRequestExceptionReason.invalid] if no request exists
+  ///   for the given [accountRequestId] or [verificationCode] is invalid.
+  @override
+  _i3.Future<String> verifyRegistrationCode({
+    required _i2.UuidValue accountRequestId,
+    required String verificationCode,
+  }) => caller.callServerEndpoint<String>(
+    'emailIdp',
+    'verifyRegistrationCode',
+    {
+      'accountRequestId': accountRequestId,
+      'verificationCode': verificationCode,
+    },
+  );
+
+  /// Completes a new account registration, creating a new auth user with a
+  /// profile and attaching the given email account to it.
+  ///
+  /// Throws an [EmailAccountRequestException] in case of errors, with reason:
+  /// - [EmailAccountRequestExceptionReason.expired] if the account request has
+  ///   already expired.
+  /// - [EmailAccountRequestExceptionReason.policyViolation] if the password
+  ///   does not comply with the password policy.
+  /// - [EmailAccountRequestExceptionReason.invalid] if the [registrationToken]
+  ///   is invalid.
+  ///
+  /// Throws an [AuthUserBlockedException] if the auth user is blocked.
+  ///
+  /// Returns a session for the newly created user.
+  @override
+  _i3.Future<_i4.AuthSuccess> finishRegistration({
+    required String registrationToken,
+    required String password,
+  }) => caller.callServerEndpoint<_i4.AuthSuccess>(
+    'emailIdp',
+    'finishRegistration',
+    {
+      'registrationToken': registrationToken,
+      'password': password,
+    },
+  );
+
+  /// Requests a password reset for [email].
+  ///
+  /// If the email address is registered, an email with reset instructions will
+  /// be send out. If the email is unknown, this method will have no effect.
+  ///
+  /// Always returns a password reset request ID, which can be used to complete
+  /// the reset. If the email is not registered, the returned ID will not be
+  /// valid.
+  ///
+  /// Throws an [EmailAccountPasswordResetException] in case of errors, with reason:
+  /// - [EmailAccountPasswordResetExceptionReason.tooManyAttempts] if the user has
+  ///   made too many attempts trying to request a password reset.
+  ///
+  @override
+  _i3.Future<_i2.UuidValue> startPasswordReset({required String email}) =>
+      caller.callServerEndpoint<_i2.UuidValue>(
+        'emailIdp',
+        'startPasswordReset',
+        {'email': email},
+      );
+
+  /// Verifies a password reset code and returns a finishPasswordResetToken
+  /// that can be used to finish the password reset.
+  ///
+  /// Throws an [EmailAccountPasswordResetException] in case of errors, with reason:
+  /// - [EmailAccountPasswordResetExceptionReason.expired] if the password reset
+  ///   request has already expired.
+  /// - [EmailAccountPasswordResetExceptionReason.tooManyAttempts] if the user has
+  ///   made too many attempts trying to verify the password reset.
+  /// - [EmailAccountPasswordResetExceptionReason.invalid] if no request exists
+  ///   for the given [passwordResetRequestId] or [verificationCode] is invalid.
+  ///
+  /// If multiple steps are required to complete the password reset, this endpoint
+  /// should be overridden to return credentials for the next step instead
+  /// of the credentials for setting the password.
+  @override
+  _i3.Future<String> verifyPasswordResetCode({
+    required _i2.UuidValue passwordResetRequestId,
+    required String verificationCode,
+  }) => caller.callServerEndpoint<String>(
+    'emailIdp',
+    'verifyPasswordResetCode',
+    {
+      'passwordResetRequestId': passwordResetRequestId,
+      'verificationCode': verificationCode,
+    },
+  );
+
+  /// Completes a password reset request by setting a new password.
+  ///
+  /// The [verificationCode] returned from [verifyPasswordResetCode] is used to
+  /// validate the password reset request.
+  ///
+  /// Throws an [EmailAccountPasswordResetException] in case of errors, with reason:
+  /// - [EmailAccountPasswordResetExceptionReason.expired] if the password reset
+  ///   request has already expired.
+  /// - [EmailAccountPasswordResetExceptionReason.policyViolation] if the new
+  ///   password does not comply with the password policy.
+  /// - [EmailAccountPasswordResetExceptionReason.invalid] if no request exists
+  ///   for the given [passwordResetRequestId] or [verificationCode] is invalid.
+  ///
+  /// Throws an [AuthUserBlockedException] if the auth user is blocked.
+  @override
+  _i3.Future<void> finishPasswordReset({
+    required String finishPasswordResetToken,
+    required String newPassword,
+  }) => caller.callServerEndpoint<void>(
+    'emailIdp',
+    'finishPasswordReset',
+    {
+      'finishPasswordResetToken': finishPasswordResetToken,
+      'newPassword': newPassword,
+    },
+  );
+}
+
+/// Google Identity Provider Endpoint
+/// Exposes Google OAuth authentication endpoints for the client
+/// Required by Serverpod 3.1 IDP authentication system
+/// {@category Endpoint}
+class EndpointGoogleIdp extends _i1.EndpointGoogleIdpBase {
+  EndpointGoogleIdp(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'googleIdp';
+
+  /// Validates a Google ID token and either logs in the associated user or
+  /// creates a new user account if the Google account ID is not yet known.
+  ///
+  /// If a new user is created an associated [UserProfile] is also created.
+  @override
+  _i3.Future<_i4.AuthSuccess> login({
+    required String idToken,
+    required String? accessToken,
+  }) => caller.callServerEndpoint<_i4.AuthSuccess>(
+    'googleIdp',
+    'login',
+    {
+      'idToken': idToken,
+      'accessToken': accessToken,
+    },
+  );
+}
+
+/// Refresh JWT Tokens Endpoint
+/// Exposes JWT token refresh endpoint for the client
+/// Required by Serverpod 3.1 IDP authentication system for token management
+/// {@category Endpoint}
+class EndpointRefreshJwtTokens extends _i4.EndpointRefreshJwtTokens {
+  EndpointRefreshJwtTokens(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'refreshJwtTokens';
+
+  /// Creates a new token pair for the given [refreshToken].
+  ///
+  /// Can throw the following exceptions:
+  /// -[RefreshTokenMalformedException]: refresh token is malformed and could
+  ///   not be parsed. Not expected to happen for tokens issued by the server.
+  /// -[RefreshTokenNotFoundException]: refresh token is unknown to the server.
+  ///   Either the token was deleted or generated by a different server.
+  /// -[RefreshTokenExpiredException]: refresh token has expired. Will happen
+  ///   only if it has not been used within configured `refreshTokenLifetime`.
+  /// -[RefreshTokenInvalidSecretException]: refresh token is incorrect, meaning
+  ///   it does not refer to the current secret refresh token. This indicates
+  ///   either a malfunctioning client or a malicious attempt by someone who has
+  ///   obtained the refresh token. In this case the underlying refresh token
+  ///   will be deleted, and access to it will expire fully when the last access
+  ///   token is elapsed.
+  ///
+  /// This endpoint is unauthenticated, meaning the client won't include any
+  /// authentication information with the call.
+  @override
+  _i3.Future<_i4.AuthSuccess> refreshAccessToken({
+    required String refreshToken,
+  }) => caller.callServerEndpoint<_i4.AuthSuccess>(
+    'refreshJwtTokens',
+    'refreshAccessToken',
+    {'refreshToken': refreshToken},
+    authenticated: false,
+  );
+}
 
 /// {@category Endpoint}
-class EndpointPrivateAccount extends _i1.EndpointRef {
-  EndpointPrivateAccount(_i1.EndpointCaller caller) : super(caller);
+class EndpointPrivateAccount extends _i2.EndpointRef {
+  EndpointPrivateAccount(_i2.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'privateAccount';
 
-  _i2.Future<_i3.AccountInfo> getAccountInfo({
+  _i3.Future<_i5.AccountInfo> getAccountInfo({
     required int? initialScrappableId,
-    required _i4.SupportedLanguage language,
-  }) => caller.callServerEndpoint<_i3.AccountInfo>(
+    required _i6.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i5.AccountInfo>(
     'privateAccount',
     'getAccountInfo',
     {
@@ -84,17 +331,17 @@ class EndpointPrivateAccount extends _i1.EndpointRef {
 }
 
 /// {@category Endpoint}
-class EndpointPrivateAiUsage extends _i1.EndpointRef {
-  EndpointPrivateAiUsage(_i1.EndpointCaller caller) : super(caller);
+class EndpointPrivateAiUsage extends _i2.EndpointRef {
+  EndpointPrivateAiUsage(_i2.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'privateAiUsage';
 
   /// Returns paginated AI credit history for the authenticated user.
-  _i2.Future<_i5.PaginatedAICreditHistoryResponse> getAiCreditHistory({
+  _i3.Future<_i7.PaginatedAICreditHistoryResponse> getAiCreditHistory({
     required int page,
-    required _i4.SupportedLanguage language,
-  }) => caller.callServerEndpoint<_i5.PaginatedAICreditHistoryResponse>(
+    required _i6.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i7.PaginatedAICreditHistoryResponse>(
     'privateAiUsage',
     'getAiCreditHistory',
     {
@@ -104,9 +351,9 @@ class EndpointPrivateAiUsage extends _i1.EndpointRef {
   );
 
   /// Returns the AI usage info for the authenticated user.
-  _i2.Future<_i6.AccountAIUsage> getAiUsageInfo({
-    required _i4.SupportedLanguage language,
-  }) => caller.callServerEndpoint<_i6.AccountAIUsage>(
+  _i3.Future<_i8.AccountAIUsage> getAiUsageInfo({
+    required _i6.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i8.AccountAIUsage>(
     'privateAiUsage',
     'getAiUsageInfo',
     {'language': language},
@@ -115,10 +362,10 @@ class EndpointPrivateAiUsage extends _i1.EndpointRef {
   /// Updates the user's OpenAI API key.
   /// Pass null or empty string to remove the API key.
   /// The key is validated against OpenAI's API before being saved.
-  _i2.Future<_i6.AccountAIUsage> updateOpenAiApiKey({
+  _i3.Future<_i8.AccountAIUsage> updateOpenAiApiKey({
     String? apiKey,
-    required _i4.SupportedLanguage language,
-  }) => caller.callServerEndpoint<_i6.AccountAIUsage>(
+    required _i6.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i8.AccountAIUsage>(
     'privateAiUsage',
     'updateOpenAiApiKey',
     {
@@ -131,10 +378,10 @@ class EndpointPrivateAiUsage extends _i1.EndpointRef {
   ///
   /// This includes all auto-fix repair attempts across all of the user's scrappables,
   /// ordered by most recent first.
-  _i2.Future<_i7.PaginatedAutoFixSessionResponse> getAutoFixSessions({
+  _i3.Future<_i9.PaginatedAutoFixSessionResponse> getAutoFixSessions({
     required int page,
-    required _i4.SupportedLanguage language,
-  }) => caller.callServerEndpoint<_i7.PaginatedAutoFixSessionResponse>(
+    required _i6.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i9.PaginatedAutoFixSessionResponse>(
     'privateAiUsage',
     'getAutoFixSessions',
     {
@@ -145,16 +392,16 @@ class EndpointPrivateAiUsage extends _i1.EndpointRef {
 }
 
 /// {@category Endpoint}
-class EndpointPrivateApiUsage extends _i1.EndpointRef {
-  EndpointPrivateApiUsage(_i1.EndpointCaller caller) : super(caller);
+class EndpointPrivateApiUsage extends _i2.EndpointRef {
+  EndpointPrivateApiUsage(_i2.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'privateApiUsage';
 
-  _i2.Future<_i8.PaginatedApiCreditHistoryResponse> getApiCreditHistory({
+  _i3.Future<_i10.PaginatedApiCreditHistoryResponse> getApiCreditHistory({
     required int page,
-    required _i4.SupportedLanguage language,
-  }) => caller.callServerEndpoint<_i8.PaginatedApiCreditHistoryResponse>(
+    required _i6.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i10.PaginatedApiCreditHistoryResponse>(
     'privateApiUsage',
     'getApiCreditHistory',
     {
@@ -163,10 +410,10 @@ class EndpointPrivateApiUsage extends _i1.EndpointRef {
     },
   );
 
-  _i2.Future<_i9.AccountApiKey> createApiKey({
+  _i3.Future<_i11.AccountApiKey> createApiKey({
     required String name,
-    required _i4.SupportedLanguage language,
-  }) => caller.callServerEndpoint<_i9.AccountApiKey>(
+    required _i6.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i11.AccountApiKey>(
     'privateApiUsage',
     'createApiKey',
     {
@@ -175,9 +422,9 @@ class EndpointPrivateApiUsage extends _i1.EndpointRef {
     },
   );
 
-  _i2.Future<bool> deactivateApiKey({
+  _i3.Future<bool> deactivateApiKey({
     required int apiKeyId,
-    required _i4.SupportedLanguage language,
+    required _i6.SupportedLanguage language,
   }) => caller.callServerEndpoint<bool>(
     'privateApiUsage',
     'deactivateApiKey',
@@ -187,41 +434,41 @@ class EndpointPrivateApiUsage extends _i1.EndpointRef {
     },
   );
 
-  _i2.Future<List<_i9.AccountApiKey>> getActiveApiKeys({
-    required _i4.SupportedLanguage language,
-  }) => caller.callServerEndpoint<List<_i9.AccountApiKey>>(
+  _i3.Future<List<_i11.AccountApiKey>> getActiveApiKeys({
+    required _i6.SupportedLanguage language,
+  }) => caller.callServerEndpoint<List<_i11.AccountApiKey>>(
     'privateApiUsage',
     'getActiveApiKeys',
     {'language': language},
   );
 
-  _i2.Future<Map<int, int>> getApiKeyUsageStats({
-    required _i4.SupportedLanguage language,
+  _i3.Future<Map<int, int>> getApiKeyUsageStats({
+    required _i6.SupportedLanguage language,
   }) => caller.callServerEndpoint<Map<int, int>>(
     'privateApiUsage',
     'getApiKeyUsageStats',
     {'language': language},
   );
 
-  _i2.Future<_i10.AccountApiUsage> getApiUsageInfo({
-    required _i4.SupportedLanguage language,
-  }) => caller.callServerEndpoint<_i10.AccountApiUsage>(
+  _i3.Future<_i12.AccountApiUsage> getApiUsageInfo({
+    required _i6.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i12.AccountApiUsage>(
     'privateApiUsage',
     'getApiUsageInfo',
     {'language': language},
   );
 
-  _i2.Future<_i11.ApiKeyResponse> getApiKeysWithStats({
-    required _i4.SupportedLanguage language,
-  }) => caller.callServerEndpoint<_i11.ApiKeyResponse>(
+  _i3.Future<_i13.ApiKeyResponse> getApiKeysWithStats({
+    required _i6.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i13.ApiKeyResponse>(
     'privateApiUsage',
     'getApiKeysWithStats',
     {'language': language},
   );
 
-  _i2.Future<String> createCreditPurchaseCheckout({
-    required _i12.CreditPurchaseOption creditPackage,
-    required _i4.SupportedLanguage language,
+  _i3.Future<String> createCreditPurchaseCheckout({
+    required _i14.CreditPurchaseOption creditPackage,
+    required _i6.SupportedLanguage language,
   }) => caller.callServerEndpoint<String>(
     'privateApiUsage',
     'createCreditPurchaseCheckout',
@@ -233,16 +480,16 @@ class EndpointPrivateApiUsage extends _i1.EndpointRef {
 }
 
 /// {@category Endpoint}
-class EndpointPrivateCloneScrappable extends _i1.EndpointRef {
-  EndpointPrivateCloneScrappable(_i1.EndpointCaller caller) : super(caller);
+class EndpointPrivateCloneScrappable extends _i2.EndpointRef {
+  EndpointPrivateCloneScrappable(_i2.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'privateCloneScrappable';
 
-  _i2.Future<_i13.Scrappable> cloneFromMarketplace({
+  _i3.Future<_i15.Scrappable> cloneFromMarketplace({
     required int scrappableId,
-    required _i4.SupportedLanguage language,
-  }) => caller.callServerEndpoint<_i13.Scrappable>(
+    required _i6.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i15.Scrappable>(
     'privateCloneScrappable',
     'cloneFromMarketplace',
     {
@@ -253,18 +500,18 @@ class EndpointPrivateCloneScrappable extends _i1.EndpointRef {
 }
 
 /// {@category Endpoint}
-class EndpointPrivateScrappableAnalytics extends _i1.EndpointRef {
-  EndpointPrivateScrappableAnalytics(_i1.EndpointCaller caller) : super(caller);
+class EndpointPrivateScrappableAnalytics extends _i2.EndpointRef {
+  EndpointPrivateScrappableAnalytics(_i2.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'privateScrappableAnalytics';
 
-  _i2.Future<_i14.PaginatedScrappableRequestsAnalytics>
+  _i3.Future<_i16.PaginatedScrappableRequestsAnalytics>
   getScrappableAnalyticsWithScope({
     required int page,
-    required _i15.AnalyticsTimeScope scope,
-    required _i4.SupportedLanguage language,
-  }) => caller.callServerEndpoint<_i14.PaginatedScrappableRequestsAnalytics>(
+    required _i17.AnalyticsTimeScope scope,
+    required _i6.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i16.PaginatedScrappableRequestsAnalytics>(
     'privateScrappableAnalytics',
     'getScrappableAnalyticsWithScope',
     {
@@ -274,11 +521,11 @@ class EndpointPrivateScrappableAnalytics extends _i1.EndpointRef {
     },
   );
 
-  _i2.Future<_i16.PaginatedScrappableAnalytics> getScrappableAnalytics({
+  _i3.Future<_i18.PaginatedScrappableAnalytics> getScrappableAnalytics({
     required int scrappableId,
     required int page,
-    required _i4.SupportedLanguage language,
-  }) => caller.callServerEndpoint<_i16.PaginatedScrappableAnalytics>(
+    required _i6.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i18.PaginatedScrappableAnalytics>(
     'privateScrappableAnalytics',
     'getScrappableAnalytics',
     {
@@ -290,10 +537,10 @@ class EndpointPrivateScrappableAnalytics extends _i1.EndpointRef {
 
   /// Get usage metrics for a scrappable in the last 30 days
   /// This includes ALL requests from ANY user who called this scrappable
-  _i2.Future<_i17.ScrappableUsageMetrics> getScrappableUsageMetrics({
+  _i3.Future<_i19.ScrappableUsageMetrics> getScrappableUsageMetrics({
     required int scrappableId,
-    required _i4.SupportedLanguage language,
-  }) => caller.callServerEndpoint<_i17.ScrappableUsageMetrics>(
+    required _i6.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i19.ScrappableUsageMetrics>(
     'privateScrappableAnalytics',
     'getScrappableUsageMetrics',
     {
@@ -304,16 +551,16 @@ class EndpointPrivateScrappableAnalytics extends _i1.EndpointRef {
 }
 
 /// {@category Endpoint}
-class EndpointPrivateSubscription extends _i1.EndpointRef {
-  EndpointPrivateSubscription(_i1.EndpointCaller caller) : super(caller);
+class EndpointPrivateSubscription extends _i2.EndpointRef {
+  EndpointPrivateSubscription(_i2.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'privateSubscription';
 
-  _i2.Future<String> createCheckoutSession({
+  _i3.Future<String> createCheckoutSession({
     required String planTier,
     required bool isYearly,
-    required _i4.SupportedLanguage language,
+    required _i6.SupportedLanguage language,
   }) => caller.callServerEndpoint<String>(
     'privateSubscription',
     'createCheckoutSession',
@@ -324,24 +571,24 @@ class EndpointPrivateSubscription extends _i1.EndpointRef {
     },
   );
 
-  _i2.Future<Map<String, dynamic>> getSubscriptionStatus({
-    required _i4.SupportedLanguage language,
+  _i3.Future<Map<String, dynamic>> getSubscriptionStatus({
+    required _i6.SupportedLanguage language,
   }) => caller.callServerEndpoint<Map<String, dynamic>>(
     'privateSubscription',
     'getSubscriptionStatus',
     {'language': language},
   );
 
-  _i2.Future<bool> cancelSubscription({
-    required _i4.SupportedLanguage language,
+  _i3.Future<bool> cancelSubscription({
+    required _i6.SupportedLanguage language,
   }) => caller.callServerEndpoint<bool>(
     'privateSubscription',
     'cancelSubscription',
     {'language': language},
   );
 
-  _i2.Future<String> createCustomerPortalSession({
-    required _i4.SupportedLanguage language,
+  _i3.Future<String> createCustomerPortalSession({
+    required _i6.SupportedLanguage language,
   }) => caller.callServerEndpoint<String>(
     'privateSubscription',
     'createCustomerPortalSession',
@@ -350,18 +597,18 @@ class EndpointPrivateSubscription extends _i1.EndpointRef {
 }
 
 /// {@category Endpoint}
-class EndpointPrivateUserScrappables extends _i1.EndpointRef {
-  EndpointPrivateUserScrappables(_i1.EndpointCaller caller) : super(caller);
+class EndpointPrivateUserScrappables extends _i2.EndpointRef {
+  EndpointPrivateUserScrappables(_i2.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'privateUserScrappables';
 
-  _i2.Future<_i18.UserPaginatedScrappableResponse> call({
+  _i3.Future<_i20.UserPaginatedScrappableResponse> call({
     required int page,
     String? searchQuery,
-    List<_i19.ScraperCategory>? categories,
-    required _i4.SupportedLanguage language,
-  }) => caller.callServerEndpoint<_i18.UserPaginatedScrappableResponse>(
+    List<_i21.ScraperCategory>? categories,
+    required _i6.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i20.UserPaginatedScrappableResponse>(
     'privateUserScrappables',
     'call',
     {
@@ -372,10 +619,10 @@ class EndpointPrivateUserScrappables extends _i1.EndpointRef {
     },
   );
 
-  _i2.Future<_i13.Scrappable> getScrappableById(
+  _i3.Future<_i15.Scrappable> getScrappableById(
     int scrappableId, {
-    required _i4.SupportedLanguage language,
-  }) => caller.callServerEndpoint<_i13.Scrappable>(
+    required _i6.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i15.Scrappable>(
     'privateUserScrappables',
     'getScrappableById',
     {
@@ -386,19 +633,19 @@ class EndpointPrivateUserScrappables extends _i1.EndpointRef {
 }
 
 /// {@category Endpoint}
-class EndpointCreateScrappable extends _i1.EndpointRef {
-  EndpointCreateScrappable(_i1.EndpointCaller caller) : super(caller);
+class EndpointCreateScrappable extends _i2.EndpointRef {
+  EndpointCreateScrappable(_i2.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'createScrappable';
 
-  _i2.Stream<_i20.CreateScrappableStreamItem> call({
+  _i3.Stream<_i22.CreateScrappableStreamItem> call({
     required String referenceLink,
-    required _i4.SupportedLanguage language,
+    required _i6.SupportedLanguage language,
   }) =>
       caller.callStreamingServerEndpoint<
-        _i2.Stream<_i20.CreateScrappableStreamItem>,
-        _i20.CreateScrappableStreamItem
+        _i3.Stream<_i22.CreateScrappableStreamItem>,
+        _i22.CreateScrappableStreamItem
       >(
         'createScrappable',
         'call',
@@ -411,15 +658,15 @@ class EndpointCreateScrappable extends _i1.EndpointRef {
 }
 
 /// {@category Endpoint}
-class EndpointDeleteScrappable extends _i1.EndpointRef {
-  EndpointDeleteScrappable(_i1.EndpointCaller caller) : super(caller);
+class EndpointDeleteScrappable extends _i2.EndpointRef {
+  EndpointDeleteScrappable(_i2.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'deleteScrappable';
 
-  _i2.Future<bool> call({
+  _i3.Future<bool> call({
     required int scrappableId,
-    required _i4.SupportedLanguage language,
+    required _i6.SupportedLanguage language,
   }) => caller.callServerEndpoint<bool>(
     'deleteScrappable',
     'call',
@@ -431,22 +678,22 @@ class EndpointDeleteScrappable extends _i1.EndpointRef {
 }
 
 /// {@category Endpoint}
-class EndpointEditScrappable extends _i1.EndpointRef {
-  EndpointEditScrappable(_i1.EndpointCaller caller) : super(caller);
+class EndpointEditScrappable extends _i2.EndpointRef {
+  EndpointEditScrappable(_i2.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'editScrappable';
 
-  _i2.Future<bool> call({
+  _i3.Future<bool> call({
     required int scrappableId,
     required String name,
     required String description,
-    required _i4.SupportedLanguage language,
-    _i19.ScraperCategory? category,
+    required _i6.SupportedLanguage language,
+    _i21.ScraperCategory? category,
     bool? willHideFromMarketplace,
     bool? autoFixEnabled,
     int? autoFixConsecutiveErrorThreshold,
-    _i21.AiModel? autoFixPreferredAiModel,
+    _i23.AiModel? autoFixPreferredAiModel,
     bool? autoFixUseAutoAiModel,
   }) => caller.callServerEndpoint<bool>(
     'editScrappable',
@@ -467,18 +714,18 @@ class EndpointEditScrappable extends _i1.EndpointRef {
 }
 
 /// {@category Endpoint}
-class EndpointMarketplace extends _i1.EndpointRef {
-  EndpointMarketplace(_i1.EndpointCaller caller) : super(caller);
+class EndpointMarketplace extends _i2.EndpointRef {
+  EndpointMarketplace(_i2.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'marketplace';
 
-  _i2.Future<_i22.PaginatedScrappableResponse> getItems({
+  _i3.Future<_i24.PaginatedScrappableResponse> getItems({
     required int page,
     String? searchQuery,
-    List<_i19.ScraperCategory>? categories,
-    required _i4.SupportedLanguage language,
-  }) => caller.callServerEndpoint<_i22.PaginatedScrappableResponse>(
+    List<_i21.ScraperCategory>? categories,
+    required _i6.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i24.PaginatedScrappableResponse>(
     'marketplace',
     'getItems',
     {
@@ -491,18 +738,18 @@ class EndpointMarketplace extends _i1.EndpointRef {
 }
 
 /// {@category Endpoint}
-class EndpointPublicScrappable extends _i1.EndpointRef {
-  EndpointPublicScrappable(_i1.EndpointCaller caller) : super(caller);
+class EndpointPublicScrappable extends _i2.EndpointRef {
+  EndpointPublicScrappable(_i2.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'publicScrappable';
 
   /// Retrieves ByteTestData for a scrappable
   /// This is a public endpoint to allow viewing test data in the marketplace
-  _i2.Future<_i23.ByteTestData?> getByteTestData(
+  _i3.Future<_i25.ByteTestData?> getByteTestData(
     int scrappableId, {
-    required _i4.SupportedLanguage language,
-  }) => caller.callServerEndpoint<_i23.ByteTestData?>(
+    required _i6.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i25.ByteTestData?>(
     'publicScrappable',
     'getByteTestData',
     {
@@ -513,16 +760,16 @@ class EndpointPublicScrappable extends _i1.EndpointRef {
 }
 
 /// {@category Endpoint}
-class EndpointPublicTier extends _i1.EndpointRef {
-  EndpointPublicTier(_i1.EndpointCaller caller) : super(caller);
+class EndpointPublicTier extends _i2.EndpointRef {
+  EndpointPublicTier(_i2.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'publicTier';
 
-  _i2.Future<void> updatePlayerTier({
+  _i3.Future<void> updatePlayerTier({
     required String email,
     required String tierManipulationKey,
-    required _i24.PlanTier planTier,
+    required _i26.PlanTier planTier,
   }) => caller.callServerEndpoint<void>(
     'publicTier',
     'updatePlayerTier',
@@ -535,15 +782,15 @@ class EndpointPublicTier extends _i1.EndpointRef {
 }
 
 /// {@category Endpoint}
-class EndpointScrappableChatSession extends _i1.EndpointRef {
-  EndpointScrappableChatSession(_i1.EndpointCaller caller) : super(caller);
+class EndpointScrappableChatSession extends _i2.EndpointRef {
+  EndpointScrappableChatSession(_i2.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'scrappableChatSession';
 
-  _i2.Future<void> commitCurrentEditState({
+  _i3.Future<void> commitCurrentEditState({
     required String sessionUuid,
-    required _i4.SupportedLanguage language,
+    required _i6.SupportedLanguage language,
   }) => caller.callServerEndpoint<void>(
     'scrappableChatSession',
     'commitCurrentEditState',
@@ -553,7 +800,7 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
     },
   );
 
-  _i2.Future<void> disposeSession({required String sessionId}) =>
+  _i3.Future<void> disposeSession({required String sessionId}) =>
       caller.callServerEndpoint<void>(
         'scrappableChatSession',
         'disposeSession',
@@ -571,10 +818,10 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
   /// 3. Used for subsequent API calls in this session (no credits deducted)
   ///
   /// Returns success and sends an [ApiKeyUpdatedResponse] to the chat stream.
-  _i2.Future<void> updateUserApiKey({
+  _i3.Future<void> updateUserApiKey({
     required String sessionId,
     required String openAiApiKey,
-    required _i4.SupportedLanguage language,
+    required _i6.SupportedLanguage language,
   }) => caller.callServerEndpoint<void>(
     'scrappableChatSession',
     'updateUserApiKey',
@@ -585,12 +832,12 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
     },
   );
 
-  _i2.Future<void> updateScrappableRequest({
+  _i3.Future<void> updateScrappableRequest({
     required int scrappableId,
     required String url,
     required List<String> pathParams,
     required Map<String, String?> queryParams,
-    required _i4.SupportedLanguage language,
+    required _i6.SupportedLanguage language,
   }) => caller.callServerEndpoint<void>(
     'scrappableChatSession',
     'updateScrappableRequest',
@@ -603,10 +850,10 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
     },
   );
 
-  _i2.Future<_i25.CreateSessionResponse> createSession({
+  _i3.Future<_i27.CreateSessionResponse> createSession({
     required int scrappableId,
-    required _i4.SupportedLanguage language,
-  }) => caller.callServerEndpoint<_i25.CreateSessionResponse>(
+    required _i6.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i27.CreateSessionResponse>(
     'scrappableChatSession',
     'createSession',
     {
@@ -615,13 +862,13 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
     },
   );
 
-  _i2.Stream<_i26.ChatResponse> listenToScrappableRedraftSession({
+  _i3.Stream<_i28.ChatResponse> listenToScrappableRedraftSession({
     required String sessionUuid,
-    required _i4.SupportedLanguage language,
+    required _i6.SupportedLanguage language,
   }) =>
       caller.callStreamingServerEndpoint<
-        _i2.Stream<_i26.ChatResponse>,
-        _i26.ChatResponse
+        _i3.Stream<_i28.ChatResponse>,
+        _i28.ChatResponse
       >(
         'scrappableChatSession',
         'listenToScrappableRedraftSession',
@@ -632,10 +879,10 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
         {},
       );
 
-  _i2.Future<void> changeChatModel({
+  _i3.Future<void> changeChatModel({
     required String sessionUuid,
-    required _i21.AiModel aiModel,
-    required _i4.SupportedLanguage language,
+    required _i23.AiModel aiModel,
+    required _i6.SupportedLanguage language,
   }) => caller.callServerEndpoint<void>(
     'scrappableChatSession',
     'changeChatModel',
@@ -646,11 +893,11 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
     },
   );
 
-  _i2.Stream<String> sendPromptMessage({
+  _i3.Stream<String> sendPromptMessage({
     required String sessionId,
     required String userPrompt,
-    required _i4.SupportedLanguage language,
-  }) => caller.callStreamingServerEndpoint<_i2.Stream<String>, String>(
+    required _i6.SupportedLanguage language,
+  }) => caller.callStreamingServerEndpoint<_i3.Stream<String>, String>(
     'scrappableChatSession',
     'sendPromptMessage',
     {
@@ -664,13 +911,16 @@ class EndpointScrappableChatSession extends _i1.EndpointRef {
 
 class Modules {
   Modules(Client client) {
-    auth = _i27.Caller(client);
+    serverpod_auth_idp = _i1.Caller(client);
+    auth_core = _i4.Caller(client);
   }
 
-  late final _i27.Caller auth;
+  late final _i1.Caller serverpod_auth_idp;
+
+  late final _i4.Caller auth_core;
 }
 
-class Client extends _i1.ServerpodClientShared {
+class Client extends _i2.ServerpodClientShared {
   Client(
     String host, {
     dynamic securityContext,
@@ -681,16 +931,16 @@ class Client extends _i1.ServerpodClientShared {
     Duration? streamingConnectionTimeout,
     Duration? connectionTimeout,
     Function(
-      _i1.MethodCallContext,
+      _i2.MethodCallContext,
       Object,
       StackTrace,
     )?
     onFailedCall,
-    Function(_i1.MethodCallContext)? onSucceededCall,
+    Function(_i2.MethodCallContext)? onSucceededCall,
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
          host,
-         _i28.Protocol(),
+         _i29.Protocol(),
          securityContext: securityContext,
          streamingConnectionTimeout: streamingConnectionTimeout,
          connectionTimeout: connectionTimeout,
@@ -699,6 +949,9 @@ class Client extends _i1.ServerpodClientShared {
          disconnectStreamsOnLostInternetConnection:
              disconnectStreamsOnLostInternetConnection,
        ) {
+    emailIdp = EndpointEmailIdp(this);
+    googleIdp = EndpointGoogleIdp(this);
+    refreshJwtTokens = EndpointRefreshJwtTokens(this);
     privateAccount = EndpointPrivateAccount(this);
     privateAiUsage = EndpointPrivateAiUsage(this);
     privateApiUsage = EndpointPrivateApiUsage(this);
@@ -715,6 +968,12 @@ class Client extends _i1.ServerpodClientShared {
     scrappableChatSession = EndpointScrappableChatSession(this);
     modules = Modules(this);
   }
+
+  late final EndpointEmailIdp emailIdp;
+
+  late final EndpointGoogleIdp googleIdp;
+
+  late final EndpointRefreshJwtTokens refreshJwtTokens;
 
   late final EndpointPrivateAccount privateAccount;
 
@@ -747,7 +1006,10 @@ class Client extends _i1.ServerpodClientShared {
   late final Modules modules;
 
   @override
-  Map<String, _i1.EndpointRef> get endpointRefLookup => {
+  Map<String, _i2.EndpointRef> get endpointRefLookup => {
+    'emailIdp': emailIdp,
+    'googleIdp': googleIdp,
+    'refreshJwtTokens': refreshJwtTokens,
     'privateAccount': privateAccount,
     'privateAiUsage': privateAiUsage,
     'privateApiUsage': privateApiUsage,
@@ -765,7 +1027,8 @@ class Client extends _i1.ServerpodClientShared {
   };
 
   @override
-  Map<String, _i1.ModuleEndpointCaller> get moduleLookup => {
-    'auth': modules.auth,
+  Map<String, _i2.ModuleEndpointCaller> get moduleLookup => {
+    'serverpod_auth_idp': modules.serverpod_auth_idp,
+    'auth_core': modules.auth_core,
   };
 }

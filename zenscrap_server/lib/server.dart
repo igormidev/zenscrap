@@ -1,5 +1,8 @@
 import 'dart:io';
 import 'package:serverpod/serverpod.dart';
+import 'package:serverpod_auth_idp_server/core.dart';
+import 'package:serverpod_auth_idp_server/providers/google.dart';
+import 'package:serverpod_auth_idp_server/providers/email.dart';
 import 'package:zenscrap_server/src/auth/handlers/on_send_reset_email.dart';
 import 'package:zenscrap_server/src/auth/handlers/on_send_validation_email.dart';
 import 'package:zenscrap_server/src/core/auto_fix/periodic_auto_fix_scrappables.dart';
@@ -9,7 +12,6 @@ import 'package:zenscrap_server/src/core/stripe/stripe_config.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_openai_sdk_impl.dart';
 import 'package:zenscrap_server/src/future_calls/cleanup_expired_ip_spending_future_call.dart';
 import 'package:zenscrap_server/src/future_calls/monthly_subscription_credits_future_call.dart';
-import 'package:serverpod_auth_server/serverpod_auth_server.dart' as auth;
 import 'package:zenscrap_server/src/endpoints/public/scrappable_chat_session.dart';
 import 'package:zenscrap_server/src/routes/scrappable_api_route.dart';
 import 'package:zenscrap_server/src/webhooks/stripe_webhook.dart';
@@ -28,14 +30,31 @@ void run(List<String> args) async {
     args,
     Protocol(),
     Endpoints(),
-    authenticationHandler: auth.authenticationHandler,
+  );
+
+  // Initialize authentication services with Serverpod 3.1 IDP system
+  pod.initializeAuthServices(
+    tokenManagerBuilders: [
+      JwtConfigFromPasswords(),
+    ],
+    identityProviderBuilders: [
+      // Google OAuth authentication
+      GoogleIdpConfig(
+        clientSecret: GoogleClientSecret.fromJsonString(
+          pod.getPassword('googleClientSecret')!,
+        ),
+      ),
+      // Email/password authentication
+      EmailIdpConfig(
+        secretHashPepper: pod.getPassword('emailSecretHashPepper')!,
+        sendRegistrationVerificationCode: onSendRegistrationVerificationCode,
+        sendPasswordResetVerificationCode: onSendPasswordResetVerificationCode,
+      ),
+    ],
   );
 
   // Register API routes FIRST (before catch-all routes)
   pod.webServer.addRoute(StripeWebhookRoute(), '/stripe/webhook');
-
-  // Register Google Sign In route for web authentication
-  pod.webServer.addRoute(auth.RouteGoogleSignIn(), '/googlesignin');
 
   // Register Scrappable API routes
   pod.webServer
@@ -68,11 +87,6 @@ void run(List<String> args) async {
     print(
         '[Zenscrap] Warning: Flutter web app not found at ${flutterAppDir.path}');
   }
-
-  auth.AuthConfig.set(auth.AuthConfig(
-    sendValidationEmail: onSendValidationEmail,
-    sendPasswordResetEmail: onSendResetEmail,
-  ));
 
   final String? scrapingBeeApiKey = pod.getPassword('scrapingBeeApiKey');
   scrappingBee = ScrapingBee(apiKey: scrapingBeeApiKey ?? '');

@@ -1,7 +1,7 @@
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:serverpod_auth_email_flutter/serverpod_auth_email_flutter.dart';
+import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
@@ -55,13 +55,22 @@ class PasswordResetPage extends ConsumerWidget {
         // Track password reset initiation
         await analytics.trackAuthPasswordResetInitiate(email: email);
 
-        final success = await emailAuth.initiatePasswordReset(email);
+        // Set email on the controller
+        emailAuth.emailController.text = email;
 
-        if (!success) {
+        try {
+          // Start password reset - this sends a verification code
+          await emailAuth.startPasswordReset();
+
+          // Track successful code sent
+          await analytics.trackAuthPasswordResetCodeSent(email: email);
+
+          return email;
+        } catch (e) {
           // Track password reset failure
           await analytics.trackAuthPasswordResetFailure(
             email: email,
-            errorMessage: 'Failed to send verification code',
+            errorMessage: e.toString(),
           );
 
           if (context.mounted) {
@@ -70,11 +79,6 @@ class PasswordResetPage extends ConsumerWidget {
 
           return null;
         }
-
-        // Track successful code sent
-        await analytics.trackAuthPasswordResetCodeSent(email: email);
-
-        return email;
       },
     );
   }

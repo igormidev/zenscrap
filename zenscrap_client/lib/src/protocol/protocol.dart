@@ -84,7 +84,10 @@ import 'package:zenscrap_client/src/protocol/entities/account/account_api_key.da
     as _i57;
 import 'package:zenscrap_client/src/protocol/entities/scrappable/scraper_category.dart'
     as _i58;
-import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i59;
+import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
+    as _i59;
+import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
+    as _i60;
 export 'entities/account/account.dart';
 export 'entities/account/account_api_key.dart';
 export 'entities/account/ai_usage/account_ai_usage.dart';
@@ -839,6 +842,9 @@ class Protocol extends _i1.SerializationManager {
     try {
       return _i59.Protocol().deserialize<T>(data, t);
     } on _i1.DeserializationTypeNotFoundException catch (_) {}
+    try {
+      return _i60.Protocol().deserialize<T>(data, t);
+    } on _i1.DeserializationTypeNotFoundException catch (_) {}
     return super.deserialize<T>(data, t);
   }
 
@@ -1066,7 +1072,11 @@ class Protocol extends _i1.SerializationManager {
     }
     className = _i59.Protocol().getClassNameForObject(data);
     if (className != null) {
-      return 'serverpod_auth.$className';
+      return 'serverpod_auth_idp.$className';
+    }
+    className = _i60.Protocol().getClassNameForObject(data);
+    if (className != null) {
+      return 'serverpod_auth_core.$className';
     }
     return null;
   }
@@ -1279,9 +1289,13 @@ class Protocol extends _i1.SerializationManager {
     if (dataClassName == 'ZenScrapException') {
       return deserialize<_i56.ZenScrapException>(data['data']);
     }
-    if (dataClassName.startsWith('serverpod_auth.')) {
-      data['className'] = dataClassName.substring(15);
+    if (dataClassName.startsWith('serverpod_auth_idp.')) {
+      data['className'] = dataClassName.substring(19);
       return _i59.Protocol().deserializeByClassName(data);
+    }
+    if (dataClassName.startsWith('serverpod_auth_core.')) {
+      data['className'] = dataClassName.substring(20);
+      return _i60.Protocol().deserializeByClassName(data);
     }
     return super.deserializeByClassName(data);
   }

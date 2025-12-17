@@ -11,124 +11,375 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
-import '../endpoints/private/private_account_endpoint.dart' as _i2;
-import '../endpoints/private/private_ai_usage_endpoint.dart' as _i3;
-import '../endpoints/private/private_api_usage_endpoint.dart' as _i4;
-import '../endpoints/private/private_clone_scrappable_endpoint.dart' as _i5;
-import '../endpoints/private/private_scrappable_analytics_endpoint.dart' as _i6;
-import '../endpoints/private/private_subscription_endpoint.dart' as _i7;
-import '../endpoints/private/private_user_scrappables_endpoint.dart' as _i8;
-import '../endpoints/public/create_scrappable.dart' as _i9;
-import '../endpoints/public/delete_scrappable_endpoint.dart' as _i10;
-import '../endpoints/public/edit_scrappable_endpoint.dart' as _i11;
-import '../endpoints/public/marketplace_endpoint.dart' as _i12;
-import '../endpoints/public/public_scrappable_endpoint.dart' as _i13;
-import '../endpoints/public/public_tier_endpoint.dart' as _i14;
-import '../endpoints/public/scrappable_chat_session.dart' as _i15;
+import '../endpoints/auth/email_idp_endpoint.dart' as _i2;
+import '../endpoints/auth/google_idp_endpoint.dart' as _i3;
+import '../endpoints/auth/refresh_jwt_tokens_endpoint.dart' as _i4;
+import '../endpoints/private/private_account_endpoint.dart' as _i5;
+import '../endpoints/private/private_ai_usage_endpoint.dart' as _i6;
+import '../endpoints/private/private_api_usage_endpoint.dart' as _i7;
+import '../endpoints/private/private_clone_scrappable_endpoint.dart' as _i8;
+import '../endpoints/private/private_scrappable_analytics_endpoint.dart' as _i9;
+import '../endpoints/private/private_subscription_endpoint.dart' as _i10;
+import '../endpoints/private/private_user_scrappables_endpoint.dart' as _i11;
+import '../endpoints/public/create_scrappable.dart' as _i12;
+import '../endpoints/public/delete_scrappable_endpoint.dart' as _i13;
+import '../endpoints/public/edit_scrappable_endpoint.dart' as _i14;
+import '../endpoints/public/marketplace_endpoint.dart' as _i15;
+import '../endpoints/public/public_scrappable_endpoint.dart' as _i16;
+import '../endpoints/public/public_tier_endpoint.dart' as _i17;
+import '../endpoints/public/scrappable_chat_session.dart' as _i18;
 import 'package:zenscrap_server/src/generated/entities/supported_language.dart'
-    as _i16;
-import 'package:zenscrap_server/src/generated/protocol.dart' as _i17;
-import 'package:zenscrap_server/src/generated/entities/account/credit_purchase_option.dart'
-    as _i18;
-import 'package:zenscrap_server/src/generated/entities/analytics/analytics_time_scope.dart'
     as _i19;
-import 'package:zenscrap_server/src/generated/entities/scrappable/scraper_category.dart'
-    as _i20;
-import 'package:zenscrap_server/src/generated/entities/scrappable/ai_model.dart'
+import 'package:zenscrap_server/src/generated/protocol.dart' as _i20;
+import 'package:zenscrap_server/src/generated/entities/account/credit_purchase_option.dart'
     as _i21;
-import 'package:zenscrap_server/src/generated/entities/account/plan_tier.dart'
+import 'package:zenscrap_server/src/generated/entities/analytics/analytics_time_scope.dart'
     as _i22;
-import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i23;
+import 'package:zenscrap_server/src/generated/entities/scrappable/scraper_category.dart'
+    as _i23;
+import 'package:zenscrap_server/src/generated/entities/scrappable/ai_model.dart'
+    as _i24;
+import 'package:zenscrap_server/src/generated/entities/account/plan_tier.dart'
+    as _i25;
+import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
+    as _i26;
+import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
+    as _i27;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
   void initializeEndpoints(_i1.Server server) {
     var endpoints = <String, _i1.Endpoint>{
-      'privateAccount': _i2.PrivateAccountEndpoint()
+      'emailIdp': _i2.EmailIdpEndpoint()
+        ..initialize(
+          server,
+          'emailIdp',
+          null,
+        ),
+      'googleIdp': _i3.GoogleIdpEndpoint()
+        ..initialize(
+          server,
+          'googleIdp',
+          null,
+        ),
+      'refreshJwtTokens': _i4.RefreshJwtTokensEndpoint()
+        ..initialize(
+          server,
+          'refreshJwtTokens',
+          null,
+        ),
+      'privateAccount': _i5.PrivateAccountEndpoint()
         ..initialize(
           server,
           'privateAccount',
           null,
         ),
-      'privateAiUsage': _i3.PrivateAiUsageEndpoint()
+      'privateAiUsage': _i6.PrivateAiUsageEndpoint()
         ..initialize(
           server,
           'privateAiUsage',
           null,
         ),
-      'privateApiUsage': _i4.PrivateApiUsageEndpoint()
+      'privateApiUsage': _i7.PrivateApiUsageEndpoint()
         ..initialize(
           server,
           'privateApiUsage',
           null,
         ),
-      'privateCloneScrappable': _i5.PrivateCloneScrappableEndpoint()
+      'privateCloneScrappable': _i8.PrivateCloneScrappableEndpoint()
         ..initialize(
           server,
           'privateCloneScrappable',
           null,
         ),
-      'privateScrappableAnalytics': _i6.PrivateScrappableAnalyticsEndpoint()
+      'privateScrappableAnalytics': _i9.PrivateScrappableAnalyticsEndpoint()
         ..initialize(
           server,
           'privateScrappableAnalytics',
           null,
         ),
-      'privateSubscription': _i7.PrivateSubscriptionEndpoint()
+      'privateSubscription': _i10.PrivateSubscriptionEndpoint()
         ..initialize(
           server,
           'privateSubscription',
           null,
         ),
-      'privateUserScrappables': _i8.PrivateUserScrappablesEndpoint()
+      'privateUserScrappables': _i11.PrivateUserScrappablesEndpoint()
         ..initialize(
           server,
           'privateUserScrappables',
           null,
         ),
-      'createScrappable': _i9.CreateScrappableEndpoint()
+      'createScrappable': _i12.CreateScrappableEndpoint()
         ..initialize(
           server,
           'createScrappable',
           null,
         ),
-      'deleteScrappable': _i10.DeleteScrappableEndpoint()
+      'deleteScrappable': _i13.DeleteScrappableEndpoint()
         ..initialize(
           server,
           'deleteScrappable',
           null,
         ),
-      'editScrappable': _i11.EditScrappableEndpoint()
+      'editScrappable': _i14.EditScrappableEndpoint()
         ..initialize(
           server,
           'editScrappable',
           null,
         ),
-      'marketplace': _i12.MarketplaceEndpoint()
+      'marketplace': _i15.MarketplaceEndpoint()
         ..initialize(
           server,
           'marketplace',
           null,
         ),
-      'publicScrappable': _i13.PublicScrappableEndpoint()
+      'publicScrappable': _i16.PublicScrappableEndpoint()
         ..initialize(
           server,
           'publicScrappable',
           null,
         ),
-      'publicTier': _i14.PublicTierEndpoint()
+      'publicTier': _i17.PublicTierEndpoint()
         ..initialize(
           server,
           'publicTier',
           null,
         ),
-      'scrappableChatSession': _i15.ScrappableChatSession()
+      'scrappableChatSession': _i18.ScrappableChatSession()
         ..initialize(
           server,
           'scrappableChatSession',
           null,
         ),
     };
+    connectors['emailIdp'] = _i1.EndpointConnector(
+      name: 'emailIdp',
+      endpoint: endpoints['emailIdp']!,
+      methodConnectors: {
+        'login': _i1.MethodConnector(
+          name: 'login',
+          params: {
+            'email': _i1.ParameterDescription(
+              name: 'email',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'password': _i1.ParameterDescription(
+              name: 'password',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['emailIdp'] as _i2.EmailIdpEndpoint).login(
+                session,
+                email: params['email'],
+                password: params['password'],
+              ),
+        ),
+        'startRegistration': _i1.MethodConnector(
+          name: 'startRegistration',
+          params: {
+            'email': _i1.ParameterDescription(
+              name: 'email',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['emailIdp'] as _i2.EmailIdpEndpoint)
+                  .startRegistration(
+                    session,
+                    email: params['email'],
+                  ),
+        ),
+        'verifyRegistrationCode': _i1.MethodConnector(
+          name: 'verifyRegistrationCode',
+          params: {
+            'accountRequestId': _i1.ParameterDescription(
+              name: 'accountRequestId',
+              type: _i1.getType<_i1.UuidValue>(),
+              nullable: false,
+            ),
+            'verificationCode': _i1.ParameterDescription(
+              name: 'verificationCode',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['emailIdp'] as _i2.EmailIdpEndpoint)
+                  .verifyRegistrationCode(
+                    session,
+                    accountRequestId: params['accountRequestId'],
+                    verificationCode: params['verificationCode'],
+                  ),
+        ),
+        'finishRegistration': _i1.MethodConnector(
+          name: 'finishRegistration',
+          params: {
+            'registrationToken': _i1.ParameterDescription(
+              name: 'registrationToken',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'password': _i1.ParameterDescription(
+              name: 'password',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['emailIdp'] as _i2.EmailIdpEndpoint)
+                  .finishRegistration(
+                    session,
+                    registrationToken: params['registrationToken'],
+                    password: params['password'],
+                  ),
+        ),
+        'startPasswordReset': _i1.MethodConnector(
+          name: 'startPasswordReset',
+          params: {
+            'email': _i1.ParameterDescription(
+              name: 'email',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['emailIdp'] as _i2.EmailIdpEndpoint)
+                  .startPasswordReset(
+                    session,
+                    email: params['email'],
+                  ),
+        ),
+        'verifyPasswordResetCode': _i1.MethodConnector(
+          name: 'verifyPasswordResetCode',
+          params: {
+            'passwordResetRequestId': _i1.ParameterDescription(
+              name: 'passwordResetRequestId',
+              type: _i1.getType<_i1.UuidValue>(),
+              nullable: false,
+            ),
+            'verificationCode': _i1.ParameterDescription(
+              name: 'verificationCode',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['emailIdp'] as _i2.EmailIdpEndpoint)
+                  .verifyPasswordResetCode(
+                    session,
+                    passwordResetRequestId: params['passwordResetRequestId'],
+                    verificationCode: params['verificationCode'],
+                  ),
+        ),
+        'finishPasswordReset': _i1.MethodConnector(
+          name: 'finishPasswordReset',
+          params: {
+            'finishPasswordResetToken': _i1.ParameterDescription(
+              name: 'finishPasswordResetToken',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'newPassword': _i1.ParameterDescription(
+              name: 'newPassword',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['emailIdp'] as _i2.EmailIdpEndpoint)
+                  .finishPasswordReset(
+                    session,
+                    finishPasswordResetToken:
+                        params['finishPasswordResetToken'],
+                    newPassword: params['newPassword'],
+                  ),
+        ),
+      },
+    );
+    connectors['googleIdp'] = _i1.EndpointConnector(
+      name: 'googleIdp',
+      endpoint: endpoints['googleIdp']!,
+      methodConnectors: {
+        'login': _i1.MethodConnector(
+          name: 'login',
+          params: {
+            'idToken': _i1.ParameterDescription(
+              name: 'idToken',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'accessToken': _i1.ParameterDescription(
+              name: 'accessToken',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['googleIdp'] as _i3.GoogleIdpEndpoint).login(
+                    session,
+                    idToken: params['idToken'],
+                    accessToken: params['accessToken'],
+                  ),
+        ),
+      },
+    );
+    connectors['refreshJwtTokens'] = _i1.EndpointConnector(
+      name: 'refreshJwtTokens',
+      endpoint: endpoints['refreshJwtTokens']!,
+      methodConnectors: {
+        'refreshAccessToken': _i1.MethodConnector(
+          name: 'refreshAccessToken',
+          params: {
+            'refreshToken': _i1.ParameterDescription(
+              name: 'refreshToken',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['refreshJwtTokens']
+                          as _i4.RefreshJwtTokensEndpoint)
+                      .refreshAccessToken(
+                        session,
+                        refreshToken: params['refreshToken'],
+                      ),
+        ),
+      },
+    );
     connectors['privateAccount'] = _i1.EndpointConnector(
       name: 'privateAccount',
       endpoint: endpoints['privateAccount']!,
@@ -143,7 +394,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -152,7 +403,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['privateAccount'] as _i2.PrivateAccountEndpoint)
+                  (endpoints['privateAccount'] as _i5.PrivateAccountEndpoint)
                       .getAccountInfo(
                         session,
                         initialScrappableId: params['initialScrappableId'],
@@ -175,7 +426,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -184,7 +435,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['privateAiUsage'] as _i3.PrivateAiUsageEndpoint)
+                  (endpoints['privateAiUsage'] as _i6.PrivateAiUsageEndpoint)
                       .getAiCreditHistory(
                         session,
                         page: params['page'],
@@ -196,7 +447,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -205,7 +456,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['privateAiUsage'] as _i3.PrivateAiUsageEndpoint)
+                  (endpoints['privateAiUsage'] as _i6.PrivateAiUsageEndpoint)
                       .getAiUsageInfo(
                         session,
                         language: params['language'],
@@ -221,7 +472,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -230,7 +481,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['privateAiUsage'] as _i3.PrivateAiUsageEndpoint)
+                  (endpoints['privateAiUsage'] as _i6.PrivateAiUsageEndpoint)
                       .updateOpenAiApiKey(
                         session,
                         apiKey: params['apiKey'],
@@ -247,7 +498,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -256,7 +507,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['privateAiUsage'] as _i3.PrivateAiUsageEndpoint)
+                  (endpoints['privateAiUsage'] as _i6.PrivateAiUsageEndpoint)
                       .getAutoFixSessions(
                         session,
                         page: params['page'],
@@ -279,7 +530,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -288,7 +539,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['privateApiUsage'] as _i4.PrivateApiUsageEndpoint)
+                  (endpoints['privateApiUsage'] as _i7.PrivateApiUsageEndpoint)
                       .getApiCreditHistory(
                         session,
                         page: params['page'],
@@ -305,7 +556,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -314,7 +565,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['privateApiUsage'] as _i4.PrivateApiUsageEndpoint)
+                  (endpoints['privateApiUsage'] as _i7.PrivateApiUsageEndpoint)
                       .createApiKey(
                         session,
                         name: params['name'],
@@ -331,7 +582,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -340,7 +591,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['privateApiUsage'] as _i4.PrivateApiUsageEndpoint)
+                  (endpoints['privateApiUsage'] as _i7.PrivateApiUsageEndpoint)
                       .deactivateApiKey(
                         session,
                         apiKeyId: params['apiKeyId'],
@@ -352,7 +603,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -361,7 +612,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['privateApiUsage'] as _i4.PrivateApiUsageEndpoint)
+                  (endpoints['privateApiUsage'] as _i7.PrivateApiUsageEndpoint)
                       .getActiveApiKeys(
                         session,
                         language: params['language'],
@@ -372,7 +623,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -381,19 +632,19 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['privateApiUsage'] as _i4.PrivateApiUsageEndpoint)
+                  (endpoints['privateApiUsage'] as _i7.PrivateApiUsageEndpoint)
                       .getApiKeyUsageStats(
                         session,
                         language: params['language'],
                       )
-                      .then((container) => _i17.mapContainerToJson(container)),
+                      .then((container) => _i20.mapContainerToJson(container)),
         ),
         'getApiUsageInfo': _i1.MethodConnector(
           name: 'getApiUsageInfo',
           params: {
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -402,7 +653,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['privateApiUsage'] as _i4.PrivateApiUsageEndpoint)
+                  (endpoints['privateApiUsage'] as _i7.PrivateApiUsageEndpoint)
                       .getApiUsageInfo(
                         session,
                         language: params['language'],
@@ -413,7 +664,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -422,7 +673,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['privateApiUsage'] as _i4.PrivateApiUsageEndpoint)
+                  (endpoints['privateApiUsage'] as _i7.PrivateApiUsageEndpoint)
                       .getApiKeysWithStats(
                         session,
                         language: params['language'],
@@ -433,12 +684,12 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'creditPackage': _i1.ParameterDescription(
               name: 'creditPackage',
-              type: _i1.getType<_i18.CreditPurchaseOption>(),
+              type: _i1.getType<_i21.CreditPurchaseOption>(),
               nullable: false,
             ),
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -447,7 +698,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['privateApiUsage'] as _i4.PrivateApiUsageEndpoint)
+                  (endpoints['privateApiUsage'] as _i7.PrivateApiUsageEndpoint)
                       .createCreditPurchaseCheckout(
                         session,
                         creditPackage: params['creditPackage'],
@@ -470,7 +721,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -480,7 +731,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async =>
                   (endpoints['privateCloneScrappable']
-                          as _i5.PrivateCloneScrappableEndpoint)
+                          as _i8.PrivateCloneScrappableEndpoint)
                       .cloneFromMarketplace(
                         session,
                         scrappableId: params['scrappableId'],
@@ -503,12 +754,12 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'scope': _i1.ParameterDescription(
               name: 'scope',
-              type: _i1.getType<_i19.AnalyticsTimeScope>(),
+              type: _i1.getType<_i22.AnalyticsTimeScope>(),
               nullable: false,
             ),
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -518,7 +769,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async =>
                   (endpoints['privateScrappableAnalytics']
-                          as _i6.PrivateScrappableAnalyticsEndpoint)
+                          as _i9.PrivateScrappableAnalyticsEndpoint)
                       .getScrappableAnalyticsWithScope(
                         session,
                         page: params['page'],
@@ -541,7 +792,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -551,7 +802,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async =>
                   (endpoints['privateScrappableAnalytics']
-                          as _i6.PrivateScrappableAnalyticsEndpoint)
+                          as _i9.PrivateScrappableAnalyticsEndpoint)
                       .getScrappableAnalytics(
                         session,
                         scrappableId: params['scrappableId'],
@@ -569,7 +820,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -579,7 +830,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async =>
                   (endpoints['privateScrappableAnalytics']
-                          as _i6.PrivateScrappableAnalyticsEndpoint)
+                          as _i9.PrivateScrappableAnalyticsEndpoint)
                       .getScrappableUsageMetrics(
                         session,
                         scrappableId: params['scrappableId'],
@@ -607,7 +858,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -617,7 +868,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async =>
                   (endpoints['privateSubscription']
-                          as _i7.PrivateSubscriptionEndpoint)
+                          as _i10.PrivateSubscriptionEndpoint)
                       .createCheckoutSession(
                         session,
                         planTier: params['planTier'],
@@ -630,7 +881,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -640,7 +891,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async =>
                   (endpoints['privateSubscription']
-                          as _i7.PrivateSubscriptionEndpoint)
+                          as _i10.PrivateSubscriptionEndpoint)
                       .getSubscriptionStatus(
                         session,
                         language: params['language'],
@@ -651,7 +902,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -661,7 +912,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async =>
                   (endpoints['privateSubscription']
-                          as _i7.PrivateSubscriptionEndpoint)
+                          as _i10.PrivateSubscriptionEndpoint)
                       .cancelSubscription(
                         session,
                         language: params['language'],
@@ -672,7 +923,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -682,7 +933,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async =>
                   (endpoints['privateSubscription']
-                          as _i7.PrivateSubscriptionEndpoint)
+                          as _i10.PrivateSubscriptionEndpoint)
                       .createCustomerPortalSession(
                         session,
                         language: params['language'],
@@ -709,12 +960,12 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'categories': _i1.ParameterDescription(
               name: 'categories',
-              type: _i1.getType<List<_i20.ScraperCategory>?>(),
+              type: _i1.getType<List<_i23.ScraperCategory>?>(),
               nullable: true,
             ),
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -724,7 +975,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async =>
                   (endpoints['privateUserScrappables']
-                          as _i8.PrivateUserScrappablesEndpoint)
+                          as _i11.PrivateUserScrappablesEndpoint)
                       .call(
                         session,
                         page: params['page'],
@@ -743,7 +994,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -753,7 +1004,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async =>
                   (endpoints['privateUserScrappables']
-                          as _i8.PrivateUserScrappablesEndpoint)
+                          as _i11.PrivateUserScrappablesEndpoint)
                       .getScrappableById(
                         session,
                         params['scrappableId'],
@@ -776,7 +1027,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -789,7 +1040,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 Map<String, Stream> streamParams,
               ) =>
                   (endpoints['createScrappable']
-                          as _i9.CreateScrappableEndpoint)
+                          as _i12.CreateScrappableEndpoint)
                       .call(
                         session,
                         referenceLink: params['referenceLink'],
@@ -812,7 +1063,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -822,7 +1073,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async =>
                   (endpoints['deleteScrappable']
-                          as _i10.DeleteScrappableEndpoint)
+                          as _i13.DeleteScrappableEndpoint)
                       .call(
                         session,
                         scrappableId: params['scrappableId'],
@@ -855,12 +1106,12 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
             'category': _i1.ParameterDescription(
               name: 'category',
-              type: _i1.getType<_i20.ScraperCategory?>(),
+              type: _i1.getType<_i23.ScraperCategory?>(),
               nullable: true,
             ),
             'willHideFromMarketplace': _i1.ParameterDescription(
@@ -880,7 +1131,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'autoFixPreferredAiModel': _i1.ParameterDescription(
               name: 'autoFixPreferredAiModel',
-              type: _i1.getType<_i21.AiModel?>(),
+              type: _i1.getType<_i24.AiModel?>(),
               nullable: true,
             ),
             'autoFixUseAutoAiModel': _i1.ParameterDescription(
@@ -894,7 +1145,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['editScrappable'] as _i11.EditScrappableEndpoint)
+                  (endpoints['editScrappable'] as _i14.EditScrappableEndpoint)
                       .call(
                         session,
                         scrappableId: params['scrappableId'],
@@ -933,12 +1184,12 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'categories': _i1.ParameterDescription(
               name: 'categories',
-              type: _i1.getType<List<_i20.ScraperCategory>?>(),
+              type: _i1.getType<List<_i23.ScraperCategory>?>(),
               nullable: true,
             ),
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -946,7 +1197,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['marketplace'] as _i12.MarketplaceEndpoint)
+              ) async => (endpoints['marketplace'] as _i15.MarketplaceEndpoint)
                   .getItems(
                     session,
                     page: params['page'],
@@ -971,7 +1222,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -981,7 +1232,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async =>
                   (endpoints['publicScrappable']
-                          as _i13.PublicScrappableEndpoint)
+                          as _i16.PublicScrappableEndpoint)
                       .getByteTestData(
                         session,
                         params['scrappableId'],
@@ -1009,7 +1260,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'planTier': _i1.ParameterDescription(
               name: 'planTier',
-              type: _i1.getType<_i22.PlanTier>(),
+              type: _i1.getType<_i25.PlanTier>(),
               nullable: false,
             ),
           },
@@ -1017,7 +1268,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['publicTier'] as _i14.PublicTierEndpoint)
+              ) async => (endpoints['publicTier'] as _i17.PublicTierEndpoint)
                   .updatePlayerTier(
                     session,
                     email: params['email'],
@@ -1041,7 +1292,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -1051,7 +1302,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async =>
                   (endpoints['scrappableChatSession']
-                          as _i15.ScrappableChatSession)
+                          as _i18.ScrappableChatSession)
                       .commitCurrentEditState(
                         session,
                         sessionUuid: params['sessionUuid'],
@@ -1073,7 +1324,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async =>
                   (endpoints['scrappableChatSession']
-                          as _i15.ScrappableChatSession)
+                          as _i18.ScrappableChatSession)
                       .disposeSession(
                         session,
                         sessionId: params['sessionId'],
@@ -1094,7 +1345,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -1104,7 +1355,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async =>
                   (endpoints['scrappableChatSession']
-                          as _i15.ScrappableChatSession)
+                          as _i18.ScrappableChatSession)
                       .updateUserApiKey(
                         session,
                         sessionId: params['sessionId'],
@@ -1137,7 +1388,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -1147,7 +1398,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async =>
                   (endpoints['scrappableChatSession']
-                          as _i15.ScrappableChatSession)
+                          as _i18.ScrappableChatSession)
                       .updateScrappableRequest(
                         session,
                         scrappableId: params['scrappableId'],
@@ -1167,7 +1418,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -1177,7 +1428,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async =>
                   (endpoints['scrappableChatSession']
-                          as _i15.ScrappableChatSession)
+                          as _i18.ScrappableChatSession)
                       .createSession(
                         session,
                         scrappableId: params['scrappableId'],
@@ -1194,12 +1445,12 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'aiModel': _i1.ParameterDescription(
               name: 'aiModel',
-              type: _i1.getType<_i21.AiModel>(),
+              type: _i1.getType<_i24.AiModel>(),
               nullable: false,
             ),
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -1209,7 +1460,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async =>
                   (endpoints['scrappableChatSession']
-                          as _i15.ScrappableChatSession)
+                          as _i18.ScrappableChatSession)
                       .changeChatModel(
                         session,
                         sessionUuid: params['sessionUuid'],
@@ -1227,7 +1478,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -1240,7 +1491,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 Map<String, Stream> streamParams,
               ) =>
                   (endpoints['scrappableChatSession']
-                          as _i15.ScrappableChatSession)
+                          as _i18.ScrappableChatSession)
                       .listenToScrappableRedraftSession(
                         session,
                         sessionUuid: params['sessionUuid'],
@@ -1262,7 +1513,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'language': _i1.ParameterDescription(
               name: 'language',
-              type: _i1.getType<_i16.SupportedLanguage>(),
+              type: _i1.getType<_i19.SupportedLanguage>(),
               nullable: false,
             ),
           },
@@ -1275,7 +1526,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 Map<String, Stream> streamParams,
               ) =>
                   (endpoints['scrappableChatSession']
-                          as _i15.ScrappableChatSession)
+                          as _i18.ScrappableChatSession)
                       .sendPromptMessage(
                         session,
                         sessionId: params['sessionId'],
@@ -1285,6 +1536,9 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
       },
     );
-    modules['serverpod_auth'] = _i23.Endpoints()..initializeEndpoints(server);
+    modules['serverpod_auth_idp'] = _i26.Endpoints()
+      ..initializeEndpoints(server);
+    modules['serverpod_auth_core'] = _i27.Endpoints()
+      ..initializeEndpoints(server);
   }
 }

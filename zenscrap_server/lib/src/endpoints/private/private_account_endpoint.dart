@@ -1,6 +1,6 @@
 import 'package:nanoid2/nanoid2.dart';
 import 'package:serverpod/serverpod.dart';
-import 'package:serverpod_auth_server/serverpod_auth_server.dart';
+import 'package:serverpod_auth_idp_server/core.dart';
 import 'package:zenscrap_server/src/core/consts.dart';
 import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';
 import 'package:zenscrap_server/src/core/translations/error_translations.dart';
@@ -21,13 +21,13 @@ class PrivateAccountEndpoint extends Endpoint {
       throw _authenticationFailed(language);
     }
 
-    final userId = authenticationInfo.userId;
+    final userId = authenticationInfo.authUserId;
 
     AccountInfo? accountInfo;
     try {
       accountInfo = await AccountInfo.db.findFirstRow(
         session,
-        where: (p0) => p0.userInfoId.equals(userId),
+        where: (p0) => p0.authUserId.equals(userId),
         include: include,
       );
     } catch (e) {
@@ -150,7 +150,7 @@ class PrivateAccountEndpoint extends Endpoint {
           transaction: transaction,
         );
         AccountInfo accountInfo = AccountInfo(
-          userInfoId: userId,
+          authUserId: userId,
           accountApiUsageId: accountApiUsage.id!,
           accountApiUsage: accountApiUsage,
           planTier: PlanTier.none,
@@ -167,7 +167,7 @@ class PrivateAccountEndpoint extends Endpoint {
 
         final accountAdded = await AccountInfo.db.findFirstRow(
           session,
-          where: (p0) => p0.userInfoId.equals(userId),
+          where: (p0) => p0.authUserId.equals(userId),
           include: include,
           transaction: transaction,
         );
@@ -265,7 +265,7 @@ class PrivateAccountEndpoint extends Endpoint {
   }
 
   final include = AccountInfo.include(
-    userInfo: UserInfo.include(),
+    authUser: AuthUser.include(),
     accountApiUsage: AccountApiUsage.include(
       apiKeys: AccountApiKey.includeList(
         limit: 10,

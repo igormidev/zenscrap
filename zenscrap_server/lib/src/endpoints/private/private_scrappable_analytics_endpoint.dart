@@ -1,5 +1,5 @@
 // ignore_for_file: constant_identifier_names
-import 'package:serverpod_auth_server/serverpod_auth_server.dart';
+import 'package:serverpod_auth_idp_server/core.dart';
 
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/core/consts.dart';
@@ -20,10 +20,10 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
     const int pageSize = kAnalyticsSummaryPageSize;
     final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) throw _authenticationFailed(language);
-    final userId = authenticationInfo.userId;
+    final userId = authenticationInfo.authUserId;
     final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
       session,
-      where: (t) => t.userInfoId.equals(userId),
+      where: (t) => t.authUserId.equals(userId),
       include: AccountInfo.include(
         accountApiUsage: AccountApiUsage.include(),
       ),
@@ -267,10 +267,10 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
     const int pageSize = kAnalyticsDetailPageSize;
     final authenticationInfo = session.authenticated;
     if (authenticationInfo == null) throw _authenticationFailed(language);
-    final userId = authenticationInfo.userId;
+    final userId = authenticationInfo.authUserId;
     final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
       session,
-      where: (t) => t.userInfoId.equals(userId),
+      where: (t) => t.authUserId.equals(userId),
       include: AccountInfo.include(
         accountApiUsage: AccountApiUsage.include(),
       ),

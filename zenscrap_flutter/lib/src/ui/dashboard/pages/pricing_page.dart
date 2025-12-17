@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pricing_page/pricing_page.dart';
+import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
@@ -187,7 +188,7 @@ class RawPricingPageComponent extends ConsumerWidget {
     final analytics = ref.read(analyticsServiceProvider);
     try {
       // Check if user is logged in
-      final isSignedIn = ref.read(sessionManagerProvider).isSignedIn;
+      final isSignedIn = ref.read(clientProvider).auth.isAuthenticated;
       if (!isSignedIn) {
         // Track unauthenticated attempt
         await analytics.trackPricingUnauthenticatedAttempt(

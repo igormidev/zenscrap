@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 import 'package:seo/seo.dart';
-import 'package:serverpod_auth_email_flutter/serverpod_auth_email_flutter.dart';
+import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/core/mixins/edit_scrappable.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
@@ -46,7 +46,13 @@ class _AuthViewState extends ConsumerState<AuthView>
   @override
   void initState() {
     super.initState();
-    _emailAuth = EmailAuthController(ref.read(clientProvider).modules.auth);
+    final client = ref.read(clientProvider);
+    _emailAuth = EmailAuthController(
+      client: client,
+      startScreen: EmailFlowScreen.login,
+      onAuthenticated: _onAuthSuccess,
+      onError: _onAuthError,
+    );
     _tabController.addListener(_setTab);
     _controller = AnimationController(
       vsync: this,
@@ -54,6 +60,15 @@ class _AuthViewState extends ConsumerState<AuthView>
         seconds: 22,
       ), // Default duration of the animation
     );
+  }
+
+  void _onAuthSuccess() {
+    // Authentication was successful - the session state is updated by individual pages
+    // that have access to the user's email and name from form inputs
+  }
+
+  void _onAuthError(Object error) {
+    // Error is handled by each page individually
   }
 
   void _setTab() {
@@ -69,6 +84,7 @@ class _AuthViewState extends ConsumerState<AuthView>
     _resetPasswordEmailVN.dispose();
     _tabController.removeListener(_setTab);
     _controller.dispose();
+    _emailAuth.dispose();
     super.dispose();
   }
 

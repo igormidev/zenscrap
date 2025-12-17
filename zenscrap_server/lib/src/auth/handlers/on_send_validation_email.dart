@@ -2,20 +2,28 @@ import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/auth/get_html_messages.dart';
 import 'package:zenscrap_server/src/auth/send_email.dart';
 
-Future<bool> onSendValidationEmail(
-  Session session,
-  String email,
-  String validationCode,
-) async {
-  session.log('Validation code: $validationCode');
-  if (email == 'igor9ms@hotmail.com') return true;
+/// Callback for sending registration verification code emails
+/// Used by EmailIdpConfig in Serverpod 3.1 IDP system
+Future<void> onSendRegistrationVerificationCode(
+  Session session, {
+  required String email,
+  required UuidValue accountRequestId,
+  required String verificationCode,
+  required Transaction? transaction,
+}) async {
+  session.log('Registration verification code for $email: $verificationCode');
+
+  // Skip email for test account
+  if (email == 'igor9ms@hotmail.com') return;
+
   final htmlText = getHTMLEmailTemplate(
     title: 'Confirm Your Email Address',
     description:
-        'Enter the following code bellow in the verfication code field.',
-    code: validationCode,
+        'Enter the following code below in the verification code field.',
+    code: verificationCode,
   );
-  return sendEmail(
+
+  await sendEmail(
     destinyEmail: email,
     subject: 'Zen Scrap | Confirm your email address',
     htmlMessage: htmlText,

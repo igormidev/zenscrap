@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/serverpod_to_result.dart';
@@ -21,9 +22,9 @@ class UserScrappablesNotifier extends Notifier<UserScrappablesState> {
     String searchQuery = '',
     Set<ScraperCategory>? categories,
   }) async {
-    final sessionManager = ref.read(sessionManagerProvider);
-    final signedInUser = sessionManager.signedInUser;
-    if (signedInUser == null) return;
+    final client = ref.read(clientProvider);
+    final isAuthenticated = client.auth.isAuthenticated;
+    if (!isAuthenticated) return;
 
     _currentPage = page;
     _currentSearchQuery = searchQuery;

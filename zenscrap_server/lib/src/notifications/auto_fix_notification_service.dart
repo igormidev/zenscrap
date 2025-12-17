@@ -1,7 +1,7 @@
 import 'dart:developer' as developer;
 
 import 'package:serverpod/serverpod.dart';
-import 'package:serverpod_auth_server/serverpod_auth_server.dart';
+import 'package:serverpod_auth_idp_server/core.dart';
 
 import '../auth/send_email.dart';
 import '../generated/protocol.dart';
@@ -175,13 +175,10 @@ class AutoFixNotificationService {
       return null;
     }
 
-    // Fetch AccountInfo with UserInfo included
+    // Fetch AccountInfo
     final accountInfo = await AccountInfo.db.findById(
       session,
       accountId,
-      include: AccountInfo.include(
-        userInfo: UserInfo.include(),
-      ),
     );
 
     if (accountInfo == null) {
@@ -192,17 +189,13 @@ class AutoFixNotificationService {
       return null;
     }
 
-    final userInfo = accountInfo.userInfo;
-    if (userInfo == null) {
-      // UserInfo might not be loaded via include, fetch it separately
-      final fetchedUserInfo = await UserInfo.db.findById(
-        session,
-        accountInfo.userInfoId,
-      );
-      return fetchedUserInfo?.email;
-    }
+    // Fetch user profile using AuthServices
+    final userProfile = await AuthServices.instance.userProfiles.findUserProfileByUserId(
+      session,
+      accountInfo.authUserId,
+    );
 
-    return userInfo.email;
+    return userProfile.email;
   }
 
   /// Formats the duration of an auto-fix session.

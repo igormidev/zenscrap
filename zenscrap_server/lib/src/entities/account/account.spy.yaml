@@ -2,7 +2,7 @@ class: AccountInfo
 table: account_info
 fields:
   scrappables: List<Scrappable>?, relation(name=account_info_scrappable)
-  userInfo: module:auth:UserInfo?, relation
+  authUser: module:auth_core:AuthUser?, relation
   accountApiUsageId: int
   accountApiUsage: AccountApiUsage?, relation(name=user_account_api_usage, field=accountApiUsageId)
   planTier: PlanTier
@@ -13,8 +13,8 @@ fields:
   accountAIUsageId: int
   accountAIUsage: AccountAIUsage?, relation(name=user_account_ai_usage, field=accountAIUsageId)
 indexes:
-  user_info_id_unique_idx:
-    fields: userInfoId
+  auth_user_id_unique_idx:
+    fields: authUserId
     unique: true
   account_api_usage_id_unique_idx:
     fields: accountApiUsageId
