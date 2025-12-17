@@ -902,6 +902,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get api_analytics_duration_label => 'Duration';
 
   @override
+  String get api_analytics_load_more_failed =>
+      'Fehler beim Laden weiterer Daten. Tippen Sie zum Wiederholen.';
+
+  @override
   String get api_usage_page_title => 'API-Guthaben & Schluessel';
 
   @override

@@ -261,6 +261,7 @@
   "api_analytics_copied_to_clipboard": "{label} copiado al portapapeles",
   "api_analytics_copy_label": "Copiar {label}",
   "api_analytics_expand_more_lines": "Haz clic en expandir para ver {count}+ lineas mas",
+  "api_analytics_load_more_failed": "Error al cargar mas datos. Toca para reintentar.",
 
   "api_usage_page_title": "Creditos y Claves API",
   "api_usage_refresh": "Actualizar",

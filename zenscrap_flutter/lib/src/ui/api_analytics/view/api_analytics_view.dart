@@ -45,12 +45,12 @@ class _ApiAnalyticsViewState extends ConsumerState<ApiAnalyticsView> {
     if (_scrollController.position.extentAfter < 500) {
       final analyticsState = ref.read(analyticsProvider);
       final hasNextPage = analyticsState.whenOrNull(
-        withData: (data) => data.hasNextPage,
+        withData: (data, _) => data.hasNextPage,
       );
       if (hasNextPage == true) {
         // Track load more trigger
         analyticsState.whenOrNull(
-          withData: (data) {
+          withData: (data, _) {
             ref.read(analyticsServiceProvider).trackApiAnalyticsLoadMoreCardsTrigger(
               currentCount: data.items.length,
               totalCount: data.totalCount,
@@ -77,10 +77,11 @@ class _ApiAnalyticsViewState extends ConsumerState<ApiAnalyticsView> {
         isLoadingMore: true,
       ),
       emptyData: () => const EmptyScrappableListageIndicatorPage(),
-      withData: (data) => _AnalyticsContent(
+      withData: (data, loadMoreFailed) => _AnalyticsContent(
         data: data,
         scrollController: _scrollController,
         isRefreshVN: _isRefreshVN,
+        loadMoreFailed: loadMoreFailed,
       ),
       withError: (error) => _AnalyticsErrorView(error: error),
     );
@@ -92,12 +93,14 @@ class _AnalyticsContent extends ConsumerWidget {
   final ScrollController scrollController;
   final ValueNotifier<bool> isRefreshVN;
   final bool isLoadingMore;
+  final bool loadMoreFailed;
 
   const _AnalyticsContent({
     required this.data,
     required this.scrollController,
     required this.isRefreshVN,
     this.isLoadingMore = false,
+    this.loadMoreFailed = false,
   });
 
   @override
@@ -114,6 +117,7 @@ class _AnalyticsContent extends ConsumerWidget {
                 scrollController: scrollController,
                 isRefreshVN: isRefreshVN,
                 isLoadingMore: isLoadingMore,
+                loadMoreFailed: loadMoreFailed,
               )
             : const SelectedScrappablePage(),
         bottomNavigationBar: selectedItem != null
@@ -163,6 +167,7 @@ class _AnalyticsContent extends ConsumerWidget {
             scrollController: scrollController,
             isRefreshVN: isRefreshVN,
             isLoadingMore: isLoadingMore,
+            loadMoreFailed: loadMoreFailed,
           ),
         ),
         const VerticalDivider(width: 1),

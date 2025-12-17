@@ -884,6 +884,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get api_analytics_duration_label => 'Duration';
 
   @override
+  String get api_analytics_load_more_failed =>
+      'Failed to load more data. Tap to retry.';
+
+  @override
   String get api_usage_page_title => 'Api Credits & Keys';
 
   @override
@@ -2787,6 +2791,10 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String api_analytics_expand_more_lines(int count) {
     return 'Clique em expandir para ver mais $count+ linhas';
   }
+
+  @override
+  String get api_analytics_load_more_failed =>
+      'Falha ao carregar mais dados. Toque para tentar novamente.';
 
   @override
   String get api_usage_page_title => 'Creditos e Chaves API';

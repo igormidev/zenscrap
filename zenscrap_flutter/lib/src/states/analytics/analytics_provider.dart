@@ -49,7 +49,7 @@ class AnalyticsNotifier extends Notifier<AnalyticsState> {
 
   Future<void> loadMoreAnalytics() async {
     final currentData = state.whenOrNull(
-      withData: (data) => data,
+      withData: (data, loadMoreFailed) => data,
     );
     if (currentData == null) return;
     if (!currentData.hasNextPage) return;
@@ -80,7 +80,19 @@ class AnalyticsNotifier extends Notifier<AnalyticsState> {
 
       state = AnalyticsState.withData(mergedData);
     } catch (error) {
-      // Revert to previous data on error
+      // Revert page counter on error
+      _currentPage--;
+      // Revert to previous data on error with loadMoreFailed flag set
+      state = AnalyticsState.withData(currentData, loadMoreFailed: true);
+    }
+  }
+
+  /// Clears the load more failed flag while keeping the current data.
+  void clearLoadMoreError() {
+    final currentData = state.whenOrNull(
+      withData: (data, loadMoreFailed) => data,
+    );
+    if (currentData != null) {
       state = AnalyticsState.withData(currentData);
     }
   }

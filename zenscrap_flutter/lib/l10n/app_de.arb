@@ -261,6 +261,7 @@
   "api_analytics_copied_to_clipboard": "{label} in Zwischenablage kopiert",
   "api_analytics_copy_label": "{label} kopieren",
   "api_analytics_expand_more_lines": "Klicken Sie auf Aufklappen, um {count}+ weitere Zeilen zu sehen",
+  "api_analytics_load_more_failed": "Fehler beim Laden weiterer Daten. Tippen Sie zum Wiederholen.",
 
   "api_usage_page_title": "API-Guthaben & Schluessel",
   "api_usage_refresh": "Aktualisieren",

@@ -1166,6 +1166,10 @@
   "@api_analytics_duration_label": {
     "description": "Label for request duration"
   },
+  "api_analytics_load_more_failed": "Failed to load more data. Tap to retry.",
+  "@api_analytics_load_more_failed": {
+    "description": "Error message shown when loading more analytics fails"
+  },
 
   "api_usage_page_title": "Api Credits & Keys",
   "@api_usage_page_title": {

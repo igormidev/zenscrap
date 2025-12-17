@@ -884,6 +884,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get api_analytics_duration_label => 'Duration';
 
   @override
+  String get api_analytics_load_more_failed =>
+      'Failed to load more data. Tap to retry.';
+
+  @override
   String get api_usage_page_title => 'Api Credits & Keys';
 
   @override

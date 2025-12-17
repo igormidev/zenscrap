@@ -869,6 +869,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get api_analytics_duration_label => 'Duration';
 
   @override
+  String get api_analytics_load_more_failed =>
+      'データの読み込みに失敗しました。タップして再試行してください。';
+
+  @override
   String get api_usage_page_title => 'APIクレジット＆キー';
 
   @override

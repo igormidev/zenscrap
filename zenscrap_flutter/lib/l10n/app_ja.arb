@@ -261,6 +261,7 @@
   "api_analytics_copied_to_clipboard": "{label}をクリップボードにコピーしました",
   "api_analytics_copy_label": "{label}をコピー",
   "api_analytics_expand_more_lines": "展開をクリックして残り{count}行以上を表示",
+  "api_analytics_load_more_failed": "データの読み込みに失敗しました。タップして再試行してください。",
 
   "api_usage_page_title": "APIクレジット＆キー",
   "api_usage_refresh": "更新",

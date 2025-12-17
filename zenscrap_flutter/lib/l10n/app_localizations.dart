@@ -1663,6 +1663,12 @@ abstract class AppLocalizations {
   /// **'Duration'**
   String get api_analytics_duration_label;
 
+  /// Error message shown when loading more analytics fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load more data. Tap to retry.'**
+  String get api_analytics_load_more_failed;
+
   /// Main title for API usage page
   ///
   /// In en, this message translates to:

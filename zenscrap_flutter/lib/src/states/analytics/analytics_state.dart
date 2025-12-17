@@ -11,7 +11,9 @@ abstract class AnalyticsState with _$AnalyticsState {
     required PaginatedScrappableRequestsAnalytics currentData,
   }) = _LoadingMore;
   factory AnalyticsState.emptyData() = _EmptyData;
-  factory AnalyticsState.withData(PaginatedScrappableRequestsAnalytics data) =
-      _Loaded;
+  factory AnalyticsState.withData(
+    PaginatedScrappableRequestsAnalytics data, {
+    @Default(false) bool loadMoreFailed,
+  }) = _Loaded;
   factory AnalyticsState.withError({required ZenScrapException error}) = _Error;
 }

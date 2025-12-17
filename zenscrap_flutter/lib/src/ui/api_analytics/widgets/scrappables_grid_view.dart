@@ -16,6 +16,7 @@ class ScrappablesGridView extends ConsumerStatefulWidget {
   final ScrollController scrollController;
   final ValueNotifier<bool> isRefreshVN;
   final bool isLoadingMore;
+  final bool loadMoreFailed;
 
   const ScrappablesGridView({
     super.key,
@@ -23,6 +24,7 @@ class ScrappablesGridView extends ConsumerStatefulWidget {
     required this.scrollController,
     required this.isRefreshVN,
     this.isLoadingMore = false,
+    this.loadMoreFailed = false,
   });
 
   @override
@@ -32,6 +34,7 @@ class ScrappablesGridView extends ConsumerStatefulWidget {
 
 class _ScrappablesGridViewState extends ConsumerState<ScrappablesGridView> {
   int? _selectedCardIndex;
+  bool _wasLoadMoreFailed = false;
 
   String _getScopeExplanation(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -70,6 +73,34 @@ class _ScrappablesGridViewState extends ConsumerState<ScrappablesGridView> {
         }
       }
     });
+  }
+
+  @override
+  void didUpdateWidget(covariant ScrappablesGridView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Show snackbar when load more fails
+    if (widget.loadMoreFailed && !_wasLoadMoreFailed) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          final l10n = AppLocalizations.of(context)!;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.api_analytics_load_more_failed),
+              action: SnackBarAction(
+                label: l10n.api_analytics_retry,
+                onPressed: () {
+                  ref.read(analyticsProvider.notifier).clearLoadMoreError();
+                  ref.read(analyticsProvider.notifier).loadMoreAnalytics();
+                },
+              ),
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 5),
+            ),
+          );
+        }
+      });
+    }
+    _wasLoadMoreFailed = widget.loadMoreFailed;
   }
 
   void _scrollToSelectedCard() {
@@ -296,6 +327,40 @@ class _ScrappablesGridViewState extends ConsumerState<ScrappablesGridView> {
                         height: ScrappableAnalyticsCard.cardHeight,
                         child: Center(
                           child: CircularProgressIndicator(),
+                        ),
+                      ),
+                    if (widget.loadMoreFailed)
+                      SizedBox(
+                        width: ScrappableAnalyticsCard.cardWidth,
+                        height: ScrappableAnalyticsCard.cardHeight,
+                        child: Card(
+                          child: InkWell(
+                            onTap: () {
+                              ref.read(analyticsProvider.notifier).clearLoadMoreError();
+                              ref.read(analyticsProvider.notifier).loadMoreAnalytics();
+                            },
+                            borderRadius: BorderRadius.circular(12),
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.refresh,
+                                    size: 32,
+                                    color: context.c.error,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    l10n.api_analytics_load_more_failed,
+                                    textAlign: TextAlign.center,
+                                    style: context.t.bodySmall?.copyWith(
+                                      color: context.c.error,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                   ],

@@ -261,6 +261,7 @@
   "api_analytics_copied_to_clipboard": "{label} copie dans le presse-papiers",
   "api_analytics_copy_label": "Copier {label}",
   "api_analytics_expand_more_lines": "Cliquez sur developper pour voir {count}+ lignes supplementaires",
+  "api_analytics_load_more_failed": "Echec du chargement de plus de donnees. Appuyez pour reessayer.",
 
   "api_usage_page_title": "Credits et Cles API",
   "api_usage_refresh": "Actualiser",

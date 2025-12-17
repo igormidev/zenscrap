@@ -173,7 +173,7 @@ class _AnalyticsLoadMoreButton extends ConsumerWidget {
       loading: () => isLoadingMore = false,
       loadingMore: (_) => isLoadingMore = true,
       emptyData: () => isLoadingMore = false,
-      withData: (_) => isLoadingMore = false,
+      withData: (_, loadMoreFailed) => isLoadingMore = false,
       withError: (_) => isLoadingMore = false,
     );
 
