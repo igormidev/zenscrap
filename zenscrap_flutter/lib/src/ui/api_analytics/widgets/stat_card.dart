@@ -18,27 +18,28 @@ class StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final card = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: color.withAlpha(30),
-        borderRadius: BorderRadius.circular(8),
+        color: color.withAlpha(18),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: color.withAlpha(100),
+          color: color.withAlpha(50),
         ),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             count.toString(),
             style: context.t.titleMedium?.copyWith(
-              color: color,
+              color: color.withAlpha(230),
               fontWeight: FontWeight.bold,
             ),
           ),
           Text(
             label,
             style: context.t.bodySmall?.copyWith(
-              color: color,
+              color: color.withAlpha(200),
             ),
           ),
         ],

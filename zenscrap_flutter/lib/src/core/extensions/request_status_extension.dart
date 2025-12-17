@@ -2,20 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 
 extension RequestStatusColors on RequestStatus {
+  /// Returns a soft, pastel color for the status.
+  /// These colors are more muted and easier on the eyes while maintaining
+  /// good readability and accessibility.
   Color get color {
     switch (this) {
       case RequestStatus.success:
-        return const Color(0xFF4CAF50); // Green
+        return const Color(0xFF66A675); // Soft sage green
       case RequestStatus.clientError:
-        return const Color(0xFFFF9800); // Orange
+        return const Color(0xFFD4915E); // Soft amber/peach
       case RequestStatus.serverError:
-        return const Color(0xFFF44336); // Red
+        return const Color(0xFFCB7171); // Soft coral/rose
       case RequestStatus.insufficientCredits:
-        return const Color(0xFF9C27B0); // Purple
+        return const Color(0xFF9B7BB8); // Soft lavender
       case RequestStatus.maxConcurrencyExceeded:
-        return const Color(0xFF00BCD4); // Cyan
+        return const Color(0xFF5BA3A8); // Soft teal
       case RequestStatus.failedAtScrappingBee:
-        return const Color(0xFFE91E63); // Pink/Magenta
+        return const Color(0xFFBF7A91); // Soft dusty rose
     }
   }
 

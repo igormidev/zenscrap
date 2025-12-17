@@ -1739,6 +1739,12 @@ class Protocol extends _i1.SerializationManagerServer {
           isNullable: true,
           dartType: 'int?',
         ),
+        _i2.ColumnDefinition(
+          name: 'apiKeyId',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: true,
+          dartType: 'int?',
+        ),
       ],
       foreignKeys: [
         _i2.ForeignKeyDefinition(
@@ -1755,6 +1761,16 @@ class Protocol extends _i1.SerializationManagerServer {
           constraintName: 'scrappable_analytics_fk_1',
           columns: ['detailsId'],
           referenceTable: 'analytics_request_details',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _i2.ForeignKeyAction.noAction,
+          onDelete: _i2.ForeignKeyAction.noAction,
+          matchType: null,
+        ),
+        _i2.ForeignKeyDefinition(
+          constraintName: 'scrappable_analytics_fk_2',
+          columns: ['apiKeyId'],
+          referenceTable: 'account_api_key',
           referenceTableSchema: 'public',
           referenceColumns: ['id'],
           onUpdate: _i2.ForeignKeyAction.noAction,

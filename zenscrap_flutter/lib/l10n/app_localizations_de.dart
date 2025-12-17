@@ -866,6 +866,32 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get api_analytics_subtitle =>
+      'Endpoints you\'ve called in the selected time period';
+
+  @override
+  String get api_analytics_scope_tooltip =>
+      'Shows endpoints you\'ve interacted with during this time period';
+
+  @override
+  String get api_analytics_badge_yours => 'Yours';
+
+  @override
+  String get api_analytics_badge_marketplace => 'Marketplace';
+
+  @override
+  String get api_analytics_api_key_label => 'API Key:';
+
+  @override
+  String get api_analytics_api_key_deleted => 'API Key (deleted)';
+
+  @override
+  String get api_analytics_api_key_copied => 'API key copied to clipboard';
+
+  @override
+  String get api_analytics_copy_button => 'Copy';
+
+  @override
   String get api_usage_page_title => 'API-Guthaben & Schluessel';
 
   @override

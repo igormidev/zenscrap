@@ -1597,6 +1597,54 @@ abstract class AppLocalizations {
   /// **'Click expand to see {count}+ more lines'**
   String api_analytics_expand_more_lines(int count);
 
+  /// Subtitle explaining what endpoints are shown
+  ///
+  /// In en, this message translates to:
+  /// **'Endpoints you\'ve called in the selected time period'**
+  String get api_analytics_subtitle;
+
+  /// Tooltip for time scope selector
+  ///
+  /// In en, this message translates to:
+  /// **'Shows endpoints you\'ve interacted with during this time period'**
+  String get api_analytics_scope_tooltip;
+
+  /// Badge label for user's own endpoints
+  ///
+  /// In en, this message translates to:
+  /// **'Yours'**
+  String get api_analytics_badge_yours;
+
+  /// Badge label for marketplace endpoints
+  ///
+  /// In en, this message translates to:
+  /// **'Marketplace'**
+  String get api_analytics_badge_marketplace;
+
+  /// Label for API key in analytics details
+  ///
+  /// In en, this message translates to:
+  /// **'API Key:'**
+  String get api_analytics_api_key_label;
+
+  /// Placeholder shown when API key was deleted
+  ///
+  /// In en, this message translates to:
+  /// **'API Key (deleted)'**
+  String get api_analytics_api_key_deleted;
+
+  /// Snackbar message when API key is copied
+  ///
+  /// In en, this message translates to:
+  /// **'API key copied to clipboard'**
+  String get api_analytics_api_key_copied;
+
+  /// Copy button label
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get api_analytics_copy_button;
+
   /// Main title for API usage page
   ///
   /// In en, this message translates to:

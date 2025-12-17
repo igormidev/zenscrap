@@ -43,60 +43,64 @@ class ScopeSelectorDropdown extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentScope = ref.watch(analyticsProvider.notifier).currentScope;
+    final l10n = AppLocalizations.of(context)!;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      height: 43,
-      decoration: BoxDecoration(
-        color: context.c.surfaceContainerHighest.withAlpha(50),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: context.c.outline.withAlpha(50),
+    return Tooltip(
+      message: l10n.api_analytics_scope_tooltip,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        height: 43,
+        decoration: BoxDecoration(
+          color: context.c.surfaceContainerHighest.withAlpha(50),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: context.c.outline.withAlpha(50),
+          ),
         ),
-      ),
-      child: DropdownButton<AnalyticsTimeScope>(
-        value: currentScope,
-        underline: const SizedBox.shrink(),
-        icon: Icon(
-          Icons.arrow_drop_down,
-          color: context.c.onSurface,
-        ),
-        dropdownColor: context.c.surface,
-        borderRadius: BorderRadius.circular(12),
-        items: AnalyticsTimeScope.values.map((scope) {
-          return DropdownMenuItem<AnalyticsTimeScope>(
-            value: scope,
-            child: Row(
-              children: [
-                Icon(
-                  _getScopeIcon(scope),
-                  size: 18,
-                  color: context.c.primary,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  _getScopeLabel(context, scope),
-                  style: context.t.labelLarge?.copyWith(
-                    color: context.c.onSurface,
+        child: DropdownButton<AnalyticsTimeScope>(
+          value: currentScope,
+          underline: const SizedBox.shrink(),
+          icon: Icon(
+            Icons.arrow_drop_down,
+            color: context.c.onSurface,
+          ),
+          dropdownColor: context.c.surface,
+          borderRadius: BorderRadius.circular(12),
+          items: AnalyticsTimeScope.values.map((scope) {
+            return DropdownMenuItem<AnalyticsTimeScope>(
+              value: scope,
+              child: Row(
+                children: [
+                  Icon(
+                    _getScopeIcon(scope),
+                    size: 18,
+                    color: context.c.primary,
                   ),
-                ),
-              ],
-            ),
-          );
-        }).toList(),
-        onChanged: (AnalyticsTimeScope? newScope) {
-          if (newScope != null) {
-            // Track time scope change
-            ref.read(analyticsServiceProvider).trackApiAnalyticsTimeScopeChange(
-              fromScope: currentScope.name,
-              toScope: newScope.name,
+                  const SizedBox(width: 8),
+                  Text(
+                    _getScopeLabel(context, scope),
+                    style: context.t.labelLarge?.copyWith(
+                      color: context.c.onSurface,
+                    ),
+                  ),
+                ],
+              ),
             );
+          }).toList(),
+          onChanged: (AnalyticsTimeScope? newScope) {
+            if (newScope != null) {
+              // Track time scope change
+              ref.read(analyticsServiceProvider).trackApiAnalyticsTimeScopeChange(
+                fromScope: currentScope.name,
+                toScope: newScope.name,
+              );
 
-            ref
-                .read(analyticsProvider.notifier)
-                .getAnalyticsData(scope: newScope);
-          }
-        },
+              ref
+                  .read(analyticsProvider.notifier)
+                  .getAnalyticsData(scope: newScope);
+            }
+          },
+        ),
       ),
     );
   }

@@ -23,10 +23,20 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
     final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
       session,
       where: (t) => t.userInfoId.equals(userId),
+      include: AccountInfo.include(
+        accountApiUsage: AccountApiUsage.include(),
+      ),
     );
     if (accountInfo == null) {
       throw _accountNotFoundForUser(language);
     }
+
+    // Get the user's nanoId from their AccountApiUsage
+    final userNanoId = accountInfo.accountApiUsage?.nanoId;
+    if (userNanoId == null) {
+      throw _accountNotFoundForUser(language);
+    }
+
     final now = DateTime.now();
 
     // Calculate time scopes based on selected scope
@@ -55,22 +65,35 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
         break;
     }
 
-    // Get total count of ALL scrappables for this account
-    final totalCount = await Scrappable.db.count(
+    // Find all unique scrappableIds that this user has interacted with
+    // by querying analytics records with their nanoId
+    final analyticsWithUserInteraction = await ScrappableAnalytics.db.find(
       session,
-      where: (t) => t.accountId.equals(accountInfo.id),
+      where: (t) => t.attachedNanoId.equals(userNanoId),
+      include: ScrappableAnalytics.include(
+        scrappable: Scrappable.include(),
+      ),
     );
 
+    // Extract unique scrappables from the analytics records
+    final Map<int, Scrappable> uniqueScrappablesMap = {};
+    for (final analytics in analyticsWithUserInteraction) {
+      final scrappable = analytics.scrappable;
+      if (scrappable != null && scrappable.id != null && !scrappable.isDeleted) {
+        uniqueScrappablesMap[scrappable.id!] = scrappable;
+      }
+    }
+
+    // Get total count of unique scrappables user has interacted with
+    final totalCount = uniqueScrappablesMap.length;
+
     final offset = (page - 1) * pageSize;
-    // Get ALL scrappables, not just those with recent analytics
-    final List<Scrappable> scrappables = await Scrappable.db.find(
-      session,
-      where: (t) => t.accountId.equals(accountInfo.id),
-      limit: pageSize,
-      offset: offset,
-      orderBy: (t) => t.id,
-      orderDescending: false,
-    );
+
+    // Get paginated list of scrappables
+    final allScrappableIds = uniqueScrappablesMap.keys.toList()..sort();
+    final paginatedIds = allScrappableIds.skip(offset).take(pageSize).toList();
+    final List<Scrappable> scrappables =
+        paginatedIds.map((id) => uniqueScrappablesMap[id]!).toList();
 
     final List<ScrappableRequestsAnalyticsItem> items = [];
 
@@ -165,34 +188,60 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
     final AccountInfo? accountInfo = await AccountInfo.db.findFirstRow(
       session,
       where: (t) => t.userInfoId.equals(userId),
+      include: AccountInfo.include(
+        accountApiUsage: AccountApiUsage.include(),
+      ),
     );
     if (accountInfo == null) {
       throw _accountNotFoundForUser(language);
     }
 
-    // Verify scrappable ownership
+    // Get the user's nanoId from their AccountApiUsage
+    final userNanoId = accountInfo.accountApiUsage?.nanoId;
+    if (userNanoId == null) {
+      throw _accountNotFoundForUser(language);
+    }
+
+    // Verify scrappable exists
     final scrappable = await Scrappable.db.findById(session, scrappableId);
-    if (scrappable == null || scrappable.accountId != accountInfo.id) {
+    if (scrappable == null) {
+      throw _scrappableNotFoundOrNoAccess(language);
+    }
+
+    // Verify user has interacted with this scrappable (has analytics records with their nanoId)
+    final hasInteraction = await ScrappableAnalytics.db.count(
+      session,
+      where: (t) =>
+          t.scrappableId.equals(scrappableId) &
+          t.attachedNanoId.equals(userNanoId),
+      limit: 1,
+    );
+    if (hasInteraction == 0) {
       throw _scrappableNotFoundOrNoAccess(language);
     }
 
     final now = DateTime.now();
     final targetDate = now.subtract(Duration(days: daysBack));
 
-    // Get total count for pagination
+    // Get total count for pagination - only count analytics from this user
     final totalCount = await ScrappableAnalytics.db.count(
       session,
       where: (t) =>
-          t.scrappableId.equals(scrappableId) & (t.requestedAt >= targetDate),
+          t.scrappableId.equals(scrappableId) &
+          t.attachedNanoId.equals(userNanoId) &
+          (t.requestedAt >= targetDate),
     );
 
     final offset = (page - 1) * pageSize;
 
     // Fetch paginated analytics with includes for better performance
+    // Only fetch analytics from this user
     final analytics = await ScrappableAnalytics.db.find(
       session,
       where: (t) =>
-          t.scrappableId.equals(scrappableId) & (t.requestedAt >= targetDate),
+          t.scrappableId.equals(scrappableId) &
+          t.attachedNanoId.equals(userNanoId) &
+          (t.requestedAt >= targetDate),
       limit: pageSize,
       offset: offset,
       orderBy: (t) => t.requestedAt,
@@ -200,6 +249,7 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
       include: ScrappableAnalytics.include(
         scrappable: Scrappable.include(),
         details: AnalyticsRequestDetails.include(),
+        apiKey: AccountApiKey.include(),
       ),
     );
 

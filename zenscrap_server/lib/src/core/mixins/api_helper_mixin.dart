@@ -959,6 +959,12 @@ Future<void> _setScrappableAnalytics(
       throw _noCreditUsageModelFound(apiKey);
     }
 
+    // Fetch the AccountApiKey entity to link it to the analytics record
+    final accountApiKey = await AccountApiKey.db.findFirstRow(
+      session,
+      where: (t) => t.apiKey.equals(apiKey) & t.isActive.equals(true),
+    );
+
     await session.db.transaction((transaction) async {
       final newCredit = credit.copyWith(
         subscriptionCredits:
@@ -985,7 +991,7 @@ Future<void> _setScrappableAnalytics(
         transaction: transaction,
       );
 
-      // Then create ScrappableAnalytics with detailsId set
+      // Then create ScrappableAnalytics with detailsId and apiKeyId set
       final analytics = await ScrappableAnalytics.db.insert(
           session,
           List.generate(items.length, (i) {
@@ -997,6 +1003,7 @@ Future<void> _setScrappableAnalytics(
               attachedApiKey: apiKey,
               attachedNanoId: nanoId,
               detailsId: detailsList[i].id,
+              apiKeyId: accountApiKey?.id,
             );
           }),
           transaction: transaction);

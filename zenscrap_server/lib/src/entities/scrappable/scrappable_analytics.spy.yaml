@@ -7,6 +7,7 @@ fields:
   attachedApiKey: String
   scrappable: Scrappable?, relation(name=scrappable_analytics)
   details: AnalyticsRequestDetails?, relation(optional)
+  apiKey: AccountApiKey?, relation(optional)
 
 indexes:
   scrappable_analytics_attached_nanoid_idx:

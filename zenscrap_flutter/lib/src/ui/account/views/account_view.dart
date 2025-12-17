@@ -30,8 +30,9 @@ class AccountView extends ConsumerWidget {
     final accountInfo = ref
         .watch(accountProvider)
         .mapOrNull(withData: (value) => value.accountInfo);
-    final session =
-        ref.watch(sessionProvider).mapOrNull(logged: (value) => value);
+    final session = ref
+        .watch(sessionProvider)
+        .mapOrNull(logged: (value) => value);
     if (accountInfo == null || session == null) {
       return SizedBox.fromSize();
     }
@@ -52,12 +53,16 @@ class AccountView extends ConsumerWidget {
               child: ListView(
                 children: [
                   const SizedBox(height: 60),
-                  Text(AppLocalizations.of(context)!.account_title,
-                      style: Theme.of(context).textTheme.displayMedium),
+                  Text(
+                    AppLocalizations.of(context)!.account_title,
+                    style: Theme.of(context).textTheme.displayMedium,
+                  ),
                   const SizedBox(height: 24),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 16),
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
@@ -72,24 +77,32 @@ class AccountView extends ConsumerWidget {
                         UserEditableProfileImage(user: user),
                         const SizedBox(height: 20),
                         Text(
-                          AppLocalizations.of(context)!.account_information_title,
+                          AppLocalizations.of(
+                            context,
+                          )!.account_information_title,
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                         const SizedBox(height: 16),
                         AccountDisplayTime(
-                          title: AppLocalizations.of(context)!.account_user_name_label,
+                          title: AppLocalizations.of(
+                            context,
+                          )!.account_user_name_label,
                           content: session.user.userName,
                           analytics: analytics,
                         ),
                         const SizedBox(height: 16),
                         AccountDisplayTime(
-                          title: AppLocalizations.of(context)!.account_email_label,
+                          title: AppLocalizations.of(
+                            context,
+                          )!.account_email_label,
                           content: session.user.email,
                           analytics: analytics,
                         ),
                         const SizedBox(height: 16),
                         AccountDisplayTime(
-                          title: AppLocalizations.of(context)!.account_subscription_plan_label,
+                          title: AppLocalizations.of(
+                            context,
+                          )!.account_subscription_plan_label,
                           content: accountInfo.planTier.displayName,
                           analytics: analytics,
                         ),
@@ -107,13 +120,7 @@ class AccountView extends ConsumerWidget {
             ),
             const SizedBox(width: 24),
             // Theme Customization Column
-            Expanded(
-              child: ListView(
-                children: [
-                  _ThemeCustomizationSection(),
-                ],
-              ),
-            ),
+            Expanded(child: ListView(children: [_ThemeCustomizationSection()])),
           ],
         ),
       ),
@@ -153,17 +160,15 @@ class AccountDisplayTime extends StatelessWidget {
                 child: Text(
                   content,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: context.c.primary,
-                        fontWeight: FontWeight.w500,
-                      ),
+                    color: context.c.primary,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
               IconButton(
                 onPressed: () async {
                   final textToCopy = copyText ?? content;
-                  await Clipboard.setData(
-                    ClipboardData(text: textToCopy),
-                  );
+                  await Clipboard.setData(ClipboardData(text: textToCopy));
 
                   // Track copy action
                   await analytics.trackAccountInfoCopy(
@@ -270,10 +275,7 @@ class _ThemeCard extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: context.c.outline.withAlpha(51),
-          width: 1,
-        ),
+        border: Border.all(color: context.c.outline.withAlpha(51), width: 1),
         color: context.c.surfaceContainerLowest.withAlpha(100),
       ),
       child: Column(
@@ -287,11 +289,7 @@ class _ThemeCard extends StatelessWidget {
                   color: context.c.primaryContainer,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(
-                  icon,
-                  color: context.c.primary,
-                  size: 22,
-                ),
+                child: Icon(icon, color: context.c.primary, size: 22),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -301,15 +299,15 @@ class _ThemeCard extends StatelessWidget {
                     Text(
                       title,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       subtitle,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: context.c.onSurfaceVariant,
-                          ),
+                        color: context.c.onSurfaceVariant,
+                      ),
                     ),
                   ],
                 ),
@@ -351,15 +349,17 @@ class _ColorPaletteGrid extends StatelessWidget {
       crossAxisSpacing: 10,
       padding: EdgeInsets.zero,
       physics: const NeverScrollableScrollPhysics(),
-      children: colors.map((color) {
-        // ignore: deprecated_member_use
-        final isSelected = color.value == selectedColor.value;
-        return ColorOption(
-          color: color,
-          isSelected: isSelected,
-          onTap: () => onColorSelected(color),
-        );
-      }).toList(growable: false),
+      children: colors
+          .map((color) {
+            // ignore: deprecated_member_use
+            final isSelected = color.value == selectedColor.value;
+            return ColorOption(
+              color: color,
+              isSelected: isSelected,
+              onTap: () => onColorSelected(color),
+            );
+          })
+          .toList(growable: false),
     );
   }
 }
