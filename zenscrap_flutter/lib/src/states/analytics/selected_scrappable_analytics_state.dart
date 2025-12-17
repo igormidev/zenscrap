@@ -17,6 +17,6 @@ abstract class SelectedScrappableAnalyticsState
     required PaginatedScrappableAnalytics data,
   }) = _SelectedScrappableAnalyticsStateWithData;
   factory SelectedScrappableAnalyticsState.withError({
-    required String error,
+    required ZenScrapException error,
   }) = _SelectedScrappableAnalyticsStateWithError;
 }

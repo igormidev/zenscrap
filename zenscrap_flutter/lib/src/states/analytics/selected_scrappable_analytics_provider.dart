@@ -36,7 +36,12 @@ class SelectedScrappableAnalyticsNotifier
       state = SelectedScrappableAnalyticsState.withData(data: result);
     } catch (error) {
       state = SelectedScrappableAnalyticsState.withError(
-        error: error.toString(),
+        error: error is ZenScrapException
+            ? error
+            : ZenScrapException(
+                title: 'Error',
+                description: error.toString(),
+              ),
       );
     }
   }

@@ -224,7 +224,7 @@ class _LoadMoreSection extends ConsumerWidget {
 }
 
 class _AnalyticsErrorState extends ConsumerWidget {
-  final String error;
+  final ZenScrapException error;
 
   const _AnalyticsErrorState({
     required this.error,
@@ -244,14 +244,14 @@ class _AnalyticsErrorState extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            l10n.api_analytics_error_loading,
+            error.title,
             style: context.t.headlineSmall?.copyWith(
               color: context.c.error,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            error,
+            error.description,
             style: context.t.bodyMedium?.copyWith(
               color: context.c.onSurface.withAlpha(150),
             ),
