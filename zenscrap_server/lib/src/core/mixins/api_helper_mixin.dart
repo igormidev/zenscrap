@@ -15,6 +15,38 @@ import 'package:zenscrap_server/src/notifications/auto_fix_notification_service.
 
 typedef ApiKey = String;
 typedef NanoId = String;
+typedef ScrappableId = int;
+
+/// Wrapper class for cache entries with timestamp tracking for TTL-based eviction.
+class _CacheEntry<T> {
+  final T value;
+  final DateTime createdAt;
+
+  _CacheEntry(this.value) : createdAt = DateTime.now();
+
+  /// Checks if this cache entry has expired based on the given max age.
+  bool isExpired(Duration maxAge) {
+    return DateTime.now().difference(createdAt) > maxAge;
+  }
+}
+
+/// Configuration constants for cache management.
+class _CacheConfig {
+  /// Maximum age for nanoId-related cache entries (30 minutes).
+  /// This covers plan tier, credit usage, API keys, etc.
+  static const Duration nanoIdCacheMaxAge = Duration(minutes: 30);
+
+  /// Maximum age for scrappable cache entries (1 hour).
+  /// Scrappables change less frequently but should still be refreshed.
+  static const Duration scrappableCacheMaxAge = Duration(hours: 1);
+
+  /// Maximum number of entries in scrappables cache before forced eviction.
+  /// This prevents unbounded growth even if cleanup doesn't run.
+  static const int maxScrappableCacheSize = 500;
+
+  /// Maximum number of nanoIds to track before forced eviction of oldest entries.
+  static const int maxNanoIdCacheSize = 1000;
+}
 
 /// Replaces placeholder patterns {paramName} in a string with actual values from the payload
 String replacePlaceholders(String? input, Map<String, dynamic> payload) {
@@ -55,16 +87,90 @@ ScrappingBeeExtractLogic replaceExtractLogicPlaceholders(
 }
 
 mixin ApiHelperMixin {
+  // Concurrency tracking - self-cleans when count reaches 0 (see decreaseConcurrency)
   static final Map<NanoId, int> _currentConcurrencyRequests = {};
-  static final Map<NanoId, PlanTier> _currentAccountPlanTierCache = {};
-  static final Map<NanoId, CreditUsage> _currentCreditUsage = {};
-  static final Map<NanoId, int> _remainingSubscriptionCredits = {};
-  static final Map<NanoId, int> _remainingPurchasedCredits = {};
-  static final Map<NanoId, List<ApiKey>> _apiKeysAttachedToNanoId = {};
-  static final Map<NanoId, List<ScrappableId>> _allowedScrappableIdsToUse = {};
-  static final Map<ScrappableId, Scrappable> _scrappables = {};
+
+  // NanoId-keyed caches with TTL tracking
+  static final Map<NanoId, _CacheEntry<PlanTier>> _currentAccountPlanTierCache =
+      {};
+  static final Map<NanoId, _CacheEntry<CreditUsage>> _currentCreditUsage = {};
+  static final Map<NanoId, _CacheEntry<int>> _remainingSubscriptionCredits = {};
+  static final Map<NanoId, _CacheEntry<int>> _remainingPurchasedCredits = {};
+  static final Map<NanoId, _CacheEntry<List<ApiKey>>> _apiKeysAttachedToNanoId =
+      {};
+  static final Map<NanoId, _CacheEntry<List<ScrappableId>>>
+      _allowedScrappableIdsToUse = {};
+
+  // Scrappable cache with TTL tracking
+  static final Map<ScrappableId, _CacheEntry<Scrappable>> _scrappables = {};
+
+  // Pending analytics - cleared by PeriodicSetRequestsAnalytics FutureCall
   static final Map<ScrappableId,
       Map<NanoId, Map<ApiKey, List<AnalyticsPayload>>>> _pendingAnalytics = {};
+
+  /// Cleans up expired cache entries. Called periodically by PeriodicCacheCleanup.
+  static void cleanupExpiredCacheEntries() {
+    final nanoIdMaxAge = _CacheConfig.nanoIdCacheMaxAge;
+    final scrappableMaxAge = _CacheConfig.scrappableCacheMaxAge;
+
+    // Cleanup nanoId-keyed caches
+    _currentAccountPlanTierCache
+        .removeWhere((_, entry) => entry.isExpired(nanoIdMaxAge));
+    _currentCreditUsage
+        .removeWhere((_, entry) => entry.isExpired(nanoIdMaxAge));
+    _remainingSubscriptionCredits
+        .removeWhere((_, entry) => entry.isExpired(nanoIdMaxAge));
+    _remainingPurchasedCredits
+        .removeWhere((_, entry) => entry.isExpired(nanoIdMaxAge));
+    _apiKeysAttachedToNanoId
+        .removeWhere((_, entry) => entry.isExpired(nanoIdMaxAge));
+    _allowedScrappableIdsToUse
+        .removeWhere((_, entry) => entry.isExpired(nanoIdMaxAge));
+
+    // Cleanup scrappable cache
+    _scrappables.removeWhere((_, entry) => entry.isExpired(scrappableMaxAge));
+
+    // Cleanup stale concurrency entries (should not normally have entries
+    // stuck, but this is a safety net)
+    _currentConcurrencyRequests.removeWhere((_, count) => count <= 0);
+  }
+
+  /// Enforces maximum cache sizes by evicting oldest entries.
+  /// Called when adding new entries to prevent unbounded growth.
+  static void _enforceNanoIdCacheSize(NanoId newNanoId) {
+    if (_currentAccountPlanTierCache.length >= _CacheConfig.maxNanoIdCacheSize) {
+      // Find and remove the oldest entry (excluding the new one being added)
+      _evictOldestEntry(_currentAccountPlanTierCache, exclude: newNanoId);
+    }
+  }
+
+  /// Enforces maximum scrappable cache size.
+  static void _enforceScrappableCacheSize(ScrappableId newId) {
+    if (_scrappables.length >= _CacheConfig.maxScrappableCacheSize) {
+      _evictOldestEntry(_scrappables, exclude: newId);
+    }
+  }
+
+  /// Evicts the oldest entry from a cache map.
+  static void _evictOldestEntry<K, V>(Map<K, _CacheEntry<V>> cache,
+      {K? exclude}) {
+    if (cache.isEmpty) return;
+
+    K? oldestKey;
+    DateTime? oldestTime;
+
+    for (final entry in cache.entries) {
+      if (entry.key == exclude) continue;
+      if (oldestTime == null || entry.value.createdAt.isBefore(oldestTime)) {
+        oldestKey = entry.key;
+        oldestTime = entry.value.createdAt;
+      }
+    }
+
+    if (oldestKey != null) {
+      cache.remove(oldestKey);
+    }
+  }
 
   static void resetNanoId(NanoId nanoId) {
     _allowedScrappableIdsToUse.remove(nanoId);
@@ -82,7 +188,13 @@ mixin ApiHelperMixin {
     ScrappableId scrappableId,
     ApiKey? apiKey,
   ) async {
-    final Scrappable? cacheScrappable = _scrappables[scrappableId];
+    // Get cached scrappable value (if not expired)
+    final scrappableCacheEntry = _scrappables[scrappableId];
+    final Scrappable? cacheScrappable =
+        scrappableCacheEntry?.isExpired(_CacheConfig.scrappableCacheMaxAge) == false
+            ? scrappableCacheEntry?.value
+            : null;
+
     String? nanoId;
     if (apiKey != null) {
       final splitted = apiKey.split('::');
@@ -90,8 +202,13 @@ mixin ApiHelperMixin {
       nanoId = splitted[0];
     }
 
-    PlanTier? cachePlanTier =
+    // Get cached plan tier (if not expired)
+    final planTierCacheEntry =
         nanoId == null ? null : _currentAccountPlanTierCache[nanoId];
+    PlanTier? cachePlanTier =
+        planTierCacheEntry?.isExpired(_CacheConfig.nanoIdCacheMaxAge) == false
+            ? planTierCacheEntry?.value
+            : null;
 
     if (apiKey == null && cacheScrappable != null) {
       return (
@@ -101,14 +218,27 @@ mixin ApiHelperMixin {
       );
     }
     if (apiKey != null && nanoId != null) {
+      // Check if all cached values are valid (not expired)
+      final creditUsageEntry = _currentCreditUsage[nanoId];
+      final apiKeysEntry = _apiKeysAttachedToNanoId[nanoId];
+      final allowedScrappablesEntry = _allowedScrappableIdsToUse[nanoId];
+
+      final creditUsageValid =
+          creditUsageEntry?.isExpired(_CacheConfig.nanoIdCacheMaxAge) == false;
+      final apiKeysValid =
+          apiKeysEntry?.isExpired(_CacheConfig.nanoIdCacheMaxAge) == false;
+      final allowedScrappablesValid =
+          allowedScrappablesEntry?.isExpired(_CacheConfig.nanoIdCacheMaxAge) ==
+              false;
+
       if (cachePlanTier != null &&
-          _currentCreditUsage.containsKey(nanoId) &&
-          _apiKeysAttachedToNanoId[nanoId]?.contains(apiKey) == true &&
-          _allowedScrappableIdsToUse[nanoId]?.contains(scrappableId) == true &&
+          creditUsageValid &&
+          apiKeysValid &&
+          apiKeysEntry!.value.contains(apiKey) &&
+          allowedScrappablesValid &&
+          allowedScrappablesEntry!.value.contains(scrappableId) &&
           cacheScrappable != null &&
           _pendingAnalytics[scrappableId]?[nanoId]?[apiKey] != null) {
-        final cachePlanTier = _currentAccountPlanTierCache[nanoId];
-        if (cachePlanTier == null) throw _invalidApiKey();
         return (
           nanoId: nanoId,
           scrappable: cacheScrappable,
@@ -133,8 +263,12 @@ mixin ApiHelperMixin {
           accountInfo?.accountApiUsage?.creditUsage;
       if (newPlanTier == null) throw _invalidApiKey();
       if (creditUsage == null) throw _invalidApiKey();
-      _currentAccountPlanTierCache[nanoId] = newPlanTier;
-      _currentCreditUsage[nanoId] = creditUsage;
+
+      // Enforce cache size limits before adding new entries
+      _enforceNanoIdCacheSize(nanoId);
+
+      _currentAccountPlanTierCache[nanoId] = _CacheEntry(newPlanTier);
+      _currentCreditUsage[nanoId] = _CacheEntry(creditUsage);
       cachePlanTier = newPlanTier;
     }
 
@@ -168,15 +302,22 @@ mixin ApiHelperMixin {
       throw _noScrappableFound(scrappableId.toString());
     }
 
-    _scrappables[scrappableId] = scrappable;
+    // Enforce cache size limit before adding new entry
+    _enforceScrappableCacheSize(scrappableId);
+    _scrappables[scrappableId] = _CacheEntry(scrappable);
 
     if (nanoId != null && apiKey != null) {
       _pendingAnalytics[scrappableId]?[nanoId]?[apiKey] ??= [];
-      if (_allowedScrappableIdsToUse[nanoId] == null) {
-        _allowedScrappableIdsToUse[nanoId] = [scrappableId];
-      } else if (!_allowedScrappableIdsToUse[nanoId]!.contains(scrappableId)) {
-        _allowedScrappableIdsToUse[nanoId]!.add(scrappableId);
+
+      // Update allowed scrappable IDs cache
+      final existingAllowedEntry = _allowedScrappableIdsToUse[nanoId];
+      if (existingAllowedEntry == null ||
+          existingAllowedEntry.isExpired(_CacheConfig.nanoIdCacheMaxAge)) {
+        _allowedScrappableIdsToUse[nanoId] = _CacheEntry([scrappableId]);
+      } else if (!existingAllowedEntry.value.contains(scrappableId)) {
+        existingAllowedEntry.value.add(scrappableId);
       }
+
       if (!_pendingAnalytics.containsKey(scrappableId)) {
         _pendingAnalytics[scrappableId] = {};
       }
@@ -186,10 +327,14 @@ mixin ApiHelperMixin {
       if (!_pendingAnalytics[scrappableId]![nanoId]!.containsKey(apiKey)) {
         _pendingAnalytics[scrappableId]![nanoId]![apiKey] = [];
       }
-      if (_apiKeysAttachedToNanoId[nanoId] == null) {
-        _apiKeysAttachedToNanoId[nanoId] = [apiKey];
-      } else if (!_apiKeysAttachedToNanoId[nanoId]!.contains(apiKey)) {
-        _apiKeysAttachedToNanoId[nanoId]!.add(apiKey);
+
+      // Update API keys cache
+      final existingApiKeysEntry = _apiKeysAttachedToNanoId[nanoId];
+      if (existingApiKeysEntry == null ||
+          existingApiKeysEntry.isExpired(_CacheConfig.nanoIdCacheMaxAge)) {
+        _apiKeysAttachedToNanoId[nanoId] = _CacheEntry([apiKey]);
+      } else if (!existingApiKeysEntry.value.contains(apiKey)) {
+        existingApiKeysEntry.value.add(apiKey);
       }
     }
 
@@ -274,8 +419,19 @@ mixin ApiHelperMixin {
     required int creditCost,
   }) async {
     if (nanoId == null) return;
-    final subscriptionCredits = _remainingSubscriptionCredits[nanoId];
-    final purchasedCredits = _remainingPurchasedCredits[nanoId];
+
+    // Get cached values, checking for expiration
+    final subscriptionEntry = _remainingSubscriptionCredits[nanoId];
+    final purchasedEntry = _remainingPurchasedCredits[nanoId];
+
+    final subscriptionCredits =
+        subscriptionEntry?.isExpired(_CacheConfig.nanoIdCacheMaxAge) == false
+            ? subscriptionEntry?.value
+            : null;
+    final purchasedCredits =
+        purchasedEntry?.isExpired(_CacheConfig.nanoIdCacheMaxAge) == false
+            ? purchasedEntry?.value
+            : null;
 
     if (subscriptionCredits == null || purchasedCredits == null) {
       // Let's get the most updated value from data base
@@ -290,11 +446,11 @@ mixin ApiHelperMixin {
         throw _noApiFound();
       }
 
-      _currentCreditUsage[nanoId] = accountApiUsage.creditUsage!;
+      _currentCreditUsage[nanoId] = _CacheEntry(accountApiUsage.creditUsage!);
       _remainingPurchasedCredits[nanoId] =
-          accountApiUsage.creditUsage!.purchasedCredits;
+          _CacheEntry(accountApiUsage.creditUsage!.purchasedCredits);
       _remainingSubscriptionCredits[nanoId] =
-          accountApiUsage.creditUsage!.subscriptionCredits;
+          _CacheEntry(accountApiUsage.creditUsage!.subscriptionCredits);
       return discountApiTokens(session, nanoId: nanoId, creditCost: creditCost);
     }
 
@@ -306,26 +462,30 @@ mixin ApiHelperMixin {
 
     // First, try to deduct from subscription credits
     if (subscriptionCredits >= creditCost) {
+      final currentEntry = _remainingSubscriptionCredits[nanoId];
+      final currentValue = currentEntry?.value ?? subscriptionCredits;
       _remainingSubscriptionCredits[nanoId] =
-          (_remainingSubscriptionCredits[nanoId] ?? subscriptionCredits) -
-              creditCost;
+          _CacheEntry(currentValue - creditCost);
       return;
     }
 
     // If subscription credits are not enough, use them all and deduct the rest from purchased credits
     if (subscriptionCredits > 0) {
       final remainingCost = creditCost - subscriptionCredits;
-      _remainingSubscriptionCredits[nanoId] = 0;
+      _remainingSubscriptionCredits[nanoId] = _CacheEntry(0);
+      final currentPurchasedEntry = _remainingPurchasedCredits[nanoId];
+      final currentPurchasedValue =
+          currentPurchasedEntry?.value ?? purchasedCredits;
       _remainingPurchasedCredits[nanoId] =
-          (_remainingPurchasedCredits[nanoId] ?? purchasedCredits) -
-              remainingCost;
+          _CacheEntry(currentPurchasedValue - remainingCost);
       return;
     }
 
     // No subscription credits, deduct all from purchased credits
     if (purchasedCredits >= creditCost) {
-      _remainingPurchasedCredits[nanoId] =
-          (_remainingPurchasedCredits[nanoId] ?? purchasedCredits) - creditCost;
+      final currentEntry = _remainingPurchasedCredits[nanoId];
+      final currentValue = currentEntry?.value ?? purchasedCredits;
+      _remainingPurchasedCredits[nanoId] = _CacheEntry(currentValue - creditCost);
       return;
     }
 
@@ -353,7 +513,11 @@ mixin ApiHelperMixin {
   }
 
   bool checkIdApiKeyExists(NanoId? nanoId, ApiKey? apiKey) {
-    return _apiKeysAttachedToNanoId[nanoId]?.contains(apiKey) ?? false;
+    final entry = _apiKeysAttachedToNanoId[nanoId];
+    if (entry == null || entry.isExpired(_CacheConfig.nanoIdCacheMaxAge)) {
+      return false;
+    }
+    return entry.value.contains(apiKey);
   }
 
   Future<void> garanteeApiKeyExists(
@@ -372,7 +536,13 @@ mixin ApiHelperMixin {
     if (accountApiUsage == null) {
       throw _apiKeyNotFound(apiKey);
     } else {
-      _apiKeysAttachedToNanoId[nanoId] ??= [apiKey];
+      final existingEntry = _apiKeysAttachedToNanoId[nanoId];
+      if (existingEntry == null ||
+          existingEntry.isExpired(_CacheConfig.nanoIdCacheMaxAge)) {
+        _apiKeysAttachedToNanoId[nanoId] = _CacheEntry([apiKey]);
+      } else if (!existingEntry.value.contains(apiKey)) {
+        existingEntry.value.add(apiKey);
+      }
     }
   }
 
@@ -492,8 +662,9 @@ mixin ApiHelperMixin {
   Map<String, dynamic>? _getCreditInfo(NanoId? nanoId, int creditCost) {
     if (nanoId == null) return null;
 
-    final subscriptionCredits = _remainingSubscriptionCredits[nanoId] ?? 0;
-    final purchasedCredits = _remainingPurchasedCredits[nanoId] ?? 0;
+    final subscriptionCredits =
+        _remainingSubscriptionCredits[nanoId]?.value ?? 0;
+    final purchasedCredits = _remainingPurchasedCredits[nanoId]?.value ?? 0;
     final totalCredits = subscriptionCredits + purchasedCredits;
 
     return {
@@ -907,7 +1078,8 @@ class PeriodicSetRequestsAnalytics extends FutureCall {
 
     for (final entry in pendingAnalytics.entries) {
       final scrappableId = entry.key;
-      final scrappable = ApiHelperMixin._scrappables[scrappableId];
+      // Extract actual Scrappable value from cache entry
+      final scrappable = ApiHelperMixin._scrappables[scrappableId]?.value;
       for (final requestEntry in entry.value.entries) {
         final nanoId = requestEntry.key;
         final apiKeys = requestEntry.value;
@@ -933,6 +1105,61 @@ class PeriodicSetRequestsAnalytics extends FutureCall {
       Duration(minutes: 5), // Adjust interval as needed
       identifier: 'periodicSetRequestsAnalytics',
     );
+  }
+}
+
+/// Periodic cleanup for in-memory caches to prevent memory leaks.
+/// This FutureCall runs every 15 minutes and evicts expired cache entries.
+class PeriodicCacheCleanup extends FutureCall {
+  @override
+  Future<void> invoke(Session session, SerializableModel? _) async {
+    try {
+      // Log cache sizes before cleanup for monitoring
+      final beforeSizes = _getCacheSizes();
+
+      // Perform cleanup
+      ApiHelperMixin.cleanupExpiredCacheEntries();
+
+      // Log cache sizes after cleanup
+      final afterSizes = _getCacheSizes();
+
+      session.log(
+        'Cache cleanup completed. '
+        'PlanTier: ${beforeSizes['planTier']} -> ${afterSizes['planTier']}, '
+        'CreditUsage: ${beforeSizes['creditUsage']} -> ${afterSizes['creditUsage']}, '
+        'Scrappables: ${beforeSizes['scrappables']} -> ${afterSizes['scrappables']}, '
+        'ApiKeys: ${beforeSizes['apiKeys']} -> ${afterSizes['apiKeys']}',
+        level: LogLevel.info,
+      );
+    } catch (e, stackTrace) {
+      session.log(
+        'Error during periodic cache cleanup',
+        exception: e,
+        stackTrace: stackTrace,
+        level: LogLevel.error,
+      );
+    }
+
+    // Schedule the next execution in 15 minutes
+    await session.serverpod.futureCallWithDelay(
+      'periodicCacheCleanup',
+      null,
+      const Duration(minutes: 15),
+      identifier: 'periodicCacheCleanup',
+    );
+  }
+
+  Map<String, int> _getCacheSizes() {
+    return {
+      'planTier': ApiHelperMixin._currentAccountPlanTierCache.length,
+      'creditUsage': ApiHelperMixin._currentCreditUsage.length,
+      'scrappables': ApiHelperMixin._scrappables.length,
+      'apiKeys': ApiHelperMixin._apiKeysAttachedToNanoId.length,
+      'subscriptionCredits': ApiHelperMixin._remainingSubscriptionCredits.length,
+      'purchasedCredits': ApiHelperMixin._remainingPurchasedCredits.length,
+      'allowedScrappables': ApiHelperMixin._allowedScrappableIdsToUse.length,
+      'concurrency': ApiHelperMixin._currentConcurrencyRequests.length,
+    };
   }
 }
 
@@ -1159,7 +1386,9 @@ Future<void> _setScrappableAnalytics(
   required List<AnalyticsPayload> items,
 }) async {
   if (scrappable != null && apiKey != null && nanoId != null) {
-    final CreditUsage? credit = ApiHelperMixin._currentCreditUsage[nanoId];
+    // Extract actual CreditUsage value from cache entry
+    final CreditUsage? credit =
+        ApiHelperMixin._currentCreditUsage[nanoId]?.value;
     if (credit == null) {
       session.log(
         'Credit usage not found for nanoId $nanoId when trying to log scrappable analytics',
@@ -1175,10 +1404,12 @@ Future<void> _setScrappableAnalytics(
     );
 
     await session.db.transaction((transaction) async {
+      // Extract actual values from cache entries
       final newCredit = credit.copyWith(
         subscriptionCredits:
-            ApiHelperMixin._remainingSubscriptionCredits[nanoId],
-        purchasedCredits: ApiHelperMixin._remainingPurchasedCredits[nanoId],
+            ApiHelperMixin._remainingSubscriptionCredits[nanoId]?.value,
+        purchasedCredits:
+            ApiHelperMixin._remainingPurchasedCredits[nanoId]?.value,
       );
       await CreditUsage.db
           .updateRow(session, newCredit, transaction: transaction);
