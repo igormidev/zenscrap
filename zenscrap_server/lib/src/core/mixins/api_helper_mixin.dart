@@ -17,6 +17,120 @@ typedef ApiKey = String;
 typedef NanoId = String;
 typedef ScrappableId = int;
 
+/// Configuration constants for API helper operations.
+///
+/// This class centralizes all tunable parameters for caching, analytics,
+/// batch processing, and cleanup operations. Having these as named constants
+/// makes the code self-documenting and simplifies tuning.
+class ApiHelperConfig {
+  ApiHelperConfig._();
+
+  // ============================================================================
+  // CACHE TTL (Time-To-Live) SETTINGS
+  // ============================================================================
+
+  /// Maximum age for nanoId-related cache entries.
+  ///
+  /// This covers plan tier, credit usage, API keys, subscription credits,
+  /// purchased credits, and allowed scrappable IDs. After this duration,
+  /// entries are considered stale and will be refreshed from the database.
+  static const Duration nanoIdCacheMaxAge = Duration(minutes: 30);
+
+  /// Maximum age for scrappable cache entries.
+  ///
+  /// Scrappables (extraction configurations) change less frequently than
+  /// account data, so they have a longer TTL. This reduces database load
+  /// for frequently accessed scrappables.
+  static const Duration scrappableCacheMaxAge = Duration(hours: 1);
+
+  // ============================================================================
+  // CACHE SIZE LIMITS
+  // ============================================================================
+
+  /// Maximum number of entries in scrappables cache before forced eviction.
+  ///
+  /// This prevents unbounded memory growth even if cleanup doesn't run.
+  /// When this limit is reached, the oldest entry is evicted to make room.
+  static const int maxScrappableCacheSize = 500;
+
+  /// Maximum number of nanoIds to track before forced eviction.
+  ///
+  /// Each nanoId can have multiple associated cache entries (plan tier,
+  /// credits, API keys, etc.). This limit ensures memory doesn't grow
+  /// unbounded with many unique users.
+  static const int maxNanoIdCacheSize = 1000;
+
+  // ============================================================================
+  // PERIODIC TASK INTERVALS
+  // ============================================================================
+
+  /// Interval for batching pending analytics writes to database.
+  ///
+  /// Analytics are collected in-memory and written to the database in batches
+  /// to reduce write frequency. Lower values = more frequent writes but less
+  /// data loss on crash. Higher values = fewer writes but more potential data loss.
+  static const Duration analyticsBatchInterval = Duration(minutes: 5);
+
+  /// Interval for cleaning up expired in-memory cache entries.
+  ///
+  /// This periodic task removes expired entries from all caches to free memory.
+  /// Should run frequently enough to prevent stale data but not so often as to
+  /// cause unnecessary overhead.
+  static const Duration cacheCleanupInterval = Duration(minutes: 15);
+
+  /// Interval for cleaning up old analytics records from the database.
+  ///
+  /// This periodic task deletes analytics details older than [analyticsRetentionPeriod]
+  /// and recalculates average durations. Runs less frequently since it involves
+  /// database operations.
+  static const Duration analyticsCleanupInterval = Duration(hours: 1);
+
+  // ============================================================================
+  // DATA RETENTION SETTINGS
+  // ============================================================================
+
+  /// How long to retain detailed analytics records before deletion.
+  ///
+  /// Analytics request details (payloads, responses, errors) older than this
+  /// are permanently deleted. Aggregated data like average durations are
+  /// calculated before deletion and preserved.
+  static const Duration analyticsRetentionPeriod = Duration(days: 7);
+
+  /// Age threshold for identifying orphaned average duration records.
+  ///
+  /// ScrappableAverageDuration records are considered orphaned if they're
+  /// not referenced by any active scrappable AND are older than this threshold.
+  /// The threshold prevents deletion of recently created records that might
+  /// not yet be linked due to race conditions.
+  static const Duration orphanedRecordThreshold = Duration(days: 1);
+
+  // ============================================================================
+  // BATCH PROCESSING SETTINGS
+  // ============================================================================
+
+  /// Number of scrappables to process per batch during cleanup operations.
+  ///
+  /// Processing in chunks prevents memory issues when dealing with large
+  /// datasets. Smaller values use less memory but require more iterations.
+  /// Larger values are more efficient but use more memory per iteration.
+  static const int cleanupBatchSize = 30;
+
+  /// Multiplier for pagination when fetching analytics with duplicates.
+  ///
+  /// When fetching unique scrappable IDs from analytics, we fetch
+  /// (limit * this multiplier) records to account for multiple analytics
+  /// per scrappable, then deduplicate. Higher values reduce database round
+  /// trips but increase memory usage per query.
+  static const int paginationMultiplier = 10;
+
+  /// Number of recent success records to use for average duration calculation.
+  ///
+  /// Average request duration is calculated from the N most recent successful
+  /// requests. Larger values give more stable averages but include older data.
+  /// Smaller values are more responsive to recent performance changes.
+  static const int averageDurationSampleSize = 50;
+}
+
 /// Wrapper class for cache entries with timestamp tracking for TTL-based eviction.
 class _CacheEntry<T> {
   final T value;
@@ -28,24 +142,6 @@ class _CacheEntry<T> {
   bool isExpired(Duration maxAge) {
     return DateTime.now().difference(createdAt) > maxAge;
   }
-}
-
-/// Configuration constants for cache management.
-class _CacheConfig {
-  /// Maximum age for nanoId-related cache entries (30 minutes).
-  /// This covers plan tier, credit usage, API keys, etc.
-  static const Duration nanoIdCacheMaxAge = Duration(minutes: 30);
-
-  /// Maximum age for scrappable cache entries (1 hour).
-  /// Scrappables change less frequently but should still be refreshed.
-  static const Duration scrappableCacheMaxAge = Duration(hours: 1);
-
-  /// Maximum number of entries in scrappables cache before forced eviction.
-  /// This prevents unbounded growth even if cleanup doesn't run.
-  static const int maxScrappableCacheSize = 500;
-
-  /// Maximum number of nanoIds to track before forced eviction of oldest entries.
-  static const int maxNanoIdCacheSize = 1000;
 }
 
 /// Replaces placeholder patterns {paramName} in a string with actual values from the payload
@@ -110,8 +206,8 @@ mixin ApiHelperMixin {
 
   /// Cleans up expired cache entries. Called periodically by PeriodicCacheCleanup.
   static void cleanupExpiredCacheEntries() {
-    final nanoIdMaxAge = _CacheConfig.nanoIdCacheMaxAge;
-    final scrappableMaxAge = _CacheConfig.scrappableCacheMaxAge;
+    final nanoIdMaxAge = ApiHelperConfig.nanoIdCacheMaxAge;
+    final scrappableMaxAge = ApiHelperConfig.scrappableCacheMaxAge;
 
     // Cleanup nanoId-keyed caches
     _currentAccountPlanTierCache
@@ -138,7 +234,7 @@ mixin ApiHelperMixin {
   /// Enforces maximum cache sizes by evicting oldest entries.
   /// Called when adding new entries to prevent unbounded growth.
   static void _enforceNanoIdCacheSize(NanoId newNanoId) {
-    if (_currentAccountPlanTierCache.length >= _CacheConfig.maxNanoIdCacheSize) {
+    if (_currentAccountPlanTierCache.length >= ApiHelperConfig.maxNanoIdCacheSize) {
       // Find and remove the oldest entry (excluding the new one being added)
       _evictOldestEntry(_currentAccountPlanTierCache, exclude: newNanoId);
     }
@@ -146,7 +242,7 @@ mixin ApiHelperMixin {
 
   /// Enforces maximum scrappable cache size.
   static void _enforceScrappableCacheSize(ScrappableId newId) {
-    if (_scrappables.length >= _CacheConfig.maxScrappableCacheSize) {
+    if (_scrappables.length >= ApiHelperConfig.maxScrappableCacheSize) {
       _evictOldestEntry(_scrappables, exclude: newId);
     }
   }
@@ -191,7 +287,7 @@ mixin ApiHelperMixin {
     // Get cached scrappable value (if not expired)
     final scrappableCacheEntry = _scrappables[scrappableId];
     final Scrappable? cacheScrappable =
-        scrappableCacheEntry?.isExpired(_CacheConfig.scrappableCacheMaxAge) == false
+        scrappableCacheEntry?.isExpired(ApiHelperConfig.scrappableCacheMaxAge) == false
             ? scrappableCacheEntry?.value
             : null;
 
@@ -206,7 +302,7 @@ mixin ApiHelperMixin {
     final planTierCacheEntry =
         nanoId == null ? null : _currentAccountPlanTierCache[nanoId];
     PlanTier? cachePlanTier =
-        planTierCacheEntry?.isExpired(_CacheConfig.nanoIdCacheMaxAge) == false
+        planTierCacheEntry?.isExpired(ApiHelperConfig.nanoIdCacheMaxAge) == false
             ? planTierCacheEntry?.value
             : null;
 
@@ -224,11 +320,11 @@ mixin ApiHelperMixin {
       final allowedScrappablesEntry = _allowedScrappableIdsToUse[nanoId];
 
       final creditUsageValid =
-          creditUsageEntry?.isExpired(_CacheConfig.nanoIdCacheMaxAge) == false;
+          creditUsageEntry?.isExpired(ApiHelperConfig.nanoIdCacheMaxAge) == false;
       final apiKeysValid =
-          apiKeysEntry?.isExpired(_CacheConfig.nanoIdCacheMaxAge) == false;
+          apiKeysEntry?.isExpired(ApiHelperConfig.nanoIdCacheMaxAge) == false;
       final allowedScrappablesValid =
-          allowedScrappablesEntry?.isExpired(_CacheConfig.nanoIdCacheMaxAge) ==
+          allowedScrappablesEntry?.isExpired(ApiHelperConfig.nanoIdCacheMaxAge) ==
               false;
 
       if (cachePlanTier != null &&
@@ -312,7 +408,7 @@ mixin ApiHelperMixin {
       // Update allowed scrappable IDs cache
       final existingAllowedEntry = _allowedScrappableIdsToUse[nanoId];
       if (existingAllowedEntry == null ||
-          existingAllowedEntry.isExpired(_CacheConfig.nanoIdCacheMaxAge)) {
+          existingAllowedEntry.isExpired(ApiHelperConfig.nanoIdCacheMaxAge)) {
         _allowedScrappableIdsToUse[nanoId] = _CacheEntry([scrappableId]);
       } else if (!existingAllowedEntry.value.contains(scrappableId)) {
         existingAllowedEntry.value.add(scrappableId);
@@ -331,7 +427,7 @@ mixin ApiHelperMixin {
       // Update API keys cache
       final existingApiKeysEntry = _apiKeysAttachedToNanoId[nanoId];
       if (existingApiKeysEntry == null ||
-          existingApiKeysEntry.isExpired(_CacheConfig.nanoIdCacheMaxAge)) {
+          existingApiKeysEntry.isExpired(ApiHelperConfig.nanoIdCacheMaxAge)) {
         _apiKeysAttachedToNanoId[nanoId] = _CacheEntry([apiKey]);
       } else if (!existingApiKeysEntry.value.contains(apiKey)) {
         existingApiKeysEntry.value.add(apiKey);
@@ -425,11 +521,11 @@ mixin ApiHelperMixin {
     final purchasedEntry = _remainingPurchasedCredits[nanoId];
 
     final subscriptionCredits =
-        subscriptionEntry?.isExpired(_CacheConfig.nanoIdCacheMaxAge) == false
+        subscriptionEntry?.isExpired(ApiHelperConfig.nanoIdCacheMaxAge) == false
             ? subscriptionEntry?.value
             : null;
     final purchasedCredits =
-        purchasedEntry?.isExpired(_CacheConfig.nanoIdCacheMaxAge) == false
+        purchasedEntry?.isExpired(ApiHelperConfig.nanoIdCacheMaxAge) == false
             ? purchasedEntry?.value
             : null;
 
@@ -514,7 +610,7 @@ mixin ApiHelperMixin {
 
   bool checkIdApiKeyExists(NanoId? nanoId, ApiKey? apiKey) {
     final entry = _apiKeysAttachedToNanoId[nanoId];
-    if (entry == null || entry.isExpired(_CacheConfig.nanoIdCacheMaxAge)) {
+    if (entry == null || entry.isExpired(ApiHelperConfig.nanoIdCacheMaxAge)) {
       return false;
     }
     return entry.value.contains(apiKey);
@@ -538,7 +634,7 @@ mixin ApiHelperMixin {
     } else {
       final existingEntry = _apiKeysAttachedToNanoId[nanoId];
       if (existingEntry == null ||
-          existingEntry.isExpired(_CacheConfig.nanoIdCacheMaxAge)) {
+          existingEntry.isExpired(ApiHelperConfig.nanoIdCacheMaxAge)) {
         _apiKeysAttachedToNanoId[nanoId] = _CacheEntry([apiKey]);
       } else if (!existingEntry.value.contains(apiKey)) {
         existingEntry.value.add(apiKey);
@@ -1102,14 +1198,14 @@ class PeriodicSetRequestsAnalytics extends FutureCall {
     await session.serverpod.futureCallWithDelay(
       'periodicSetRequestsAnalytics',
       null,
-      Duration(minutes: 5), // Adjust interval as needed
+      ApiHelperConfig.analyticsBatchInterval,
       identifier: 'periodicSetRequestsAnalytics',
     );
   }
 }
 
 /// Periodic cleanup for in-memory caches to prevent memory leaks.
-/// This FutureCall runs every 15 minutes and evicts expired cache entries.
+/// This FutureCall runs at [ApiHelperConfig.cacheCleanupInterval] and evicts expired cache entries.
 class PeriodicCacheCleanup extends FutureCall {
   @override
   Future<void> invoke(Session session, SerializableModel? _) async {
@@ -1140,11 +1236,11 @@ class PeriodicCacheCleanup extends FutureCall {
       );
     }
 
-    // Schedule the next execution in 15 minutes
+    // Schedule the next execution
     await session.serverpod.futureCallWithDelay(
       'periodicCacheCleanup',
       null,
-      const Duration(minutes: 15),
+      ApiHelperConfig.cacheCleanupInterval,
       identifier: 'periodicCacheCleanup',
     );
   }
@@ -1168,19 +1264,19 @@ class PeriodicCleanupOldAnalyticsDetails extends FutureCall {
   Future<void> invoke(Session session, SerializableModel? _) async {
     try {
       final now = DateTime.now();
-      final sevenDaysAgo = now.subtract(const Duration(days: 7));
+      final retentionCutoff = now.subtract(ApiHelperConfig.analyticsRetentionPeriod);
 
       // STEP 1: Calculate and update average durations BEFORE deleting old analytics
       await _updateAverageDurationsForAllScrappables(session);
 
-      // STEP 2: Delete all AnalyticsRequestDetails older than 7 days
+      // STEP 2: Delete all AnalyticsRequestDetails older than retention period
       final deletedCount = await AnalyticsRequestDetails.db.deleteWhere(
         session,
-        where: (t) => t.timeStamp < sevenDaysAgo,
+        where: (t) => t.timeStamp < retentionCutoff,
       );
 
       session.log(
-        'Cleaned up $deletedCount old analytics details (older than 7 days)',
+        'Cleaned up $deletedCount old analytics details (older than ${ApiHelperConfig.analyticsRetentionPeriod.inDays} days)',
         level: LogLevel.info,
       );
 
@@ -1195,22 +1291,22 @@ class PeriodicCleanupOldAnalyticsDetails extends FutureCall {
       );
     }
 
-    // Schedule the next execution in 1 hour
+    // Schedule the next execution
     await session.serverpod.futureCallWithDelay(
       'periodicCleanupOldAnalyticsDetails',
       null,
-      const Duration(hours: 1),
+      ApiHelperConfig.analyticsCleanupInterval,
       identifier: 'periodicCleanupOldAnalyticsDetails',
     );
   }
 
   /// Updates average duration for all scrappables that have analytics with duration data.
   ///
-  /// This method processes scrappables in chunks of 30 to avoid memory issues
-  /// when dealing with large datasets.
+  /// This method processes scrappables in chunks of [ApiHelperConfig.cleanupBatchSize]
+  /// to avoid memory issues when dealing with large datasets.
   Future<void> _updateAverageDurationsForAllScrappables(Session session) async {
     try {
-      const int chunkSize = 30;
+      const int chunkSize = ApiHelperConfig.cleanupBatchSize;
       int offset = 0;
       bool hasMore = true;
       int updatedCount = 0;
@@ -1278,8 +1374,8 @@ class PeriodicCleanupOldAnalyticsDetails extends FutureCall {
           t.duration.notEquals(null) &
           t.requestStatus.equals(RequestStatus.success),
       orderBy: (t) => t.scrappableId,
-      limit: limit * 10, // Fetch more to account for multiple analytics per scrappable
-      offset: offset * 10, // Adjust offset accordingly
+      limit: limit * ApiHelperConfig.paginationMultiplier, // Fetch more to account for multiple analytics per scrappable
+      offset: offset * ApiHelperConfig.paginationMultiplier, // Adjust offset accordingly
     );
 
     // Extract unique scrappable IDs while maintaining order
@@ -1301,22 +1397,23 @@ class PeriodicCleanupOldAnalyticsDetails extends FutureCall {
 
   /// Updates the average duration for a single scrappable.
   ///
-  /// Fetches the last 50 SUCCESS analytics records with duration data,
-  /// calculates the average, and updates or creates the ScrappableAverageDuration record.
+  /// Fetches the last [ApiHelperConfig.averageDurationSampleSize] SUCCESS analytics
+  /// records with duration data, calculates the average, and updates or creates
+  /// the ScrappableAverageDuration record.
   ///
   /// Returns true if the average duration was updated, false otherwise.
   Future<bool> _updateAverageDurationForScrappable(
     Session session,
     int scrappableId,
   ) async {
-    // Fetch last 50 SUCCESS analytics with duration for this scrappable
+    // Fetch last N SUCCESS analytics with duration for this scrappable
     final analytics = await ScrappableAnalytics.db.find(
       session,
       where: (t) =>
           t.scrappableId.equals(scrappableId) &
           t.duration.notEquals(null) &
           t.requestStatus.equals(RequestStatus.success),
-      limit: 50,
+      limit: ApiHelperConfig.averageDurationSampleSize,
       orderBy: (t) => t.requestedAt,
       orderDescending: true, // Most recent first
     );
@@ -1405,13 +1502,13 @@ class PeriodicCleanupOldAnalyticsDetails extends FutureCall {
           .whereType<int>()
           .toSet();
 
-      // Find all ScrappableAverageDuration records that are older than 1 day
+      // Find all ScrappableAverageDuration records that are older than the threshold
       // to avoid race conditions with newly created records
-      final oneDayAgo = DateTime.now().subtract(const Duration(days: 1));
+      final orphanThreshold = DateTime.now().subtract(ApiHelperConfig.orphanedRecordThreshold);
 
       final allAverageDurations = await ScrappableAverageDuration.db.find(
         session,
-        where: (t) => t.updatedAt < oneDayAgo,
+        where: (t) => t.updatedAt < orphanThreshold,
       );
 
       // Filter to find orphaned records (not in the active set)
