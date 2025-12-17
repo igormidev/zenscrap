@@ -1183,6 +1183,9 @@ class PeriodicCleanupOldAnalyticsDetails extends FutureCall {
         'Cleaned up $deletedCount old analytics details (older than 7 days)',
         level: LogLevel.info,
       );
+
+      // STEP 3: Clean up orphaned ScrappableAverageDuration records
+      await _cleanupOrphanedAverageDurations(session);
     } catch (e, stackTrace) {
       session.log(
         'Error during periodic cleanup of analytics details',
@@ -1375,6 +1378,70 @@ class PeriodicCleanupOldAnalyticsDetails extends FutureCall {
     }
 
     return true;
+  }
+
+  /// Cleans up orphaned ScrappableAverageDuration records.
+  ///
+  /// An orphaned record is one that is not referenced by any active (non-deleted)
+  /// scrappable. This can happen when:
+  /// - A scrappable is soft-deleted (isDeleted = true)
+  /// - A scrappable is hard-deleted
+  /// - The averageDurationInfoId is set to null
+  ///
+  /// This method finds all ScrappableAverageDuration IDs that are:
+  /// 1. Not referenced by any scrappable with isDeleted = false
+  /// 2. Older than 1 day (to avoid race conditions with recent creations)
+  Future<void> _cleanupOrphanedAverageDurations(Session session) async {
+    try {
+      // Get all averageDurationInfoIds that are currently in use by active scrappables
+      final activeScrappables = await Scrappable.db.find(
+        session,
+        where: (t) =>
+            t.isDeleted.equals(false) & t.averageDurationInfoId.notEquals(null),
+      );
+
+      final activeAverageDurationIds = activeScrappables
+          .map((s) => s.averageDurationInfoId)
+          .whereType<int>()
+          .toSet();
+
+      // Find all ScrappableAverageDuration records that are older than 1 day
+      // to avoid race conditions with newly created records
+      final oneDayAgo = DateTime.now().subtract(const Duration(days: 1));
+
+      final allAverageDurations = await ScrappableAverageDuration.db.find(
+        session,
+        where: (t) => t.updatedAt < oneDayAgo,
+      );
+
+      // Filter to find orphaned records (not in the active set)
+      final orphanedRecords = allAverageDurations
+          .where((record) => !activeAverageDurationIds.contains(record.id))
+          .toList();
+
+      if (orphanedRecords.isEmpty) {
+        session.log(
+          'No orphaned ScrappableAverageDuration records to clean up',
+          level: LogLevel.debug,
+        );
+        return;
+      }
+
+      // Delete orphaned records
+      await ScrappableAverageDuration.db.delete(session, orphanedRecords);
+
+      session.log(
+        'Cleaned up ${orphanedRecords.length} orphaned ScrappableAverageDuration records',
+        level: LogLevel.info,
+      );
+    } catch (e, stackTrace) {
+      session.log(
+        'Error cleaning up orphaned ScrappableAverageDuration records',
+        exception: e,
+        stackTrace: stackTrace,
+        level: LogLevel.error,
+      );
+    }
   }
 }
 
