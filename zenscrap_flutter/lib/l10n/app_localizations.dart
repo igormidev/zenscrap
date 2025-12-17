@@ -1645,6 +1645,24 @@ abstract class AppLocalizations {
   /// **'Copy'**
   String get api_analytics_copy_button;
 
+  /// Prefix for average duration badge
+  ///
+  /// In en, this message translates to:
+  /// **'Avg: '**
+  String get api_analytics_average_duration_prefix;
+
+  /// Tooltip for average duration badge on scrappable cards
+  ///
+  /// In en, this message translates to:
+  /// **'Average request duration'**
+  String get scrappable_card_average_duration_tooltip;
+
+  /// Label for request duration
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get api_analytics_duration_label;
+
   /// Main title for API usage page
   ///
   /// In en, this message translates to:

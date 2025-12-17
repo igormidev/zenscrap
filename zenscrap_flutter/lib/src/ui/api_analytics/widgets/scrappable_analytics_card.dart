@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
+import 'package:zenscrap_flutter/src/core/extensions/duration_extension.dart';
 import 'package:zenscrap_flutter/src/core/extensions/request_status_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
@@ -158,12 +159,23 @@ class ScrappableAnalyticsCard extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 4),
-        // Ownership badge - FIXED HEIGHT
+        // Ownership badge and average duration - FIXED HEIGHT
         SizedBox(
           height: ownershipBadgeHeight,
-          child: _OwnershipBadge(
-            isOwnedByUser: isOwnedByUser,
-            l10n: l10n,
+          child: Row(
+            children: [
+              _OwnershipBadge(
+                isOwnedByUser: isOwnedByUser,
+                l10n: l10n,
+              ),
+              if (item.scrappable.averageDurationInfo != null) ...[
+                const SizedBox(width: 6),
+                _AverageDurationBadge(
+                  averageDuration: item.scrappable.averageDurationInfo!.averageDuration,
+                  l10n: l10n,
+                ),
+              ],
+            ],
           ),
         ),
         const SizedBox(height: spacing),
@@ -401,6 +413,53 @@ class _OwnershipBadge extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             badgeText,
+            style: context.t.labelSmall?.copyWith(
+              color: badgeColor.withAlpha(220),
+              fontWeight: FontWeight.w500,
+              fontSize: 10,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// A small badge showing the average request duration.
+class _AverageDurationBadge extends StatelessWidget {
+  final Duration averageDuration;
+  final AppLocalizations l10n;
+
+  const _AverageDurationBadge({
+    required this.averageDuration,
+    required this.l10n,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final badgeColor = context.c.secondary;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: badgeColor.withAlpha(15),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: badgeColor.withAlpha(40),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.timer_outlined,
+            size: 10,
+            color: badgeColor.withAlpha(200),
+          ),
+          const SizedBox(width: 4),
+          Text(
+            '${l10n.api_analytics_average_duration_prefix}${averageDuration.shortFormat}',
             style: context.t.labelSmall?.copyWith(
               color: badgeColor.withAlpha(220),
               fontWeight: FontWeight.w500,

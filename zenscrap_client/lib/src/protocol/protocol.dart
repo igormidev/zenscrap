@@ -73,17 +73,18 @@ import 'entities/scrappable/request_status.dart' as _i47;
 import 'entities/scrappable/scraper_category.dart' as _i48;
 import 'entities/scrappable/scrappable.dart' as _i49;
 import 'entities/scrappable/scrappable_analytics.dart' as _i50;
-import 'entities/scrappable/scrappable_request.dart' as _i51;
-import 'entities/scrappable/scrapping_bee_extract_logic.dart' as _i52;
-import 'entities/supported_language.dart' as _i53;
+import 'entities/scrappable/scrappable_average_duration.dart' as _i51;
+import 'entities/scrappable/scrappable_request.dart' as _i52;
+import 'entities/scrappable/scrapping_bee_extract_logic.dart' as _i53;
+import 'entities/supported_language.dart' as _i54;
 import 'entities/user_scrappables/user_paginated_scrappable_response.dart'
-    as _i54;
-import 'entities/zenscrap_exception.dart' as _i55;
+    as _i55;
+import 'entities/zenscrap_exception.dart' as _i56;
 import 'package:zenscrap_client/src/protocol/entities/account/account_api_key.dart'
-    as _i56;
-import 'package:zenscrap_client/src/protocol/entities/scrappable/scraper_category.dart'
     as _i57;
-import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i58;
+import 'package:zenscrap_client/src/protocol/entities/scrappable/scraper_category.dart'
+    as _i58;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i59;
 export 'entities/account/account.dart';
 export 'entities/account/account_api_key.dart';
 export 'entities/account/ai_usage/account_ai_usage.dart';
@@ -133,6 +134,7 @@ export 'entities/scrappable/request_status.dart';
 export 'entities/scrappable/scraper_category.dart';
 export 'entities/scrappable/scrappable.dart';
 export 'entities/scrappable/scrappable_analytics.dart';
+export 'entities/scrappable/scrappable_average_duration.dart';
 export 'entities/scrappable/scrappable_request.dart';
 export 'entities/scrappable/scrapping_bee_extract_logic.dart';
 export 'entities/supported_language.dart';
@@ -354,20 +356,23 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i50.ScrappableAnalytics) {
       return _i50.ScrappableAnalytics.fromJson(data) as T;
     }
-    if (t == _i51.ScrappableRequest) {
-      return _i51.ScrappableRequest.fromJson(data) as T;
+    if (t == _i51.ScrappableAverageDuration) {
+      return _i51.ScrappableAverageDuration.fromJson(data) as T;
     }
-    if (t == _i52.ScrappingBeeExtractLogic) {
-      return _i52.ScrappingBeeExtractLogic.fromJson(data) as T;
+    if (t == _i52.ScrappableRequest) {
+      return _i52.ScrappableRequest.fromJson(data) as T;
     }
-    if (t == _i53.SupportedLanguage) {
-      return _i53.SupportedLanguage.fromJson(data) as T;
+    if (t == _i53.ScrappingBeeExtractLogic) {
+      return _i53.ScrappingBeeExtractLogic.fromJson(data) as T;
     }
-    if (t == _i54.UserPaginatedScrappableResponse) {
-      return _i54.UserPaginatedScrappableResponse.fromJson(data) as T;
+    if (t == _i54.SupportedLanguage) {
+      return _i54.SupportedLanguage.fromJson(data) as T;
     }
-    if (t == _i55.ZenScrapException) {
-      return _i55.ZenScrapException.fromJson(data) as T;
+    if (t == _i55.UserPaginatedScrappableResponse) {
+      return _i55.UserPaginatedScrappableResponse.fromJson(data) as T;
+    }
+    if (t == _i56.ZenScrapException) {
+      return _i56.ZenScrapException.fromJson(data) as T;
     }
     if (t == _i1.getType<_i2.AccountInfo?>()) {
       return (data != null ? _i2.AccountInfo.fromJson(data) : null) as T;
@@ -630,26 +635,32 @@ class Protocol extends _i1.SerializationManager {
       return (data != null ? _i50.ScrappableAnalytics.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i51.ScrappableRequest?>()) {
-      return (data != null ? _i51.ScrappableRequest.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i52.ScrappingBeeExtractLogic?>()) {
+    if (t == _i1.getType<_i51.ScrappableAverageDuration?>()) {
       return (data != null
-              ? _i52.ScrappingBeeExtractLogic.fromJson(data)
+              ? _i51.ScrappableAverageDuration.fromJson(data)
               : null)
           as T;
     }
-    if (t == _i1.getType<_i53.SupportedLanguage?>()) {
-      return (data != null ? _i53.SupportedLanguage.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i52.ScrappableRequest?>()) {
+      return (data != null ? _i52.ScrappableRequest.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i54.UserPaginatedScrappableResponse?>()) {
+    if (t == _i1.getType<_i53.ScrappingBeeExtractLogic?>()) {
       return (data != null
-              ? _i54.UserPaginatedScrappableResponse.fromJson(data)
+              ? _i53.ScrappingBeeExtractLogic.fromJson(data)
               : null)
           as T;
     }
-    if (t == _i1.getType<_i55.ZenScrapException?>()) {
-      return (data != null ? _i55.ZenScrapException.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i54.SupportedLanguage?>()) {
+      return (data != null ? _i54.SupportedLanguage.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i55.UserPaginatedScrappableResponse?>()) {
+      return (data != null
+              ? _i55.UserPaginatedScrappableResponse.fromJson(data)
+              : null)
+          as T;
+    }
+    if (t == _i1.getType<_i56.ZenScrapException?>()) {
+      return (data != null ? _i56.ZenScrapException.fromJson(data) : null) as T;
     }
     if (t == List<_i49.Scrappable>) {
       return (data as List).map((e) => deserialize<_i49.Scrappable>(e)).toList()
@@ -781,9 +792,9 @@ class Protocol extends _i1.SerializationManager {
               : null)
           as T;
     }
-    if (t == List<_i56.AccountApiKey>) {
+    if (t == List<_i57.AccountApiKey>) {
       return (data as List)
-              .map((e) => deserialize<_i56.AccountApiKey>(e))
+              .map((e) => deserialize<_i57.AccountApiKey>(e))
               .toList()
           as T;
     }
@@ -802,16 +813,16 @@ class Protocol extends _i1.SerializationManager {
           )
           as T;
     }
-    if (t == List<_i57.ScraperCategory>) {
+    if (t == List<_i58.ScraperCategory>) {
       return (data as List)
-              .map((e) => deserialize<_i57.ScraperCategory>(e))
+              .map((e) => deserialize<_i58.ScraperCategory>(e))
               .toList()
           as T;
     }
-    if (t == _i1.getType<List<_i57.ScraperCategory>?>()) {
+    if (t == _i1.getType<List<_i58.ScraperCategory>?>()) {
       return (data != null
               ? (data as List)
-                    .map((e) => deserialize<_i57.ScraperCategory>(e))
+                    .map((e) => deserialize<_i58.ScraperCategory>(e))
                     .toList()
               : null)
           as T;
@@ -826,7 +837,7 @@ class Protocol extends _i1.SerializationManager {
           as T;
     }
     try {
-      return _i58.Protocol().deserialize<T>(data, t);
+      return _i59.Protocol().deserialize<T>(data, t);
     } on _i1.DeserializationTypeNotFoundException catch (_) {}
     return super.deserialize<T>(data, t);
   }
@@ -900,11 +911,12 @@ class Protocol extends _i1.SerializationManager {
       _i48.ScraperCategory => 'ScraperCategory',
       _i49.Scrappable => 'Scrappable',
       _i50.ScrappableAnalytics => 'ScrappableAnalytics',
-      _i51.ScrappableRequest => 'ScrappableRequest',
-      _i52.ScrappingBeeExtractLogic => 'ScrappingBeeExtractLogic',
-      _i53.SupportedLanguage => 'SupportedLanguage',
-      _i54.UserPaginatedScrappableResponse => 'UserPaginatedScrappableResponse',
-      _i55.ZenScrapException => 'ZenScrapException',
+      _i51.ScrappableAverageDuration => 'ScrappableAverageDuration',
+      _i52.ScrappableRequest => 'ScrappableRequest',
+      _i53.ScrappingBeeExtractLogic => 'ScrappingBeeExtractLogic',
+      _i54.SupportedLanguage => 'SupportedLanguage',
+      _i55.UserPaginatedScrappableResponse => 'UserPaginatedScrappableResponse',
+      _i56.ZenScrapException => 'ZenScrapException',
       _ => null,
     };
   }
@@ -1039,18 +1051,20 @@ class Protocol extends _i1.SerializationManager {
         return 'Scrappable';
       case _i50.ScrappableAnalytics():
         return 'ScrappableAnalytics';
-      case _i51.ScrappableRequest():
+      case _i51.ScrappableAverageDuration():
+        return 'ScrappableAverageDuration';
+      case _i52.ScrappableRequest():
         return 'ScrappableRequest';
-      case _i52.ScrappingBeeExtractLogic():
+      case _i53.ScrappingBeeExtractLogic():
         return 'ScrappingBeeExtractLogic';
-      case _i53.SupportedLanguage():
+      case _i54.SupportedLanguage():
         return 'SupportedLanguage';
-      case _i54.UserPaginatedScrappableResponse():
+      case _i55.UserPaginatedScrappableResponse():
         return 'UserPaginatedScrappableResponse';
-      case _i55.ZenScrapException():
+      case _i56.ZenScrapException():
         return 'ZenScrapException';
     }
-    className = _i58.Protocol().getClassNameForObject(data);
+    className = _i59.Protocol().getClassNameForObject(data);
     if (className != null) {
       return 'serverpod_auth.$className';
     }
@@ -1247,24 +1261,27 @@ class Protocol extends _i1.SerializationManager {
     if (dataClassName == 'ScrappableAnalytics') {
       return deserialize<_i50.ScrappableAnalytics>(data['data']);
     }
+    if (dataClassName == 'ScrappableAverageDuration') {
+      return deserialize<_i51.ScrappableAverageDuration>(data['data']);
+    }
     if (dataClassName == 'ScrappableRequest') {
-      return deserialize<_i51.ScrappableRequest>(data['data']);
+      return deserialize<_i52.ScrappableRequest>(data['data']);
     }
     if (dataClassName == 'ScrappingBeeExtractLogic') {
-      return deserialize<_i52.ScrappingBeeExtractLogic>(data['data']);
+      return deserialize<_i53.ScrappingBeeExtractLogic>(data['data']);
     }
     if (dataClassName == 'SupportedLanguage') {
-      return deserialize<_i53.SupportedLanguage>(data['data']);
+      return deserialize<_i54.SupportedLanguage>(data['data']);
     }
     if (dataClassName == 'UserPaginatedScrappableResponse') {
-      return deserialize<_i54.UserPaginatedScrappableResponse>(data['data']);
+      return deserialize<_i55.UserPaginatedScrappableResponse>(data['data']);
     }
     if (dataClassName == 'ZenScrapException') {
-      return deserialize<_i55.ZenScrapException>(data['data']);
+      return deserialize<_i56.ZenScrapException>(data['data']);
     }
     if (dataClassName.startsWith('serverpod_auth.')) {
       data['className'] = dataClassName.substring(15);
-      return _i58.Protocol().deserializeByClassName(data);
+      return _i59.Protocol().deserializeByClassName(data);
     }
     return super.deserializeByClassName(data);
   }

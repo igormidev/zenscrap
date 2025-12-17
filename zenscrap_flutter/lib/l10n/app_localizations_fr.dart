@@ -889,6 +889,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get api_analytics_copy_button => 'Copy';
 
   @override
+  String get api_analytics_average_duration_prefix => 'Avg: ';
+
+  @override
+  String get scrappable_card_average_duration_tooltip =>
+      'Average request duration';
+
+  @override
+  String get api_analytics_duration_label => 'Duration';
+
+  @override
   String get api_usage_page_title => 'Credits et Cles API';
 
   @override

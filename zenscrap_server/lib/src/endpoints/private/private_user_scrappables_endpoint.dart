@@ -97,6 +97,7 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
         scrappingBeeExtractRules: ScrappingBeeExtractLogic.include(),
         referenceTestData: ReferenceTestData.include(),
         autoFixConfig: AutoFixConfig.include(),
+        averageDurationInfo: ScrappableAverageDuration.include(),
       ),
     );
 
@@ -144,6 +145,8 @@ class PrivateUserScrappablesEndpoint extends Endpoint {
         referenceTestData: ReferenceTestData.include(
           byteData: ByteTestData.include(),
         ),
+        autoFixConfig: AutoFixConfig.include(),
+        averageDurationInfo: ScrappableAverageDuration.include(),
       ),
     );
 

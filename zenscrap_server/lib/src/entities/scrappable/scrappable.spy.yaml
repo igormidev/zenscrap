@@ -21,6 +21,8 @@ fields:
   isDeleted: bool
   # Auto-fix configuration (1:1 relationship - stored in separate table for smaller update footprint)
   autoFixConfig: AutoFixConfig?, relation(name=scrappable_auto_fix_config)
+  # Average duration info (1:1 relationship - calculated periodically from analytics)
+  averageDurationInfo: ScrappableAverageDuration?, relation(optional)
 indexes:
   scrappable_target_request_unique_idx:
     fields: targetRequestId

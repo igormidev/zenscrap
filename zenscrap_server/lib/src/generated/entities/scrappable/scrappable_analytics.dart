@@ -33,6 +33,7 @@ abstract class ScrappableAnalytics
     this.details,
     this.apiKeyId,
     this.apiKey,
+    this.duration,
   });
 
   factory ScrappableAnalytics({
@@ -47,6 +48,7 @@ abstract class ScrappableAnalytics
     _i4.AnalyticsRequestDetails? details,
     int? apiKeyId,
     _i5.AccountApiKey? apiKey,
+    Duration? duration,
   }) = _ScrappableAnalyticsImpl;
 
   factory ScrappableAnalytics.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -78,6 +80,9 @@ abstract class ScrappableAnalytics
           : _i6.Protocol().deserialize<_i5.AccountApiKey>(
               jsonSerialization['apiKey'],
             ),
+      duration: jsonSerialization['duration'] == null
+          ? null
+          : _i1.DurationJsonExtension.fromJson(jsonSerialization['duration']),
     );
   }
 
@@ -108,6 +113,8 @@ abstract class ScrappableAnalytics
 
   _i5.AccountApiKey? apiKey;
 
+  Duration? duration;
+
   @override
   _i1.Table<int?> get table => t;
 
@@ -126,6 +133,7 @@ abstract class ScrappableAnalytics
     _i4.AnalyticsRequestDetails? details,
     int? apiKeyId,
     _i5.AccountApiKey? apiKey,
+    Duration? duration,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -142,6 +150,7 @@ abstract class ScrappableAnalytics
       if (details != null) 'details': details?.toJson(),
       if (apiKeyId != null) 'apiKeyId': apiKeyId,
       if (apiKey != null) 'apiKey': apiKey?.toJson(),
+      if (duration != null) 'duration': duration?.toJson(),
     };
   }
 
@@ -160,6 +169,7 @@ abstract class ScrappableAnalytics
       if (details != null) 'details': details?.toJsonForProtocol(),
       if (apiKeyId != null) 'apiKeyId': apiKeyId,
       if (apiKey != null) 'apiKey': apiKey?.toJsonForProtocol(),
+      if (duration != null) 'duration': duration?.toJson(),
     };
   }
 
@@ -216,6 +226,7 @@ class _ScrappableAnalyticsImpl extends ScrappableAnalytics {
     _i4.AnalyticsRequestDetails? details,
     int? apiKeyId,
     _i5.AccountApiKey? apiKey,
+    Duration? duration,
   }) : super._(
          id: id,
          requestStatus: requestStatus,
@@ -228,6 +239,7 @@ class _ScrappableAnalyticsImpl extends ScrappableAnalytics {
          details: details,
          apiKeyId: apiKeyId,
          apiKey: apiKey,
+         duration: duration,
        );
 
   /// Returns a shallow copy of this [ScrappableAnalytics]
@@ -246,6 +258,7 @@ class _ScrappableAnalyticsImpl extends ScrappableAnalytics {
     Object? details = _Undefined,
     Object? apiKeyId = _Undefined,
     Object? apiKey = _Undefined,
+    Object? duration = _Undefined,
   }) {
     return ScrappableAnalytics(
       id: id is int? ? id : this.id,
@@ -263,6 +276,7 @@ class _ScrappableAnalyticsImpl extends ScrappableAnalytics {
           : this.details?.copyWith(),
       apiKeyId: apiKeyId is int? ? apiKeyId : this.apiKeyId,
       apiKey: apiKey is _i5.AccountApiKey? ? apiKey : this.apiKey?.copyWith(),
+      duration: duration is Duration? ? duration : this.duration,
     );
   }
 }
@@ -310,6 +324,12 @@ class ScrappableAnalyticsUpdateTable
     table.apiKeyId,
     value,
   );
+
+  _i1.ColumnValue<Duration, Duration> duration(Duration? value) =>
+      _i1.ColumnValue(
+        table.duration,
+        value,
+      );
 }
 
 class ScrappableAnalyticsTable extends _i1.Table<int?> {
@@ -345,6 +365,10 @@ class ScrappableAnalyticsTable extends _i1.Table<int?> {
       'apiKeyId',
       this,
     );
+    duration = _i1.ColumnDuration(
+      'duration',
+      this,
+    );
   }
 
   late final ScrappableAnalyticsUpdateTable updateTable;
@@ -368,6 +392,8 @@ class ScrappableAnalyticsTable extends _i1.Table<int?> {
   late final _i1.ColumnInt apiKeyId;
 
   _i5.AccountApiKeyTable? _apiKey;
+
+  late final _i1.ColumnDuration duration;
 
   _i3.ScrappableTable get scrappable {
     if (_scrappable != null) return _scrappable!;
@@ -418,6 +444,7 @@ class ScrappableAnalyticsTable extends _i1.Table<int?> {
     scrappableId,
     detailsId,
     apiKeyId,
+    duration,
   ];
 
   @override

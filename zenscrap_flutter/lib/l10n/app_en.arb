@@ -1154,6 +1154,18 @@
   "@api_analytics_copy_button": {
     "description": "Copy button label"
   },
+  "api_analytics_average_duration_prefix": "Avg: ",
+  "@api_analytics_average_duration_prefix": {
+    "description": "Prefix for average duration badge"
+  },
+  "scrappable_card_average_duration_tooltip": "Average request duration",
+  "@scrappable_card_average_duration_tooltip": {
+    "description": "Tooltip for average duration badge on scrappable cards"
+  },
+  "api_analytics_duration_label": "Duration",
+  "@api_analytics_duration_label": {
+    "description": "Label for request duration"
+  },
 
   "api_usage_page_title": "Api Credits & Keys",
   "@api_usage_page_title": {

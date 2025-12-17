@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/core/extensions/convert_extensions.dart';
+import 'package:zenscrap_flutter/src/core/extensions/duration_extension.dart';
 import 'package:zenscrap_flutter/src/core/extensions/request_status_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 
@@ -61,6 +62,7 @@ class _AnalyticsItemCardState extends State<AnalyticsItemCard> {
             requestedAt: widget.analytics.requestedAt,
             isExpanded: _isExpanded,
             hasDetails: hasDetails,
+            duration: widget.analytics.duration,
             onToggleExpand: hasDetails
                 ? () => setState(() => _isExpanded = !_isExpanded)
                 : null,
@@ -137,6 +139,7 @@ class _MainRow extends StatelessWidget {
   final DateTime requestedAt;
   final bool isExpanded;
   final bool hasDetails;
+  final Duration? duration;
   final VoidCallback? onToggleExpand;
 
   const _MainRow({
@@ -145,6 +148,7 @@ class _MainRow extends StatelessWidget {
     required this.requestedAt,
     required this.isExpanded,
     required this.hasDetails,
+    this.duration,
     this.onToggleExpand,
   });
 
@@ -182,6 +186,36 @@ class _MainRow extends StatelessWidget {
           ),
 
           const Spacer(),
+
+          // Duration badge (if available)
+          if (duration != null) ...[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: context.c.secondaryContainer.withAlpha(80),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.timer_outlined,
+                    size: 14,
+                    color: context.c.onSecondaryContainer.withAlpha(180),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    duration!.formatted,
+                    style: context.t.labelSmall?.copyWith(
+                      color: context.c.onSecondaryContainer.withAlpha(200),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+          ],
 
           // Date/time
           Text(

@@ -8,6 +8,7 @@ fields:
   scrappable: Scrappable?, relation(name=scrappable_analytics)
   details: AnalyticsRequestDetails?, relation(optional)
   apiKey: AccountApiKey?, relation(optional)
+  duration: Duration?
 
 indexes:
   scrappable_analytics_attached_nanoid_idx:

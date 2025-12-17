@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:result_dart/result_dart.dart';
 import 'package:serverpod/serverpod.dart' hide Result;
+import 'package:zenscrap_server/src/core/extension/duration_list_extension.dart';
 import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';
 import 'package:zenscrap_server/src/core/extension/scrapping_bee_extract_logic_extension.dart';
 import 'package:zenscrap_server/src/core/scraping_bee.dart';
@@ -380,8 +381,10 @@ mixin ApiHelperMixin {
     ScrappableId scrappableId,
     ApiKey? apiKey,
     Map<String, dynamic> payload,
-    Future<T> Function(NanoId? nanoId, Scrappable scrappable) call,
+    Future<T> Function(NanoId? nanoId, Scrappable scrappable, Stopwatch stopwatch) call,
   ) async {
+    // Start stopwatch at the EARLIEST point to capture full request duration
+    final stopwatch = Stopwatch()..start();
     final now = DateTime.now();
     final String stringifiedPayload = jsonEncode(payload);
     Scrappable scrappable;
@@ -400,8 +403,10 @@ mixin ApiHelperMixin {
         await garanteeApiKeyExists(session, nanoId, apiKey);
       }
 
-      return await call(nanoId, scrappable);
+      return await call(nanoId, scrappable, stopwatch);
     } on ApiError catch (error, stackTrace) {
+      stopwatch.stop();
+      final requestDuration = stopwatch.elapsed;
       session.log(
         '[${error.status.name.toUpperCase()}] ${error.exception.title}',
         exception: error.exception,
@@ -419,11 +424,14 @@ mixin ApiHelperMixin {
             description: error.exception.description,
             errorObjectAsString: error.exception.toString(),
             errorStackTraceAsString: stackTrace.toString(),
+            duration: requestDuration,
           ),
         );
       }
       rethrow;
     } on ZenScrapException catch (error, stackTrace) {
+      stopwatch.stop();
+      final requestDuration = stopwatch.elapsed;
       // Convert ZenScrapException to ApiError to preserve error details
       final apiError = ApiError(RequestStatus.clientError, error);
       session.log(
@@ -443,11 +451,14 @@ mixin ApiHelperMixin {
             description: error.description,
             errorObjectAsString: error.toString(),
             errorStackTraceAsString: stackTrace.toString(),
+            duration: requestDuration,
           ),
         );
       }
       throw apiError;
     } catch (error, stackTrace) {
+      stopwatch.stop();
+      final requestDuration = stopwatch.elapsed;
       session.log(
         'An unknown error occurred in api',
         exception: error,
@@ -465,6 +476,7 @@ mixin ApiHelperMixin {
             description: getErrorDescription('unexpected_error', SupportedLanguage.en),
             errorObjectAsString: error.toString(),
             errorStackTraceAsString: stackTrace.toString(),
+            duration: requestDuration,
           ),
         );
       }
@@ -503,7 +515,7 @@ mixin ApiHelperMixin {
     final String stringifiedPayload = jsonEncode(payload);
     try {
       return await wrapAnalytics(session, scrappableId, apiKey, payload,
-          (nanoId, scrappable) async {
+          (nanoId, scrappable, stopwatch) async {
         // final (Scrappable scrappable, ScrappableRequest targetRequest) =
         //     await getScrappableById(session, scrappableId, nanoId);
         // setScrappableCallback(scrappable);
@@ -537,6 +549,8 @@ mixin ApiHelperMixin {
               getReferenceTestData(scrappable.id!);
 
           if (currentTestData == null) {
+            // Stop stopwatch before returning error
+            stopwatch.stop();
             return ApiError(
               RequestStatus.serverError,
               createTranslatedException(
@@ -548,11 +562,15 @@ mixin ApiHelperMixin {
           final extractLogicWithReplacedPlaceholders =
               replaceExtractLogicPlaceholders(extractRules, payload);
 
+          // ScrapingBee API call - stopwatch already running from wrapAnalytics
           final ExtractFullDataByRule extractResponse =
               await scrappingBee.fetchHtmlAndScreenshotWithLogic(
             targetUrl: targetUrl,
             scrappingBeeExtractLogic: extractLogicWithReplacedPlaceholders,
           );
+          // Stop stopwatch after ScrapingBee call completes (success or error)
+          stopwatch.stop();
+          final requestDuration = stopwatch.elapsed;
 
           return extractResponse.when(
               withData: (scrapedData, html, pageFullscreenScreenshot) async {
@@ -566,6 +584,7 @@ mixin ApiHelperMixin {
                   status: RequestStatus.success,
                   stringifiedPayload: stringifiedPayload,
                   stringifiedResponse: responseJson,
+                  duration: requestDuration,
                 ),
               );
             }
@@ -625,6 +644,7 @@ mixin ApiHelperMixin {
                   stringifiedPayload: stringifiedPayload,
                   title: 'Scraping Error',
                   description: errorMessage,
+                  duration: requestDuration,
                 ),
               );
             }
@@ -655,11 +675,15 @@ mixin ApiHelperMixin {
           final extractLogicWithReplacedPlaceholders =
               replaceExtractLogicPlaceholders(extractRules, payload);
 
+          // ScrapingBee API call - stopwatch already running from wrapAnalytics
           final ExtractDataByRule extractResponse =
               await scrappingBee.extractByRulesWithLogic(
             targetUrl: targetUrl,
             scrappingBeeExtractLogic: extractLogicWithReplacedPlaceholders,
           );
+          // Stop stopwatch after ScrapingBee call completes (success or error)
+          stopwatch.stop();
+          final requestDuration = stopwatch.elapsed;
 
           return extractResponse.when(withData: (scrapedData) {
             final responseJson = jsonEncode(scrapedData);
@@ -672,6 +696,7 @@ mixin ApiHelperMixin {
                   status: RequestStatus.success,
                   stringifiedPayload: stringifiedPayload,
                   stringifiedResponse: responseJson,
+                  duration: requestDuration,
                 ),
               );
             }
@@ -693,6 +718,7 @@ mixin ApiHelperMixin {
                   stringifiedPayload: stringifiedPayload,
                   title: 'Scraping Error',
                   description: errorMessage,
+                  duration: requestDuration,
                 ),
               );
             }
@@ -856,6 +882,9 @@ class AnalyticsPayload {
   /// The JSON-encoded response data (only present on successful requests)
   final String? stringifiedResponse;
 
+  /// The duration of the request execution (only present when timing was captured)
+  final Duration? duration;
+
   const AnalyticsPayload({
     required this.time,
     required this.status,
@@ -865,6 +894,7 @@ class AnalyticsPayload {
     this.errorObjectAsString,
     this.errorStackTraceAsString,
     this.stringifiedResponse,
+    this.duration,
   });
 }
 
@@ -913,7 +943,10 @@ class PeriodicCleanupOldAnalyticsDetails extends FutureCall {
       final now = DateTime.now();
       final sevenDaysAgo = now.subtract(const Duration(days: 7));
 
-      // Delete all AnalyticsRequestDetails older than 7 days
+      // STEP 1: Calculate and update average durations BEFORE deleting old analytics
+      await _updateAverageDurationsForAllScrappables(session);
+
+      // STEP 2: Delete all AnalyticsRequestDetails older than 7 days
       final deletedCount = await AnalyticsRequestDetails.db.deleteWhere(
         session,
         where: (t) => t.timeStamp < sevenDaysAgo,
@@ -939,6 +972,182 @@ class PeriodicCleanupOldAnalyticsDetails extends FutureCall {
       const Duration(hours: 1),
       identifier: 'periodicCleanupOldAnalyticsDetails',
     );
+  }
+
+  /// Updates average duration for all scrappables that have analytics with duration data.
+  ///
+  /// This method processes scrappables in chunks of 30 to avoid memory issues
+  /// when dealing with large datasets.
+  Future<void> _updateAverageDurationsForAllScrappables(Session session) async {
+    try {
+      const int chunkSize = 30;
+      int offset = 0;
+      bool hasMore = true;
+      int updatedCount = 0;
+
+      while (hasMore) {
+        // Get a chunk of scrappable IDs that have analytics with duration
+        final scrappableIds = await _getUniqueScrappableIdsWithDuration(
+          session,
+          limit: chunkSize,
+          offset: offset,
+        );
+
+        if (scrappableIds.isEmpty) {
+          hasMore = false;
+          break;
+        }
+
+        // Process this chunk
+        for (final scrappableId in scrappableIds) {
+          final wasUpdated = await _updateAverageDurationForScrappable(
+            session,
+            scrappableId,
+          );
+          if (wasUpdated) {
+            updatedCount++;
+          }
+        }
+
+        offset += chunkSize;
+
+        // Safety check to avoid infinite loops
+        if (scrappableIds.length < chunkSize) {
+          hasMore = false;
+        }
+      }
+
+      session.log(
+        'Updated average durations for $updatedCount scrappables',
+        level: LogLevel.info,
+      );
+    } catch (e, stackTrace) {
+      session.log(
+        'Error updating average durations',
+        exception: e,
+        stackTrace: stackTrace,
+        level: LogLevel.error,
+      );
+    }
+  }
+
+  /// Gets unique scrappable IDs that have analytics with duration data.
+  ///
+  /// Uses pagination with [limit] and [offset] to avoid loading all data at once.
+  /// Returns a list of unique scrappable IDs.
+  Future<List<int>> _getUniqueScrappableIdsWithDuration(
+    Session session, {
+    required int limit,
+    required int offset,
+  }) async {
+    // Query analytics with duration, ordered by scrappableId for consistent pagination
+    // We fetch more records than limit to account for duplicates, then deduplicate
+    final analytics = await ScrappableAnalytics.db.find(
+      session,
+      where: (t) =>
+          t.duration.notEquals(null) &
+          t.requestStatus.equals(RequestStatus.success),
+      orderBy: (t) => t.scrappableId,
+      limit: limit * 10, // Fetch more to account for multiple analytics per scrappable
+      offset: offset * 10, // Adjust offset accordingly
+    );
+
+    // Extract unique scrappable IDs while maintaining order
+    final Set<int> seenIds = {};
+    final List<int> uniqueIds = [];
+
+    for (final record in analytics) {
+      if (!seenIds.contains(record.scrappableId)) {
+        seenIds.add(record.scrappableId);
+        uniqueIds.add(record.scrappableId);
+        if (uniqueIds.length >= limit) {
+          break;
+        }
+      }
+    }
+
+    return uniqueIds;
+  }
+
+  /// Updates the average duration for a single scrappable.
+  ///
+  /// Fetches the last 50 SUCCESS analytics records with duration data,
+  /// calculates the average, and updates or creates the ScrappableAverageDuration record.
+  ///
+  /// Returns true if the average duration was updated, false otherwise.
+  Future<bool> _updateAverageDurationForScrappable(
+    Session session,
+    int scrappableId,
+  ) async {
+    // Fetch last 50 SUCCESS analytics with duration for this scrappable
+    final analytics = await ScrappableAnalytics.db.find(
+      session,
+      where: (t) =>
+          t.scrappableId.equals(scrappableId) &
+          t.duration.notEquals(null) &
+          t.requestStatus.equals(RequestStatus.success),
+      limit: 50,
+      orderBy: (t) => t.requestedAt,
+      orderDescending: true, // Most recent first
+    );
+
+    if (analytics.isEmpty) {
+      return false;
+    }
+
+    // Extract durations
+    final durations = analytics
+        .where((a) => a.duration != null)
+        .map((a) => a.duration!)
+        .toList();
+
+    if (durations.isEmpty) {
+      return false;
+    }
+
+    // Calculate average
+    final avgDuration = durations.average;
+
+    // Get the scrappable with its averageDurationInfo relation
+    final scrappable = await Scrappable.db.findById(
+      session,
+      scrappableId,
+      include: Scrappable.include(
+        averageDurationInfo: ScrappableAverageDuration.include(),
+      ),
+    );
+
+    if (scrappable == null) {
+      return false;
+    }
+
+    // Update or create the average duration info
+    if (scrappable.averageDurationInfo == null) {
+      // Create new ScrappableAverageDuration
+      final avgInfo = ScrappableAverageDuration(
+        updatedAt: DateTime.now(),
+        averageDuration: avgDuration,
+      );
+      final inserted =
+          await ScrappableAverageDuration.db.insertRow(session, avgInfo);
+
+      // Update scrappable to link to the new average duration info
+      await Scrappable.db.updateRow(
+        session,
+        scrappable.copyWith(averageDurationInfoId: inserted.id),
+      );
+    } else {
+      // Update existing ScrappableAverageDuration
+      await ScrappableAverageDuration.db.updateRow(
+        session,
+        scrappable.averageDurationInfo!.copyWith(
+          updatedAt: DateTime.now(),
+          averageDuration: avgDuration,
+        ),
+      );
+    }
+
+    return true;
   }
 }
 
@@ -1004,6 +1213,7 @@ Future<void> _setScrappableAnalytics(
               attachedNanoId: nanoId,
               detailsId: detailsList[i].id,
               apiKeyId: accountApiKey?.id,
+              duration: items[i].duration,
             );
           }),
           transaction: transaction);

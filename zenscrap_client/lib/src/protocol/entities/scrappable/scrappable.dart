@@ -17,7 +17,8 @@ import '../../entities/scrappable/reference_test_data.dart' as _i4;
 import '../../entities/scrappable/scrappable_analytics.dart' as _i5;
 import '../../entities/scrappable/scraper_category.dart' as _i6;
 import '../../entities/scrappable/auto_fix/auto_fix_config.dart' as _i7;
-import 'package:zenscrap_client/src/protocol/protocol.dart' as _i8;
+import '../../entities/scrappable/scrappable_average_duration.dart' as _i8;
+import 'package:zenscrap_client/src/protocol/protocol.dart' as _i9;
 
 abstract class Scrappable implements _i1.SerializableModel {
   Scrappable._({
@@ -39,6 +40,8 @@ abstract class Scrappable implements _i1.SerializableModel {
     required this.category,
     required this.isDeleted,
     this.autoFixConfig,
+    this.averageDurationInfoId,
+    this.averageDurationInfo,
   });
 
   factory Scrappable({
@@ -60,6 +63,8 @@ abstract class Scrappable implements _i1.SerializableModel {
     required _i6.ScraperCategory category,
     required bool isDeleted,
     _i7.AutoFixConfig? autoFixConfig,
+    int? averageDurationInfoId,
+    _i8.ScrappableAverageDuration? averageDurationInfo,
   }) = _ScrappableImpl;
 
   factory Scrappable.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -86,7 +91,7 @@ abstract class Scrappable implements _i1.SerializableModel {
       scrappingBeeExtractRules:
           jsonSerialization['scrappingBeeExtractRules'] == null
           ? null
-          : _i8.Protocol().deserialize<_i2.ScrappingBeeExtractLogic>(
+          : _i9.Protocol().deserialize<_i2.ScrappingBeeExtractLogic>(
               jsonSerialization['scrappingBeeExtractRules'],
             ),
       willHideFromMarketplace:
@@ -94,18 +99,18 @@ abstract class Scrappable implements _i1.SerializableModel {
       targetRequestId: jsonSerialization['targetRequestId'] as int,
       targetRequest: jsonSerialization['targetRequest'] == null
           ? null
-          : _i8.Protocol().deserialize<_i3.ScrappableRequest>(
+          : _i9.Protocol().deserialize<_i3.ScrappableRequest>(
               jsonSerialization['targetRequest'],
             ),
       referenceTestDataId: jsonSerialization['referenceTestDataId'] as int,
       referenceTestData: jsonSerialization['referenceTestData'] == null
           ? null
-          : _i8.Protocol().deserialize<_i4.ReferenceTestData>(
+          : _i9.Protocol().deserialize<_i4.ReferenceTestData>(
               jsonSerialization['referenceTestData'],
             ),
       scrappableAnalytics: jsonSerialization['scrappableAnalytics'] == null
           ? null
-          : _i8.Protocol().deserialize<List<_i5.ScrappableAnalytics>>(
+          : _i9.Protocol().deserialize<List<_i5.ScrappableAnalytics>>(
               jsonSerialization['scrappableAnalytics'],
             ),
       category: _i6.ScraperCategory.fromJson(
@@ -114,8 +119,14 @@ abstract class Scrappable implements _i1.SerializableModel {
       isDeleted: jsonSerialization['isDeleted'] as bool,
       autoFixConfig: jsonSerialization['autoFixConfig'] == null
           ? null
-          : _i8.Protocol().deserialize<_i7.AutoFixConfig>(
+          : _i9.Protocol().deserialize<_i7.AutoFixConfig>(
               jsonSerialization['autoFixConfig'],
+            ),
+      averageDurationInfoId: jsonSerialization['averageDurationInfoId'] as int?,
+      averageDurationInfo: jsonSerialization['averageDurationInfo'] == null
+          ? null
+          : _i9.Protocol().deserialize<_i8.ScrappableAverageDuration>(
+              jsonSerialization['averageDurationInfo'],
             ),
     );
   }
@@ -159,6 +170,10 @@ abstract class Scrappable implements _i1.SerializableModel {
 
   _i7.AutoFixConfig? autoFixConfig;
 
+  int? averageDurationInfoId;
+
+  _i8.ScrappableAverageDuration? averageDurationInfo;
+
   /// Returns a shallow copy of this [Scrappable]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
@@ -181,6 +196,8 @@ abstract class Scrappable implements _i1.SerializableModel {
     _i6.ScraperCategory? category,
     bool? isDeleted,
     _i7.AutoFixConfig? autoFixConfig,
+    int? averageDurationInfoId,
+    _i8.ScrappableAverageDuration? averageDurationInfo,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -210,6 +227,10 @@ abstract class Scrappable implements _i1.SerializableModel {
       'category': category.toJson(),
       'isDeleted': isDeleted,
       if (autoFixConfig != null) 'autoFixConfig': autoFixConfig?.toJson(),
+      if (averageDurationInfoId != null)
+        'averageDurationInfoId': averageDurationInfoId,
+      if (averageDurationInfo != null)
+        'averageDurationInfo': averageDurationInfo?.toJson(),
     };
   }
 
@@ -241,6 +262,8 @@ class _ScrappableImpl extends Scrappable {
     required _i6.ScraperCategory category,
     required bool isDeleted,
     _i7.AutoFixConfig? autoFixConfig,
+    int? averageDurationInfoId,
+    _i8.ScrappableAverageDuration? averageDurationInfo,
   }) : super._(
          id: id,
          accountId: accountId,
@@ -260,6 +283,8 @@ class _ScrappableImpl extends Scrappable {
          category: category,
          isDeleted: isDeleted,
          autoFixConfig: autoFixConfig,
+         averageDurationInfoId: averageDurationInfoId,
+         averageDurationInfo: averageDurationInfo,
        );
 
   /// Returns a shallow copy of this [Scrappable]
@@ -285,6 +310,8 @@ class _ScrappableImpl extends Scrappable {
     _i6.ScraperCategory? category,
     bool? isDeleted,
     Object? autoFixConfig = _Undefined,
+    Object? averageDurationInfoId = _Undefined,
+    Object? averageDurationInfo = _Undefined,
   }) {
     return Scrappable(
       id: id is int? ? id : this.id,
@@ -321,6 +348,12 @@ class _ScrappableImpl extends Scrappable {
       autoFixConfig: autoFixConfig is _i7.AutoFixConfig?
           ? autoFixConfig
           : this.autoFixConfig?.copyWith(),
+      averageDurationInfoId: averageDurationInfoId is int?
+          ? averageDurationInfoId
+          : this.averageDurationInfoId,
+      averageDurationInfo: averageDurationInfo is _i8.ScrappableAverageDuration?
+          ? averageDurationInfo
+          : this.averageDurationInfo?.copyWith(),
     );
   }
 }

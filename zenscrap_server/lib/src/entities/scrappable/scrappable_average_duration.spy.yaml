@@ -1,0 +1,5 @@
+class: ScrappableAverageDuration
+table: scrappable_average_duration
+fields:
+  updatedAt: DateTime
+  averageDuration: Duration

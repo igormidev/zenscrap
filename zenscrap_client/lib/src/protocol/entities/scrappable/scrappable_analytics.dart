@@ -30,6 +30,7 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
     this.details,
     this.apiKeyId,
     this.apiKey,
+    this.duration,
   });
 
   factory ScrappableAnalytics({
@@ -44,6 +45,7 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
     _i4.AnalyticsRequestDetails? details,
     int? apiKeyId,
     _i5.AccountApiKey? apiKey,
+    Duration? duration,
   }) = _ScrappableAnalyticsImpl;
 
   factory ScrappableAnalytics.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -75,6 +77,9 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
           : _i6.Protocol().deserialize<_i5.AccountApiKey>(
               jsonSerialization['apiKey'],
             ),
+      duration: jsonSerialization['duration'] == null
+          ? null
+          : _i1.DurationJsonExtension.fromJson(jsonSerialization['duration']),
     );
   }
 
@@ -103,6 +108,8 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
 
   _i5.AccountApiKey? apiKey;
 
+  Duration? duration;
+
   /// Returns a shallow copy of this [ScrappableAnalytics]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
@@ -118,6 +125,7 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
     _i4.AnalyticsRequestDetails? details,
     int? apiKeyId,
     _i5.AccountApiKey? apiKey,
+    Duration? duration,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -134,6 +142,7 @@ abstract class ScrappableAnalytics implements _i1.SerializableModel {
       if (details != null) 'details': details?.toJson(),
       if (apiKeyId != null) 'apiKeyId': apiKeyId,
       if (apiKey != null) 'apiKey': apiKey?.toJson(),
+      if (duration != null) 'duration': duration?.toJson(),
     };
   }
 
@@ -158,6 +167,7 @@ class _ScrappableAnalyticsImpl extends ScrappableAnalytics {
     _i4.AnalyticsRequestDetails? details,
     int? apiKeyId,
     _i5.AccountApiKey? apiKey,
+    Duration? duration,
   }) : super._(
          id: id,
          requestStatus: requestStatus,
@@ -170,6 +180,7 @@ class _ScrappableAnalyticsImpl extends ScrappableAnalytics {
          details: details,
          apiKeyId: apiKeyId,
          apiKey: apiKey,
+         duration: duration,
        );
 
   /// Returns a shallow copy of this [ScrappableAnalytics]
@@ -188,6 +199,7 @@ class _ScrappableAnalyticsImpl extends ScrappableAnalytics {
     Object? details = _Undefined,
     Object? apiKeyId = _Undefined,
     Object? apiKey = _Undefined,
+    Object? duration = _Undefined,
   }) {
     return ScrappableAnalytics(
       id: id is int? ? id : this.id,
@@ -205,6 +217,7 @@ class _ScrappableAnalyticsImpl extends ScrappableAnalytics {
           : this.details?.copyWith(),
       apiKeyId: apiKeyId is int? ? apiKeyId : this.apiKeyId,
       apiKey: apiKey is _i5.AccountApiKey? ? apiKey : this.apiKey?.copyWith(),
+      duration: duration is Duration? ? duration : this.duration,
     );
   }
 }

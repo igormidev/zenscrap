@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/core/extensions/date_time_extension.dart';
+import 'package:zenscrap_flutter/src/core/extensions/duration_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/category_badge.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/edit_scrappable_dialog.dart';
@@ -187,6 +189,13 @@ class ScrappableCardIndicator extends ConsumerWidget {
                       ],
                     ),
                   ),
+                  if (scrappable.averageDurationInfo != null) ...[
+                    const SizedBox(width: 8),
+                    _AverageDurationBadge(
+                      averageDuration:
+                          scrappable.averageDurationInfo!.averageDuration,
+                    ),
+                  ],
                 ] else ...[
                   // Status badge
                   Container(
@@ -236,6 +245,13 @@ class ScrappableCardIndicator extends ConsumerWidget {
                       ],
                     ),
                   ),
+                  if (scrappable.averageDurationInfo != null) ...[
+                    const SizedBox(width: 8),
+                    _AverageDurationBadge(
+                      averageDuration:
+                          scrappable.averageDurationInfo!.averageDuration,
+                    ),
+                  ],
                 ],
                 if (!isNew) ...[
                   const Spacer(),
@@ -247,6 +263,50 @@ class ScrappableCardIndicator extends ConsumerWidget {
                   ),
                 ],
               ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// A small badge showing the average request duration.
+class _AverageDurationBadge extends StatelessWidget {
+  final Duration averageDuration;
+
+  const _AverageDurationBadge({
+    required this.averageDuration,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final badgeColor = context.c.tertiary;
+
+    return Tooltip(
+      message: l10n.scrappable_card_average_duration_tooltip,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: badgeColor.withAlpha(26),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.speed_outlined,
+              size: 14,
+              color: badgeColor,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              '${l10n.api_analytics_average_duration_prefix}${averageDuration.shortFormat}',
+              style: context.t.labelSmall?.copyWith(
+                color: badgeColor,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),

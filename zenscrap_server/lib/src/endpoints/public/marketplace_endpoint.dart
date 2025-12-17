@@ -86,6 +86,7 @@ class MarketplaceEndpoint extends Endpoint {
         scrappingBeeExtractRules: ScrappingBeeExtractLogic.include(),
         referenceTestData: ReferenceTestData.include(),
         autoFixConfig: AutoFixConfig.include(),
+        averageDurationInfo: ScrappableAverageDuration.include(),
       ),
     );
 

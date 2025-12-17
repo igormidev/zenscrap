@@ -19,7 +19,8 @@ import '../../entities/scrappable/reference_test_data.dart' as _i4;
 import '../../entities/scrappable/scrappable_analytics.dart' as _i5;
 import '../../entities/scrappable/scraper_category.dart' as _i6;
 import '../../entities/scrappable/auto_fix/auto_fix_config.dart' as _i7;
-import 'package:zenscrap_server/src/generated/protocol.dart' as _i8;
+import '../../entities/scrappable/scrappable_average_duration.dart' as _i8;
+import 'package:zenscrap_server/src/generated/protocol.dart' as _i9;
 
 abstract class Scrappable
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -43,6 +44,8 @@ abstract class Scrappable
     required this.category,
     required this.isDeleted,
     this.autoFixConfig,
+    this.averageDurationInfoId,
+    this.averageDurationInfo,
   });
 
   factory Scrappable({
@@ -65,6 +68,8 @@ abstract class Scrappable
     required _i6.ScraperCategory category,
     required bool isDeleted,
     _i7.AutoFixConfig? autoFixConfig,
+    int? averageDurationInfoId,
+    _i8.ScrappableAverageDuration? averageDurationInfo,
   }) = _ScrappableImpl;
 
   factory Scrappable.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -92,7 +97,7 @@ abstract class Scrappable
       scrappingBeeExtractRules:
           jsonSerialization['scrappingBeeExtractRules'] == null
           ? null
-          : _i8.Protocol().deserialize<_i2.ScrappingBeeExtractLogic>(
+          : _i9.Protocol().deserialize<_i2.ScrappingBeeExtractLogic>(
               jsonSerialization['scrappingBeeExtractRules'],
             ),
       willHideFromMarketplace:
@@ -100,18 +105,18 @@ abstract class Scrappable
       targetRequestId: jsonSerialization['targetRequestId'] as int,
       targetRequest: jsonSerialization['targetRequest'] == null
           ? null
-          : _i8.Protocol().deserialize<_i3.ScrappableRequest>(
+          : _i9.Protocol().deserialize<_i3.ScrappableRequest>(
               jsonSerialization['targetRequest'],
             ),
       referenceTestDataId: jsonSerialization['referenceTestDataId'] as int,
       referenceTestData: jsonSerialization['referenceTestData'] == null
           ? null
-          : _i8.Protocol().deserialize<_i4.ReferenceTestData>(
+          : _i9.Protocol().deserialize<_i4.ReferenceTestData>(
               jsonSerialization['referenceTestData'],
             ),
       scrappableAnalytics: jsonSerialization['scrappableAnalytics'] == null
           ? null
-          : _i8.Protocol().deserialize<List<_i5.ScrappableAnalytics>>(
+          : _i9.Protocol().deserialize<List<_i5.ScrappableAnalytics>>(
               jsonSerialization['scrappableAnalytics'],
             ),
       category: _i6.ScraperCategory.fromJson(
@@ -120,8 +125,14 @@ abstract class Scrappable
       isDeleted: jsonSerialization['isDeleted'] as bool,
       autoFixConfig: jsonSerialization['autoFixConfig'] == null
           ? null
-          : _i8.Protocol().deserialize<_i7.AutoFixConfig>(
+          : _i9.Protocol().deserialize<_i7.AutoFixConfig>(
               jsonSerialization['autoFixConfig'],
+            ),
+      averageDurationInfoId: jsonSerialization['averageDurationInfoId'] as int?,
+      averageDurationInfo: jsonSerialization['averageDurationInfo'] == null
+          ? null
+          : _i9.Protocol().deserialize<_i8.ScrappableAverageDuration>(
+              jsonSerialization['averageDurationInfo'],
             ),
     );
   }
@@ -169,6 +180,10 @@ abstract class Scrappable
 
   _i7.AutoFixConfig? autoFixConfig;
 
+  int? averageDurationInfoId;
+
+  _i8.ScrappableAverageDuration? averageDurationInfo;
+
   @override
   _i1.Table<int?> get table => t;
 
@@ -195,6 +210,8 @@ abstract class Scrappable
     _i6.ScraperCategory? category,
     bool? isDeleted,
     _i7.AutoFixConfig? autoFixConfig,
+    int? averageDurationInfoId,
+    _i8.ScrappableAverageDuration? averageDurationInfo,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -226,6 +243,10 @@ abstract class Scrappable
       'category': category.toJson(),
       'isDeleted': isDeleted,
       if (autoFixConfig != null) 'autoFixConfig': autoFixConfig?.toJson(),
+      if (averageDurationInfoId != null)
+        'averageDurationInfoId': averageDurationInfoId,
+      if (averageDurationInfo != null)
+        'averageDurationInfo': averageDurationInfo?.toJson(),
     };
   }
 
@@ -260,6 +281,10 @@ abstract class Scrappable
       'isDeleted': isDeleted,
       if (autoFixConfig != null)
         'autoFixConfig': autoFixConfig?.toJsonForProtocol(),
+      if (averageDurationInfoId != null)
+        'averageDurationInfoId': averageDurationInfoId,
+      if (averageDurationInfo != null)
+        'averageDurationInfo': averageDurationInfo?.toJsonForProtocol(),
     };
   }
 
@@ -269,6 +294,7 @@ abstract class Scrappable
     _i4.ReferenceTestDataInclude? referenceTestData,
     _i5.ScrappableAnalyticsIncludeList? scrappableAnalytics,
     _i7.AutoFixConfigInclude? autoFixConfig,
+    _i8.ScrappableAverageDurationInclude? averageDurationInfo,
   }) {
     return ScrappableInclude._(
       scrappingBeeExtractRules: scrappingBeeExtractRules,
@@ -276,6 +302,7 @@ abstract class Scrappable
       referenceTestData: referenceTestData,
       scrappableAnalytics: scrappableAnalytics,
       autoFixConfig: autoFixConfig,
+      averageDurationInfo: averageDurationInfo,
     );
   }
 
@@ -328,6 +355,8 @@ class _ScrappableImpl extends Scrappable {
     required _i6.ScraperCategory category,
     required bool isDeleted,
     _i7.AutoFixConfig? autoFixConfig,
+    int? averageDurationInfoId,
+    _i8.ScrappableAverageDuration? averageDurationInfo,
   }) : super._(
          id: id,
          accountId: accountId,
@@ -348,6 +377,8 @@ class _ScrappableImpl extends Scrappable {
          category: category,
          isDeleted: isDeleted,
          autoFixConfig: autoFixConfig,
+         averageDurationInfoId: averageDurationInfoId,
+         averageDurationInfo: averageDurationInfo,
        );
 
   /// Returns a shallow copy of this [Scrappable]
@@ -374,6 +405,8 @@ class _ScrappableImpl extends Scrappable {
     _i6.ScraperCategory? category,
     bool? isDeleted,
     Object? autoFixConfig = _Undefined,
+    Object? averageDurationInfoId = _Undefined,
+    Object? averageDurationInfo = _Undefined,
   }) {
     return Scrappable(
       id: id is int? ? id : this.id,
@@ -413,6 +446,12 @@ class _ScrappableImpl extends Scrappable {
       autoFixConfig: autoFixConfig is _i7.AutoFixConfig?
           ? autoFixConfig
           : this.autoFixConfig?.copyWith(),
+      averageDurationInfoId: averageDurationInfoId is int?
+          ? averageDurationInfoId
+          : this.averageDurationInfoId,
+      averageDurationInfo: averageDurationInfo is _i8.ScrappableAverageDuration?
+          ? averageDurationInfo
+          : this.averageDurationInfo?.copyWith(),
     );
   }
 }
@@ -493,6 +532,12 @@ class ScrappableUpdateTable extends _i1.UpdateTable<ScrappableTable> {
     table.isDeleted,
     value,
   );
+
+  _i1.ColumnValue<int, int> averageDurationInfoId(int? value) =>
+      _i1.ColumnValue(
+        table.averageDurationInfoId,
+        value,
+      );
 }
 
 class ScrappableTable extends _i1.Table<int?> {
@@ -551,6 +596,10 @@ class ScrappableTable extends _i1.Table<int?> {
       'isDeleted',
       this,
     );
+    averageDurationInfoId = _i1.ColumnInt(
+      'averageDurationInfoId',
+      this,
+    );
   }
 
   late final ScrappableUpdateTable updateTable;
@@ -592,6 +641,10 @@ class ScrappableTable extends _i1.Table<int?> {
   late final _i1.ColumnBool isDeleted;
 
   _i7.AutoFixConfigTable? _autoFixConfig;
+
+  late final _i1.ColumnInt averageDurationInfoId;
+
+  _i8.ScrappableAverageDurationTable? _averageDurationInfo;
 
   _i2.ScrappingBeeExtractLogicTable get scrappingBeeExtractRules {
     if (_scrappingBeeExtractRules != null) return _scrappingBeeExtractRules!;
@@ -659,6 +712,20 @@ class ScrappableTable extends _i1.Table<int?> {
     return _autoFixConfig!;
   }
 
+  _i8.ScrappableAverageDurationTable get averageDurationInfo {
+    if (_averageDurationInfo != null) return _averageDurationInfo!;
+    _averageDurationInfo = _i1.createRelationTable(
+      relationFieldName: 'averageDurationInfo',
+      field: Scrappable.t.averageDurationInfoId,
+      foreignField: _i8.ScrappableAverageDuration.t.id,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) => _i8.ScrappableAverageDurationTable(
+        tableRelation: foreignTableRelation,
+      ),
+    );
+    return _averageDurationInfo!;
+  }
+
   _i1.ManyRelation<_i5.ScrappableAnalyticsTable> get scrappableAnalytics {
     if (_scrappableAnalytics != null) return _scrappableAnalytics!;
     var relationTable = _i1.createRelationTable(
@@ -694,6 +761,7 @@ class ScrappableTable extends _i1.Table<int?> {
     referenceTestDataId,
     category,
     isDeleted,
+    averageDurationInfoId,
   ];
 
   @override
@@ -713,6 +781,9 @@ class ScrappableTable extends _i1.Table<int?> {
     if (relationField == 'autoFixConfig') {
       return autoFixConfig;
     }
+    if (relationField == 'averageDurationInfo') {
+      return averageDurationInfo;
+    }
     return null;
   }
 }
@@ -724,12 +795,14 @@ class ScrappableInclude extends _i1.IncludeObject {
     _i4.ReferenceTestDataInclude? referenceTestData,
     _i5.ScrappableAnalyticsIncludeList? scrappableAnalytics,
     _i7.AutoFixConfigInclude? autoFixConfig,
+    _i8.ScrappableAverageDurationInclude? averageDurationInfo,
   }) {
     _scrappingBeeExtractRules = scrappingBeeExtractRules;
     _targetRequest = targetRequest;
     _referenceTestData = referenceTestData;
     _scrappableAnalytics = scrappableAnalytics;
     _autoFixConfig = autoFixConfig;
+    _averageDurationInfo = averageDurationInfo;
   }
 
   _i2.ScrappingBeeExtractLogicInclude? _scrappingBeeExtractRules;
@@ -742,6 +815,8 @@ class ScrappableInclude extends _i1.IncludeObject {
 
   _i7.AutoFixConfigInclude? _autoFixConfig;
 
+  _i8.ScrappableAverageDurationInclude? _averageDurationInfo;
+
   @override
   Map<String, _i1.Include?> get includes => {
     'scrappingBeeExtractRules': _scrappingBeeExtractRules,
@@ -749,6 +824,7 @@ class ScrappableInclude extends _i1.IncludeObject {
     'referenceTestData': _referenceTestData,
     'scrappableAnalytics': _scrappableAnalytics,
     'autoFixConfig': _autoFixConfig,
+    'averageDurationInfo': _averageDurationInfo,
   };
 
   @override
@@ -1170,6 +1246,31 @@ class ScrappableAttachRowRepository {
     );
   }
 
+  /// Creates a relation between the given [Scrappable] and [ScrappableAverageDuration]
+  /// by setting the [Scrappable]'s foreign key `averageDurationInfoId` to refer to the [ScrappableAverageDuration].
+  Future<void> averageDurationInfo(
+    _i1.Session session,
+    Scrappable scrappable,
+    _i8.ScrappableAverageDuration averageDurationInfo, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (scrappable.id == null) {
+      throw ArgumentError.notNull('scrappable.id');
+    }
+    if (averageDurationInfo.id == null) {
+      throw ArgumentError.notNull('averageDurationInfo.id');
+    }
+
+    var $scrappable = scrappable.copyWith(
+      averageDurationInfoId: averageDurationInfo.id,
+    );
+    await session.db.updateRow<Scrappable>(
+      $scrappable,
+      columns: [Scrappable.t.averageDurationInfoId],
+      transaction: transaction,
+    );
+  }
+
   /// Creates a relation between this [Scrappable] and the given [ScrappableAnalytics]
   /// by setting the [ScrappableAnalytics]'s foreign key `scrappableId` to refer to this [Scrappable].
   Future<void> scrappableAnalytics(
@@ -1255,6 +1356,28 @@ class ScrappableDetachRowRepository {
     await session.db.updateRow<_i2.ScrappingBeeExtractLogic>(
       $$scrappingBeeExtractRules,
       columns: [_i2.ScrappingBeeExtractLogic.t.scrappableId],
+      transaction: transaction,
+    );
+  }
+
+  /// Detaches the relation between this [Scrappable] and the [ScrappableAverageDuration] set in `averageDurationInfo`
+  /// by setting the [Scrappable]'s foreign key `averageDurationInfoId` to `null`.
+  ///
+  /// This removes the association between the two models without deleting
+  /// the related record.
+  Future<void> averageDurationInfo(
+    _i1.Session session,
+    Scrappable scrappable, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (scrappable.id == null) {
+      throw ArgumentError.notNull('scrappable.id');
+    }
+
+    var $scrappable = scrappable.copyWith(averageDurationInfoId: null);
+    await session.db.updateRow<Scrappable>(
+      $scrappable,
+      columns: [Scrappable.t.averageDurationInfoId],
       transaction: transaction,
     );
   }
