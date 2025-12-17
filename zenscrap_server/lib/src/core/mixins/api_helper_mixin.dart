@@ -1377,17 +1377,83 @@ class PeriodicCleanupOldAnalyticsDetails extends FutureCall {
     return result.map((row) => row[0] as int).toList();
   }
 
+  /// Gets the timestamp of the most recent SUCCESS analytics record with duration
+  /// for a given scrappable. Returns null if no records exist.
+  ///
+  /// This is used to determine if there's new data since the last average
+  /// duration calculation, avoiding unnecessary recalculations.
+  Future<DateTime?> _getLatestAnalyticsTimestamp(
+    Session session,
+    int scrappableId,
+  ) async {
+    final result = await ScrappableAnalytics.db.findFirstRow(
+      session,
+      where: (t) =>
+          t.scrappableId.equals(scrappableId) &
+          t.duration.notEquals(null) &
+          t.requestStatus.equals(RequestStatus.success),
+      orderBy: (t) => t.requestedAt,
+      orderDescending: true,
+    );
+    return result?.requestedAt;
+  }
+
   /// Updates the average duration for a single scrappable.
   ///
   /// Fetches the last [ApiHelperConfig.averageDurationSampleSize] SUCCESS analytics
   /// records with duration data, calculates the average, and updates or creates
   /// the ScrappableAverageDuration record.
   ///
+  /// This method only performs the calculation if there is new analytics data
+  /// since the last update. This makes the `updatedAt` field meaningful - it
+  /// accurately reflects when the average was last recalculated based on new data,
+  /// not just when the periodic job ran.
+  ///
   /// Returns true if the average duration was updated, false otherwise.
   Future<bool> _updateAverageDurationForScrappable(
     Session session,
     int scrappableId,
   ) async {
+    // STEP 1: Get the timestamp of the most recent analytics record
+    final latestAnalyticsTimestamp = await _getLatestAnalyticsTimestamp(
+      session,
+      scrappableId,
+    );
+
+    // If no analytics exist, nothing to calculate
+    if (latestAnalyticsTimestamp == null) {
+      return false;
+    }
+
+    // STEP 2: Get the scrappable with its existing average duration info
+    final scrappable = await Scrappable.db.findById(
+      session,
+      scrappableId,
+      include: Scrappable.include(
+        averageDurationInfo: ScrappableAverageDuration.include(),
+      ),
+    );
+
+    if (scrappable == null) {
+      return false;
+    }
+
+    final existing = scrappable.averageDurationInfo;
+
+    // STEP 3: Check if we need to update
+    // Update required if:
+    // - No existing record (first time calculation)
+    // - Latest analytics timestamp is after the last update (new data exists)
+    if (existing != null && !latestAnalyticsTimestamp.isAfter(existing.updatedAt)) {
+      // No new data since last calculation - SKIP
+      session.log(
+        'Skipping average duration update for scrappable $scrappableId - no new data since ${existing.updatedAt}',
+        level: LogLevel.debug,
+      );
+      return false;
+    }
+
+    // STEP 4: New data exists - proceed with calculation
     // Fetch last N SUCCESS analytics with duration for this scrappable
     final analytics = await ScrappableAnalytics.db.find(
       session,
@@ -1417,21 +1483,8 @@ class PeriodicCleanupOldAnalyticsDetails extends FutureCall {
     // Calculate average
     final avgDuration = durations.average;
 
-    // Get the scrappable with its averageDurationInfo relation
-    final scrappable = await Scrappable.db.findById(
-      session,
-      scrappableId,
-      include: Scrappable.include(
-        averageDurationInfo: ScrappableAverageDuration.include(),
-      ),
-    );
-
-    if (scrappable == null) {
-      return false;
-    }
-
-    // Update or create the average duration info
-    if (scrappable.averageDurationInfo == null) {
+    // STEP 5: Update or create the average duration info
+    if (existing == null) {
       // Create new ScrappableAverageDuration
       final avgInfo = ScrappableAverageDuration(
         updatedAt: DateTime.now(),
@@ -1449,7 +1502,7 @@ class PeriodicCleanupOldAnalyticsDetails extends FutureCall {
       // Update existing ScrappableAverageDuration
       await ScrappableAverageDuration.db.updateRow(
         session,
-        scrappable.averageDurationInfo!.copyWith(
+        existing.copyWith(
           updatedAt: DateTime.now(),
           averageDuration: avgDuration,
         ),
