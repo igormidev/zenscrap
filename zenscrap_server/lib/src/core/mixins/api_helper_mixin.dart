@@ -616,7 +616,7 @@ mixin ApiHelperMixin {
     return entry.value.contains(apiKey);
   }
 
-  Future<void> garanteeApiKeyExists(
+  Future<void> guaranteeApiKeyExists(
       Session session, NanoId? nanoId, ApiKey? apiKey) async {
     final isTest = nanoId == null || apiKey == null;
     if (isTest) return;
@@ -666,7 +666,7 @@ mixin ApiHelperMixin {
       final doesApiKeyExists = checkIdApiKeyExists(nanoId, apiKey);
       // Will throw if not exists and cache result if exist so new calls to db are not needed each time
       if (!doesApiKeyExists) {
-        await garanteeApiKeyExists(session, nanoId, apiKey);
+        await guaranteeApiKeyExists(session, nanoId, apiKey);
       }
 
       return await call(nanoId, scrappable, stopwatch);
