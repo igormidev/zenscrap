@@ -90,16 +90,112 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
 
     final offset = (page - 1) * pageSize;
 
-    // Get paginated list of scrappables
+    // Get paginated list of scrappable IDs
     final allScrappableIds = uniqueScrappablesMap.keys.toList()..sort();
     final paginatedIds = allScrappableIds.skip(offset).take(pageSize).toList();
-    final List<Scrappable> scrappables =
-        paginatedIds.map((id) => uniqueScrappablesMap[id]!).toList();
 
+    // ==========================================================================
+    // OPTIMIZED: Single aggregated query instead of N+1 queries
+    // ==========================================================================
+    // Previously: For each scrappable × each interval × each status = separate query
+    // Now: Single query with GROUP BY, then map results to data structures
+    // ==========================================================================
+
+    if (paginatedIds.isEmpty) {
+      return PaginatedScrappableRequestsAnalytics(
+        scope: scope,
+        items: [],
+        hasNextPage: false,
+        totalCount: totalCount,
+        currentPage: page,
+        pageSize: pageSize,
+      );
+    }
+
+    // Calculate the time intervals for this scope
+    final List<({DateTime start, DateTime end})> intervals = [];
+    DateTime intervalEnd = now;
+    for (final Duration duration in timeScopes) {
+      final DateTime intervalStart = now.subtract(duration);
+      intervals.add((start: intervalStart, end: intervalEnd));
+      intervalEnd = intervalStart;
+    }
+
+    // Get the overall time range (from oldest interval start to now)
+    final DateTime overallStart = now.subtract(timeScopes.last);
+    final DateTime overallEnd = now;
+
+    // Execute a single aggregated query for all scrappables and statuses
+    // This replaces potentially thousands of individual count queries
+    final aggregatedResult = await session.db.unsafeQuery(
+      r'''
+      SELECT
+        "scrappableId",
+        "requestStatus",
+        "requestedAt"
+      FROM "scrappable_analytics"
+      WHERE "scrappableId" = ANY(@scrappableIds)
+        AND "requestedAt" >= @startTime
+        AND "requestedAt" <= @endTime
+      ORDER BY "scrappableId", "requestedAt"
+      ''',
+      parameters: QueryParameters.named({
+        'scrappableIds': paginatedIds,
+        'startTime': overallStart,
+        'endTime': overallEnd,
+      }),
+    );
+
+    // Build a map: scrappableId -> intervalIndex -> status -> count
+    // We need to bucket each record into the correct interval
+    final Map<int, Map<int, Map<String, int>>> countsByScrapAndInterval = {};
+
+    // Initialize the structure for all scrappables and intervals
+    for (final scrappableId in paginatedIds) {
+      countsByScrapAndInterval[scrappableId] = {};
+      for (var i = 0; i < intervals.length; i++) {
+        countsByScrapAndInterval[scrappableId]![i] = {
+          'success': 0,
+          'clientError': 0,
+          'serverError': 0,
+          'insufficientCredits': 0,
+          'maxConcurrencyExceeded': 0,
+          'failedAtScrappingBee': 0,
+        };
+      }
+    }
+
+    // Process each record and bucket it into the appropriate interval
+    for (final row in aggregatedResult) {
+      final scrappableId = row[0] as int;
+      final status = row[1] as String;
+      final requestedAt = row[2] as DateTime;
+
+      // Find which interval this record belongs to
+      // Intervals are processed from most recent (index 0) to oldest (last index)
+      // Each interval: (start, end] where end is inclusive
+      for (var i = 0; i < intervals.length; i++) {
+        final interval = intervals[i];
+        // Match the original BETWEEN behavior: inclusive on both ends
+        if ((requestedAt.isAtSameMomentAs(interval.start) ||
+                requestedAt.isAfter(interval.start)) &&
+            (requestedAt.isAtSameMomentAs(interval.end) ||
+                requestedAt.isBefore(interval.end))) {
+          countsByScrapAndInterval[scrappableId]?[i]?[status] =
+              (countsByScrapAndInterval[scrappableId]?[i]?[status] ?? 0) + 1;
+          break; // Each record belongs to one interval only
+        }
+      }
+    }
+
+    // Build the response items from the aggregated data
     final List<ScrappableRequestsAnalyticsItem> items = [];
 
-    for (final Scrappable scrappable in scrappables) {
-      final List<ScrappableRequestPerTimeScope> data = [];
+    for (final scrappableId in paginatedIds) {
+      final scrappable = uniqueScrappablesMap[scrappableId]!;
+      final intervalCounts = countsByScrapAndInterval[scrappableId]!;
+
+      // Calculate totals and build per-interval data
       int successTotalCount = 0;
       int clientErrorTotalCount = 0;
       int serverErrorTotalCount = 0;
@@ -107,30 +203,18 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
       int maxConcurrencyExceededTotalCount = 0;
       int failedAtScrappingBeeTotalCount = 0;
 
-      DateTime end = now;
-      for (final Duration duration in timeScopes) {
-        final DateTime start = now.subtract(duration);
-        // Dwc stands for "Default where clause"
-        dWC(ScrappableAnalyticsTable t, RequestStatus status) =>
-            t.scrappableId.equals(scrappable.id) &
-            (t.requestedAt.between(start, end)) &
-            t.requestStatus.equals(status);
+      final List<ScrappableRequestPerTimeScope> data = [];
 
-        final successCount = await ScrappableAnalytics.db
-            .count(session, where: (p0) => dWC(p0, RequestStatus.success));
-        final clientErrorCount = await ScrappableAnalytics.db
-            .count(session, where: (p0) => dWC(p0, RequestStatus.clientError));
-        final serverErrorCount = await ScrappableAnalytics.db
-            .count(session, where: (p0) => dWC(p0, RequestStatus.serverError));
-        final insufficientCreditsCount = await ScrappableAnalytics.db.count(
-            session,
-            where: (p0) => dWC(p0, RequestStatus.insufficientCredits));
-        final maxConcurrencyExceededCount = await ScrappableAnalytics.db.count(
-            session,
-            where: (p0) => dWC(p0, RequestStatus.maxConcurrencyExceeded));
-        final failedAtScrappingBeeCount = await ScrappableAnalytics.db.count(
-            session,
-            where: (p0) => dWC(p0, RequestStatus.failedAtScrappingBee));
+      for (var i = 0; i < intervals.length; i++) {
+        final interval = intervals[i];
+        final counts = intervalCounts[i]!;
+
+        final successCount = counts['success']!;
+        final clientErrorCount = counts['clientError']!;
+        final serverErrorCount = counts['serverError']!;
+        final insufficientCreditsCount = counts['insufficientCredits']!;
+        final maxConcurrencyExceededCount = counts['maxConcurrencyExceeded']!;
+        final failedAtScrappingBeeCount = counts['failedAtScrappingBee']!;
 
         successTotalCount += successCount;
         clientErrorTotalCount += clientErrorCount;
@@ -140,8 +224,8 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
         failedAtScrappingBeeTotalCount += failedAtScrappingBeeCount;
 
         data.add(ScrappableRequestPerTimeScope(
-          start: start,
-          end: end,
+          start: interval.start,
+          end: interval.end,
           successCount: successCount,
           clientErrorCount: clientErrorCount,
           serverErrorCount: serverErrorCount,
@@ -149,8 +233,6 @@ class PrivateScrappableAnalyticsEndpoint extends Endpoint {
           maxConcurrencyExceededCount: maxConcurrencyExceededCount,
           failedAtScrappingBeeCount: failedAtScrappingBeeCount,
         ));
-
-        end = start;
       }
 
       items.add(ScrappableRequestsAnalyticsItem(
