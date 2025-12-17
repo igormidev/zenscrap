@@ -17,3 +17,5 @@ indexes:
     fields: attachedNanoId
   scrappable_analytics_attached_apikey_idx:
     fields: attachedApiKey
+  scrappable_analytics_scrappable_requested_status_idx:
+    fields: scrappableId, requestedAt, requestStatus

@@ -1855,6 +1855,27 @@ class Protocol extends _i1.SerializationManagerServer {
           isUnique: false,
           isPrimary: false,
         ),
+        _i2.IndexDefinition(
+          indexName: 'scrappable_analytics_scrappable_requested_status_idx',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'scrappableId',
+            ),
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'requestedAt',
+            ),
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'requestStatus',
+            ),
+          ],
+          type: 'btree',
+          isUnique: false,
+          isPrimary: false,
+        ),
       ],
       managed: true,
     ),
