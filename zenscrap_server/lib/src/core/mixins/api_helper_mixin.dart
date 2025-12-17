@@ -115,14 +115,6 @@ class ApiHelperConfig {
   /// Larger values are more efficient but use more memory per iteration.
   static const int cleanupBatchSize = 30;
 
-  /// Multiplier for pagination when fetching analytics with duplicates.
-  ///
-  /// When fetching unique scrappable IDs from analytics, we fetch
-  /// (limit * this multiplier) records to account for multiple analytics
-  /// per scrappable, then deduplicate. Higher values reduce database round
-  /// trips but increase memory usage per query.
-  static const int paginationMultiplier = 10;
-
   /// Number of recent success records to use for average duration calculation.
   ///
   /// Average request duration is calculated from the N most recent successful
@@ -1359,40 +1351,30 @@ class PeriodicCleanupOldAnalyticsDetails extends FutureCall {
 
   /// Gets unique scrappable IDs that have analytics with duration data.
   ///
-  /// Uses pagination with [limit] and [offset] to avoid loading all data at once.
-  /// Returns a list of unique scrappable IDs.
+  /// Uses a raw SQL query with DISTINCT for efficient unique ID retrieval.
+  /// Pagination is handled with [limit] and [offset] parameters.
+  /// Returns a list of unique scrappable IDs ordered by scrappableId.
   Future<List<int>> _getUniqueScrappableIdsWithDuration(
     Session session, {
     required int limit,
     required int offset,
   }) async {
-    // Query analytics with duration, ordered by scrappableId for consistent pagination
-    // We fetch more records than limit to account for duplicates, then deduplicate
-    final analytics = await ScrappableAnalytics.db.find(
-      session,
-      where: (t) =>
-          t.duration.notEquals(null) &
-          t.requestStatus.equals(RequestStatus.success),
-      orderBy: (t) => t.scrappableId,
-      limit: limit * ApiHelperConfig.paginationMultiplier, // Fetch more to account for multiple analytics per scrappable
-      offset: offset * ApiHelperConfig.paginationMultiplier, // Adjust offset accordingly
+    // Use raw SQL with DISTINCT for efficient unique ID retrieval
+    // This is much more efficient than fetching all records and deduplicating in Dart
+    final result = await session.db.unsafeQuery(
+      r'''
+      SELECT DISTINCT "scrappableId"
+      FROM "scrappable_analytics"
+      WHERE "duration" IS NOT NULL
+        AND "requestStatus" = 'success'
+      ORDER BY "scrappableId"
+      LIMIT @limit OFFSET @offset
+      ''',
+      parameters: QueryParameters.named({'limit': limit, 'offset': offset}),
     );
 
-    // Extract unique scrappable IDs while maintaining order
-    final Set<int> seenIds = {};
-    final List<int> uniqueIds = [];
-
-    for (final record in analytics) {
-      if (!seenIds.contains(record.scrappableId)) {
-        seenIds.add(record.scrappableId);
-        uniqueIds.add(record.scrappableId);
-        if (uniqueIds.length >= limit) {
-          break;
-        }
-      }
-    }
-
-    return uniqueIds;
+    // Map the result rows to a list of integers
+    return result.map((row) => row[0] as int).toList();
   }
 
   /// Updates the average duration for a single scrappable.
