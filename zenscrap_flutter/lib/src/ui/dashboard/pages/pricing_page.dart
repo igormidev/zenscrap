@@ -5,6 +5,7 @@ import 'package:pricing_page/pricing_page.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
@@ -49,9 +50,25 @@ class RawPricingPageComponent extends ConsumerWidget {
     // Track page view when pricing page is displayed
     analytics.trackPricingPageView();
     final l10n = AppLocalizations.of(context)!;
+
+    // Responsive pricing layout
+    // Compact: narrower width, adjusted aspect ratio for vertical layout
+    // Medium/Expanded: original desktop layout
+    final pricingWidth = context.responsiveValue<double>(
+      compact: 320,
+      medium: 600,
+      expanded: 865,
+    );
+
+    final pricingAspectRatio = context.responsiveValue<double>(
+      compact: 0.38,
+      medium: 0.42,
+      expanded: 0.45,
+    );
+
     return PricingPage(
-      width: 865,
-      childAspectRatio: 0.45,
+      width: pricingWidth,
+      childAspectRatio: pricingAspectRatio,
       perMonthText: l10n.pricing_per_month,
       perYearText: l10n.pricing_per_year,
       subtitle: l10n.pricing_subtitle,
@@ -78,6 +95,8 @@ class RawPricingPageComponent extends ConsumerWidget {
               isYearly: isYearly,
               price: isYearly ? 1050.0 : 100.0,
             );
+
+            if (!context.mounted) return;
 
             if (isInsideLandingPage) {
               context.push('/auth');
@@ -115,6 +134,8 @@ class RawPricingPageComponent extends ConsumerWidget {
               isYearly: isYearly,
               price: isYearly ? 1999.0 : 199.0,
             );
+
+            if (!context.mounted) return;
 
             if (isInsideLandingPage) {
               context.push('/auth');
@@ -155,6 +176,8 @@ class RawPricingPageComponent extends ConsumerWidget {
               isYearly: isYearly,
               price: isYearly ? 5500.0 : 500.0,
             );
+
+            if (!context.mounted) return;
 
             if (isInsideLandingPage) {
               context.push('/auth');
@@ -200,7 +223,7 @@ class RawPricingPageComponent extends ConsumerWidget {
           SnackBar(content: Text(l10n.pricing_sign_in_required)),
         );
         await Future.delayed(const Duration(milliseconds: 500));
-        // ignore: use_build_context_synchronously
+        if (!context.mounted) return;
         context.go('/auth');
         return;
       }

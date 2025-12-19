@@ -7,6 +7,7 @@ import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/widgets/account_image.dart';
+import 'package:zenscrap_flutter/src/ui/dashboard/widgets/expand_button.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/widgets/version_indicator.dart';
 
 class DashboardDrawer extends ConsumerWidget {
@@ -15,11 +16,16 @@ class DashboardDrawer extends ConsumerWidget {
     required this.widget,
     required this.navigationType,
     required this.changeDrawerStyle,
+    this.isCompactMode = false,
   });
 
   final DashboardView widget;
   final NavigationType navigationType;
   final void Function(NavigationType type) changeDrawerStyle;
+
+  /// When true, the drawer is shown in compact/mobile mode where it slides in.
+  /// In this mode, the expand button is hidden since there's no rail alternative.
+  final bool isCompactMode;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -29,8 +35,12 @@ class DashboardDrawer extends ConsumerWidget {
         .watch(sessionProvider)
         .mapOrNull(logged: (value) => value.user.imageUrl);
 
+    // Responsive sizing
+    final drawerWidth = isCompactMode ? 280.0 : 200.0;
+    final accountImageSize = isCompactMode ? 100.0 : 120.0;
+
     return SizedBox(
-      width: 200.0,
+      width: drawerWidth,
       child: Stack(
         children: [
           NavigationDrawer(
@@ -40,11 +50,16 @@ class DashboardDrawer extends ConsumerWidget {
               final DashboardNavigationType tab = navigationOptions[index];
 
               await changeTab(tab, context, ref);
-              if (context.mounted) Scaffold.of(context).closeDrawer();
+              if (context.mounted) {
+                // Only close drawer if in compact mode (slide-in drawer)
+                if (isCompactMode) {
+                  Scaffold.of(context).closeDrawer();
+                }
+              }
             },
             children: [
               const SizedBox(height: 20),
-              AccountImage(image: accountImageUrl, size: 120),
+              AccountImage(image: accountImageUrl, size: accountImageSize),
               const SizedBox(height: 20),
               const Divider(height: 16),
               ...navigationOptions.map((item) {
@@ -61,14 +76,16 @@ class DashboardDrawer extends ConsumerWidget {
           Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: ExpandButton(
-                  selectedNavigationType: navigationType,
-                  onNavigationTypeChange: changeDrawerStyle,
+              // Only show expand button in expanded mode (not in compact/mobile)
+              if (!isCompactMode)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: ExpandButton(
+                    selectedNavigationType: navigationType,
+                    onNavigationTypeChange: changeDrawerStyle,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
+              if (!isCompactMode) const SizedBox(height: 8),
               const VersionIndicator(),
               const SizedBox(height: 16),
             ],
