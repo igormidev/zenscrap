@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/analytics/analytics_provider.dart';
 import 'package:zenscrap_flutter/src/states/analytics/analytics_state.dart';
@@ -105,59 +106,118 @@ class _AnalyticsContent extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    return ResponsiveBuilder(
+      compact: (context, constraints) => _CompactLayout(
+        data: data,
+        scrollController: scrollController,
+        isRefreshVN: isRefreshVN,
+        isLoadingMore: isLoadingMore,
+        loadMoreFailed: loadMoreFailed,
+      ),
+      expanded: (context, constraints) => _ExpandedLayout(
+        data: data,
+        scrollController: scrollController,
+        isRefreshVN: isRefreshVN,
+        isLoadingMore: isLoadingMore,
+        loadMoreFailed: loadMoreFailed,
+      ),
+    );
+  }
+}
+
+/// Compact layout for mobile devices
+class _CompactLayout extends ConsumerWidget {
+  final PaginatedScrappableRequestsAnalytics data;
+  final ScrollController scrollController;
+  final ValueNotifier<bool> isRefreshVN;
+  final bool isLoadingMore;
+  final bool loadMoreFailed;
+
+  const _CompactLayout({
+    required this.data,
+    required this.scrollController,
+    required this.isRefreshVN,
+    required this.isLoadingMore,
+    required this.loadMoreFailed,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     final selectedItem = ref.watch(selectedScrappableProvider);
-    final isMobile = MediaQuery.of(context).size.width < 768;
 
-    if (isMobile) {
-      // Mobile layout with tabs
-      return Scaffold(
-        body: selectedItem == null
-            ? ScrappablesGridView(
-                data: data,
-                scrollController: scrollController,
-                isRefreshVN: isRefreshVN,
-                isLoadingMore: isLoadingMore,
-                loadMoreFailed: loadMoreFailed,
-              )
-            : const SelectedScrappablePage(),
-        bottomNavigationBar: selectedItem != null
-            ? BottomAppBar(
-                child: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.arrow_back),
-                          onPressed: () {
-                            // Track mobile back click
-                            ref.read(analyticsServiceProvider).trackApiAnalyticsMobileBackClick(
-                              scrappableId: selectedItem.scrappable.id!,
-                            );
-
-                            ref
-                                .read(selectedScrappableProvider.notifier)
-                                .clear();
-                          },
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            selectedItem.scrappable.name,
-                            style: context.t.titleMedium,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
+    return Scaffold(
+      body: selectedItem == null
+          ? ScrappablesGridView(
+              data: data,
+              scrollController: scrollController,
+              isRefreshVN: isRefreshVN,
+              isLoadingMore: isLoadingMore,
+              loadMoreFailed: loadMoreFailed,
+            )
+          : const SelectedScrappablePage(),
+      bottomNavigationBar: selectedItem != null
+          ? BottomAppBar(
+              child: SafeArea(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: context.responsiveValue(
+                      compact: 16.0,
+                      medium: 24.0,
                     ),
                   ),
-                ),
-              )
-            : null,
-      );
-    }
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: () {
+                          // Track mobile back click
+                          ref
+                              .read(analyticsServiceProvider)
+                              .trackApiAnalyticsMobileBackClick(
+                            scrappableId: selectedItem.scrappable.id!,
+                          );
 
-    // Desktop layout with animated side panel
+                          ref.read(selectedScrappableProvider.notifier).clear();
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          selectedItem.scrappable.name,
+                          style: context.t.titleMedium,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            )
+          : null,
+    );
+  }
+}
+
+/// Expanded layout for desktop with side panel
+class _ExpandedLayout extends ConsumerWidget {
+  final PaginatedScrappableRequestsAnalytics data;
+  final ScrollController scrollController;
+  final ValueNotifier<bool> isRefreshVN;
+  final bool isLoadingMore;
+  final bool loadMoreFailed;
+
+  const _ExpandedLayout({
+    required this.data,
+    required this.scrollController,
+    required this.isRefreshVN,
+    required this.isLoadingMore,
+    required this.loadMoreFailed,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedItem = ref.watch(selectedScrappableProvider);
+
     return Row(
       children: [
         // Scrappables grid (left side)
@@ -175,7 +235,13 @@ class _AnalyticsContent extends ConsumerWidget {
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
           child: SizedBox(
-            width: selectedItem != null ? 429 : 0,
+            width: selectedItem != null
+                ? context.responsiveValue(
+                    compact: 0,
+                    medium: 400,
+                    expanded: 429,
+                  )
+                : 0,
             child: const SelectedScrappablePage()
                 .animate()
                 .fadeIn(duration: 200.ms, delay: 100.ms)

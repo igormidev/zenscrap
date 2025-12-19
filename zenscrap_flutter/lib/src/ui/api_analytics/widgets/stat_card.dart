@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 
 class StatCard extends StatelessWidget {
   final String label;
@@ -18,10 +19,27 @@ class StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final card = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      padding: EdgeInsets.symmetric(
+        horizontal: context.responsiveValue(
+          compact: 12.0,
+          medium: 14.0,
+          expanded: 14.0,
+        ),
+        vertical: context.responsiveValue(
+          compact: 8.0,
+          medium: 10.0,
+          expanded: 10.0,
+        ),
+      ),
       decoration: BoxDecoration(
         color: color.withAlpha(18),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(
+          context.responsiveValue(
+            compact: 12.0,
+            medium: 16.0,
+            expanded: 16.0,
+          ),
+        ),
         border: Border.all(
           color: color.withAlpha(50),
         ),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/analytics/analytics_provider.dart';
 
@@ -48,8 +49,18 @@ class ScopeSelectorDropdown extends ConsumerWidget {
     return Tooltip(
       message: l10n.api_analytics_scope_tooltip,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        height: 43,
+        padding: EdgeInsets.symmetric(
+          horizontal: context.responsiveValue(
+            compact: 10.0,
+            medium: 12.0,
+            expanded: 12.0,
+          ),
+        ),
+        height: context.responsiveValue(
+          compact: 48.0,
+          medium: 48.0,
+          expanded: 48.0,
+        ),
         decoration: BoxDecoration(
           color: context.c.surfaceContainerHighest.withAlpha(50),
           borderRadius: BorderRadius.circular(12),

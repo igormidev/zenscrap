@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/analytics/selected_scrappable_provider.dart';
 import 'package:zenscrap_flutter/src/states/analytics/selected_scrappable_analytics_provider.dart';
@@ -147,9 +148,21 @@ class _AnalyticsListView extends StatelessWidget {
         AnalyticsStatsSummary(data: data),
         Expanded(
           child: ListView.separated(
-            separatorBuilder: (context, index) => const SizedBox(height: 12),
+            separatorBuilder: (context, index) => SizedBox(
+              height: context.responsiveValue(
+                compact: 8.0,
+                medium: 12.0,
+                expanded: 12.0,
+              ),
+            ),
             controller: scrollController,
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(
+              context.responsiveValue(
+                compact: 12.0,
+                medium: 16.0,
+                expanded: 16.0,
+              ),
+            ),
             itemCount: data.items.length + 1,
             itemBuilder: (context, index) {
               if (index == data.items.length) {

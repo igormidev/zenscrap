@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/analytics/analytics_provider.dart';
@@ -115,16 +116,27 @@ class _ScrappablesGridViewState extends ConsumerState<ScrappablesGridView> {
     const spacing = 16.0;
 
     // Get available width for wrap
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = context.screenWidth;
     final selectedItem = ref.read(selectedScrappableProvider);
+
+    // Responsive side panel width
+    final sidePanelWidth = selectedItem != null
+        ? context.responsiveValue(
+            compact: 0,
+            medium: 400,
+            expanded: 429,
+          )
+        : 0;
+
     final availableWidth = selectedItem != null
-        ? screenWidth - 489 - 1 // subtract side panel width and divider
+        ? screenWidth - sidePanelWidth - 1 // subtract side panel width and divider
         : screenWidth;
 
     // Calculate cards per row in wrap
     final cardsPerRow =
         ((availableWidth - (padding * 2) + spacing) / (cardWidth + spacing))
-            .floor();
+            .floor()
+            .clamp(1, 10); // Ensure at least 1 card per row
 
     // Calculate row index
     final rowIndex = _selectedCardIndex! ~/ cardsPerRow;
@@ -181,140 +193,190 @@ class _ScrappablesGridViewState extends ConsumerState<ScrappablesGridView> {
           final l10n = AppLocalizations.of(context)!;
           return Column(
         children: [
-          const SizedBox(height: 12),
+          SizedBox(
+            height: context.responsiveValue(
+              compact: 12.0,
+              medium: 16.0,
+              expanded: 20.0,
+            ),
+          ),
           // Header with title, scope selector, and refresh button
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l10n.api_analytics_title,
-                      style: context.t.displaySmall,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      l10n.api_analytics_subtitle,
-                      style: context.t.bodyMedium?.copyWith(
-                        color: context.c.onSurface.withAlpha(150),
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: context.responsiveValue(
+                compact: 12.0,
+                medium: 16.0,
+                expanded: 16.0,
+              ),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.api_analytics_title,
+                        style: context.t.displaySmall,
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 4),
+                      Text(
+                        l10n.api_analytics_subtitle,
+                        style: context.t.bodyMedium?.copyWith(
+                          color: context.c.onSurface.withAlpha(150),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              ValueListenableBuilder(
-                valueListenable: widget.isRefreshVN,
-                builder: (context, isRefresh, _) {
-                  return FilledButton.tonalIcon(
-                    onPressed: isRefresh
-                        ? null
-                        : () async {
-                            // Track refresh click
-                            ref.read(analyticsServiceProvider).trackApiAnalyticsRefreshClick(
-                              timeScope: widget.data.scope.name,
-                            );
+                ValueListenableBuilder(
+                  valueListenable: widget.isRefreshVN,
+                  builder: (context, isRefresh, _) {
+                    return FilledButton.tonalIcon(
+                      onPressed: isRefresh
+                          ? null
+                          : () async {
+                              // Track refresh click
+                              ref
+                                  .read(analyticsServiceProvider)
+                                  .trackApiAnalyticsRefreshClick(
+                                timeScope: widget.data.scope.name,
+                              );
 
-                            widget.isRefreshVN.value = true;
-                            try {
-                              await Future.delayed(
-                                  const Duration(milliseconds: 600));
-                              await ref.globalLoadingSetter(() async {
-                                await ref
-                                    .read(analyticsProvider.notifier)
-                                    .getAnalyticsData();
-                              });
-                            } finally {
-                              widget.isRefreshVN.value = false;
-                            }
-                          },
-                    label: Text(l10n.api_analytics_refresh),
-                    icon: isRefresh
-                        ? const CupertinoActivityIndicator()
-                        : const Icon(Icons.refresh),
-                  );
-                },
-              ),
-              const SizedBox(width: 12),
-              const ScopeSelectorDropdown(),
-              const SizedBox(width: 12),
-            ],
+                              widget.isRefreshVN.value = true;
+                              try {
+                                await Future.delayed(
+                                    const Duration(milliseconds: 600));
+                                await ref.globalLoadingSetter(() async {
+                                  await ref
+                                      .read(analyticsProvider.notifier)
+                                      .getAnalyticsData();
+                                });
+                              } finally {
+                                widget.isRefreshVN.value = false;
+                              }
+                            },
+                      label: Text(l10n.api_analytics_refresh),
+                      icon: isRefresh
+                          ? const CupertinoActivityIndicator()
+                          : const Icon(Icons.refresh),
+                    );
+                  },
+                ),
+                const SizedBox(width: 12),
+                const ScopeSelectorDropdown(),
+                const SizedBox(width: 12),
+              ],
+            ),
           ),
           const SizedBox(height: 8),
-          Row(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: context.c.primaryContainer.withAlpha(40),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: context.c.primary.withAlpha(40),
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: context.responsiveValue(
+                compact: 12.0,
+                medium: 16.0,
+                expanded: 16.0,
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: context.c.primaryContainer.withAlpha(40),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: context.c.primary.withAlpha(40),
+                    ),
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.schedule_outlined,
+                        color: context.c.primary.withAlpha(180),
+                        size: 14,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        l10n.api_analytics_request_delay_warning,
+                        style: context.t.bodySmall?.copyWith(
+                          color: context.c.onSurface.withAlpha(150),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.schedule_outlined,
-                      color: context.c.primary.withAlpha(180),
-                      size: 14,
+                const SizedBox(width: 12),
+                Container(
+                  decoration: BoxDecoration(
+                    color: context.c.surfaceContainerLow.withAlpha(60),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: context.c.outline.withAlpha(40),
                     ),
-                    const SizedBox(width: 6),
-                    Text(
-                      l10n.api_analytics_request_delay_warning,
-                      style: context.t.bodySmall?.copyWith(
-                        color: context.c.onSurface.withAlpha(150),
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        color: context.c.onSurface.withAlpha(120),
+                        size: 14,
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 12),
-              Container(
-                decoration: BoxDecoration(
-                  color: context.c.surfaceContainerLow.withAlpha(60),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: context.c.outline.withAlpha(40),
+                      const SizedBox(width: 6),
+                      Text(
+                        _getScopeExplanation(context),
+                        style: context.t.bodySmall?.copyWith(
+                          color: context.c.onSurface.withAlpha(150),
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.info_outline,
-                      color: context.c.onSurface.withAlpha(120),
-                      size: 14,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      _getScopeExplanation(context),
-                      style: context.t.bodySmall?.copyWith(
-                        color: context.c.onSurface.withAlpha(150),
-                        fontSize: 11,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(
+            height: context.responsiveValue(
+              compact: 12.0,
+              medium: 16.0,
+              expanded: 16.0,
+            ),
+          ),
           // Wrap with cards
           Expanded(
             child: SingleChildScrollView(
               controller: widget.scrollController,
-              child: Align(
-                alignment: Alignment.topLeft,
-                child: Wrap(
-                  spacing: 16.0,
-                  runSpacing: 16.0,
-                  runAlignment: WrapAlignment.start,
-                  alignment: WrapAlignment.start,
-                  children: [
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.responsiveValue(
+                    compact: 12.0,
+                    medium: 16.0,
+                    expanded: 16.0,
+                  ),
+                ),
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Wrap(
+                    spacing: context.responsiveValue(
+                      compact: 12.0,
+                      medium: 16.0,
+                      expanded: 16.0,
+                    ),
+                    runSpacing: context.responsiveValue(
+                      compact: 12.0,
+                      medium: 16.0,
+                      expanded: 16.0,
+                    ),
+                    runAlignment: WrapAlignment.start,
+                    alignment: WrapAlignment.start,
+                    children: [
                     ...widget.data.items.map((item) {
                       return ScrappableAnalyticsCard(
                         item: item,
@@ -363,7 +425,8 @@ class _ScrappablesGridViewState extends ConsumerState<ScrappablesGridView> {
                           ),
                         ),
                       ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

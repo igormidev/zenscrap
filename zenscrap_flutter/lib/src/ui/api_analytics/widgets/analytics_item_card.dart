@@ -8,6 +8,7 @@ import 'package:zenscrap_flutter/src/core/extensions/convert_extensions.dart';
 import 'package:zenscrap_flutter/src/core/extensions/duration_extension.dart';
 import 'package:zenscrap_flutter/src/core/extensions/request_status_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 
 class AnalyticsItemCard extends StatefulWidget {
   final ScrappableAnalytics analytics;
@@ -155,7 +156,18 @@ class _MainRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      padding: EdgeInsets.symmetric(
+        horizontal: context.responsiveValue(
+          compact: 16.0,
+          medium: 20.0,
+          expanded: 20.0,
+        ),
+        vertical: context.responsiveValue(
+          compact: 10.0,
+          medium: 12.0,
+          expanded: 12.0,
+        ),
+      ),
       child: Row(
         children: [
           // Status icon
@@ -263,7 +275,13 @@ class _DetailsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.symmetric(
+        horizontal: context.responsiveValue(
+          compact: 16.0,
+          medium: 20.0,
+          expanded: 20.0,
+        ),
+      ),
       child: ListView(
         // crossAxisAlignment: CrossAxisAlignment.start,
         children: [
