@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 
 class CreateApiKeyDialog extends StatefulWidget {
   /// Callback that creates the API key and returns it (or null on failure)
@@ -52,19 +53,36 @@ class _CreateApiKeyDialogState extends State<CreateApiKeyDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final maxWidth = context.responsiveValue(
+      compact: double.infinity,
+      medium: 500.0,
+      expanded: 600.0,
+    );
+    final padding = context.responsiveValue(
+      compact: 20.0,
+      medium: 24.0,
+      expanded: 24.0,
+    );
+    final borderRadius = context.responsiveValue(
+      compact: 12.0,
+      medium: 16.0,
+      expanded: 16.0,
+    );
+
     return Dialog(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(borderRadius),
       ),
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 600),
-        padding: const EdgeInsets.all(24),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+        constraints: BoxConstraints(maxWidth: maxWidth),
+        padding: EdgeInsets.all(padding),
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
               Row(
                 children: [
                   Container(
@@ -167,32 +185,37 @@ class _CreateApiKeyDialogState extends State<CreateApiKeyDialog> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextButton(
-                    onPressed:
-                        _isCreating ? null : () => Navigator.of(context).pop(),
-                    child: Text(l10n.api_usage_cancel),
+                  Flexible(
+                    child: TextButton(
+                      onPressed:
+                          _isCreating ? null : () => Navigator.of(context).pop(),
+                      child: Text(l10n.api_usage_cancel),
+                    ),
                   ),
                   const SizedBox(width: 12),
-                  FilledButton.icon(
-                    onPressed: _isCreating ? null : _handleCreate,
-                    icon: _isCreating
-                        ? SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                  context.c.onPrimary),
-                            ),
-                          )
-                        : Icon(Icons.add),
-                    label: Text(_isCreating ? l10n.api_usage_creating : l10n.api_usage_create_api_key),
+                  Flexible(
+                    child: FilledButton.icon(
+                      onPressed: _isCreating ? null : _handleCreate,
+                      icon: _isCreating
+                          ? SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    context.c.onPrimary),
+                              ),
+                            )
+                          : Icon(Icons.add),
+                      label: Text(_isCreating ? l10n.api_usage_creating : l10n.api_usage_create_api_key),
+                    ),
                   ),
                 ],
               ),
             ],
           ),
         ),
+      ),
       ),
     );
   }
