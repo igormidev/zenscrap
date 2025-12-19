@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/ui/ai_usage/widgets/ai_usage_card.dart';
 import 'package:zenscrap_flutter/src/ui/ai_usage/widgets/load_more_button.dart';
 
@@ -30,7 +31,13 @@ class AutoFixSessionsSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(
+              context.responsiveValue(
+                compact: 16.0,
+                medium: 20.0,
+                expanded: 24.0,
+              ),
+            ),
             child: AiUsageCardHeader(
               icon: Icons.auto_fix_high,
               title: AppLocalizations.of(context)!.ai_usage_autofix_sessions,
@@ -69,8 +76,14 @@ class _AutoFixSessionsList extends StatelessWidget {
       return _EmptySessionsState();
     }
 
+    final horizontalPadding = context.responsiveValue(
+      compact: 16.0,
+      medium: 20.0,
+      expanded: 24.0,
+    );
+
     return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+      padding: EdgeInsets.fromLTRB(horizontalPadding, 0, horizontalPadding, horizontalPadding),
       itemCount: sessions.length + (hasMore ? 1 : 0),
       itemBuilder: (context, index) {
         if (index == sessions.length) {
@@ -422,11 +435,17 @@ class _DetailRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final labelWidth = context.responsiveValue(
+      compact: 100.0,
+      medium: 120.0,
+      expanded: 140.0,
+    );
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-          width: 120,
+          width: labelWidth,
           child: Text(
             label,
             style: context.t.bodySmall?.copyWith(

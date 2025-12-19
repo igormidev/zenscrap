@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/states/ai_usage/ai_credit_history_provider.dart';
 import 'package:zenscrap_flutter/src/states/ai_usage/ai_credit_history_state.dart';
 import 'package:zenscrap_flutter/src/states/ai_usage/ai_usage_provider.dart';
@@ -165,9 +166,21 @@ class _AiUsageViewState extends ConsumerState<AiUsageView> {
         },
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 900),
+            constraints: BoxConstraints(
+              maxWidth: context.responsiveValue(
+                compact: double.infinity,
+                medium: 900,
+                expanded: 1200,
+              ),
+            ),
             child: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(
+                context.responsiveValue(
+                  compact: 16.0,
+                  medium: 20.0,
+                  expanded: 24.0,
+                ),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -176,82 +189,38 @@ class _AiUsageViewState extends ConsumerState<AiUsageView> {
                     isRefreshing: _isRefreshVN,
                     onRefresh: _handleRefresh,
                   ),
-                  const SizedBox(height: 24),
+                  ResponsiveGap.vertical(
+                    compactSize: 16,
+                    mediumSize: 20,
+                    expandedSize: 24,
+                  ),
                   // Content
                   Expanded(
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        // Use two-column layout for wider screens
-                        final useWideLayout = constraints.maxWidth > 600;
-
-                        if (useWideLayout) {
-                          return Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Left column: Overview + API Key + History
-                              Expanded(
-                                child: Column(
-                                  children: [
-                                    AiCreditsOverviewSection(aiUsage: aiUsage),
-                                    const SizedBox(height: 20),
-                                    ApiKeySection(aiUsage: aiUsage),
-                                    const SizedBox(height: 20),
-                                    Expanded(
-                                      child: AiCreditsHistorySection(
-                                        creditHistory: creditHistory,
-                                        isLoadingMoreHistory: isLoadingMoreHistory,
-                                        hasMoreHistory: hasMoreHistory,
-                                        onLoadMoreHistory: _loadMoreHistory,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 20),
-                              // Right column: Auto-Fix Sessions
-                              Expanded(
-                                child: AutoFixSessionsSection(
-                                  sessions: autoFixSessions,
-                                  isLoadingMore: isLoadingMoreSessions,
-                                  hasMore: hasMoreSessions,
-                                  onLoadMore: _loadMoreSessions,
-                                ),
-                              ),
-                            ],
-                          );
-                        }
-
-                        // Single column for narrow screens
-                        return SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              AiCreditsOverviewSection(aiUsage: aiUsage),
-                              const SizedBox(height: 20),
-                              ApiKeySection(aiUsage: aiUsage),
-                              const SizedBox(height: 20),
-                              SizedBox(
-                                height: 400,
-                                child: AiCreditsHistorySection(
-                                  creditHistory: creditHistory,
-                                  isLoadingMoreHistory: isLoadingMoreHistory,
-                                  hasMoreHistory: hasMoreHistory,
-                                  onLoadMoreHistory: _loadMoreHistory,
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                              SizedBox(
-                                height: 500,
-                                child: AutoFixSessionsSection(
-                                  sessions: autoFixSessions,
-                                  isLoadingMore: isLoadingMoreSessions,
-                                  hasMore: hasMoreSessions,
-                                  onLoadMore: _loadMoreSessions,
-                                ),
-                              ),
-                            ],
+                    child: ResponsiveBuilder(
+                      compact: (context, constraints) =>
+                          _CompactLayout(
+                            aiUsage: aiUsage,
+                            creditHistory: creditHistory,
+                            isLoadingMoreHistory: isLoadingMoreHistory,
+                            hasMoreHistory: hasMoreHistory,
+                            onLoadMoreHistory: _loadMoreHistory,
+                            autoFixSessions: autoFixSessions,
+                            isLoadingMoreSessions: isLoadingMoreSessions,
+                            hasMoreSessions: hasMoreSessions,
+                            onLoadMoreSessions: _loadMoreSessions,
                           ),
-                        );
-                      },
+                      medium: (context, constraints) =>
+                          _ExpandedLayout(
+                            aiUsage: aiUsage,
+                            creditHistory: creditHistory,
+                            isLoadingMoreHistory: isLoadingMoreHistory,
+                            hasMoreHistory: hasMoreHistory,
+                            onLoadMoreHistory: _loadMoreHistory,
+                            autoFixSessions: autoFixSessions,
+                            isLoadingMoreSessions: isLoadingMoreSessions,
+                            hasMoreSessions: hasMoreSessions,
+                            onLoadMoreSessions: _loadMoreSessions,
+                          ),
                     ),
                   ),
                 ],
@@ -305,6 +274,131 @@ class _Header extends StatelessWidget {
                   : const Icon(Icons.refresh, size: 20),
             );
           },
+        ),
+      ],
+    );
+  }
+}
+
+class _CompactLayout extends StatelessWidget {
+  final AccountAIUsage aiUsage;
+  final List<AICreditHistoryItem> creditHistory;
+  final bool isLoadingMoreHistory;
+  final bool hasMoreHistory;
+  final VoidCallback onLoadMoreHistory;
+  final List<AutoFixSession> autoFixSessions;
+  final bool isLoadingMoreSessions;
+  final bool hasMoreSessions;
+  final VoidCallback onLoadMoreSessions;
+
+  const _CompactLayout({
+    required this.aiUsage,
+    required this.creditHistory,
+    required this.isLoadingMoreHistory,
+    required this.hasMoreHistory,
+    required this.onLoadMoreHistory,
+    required this.autoFixSessions,
+    required this.isLoadingMoreSessions,
+    required this.hasMoreSessions,
+    required this.onLoadMoreSessions,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          AiCreditsOverviewSection(aiUsage: aiUsage),
+          const SizedBox(height: 16),
+          ApiKeySection(aiUsage: aiUsage),
+          const SizedBox(height: 16),
+          SizedBox(
+            height: 400,
+            child: AiCreditsHistorySection(
+              creditHistory: creditHistory,
+              isLoadingMoreHistory: isLoadingMoreHistory,
+              hasMoreHistory: hasMoreHistory,
+              onLoadMoreHistory: onLoadMoreHistory,
+            ),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            height: 500,
+            child: AutoFixSessionsSection(
+              sessions: autoFixSessions,
+              isLoadingMore: isLoadingMoreSessions,
+              hasMore: hasMoreSessions,
+              onLoadMore: onLoadMoreSessions,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ExpandedLayout extends StatelessWidget {
+  final AccountAIUsage aiUsage;
+  final List<AICreditHistoryItem> creditHistory;
+  final bool isLoadingMoreHistory;
+  final bool hasMoreHistory;
+  final VoidCallback onLoadMoreHistory;
+  final List<AutoFixSession> autoFixSessions;
+  final bool isLoadingMoreSessions;
+  final bool hasMoreSessions;
+  final VoidCallback onLoadMoreSessions;
+
+  const _ExpandedLayout({
+    required this.aiUsage,
+    required this.creditHistory,
+    required this.isLoadingMoreHistory,
+    required this.hasMoreHistory,
+    required this.onLoadMoreHistory,
+    required this.autoFixSessions,
+    required this.isLoadingMoreSessions,
+    required this.hasMoreSessions,
+    required this.onLoadMoreSessions,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = context.responsiveValue(
+      compact: 16.0,
+      medium: 20.0,
+      expanded: 24.0,
+    );
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Left column: Overview + API Key + History
+        Expanded(
+          child: Column(
+            children: [
+              AiCreditsOverviewSection(aiUsage: aiUsage),
+              SizedBox(height: spacing),
+              ApiKeySection(aiUsage: aiUsage),
+              SizedBox(height: spacing),
+              Expanded(
+                child: AiCreditsHistorySection(
+                  creditHistory: creditHistory,
+                  isLoadingMoreHistory: isLoadingMoreHistory,
+                  hasMoreHistory: hasMoreHistory,
+                  onLoadMoreHistory: onLoadMoreHistory,
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(width: spacing),
+        // Right column: Auto-Fix Sessions
+        Expanded(
+          child: AutoFixSessionsSection(
+            sessions: autoFixSessions,
+            isLoadingMore: isLoadingMoreSessions,
+            hasMore: hasMoreSessions,
+            onLoadMore: onLoadMoreSessions,
+          ),
         ),
       ],
     );

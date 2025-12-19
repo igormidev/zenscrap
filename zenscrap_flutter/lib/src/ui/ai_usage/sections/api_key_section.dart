@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/states/ai_usage/ai_usage_provider.dart';
 import 'package:zenscrap_flutter/src/ui/ai_usage/widgets/ai_usage_card.dart';
 
@@ -164,7 +165,11 @@ class _ApiKeyInputDialogState extends State<_ApiKeyInputDialog> {
     return AlertDialog(
       title: Text(l10n.ai_usage_api_key_dialog_title),
       content: SizedBox(
-        width: 400,
+        width: context.responsiveValue(
+          compact: double.infinity,
+          medium: 400,
+          expanded: 500,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
