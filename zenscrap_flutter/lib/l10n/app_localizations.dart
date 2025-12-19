@@ -160,6 +160,12 @@ abstract class AppLocalizations {
   /// **'Learn more'**
   String get landing_learn_more;
 
+  /// Label for language selector in mobile drawer
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get landing_drawer_language;
+
   /// Main hero section headline
   ///
   /// In en, this message translates to:

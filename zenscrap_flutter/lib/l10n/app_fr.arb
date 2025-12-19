@@ -10,6 +10,7 @@
   "landing_sign_in": "Se connecter",
   "landing_app_name": "ZenScrap",
   "landing_learn_more": "En savoir plus",
+  "landing_drawer_language": "Langue",
 
   "landing_hero_title": "Des Web Scrapers qui se\nreparent tout seuls",
   "landing_hero_subtitle": "Decrivez ce que vous voulez extraire. Notre IA construit, teste et maintient votre scraper automatiquement. Sans code. Sans selecteurs CSS. Sans endpoints casses.",

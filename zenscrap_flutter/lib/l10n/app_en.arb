@@ -37,6 +37,10 @@
   "@landing_learn_more": {
     "description": "Learn more scroll indicator text"
   },
+  "landing_drawer_language": "Language",
+  "@landing_drawer_language": {
+    "description": "Label for language selector in mobile drawer"
+  },
 
   "landing_hero_title": "Web Scrapers That\nFix Themselves",
   "@landing_hero_title": {

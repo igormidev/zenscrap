@@ -36,6 +36,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get landing_learn_more => '詳しく見る';
 
   @override
+  String get landing_drawer_language => '言語';
+
+  @override
   String get landing_hero_title => '自己修復する\nWebスクレイパー';
 
   @override

@@ -73,6 +73,8 @@ dev_dependencies:
   freezed: ^3.2.3
   json_serializable: ^6.10.0
   flutter_launcher_icons: ^0.14.4
+  analyzer: ^7.0.0
+  path: ^1.9.0
 
 # Flutter Launcher Icons configuration
 flutter_launcher_icons:

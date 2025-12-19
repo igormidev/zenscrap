@@ -6,6 +6,7 @@ import 'package:seo/seo.dart';
 import 'package:simple_platform/simple_platform.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_state.dart';
@@ -19,6 +20,7 @@ import 'package:zenscrap_flutter/src/ui/landing_page/sections/how_it_works_secti
 import 'package:zenscrap_flutter/src/ui/landing_page/sections/marketplace_section.dart';
 import 'package:zenscrap_flutter/src/ui/landing_page/sections/problem_section.dart';
 import 'package:zenscrap_flutter/src/ui/landing_page/widgets/landing_appbar.dart';
+import 'package:zenscrap_flutter/src/ui/landing_page/widgets/landing_mobile_drawer.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/view/scrappable_edit_session.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/creating_scrappable_dialog.dart';
 import 'package:zenscrap_flutter/src/design_system/elements/ip_limit_error_view.dart';
@@ -36,6 +38,7 @@ class LandingPage extends ConsumerStatefulWidget {
 class _LandingPageState extends ConsumerState<LandingPage>
     with TickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late AnimationController _backgroundController;
 
   bool _isScrolled = false;
@@ -407,233 +410,349 @@ class _LandingPageState extends ConsumerState<LandingPage>
       },
       // For blank, creatingSessionState, and creatingScrappable states, show landing page
       // The creatingScrappable state will have the dialog shown on top via the listener
-      orElse: () => _buildLandingPage(context),
+      orElse: () => _LandingPageContent(
+        scaffoldKey: _scaffoldKey,
+        scrollController: _scrollController,
+        backgroundController: _backgroundController,
+        activeSection: _activeSection,
+        isScrolled: _isScrolled,
+        learnMoreOpacity: _learnMoreOpacity,
+        heroKey: _heroKey,
+        howItWorksKey: _howItWorksKey,
+        autoFixKey: _autoFixKey,
+        featuresKey: _featuresKey,
+        marketplaceKey: _marketplaceKey,
+        pricingKey: _pricingKey,
+        onSectionTap: _scrollToSection,
+        onSignInTap: _trackSignInClick,
+        onScrollToTop: _scrollToTop,
+        onLearnMoreTap: () {
+          _trackLearnMoreClick();
+          _scrollToSection(LandingSection.howItWorks);
+        },
+        onFinalCtaCreateTap: _trackFinalCtaCreateClick,
+        onFinalCtaMarketplaceTap: _trackFinalCtaMarketplaceClick,
+        onPageViewTracked: () {
+          if (!_hasTrackedPageView) {
+            _hasTrackedPageView = true;
+            ref.read(analyticsServiceProvider).trackLandingPageView();
+            _trackSectionView('hero', 0);
+          }
+        },
+      ),
     );
   }
+}
 
-  Widget _buildLandingPage(BuildContext context) {
-    const appBarHeight = 80.0;
+/// Landing page content widget - proper widget class instead of build method
+class _LandingPageContent extends StatelessWidget {
+  final GlobalKey<ScaffoldState> scaffoldKey;
+  final ScrollController scrollController;
+  final AnimationController backgroundController;
+  final LandingSection? activeSection;
+  final bool isScrolled;
+  final double learnMoreOpacity;
+  final GlobalKey heroKey;
+  final GlobalKey howItWorksKey;
+  final GlobalKey autoFixKey;
+  final GlobalKey featuresKey;
+  final GlobalKey marketplaceKey;
+  final GlobalKey pricingKey;
+  final void Function(LandingSection) onSectionTap;
+  final VoidCallback onSignInTap;
+  final VoidCallback onScrollToTop;
+  final VoidCallback onLearnMoreTap;
+  final VoidCallback onFinalCtaCreateTap;
+  final VoidCallback onFinalCtaMarketplaceTap;
+  final VoidCallback onPageViewTracked;
 
+  const _LandingPageContent({
+    required this.scaffoldKey,
+    required this.scrollController,
+    required this.backgroundController,
+    required this.activeSection,
+    required this.isScrolled,
+    required this.learnMoreOpacity,
+    required this.heroKey,
+    required this.howItWorksKey,
+    required this.autoFixKey,
+    required this.featuresKey,
+    required this.marketplaceKey,
+    required this.pricingKey,
+    required this.onSectionTap,
+    required this.onSignInTap,
+    required this.onScrollToTop,
+    required this.onLearnMoreTap,
+    required this.onFinalCtaCreateTap,
+    required this.onFinalCtaMarketplaceTap,
+    required this.onPageViewTracked,
+  });
+
+  static const _appBarHeight = 80.0;
+
+  @override
+  Widget build(BuildContext context) {
     // Track page view once when landing page is built
-    if (!_hasTrackedPageView) {
-      _hasTrackedPageView = true;
-      ref.read(analyticsServiceProvider).trackLandingPageView();
-      // Track initial hero section view
-      _trackSectionView('hero', 0);
-    }
+    onPageViewTracked();
 
     // SEO meta tags for the landing page
     // Note: Open Graph and Twitter Card tags must be set in index.html
     // as social media crawlers don't execute JavaScript
     return Seo.head(
-      tags: [
+      tags: const [
         // Primary meta tags for search engines
-        const MetaTag(
+        MetaTag(
           name: 'title',
           content: 'ZenScrap - AI-Powered Web Scrapers That Fix Themselves',
         ),
-        const MetaTag(
+        MetaTag(
           name: 'description',
           content:
               'Create self-healing web scrapers with AI. Describe what you want to extract and get a ready-to-use API endpoint. No code, no CSS selectors, no maintenance. Free to start.',
         ),
-        const MetaTag(
+        MetaTag(
           name: 'keywords',
           content:
               'web scraping, AI scraper, self-healing scraper, web data extraction, API, no-code scraping, automated scraping, data extraction tool, web scraper API, scraping service',
         ),
-        const MetaTag(name: 'author', content: 'ZenScrap'),
-        const MetaTag(name: 'robots', content: 'index, follow'),
-        const MetaTag(
+        MetaTag(name: 'author', content: 'ZenScrap'),
+        MetaTag(name: 'robots', content: 'index, follow'),
+        MetaTag(
           name: 'googlebot',
           content: 'index, follow, max-snippet:-1, max-image-preview:large',
         ),
         // Canonical URL to prevent duplicate content issues
-        const LinkTag(rel: 'canonical', href: 'https://zenscrap.com/'),
+        LinkTag(rel: 'canonical', href: 'https://zenscrap.com/'),
         // Language and locale
-        const MetaTag(name: 'language', content: 'en'),
+        MetaTag(name: 'language', content: 'en'),
         // Application metadata
-        const MetaTag(name: 'application-name', content: 'ZenScrap'),
-        const MetaTag(name: 'theme-color', content: '#607D8B'),
+        MetaTag(name: 'application-name', content: 'ZenScrap'),
+        MetaTag(name: 'theme-color', content: '#607D8B'),
       ],
       child: Scaffold(
-      // Make scaffold background transparent so Lottie shows through
-      backgroundColor: Colors.transparent,
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final availableHeroHeight = constraints.maxHeight - appBarHeight;
+        key: scaffoldKey,
+        // Make scaffold background transparent so Lottie shows through
+        backgroundColor: Colors.transparent,
+        // Mobile drawer for navigation
+        endDrawer: LandingMobileDrawer(
+          activeSection: activeSection,
+          onSectionTap: onSectionTap,
+          onSignInTap: onSignInTap,
+        ),
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            final availableHeroHeight = constraints.maxHeight - _appBarHeight;
 
-          return Stack(
-            children: [
-              // Base background color layer
-              Positioned.fill(child: Container(color: context.c.surface)),
+            return Stack(
+              children: [
+                // Base background color layer
+                Positioned.fill(child: Container(color: context.c.surface)),
 
-              // Fixed background Lottie animation
-              if (!DevicePlatform.isWindows)
-                Positioned.fill(
-                  child: IgnorePointer(
-                    child: Lottie.network(
-                      'https://lottie.host/b70b435a-8472-4e19-ad03-71579dd08074/zOcB4gAPwC.lottie',
-                      decoder: customDecoder,
-                      fit: BoxFit.cover,
-                      frameRate: FrameRate(60),
-                      controller: _backgroundController,
-                      onLoaded: (composition) {
-                        _backgroundController.repeat();
-                      },
-                    ),
-                  ),
-                ),
-
-              // Scrollable content with transparent background
-              CustomScrollView(
-                controller: _scrollController,
-                slivers: [
-                  // Spacer for appbar
-                  const SliverToBoxAdapter(
-                    child: SizedBox(height: appBarHeight),
-                  ),
-
-                  // Hero Section - key on the child widget, not the sliver
-                  SliverToBoxAdapter(
-                    child: HeroSection(
-                      key: _heroKey,
-                      availableHeight: availableHeroHeight,
-                    ),
-                  ),
-
-                  // Problem Section
-                  const SliverToBoxAdapter(child: ProblemSection()),
-
-                  // How It Works Section - key on the child widget
-                  SliverToBoxAdapter(
-                    child: HowItWorksSection(key: _howItWorksKey),
-                  ),
-
-                  // Auto-Fix Section - key on the child widget
-                  SliverToBoxAdapter(child: AutoFixSection(key: _autoFixKey)),
-
-                  // Features Section - key on the child widget
-                  SliverToBoxAdapter(child: FeaturesSection(key: _featuresKey)),
-
-                  // Marketplace Section - key on the child widget
-                  SliverToBoxAdapter(
-                    child: MarketplaceSection(key: _marketplaceKey),
-                  ),
-
-                  // Pricing Section - key on the Container wrapper
-                  SliverToBoxAdapter(
-                    child: Container(
-                      key: _pricingKey,
-                      // No background - transparent
-                      padding: const EdgeInsets.symmetric(vertical: 60),
-                      child: Column(
-                        children: [
-                          Text(
-                            AppLocalizations.of(context)!.landing_pricing_title,
-                            style: context.t.displaySmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: context.c.onSurface,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            AppLocalizations.of(context)!.landing_pricing_subtitle,
-                            style: context.t.titleMedium?.copyWith(
-                              color: context.c.onSurfaceVariant,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 48),
-                          const SizedBox(
-                            height: 980,
-                            child: RawPricingPageComponent(
-                              isInsideLandingPage: true,
-                            ),
-                          ),
-                        ],
+                // Fixed background Lottie animation
+                if (!DevicePlatform.isWindows)
+                  Positioned.fill(
+                    child: IgnorePointer(
+                      child: Lottie.network(
+                        'https://lottie.host/b70b435a-8472-4e19-ad03-71579dd08074/zOcB4gAPwC.lottie',
+                        decoder: customDecoder,
+                        fit: BoxFit.cover,
+                        frameRate: FrameRate(60),
+                        controller: backgroundController,
+                        onLoaded: (composition) {
+                          backgroundController.repeat();
+                        },
                       ),
                     ),
                   ),
 
-                  // Final CTA Section
-                  SliverToBoxAdapter(
-                    child: FinalCtaSection(
-                      onScrollToTop: _scrollToTop,
-                      onCreateScraperTap: _trackFinalCtaCreateClick,
-                      onBrowseMarketplaceTap: _trackFinalCtaMarketplaceClick,
+                // Scrollable content with transparent background
+                CustomScrollView(
+                  controller: scrollController,
+                  slivers: [
+                    // Spacer for appbar
+                    const SliverToBoxAdapter(
+                      child: SizedBox(height: _appBarHeight),
                     ),
-                  ),
-                ],
-              ),
 
-              // Fixed floating appbar
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                child: LandingAppBar(
-                  activeSection: _activeSection,
-                  isScrolled: _isScrolled,
-                  onSectionTap: _scrollToSection,
-                  onSignInTap: _trackSignInClick,
+                    // Hero Section - key on the child widget, not the sliver
+                    SliverToBoxAdapter(
+                      child: HeroSection(
+                        key: heroKey,
+                        availableHeight: availableHeroHeight,
+                      ),
+                    ),
+
+                    // Problem Section
+                    const SliverToBoxAdapter(child: ProblemSection()),
+
+                    // How It Works Section - key on the child widget
+                    SliverToBoxAdapter(
+                      child: HowItWorksSection(key: howItWorksKey),
+                    ),
+
+                    // Auto-Fix Section - key on the child widget
+                    SliverToBoxAdapter(child: AutoFixSection(key: autoFixKey)),
+
+                    // Features Section - key on the child widget
+                    SliverToBoxAdapter(
+                        child: FeaturesSection(key: featuresKey)),
+
+                    // Marketplace Section - key on the child widget
+                    SliverToBoxAdapter(
+                      child: MarketplaceSection(key: marketplaceKey),
+                    ),
+
+                    // Pricing Section - key on the Container wrapper
+                    SliverToBoxAdapter(
+                      child: _PricingSection(pricingKey: pricingKey),
+                    ),
+
+                    // Final CTA Section
+                    SliverToBoxAdapter(
+                      child: FinalCtaSection(
+                        onScrollToTop: onScrollToTop,
+                        onCreateScraperTap: onFinalCtaCreateTap,
+                        onBrowseMarketplaceTap: onFinalCtaMarketplaceTap,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
 
-              // "Learn more" scroll indicator - overlays on top, fades out on scroll
-              if (_learnMoreOpacity > 0)
+                // Fixed floating appbar
                 Positioned(
-                  bottom: 20,
+                  top: 0,
                   left: 0,
                   right: 0,
-                  child: IgnorePointer(
-                    ignoring: _learnMoreOpacity < 0.5,
-                    child: AnimatedOpacity(
-                      duration: const Duration(milliseconds: 100),
-                      opacity: _learnMoreOpacity,
-                      child: Center(
-                        child: GestureDetector(
-                          onTap: () {
-                            _trackLearnMoreClick();
-                            _scrollToSection(LandingSection.howItWorks);
-                          },
-                          child: MouseRegion(
-                            cursor: SystemMouseCursors.click,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  AppLocalizations.of(context)!.landing_learn_more,
-                                  style: context.t.labelMedium?.copyWith(
-                                    color: context.c.onSurfaceVariant,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Icon(
-                                      Icons.keyboard_arrow_down_rounded,
-                                      size: 28,
-                                      color: context.c.primary,
-                                    )
-                                    .animate(
-                                      onPlay: (controller) =>
-                                          controller.repeat(reverse: true),
-                                    )
-                                    .moveY(begin: 0, end: 8, duration: 800.ms),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+                  child: LandingAppBar(
+                    activeSection: activeSection,
+                    isScrolled: isScrolled,
+                    onSectionTap: onSectionTap,
+                    onSignInTap: onSignInTap,
+                    onMenuTap: () => scaffoldKey.currentState?.openEndDrawer(),
                   ),
                 ),
 
-            ],
-          );
-        },
+                // "Learn more" scroll indicator - overlays on top, fades out on scroll
+                if (learnMoreOpacity > 0)
+                  _LearnMoreIndicator(
+                    opacity: learnMoreOpacity,
+                    onTap: onLearnMoreTap,
+                  ),
+              ],
+            );
+          },
+        ),
       ),
-      ), // End of Seo.head child: Scaffold
-    ); // End of Seo.head
+    );
+  }
+}
+
+/// Pricing section widget
+class _PricingSection extends StatelessWidget {
+  final GlobalKey pricingKey;
+
+  const _PricingSection({required this.pricingKey});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: pricingKey,
+      // No background - transparent
+      padding: EdgeInsets.symmetric(
+        vertical: context.responsiveValue(compact: 40.0, expanded: 60.0),
+        horizontal: context.responsiveValue(compact: 20.0, expanded: 40.0),
+      ),
+      child: Column(
+        children: [
+          Text(
+            AppLocalizations.of(context)!.landing_pricing_title,
+            style: context.responsiveValue(
+              compact: context.t.headlineMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: context.c.onSurface,
+              ),
+              expanded: context.t.displaySmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: context.c.onSurface,
+              ),
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            AppLocalizations.of(context)!.landing_pricing_subtitle,
+            style: context.t.titleMedium?.copyWith(
+              color: context.c.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(
+              height: context.responsiveValue(compact: 32.0, expanded: 48.0)),
+          SizedBox(
+            height: context.responsiveValue(compact: 1200.0, expanded: 980.0),
+            child: const RawPricingPageComponent(
+              isInsideLandingPage: true,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// "Learn more" scroll indicator widget
+class _LearnMoreIndicator extends StatelessWidget {
+  final double opacity;
+  final VoidCallback onTap;
+
+  const _LearnMoreIndicator({
+    required this.opacity,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      bottom: 20,
+      left: 0,
+      right: 0,
+      child: IgnorePointer(
+        ignoring: opacity < 0.5,
+        child: AnimatedOpacity(
+          duration: const Duration(milliseconds: 100),
+          opacity: opacity,
+          child: Center(
+            child: GestureDetector(
+              onTap: onTap,
+              child: MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      AppLocalizations.of(context)!.landing_learn_more,
+                      style: context.t.labelMedium?.copyWith(
+                        color: context.c.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          size: 28,
+                          color: context.c.primary,
+                        )
+                        .animate(
+                          onPlay: (controller) =>
+                              controller.repeat(reverse: true),
+                        )
+                        .moveY(begin: 0, end: 8, duration: 800.ms),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

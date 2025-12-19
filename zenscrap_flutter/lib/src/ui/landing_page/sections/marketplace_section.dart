@@ -2,18 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 
 /// Section highlighting the marketplace feature.
 /// Shows that users can leverage pre-built scrapers from the community.
+/// On mobile, features are shown in a Column; on desktop, in a Row.
 class MarketplaceSection extends StatelessWidget {
   const MarketplaceSection({super.key});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 100, horizontal: 40),
+      padding: EdgeInsets.symmetric(
+        vertical: context.responsiveValue(compact: 60.0, expanded: 100.0),
+        horizontal: context.responsiveValue(compact: 20.0, expanded: 40.0),
+      ),
       child: Column(
         children: [
           Container(
@@ -48,9 +54,15 @@ class MarketplaceSection extends StatelessWidget {
           const SizedBox(height: 24),
           Text(
             l10n.landing_marketplace_title,
-            style: context.t.displaySmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: context.c.onSurface,
+            style: context.responsiveValue(
+              compact: context.t.headlineMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: context.c.onSurface,
+              ),
+              expanded: context.t.displaySmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: context.c.onSurface,
+              ),
             ),
             textAlign: TextAlign.center,
           )
@@ -72,42 +84,14 @@ class MarketplaceSection extends StatelessWidget {
               .animate()
               .fadeIn(duration: 600.ms, delay: 200.ms)
               .slideY(begin: 0.2, end: 0),
-          const SizedBox(height: 64),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 900),
-            child: Row(
-              children: [
-                Expanded(
-                  child: _MarketplaceFeature(
-                    icon: Icons.store_rounded,
-                    title: l10n.landing_marketplace_prebuilt_title,
-                    description: l10n.landing_marketplace_prebuilt_description,
-                    delay: 300,
-                  ),
-                ),
-                const SizedBox(width: 24),
-                Expanded(
-                  child: _MarketplaceFeature(
-                    icon: Icons.trending_up_rounded,
-                    title: l10n.landing_marketplace_stats_title,
-                    description: l10n.landing_marketplace_stats_description,
-                    delay: 400,
-                  ),
-                ),
-                const SizedBox(width: 24),
-                Expanded(
-                  child: _MarketplaceFeature(
-                    icon: Icons.play_arrow_rounded,
-                    title: l10n.landing_marketplace_testing_title,
-                    description: l10n.landing_marketplace_testing_description,
-                    delay: 500,
-                  ),
-                ),
-              ],
-            ),
+          SizedBox(height: context.responsiveValue(compact: 40.0, expanded: 64.0)),
+          // Responsive features layout
+          ResponsiveWidget(
+            compact: _MobileFeaturesLayout(l10n: l10n),
+            expanded: _DesktopFeaturesLayout(l10n: l10n),
           ),
-          const SizedBox(height: 48),
-          // Categories preview
+          SizedBox(height: context.responsiveValue(compact: 32.0, expanded: 48.0)),
+          // Categories preview - Wrap handles responsiveness automatically
           Wrap(
             spacing: 12,
             runSpacing: 12,
@@ -125,6 +109,85 @@ class MarketplaceSection extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Desktop layout with Row of features
+class _DesktopFeaturesLayout extends StatelessWidget {
+  final AppLocalizations l10n;
+
+  const _DesktopFeaturesLayout({required this.l10n});
+
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 900),
+      child: Row(
+        children: [
+          Expanded(
+            child: _MarketplaceFeature(
+              icon: Icons.store_rounded,
+              title: l10n.landing_marketplace_prebuilt_title,
+              description: l10n.landing_marketplace_prebuilt_description,
+              delay: 300,
+            ),
+          ),
+          const SizedBox(width: 24),
+          Expanded(
+            child: _MarketplaceFeature(
+              icon: Icons.trending_up_rounded,
+              title: l10n.landing_marketplace_stats_title,
+              description: l10n.landing_marketplace_stats_description,
+              delay: 400,
+            ),
+          ),
+          const SizedBox(width: 24),
+          Expanded(
+            child: _MarketplaceFeature(
+              icon: Icons.play_arrow_rounded,
+              title: l10n.landing_marketplace_testing_title,
+              description: l10n.landing_marketplace_testing_description,
+              delay: 500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Mobile layout with Column of features
+class _MobileFeaturesLayout extends StatelessWidget {
+  final AppLocalizations l10n;
+
+  const _MobileFeaturesLayout({required this.l10n});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        _MarketplaceFeature(
+          icon: Icons.store_rounded,
+          title: l10n.landing_marketplace_prebuilt_title,
+          description: l10n.landing_marketplace_prebuilt_description,
+          delay: 300,
+        ),
+        const SizedBox(height: 16),
+        _MarketplaceFeature(
+          icon: Icons.trending_up_rounded,
+          title: l10n.landing_marketplace_stats_title,
+          description: l10n.landing_marketplace_stats_description,
+          delay: 400,
+        ),
+        const SizedBox(height: 16),
+        _MarketplaceFeature(
+          icon: Icons.play_arrow_rounded,
+          title: l10n.landing_marketplace_testing_title,
+          description: l10n.landing_marketplace_testing_description,
+          delay: 500,
+        ),
+      ],
     );
   }
 }

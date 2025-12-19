@@ -36,6 +36,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get landing_learn_more => 'Mehr erfahren';
 
   @override
+  String get landing_drawer_language => 'Sprache';
+
+  @override
   String get landing_hero_title => 'Web Scraper, die sich\nselbst reparieren';
 
   @override

@@ -36,6 +36,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get landing_learn_more => 'En savoir plus';
 
   @override
+  String get landing_drawer_language => 'Langue';
+
+  @override
   String get landing_hero_title =>
       'Des Web Scrapers qui se\nreparent tout seuls';
 

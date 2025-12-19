@@ -10,6 +10,7 @@
   "landing_sign_in": "ログイン",
   "landing_app_name": "ZenScrap",
   "landing_learn_more": "詳しく見る",
+  "landing_drawer_language": "言語",
 
   "landing_hero_title": "自己修復する\nWebスクレイパー",
   "landing_hero_subtitle": "抽出したい内容を説明するだけ。AIがスクレイパーを自動で構築、テスト、メンテナンスします。コード不要。CSSセレクター不要。壊れたエンドポイントはもう心配いりません。",

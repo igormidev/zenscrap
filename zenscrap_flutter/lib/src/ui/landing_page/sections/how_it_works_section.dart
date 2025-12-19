@@ -2,25 +2,37 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 
 /// Section explaining the 3-step process to create a scraper.
 /// Emphasizes the simplicity and AI automation.
+/// On mobile, steps are shown in a Column; on desktop, in a Row with connectors.
 class HowItWorksSection extends StatelessWidget {
   const HowItWorksSection({super.key});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 100, horizontal: 40),
+      padding: EdgeInsets.symmetric(
+        vertical: context.responsiveValue(compact: 60.0, expanded: 100.0),
+        horizontal: context.responsiveValue(compact: 20.0, expanded: 40.0),
+      ),
       child: Column(
         children: [
           Text(
             l10n.landing_how_title,
-            style: context.t.displaySmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: context.c.onSurface,
+            style: context.responsiveValue(
+              compact: context.t.headlineMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: context.c.onSurface,
+              ),
+              expanded: context.t.displaySmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: context.c.onSurface,
+              ),
             ),
             textAlign: TextAlign.center,
           )
@@ -42,81 +54,153 @@ class HowItWorksSection extends StatelessWidget {
               .animate()
               .fadeIn(duration: 600.ms, delay: 200.ms)
               .slideY(begin: 0.2, end: 0),
-          const SizedBox(height: 80),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1100),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: _StepCard(
-                    stepNumber: '1',
-                    icon: Icons.link_rounded,
-                    title: l10n.landing_how_step1_title,
-                    description: l10n.landing_how_step1_description,
-                    delay: 300,
-                  ),
-                ),
-                _StepConnector().animate().fadeIn(delay: 400.ms, duration: 400.ms),
-                Expanded(
-                  child: _StepCard(
-                    stepNumber: '2',
-                    icon: Icons.chat_bubble_outline_rounded,
-                    title: l10n.landing_how_step2_title,
-                    description: l10n.landing_how_step2_description,
-                    delay: 500,
-                  ),
-                ),
-                _StepConnector().animate().fadeIn(delay: 600.ms, duration: 400.ms),
-                Expanded(
-                  child: _StepCard(
-                    stepNumber: '3',
-                    icon: Icons.auto_fix_high_rounded,
-                    title: l10n.landing_how_step3_title,
-                    description: l10n.landing_how_step3_description,
-                    delay: 700,
-                    isHighlighted: true,
-                  ),
-                ),
-              ],
-            ),
+          SizedBox(height: context.responsiveValue(compact: 40.0, expanded: 80.0)),
+          // Responsive steps layout
+          ResponsiveWidget(
+            compact: _MobileStepsLayout(l10n: l10n),
+            expanded: _DesktopStepsLayout(l10n: l10n),
           ),
-          const SizedBox(height: 64),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            decoration: BoxDecoration(
-              color: context.c.primaryContainer.withAlpha(60),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: context.c.primary.withAlpha(40),
-                width: 1,
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.auto_awesome_rounded,
-                  color: context.c.primary,
-                  size: 24,
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  l10n.landing_how_ai_note,
-                  style: context.t.bodyLarge?.copyWith(
-                    color: context.c.onSurface,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          )
-              .animate()
-              .fadeIn(duration: 600.ms, delay: 900.ms)
-              .slideY(begin: 0.2, end: 0),
+          SizedBox(height: context.responsiveValue(compact: 40.0, expanded: 64.0)),
+          const _AiNoteWidget(),
         ],
       ),
     );
+  }
+}
+
+/// Desktop layout with Row and connectors
+class _DesktopStepsLayout extends StatelessWidget {
+  final AppLocalizations l10n;
+
+  const _DesktopStepsLayout({required this.l10n});
+
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 1100),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: _StepCard(
+              stepNumber: '1',
+              icon: Icons.link_rounded,
+              title: l10n.landing_how_step1_title,
+              description: l10n.landing_how_step1_description,
+              delay: 300,
+            ),
+          ),
+          const _StepConnector(delay: 400),
+          Expanded(
+            child: _StepCard(
+              stepNumber: '2',
+              icon: Icons.chat_bubble_outline_rounded,
+              title: l10n.landing_how_step2_title,
+              description: l10n.landing_how_step2_description,
+              delay: 500,
+            ),
+          ),
+          const _StepConnector(delay: 600),
+          Expanded(
+            child: _StepCard(
+              stepNumber: '3',
+              icon: Icons.auto_fix_high_rounded,
+              title: l10n.landing_how_step3_title,
+              description: l10n.landing_how_step3_description,
+              delay: 700,
+              isHighlighted: true,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Mobile layout with Column (no connectors)
+class _MobileStepsLayout extends StatelessWidget {
+  final AppLocalizations l10n;
+
+  const _MobileStepsLayout({required this.l10n});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        _StepCard(
+          stepNumber: '1',
+          icon: Icons.link_rounded,
+          title: l10n.landing_how_step1_title,
+          description: l10n.landing_how_step1_description,
+          delay: 300,
+        ),
+        const SizedBox(height: 16),
+        _StepCard(
+          stepNumber: '2',
+          icon: Icons.chat_bubble_outline_rounded,
+          title: l10n.landing_how_step2_title,
+          description: l10n.landing_how_step2_description,
+          delay: 400,
+        ),
+        const SizedBox(height: 16),
+        _StepCard(
+          stepNumber: '3',
+          icon: Icons.auto_fix_high_rounded,
+          title: l10n.landing_how_step3_title,
+          description: l10n.landing_how_step3_description,
+          delay: 500,
+          isHighlighted: true,
+        ),
+      ],
+    );
+  }
+}
+
+/// AI Note widget at the bottom
+class _AiNoteWidget extends StatelessWidget {
+  const _AiNoteWidget();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: context.responsiveValue(compact: 16.0, expanded: 24.0),
+        vertical: 16,
+      ),
+      decoration: BoxDecoration(
+        color: context.c.primaryContainer.withAlpha(60),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: context.c.primary.withAlpha(40),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.auto_awesome_rounded,
+            color: context.c.primary,
+            size: context.responsiveValue(compact: 20.0, expanded: 24.0),
+          ),
+          const SizedBox(width: 12),
+          Flexible(
+            child: Text(
+              l10n.landing_how_ai_note,
+              style: context.t.bodyLarge?.copyWith(
+                color: context.c.onSurface,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    )
+        .animate()
+        .fadeIn(duration: 600.ms, delay: 900.ms)
+        .slideY(begin: 0.2, end: 0);
   }
 }
 
@@ -225,6 +309,10 @@ class _StepCard extends StatelessWidget {
 }
 
 class _StepConnector extends StatelessWidget {
+  final int delay;
+
+  const _StepConnector({required this.delay});
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -239,6 +327,6 @@ class _StepConnector extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ).animate().fadeIn(delay: delay.ms, duration: 400.ms);
   }
 }

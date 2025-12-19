@@ -7,6 +7,7 @@ import 'package:lottie/lottie.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/core/mixins/create_scrappable_mixin.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
 import 'package:zenscrap_flutter/src/ui/landing_page/widgets/trust_badges_row.dart';
@@ -106,13 +107,64 @@ class _HeroSectionState extends ConsumerState<HeroSection>
     // Note: Form view tracking is now handled by landing page trackLandingPageView
     // to avoid redundant calls on every rebuild
 
+    // Use responsive layout
+    return ResponsiveBuilder(
+      compact: (context, constraints) => _MobileHeroLayout(
+        availableHeight: widget.availableHeight,
+        formKey: _formKey,
+        referenceLinkEC: _referenceLinkEC,
+        promptEC: _promptEC,
+        isDescriptionFocused: _isDescriptionFocused,
+        onDescriptionFocusChange: (focused) =>
+            setState(() => _isDescriptionFocused = focused),
+        onSubmit: _submitForm,
+        promptText: _promptEC.text,
+      ),
+      expanded: (context, constraints) => _DesktopHeroLayout(
+        availableHeight: widget.availableHeight,
+        formKey: _formKey,
+        referenceLinkEC: _referenceLinkEC,
+        promptEC: _promptEC,
+        isDescriptionFocused: _isDescriptionFocused,
+        onDescriptionFocusChange: (focused) =>
+            setState(() => _isDescriptionFocused = focused),
+        onSubmit: _submitForm,
+        promptText: _promptEC.text,
+      ),
+    );
+  }
+}
+
+/// Desktop layout with Row - content on left, Lottie on right
+class _DesktopHeroLayout extends StatelessWidget {
+  final double availableHeight;
+  final GlobalKey<FormState> formKey;
+  final TextEditingController referenceLinkEC;
+  final TextEditingController promptEC;
+  final bool isDescriptionFocused;
+  final void Function(bool) onDescriptionFocusChange;
+  final VoidCallback onSubmit;
+  final String promptText;
+
+  const _DesktopHeroLayout({
+    required this.availableHeight,
+    required this.formKey,
+    required this.referenceLinkEC,
+    required this.promptEC,
+    required this.isDescriptionFocused,
+    required this.onDescriptionFocusChange,
+    required this.onSubmit,
+    required this.promptText,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     // Calculate scale factor based on available height
     // Base reference height is 720px (typical laptop viewport minus app bar)
     const baseHeight = 720.0;
-    final scaleFactor = (widget.availableHeight / baseHeight).clamp(0.65, 1.4);
+    final scaleFactor = (availableHeight / baseHeight).clamp(0.65, 1.4);
 
     // Scale values for different elements
-    // Lottie scale: use Transform.scale based on available height
     final lottieScale = (1.2 * scaleFactor).clamp(0.9, 1.6);
     final headlineSize = (context.t.displayLarge?.fontSize ?? 57) * scaleFactor;
     final subheadlineSize =
@@ -124,7 +176,7 @@ class _HeroSectionState extends ConsumerState<HeroSection>
 
     return Container(
       width: double.infinity,
-      height: widget.availableHeight,
+      height: availableHeight,
       padding: EdgeInsets.symmetric(
         horizontal: horizontalPadding,
         vertical: verticalPadding,
@@ -169,125 +221,20 @@ class _HeroSectionState extends ConsumerState<HeroSection>
                     .fadeIn(duration: 600.ms, delay: 400.ms)
                     .slideX(begin: -0.1, end: 0),
                 SizedBox(height: formSpacing),
-                // Form - textfields don't scale per user request
-                Form(
-                  key: _formKey,
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 480),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ZenTextfield(
-                              controller: _referenceLinkEC,
-                              labelText: AppLocalizations.of(context)!.landing_hero_target_url_label,
-                              hintText: AppLocalizations.of(context)!.landing_hero_target_url_hint,
-                              onSubmitted: (_) => _submitForm(),
-                              maxLines: 1,
-                              validator: (s) =>
-                                  ValidationBuilder()
-                                      .url(AppLocalizations.of(context)!.landing_hero_url_validation_invalid)
-                                      .minLength(
-                                        10,
-                                        AppLocalizations.of(context)!.landing_hero_url_validation_min_length,
-                                      )
-                                      .maxLength(
-                                        500,
-                                        AppLocalizations.of(context)!.landing_hero_url_validation_max_length,
-                                      )
-                                      .build()(
-                                    s?.startsWith('http') == true
-                                        ? s
-                                        : 'http://$s',
-                                  ),
-                            )
-                            .animate()
-                            .fadeIn(duration: 500.ms, delay: 600.ms)
-                            .slideY(begin: 0.2, end: 0),
-                        const SizedBox(height: 16),
-                        AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              height: _isDescriptionFocused ? 200 : 56,
-                              child: Focus(
-                                onFocusChange: (hasFocus) {
-                                  if (hasFocus && !_isDescriptionFocused) {
-                                    setState(
-                                      () => _isDescriptionFocused = true,
-                                    );
-                                  } else if (!hasFocus &&
-                                      _isDescriptionFocused) {
-                                    if (_promptEC.text.trim().isNotEmpty) {
-                                      return;
-                                    }
-                                    setState(
-                                      () => _isDescriptionFocused = false,
-                                    );
-                                  }
-                                },
-                                child: ZenTextfield(
-                                  controller: _promptEC,
-                                  labelText: AppLocalizations.of(context)!.landing_hero_prompt_label,
-                                  hintText:
-                                      AppLocalizations.of(context)!.landing_hero_prompt_hint,
-                                  expands: true,
-                                  maxLines: null,
-                                  minLines: null,
-                                  onSubmitted: (_) => _submitForm(),
-                                  validator: ValidationBuilder()
-                                      .minLength(
-                                        10,
-                                        AppLocalizations.of(context)!.landing_hero_prompt_validation_min_length,
-                                      )
-                                      .maxLength(
-                                        2200,
-                                        AppLocalizations.of(context)!.landing_hero_prompt_validation_max_length,
-                                      )
-                                      .build(),
-                                ),
-                              ),
-                            )
-                            .animate()
-                            .fadeIn(duration: 500.ms, delay: 700.ms)
-                            .slideY(begin: 0.2, end: 0),
-                        const SizedBox(height: 24),
-                        Row(
-                              children: [
-                                FilledButton.icon(
-                                  onPressed: _submitForm,
-                                  icon: const Icon(Icons.auto_awesome_rounded),
-                                  label: Text(
-                                    AppLocalizations.of(context)!.landing_hero_cta_button,
-                                  ),
-                                  style: FilledButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 24,
-                                      vertical: 18,
-                                    ),
-                                    textStyle: context.t.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                Text(
-                                  AppLocalizations.of(context)!.landing_hero_free_label,
-                                  style: context.t.labelLarge?.copyWith(
-                                    color: context.c.primary,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            )
-                            .animate()
-                            .fadeIn(duration: 500.ms, delay: 800.ms)
-                            .slideY(begin: 0.2, end: 0),
-                      ],
-                    ),
-                  ),
+                // Form
+                _HeroForm(
+                  formKey: formKey,
+                  referenceLinkEC: referenceLinkEC,
+                  promptEC: promptEC,
+                  isDescriptionFocused: isDescriptionFocused,
+                  onDescriptionFocusChange: onDescriptionFocusChange,
+                  onSubmit: onSubmit,
+                  promptText: promptText,
                 ),
               ],
             ),
           ),
-          // Right side - Robot Lottie with trust badges below (Z-pattern right end)
+          // Right side - Robot Lottie with trust badges below
           Expanded(
             flex: 4,
             child: Column(
@@ -322,3 +269,275 @@ class _HeroSectionState extends ConsumerState<HeroSection>
     );
   }
 }
+
+/// Mobile layout with Column - content stacked vertically
+class _MobileHeroLayout extends StatelessWidget {
+  final double availableHeight;
+  final GlobalKey<FormState> formKey;
+  final TextEditingController referenceLinkEC;
+  final TextEditingController promptEC;
+  final bool isDescriptionFocused;
+  final void Function(bool) onDescriptionFocusChange;
+  final VoidCallback onSubmit;
+  final String promptText;
+
+  const _MobileHeroLayout({
+    required this.availableHeight,
+    required this.formKey,
+    required this.referenceLinkEC,
+    required this.promptEC,
+    required this.isDescriptionFocused,
+    required this.onDescriptionFocusChange,
+    required this.onSubmit,
+    required this.promptText,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Container(
+      width: double.infinity,
+      constraints: BoxConstraints(minHeight: availableHeight),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Headline - centered on mobile
+            Text(
+                  l10n.landing_hero_title,
+                  style: context.t.headlineLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: context.c.onSurface,
+                    height: 1.1,
+                  ),
+                  textAlign: TextAlign.center,
+                )
+                .animate()
+                .fadeIn(duration: 600.ms, delay: 200.ms)
+                .slideY(begin: -0.1, end: 0),
+            const SizedBox(height: 16),
+            // Subheadline - centered on mobile
+            Text(
+                  l10n.landing_hero_subtitle,
+                  style: context.t.bodyLarge?.copyWith(
+                    color: context.c.onSurfaceVariant,
+                    height: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                )
+                .animate()
+                .fadeIn(duration: 600.ms, delay: 400.ms)
+                .slideY(begin: -0.1, end: 0),
+            const SizedBox(height: 24),
+            // Trust badges - responsive
+            const TrustBadgesRow()
+                .animate()
+                .fadeIn(duration: 600.ms, delay: 500.ms),
+            const SizedBox(height: 32),
+            // Form - full width on mobile
+            _HeroForm(
+              formKey: formKey,
+              referenceLinkEC: referenceLinkEC,
+              promptEC: promptEC,
+              isDescriptionFocused: isDescriptionFocused,
+              onDescriptionFocusChange: onDescriptionFocusChange,
+              onSubmit: onSubmit,
+              promptText: promptText,
+              isMobile: true,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Shared form widget for both layouts
+class _HeroForm extends StatelessWidget {
+  final GlobalKey<FormState> formKey;
+  final TextEditingController referenceLinkEC;
+  final TextEditingController promptEC;
+  final bool isDescriptionFocused;
+  final void Function(bool) onDescriptionFocusChange;
+  final VoidCallback onSubmit;
+  final String promptText;
+  final bool isMobile;
+
+  const _HeroForm({
+    required this.formKey,
+    required this.referenceLinkEC,
+    required this.promptEC,
+    required this.isDescriptionFocused,
+    required this.onDescriptionFocusChange,
+    required this.onSubmit,
+    required this.promptText,
+    this.isMobile = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Form(
+      key: formKey,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: isMobile ? double.infinity : 480),
+        child: Column(
+          crossAxisAlignment:
+              isMobile ? CrossAxisAlignment.stretch : CrossAxisAlignment.start,
+          children: [
+            ZenTextfield(
+                  controller: referenceLinkEC,
+                  labelText: l10n.landing_hero_target_url_label,
+                  hintText: l10n.landing_hero_target_url_hint,
+                  onSubmitted: (_) => onSubmit(),
+                  maxLines: 1,
+                  validator: (s) => ValidationBuilder()
+                      .url(l10n.landing_hero_url_validation_invalid)
+                      .minLength(10, l10n.landing_hero_url_validation_min_length)
+                      .maxLength(
+                          500, l10n.landing_hero_url_validation_max_length)
+                      .build()(
+                    s?.startsWith('http') == true ? s : 'http://$s',
+                  ),
+                )
+                .animate()
+                .fadeIn(duration: 500.ms, delay: 600.ms)
+                .slideY(begin: 0.2, end: 0),
+            const SizedBox(height: 16),
+            AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  height: isDescriptionFocused ? 200 : 56,
+                  child: Focus(
+                    onFocusChange: (hasFocus) {
+                      if (hasFocus && !isDescriptionFocused) {
+                        onDescriptionFocusChange(true);
+                      } else if (!hasFocus && isDescriptionFocused) {
+                        if (promptText.trim().isNotEmpty) {
+                          return;
+                        }
+                        onDescriptionFocusChange(false);
+                      }
+                    },
+                    child: ZenTextfield(
+                      controller: promptEC,
+                      labelText: l10n.landing_hero_prompt_label,
+                      hintText: l10n.landing_hero_prompt_hint,
+                      expands: true,
+                      maxLines: null,
+                      minLines: null,
+                      onSubmitted: (_) => onSubmit(),
+                      validator: ValidationBuilder()
+                          .minLength(
+                              10, l10n.landing_hero_prompt_validation_min_length)
+                          .maxLength(2200,
+                              l10n.landing_hero_prompt_validation_max_length)
+                          .build(),
+                    ),
+                  ),
+                )
+                .animate()
+                .fadeIn(duration: 500.ms, delay: 700.ms)
+                .slideY(begin: 0.2, end: 0),
+            const SizedBox(height: 24),
+            if (isMobile)
+              _MobileCtaButton(onSubmit: onSubmit)
+            else
+              _DesktopCtaRow(onSubmit: onSubmit),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Desktop CTA row with button and free label side by side
+class _DesktopCtaRow extends StatelessWidget {
+  final VoidCallback onSubmit;
+
+  const _DesktopCtaRow({required this.onSubmit});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Row(
+          children: [
+            FilledButton.icon(
+              onPressed: onSubmit,
+              icon: const Icon(Icons.auto_awesome_rounded),
+              label: Text(l10n.landing_hero_cta_button),
+              style: FilledButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 18,
+                ),
+                textStyle: context.t.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Text(
+              l10n.landing_hero_free_label,
+              style: context.t.labelLarge?.copyWith(
+                color: context.c.primary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        )
+        .animate()
+        .fadeIn(duration: 500.ms, delay: 800.ms)
+        .slideY(begin: 0.2, end: 0);
+  }
+}
+
+/// Mobile CTA button - full width with free label below
+class _MobileCtaButton extends StatelessWidget {
+  final VoidCallback onSubmit;
+
+  const _MobileCtaButton({required this.onSubmit});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Column(
+          children: [
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: onSubmit,
+                icon: const Icon(Icons.auto_awesome_rounded),
+                label: Text(l10n.landing_hero_cta_button),
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 16,
+                  ),
+                  textStyle: context.t.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              l10n.landing_hero_free_label,
+              style: context.t.labelLarge?.copyWith(
+                color: context.c.primary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        )
+        .animate()
+        .fadeIn(duration: 500.ms, delay: 800.ms)
+        .slideY(begin: 0.2, end: 0);
+  }
+}
+

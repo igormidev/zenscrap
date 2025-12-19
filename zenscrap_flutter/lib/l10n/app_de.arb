@@ -10,6 +10,7 @@
   "landing_sign_in": "Anmelden",
   "landing_app_name": "ZenScrap",
   "landing_learn_more": "Mehr erfahren",
+  "landing_drawer_language": "Sprache",
 
   "landing_hero_title": "Web Scraper, die sich\nselbst reparieren",
   "landing_hero_subtitle": "Beschreiben Sie, was Sie extrahieren moechten. Unsere KI erstellt, testet und wartet Ihren Scraper automatisch. Kein Code. Keine CSS-Selektoren. Keine defekten Endpunkte.",

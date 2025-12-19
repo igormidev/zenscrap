@@ -36,6 +36,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get landing_learn_more => 'Learn more';
 
   @override
+  String get landing_drawer_language => 'Language';
+
+  @override
   String get landing_hero_title => 'Web Scrapers That\nFix Themselves';
 
   @override
@@ -1968,6 +1971,9 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get landing_learn_more => 'Saiba mais';
+
+  @override
+  String get landing_drawer_language => 'Idioma';
 
   @override
   String get landing_hero_title => 'Web Scrapers que se\nReparam Sozinhos';
