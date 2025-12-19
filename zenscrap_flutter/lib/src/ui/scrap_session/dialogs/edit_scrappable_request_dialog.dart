@@ -5,6 +5,7 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/serverpod_to_result.dart';
 import 'package:zenscrap_flutter/src/design_system/default_error_snackbar.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/path_parameters_section.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/query_parameters_section.dart';
@@ -225,11 +226,24 @@ class _EditScrappableRequestDialogState
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Dialog(
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.7,
-        height: MediaQuery.of(context).size.height * 0.85,
-        padding: const EdgeInsets.all(24),
-        child: Column(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: context.responsiveValue(
+            compact: double.infinity,
+            medium: 700,
+            expanded: 900,
+          ),
+          maxHeight: MediaQuery.sizeOf(context).height * 0.85,
+        ),
+        child: Container(
+          padding: EdgeInsets.all(
+            context.responsiveValue(
+              compact: 16.0,
+              medium: 20.0,
+              expanded: 24.0,
+            ),
+          ),
+          child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header
@@ -314,12 +328,12 @@ class _EditScrappableRequestDialogState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // URL Section
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: TextField(
+                    // URL Section - Responsive Layout
+                    ResponsiveBuilder(
+                      compact: (context, constraints) => Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          TextField(
                             controller: _urlController,
                             decoration: InputDecoration(
                               hintText: 'https://example.com/users/{userId}',
@@ -338,23 +352,64 @@ class _EditScrappableRequestDialogState
                             minLines: 1,
                             onChanged: (_) => _markAsChanged(),
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        SizedBox(
-                          height: 48,
-                          child: FilledButton.icon(
-                            onPressed: _hasChanges ? _handleSave : null,
-                            icon: const Icon(Icons.save),
-                            label: Text(l10n.scrap_session_save_changes),
-                            style: FilledButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 16,
+                          const SizedBox(height: 12),
+                          SizedBox(
+                            height: 48,
+                            child: FilledButton.icon(
+                              onPressed: _hasChanges ? _handleSave : null,
+                              icon: const Icon(Icons.save),
+                              label: Text(l10n.scrap_session_save_changes),
+                              style: FilledButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                  vertical: 16,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
+                      expanded: (context, constraints) => Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: _urlController,
+                              decoration: InputDecoration(
+                                hintText: 'https://example.com/users/{userId}',
+                                border: const OutlineInputBorder(),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                                helperText: l10n.scrap_session_use_param_name('{paramName}'),
+                                helperMaxLines: 2,
+                              ),
+                              style: context.t.bodyMedium?.copyWith(
+                                fontFamily: 'monospace',
+                              ),
+                              maxLines: 3,
+                              minLines: 1,
+                              onChanged: (_) => _markAsChanged(),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          SizedBox(
+                            height: 48,
+                            child: FilledButton.icon(
+                              onPressed: _hasChanges ? _handleSave : null,
+                              icon: const Icon(Icons.save),
+                              label: Text(l10n.scrap_session_save_changes),
+                              style: FilledButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                  vertical: 16,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 8),
 
@@ -379,6 +434,7 @@ class _EditScrappableRequestDialogState
             ),
           ],
         ),
+      ),
       ),
     );
   }

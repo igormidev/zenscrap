@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/animated_thinking_dots.dart';
 
@@ -279,49 +280,72 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       contentPadding: EdgeInsets.zero,
-      content: Container(
-        width: MediaQuery.of(context).size.width * 0.7,
-        height: MediaQuery.of(context).size.height * 0.8,
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _TestDialogHeader(
-              targetTime: widget.targetTime,
-              isTestMode: widget.isTestMode,
-            ),
-            const SizedBox(height: 24),
-            Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Parameters Panel
-                  SizedBox(
-                    width: 320,
-                    child: _ParametersPanel(
-                      pathParamControllers: _pathParamControllers,
-                      queryParamControllers: _queryParamControllers,
-                      isLoading: _isLoading,
-                      onTest: _handleTest,
-                    ),
-                  ),
-                  const SizedBox(width: 24),
-                  // Response Panel
-                  Expanded(
-                    child: _ResponsePanel(
-                      isLoading: _isLoading,
-                      responseJson: _responseJson,
-                      errorMessage: _errorMessage,
-                      hasTestedOnce: _hasTestedOnce,
-                      statusCode: _statusCode,
-                      responseTimeMs: _responseTimeMs,
-                      elapsedMsNotifier: _elapsedMs,
-                    ),
-                  ),
-                ],
+      content: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: context.responsiveValue(
+            compact: double.infinity,
+            medium: 700,
+            expanded: 1000,
+          ),
+          maxHeight: MediaQuery.sizeOf(context).height *
+              context.responsiveValue(
+                compact: 0.9,
+                medium: 0.85,
+                expanded: 0.8,
               ),
+        ),
+        child: Container(
+          padding: EdgeInsets.all(
+            context.responsiveValue(
+              compact: 16.0,
+              medium: 20.0,
+              expanded: 24.0,
             ),
-          ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _TestDialogHeader(
+                targetTime: widget.targetTime,
+                isTestMode: widget.isTestMode,
+              ),
+              SizedBox(
+                height: context.responsiveValue(
+                  compact: 16.0,
+                  medium: 20.0,
+                  expanded: 24.0,
+                ),
+              ),
+              Expanded(
+                child: ResponsiveBuilder(
+                  compact: (context, constraints) => _CompactDialogLayout(
+                    pathParamControllers: _pathParamControllers,
+                    queryParamControllers: _queryParamControllers,
+                    isLoading: _isLoading,
+                    onTest: _handleTest,
+                    responseJson: _responseJson,
+                    errorMessage: _errorMessage,
+                    hasTestedOnce: _hasTestedOnce,
+                    statusCode: _statusCode,
+                    responseTimeMs: _responseTimeMs,
+                    elapsedMsNotifier: _elapsedMs,
+                  ),
+                  expanded: (context, constraints) => _ExpandedDialogLayout(
+                    pathParamControllers: _pathParamControllers,
+                    queryParamControllers: _queryParamControllers,
+                    isLoading: _isLoading,
+                    onTest: _handleTest,
+                    responseJson: _responseJson,
+                    errorMessage: _errorMessage,
+                    hasTestedOnce: _hasTestedOnce,
+                    statusCode: _statusCode,
+                    responseTimeMs: _responseTimeMs,
+                    elapsedMsNotifier: _elapsedMs,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -1145,6 +1169,163 @@ class _EmptyState extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Compact layout for mobile - stacked vertical with tabs
+class _CompactDialogLayout extends StatefulWidget {
+  final Map<String, TextEditingController> pathParamControllers;
+  final Map<String, TextEditingController> queryParamControllers;
+  final bool isLoading;
+  final VoidCallback onTest;
+  final String? responseJson;
+  final String? errorMessage;
+  final bool hasTestedOnce;
+  final int? statusCode;
+  final int? responseTimeMs;
+  final ValueNotifier<int> elapsedMsNotifier;
+
+  const _CompactDialogLayout({
+    required this.pathParamControllers,
+    required this.queryParamControllers,
+    required this.isLoading,
+    required this.onTest,
+    required this.responseJson,
+    required this.errorMessage,
+    required this.hasTestedOnce,
+    required this.statusCode,
+    required this.responseTimeMs,
+    required this.elapsedMsNotifier,
+  });
+
+  @override
+  State<_CompactDialogLayout> createState() => _CompactDialogLayoutState();
+}
+
+class _CompactDialogLayoutState extends State<_CompactDialogLayout>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(text: 'Parameters'),
+            Tab(text: 'Response'),
+          ],
+        ),
+        const SizedBox(height: 16),
+        Expanded(
+          child: TabBarView(
+            controller: _tabController,
+            children: [
+              _ParametersPanel(
+                pathParamControllers: widget.pathParamControllers,
+                queryParamControllers: widget.queryParamControllers,
+                isLoading: widget.isLoading,
+                onTest: () {
+                  widget.onTest();
+                  // Auto-switch to response tab after test
+                  _tabController.animateTo(1);
+                },
+              ),
+              _ResponsePanel(
+                isLoading: widget.isLoading,
+                responseJson: widget.responseJson,
+                errorMessage: widget.errorMessage,
+                hasTestedOnce: widget.hasTestedOnce,
+                statusCode: widget.statusCode,
+                responseTimeMs: widget.responseTimeMs,
+                elapsedMsNotifier: widget.elapsedMsNotifier,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Expanded layout for desktop - side-by-side panels
+class _ExpandedDialogLayout extends StatelessWidget {
+  final Map<String, TextEditingController> pathParamControllers;
+  final Map<String, TextEditingController> queryParamControllers;
+  final bool isLoading;
+  final VoidCallback onTest;
+  final String? responseJson;
+  final String? errorMessage;
+  final bool hasTestedOnce;
+  final int? statusCode;
+  final int? responseTimeMs;
+  final ValueNotifier<int> elapsedMsNotifier;
+
+  const _ExpandedDialogLayout({
+    required this.pathParamControllers,
+    required this.queryParamControllers,
+    required this.isLoading,
+    required this.onTest,
+    required this.responseJson,
+    required this.errorMessage,
+    required this.hasTestedOnce,
+    required this.statusCode,
+    required this.responseTimeMs,
+    required this.elapsedMsNotifier,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Parameters Panel
+            SizedBox(
+              width: responsiveValue(
+                width: constraints.maxWidth,
+                compact: constraints.maxWidth * 0.4,
+                medium: 320,
+                expanded: 340,
+              ),
+              child: _ParametersPanel(
+            pathParamControllers: pathParamControllers,
+            queryParamControllers: queryParamControllers,
+            isLoading: isLoading,
+            onTest: onTest,
+          ),
+        ),
+        const SizedBox(width: 24),
+        // Response Panel
+        Expanded(
+          child: _ResponsePanel(
+            isLoading: isLoading,
+            responseJson: responseJson,
+            errorMessage: errorMessage,
+            hasTestedOnce: hasTestedOnce,
+            statusCode: statusCode,
+            responseTimeMs: responseTimeMs,
+            elapsedMsNotifier: elapsedMsNotifier,
+          ),
+        ),
+          ],
+        );
+      },
     );
   }
 }

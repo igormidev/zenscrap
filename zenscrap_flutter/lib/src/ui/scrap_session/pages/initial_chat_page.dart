@@ -8,6 +8,7 @@ import 'package:lottie/lottie.dart';
 import 'package:simple_platform/simple_platform.dart';
 import 'package:zenscrap_flutter/src/core/mixins/create_scrappable_mixin.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
@@ -118,54 +119,99 @@ class _ChatViewPageState extends ConsumerState<InitialChatPage>
           ),
         Center(
           child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 600),
+            constraints: BoxConstraints(
+              maxWidth: context.responsiveValue(
+                compact: double.infinity,
+                medium: 600,
+                expanded: 700,
+              ),
+            ),
             child: Form(
               key: _formKey,
               child: ListView(
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.responsiveValue(
+                    compact: 20.0,
+                    medium: 40.0,
+                    expanded: 60.0,
+                  ),
+                ),
                 children: [
                   AnimatedContainer(
-                    height: 40,
-                    // height: _isDescriptionFocussed ? 80 : 40,
+                    height: context.responsiveValue(
+                      compact: 20.0,
+                      medium: 30.0,
+                      expanded: 40.0,
+                    ),
                     duration: const Duration(milliseconds: 800),
                   ),
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 500),
-                    height: _isDescriptionFocussed ? 120 : 400,
-                    child:
-                        SizedBox(
-                              height: 500,
-                              child: Transform.scale(
-                                scale: 1.3,
-                                child: Lottie.network(
-                                  'https://lottie.host/5f15ff4c-0e86-4f26-9bbc-29afbf753eb0/okRB2OAoWp.lottie',
-                                  decoder: customDecoder,
-                                ),
-                              ),
-                            )
-                            .animate()
-                            .fadeIn(
-                              duration: const Duration(seconds: 1),
-                              delay: const Duration(milliseconds: 300),
-                            )
-                            .animate(target: _isDescriptionFocussed ? 1 : 0)
-                            .fadeOut(
-                              duration: const Duration(milliseconds: 200),
-                            ),
+                    height: _isDescriptionFocussed
+                        ? context.responsiveValue(
+                            compact: 80.0,
+                            medium: 100.0,
+                            expanded: 120.0,
+                          )
+                        : context.responsiveValue(
+                            compact: 280.0,
+                            medium: 340.0,
+                            expanded: 400.0,
+                          ),
+                    child: SizedBox(
+                      height: context.responsiveValue(
+                        compact: 350.0,
+                        medium: 425.0,
+                        expanded: 500.0,
+                      ),
+                      child: Transform.scale(
+                        scale: context.responsiveValue(
+                          compact: 1.1,
+                          medium: 1.2,
+                          expanded: 1.3,
+                        ),
+                        child: Lottie.network(
+                          'https://lottie.host/5f15ff4c-0e86-4f26-9bbc-29afbf753eb0/okRB2OAoWp.lottie',
+                          decoder: customDecoder,
+                        ),
+                      ),
+                    )
+                        .animate()
+                        .fadeIn(
+                          duration: const Duration(seconds: 1),
+                          delay: const Duration(milliseconds: 300),
+                        )
+                        .animate(target: _isDescriptionFocussed ? 1 : 0)
+                        .fadeOut(
+                          duration: const Duration(milliseconds: 200),
+                        ),
                   ),
                   Center(
                     child: Transform.translate(
                       offset: const Offset(0, -20),
                       child: Text(
                         'Vibe scrap any site',
+                        textAlign: TextAlign.center,
                         style: context.t.displayMedium?.copyWith(
                           fontStyle: FontStyle.italic,
                           height: 1,
                           color: context.c.primary,
+                          fontSize: context.responsiveValue(
+                            compact: 32.0,
+                            medium: 40.0,
+                            expanded: 48.0,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(
+                    height: context.responsiveValue(
+                      compact: 16.0,
+                      medium: 18.0,
+                      expanded: 20.0,
+                    ),
+                  ),
                   ZenTextfield(
                     controller: _referenceLinkEC,
                     labelText: 'Drop a target link',
@@ -185,12 +231,26 @@ class _ChatViewPageState extends ConsumerState<InitialChatPage>
                   ),
                   AnimatedSize(
                     duration: const Duration(milliseconds: 100),
-                    child: SizedBox(height: _isDescriptionFocussed ? 30 : 12),
+                    child: SizedBox(
+                      height: _isDescriptionFocussed
+                          ? context.responsiveValue(
+                              compact: 20.0,
+                              medium: 25.0,
+                              expanded: 30.0,
+                            )
+                          : 12,
+                    ),
                   ),
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     alignment: Alignment.topCenter,
-                    height: _isDescriptionFocussed ? 300 : 56,
+                    height: _isDescriptionFocussed
+                        ? context.responsiveValue(
+                            compact: 250.0,
+                            medium: 275.0,
+                            expanded: 300.0,
+                          )
+                        : 56,
                     child: Focus(
                       onFocusChange: (hasFocus) {
                         if (hasFocus && !_isDescriptionFocussed) {
@@ -239,18 +299,32 @@ class _ChatViewPageState extends ConsumerState<InitialChatPage>
                       ),
                     ),
                   ),
-                  SizedBox(height: 32),
+                  SizedBox(
+                    height: context.responsiveValue(
+                      compact: 24.0,
+                      medium: 28.0,
+                      expanded: 32.0,
+                    ),
+                  ),
                   Center(
                     child: FilledButton.tonalIcon(
                       onPressed: _submitForm,
                       style: FilledButton.styleFrom(
                         iconAlignment: IconAlignment.end,
+                        minimumSize: Size(
+                          context.responsiveValue(
+                            compact: double.infinity,
+                            medium: 200.0,
+                            expanded: 220.0,
+                          ),
+                          48,
+                        ),
                       ),
                       icon: const Icon(Icons.send),
                       label: const Text('Create scrappable'),
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Text(
                     'Test the platform easily'
                     '\nNo login required to test your scrap endpoint',
@@ -259,7 +333,13 @@ class _ChatViewPageState extends ConsumerState<InitialChatPage>
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: 32),
+                  SizedBox(
+                    height: context.responsiveValue(
+                      compact: 24.0,
+                      medium: 28.0,
+                      expanded: 32.0,
+                    ),
+                  ),
                 ],
               ),
             ),
