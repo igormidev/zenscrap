@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 import 'package:zenscrap_flutter/src/states/session/user_model.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
 
+/// Splash view that checks authentication state and redirects accordingly.
+/// Works at all screen sizes with centered loading indicator.
 class SplashView extends ConsumerStatefulWidget {
   const SplashView({super.key});
 
@@ -53,9 +56,19 @@ class _SplashViewState extends ConsumerState<SplashView> {
 
   @override
   Widget build(BuildContext context) {
+    // Responsive loading indicator size
+    final indicatorSize = context.responsiveValue(
+      compact: 36.0,
+      expanded: 48.0,
+    );
+
     return Scaffold(
       body: Center(
-        child: CircularProgressIndicator(),
+        child: SizedBox(
+          width: indicatorSize,
+          height: indicatorSize,
+          child: const CircularProgressIndicator(),
+        ),
       ),
     );
   }

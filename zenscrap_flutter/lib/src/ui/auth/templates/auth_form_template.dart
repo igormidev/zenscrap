@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:zenscrap_flutter/src/design_system/components/adaptive_progress_indicator.dart';
 import 'package:zenscrap_flutter/src/design_system/global_loading_builder.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/design_system/value_notifier_builder.dart';
 import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 
@@ -61,85 +62,47 @@ class _AuthFormTemplateState<T> extends ConsumerState<AuthFormTemplate<T>> {
 
   @override
   Widget build(BuildContext context) {
+    // Responsive padding values
+    final horizontalPadding = context.responsiveValue(
+      compact: 16.0,
+      medium: 20.0,
+      expanded: 24.0,
+    );
+    final itemSpacing = context.responsiveValue(
+      compact: 12.0,
+      expanded: 16.0,
+    );
+
     return Form(
       key: _formKey,
       child: FocusTraversalGroup(
         policy: OrderedTraversalPolicy(),
         child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           children: [
-            const SizedBox(height: 16),
+            SizedBox(height: itemSpacing),
             for (var i = 0; i < widget.items.length; i++) ...[
-              ValueNotifierBuilder<bool?>(
-                initialValue: widget.items[i].obscureText
-                    ? false
-                    : _isObscureText[i]?.value,
-                builder: (context, isDisplaying, _, setter) {
-                  final hintText = widget.items[i].autofillHints;
-                  return TextFormField(
-                    controller: _controllers[i],
-                    obscureText: isDisplaying == null ? false : !isDisplaying,
-                    textInputAction: i == widget.items.length - 1
-                        ? TextInputAction.done
-                        : TextInputAction.next,
-                    autofillHints: hintText != null ? [hintText] : null,
-                    keyboardType: widget.items[i].keyboardType,
-                    onEditingComplete: () {
-                      final isLast = i == widget.items.length - 1;
-                      if (isLast) {
-                        _validateForms();
-                      } else {
-                        FocusScope.of(context).nextFocus();
-                      }
-                    },
-                    decoration: InputDecoration(
-                      border: const OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(8)),
-                      ),
-                      hintText: widget.items[i].hintText,
-                      labelText: widget.items[i].labelText,
-                      suffixIcon: isDisplaying == null
-                          ? null
-                          : Padding(
-                              padding: const EdgeInsets.only(right: 8),
-                              child: IconButton(
-                                onPressed: () {
-                                  setter(!isDisplaying);
-                                },
-                                icon: Icon(
-                                  isDisplaying
-                                      ? Icons.visibility
-                                      : Icons.visibility_off,
-                                ),
-                              ),
-                            ),
-                    ),
-                    validator: widget.items[i].validator ??
-                        (text) {
-                          return widget.items[i].validatorWithItems?.call(
-                            text,
-                            _controllers.map((e) => e.text).toList(),
-                          );
-                        },
-                  );
+              _AuthFormField(
+                item: widget.items[i],
+                controller: _controllers[i],
+                isObscureText: _isObscureText[i],
+                isLast: i == widget.items.length - 1,
+                allControllers: _controllers,
+                onEditingComplete: () {
+                  final isLast = i == widget.items.length - 1;
+                  if (isLast) {
+                    _validateForms();
+                  } else {
+                    FocusScope.of(context).nextFocus();
+                  }
                 },
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: itemSpacing),
             ],
             ...widget.children,
-            Consumer(
-              builder: (context, ref, child) {
-                return GlobalLoadingBuilder(
-                  builder: (context, isGlobalLoadingActive) {
-                    return FilledButton(
-                      onPressed: isGlobalLoadingActive ? null : _validateForms,
-                      child: isGlobalLoadingActive
-                          ? const AdaptiveProgressIndicator()
-                          : Text(widget.submitText),
-                    );
-                  },
-                );
-              },
+            _SubmitButton(
+              submitText: widget.submitText,
+              onPressed: _validateForms,
             ),
           ],
         ),
@@ -182,4 +145,128 @@ class AuthFormItem {
     this.keyboardType,
     this.validatorWithItems,
   });
+}
+
+/// Individual form field widget with proper touch target sizing
+class _AuthFormField extends StatelessWidget {
+  final AuthFormItem item;
+  final TextEditingController controller;
+  final ValueNotifier<bool?>? isObscureText;
+  final bool isLast;
+  final List<TextEditingController> allControllers;
+  final VoidCallback onEditingComplete;
+
+  const _AuthFormField({
+    required this.item,
+    required this.controller,
+    required this.isObscureText,
+    required this.isLast,
+    required this.allControllers,
+    required this.onEditingComplete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueNotifierBuilder<bool?>(
+      initialValue: item.obscureText ? false : isObscureText?.value,
+      builder: (context, isDisplaying, _, setter) {
+        final hintText = item.autofillHints;
+        return TextFormField(
+          controller: controller,
+          obscureText: isDisplaying == null ? false : !isDisplaying,
+          textInputAction: isLast ? TextInputAction.done : TextInputAction.next,
+          autofillHints: hintText != null ? [hintText] : null,
+          keyboardType: item.keyboardType,
+          onEditingComplete: onEditingComplete,
+          // Ensure minimum touch target height for mobile (48px minimum)
+          style: context.responsiveValue(
+            compact: Theme.of(context).textTheme.bodyLarge,
+            expanded: Theme.of(context).textTheme.bodyMedium,
+          ),
+          decoration: InputDecoration(
+            border: const OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(8)),
+            ),
+            // Responsive content padding for proper touch target on mobile
+            contentPadding: context.responsiveValue(
+              compact: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              expanded: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            ),
+            hintText: item.hintText,
+            labelText: item.labelText,
+            suffixIcon: isDisplaying == null
+                ? null
+                : Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: IconButton(
+                      onPressed: () {
+                        setter(!isDisplaying);
+                      },
+                      icon: Icon(
+                        isDisplaying ? Icons.visibility : Icons.visibility_off,
+                      ),
+                      // Ensure icon button has minimum 48x48 touch target
+                      iconSize: 24,
+                    ),
+                  ),
+          ),
+          validator: item.validator ??
+              (text) {
+                return item.validatorWithItems?.call(
+                  text,
+                  allControllers.map((e) => e.text).toList(),
+                );
+              },
+        );
+      },
+    );
+  }
+}
+
+/// Submit button with responsive sizing for proper mobile touch targets
+class _SubmitButton extends ConsumerWidget {
+  final String submitText;
+  final VoidCallback onPressed;
+
+  const _SubmitButton({
+    required this.submitText,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return GlobalLoadingBuilder(
+      builder: (context, isGlobalLoadingActive) {
+        return SizedBox(
+          width: double.infinity,
+          // Minimum 48px height for mobile touch target, larger on desktop
+          height: context.responsiveValue(
+            compact: 52.0,
+            expanded: 48.0,
+          ),
+          child: FilledButton(
+            onPressed: isGlobalLoadingActive ? null : onPressed,
+            style: FilledButton.styleFrom(
+              // Ensure proper padding for touch target
+              padding: context.responsiveValue(
+                compact: const EdgeInsets.symmetric(vertical: 14),
+                expanded: const EdgeInsets.symmetric(vertical: 12),
+              ),
+            ),
+            child: isGlobalLoadingActive
+                ? const AdaptiveProgressIndicator()
+                : Text(
+                    submitText,
+                    style: context.responsiveValue(
+                      compact: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: Theme.of(context).colorScheme.onPrimary,
+                          ),
+                      expanded: null, // Use default button text style
+                    ),
+                  ),
+          ),
+        );
+      },
+    );
+  }
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
@@ -90,6 +91,11 @@ class _ZenScrapGoogleSignInButtonState
         // Google Sign-In Button
         SizedBox(
           width: double.infinity,
+          // Minimum 48px height for mobile touch target
+          height: context.responsiveValue(
+            compact: 52.0,
+            expanded: 48.0,
+          ),
           child: OutlinedButton.icon(
             onPressed: _isLoading
                 ? null
@@ -191,9 +197,19 @@ class _ZenScrapGoogleSignInButtonState
                     errorBuilder: (context, error, stackTrace) =>
                         const Icon(Icons.g_mobiledata, size: 20),
                   ),
-            label: Text(_isLoading ? l10n.auth_signing_in : l10n.auth_continue_with_google),
+            label: Text(
+              _isLoading ? l10n.auth_signing_in : l10n.auth_continue_with_google,
+              style: context.responsiveValue(
+                compact: Theme.of(context).textTheme.titleSmall,
+                expanded: null, // Use default
+              ),
+            ),
             style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              // Responsive padding for proper touch target
+              padding: context.responsiveValue(
+                compact: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                expanded: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),

@@ -10,6 +10,7 @@ import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/core/mixins/edit_scrappable.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/contact_support_button.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/ui/auth/pages/confirm_email_page.dart';
@@ -22,6 +23,7 @@ import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_prov
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_state.dart';
 import 'package:zenscrap_flutter/src/ui/legal/terms_of_service_dialog.dart';
 import 'package:zenscrap_flutter/src/ui/legal/privacy_policy_dialog.dart';
+import 'package:zenscrap_client/zenscrap_client.dart';
 
 class AuthView extends ConsumerStatefulWidget {
   const AuthView({super.key});
@@ -123,257 +125,84 @@ class _AuthViewState extends ConsumerState<AuthView>
       orElse: () => null,
     );
 
-    final double screenWidth = MediaQuery.sizeOf(context).width;
-    final bool isCompactSize = screenWidth < 1060.0;
-
     // SEO meta tags for the authentication page
     return Seo.head(
-      tags: [
-        const MetaTag(
+      tags: const [
+        MetaTag(
           name: 'title',
           content: 'Sign In | ZenScrap - AI-Powered Web Scraping Platform',
         ),
-        const MetaTag(
+        MetaTag(
           name: 'description',
           content:
               'Sign in or create your ZenScrap account. Access AI-powered web scrapers, manage your endpoints, and start extracting data automatically.',
         ),
-        const MetaTag(
+        MetaTag(
           name: 'keywords',
           content:
               'ZenScrap login, sign in, create account, web scraping account, API access',
         ),
-        const MetaTag(name: 'robots', content: 'index, follow'),
-        const LinkTag(rel: 'canonical', href: 'https://zenscrap.com/auth'),
+        MetaTag(name: 'robots', content: 'index, follow'),
+        LinkTag(rel: 'canonical', href: 'https://zenscrap.com/auth'),
       ],
       child: Scaffold(
         backgroundColor: Colors.grey[100],
         body: Stack(
-        children: [
-          SizedBox.expand(
-            child: Lottie.network(
-              'https://lottie.host/b70b435a-8472-4e19-ad03-71579dd08074/zOcB4gAPwC.lottie',
-              decoder: customDecoder,
-              fit: BoxFit.fitWidth,
-              controller: _controller,
-              onLoaded: (composition) {
-                _controller.repeat();
-              },
-            ),
-          ).animate().fadeIn(
-                duration: const Duration(seconds: 1),
-                delay: const Duration(milliseconds: 800),
+          children: [
+            // Background Lottie animation
+            SizedBox.expand(
+              child: Lottie.network(
+                'https://lottie.host/b70b435a-8472-4e19-ad03-71579dd08074/zOcB4gAPwC.lottie',
+                decoder: customDecoder,
+                fit: BoxFit.fitWidth,
+                controller: _controller,
+                onLoaded: (composition) {
+                  _controller.repeat();
+                },
               ),
-          // Terms of Service and Privacy Policy links - bottom right corner
-          Positioned(
-            bottom: 16,
-            right: 16,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TermsOfServiceLink(
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey[600],
-                        decoration: TextDecoration.underline,
-                        decorationColor: Colors.grey[600],
-                      ),
+            ).animate().fadeIn(
+                  duration: const Duration(seconds: 1),
+                  delay: const Duration(milliseconds: 800),
                 ),
-                const SizedBox(width: 16),
-                PrivacyPolicyLink(
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey[600],
-                        decoration: TextDecoration.underline,
-                        decorationColor: Colors.grey[600],
-                      ),
+            // Terms of Service and Privacy Policy links - bottom right corner
+            _LegalLinksFooter(),
+            // Main content with responsive layout
+            Center(
+              child: ResponsiveBuilder(
+                compact: (context, constraints) => _MobileAuthLayout(
+                  tabController: _tabController,
+                  emailAuth: _emailAuth,
+                  isConfirmEmail: _isConfirmEmail,
+                  resetPasswordEmailVN: _resetPasswordEmailVN,
+                  onChangeToConfirmEmail: _onChangeToConfirmEmail,
+                  onSuccessConfirmEmail: _onSuccessConfirmEmail,
+                  onChangeToPasswordReset: _onChangeToPasswordReset,
+                  onSuccessChangePassword: _onSuccessChangePassword,
+                  scrappable: scrappable,
                 ),
-              ],
+                expanded: (context, constraints) => _DesktopAuthLayout(
+                  tabController: _tabController,
+                  emailAuth: _emailAuth,
+                  isConfirmEmail: _isConfirmEmail,
+                  resetPasswordEmailVN: _resetPasswordEmailVN,
+                  onChangeToConfirmEmail: _onChangeToConfirmEmail,
+                  onSuccessConfirmEmail: _onSuccessConfirmEmail,
+                  onChangeToPasswordReset: _onChangeToPasswordReset,
+                  onSuccessChangePassword: _onSuccessChangePassword,
+                  selectedAuthPage: _selectedAuthPage,
+                  scrappable: scrappable,
+                ),
+              ),
             ),
-          ),
-          Center(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: isCompactSize ? 600 : 1700),
-              child: isCompactSize
-                  ? Column(
-                      children: [
-                        SizedBox(height: 20),
-                        Transform.scale(
-                          scale: 1.6,
-                          child: Lottie.network(
-                            'https://lottie.host/6778c6b9-32ee-401c-bc8f-97eea151b1df/U3LT3t31Wa.lottie',
-                            decoder: customDecoder,
-                            width: double.maxFinite,
-                            height: 200,
-                            fit: BoxFit.fitHeight,
-                          ),
-                        ),
-                        // Form section for compact size
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 20,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                if (context.canPop())
-                                  CircleAvatar(
-                                    backgroundColor:
-                                        context.c.surfaceContainerHighest,
-                                    child: IconButton(
-                                      onPressed: context.pop,
-                                      icon: Icon(Icons.arrow_back),
-                                    ),
-                                  ),
-                                Text(
-                                  AppLocalizations.of(context)!.auth_welcome,
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.displayMedium,
-                                ),
-                                const SizedBox(height: 20),
-                                Expanded(
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 700),
-                                    child: AuthContainer(
-                                      tabController: _tabController,
-                                      emailAuth: _emailAuth,
-                                      isConfirmEmail: _isConfirmEmail,
-                                      resetPasswordEmailVN:
-                                          _resetPasswordEmailVN,
-                                      onChangeToConfirmEmail:
-                                          _onChangeToConfirmEmail,
-                                      onSuccessConfirmEmail:
-                                          _onSuccessConfirmEmail,
-                                      onChangeToPasswordReset:
-                                          _onChangeToPasswordReset,
-                                      onSuccessChangePassword:
-                                          _onSuccessChangePassword,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                if (scrappable != null) ...[
-                                  const SizedBox(height: 16),
-                                  ScrappableCardIndicator(
-                                    accountId: null,
-                                    scrappable: scrappable,
-                                  ),
-                                ],
-                                const SizedBox(height: 16),
-                                const ContactSupportButton(),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                  : Row(
-                      children: [
-                        const SizedBox(width: 20),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 40,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                if (context.canPop()) ...[
-                                  CircleAvatar(
-                                    backgroundColor:
-                                        context.c.surfaceContainerHighest,
-                                    child: IconButton(
-                                      onPressed: context.pop,
-                                      icon: Icon(Icons.arrow_back),
-                                    ),
-                                  ),
-                                  SizedBox(height: 8),
-                                ],
-                                Text(
-                                  AppLocalizations.of(context)!.auth_welcome,
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.displayLarge,
-                                ),
-                                const SizedBox(height: 20),
-                                AnimatedContainer(
-                                  height: switch (_selectedAuthPage) {
-                                    SelectedAuthPage.login => 300,
-                                    SelectedAuthPage.signIn => 440,
-                                    SelectedAuthPage.passwordReset => 270,
-                                  },
-                                  duration: const Duration(milliseconds: 700),
-                                  child: AuthContainer(
-                                    tabController: _tabController,
-                                    emailAuth: _emailAuth,
-                                    isConfirmEmail: _isConfirmEmail,
-                                    resetPasswordEmailVN: _resetPasswordEmailVN,
-                                    onChangeToConfirmEmail:
-                                        _onChangeToConfirmEmail,
-                                    onSuccessConfirmEmail:
-                                        _onSuccessConfirmEmail,
-                                    onChangeToPasswordReset:
-                                        _onChangeToPasswordReset,
-                                    onSuccessChangePassword:
-                                        _onSuccessChangePassword,
-                                  ),
-                                ),
-                                if (scrappable != null) ...[
-                                  const SizedBox(height: 16),
-                                  ScrappableCardIndicator(
-                                    accountId: null,
-                                    scrappable: scrappable,
-                                  ),
-                                ],
-                                const SizedBox(height: 16),
-                                const ContactSupportButton(),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Center(
-                            child: AspectRatio(
-                              aspectRatio: 1,
-                              child: Stack(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 20,
-                                    ),
-                                    child: Lottie.network(
-                                      'https://lottie.host/6778c6b9-32ee-401c-bc8f-97eea151b1df/U3LT3t31Wa.lottie',
-                                      decoder: customDecoder,
-                                      width: double.maxFinite,
-                                      fit: BoxFit.fitWidth,
-                                    ),
-                                  ).animate().fadeIn(
-                                        duration: const Duration(seconds: 1),
-                                        delay:
-                                            const Duration(milliseconds: 200),
-                                      ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
-      ), // End of Seo.head child: Scaffold
-    ); // End of Seo.head
+    );
   }
 }
 
-class AuthContainer extends StatelessWidget {
-  const AuthContainer({
-    super.key,
+class _AuthContainer extends StatelessWidget {
+  const _AuthContainer({
     required this.tabController,
     required this.emailAuth,
     required this.isConfirmEmail,
@@ -533,6 +362,267 @@ class AuthContainer extends StatelessWidget {
 }
 
 enum SelectedAuthPage { login, signIn, passwordReset }
+
+/// Legal links footer positioned at bottom right corner
+class _LegalLinksFooter extends StatelessWidget {
+  const _LegalLinksFooter();
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      bottom: context.responsiveValue(compact: 8.0, expanded: 16.0),
+      right: context.responsiveValue(compact: 8.0, expanded: 16.0),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TermsOfServiceLink(
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Colors.grey[600],
+                  decoration: TextDecoration.underline,
+                  decorationColor: Colors.grey[600],
+                ),
+          ),
+          SizedBox(width: context.responsiveValue(compact: 12.0, expanded: 16.0)),
+          PrivacyPolicyLink(
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Colors.grey[600],
+                  decoration: TextDecoration.underline,
+                  decorationColor: Colors.grey[600],
+                ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Mobile layout for auth view - stacked vertically with smaller animation
+class _MobileAuthLayout extends StatelessWidget {
+  final TabController tabController;
+  final EmailAuthController emailAuth;
+  final ValueNotifier<String?> isConfirmEmail;
+  final ValueNotifier<String?> resetPasswordEmailVN;
+  final void Function(String) onChangeToConfirmEmail;
+  final Future<void> Function() onSuccessConfirmEmail;
+  final void Function(String) onChangeToPasswordReset;
+  final void Function() onSuccessChangePassword;
+  final Scrappable? scrappable;
+
+  const _MobileAuthLayout({
+    required this.tabController,
+    required this.emailAuth,
+    required this.isConfirmEmail,
+    required this.resetPasswordEmailVN,
+    required this.onChangeToConfirmEmail,
+    required this.onSuccessConfirmEmail,
+    required this.onChangeToPasswordReset,
+    required this.onSuccessChangePassword,
+    this.scrappable,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 600),
+      child: Column(
+        children: [
+          const SizedBox(height: 20),
+          // Compact Lottie animation at top
+          Transform.scale(
+            scale: 1.4,
+            child: Lottie.network(
+              'https://lottie.host/6778c6b9-32ee-401c-bc8f-97eea151b1df/U3LT3t31Wa.lottie',
+              decoder: customDecoder,
+              width: double.maxFinite,
+              height: 160,
+              fit: BoxFit.fitHeight,
+            ),
+          ),
+          // Form section
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 16,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Back button and title row
+                  if (context.canPop())
+                    _BackButton(),
+                  Text(
+                    l10n.auth_welcome,
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                  const SizedBox(height: 16),
+                  // Auth form container
+                  Expanded(
+                    child: _AuthContainer(
+                      tabController: tabController,
+                      emailAuth: emailAuth,
+                      isConfirmEmail: isConfirmEmail,
+                      resetPasswordEmailVN: resetPasswordEmailVN,
+                      onChangeToConfirmEmail: onChangeToConfirmEmail,
+                      onSuccessConfirmEmail: onSuccessConfirmEmail,
+                      onChangeToPasswordReset: onChangeToPasswordReset,
+                      onSuccessChangePassword: onSuccessChangePassword,
+                    ),
+                  ),
+                  // Scrappable indicator if available
+                  if (scrappable != null) ...[
+                    const SizedBox(height: 12),
+                    ScrappableCardIndicator(
+                      accountId: null,
+                      scrappable: scrappable!,
+                    ),
+                  ],
+                  const SizedBox(height: 12),
+                  const ContactSupportButton(),
+                  // Extra padding for legal links footer
+                  const SizedBox(height: 40),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Desktop layout for auth view - side by side with large animation
+class _DesktopAuthLayout extends StatelessWidget {
+  final TabController tabController;
+  final EmailAuthController emailAuth;
+  final ValueNotifier<String?> isConfirmEmail;
+  final ValueNotifier<String?> resetPasswordEmailVN;
+  final void Function(String) onChangeToConfirmEmail;
+  final Future<void> Function() onSuccessConfirmEmail;
+  final void Function(String) onChangeToPasswordReset;
+  final void Function() onSuccessChangePassword;
+  final SelectedAuthPage selectedAuthPage;
+  final Scrappable? scrappable;
+
+  const _DesktopAuthLayout({
+    required this.tabController,
+    required this.emailAuth,
+    required this.isConfirmEmail,
+    required this.resetPasswordEmailVN,
+    required this.onChangeToConfirmEmail,
+    required this.onSuccessConfirmEmail,
+    required this.onChangeToPasswordReset,
+    required this.onSuccessChangePassword,
+    required this.selectedAuthPage,
+    this.scrappable,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 1400),
+      child: Row(
+        children: [
+          const SizedBox(width: 20),
+          // Left side - Form section
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 40,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (context.canPop()) ...[
+                    _BackButton(),
+                    const SizedBox(height: 8),
+                  ],
+                  Text(
+                    l10n.auth_welcome,
+                    style: Theme.of(context).textTheme.displayLarge,
+                  ),
+                  const SizedBox(height: 20),
+                  // Animated height container for auth form
+                  AnimatedContainer(
+                    height: switch (selectedAuthPage) {
+                      SelectedAuthPage.login => 300,
+                      SelectedAuthPage.signIn => 440,
+                      SelectedAuthPage.passwordReset => 270,
+                    },
+                    duration: const Duration(milliseconds: 700),
+                    child: _AuthContainer(
+                      tabController: tabController,
+                      emailAuth: emailAuth,
+                      isConfirmEmail: isConfirmEmail,
+                      resetPasswordEmailVN: resetPasswordEmailVN,
+                      onChangeToConfirmEmail: onChangeToConfirmEmail,
+                      onSuccessConfirmEmail: onSuccessConfirmEmail,
+                      onChangeToPasswordReset: onChangeToPasswordReset,
+                      onSuccessChangePassword: onSuccessChangePassword,
+                    ),
+                  ),
+                  // Scrappable indicator if available
+                  if (scrappable != null) ...[
+                    const SizedBox(height: 16),
+                    ScrappableCardIndicator(
+                      accountId: null,
+                      scrappable: scrappable!,
+                    ),
+                  ],
+                  const SizedBox(height: 16),
+                  const ContactSupportButton(),
+                ],
+              ),
+            ),
+          ),
+          // Right side - Lottie animation
+          Expanded(
+            child: Center(
+              child: AspectRatio(
+                aspectRatio: 1,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Lottie.network(
+                    'https://lottie.host/6778c6b9-32ee-401c-bc8f-97eea151b1df/U3LT3t31Wa.lottie',
+                    decoder: customDecoder,
+                    width: double.maxFinite,
+                    fit: BoxFit.fitWidth,
+                  ),
+                ).animate().fadeIn(
+                      duration: const Duration(seconds: 1),
+                      delay: const Duration(milliseconds: 200),
+                    ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Reusable back button widget for both layouts
+class _BackButton extends StatelessWidget {
+  const _BackButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return CircleAvatar(
+      backgroundColor: context.c.surfaceContainerHighest,
+      child: IconButton(
+        onPressed: context.pop,
+        icon: const Icon(Icons.arrow_back),
+        tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+      ),
+    );
+  }
+}
 
 Future<LottieComposition?> customDecoder(List<int> bytes) {
   return LottieComposition.decodeZip(
