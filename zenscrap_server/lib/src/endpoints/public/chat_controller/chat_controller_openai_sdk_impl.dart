@@ -513,17 +513,19 @@ class ChatControllerOpenAiSdkImpl extends IChatController
 
     // Build tools array with file_search for Vector Store documentation
     final tools = <Map<String, dynamic>>[
-      // MCP tools for web scraping
+      // MCP tools for web scraping (authenticated with X-API-KEY header)
       {
         'type': 'mcp',
         'server_label': 'playwright',
         'server_url': _playwrightMcpUrl,
+        'headers': {'X-API-KEY': kMcpApiKey},
         'require_approval': 'never',
       },
       {
         'type': 'mcp',
         'server_label': 'scraping_bee',
         'server_url': _scrapingBeeMcpUrl,
+        'headers': {'X-API-KEY': kMcpApiKey},
         'require_approval': 'never',
       },
     ];

@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/core/auto_fix/auto_fix_prompt_builder.dart';
+import 'package:zenscrap_server/src/core/consts.dart';
 import 'package:zenscrap_server/src/core/scraping_bee.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/openai_prompt_builder.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/web_scraper_ai_models.dart';
@@ -449,12 +450,14 @@ class AutoFixSessionHandler {
         'type': 'mcp',
         'server_label': 'playwright',
         'server_url': _playwrightMcpUrl,
+        'headers': {'X-API-KEY': kMcpApiKey},
         'require_approval': 'never',
       },
       {
         'type': 'mcp',
         'server_label': 'scraping_bee',
         'server_url': _scrapingBeeMcpUrl,
+        'headers': {'X-API-KEY': kMcpApiKey},
         'require_approval': 'never',
       },
     ];

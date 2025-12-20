@@ -1,3 +1,8 @@
+/// API key for authenticating requests to our MCP servers (Playwright and ScrapingBee).
+/// This key is validated by the MCP servers via X-API-KEY header.
+/// Without this key, the MCP servers will reject requests with 401 Unauthorized.
+const String kMcpApiKey = '9cdad40e-396e-455e-8df4-928bb8f97497';
+
 /// Default AI usage credits in dollars that users receive monthly.
 /// This amount is reset every month for each user.
 const double kDefaultMonthlyAICreditsInDollars = 10.0;

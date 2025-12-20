@@ -155,9 +155,32 @@ function createMcpErrorResponse(error, operation, context = {}) {
   };
 }
 
-// ScrapingBee proxy configuration
-const SCRAPINGBEE_API_KEY = process.env.SCRAPINGBEE_API_KEY || '37N8150Q1JBVN85NS4RUOUIUYZ2AEUFX69QBM0X74VD13M9TLNRVOFWS7HZMKRG1X4SOH4BKJT5EUN6K';
+// ScrapingBee proxy configuration - MUST be set via environment variable
+const SCRAPINGBEE_API_KEY = process.env.SCRAPINGBEE_API_KEY;
 const SCRAPINGBEE_PROXY_PARAMS = process.env.SCRAPINGBEE_PROXY_PARAMS || 'render_js=true&premium_proxy=true';
+
+// MCP API Key for authentication - requests without valid X-API-KEY header will be rejected
+const MCP_API_KEY = process.env.MCP_API_KEY;
+
+if (!SCRAPINGBEE_API_KEY) {
+  console.error('FATAL: SCRAPINGBEE_API_KEY environment variable is not set');
+  process.exit(1);
+}
+
+if (!MCP_API_KEY) {
+  console.error('FATAL: MCP_API_KEY environment variable is not set');
+  process.exit(1);
+}
+
+/**
+ * Validates the X-API-KEY header for authentication
+ * @param {http.IncomingMessage} req - The HTTP request
+ * @returns {boolean} True if authenticated, false otherwise
+ */
+function validateApiKey(req) {
+  const apiKey = req.headers['x-api-key'];
+  return apiKey === MCP_API_KEY;
+}
 
 const proxyConfig = {
   server: 'http://proxy.scrapingbee.com:8886',
@@ -691,7 +714,7 @@ const httpServer = http.createServer(async (req, res) => {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Mcp-Session-Id, Last-Event-ID');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Mcp-Session-Id, Last-Event-ID, X-API-KEY');
 
   if (req.method === 'OPTIONS') {
     res.writeHead(200);
@@ -699,7 +722,7 @@ const httpServer = http.createServer(async (req, res) => {
     return;
   }
 
-  // Health check
+  // Health check (no auth required)
   if ((req.url === '/health' || req.url === '/') && req.method === 'GET') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ status: 'ok', service: 'playwright-mcp-scrapingbee' }));
@@ -708,6 +731,16 @@ const httpServer = http.createServer(async (req, res) => {
 
   // MCP endpoint - Streamable HTTP transport
   if (req.url === '/mcp' || req.url === '/sse') {
+    // Validate X-API-KEY for MCP endpoints
+    if (!validateApiKey(req)) {
+      console.log('[Auth] Rejected request: Invalid or missing X-API-KEY');
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        jsonrpc: '2.0',
+        error: { code: -32001, message: 'Unauthorized: Invalid or missing X-API-KEY header' }
+      }));
+      return;
+    }
     if (req.method === 'GET') {
       // SSE stream for server-to-client messages (optional in Streamable HTTP)
       res.writeHead(200, {
