@@ -10,6 +10,7 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/core/extensions/convert_extensions.dart';
 import 'package:zenscrap_flutter/src/core/extensions/string_extension.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/design_system/elements/animated_switch.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
@@ -171,133 +172,209 @@ class _ExampleResponseDialogState extends ConsumerState<ExampleResponseDialog>
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final contentHeight = context.responsiveValue(
+      compact: screenHeight * 0.7,
+      medium: screenHeight * 0.6,
+      expanded: screenHeight * 0.6 + 92,
+    );
+
     return Stack(
       children: [
         AlertDialog(
           title: Text(AppLocalizations.of(context)!.marketplace_example_response),
-          insetPadding: const EdgeInsets.symmetric(vertical: 20),
-          titlePadding: const EdgeInsets.only(left: 24, right: 24, top: 24),
+          insetPadding: EdgeInsets.symmetric(
+            vertical: context.responsiveValue(
+              compact: 16.0,
+              medium: 20.0,
+              expanded: 20.0,
+            ),
+            horizontal: context.responsiveValue(
+              compact: 16.0,
+              medium: 40.0,
+              expanded: 40.0,
+            ),
+          ),
+          titlePadding: EdgeInsets.only(
+            left: context.responsiveValue(
+              compact: 16.0,
+              medium: 24.0,
+              expanded: 24.0,
+            ),
+            right: context.responsiveValue(
+              compact: 16.0,
+              medium: 24.0,
+              expanded: 24.0,
+            ),
+            top: context.responsiveValue(
+              compact: 20.0,
+              medium: 24.0,
+              expanded: 24.0,
+            ),
+          ),
           contentPadding: EdgeInsets.zero,
-          // contentPadding: const EdgeInsets.only(left: 24, right: 24),
-          content: SizedBox(
-            height: MediaQuery.sizeOf(context).height * 0.6 + 92,
-            width: MediaQuery.sizeOf(context).width * 0.3,
-            child: Column(
-              children: [
-                const SizedBox(height: 8),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: ReferenceLinkWidget(widget: widget),
-                ),
-                const SizedBox(height: 4),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: ZenAnimatedSwitch(
-                    tabController: _tabController,
-                    tabs: [
-                      AnimatedSwitchItem(AppLocalizations.of(context)!.marketplace_tab_result, fontSize: 16),
-                      AnimatedSwitchItem(AppLocalizations.of(context)!.marketplace_tab_html, fontSize: 16),
-                      AnimatedSwitchItem(AppLocalizations.of(context)!.marketplace_tab_screenshot, fontSize: 16),
-                    ],
+          content: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: contentHeight,
+              maxWidth: context.responsiveValue(
+                compact: double.infinity,
+                medium: 500.0,
+                expanded: 600.0,
+              ),
+            ),
+            child: SizedBox(
+              width: double.infinity,
+              child: Column(
+                children: [
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.responsiveValue(
+                        compact: 16.0,
+                        medium: 24.0,
+                        expanded: 24.0,
+                      ),
+                    ),
+                    child: ReferenceLinkWidget(widget: widget),
                   ),
-                ),
-                const SizedBox(height: 8),
-                Expanded(
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 24, right: 24),
-                        child: _ResultTab(
-                          scrappable: widget.scrappable,
-                          fontSize: _resultFontSize,
-                          isHovered: _isResultHovered,
-                          onHoverChanged: (value) =>
-                              setState(() => _isResultHovered = value),
-                          onCopy: () {
-                            final decodedJson = tryDecode(widget
-                                .scrappable.referenceTestData?.scrapResultJson);
-                            if (decodedJson != null) {
-                              final jsonString =
-                                  const JsonEncoder.withIndent('  ')
-                                      .convert(decodedJson);
-                              Clipboard.setData(
-                                  ClipboardData(text: jsonString));
-                              _showToastMessage(AppLocalizations.of(context)!.marketplace_result_copied);
-                            }
-                          },
-                          onIncreaseFontSize: () {
-                            setState(() {
-                              _resultFontSize =
-                                  (_resultFontSize + 2).clamp(10, 24);
-                              _saveFontSize('example_response_result_font',
-                                  _resultFontSize);
-                            });
-                          },
-                          onDecreaseFontSize: () {
-                            setState(() {
-                              _resultFontSize =
-                                  (_resultFontSize - 2).clamp(10, 24);
-                              _saveFontSize('example_response_result_font',
-                                  _resultFontSize);
-                            });
-                          },
-                        ),
+                  const SizedBox(height: 4),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.responsiveValue(
+                        compact: 16.0,
+                        medium: 24.0,
+                        expanded: 24.0,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8, right: 8),
-                        child: _HtmlTab(
-                          htmlData: _htmlData,
-                          isLoading: _isLoadingHtml,
-                          fontSize: _htmlFontSize,
-                          isHovered: _isHtmlHovered,
-                          onHoverChanged: (value) =>
-                              setState(() => _isHtmlHovered = value),
-                          onCopy: () {
-                            if (_htmlData != null) {
-                              final htmlString =
-                                  utf8.decode(_htmlData!.buffer.asUint8List());
-                              Clipboard.setData(
-                                  ClipboardData(text: htmlString));
-                              _showToastMessage(AppLocalizations.of(context)!.marketplace_html_copied);
-                            }
-                          },
-                          onIncreaseFontSize: () {
-                            setState(() {
-                              _htmlFontSize = (_htmlFontSize + 2).clamp(10, 24);
-                              _saveFontSize(
-                                  'example_response_html_font', _htmlFontSize);
-                            });
-                          },
-                          onDecreaseFontSize: () {
-                            setState(() {
-                              _htmlFontSize = (_htmlFontSize - 2).clamp(10, 24);
-                              _saveFontSize(
-                                  'example_response_html_font', _htmlFontSize);
-                            });
-                          },
-                        ),
-                      ),
-                      ClipRRect(
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(24),
-                          bottomRight: Radius.circular(24),
-                        ),
-                        child: _ScreenshotTab(
-                          screenshotData: _screenshotData,
-                          isLoading: _isLoadingScreenshot,
-                          isHovered: _isScreenshotHovered,
-                          onHoverChanged: (value) =>
-                              setState(() => _isScreenshotHovered = value),
-                          onCopy: () {
-                            _showToastMessage(AppLocalizations.of(context)!.marketplace_screenshot_info_copied);
-                          },
-                        ),
-                      ),
-                    ],
+                    ),
+                    child: ZenAnimatedSwitch(
+                      tabController: _tabController,
+                      tabs: [
+                        AnimatedSwitchItem(AppLocalizations.of(context)!.marketplace_tab_result, fontSize: 16),
+                        AnimatedSwitchItem(AppLocalizations.of(context)!.marketplace_tab_html, fontSize: 16),
+                        AnimatedSwitchItem(AppLocalizations.of(context)!.marketplace_tab_screenshot, fontSize: 16),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(
+                            left: context.responsiveValue(
+                              compact: 16.0,
+                              medium: 24.0,
+                              expanded: 24.0,
+                            ),
+                            right: context.responsiveValue(
+                              compact: 16.0,
+                              medium: 24.0,
+                              expanded: 24.0,
+                            ),
+                          ),
+                          child: _ResultTab(
+                            scrappable: widget.scrappable,
+                            fontSize: _resultFontSize,
+                            isHovered: _isResultHovered,
+                            onHoverChanged: (value) =>
+                                setState(() => _isResultHovered = value),
+                            onCopy: () {
+                              final decodedJson = tryDecode(widget
+                                  .scrappable.referenceTestData?.scrapResultJson);
+                              if (decodedJson != null) {
+                                final jsonString =
+                                    const JsonEncoder.withIndent('  ')
+                                        .convert(decodedJson);
+                                Clipboard.setData(
+                                    ClipboardData(text: jsonString));
+                                _showToastMessage(AppLocalizations.of(context)!.marketplace_result_copied);
+                              }
+                            },
+                            onIncreaseFontSize: () {
+                              setState(() {
+                                _resultFontSize =
+                                    (_resultFontSize + 2).clamp(10, 24);
+                                _saveFontSize('example_response_result_font',
+                                    _resultFontSize);
+                              });
+                            },
+                            onDecreaseFontSize: () {
+                              setState(() {
+                                _resultFontSize =
+                                    (_resultFontSize - 2).clamp(10, 24);
+                                _saveFontSize('example_response_result_font',
+                                    _resultFontSize);
+                              });
+                            },
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(
+                            left: context.responsiveValue(
+                              compact: 8.0,
+                              medium: 8.0,
+                              expanded: 8.0,
+                            ),
+                            right: context.responsiveValue(
+                              compact: 8.0,
+                              medium: 8.0,
+                              expanded: 8.0,
+                            ),
+                          ),
+                          child: _HtmlTab(
+                            htmlData: _htmlData,
+                            isLoading: _isLoadingHtml,
+                            fontSize: _htmlFontSize,
+                            isHovered: _isHtmlHovered,
+                            onHoverChanged: (value) =>
+                                setState(() => _isHtmlHovered = value),
+                            onCopy: () {
+                              if (_htmlData != null) {
+                                final htmlString =
+                                    utf8.decode(_htmlData!.buffer.asUint8List());
+                                Clipboard.setData(
+                                    ClipboardData(text: htmlString));
+                                _showToastMessage(AppLocalizations.of(context)!.marketplace_html_copied);
+                              }
+                            },
+                            onIncreaseFontSize: () {
+                              setState(() {
+                                _htmlFontSize = (_htmlFontSize + 2).clamp(10, 24);
+                                _saveFontSize(
+                                    'example_response_html_font', _htmlFontSize);
+                              });
+                            },
+                            onDecreaseFontSize: () {
+                              setState(() {
+                                _htmlFontSize = (_htmlFontSize - 2).clamp(10, 24);
+                                _saveFontSize(
+                                    'example_response_html_font', _htmlFontSize);
+                              });
+                            },
+                          ),
+                        ),
+                        ClipRRect(
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(24),
+                            bottomRight: Radius.circular(24),
+                          ),
+                          child: _ScreenshotTab(
+                            screenshotData: _screenshotData,
+                            isLoading: _isLoadingScreenshot,
+                            isHovered: _isScreenshotHovered,
+                            onHoverChanged: (value) =>
+                                setState(() => _isScreenshotHovered = value),
+                            onCopy: () {
+                              _showToastMessage(AppLocalizations.of(context)!.marketplace_screenshot_info_copied);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

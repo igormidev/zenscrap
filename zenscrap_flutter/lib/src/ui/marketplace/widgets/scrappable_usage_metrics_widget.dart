@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 
@@ -155,7 +156,13 @@ class _MetricsDisplay extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(
+        context.responsiveValue(
+          compact: 12.0,
+          medium: 16.0,
+          expanded: 16.0,
+        ),
+      ),
       decoration: BoxDecoration(
         color: context.c.surfaceContainerHighest.withAlpha(51),
         borderRadius: BorderRadius.circular(12),
@@ -163,14 +170,23 @@ class _MetricsDisplay extends StatelessWidget {
           color: context.c.outline.withAlpha(51),
         ),
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: _MetricsNumbers(metrics: metrics),
-          ),
-          const SizedBox(width: 24),
-          _DonutChart(metrics: metrics),
-        ],
+      child: ResponsiveBuilder(
+        compact: (context, constraints) => Column(
+          children: [
+            _MetricsNumbers(metrics: metrics),
+            const SizedBox(height: 16),
+            _DonutChart(metrics: metrics),
+          ],
+        ),
+        expanded: (context, constraints) => Row(
+          children: [
+            Expanded(
+              child: _MetricsNumbers(metrics: metrics),
+            ),
+            const SizedBox(width: 24),
+            _DonutChart(metrics: metrics),
+          ],
+        ),
       ),
     );
   }

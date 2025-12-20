@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 
 class CloneSuccessDialog extends StatelessWidget {
@@ -19,8 +20,20 @@ class CloneSuccessDialog extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
       ),
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 400),
-        padding: const EdgeInsets.all(24),
+        constraints: BoxConstraints(
+          maxWidth: context.responsiveValue(
+            compact: double.infinity,
+            medium: 400.0,
+            expanded: 400.0,
+          ),
+        ),
+        padding: EdgeInsets.all(
+          context.responsiveValue(
+            compact: 20.0,
+            medium: 24.0,
+            expanded: 24.0,
+          ),
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
