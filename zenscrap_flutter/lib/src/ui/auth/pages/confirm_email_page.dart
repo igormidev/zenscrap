@@ -6,7 +6,6 @@ import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
-import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 import 'package:zenscrap_flutter/src/states/session/user_model.dart';
@@ -62,23 +61,17 @@ class ConfirmEmailPage extends ConsumerWidget {
           }
 
           // Complete the registration
+          // Note: Do NOT check client.auth.isAuthenticated immediately after this call.
+          // The auth state update is asynchronous and the onAuthenticated callback
+          // will be triggered when authentication is complete.
           await emailAuth.finishRegistration();
 
           // Clear the pending data
           PendingRegistrationData.clear();
 
-          // Check if authenticated
-          final client = ref.read(clientProvider);
-          final isAuthenticated = client.auth.isAuthenticated;
-
-          if (!isAuthenticated) {
-            if (context.mounted) {
-              showErrorSnackbar(context);
-            }
-            return null;
-          }
-
-          // Update session state using the data we collected from the form
+          // If finishRegistration() completes without throwing, registration succeeded.
+          // The EmailAuthController's onAuthenticated callback will handle the auth state.
+          // Update session state using the data we collected from the form.
           ref.read(sessionProvider.notifier).setState(
                 SessionState.logged(
                   user: UserModel(
@@ -94,6 +87,9 @@ class ConfirmEmailPage extends ConsumerWidget {
 
           return true;
         } catch (e) {
+          // Clear pending data on failure
+          PendingRegistrationData.clear();
+
           if (context.mounted) {
             showErrorSnackbar(context);
           }

@@ -5,7 +5,6 @@ import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
-import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 import 'package:zenscrap_flutter/src/states/session/user_model.dart';
@@ -71,17 +70,24 @@ class LoginPage extends ConsumerWidget {
 
         try {
           // Attempt login using the new IDP system
+          // Note: login() does NOT throw on invalid credentials.
+          // Instead, it triggers onError callback and sets errorMessage.
           await emailAuth.login();
 
-          // Check if authenticated
-          final client = ref.read(clientProvider);
-          final isAuthenticated = client.auth.isAuthenticated;
+          // Small delay to allow the async state update to propagate
+          // The EmailAuthController updates state asynchronously after login()
+          await Future.delayed(const Duration(milliseconds: 50));
+
+          // Check the controller's isAuthenticated property (not client.auth.isAuthenticated)
+          // This is updated by the EmailAuthController after login() completes
+          final isAuthenticated = emailAuth.isAuthenticated;
 
           if (!isAuthenticated) {
-            // Track login failure
+            // Track login failure - use errorMessage if available
+            final errorMsg = emailAuth.errorMessage ?? 'Invalid credentials';
             await analytics.trackAuthLoginFailure(
               email: email,
-              errorMessage: 'Invalid credentials or user not found',
+              errorMessage: errorMsg,
             );
 
             if (context.mounted) {
@@ -91,8 +97,8 @@ class LoginPage extends ConsumerWidget {
             return null;
           }
 
-          // We use the email from the form since AuthSuccess doesn't contain user profile info
-          // Username can be fetched from server later or we use a default
+          // Login succeeded.
+          // The EmailAuthController's onAuthenticated callback handles auth state.
           const userName = 'User';
 
           // Track successful login
