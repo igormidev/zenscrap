@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables_provider.dart';
 
@@ -42,11 +43,33 @@ class _UserScrappablesSearchBarState
 
   @override
   Widget build(BuildContext context) {
+    // Responsive sizing values
+    final searchBarHeight = context.responsiveValue(
+      compact: 44.0,
+      medium: 48.0,
+      expanded: 48.0,
+    );
+    final borderRadius = context.responsiveValue(
+      compact: 20.0,
+      medium: 24.0,
+      expanded: 24.0,
+    );
+    final iconSize = context.responsiveValue(
+      compact: 18.0,
+      medium: 20.0,
+      expanded: 20.0,
+    );
+    final contentPadding = context.responsiveValue(
+      compact: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      medium: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      expanded: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    );
+
     return Container(
-      height: 48,
+      height: searchBarHeight,
       decoration: BoxDecoration(
         color: context.c.surfaceContainerHighest.withAlpha(77),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(borderRadius),
         border: Border.all(
           color: context.c.outline.withAlpha(51),
           width: 1,
@@ -64,7 +87,7 @@ class _UserScrappablesSearchBarState
           prefixIcon: Icon(
             Icons.search_rounded,
             color: context.c.onSurfaceVariant,
-            size: 20,
+            size: iconSize,
           ),
           suffixIcon: _searchController.text.isNotEmpty
               ? IconButton(
@@ -78,15 +101,12 @@ class _UserScrappablesSearchBarState
                   icon: Icon(
                     Icons.clear_rounded,
                     color: context.c.onSurfaceVariant,
-                    size: 20,
+                    size: iconSize,
                   ),
                 )
               : null,
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 14,
-          ),
+          contentPadding: contentPadding,
         ),
       ),
     );

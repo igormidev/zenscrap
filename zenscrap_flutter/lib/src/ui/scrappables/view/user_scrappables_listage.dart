@@ -7,6 +7,7 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/plan_tier_extension.dart';
 import 'package:zenscrap_flutter/src/core/mixins/edit_scrappable.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/design_system/scrappables_listage_ui_template/scrappables_listage_template.dart';
 import 'package:zenscrap_flutter/src/design_system/scrappables_listage_ui_template/pagination_controls.dart';
 import 'package:zenscrap_flutter/src/design_system/scrappables_listage_ui_template/scrappables_search_bar.dart';
@@ -200,11 +201,28 @@ class _UserScrappablesLayout extends ConsumerWidget {
     final isAtLimit = totalUserScrappables >= maxAllowed;
     final l10n = AppLocalizations.of(context)!;
 
+    // Responsive spacing values
+    final horizontalPadding = context.responsiveValue(
+      compact: 16.0,
+      medium: 20.0,
+      expanded: 20.0,
+    );
+    final topSpacing = context.responsiveValue(
+      compact: 16.0,
+      medium: 20.0,
+      expanded: 20.0,
+    );
+    final sectionSpacing = context.responsiveValue(
+      compact: 12.0,
+      medium: 16.0,
+      expanded: 16.0,
+    );
+
     return Padding(
-      padding: const EdgeInsets.only(right: 20),
+      padding: EdgeInsets.only(right: horizontalPadding),
       child: Column(
         children: [
-          const SizedBox(height: 20),
+          SizedBox(height: topSpacing),
           Row(
             children: [
               Text(
@@ -222,7 +240,7 @@ class _UserScrappablesLayout extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: sectionSpacing),
           ScrappablesSearchBar(
             hintText: l10n.scrappables_search_hint,
             onSearch: (query) {
@@ -238,7 +256,7 @@ class _UserScrappablesLayout extends ConsumerWidget {
               analytics.trackUserScrappablesSearchClear();
             },
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: sectionSpacing),
           CategoryFilterSection(
             selectedCategories: selectedCategories,
             onCategoriesChanged: (categories) {
@@ -247,7 +265,7 @@ class _UserScrappablesLayout extends ConsumerWidget {
                   .filterByCategories(categories);
             },
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: sectionSpacing),
           Expanded(child: contentWidget),
         ],
       ),

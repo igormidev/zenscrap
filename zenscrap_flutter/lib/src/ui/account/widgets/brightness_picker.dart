@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 
 class BrightnessPicker extends StatefulWidget {
   final Brightness brightness;
@@ -85,6 +86,11 @@ class _BrightnessPickerState extends State<BrightnessPicker> {
   @override
   Widget build(BuildContext context) {
     final isDark = widget.brightness == Brightness.dark;
+    final spacing = context.responsiveValue(
+      compact: 10.0,
+      medium: 11.0,
+      expanded: 12.0,
+    );
 
     return Row(
       children: [
@@ -94,7 +100,7 @@ class _BrightnessPickerState extends State<BrightnessPicker> {
           isSelected: !isDark,
           onTap: () => widget.onBrightnessChanged(Brightness.light),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: spacing),
         _BrightnessOption(
           icon: Icons.dark_mode_rounded,
           label: AppLocalizations.of(context)!.account_brightness_dark,
@@ -133,6 +139,42 @@ class _BrightnessOptionState extends State<_BrightnessOption> {
   Widget build(BuildContext context) {
     final isClickable = widget.onTap != null;
 
+    final verticalPadding = context.responsiveValue(
+      compact: 14.0,
+      medium: 15.0,
+      expanded: 16.0,
+    );
+
+    final horizontalPadding = context.responsiveValue(
+      compact: 10.0,
+      medium: 11.0,
+      expanded: 12.0,
+    );
+
+    final borderRadius = context.responsiveValue(
+      compact: 10.0,
+      medium: 11.0,
+      expanded: 12.0,
+    );
+
+    final iconPadding = context.responsiveValue(
+      compact: 8.0,
+      medium: 9.0,
+      expanded: 10.0,
+    );
+
+    final iconSize = context.responsiveValue(
+      compact: 22.0,
+      medium: 23.0,
+      expanded: 24.0,
+    );
+
+    final iconLabelSpacing = context.responsiveValue(
+      compact: 10.0,
+      medium: 11.0,
+      expanded: 12.0,
+    );
+
     return Expanded(
       child: MouseRegion(
         onEnter: (_) => setState(() => _isHovered = true),
@@ -143,14 +185,17 @@ class _BrightnessOptionState extends State<_BrightnessOption> {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             curve: Curves.easeOutCubic,
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+            padding: EdgeInsets.symmetric(
+              vertical: verticalPadding,
+              horizontal: horizontalPadding,
+            ),
             decoration: BoxDecoration(
               color: widget.isSelected
                   ? context.c.primaryContainer
                   : (_isHovered
                       ? context.c.surfaceContainerHighest
                       : context.c.surfaceContainerLow),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(borderRadius),
               border: Border.all(
                 color: widget.isSelected
                     ? context.c.primary
@@ -175,7 +220,7 @@ class _BrightnessOptionState extends State<_BrightnessOption> {
                   children: [
                     AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.all(10),
+                      padding: EdgeInsets.all(iconPadding),
                       decoration: BoxDecoration(
                         color: widget.isSelected
                             ? context.c.primary.withAlpha(30)
@@ -184,13 +229,13 @@ class _BrightnessOptionState extends State<_BrightnessOption> {
                       ),
                       child: Icon(
                         widget.icon,
-                        size: 24,
+                        size: iconSize,
                         color: widget.isSelected
                             ? context.c.primary
                             : context.c.onSurfaceVariant,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: iconLabelSpacing),
                     Text(
                       widget.label,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(

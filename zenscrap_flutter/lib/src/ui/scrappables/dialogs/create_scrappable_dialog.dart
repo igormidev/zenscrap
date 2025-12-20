@@ -5,6 +5,7 @@ import 'package:form_validator/form_validator.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/core/mixins/create_scrappable_mixin.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 
 /// A dialog that allows users to create a new scrappable by providing
@@ -121,13 +122,33 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
+    // Responsive dialog sizing
+    final dialogMaxWidth = context.responsiveValue(
+      compact: MediaQuery.sizeOf(context).width * 0.9, // 90% on mobile
+      medium: 520.0,
+      expanded: 560.0,
+    );
+    final dialogMaxHeight = context.responsiveValue(
+      compact: MediaQuery.sizeOf(context).height * 0.85, // 85% on mobile
+      medium: 600.0,
+      expanded: 620.0,
+    );
+    final dialogBorderRadius = context.responsiveValue(
+      compact: 20.0,
+      medium: 24.0,
+      expanded: 28.0,
+    );
+
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 560, maxHeight: 620),
+        constraints: BoxConstraints(
+          maxWidth: dialogMaxWidth,
+          maxHeight: dialogMaxHeight,
+        ),
         decoration: BoxDecoration(
           color: context.c.surface,
-          borderRadius: BorderRadius.circular(28),
+          borderRadius: BorderRadius.circular(dialogBorderRadius),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withAlpha(30),
@@ -147,17 +168,46 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
               // Content
               Flexible(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+                  padding: EdgeInsets.fromLTRB(
+                    context.responsiveValue(
+                      compact: 20.0,
+                      medium: 24.0,
+                      expanded: 24.0,
+                    ),
+                    context.responsiveValue(
+                      compact: 12.0,
+                      medium: 16.0,
+                      expanded: 16.0,
+                    ),
+                    context.responsiveValue(
+                      compact: 20.0,
+                      medium: 24.0,
+                      expanded: 24.0,
+                    ),
+                    0,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Description
                       _buildDescription(context, l10n),
-                      const SizedBox(height: 24),
+                      SizedBox(
+                        height: context.responsiveValue(
+                          compact: 20.0,
+                          medium: 24.0,
+                          expanded: 24.0,
+                        ),
+                      ),
 
                       // URL Field
                       _buildUrlField(context, l10n),
-                      const SizedBox(height: 20),
+                      SizedBox(
+                        height: context.responsiveValue(
+                          compact: 16.0,
+                          medium: 20.0,
+                          expanded: 20.0,
+                        ),
+                      ),
 
                       // Prompt Field
                       _buildPromptField(context, l10n),
@@ -181,8 +231,14 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
   }
 
   Widget _buildHeader(BuildContext context, AppLocalizations l10n) {
+    final headerPadding = context.responsiveValue(
+      compact: 20.0,
+      medium: 24.0,
+      expanded: 24.0,
+    );
+
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(headerPadding),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -197,7 +253,13 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: EdgeInsets.all(
+              context.responsiveValue(
+                compact: 10.0,
+                medium: 12.0,
+                expanded: 12.0,
+              ),
+            ),
             decoration: BoxDecoration(
               color: context.c.primary,
               shape: BoxShape.circle,
@@ -212,10 +274,20 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
             child: Icon(
               Icons.auto_awesome_rounded,
               color: context.c.onPrimary,
-              size: 24,
+              size: context.responsiveValue(
+                compact: 20.0,
+                medium: 24.0,
+                expanded: 24.0,
+              ),
             ),
           ),
-          const SizedBox(width: 16),
+          SizedBox(
+            width: context.responsiveValue(
+              compact: 12.0,
+              medium: 16.0,
+              expanded: 16.0,
+            ),
+          ),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -444,8 +516,14 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
   }
 
   Widget _buildActions(BuildContext context, AppLocalizations l10n) {
+    final actionPadding = context.responsiveValue(
+      compact: 20.0,
+      medium: 24.0,
+      expanded: 24.0,
+    );
+
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(actionPadding),
       child: Row(
         children: [
           // Character hint

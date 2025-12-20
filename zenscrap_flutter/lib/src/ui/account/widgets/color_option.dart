@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 
 class ColorOption extends StatefulWidget {
   final Color color;
@@ -58,6 +59,24 @@ class _ColorOptionState extends State<ColorOption>
     final isLight = widget.color.computeLuminance() > 0.5;
     final checkColor = isLight ? Colors.black87 : Colors.white;
 
+    final size = context.responsiveValue(
+      compact: 38.0,
+      medium: 40.0,
+      expanded: 42.0,
+    );
+
+    final iconSize = context.responsiveValue(
+      compact: 20.0,
+      medium: 21.0,
+      expanded: 22.0,
+    );
+
+    final borderWidth = context.responsiveValue(
+      compact: 2.0,
+      medium: 2.5,
+      expanded: 3.0,
+    );
+
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
@@ -80,8 +99,8 @@ class _ColorOptionState extends State<ColorOption>
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             curve: Curves.easeOutCubic,
-            width: 42,
-            height: 42,
+            width: size,
+            height: size,
             decoration: BoxDecoration(
               color: widget.color,
               shape: BoxShape.circle,
@@ -89,7 +108,7 @@ class _ColorOptionState extends State<ColorOption>
                 color: widget.isSelected
                     ? context.c.primary
                     : (_isHovered ? context.c.outline : Colors.transparent),
-                width: widget.isSelected ? 3 : 2,
+                width: widget.isSelected ? borderWidth : borderWidth - 1,
               ),
               boxShadow: [
                 if (widget.isSelected || _isHovered)
@@ -106,7 +125,7 @@ class _ColorOptionState extends State<ColorOption>
               child: Icon(
                 Icons.check_rounded,
                 color: checkColor,
-                size: 22,
+                size: iconSize,
               ),
             ),
           ),
