@@ -11,308 +11,264 @@ part of 'theme_state.dart';
 
 // dart format off
 T _$identity<T>(T value) => value;
-
 /// @nodoc
 mixin _$ThemeState {
-  int get colorValue;
-  Brightness get brightness;
 
-  /// Create a copy of ThemeState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  $ThemeStateCopyWith<ThemeState> get copyWith =>
-      _$ThemeStateCopyWithImpl<ThemeState>(this as ThemeState, _$identity);
+ int get colorValue; Brightness get brightness;
+/// Create a copy of ThemeState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ThemeStateCopyWith<ThemeState> get copyWith => _$ThemeStateCopyWithImpl<ThemeState>(this as ThemeState, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is ThemeState &&
-            (identical(other.colorValue, colorValue) ||
-                other.colorValue == colorValue) &&
-            (identical(other.brightness, brightness) ||
-                other.brightness == brightness));
-  }
 
-  @override
-  int get hashCode => Object.hash(runtimeType, colorValue, brightness);
 
-  @override
-  String toString() {
-    return 'ThemeState(colorValue: $colorValue, brightness: $brightness)';
-  }
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ThemeState&&(identical(other.colorValue, colorValue) || other.colorValue == colorValue)&&(identical(other.brightness, brightness) || other.brightness == brightness));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,colorValue,brightness);
+
+@override
+String toString() {
+  return 'ThemeState(colorValue: $colorValue, brightness: $brightness)';
+}
+
+
 }
 
 /// @nodoc
-abstract mixin class $ThemeStateCopyWith<$Res> {
-  factory $ThemeStateCopyWith(
-          ThemeState value, $Res Function(ThemeState) _then) =
-      _$ThemeStateCopyWithImpl;
-  @useResult
-  $Res call({int colorValue, Brightness brightness});
-}
+abstract mixin class $ThemeStateCopyWith<$Res>  {
+  factory $ThemeStateCopyWith(ThemeState value, $Res Function(ThemeState) _then) = _$ThemeStateCopyWithImpl;
+@useResult
+$Res call({
+ int colorValue, Brightness brightness
+});
 
+
+
+
+}
 /// @nodoc
-class _$ThemeStateCopyWithImpl<$Res> implements $ThemeStateCopyWith<$Res> {
+class _$ThemeStateCopyWithImpl<$Res>
+    implements $ThemeStateCopyWith<$Res> {
   _$ThemeStateCopyWithImpl(this._self, this._then);
 
   final ThemeState _self;
   final $Res Function(ThemeState) _then;
 
-  /// Create a copy of ThemeState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? colorValue = null,
-    Object? brightness = null,
-  }) {
-    return _then(_self.copyWith(
-      colorValue: null == colorValue
-          ? _self.colorValue
-          : colorValue // ignore: cast_nullable_to_non_nullable
-              as int,
-      brightness: null == brightness
-          ? _self.brightness
-          : brightness // ignore: cast_nullable_to_non_nullable
-              as Brightness,
-    ));
-  }
+/// Create a copy of ThemeState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? colorValue = null,Object? brightness = null,}) {
+  return _then(_self.copyWith(
+colorValue: null == colorValue ? _self.colorValue : colorValue // ignore: cast_nullable_to_non_nullable
+as int,brightness: null == brightness ? _self.brightness : brightness // ignore: cast_nullable_to_non_nullable
+as Brightness,
+  ));
 }
+
+}
+
 
 /// Adds pattern-matching-related methods to [ThemeState].
 extension ThemeStatePatterns on ThemeState {
-  /// A variant of `map` that fallback to returning `orElse`.
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case final Subclass value:
-  ///     return ...;
-  ///   case _:
-  ///     return orElse();
-  /// }
-  /// ```
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>(
-    TResult Function(_ThemeState value)? $default, {
-    required TResult orElse(),
-  }) {
-    final _that = this;
-    switch (_that) {
-      case _ThemeState() when $default != null:
-        return $default(_that);
-      case _:
-        return orElse();
-    }
-  }
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ThemeState value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _ThemeState() when $default != null:
+return $default(_that);case _:
+  return orElse();
 
-  /// A `switch`-like method, using callbacks.
-  ///
-  /// Callbacks receives the raw object, upcasted.
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case final Subclass value:
-  ///     return ...;
-  ///   case final Subclass2 value:
-  ///     return ...;
-  /// }
-  /// ```
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>(
-    TResult Function(_ThemeState value) $default,
-  ) {
-    final _that = this;
-    switch (_that) {
-      case _ThemeState():
-        return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
-    }
-  }
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ThemeState value)  $default,){
+final _that = this;
+switch (_that) {
+case _ThemeState():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
 
-  /// A variant of `map` that fallback to returning `null`.
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case final Subclass value:
-  ///     return ...;
-  ///   case _:
-  ///     return null;
-  /// }
-  /// ```
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>(
-    TResult? Function(_ThemeState value)? $default,
-  ) {
-    final _that = this;
-    switch (_that) {
-      case _ThemeState() when $default != null:
-        return $default(_that);
-      case _:
-        return null;
-    }
-  }
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ThemeState value)?  $default,){
+final _that = this;
+switch (_that) {
+case _ThemeState() when $default != null:
+return $default(_that);case _:
+  return null;
 
-  /// A variant of `when` that fallback to an `orElse` callback.
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case Subclass(:final field):
-  ///     return ...;
-  ///   case _:
-  ///     return orElse();
-  /// }
-  /// ```
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>(
-    TResult Function(int colorValue, Brightness brightness)? $default, {
-    required TResult orElse(),
-  }) {
-    final _that = this;
-    switch (_that) {
-      case _ThemeState() when $default != null:
-        return $default(_that.colorValue, _that.brightness);
-      case _:
-        return orElse();
-    }
-  }
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int colorValue,  Brightness brightness)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _ThemeState() when $default != null:
+return $default(_that.colorValue,_that.brightness);case _:
+  return orElse();
 
-  /// A `switch`-like method, using callbacks.
-  ///
-  /// As opposed to `map`, this offers destructuring.
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case Subclass(:final field):
-  ///     return ...;
-  ///   case Subclass2(:final field2):
-  ///     return ...;
-  /// }
-  /// ```
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>(
-    TResult Function(int colorValue, Brightness brightness) $default,
-  ) {
-    final _that = this;
-    switch (_that) {
-      case _ThemeState():
-        return $default(_that.colorValue, _that.brightness);
-      case _:
-        throw StateError('Unexpected subclass');
-    }
-  }
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int colorValue,  Brightness brightness)  $default,) {final _that = this;
+switch (_that) {
+case _ThemeState():
+return $default(_that.colorValue,_that.brightness);case _:
+  throw StateError('Unexpected subclass');
 
-  /// A variant of `when` that fallback to returning `null`
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case Subclass(:final field):
-  ///     return ...;
-  ///   case _:
-  ///     return null;
-  /// }
-  /// ```
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(int colorValue, Brightness brightness)? $default,
-  ) {
-    final _that = this;
-    switch (_that) {
-      case _ThemeState() when $default != null:
-        return $default(_that.colorValue, _that.brightness);
-      case _:
-        return null;
-    }
-  }
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int colorValue,  Brightness brightness)?  $default,) {final _that = this;
+switch (_that) {
+case _ThemeState() when $default != null:
+return $default(_that.colorValue,_that.brightness);case _:
+  return null;
+
+}
+}
+
 }
 
 /// @nodoc
+
 
 class _ThemeState implements ThemeState {
-  _ThemeState({required this.colorValue, required this.brightness});
+   _ThemeState({required this.colorValue, required this.brightness});
+  
 
-  @override
-  final int colorValue;
-  @override
-  final Brightness brightness;
+@override final  int colorValue;
+@override final  Brightness brightness;
 
-  /// Create a copy of ThemeState
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  _$ThemeStateCopyWith<_ThemeState> get copyWith =>
-      __$ThemeStateCopyWithImpl<_ThemeState>(this, _$identity);
+/// Create a copy of ThemeState
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ThemeStateCopyWith<_ThemeState> get copyWith => __$ThemeStateCopyWithImpl<_ThemeState>(this, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _ThemeState &&
-            (identical(other.colorValue, colorValue) ||
-                other.colorValue == colorValue) &&
-            (identical(other.brightness, brightness) ||
-                other.brightness == brightness));
-  }
 
-  @override
-  int get hashCode => Object.hash(runtimeType, colorValue, brightness);
 
-  @override
-  String toString() {
-    return 'ThemeState(colorValue: $colorValue, brightness: $brightness)';
-  }
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ThemeState&&(identical(other.colorValue, colorValue) || other.colorValue == colorValue)&&(identical(other.brightness, brightness) || other.brightness == brightness));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,colorValue,brightness);
+
+@override
+String toString() {
+  return 'ThemeState(colorValue: $colorValue, brightness: $brightness)';
+}
+
+
 }
 
 /// @nodoc
-abstract mixin class _$ThemeStateCopyWith<$Res>
-    implements $ThemeStateCopyWith<$Res> {
-  factory _$ThemeStateCopyWith(
-          _ThemeState value, $Res Function(_ThemeState) _then) =
-      __$ThemeStateCopyWithImpl;
-  @override
-  @useResult
-  $Res call({int colorValue, Brightness brightness});
-}
+abstract mixin class _$ThemeStateCopyWith<$Res> implements $ThemeStateCopyWith<$Res> {
+  factory _$ThemeStateCopyWith(_ThemeState value, $Res Function(_ThemeState) _then) = __$ThemeStateCopyWithImpl;
+@override @useResult
+$Res call({
+ int colorValue, Brightness brightness
+});
 
+
+
+
+}
 /// @nodoc
-class __$ThemeStateCopyWithImpl<$Res> implements _$ThemeStateCopyWith<$Res> {
+class __$ThemeStateCopyWithImpl<$Res>
+    implements _$ThemeStateCopyWith<$Res> {
   __$ThemeStateCopyWithImpl(this._self, this._then);
 
   final _ThemeState _self;
   final $Res Function(_ThemeState) _then;
 
-  /// Create a copy of ThemeState
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? colorValue = null,
-    Object? brightness = null,
-  }) {
-    return _then(_ThemeState(
-      colorValue: null == colorValue
-          ? _self.colorValue
-          : colorValue // ignore: cast_nullable_to_non_nullable
-              as int,
-      brightness: null == brightness
-          ? _self.brightness
-          : brightness // ignore: cast_nullable_to_non_nullable
-              as Brightness,
-    ));
-  }
+/// Create a copy of ThemeState
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? colorValue = null,Object? brightness = null,}) {
+  return _then(_ThemeState(
+colorValue: null == colorValue ? _self.colorValue : colorValue // ignore: cast_nullable_to_non_nullable
+as int,brightness: null == brightness ? _self.brightness : brightness // ignore: cast_nullable_to_non_nullable
+as Brightness,
+  ));
+}
+
+
 }
 
 // dart format on

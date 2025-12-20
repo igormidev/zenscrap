@@ -1,3 +1,6 @@
 {
-  "@@locale": "pt"
+  "@@locale": "pt",
+  "common_show_original": "Mostrar original",
+  "common_show_translated": "Mostrar traducao",
+  "common_auto_translated": "Traduzido automaticamente de {language}"
 }

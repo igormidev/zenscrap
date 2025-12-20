@@ -573,5 +573,8 @@
   "scrappables_selected_category": "選択したカテゴリ",
   "scrappables_selected_categories": "選択したカテゴリ",
   "scrappables_your_endpoints": "あなたのエンドポイント",
-  "scrappables_create_new": "新しいエンドポイントを作成"
+  "scrappables_create_new": "新しいエンドポイントを作成",
+  "common_show_original": "原文を表示",
+  "common_show_translated": "翻訳を表示",
+  "common_auto_translated": "{language}から自動翻訳"
 }

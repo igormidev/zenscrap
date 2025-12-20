@@ -3544,6 +3544,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Creating...'**
   String get scrappables_create_dialog_creating;
+
+  /// Tooltip for showing original text (not translated)
+  ///
+  /// In en, this message translates to:
+  /// **'Show original'**
+  String get common_show_original;
+
+  /// Tooltip for showing translated text
+  ///
+  /// In en, this message translates to:
+  /// **'Show translated'**
+  String get common_show_translated;
+
+  /// Badge indicating text was auto-translated
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-translated from {language}'**
+  String common_auto_translated(String language);
 }
 
 class _AppLocalizationsDelegate

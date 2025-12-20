@@ -1984,4 +1984,15 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get scrappables_create_dialog_creating => 'Creating...';
+
+  @override
+  String get common_show_original => 'Afficher l\'original';
+
+  @override
+  String get common_show_translated => 'Afficher la traduction';
+
+  @override
+  String common_auto_translated(String language) {
+    return 'Traduit automatiquement depuis $language';
+  }
 }

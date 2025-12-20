@@ -573,5 +573,8 @@
   "scrappables_selected_category": "la categorie selectionnee",
   "scrappables_selected_categories": "les categories selectionnees",
   "scrappables_your_endpoints": "Vos endpoints",
-  "scrappables_create_new": "Creer un nouvel endpoint"
+  "scrappables_create_new": "Creer un nouvel endpoint",
+  "common_show_original": "Afficher l'original",
+  "common_show_translated": "Afficher la traduction",
+  "common_auto_translated": "Traduit automatiquement depuis {language}"
 }

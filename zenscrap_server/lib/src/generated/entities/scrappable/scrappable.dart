@@ -32,7 +32,9 @@ abstract class Scrappable
     required this.generalInfosUpdatedAt,
     required this.extractRulesUpdatedAt,
     required this.name,
+    this.nameLanguage,
     required this.description,
+    this.descriptionLanguage,
     this.testEndpointAvailableUntil,
     this.scrappingBeeExtractRules,
     required this.willHideFromMarketplace,
@@ -56,7 +58,9 @@ abstract class Scrappable
     required DateTime generalInfosUpdatedAt,
     required DateTime extractRulesUpdatedAt,
     required String name,
+    String? nameLanguage,
     required String description,
+    String? descriptionLanguage,
     DateTime? testEndpointAvailableUntil,
     _i2.ScrappingBeeExtractLogic? scrappingBeeExtractRules,
     required bool willHideFromMarketplace,
@@ -87,7 +91,9 @@ abstract class Scrappable
         jsonSerialization['extractRulesUpdatedAt'],
       ),
       name: jsonSerialization['name'] as String,
+      nameLanguage: jsonSerialization['nameLanguage'] as String?,
       description: jsonSerialization['description'] as String,
+      descriptionLanguage: jsonSerialization['descriptionLanguage'] as String?,
       testEndpointAvailableUntil:
           jsonSerialization['testEndpointAvailableUntil'] == null
           ? null
@@ -156,7 +162,11 @@ abstract class Scrappable
 
   String name;
 
+  String? nameLanguage;
+
   String description;
+
+  String? descriptionLanguage;
 
   DateTime? testEndpointAvailableUntil;
 
@@ -198,7 +208,9 @@ abstract class Scrappable
     DateTime? generalInfosUpdatedAt,
     DateTime? extractRulesUpdatedAt,
     String? name,
+    String? nameLanguage,
     String? description,
+    String? descriptionLanguage,
     DateTime? testEndpointAvailableUntil,
     _i2.ScrappingBeeExtractLogic? scrappingBeeExtractRules,
     bool? willHideFromMarketplace,
@@ -225,7 +237,10 @@ abstract class Scrappable
       'generalInfosUpdatedAt': generalInfosUpdatedAt.toJson(),
       'extractRulesUpdatedAt': extractRulesUpdatedAt.toJson(),
       'name': name,
+      if (nameLanguage != null) 'nameLanguage': nameLanguage,
       'description': description,
+      if (descriptionLanguage != null)
+        'descriptionLanguage': descriptionLanguage,
       if (testEndpointAvailableUntil != null)
         'testEndpointAvailableUntil': testEndpointAvailableUntil?.toJson(),
       if (scrappingBeeExtractRules != null)
@@ -260,7 +275,10 @@ abstract class Scrappable
       'generalInfosUpdatedAt': generalInfosUpdatedAt.toJson(),
       'extractRulesUpdatedAt': extractRulesUpdatedAt.toJson(),
       'name': name,
+      if (nameLanguage != null) 'nameLanguage': nameLanguage,
       'description': description,
+      if (descriptionLanguage != null)
+        'descriptionLanguage': descriptionLanguage,
       if (testEndpointAvailableUntil != null)
         'testEndpointAvailableUntil': testEndpointAvailableUntil?.toJson(),
       if (scrappingBeeExtractRules != null)
@@ -343,7 +361,9 @@ class _ScrappableImpl extends Scrappable {
     required DateTime generalInfosUpdatedAt,
     required DateTime extractRulesUpdatedAt,
     required String name,
+    String? nameLanguage,
     required String description,
+    String? descriptionLanguage,
     DateTime? testEndpointAvailableUntil,
     _i2.ScrappingBeeExtractLogic? scrappingBeeExtractRules,
     required bool willHideFromMarketplace,
@@ -365,7 +385,9 @@ class _ScrappableImpl extends Scrappable {
          generalInfosUpdatedAt: generalInfosUpdatedAt,
          extractRulesUpdatedAt: extractRulesUpdatedAt,
          name: name,
+         nameLanguage: nameLanguage,
          description: description,
+         descriptionLanguage: descriptionLanguage,
          testEndpointAvailableUntil: testEndpointAvailableUntil,
          scrappingBeeExtractRules: scrappingBeeExtractRules,
          willHideFromMarketplace: willHideFromMarketplace,
@@ -393,7 +415,9 @@ class _ScrappableImpl extends Scrappable {
     DateTime? generalInfosUpdatedAt,
     DateTime? extractRulesUpdatedAt,
     String? name,
+    Object? nameLanguage = _Undefined,
     String? description,
+    Object? descriptionLanguage = _Undefined,
     Object? testEndpointAvailableUntil = _Undefined,
     Object? scrappingBeeExtractRules = _Undefined,
     bool? willHideFromMarketplace,
@@ -420,7 +444,11 @@ class _ScrappableImpl extends Scrappable {
       extractRulesUpdatedAt:
           extractRulesUpdatedAt ?? this.extractRulesUpdatedAt,
       name: name ?? this.name,
+      nameLanguage: nameLanguage is String? ? nameLanguage : this.nameLanguage,
       description: description ?? this.description,
+      descriptionLanguage: descriptionLanguage is String?
+          ? descriptionLanguage
+          : this.descriptionLanguage,
       testEndpointAvailableUntil: testEndpointAvailableUntil is DateTime?
           ? testEndpointAvailableUntil
           : this.testEndpointAvailableUntil,
@@ -493,10 +521,22 @@ class ScrappableUpdateTable extends _i1.UpdateTable<ScrappableTable> {
     value,
   );
 
+  _i1.ColumnValue<String, String> nameLanguage(String? value) =>
+      _i1.ColumnValue(
+        table.nameLanguage,
+        value,
+      );
+
   _i1.ColumnValue<String, String> description(String value) => _i1.ColumnValue(
     table.description,
     value,
   );
+
+  _i1.ColumnValue<String, String> descriptionLanguage(String? value) =>
+      _i1.ColumnValue(
+        table.descriptionLanguage,
+        value,
+      );
 
   _i1.ColumnValue<DateTime, DateTime> testEndpointAvailableUntil(
     DateTime? value,
@@ -567,8 +607,16 @@ class ScrappableTable extends _i1.Table<int?> {
       'name',
       this,
     );
+    nameLanguage = _i1.ColumnString(
+      'nameLanguage',
+      this,
+    );
     description = _i1.ColumnString(
       'description',
+      this,
+    );
+    descriptionLanguage = _i1.ColumnString(
+      'descriptionLanguage',
       this,
     );
     testEndpointAvailableUntil = _i1.ColumnDateTime(
@@ -616,7 +664,11 @@ class ScrappableTable extends _i1.Table<int?> {
 
   late final _i1.ColumnString name;
 
+  late final _i1.ColumnString nameLanguage;
+
   late final _i1.ColumnString description;
+
+  late final _i1.ColumnString descriptionLanguage;
 
   late final _i1.ColumnDateTime testEndpointAvailableUntil;
 
@@ -754,7 +806,9 @@ class ScrappableTable extends _i1.Table<int?> {
     generalInfosUpdatedAt,
     extractRulesUpdatedAt,
     name,
+    nameLanguage,
     description,
+    descriptionLanguage,
     testEndpointAvailableUntil,
     willHideFromMarketplace,
     targetRequestId,

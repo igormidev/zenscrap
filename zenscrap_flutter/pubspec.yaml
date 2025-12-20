@@ -61,6 +61,9 @@ dependencies:
   serverpod_auth_idp_client: 3.1.1
   serverpod_auth_idp_flutter: 3.1.1
 
+  translator: ^1.0.4+1
+  executor: ^2.2.5
+
   freezed_annotation: ^3.1.0
   json_annotation: ^4.9.0
   intl: ^0.20.0

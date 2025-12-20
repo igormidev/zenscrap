@@ -1884,4 +1884,15 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get scrappables_create_dialog_creating => 'Creating...';
+
+  @override
+  String get common_show_original => '原文を表示';
+
+  @override
+  String get common_show_translated => '翻訳を表示';
+
+  @override
+  String common_auto_translated(String language) {
+    return '$languageから自動翻訳';
+  }
 }

@@ -2538,5 +2538,22 @@
   "scrappables_create_dialog_creating": "Creating...",
   "@scrappables_create_dialog_creating": {
     "description": "Creating button text when loading"
+  },
+  "common_show_original": "Show original",
+  "@common_show_original": {
+    "description": "Tooltip for showing original text (not translated)"
+  },
+  "common_show_translated": "Show translated",
+  "@common_show_translated": {
+    "description": "Tooltip for showing translated text"
+  },
+  "common_auto_translated": "Auto-translated from {language}",
+  "@common_auto_translated": {
+    "description": "Badge indicating text was auto-translated",
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
   }
 }

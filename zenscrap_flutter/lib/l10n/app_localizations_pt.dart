@@ -1939,6 +1939,17 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get scrappables_create_dialog_creating => 'Creating...';
+
+  @override
+  String get common_show_original => 'Mostrar original';
+
+  @override
+  String get common_show_translated => 'Mostrar traducao';
+
+  @override
+  String common_auto_translated(String language) {
+    return 'Traduzido automaticamente de $language';
+  }
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -3853,4 +3864,15 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get scrappables_create_new => 'Criar novo endpoint';
+
+  @override
+  String get common_show_original => 'Mostrar original';
+
+  @override
+  String get common_show_translated => 'Mostrar traducao';
+
+  @override
+  String common_auto_translated(String language) {
+    return 'Traduzido automaticamente de $language';
+  }
 }

@@ -1972,4 +1972,15 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get scrappables_create_dialog_creating => 'Creating...';
+
+  @override
+  String get common_show_original => 'Mostrar original';
+
+  @override
+  String get common_show_translated => 'Mostrar traducido';
+
+  @override
+  String common_auto_translated(String language) {
+    return 'Traducido automaticamente de $language';
+  }
 }
