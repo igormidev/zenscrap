@@ -39,9 +39,9 @@ class PurchaseSection extends ConsumerWidget {
       expanded: 12.0,
     );
     final listHeight = context.responsiveValue(
-      compact: 120.0,
-      medium: 129.0,
-      expanded: 129.0,
+      compact: 130.0,
+      medium: 135.0,
+      expanded: 135.0,
     );
 
     return Container(
@@ -356,31 +356,36 @@ class _CreditPackageCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    credits,
-                    style: context.t.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: isHighlighted
-                          ? context.c.primary
-                          : context.c.onSurface,
+                  Flexible(
+                    child: Text(
+                      credits,
+                      style: context.t.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: isHighlighted
+                            ? context.c.primary
+                            : context.c.onSurface,
+                      ),
                     ),
                   ),
                   if (badge != null)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: context.c.tertiary,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        badge!,
-                        style: context.t.labelSmall?.copyWith(
-                          fontSize: 9,
-                          fontWeight: FontWeight.bold,
-                          color: context.c.onTertiary,
+                    Flexible(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: context.c.tertiary,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          badge!,
+                          style: context.t.labelSmall?.copyWith(
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                            color: context.c.onTertiary,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ),
@@ -399,6 +404,8 @@ class _CreditPackageCard extends StatelessWidget {
                 style: context.t.labelSmall?.copyWith(
                   color: context.c.onSurfaceVariant.withAlpha(150),
                 ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
               ),
             ],
           ),

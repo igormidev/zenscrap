@@ -63,11 +63,20 @@ class ApiKeysSection extends StatelessWidget {
                 ),
               ),
               SizedBox(width: 8),
-              ElevatedButton.icon(
-                onPressed: onShowCreateApiKeyDialog,
-                icon: const Icon(Icons.add),
-                label: Text(AppLocalizations.of(context)!.api_usage_create_key),
-              ),
+              // Use icon-only button on compact screens to prevent overflow
+              context.windowSizeClass == WindowSizeClass.compact
+                  ? IconButton.filled(
+                      onPressed: onShowCreateApiKeyDialog,
+                      icon: const Icon(Icons.add),
+                      tooltip:
+                          AppLocalizations.of(context)!.api_usage_create_key,
+                    )
+                  : ElevatedButton.icon(
+                      onPressed: onShowCreateApiKeyDialog,
+                      icon: const Icon(Icons.add),
+                      label: Text(
+                          AppLocalizations.of(context)!.api_usage_create_key),
+                    ),
             ],
           ),
           SizedBox(height: verticalSpacing),
