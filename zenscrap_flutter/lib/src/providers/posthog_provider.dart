@@ -1714,6 +1714,37 @@ class AnalyticsService {
     );
   }
 
+  /// Track when a new (anonymous/not logged in) user encounters an error on their
+  /// first interaction with the platform.
+  ///
+  /// This is a critical event for understanding user drop-off at the very first
+  /// step of the user journey. New users who hit errors on their first attempt
+  /// are at high risk of abandoning the platform.
+  ///
+  /// This event is ONLY tracked for:
+  /// - Users who are NOT logged in (anonymous/new visitors)
+  /// - When an error occurs during their first scrappable creation attempt
+  ///
+  /// Fields:
+  /// - targetUrl: The URL the user was trying to scrape
+  /// - promptLength: Length of the user's extraction prompt
+  /// - errorMessage: The error message received
+  Future<void> trackNewUserFirstInteractionError({
+    required String targetUrl,
+    required int promptLength,
+    required String errorMessage,
+  }) async {
+    await _safeCapture(
+      eventName: 'new_user:first_interaction_error',
+      properties: {
+        'target_url': targetUrl,
+        'prompt_length': promptLength,
+        'error_message': errorMessage,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
   /// Track when user sees the session credit limit reached message
   Future<void> trackChatSessionLimitReachedView({
     required double creditsSpent,
