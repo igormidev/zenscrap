@@ -65,7 +65,7 @@ void run(List<String> args) async {
   // Serve all files in the /static directory using Serverpod 3.0 StaticRoute
   pod.webServer.addRoute(
     StaticRoute.directory(Directory('web/static')),
-    '/static/**',
+    '/static',
   );
 
   // Register legal pages (Terms of Service and Privacy Policy)
@@ -78,10 +78,8 @@ void run(List<String> args) async {
   // - Adds WASM multi-threading headers (Cross-Origin-Opener-Policy, Cross-Origin-Embedder-Policy)
   final flutterAppDir = Directory('web/app');
   if (flutterAppDir.existsSync()) {
-    // Add explicit route for root path '/' to serve index.html
-    // This is needed because '/**' pattern may not match the root path in some versions
+    // FlutterRoute handles catch-all routing internally for SPA apps
     pod.webServer.addRoute(FlutterRoute(flutterAppDir), '/');
-    pod.webServer.addRoute(FlutterRoute(flutterAppDir), '/**');
   } else {
     // ignore: avoid_print
     print(
