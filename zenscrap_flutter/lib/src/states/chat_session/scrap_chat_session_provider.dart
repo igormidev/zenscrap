@@ -6,6 +6,7 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/serverpod_to_result.dart';
 import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 import 'package:zenscrap_flutter/src/design_system/default_error_snackbar.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_messages_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_state.dart';
@@ -15,6 +16,10 @@ import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_stat
 class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
   StreamSubscription<ChatResponse>? _chatResponseSubscription;
   StreamSubscription<String>? _aiCurrentThinkingSubscription;
+
+  /// Tracks whether we've received a successful extract rule in this session.
+  /// Used to determine if errors occur before the first successful result.
+  bool _hasReceivedExtractRule = false;
 
   @override
   ScrapChatSessionState build() {
@@ -34,6 +39,7 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
     _aiCurrentThinkingSubscription?.cancel();
     _chatResponseSubscription = null;
     _aiCurrentThinkingSubscription = null;
+    _hasReceivedExtractRule = false;
   }
 
   Future<void> createScrappable({
@@ -148,6 +154,17 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
   }
 
   void onChange(ChatResponse chatResponse) {
+    // Get scrappable ID and message count for analytics
+    final scrappableId = state.mapOrNull(standard: (value) => value.data.id);
+    final currentMessages = ref.read(chatMessagesProvider);
+    final messageCount = currentMessages.maybeWhen(
+      data: (messages) => messages.length,
+      orElse: () => 0,
+    );
+
+    // Track the response for analytics
+    _trackChatResponse(chatResponse, scrappableId, messageCount);
+
     if (chatResponse is UpdatedScrappableRequestResponse) {
       state.mapOrNull(
         standard: (value) {
@@ -189,13 +206,133 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
         },
       );
     }
-    final currentMessages = ref.read(chatMessagesProvider);
     ref.read(chatMessagesProvider.notifier).setMessages(
           currentMessages.maybeMap(
             data: (data) => AsyncValue.data([...data.value, chatResponse]),
             orElse: () => AsyncValue.data([chatResponse]),
           ),
         );
+  }
+
+  /// Tracks chat response for analytics.
+  /// Identifies error types and tracks first extract rule success/failure.
+  void _trackChatResponse(
+    ChatResponse chatResponse,
+    int? scrappableId,
+    int messageCount,
+  ) {
+    if (scrappableId == null) return;
+
+    final analytics = ref.read(analyticsServiceProvider);
+    final responseType = _getResponseType(chatResponse);
+    final isFirstResponse = messageCount == 0;
+
+    // Track every response received
+    analytics.trackChatResponseReceived(
+      scrappableId: scrappableId,
+      responseType: responseType,
+      messageCount: messageCount,
+      hasReceivedExtractRule: _hasReceivedExtractRule,
+    );
+
+    // Check if this is an error response
+    if (_isErrorResponse(chatResponse)) {
+      _trackErrorResponse(
+        chatResponse,
+        scrappableId,
+        messageCount,
+        isFirstResponse,
+        analytics,
+      );
+      return;
+    }
+
+    // Track first successful extract rule
+    if (chatResponse is NewExtractRuleResponse && !_hasReceivedExtractRule) {
+      _hasReceivedExtractRule = true;
+      analytics.trackChatFirstExtractRuleSuccess(
+        scrappableId: scrappableId,
+        messageCount: messageCount,
+      );
+    }
+  }
+
+  /// Returns the response type string for analytics tracking.
+  String _getResponseType(ChatResponse response) {
+    // All ChatResponse subtypes are covered - switch is exhaustive
+    return switch (response) {
+      MessageTextResponse() => 'message_text',
+      NewExtractRuleResponse() => 'new_extract_rule',
+      TestEndpointCalledSuccessResponse() => 'test_endpoint_success',
+      TestEndpointCalledErrorResponse() => 'test_endpoint_error',
+      UpdatedScrappableRequestResponse() => 'updated_request',
+      CandidateExtractLogicUpdate() => 'candidate_extract_logic',
+      ApiKeyUpdatedResponse() => 'api_key_updated',
+      ErrorTextResponse() => 'error_text',
+      CreditLimitReachedResponse() => 'credit_limit_reached',
+      IpLimitReachedResponse() => 'ip_limit_reached',
+      UserApiKeyQuotaExceededResponse() => 'user_api_key_quota_exceeded',
+    };
+  }
+
+  /// Checks if the response is an error type.
+  bool _isErrorResponse(ChatResponse response) {
+    return response is ErrorTextResponse ||
+        response is TestEndpointCalledErrorResponse ||
+        response is CreditLimitReachedResponse ||
+        response is IpLimitReachedResponse ||
+        response is UserApiKeyQuotaExceededResponse;
+  }
+
+  /// Tracks error responses with detailed information.
+  void _trackErrorResponse(
+    ChatResponse chatResponse,
+    int scrappableId,
+    int messageCount,
+    bool isFirstResponse,
+    AnalyticsService analytics,
+  ) {
+    final errorType = _getResponseType(chatResponse);
+    String? errorMessage;
+    String? errorTitle;
+    String? errorDescription;
+
+    // Extract error details based on type
+    if (chatResponse is ErrorTextResponse) {
+      errorMessage = chatResponse.errorMessage;
+    } else if (chatResponse is TestEndpointCalledErrorResponse) {
+      errorTitle = chatResponse.errorTitle;
+      errorDescription = chatResponse.errorDescription;
+    } else if (chatResponse is CreditLimitReachedResponse) {
+      errorTitle = 'Credit Limit Reached';
+    } else if (chatResponse is IpLimitReachedResponse) {
+      errorTitle = 'IP Limit Reached';
+    } else if (chatResponse is UserApiKeyQuotaExceededResponse) {
+      errorTitle = 'User API Key Quota Exceeded';
+    }
+
+    // Track the error
+    analytics.trackChatResponseError(
+      scrappableId: scrappableId,
+      errorType: errorType,
+      messageCount: messageCount,
+      isFirstResponse: isFirstResponse,
+      errorMessage: errorMessage,
+      errorTitle: errorTitle,
+      errorDescription: errorDescription,
+    );
+
+    // If no extract rule has been received yet, this is a critical "first response error"
+    if (!_hasReceivedExtractRule) {
+      analytics.trackChatFirstExtractRuleError(
+        scrappableId: scrappableId,
+        errorType: errorType,
+        messageCount: messageCount,
+        errorMessage: errorMessage,
+        errorTitle: errorTitle,
+        errorDescription: errorDescription,
+      );
+    }
   }
 
   void updateScrappableDetails({
