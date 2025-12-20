@@ -27,9 +27,9 @@ void main() {
             responsiveTestWrapper(
               sharedPreferences: prefs,
               ResponsiveBuilder(
-                compact: (_, __) => const Text('Compact'),
-                medium: (_, __) => const Text('Medium'),
-                expanded: (_, __) => const Text('Expanded'),
+                compact: (_, constraints) => const Text('Compact'),
+                medium: (_, constraints) => const Text('Medium'),
+                expanded: (_, constraints) => const Text('Expanded'),
               ),
             ),
           );
@@ -48,9 +48,9 @@ void main() {
             responsiveTestWrapper(
               sharedPreferences: prefs,
               ResponsiveBuilder(
-                compact: (_, __) => const Text('Compact'),
-                medium: (_, __) => const Text('Medium'),
-                expanded: (_, __) => const Text('Expanded'),
+                compact: (_, constraints) => const Text('Compact'),
+                medium: (_, constraints) => const Text('Medium'),
+                expanded: (_, constraints) => const Text('Expanded'),
               ),
             ),
           );
@@ -69,9 +69,9 @@ void main() {
             responsiveTestWrapper(
               sharedPreferences: prefs,
               ResponsiveBuilder(
-                compact: (_, __) => const Text('Compact'),
-                medium: (_, __) => const Text('Medium'),
-                expanded: (_, __) => const Text('Expanded'),
+                compact: (_, constraints) => const Text('Compact'),
+                medium: (_, constraints) => const Text('Medium'),
+                expanded: (_, constraints) => const Text('Expanded'),
               ),
             ),
           );
@@ -90,9 +90,9 @@ void main() {
           responsiveTestWrapper(
             sharedPreferences: prefs,
             ResponsiveBuilder(
-              compact: (_, __) => const Text('Compact'),
+              compact: (_, constraints) => const Text('Compact'),
               // medium not provided
-              expanded: (_, __) => const Text('Expanded'),
+              expanded: (_, constraints) => const Text('Expanded'),
             ),
           ),
         );
@@ -110,8 +110,8 @@ void main() {
           responsiveTestWrapper(
             sharedPreferences: prefs,
             ResponsiveBuilder(
-              compact: (_, __) => const Text('Compact'),
-              medium: (_, __) => const Text('Medium'),
+              compact: (_, constraints) => const Text('Compact'),
+              medium: (_, constraints) => const Text('Medium'),
               // expanded not provided
             ),
           ),
@@ -189,9 +189,9 @@ void main() {
           responsiveTestWrapper(
             sharedPreferences: prefs,
             ResponsiveBuilder(
-              compact: (_, __) => const Text('Compact'),
-              medium: (_, __) => const Text('Medium'),
-              expanded: (_, __) => const Text('Expanded'),
+              compact: (_, constraints) => const Text('Compact'),
+              medium: (_, constraints) => const Text('Medium'),
+              expanded: (_, constraints) => const Text('Expanded'),
             ),
           ),
         );
@@ -205,9 +205,9 @@ void main() {
           responsiveTestWrapper(
             sharedPreferences: prefs,
             ResponsiveBuilder(
-              compact: (_, __) => const Text('Compact'),
-              medium: (_, __) => const Text('Medium'),
-              expanded: (_, __) => const Text('Expanded'),
+              compact: (_, constraints) => const Text('Compact'),
+              medium: (_, constraints) => const Text('Medium'),
+              expanded: (_, constraints) => const Text('Expanded'),
             ),
           ),
         );
@@ -224,9 +224,9 @@ void main() {
           responsiveTestWrapper(
             sharedPreferences: prefs,
             ResponsiveBuilder(
-              compact: (_, __) => const Text('Compact'),
-              medium: (_, __) => const Text('Medium'),
-              expanded: (_, __) => const Text('Expanded'),
+              compact: (_, constraints) => const Text('Compact'),
+              medium: (_, constraints) => const Text('Medium'),
+              expanded: (_, constraints) => const Text('Expanded'),
             ),
           ),
         );
@@ -240,9 +240,9 @@ void main() {
           responsiveTestWrapper(
             sharedPreferences: prefs,
             ResponsiveBuilder(
-              compact: (_, __) => const Text('Compact'),
-              medium: (_, __) => const Text('Medium'),
-              expanded: (_, __) => const Text('Expanded'),
+              compact: (_, constraints) => const Text('Compact'),
+              medium: (_, constraints) => const Text('Medium'),
+              expanded: (_, constraints) => const Text('Expanded'),
             ),
           ),
         );

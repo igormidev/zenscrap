@@ -97,15 +97,15 @@ void main() {
             responsiveTestWrapper(
               sharedPreferences: prefs,
               ResponsiveBuilder(
-                compact: (_, __) => const Padding(
+                compact: (_, constraints) => const Padding(
                   padding: EdgeInsets.all(16),
                   child: Text('Compact layout with proper padding'),
                 ),
-                medium: (_, __) => const Padding(
+                medium: (_, constraints) => const Padding(
                   padding: EdgeInsets.all(24),
                   child: Text('Medium layout with proper padding'),
                 ),
-                expanded: (_, __) => const Padding(
+                expanded: (_, constraints) => const Padding(
                   padding: EdgeInsets.all(32),
                   child: Text('Expanded layout with proper padding'),
                 ),
