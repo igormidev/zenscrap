@@ -26,17 +26,11 @@ import 'src/generated/endpoints.dart';
 
 void run(List<String> args) async {
   // Initialize Serverpod and connect it with your generated code.
-  final pod = Serverpod(
-    args,
-    Protocol(),
-    Endpoints(),
-  );
+  final pod = Serverpod(args, Protocol(), Endpoints());
 
   // Initialize authentication services with Serverpod 3.1 IDP system
   pod.initializeAuthServices(
-    tokenManagerBuilders: [
-      JwtConfigFromPasswords(),
-    ],
+    tokenManagerBuilders: [JwtConfigFromPasswords()],
     identityProviderBuilders: [
       // Google OAuth authentication
       GoogleIdpConfig(
@@ -57,12 +51,17 @@ void run(List<String> args) async {
   pod.webServer.addRoute(StripeWebhookRoute(), '/stripe/webhook');
 
   // Register Scrappable API routes
-  pod.webServer
-      .addRoute(ScrappableApiRoute(isProd: false), '/api/scrappable/test');
-  pod.webServer
-      .addRoute(ScrappableApiRoute(isProd: true), '/api/scrappable/prod');
+  pod.webServer.addRoute(
+    ScrappableApiRoute(isProd: false),
+    '/api/scrappable/test',
+  );
+  pod.webServer.addRoute(
+    ScrappableApiRoute(isProd: true),
+    '/api/scrappable/prod',
+  );
 
   // Serve all files in the /static directory using Serverpod 3.0 StaticRoute
+  // Note: StaticRoute.directory internally uses '/**' path, so we only specify '/static'
   pod.webServer.addRoute(
     StaticRoute.directory(Directory('web/static')),
     '/static',
@@ -76,14 +75,15 @@ void run(List<String> args) async {
   // FlutterRoute is designed for Flutter WASM apps and automatically:
   // - Handles SPA-style routing (falls back to index.html)
   // - Adds WASM multi-threading headers (Cross-Origin-Opener-Policy, Cross-Origin-Embedder-Policy)
+  // Note: FlutterRoute internally handles all routing via injectIn, so we add it at '/' only
   final flutterAppDir = Directory('web/app');
   if (flutterAppDir.existsSync()) {
-    // FlutterRoute handles catch-all routing internally for SPA apps
     pod.webServer.addRoute(FlutterRoute(flutterAppDir), '/');
   } else {
     // ignore: avoid_print
     print(
-        '[Zenscrap] Warning: Flutter web app not found at ${flutterAppDir.path}');
+      '[Zenscrap] Warning: Flutter web app not found at ${flutterAppDir.path}',
+    );
   }
 
   final String? scrapingBeeApiKey = pod.getPassword('scrapingBeeApiKey');
@@ -113,18 +113,30 @@ void run(List<String> args) async {
 
   // // Register your future calls
   pod.registerFutureCall(
-      TestScrappableDisposeFutureCall(), 'dispose_temporary_scrappable');
+    TestScrappableDisposeFutureCall(),
+    'dispose_temporary_scrappable',
+  );
   pod.registerFutureCall(
-      MonthlySubscriptionCreditsFutureCall(), 'monthly_subscription_credits');
+    MonthlySubscriptionCreditsFutureCall(),
+    'monthly_subscription_credits',
+  );
   pod.registerFutureCall(SessionPromptFutureCall(), 'session_prompt');
   pod.registerFutureCall(
-      PeriodicSetRequestsAnalytics(), 'periodicSetRequestsAnalytics');
-  pod.registerFutureCall(PeriodicCleanupOldAnalyticsDetails(),
-      'periodicCleanupOldAnalyticsDetails');
+    PeriodicSetRequestsAnalytics(),
+    'periodicSetRequestsAnalytics',
+  );
   pod.registerFutureCall(
-      PeriodicAutoFixBrokenScrappables(), 'periodicAutoFixBrokenScrappables');
-  pod.registerFutureCall(CleanupExpiredIpSpendingFutureCall(),
-      CleanupExpiredIpSpendingFutureCall.callName);
+    PeriodicCleanupOldAnalyticsDetails(),
+    'periodicCleanupOldAnalyticsDetails',
+  );
+  pod.registerFutureCall(
+    PeriodicAutoFixBrokenScrappables(),
+    'periodicAutoFixBrokenScrappables',
+  );
+  pod.registerFutureCall(
+    CleanupExpiredIpSpendingFutureCall(),
+    CleanupExpiredIpSpendingFutureCall.callName,
+  );
 
   // Start the server.
   await pod.start();
@@ -145,7 +157,8 @@ void run(List<String> args) async {
   } else {
     // ignore: avoid_print
     print(
-        '[Zenscrap] WARNING: OpenAI API key not configured, skipping Vector Store initialization');
+      '[Zenscrap] WARNING: OpenAI API key not configured, skipping Vector Store initialization',
+    );
   }
 
   await pod.cancelFutureCall('periodicSetRequestsAnalytics');
