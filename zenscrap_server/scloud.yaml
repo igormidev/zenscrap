@@ -9,3 +9,6 @@
 
 project:
   projectId: "thezenscrapper"
+  scripts:
+    pre_deploy: []
+    post_deploy: []

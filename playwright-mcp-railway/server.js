@@ -1,4 +1,5 @@
 import http from 'http';
+import crypto from 'crypto';
 import { chromium } from 'playwright';
 
 const PORT = process.env.PORT || 8931;
@@ -173,13 +174,29 @@ if (!MCP_API_KEY) {
 }
 
 /**
- * Validates the X-API-KEY header for authentication
+ * Validates the X-API-KEY header for authentication using constant-time comparison
+ * to prevent timing attacks.
  * @param {http.IncomingMessage} req - The HTTP request
  * @returns {boolean} True if authenticated, false otherwise
  */
 function validateApiKey(req) {
   const apiKey = req.headers['x-api-key'];
-  return apiKey === MCP_API_KEY;
+
+  // Early return if missing
+  if (!apiKey || !MCP_API_KEY) return false;
+
+  // Length check (different lengths can't be compared with timingSafeEqual)
+  if (apiKey.length !== MCP_API_KEY.length) return false;
+
+  // Constant-time comparison to prevent timing attacks
+  try {
+    return crypto.timingSafeEqual(
+      Buffer.from(apiKey, 'utf8'),
+      Buffer.from(MCP_API_KEY, 'utf8')
+    );
+  } catch {
+    return false;
+  }
 }
 
 const proxyConfig = {
