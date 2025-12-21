@@ -113,11 +113,11 @@ class LoginPage extends ConsumerWidget {
               final authError = error != null
                   ? AuthErrorMapper.mapError(error, context: AuthContext.login)
                   : (emailAuth.errorMessage != null
-                      ? AuthErrorMapper.mapControllerError(
-                          emailAuth.errorMessage,
-                          context: AuthContext.login,
-                        )
-                      : AuthErrorMapper.loginFailed());
+                        ? AuthErrorMapper.mapControllerError(
+                            emailAuth.errorMessage,
+                            context: AuthContext.login,
+                          )
+                        : AuthErrorMapper.loginFailed());
               showAuthErrorDialog(context: context, error: authError);
             }
 

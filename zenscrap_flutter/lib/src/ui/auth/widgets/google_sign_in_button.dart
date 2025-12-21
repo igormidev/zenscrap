@@ -56,9 +56,9 @@ class _ZenScrapGoogleSignInButtonState
           child: Text(
             'Google Sign-In not configured. Set GOOGLE_SERVER_CLIENT_ID environment variable.',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.outline,
-                  fontStyle: FontStyle.italic,
-                ),
+              color: Theme.of(context).colorScheme.outline,
+              fontStyle: FontStyle.italic,
+            ),
             textAlign: TextAlign.center,
           ),
         );
@@ -81,22 +81,19 @@ class _ZenScrapGoogleSignInButtonState
               child: Text(
                 l10n.auth_or_divider,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.outline,
-                    ),
+                  color: Theme.of(context).colorScheme.outline,
+                ),
               ),
             ),
             const Expanded(child: Divider()),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 10),
         // Google Sign-In Button
         SizedBox(
           width: double.infinity,
           // Minimum 48px height for mobile touch target
-          height: context.responsiveValue(
-            compact: 52.0,
-            expanded: 48.0,
-          ),
+          height: context.responsiveValue(compact: 52.0, expanded: 48.0),
           child: OutlinedButton.icon(
             onPressed: _isLoading
                 ? null
@@ -138,7 +135,8 @@ class _ZenScrapGoogleSignInButtonState
 
                       // Check the controller's isAuthenticated property (not client.auth.isAuthenticated)
                       // This is updated by the GoogleAuthController after signIn() completes
-                      final isAuthenticated = _googleAuthController!.isAuthenticated;
+                      final isAuthenticated =
+                          _googleAuthController!.isAuthenticated;
 
                       if (!isAuthenticated) {
                         // Reset loading state immediately when not authenticated
@@ -180,15 +178,16 @@ class _ZenScrapGoogleSignInButtonState
                       }
 
                       // Fetch real user profile from the server
-                      final userProfileResponse =
-                          await client.userProfile.getCurrentUserProfile();
+                      final userProfileResponse = await client.userProfile
+                          .getCurrentUserProfile();
 
                       // Track successful Google sign-in with real user info
                       await analytics.trackEvent(
                         eventName: 'auth_google_success',
                         properties: {
                           'email': userProfileResponse.email ?? 'unknown',
-                          'user_name': userProfileResponse.userName ??
+                          'user_name':
+                              userProfileResponse.userName ??
                               userProfileResponse.fullName ??
                               'Google User',
                         },
@@ -196,12 +195,16 @@ class _ZenScrapGoogleSignInButtonState
 
                       // Update session state with real user profile
                       if (context.mounted) {
-                        ref.read(sessionProvider.notifier).setState(
+                        ref
+                            .read(sessionProvider.notifier)
+                            .setState(
                               SessionState.logged(
                                 user: UserModel(
-                                  email: userProfileResponse.email ??
+                                  email:
+                                      userProfileResponse.email ??
                                       'google_user@google.com',
-                                  userName: userProfileResponse.userName ??
+                                  userName:
+                                      userProfileResponse.userName ??
                                       userProfileResponse.fullName ??
                                       'Google User',
                                   imageUrl: userProfileResponse.imageUrl,
@@ -250,7 +253,9 @@ class _ZenScrapGoogleSignInButtonState
                         const Icon(Icons.g_mobiledata, size: 20),
                   ),
             label: Text(
-              _isLoading ? l10n.auth_signing_in : l10n.auth_continue_with_google,
+              _isLoading
+                  ? l10n.auth_signing_in
+                  : l10n.auth_continue_with_google,
               style: context.responsiveValue(
                 compact: Theme.of(context).textTheme.titleSmall,
                 expanded: null, // Use default
@@ -259,8 +264,14 @@ class _ZenScrapGoogleSignInButtonState
             style: OutlinedButton.styleFrom(
               // Responsive padding for proper touch target
               padding: context.responsiveValue(
-                compact: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-                expanded: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                compact: const EdgeInsets.symmetric(
+                  vertical: 14,
+                  horizontal: 16,
+                ),
+                expanded: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 16,
+                ),
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -272,8 +283,8 @@ class _ZenScrapGoogleSignInButtonState
         Text(
           l10n.auth_google_sign_in_description,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.outline,
-              ),
+            color: Theme.of(context).colorScheme.outline,
+          ),
           textAlign: TextAlign.center,
         ),
       ],

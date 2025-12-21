@@ -639,8 +639,8 @@ double _calculateAuthContainerHeight({
 
   // Default heights based on selected page
   return switch (selectedAuthPage) {
-    SelectedAuthPage.login => 400,
-    SelectedAuthPage.signIn => 465,
+    SelectedAuthPage.login => 388,
+    SelectedAuthPage.signIn => 455,
     SelectedAuthPage.passwordReset => 270,
   };
 }
