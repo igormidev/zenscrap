@@ -87,23 +87,47 @@ class _MobileLayout extends StatelessWidget {
     return ListView(
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       children: [
-        SizedBox(height: context.responsiveValue(compact: 24.0, medium: 40.0, expanded: 60.0)),
+        SizedBox(
+          height: context.responsiveValue(
+            compact: 24.0,
+            medium: 40.0,
+            expanded: 60.0,
+          ),
+        ),
         Text(
           AppLocalizations.of(context)!.account_title,
           style: Theme.of(context).textTheme.displayMedium,
         ),
-        SizedBox(height: context.responsiveValue(compact: 16.0, medium: 20.0, expanded: 24.0)),
+        SizedBox(
+          height: context.responsiveValue(
+            compact: 16.0,
+            medium: 20.0,
+            expanded: 24.0,
+          ),
+        ),
         _AccountInformationCard(
           user: user,
           accountInfo: accountInfo,
           analytics: analytics,
         ),
-        SizedBox(height: context.responsiveValue(compact: 20.0, medium: 24.0, expanded: 27.0)),
+        SizedBox(
+          height: context.responsiveValue(
+            compact: 20.0,
+            medium: 24.0,
+            expanded: 27.0,
+          ),
+        ),
         Text(
           AppLocalizations.of(context)!.account_appearance_title,
           style: Theme.of(context).textTheme.displayMedium,
         ),
-        SizedBox(height: context.responsiveValue(compact: 16.0, medium: 20.0, expanded: 24.0)),
+        SizedBox(
+          height: context.responsiveValue(
+            compact: 16.0,
+            medium: 20.0,
+            expanded: 24.0,
+          ),
+        ),
         _ThemeCustomizationSection(),
         const SizedBox(height: 32),
       ],
@@ -186,19 +210,23 @@ class _DesktopLayout extends StatelessWidget {
                       accountInfo: accountInfo,
                       analytics: analytics,
                     ),
+                    SizedBox(height: 20),
+                    // Language Card
+                    const LanguageSelectorCard(),
                   ],
                 ),
               ),
-              SizedBox(width: context.responsiveValue(compact: 16.0, medium: 20.0, expanded: 24.0)),
+              SizedBox(
+                width: context.responsiveValue(
+                  compact: 16.0,
+                  medium: 20.0,
+                  expanded: 24.0,
+                ),
+              ),
               Expanded(
                 child: ListView(
                   children: [
-                    const SizedBox(height: 60),
-                    Text(
-                      AppLocalizations.of(context)!.account_appearance_title,
-                      style: Theme.of(context).textTheme.displayMedium,
-                    ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 0),
                     _ThemeCustomizationSection(),
                   ],
                 ),
@@ -241,46 +269,87 @@ class _AccountInformationCard extends StatelessWidget {
       padding: cardPadding,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(borderRadius),
-        border: Border.all(
-          color: context.c.outline.withAlpha(51),
-          width: 1,
-        ),
+        border: Border.all(color: context.c.outline.withAlpha(51), width: 1),
         color: context.c.surfaceContainerLowest.withAlpha(100),
       ),
       child: Column(
         children: [
-          SizedBox(height: context.responsiveValue(compact: 12.0, medium: 16.0, expanded: 20.0)),
+          SizedBox(
+            height: context.responsiveValue(
+              compact: 12.0,
+              medium: 16.0,
+              expanded: 20.0,
+            ),
+          ),
           // Profile image editing not available in new IDP system
           // UserEditableProfileImage is disabled until we have a way to update profile
-          SizedBox(height: context.responsiveValue(compact: 12.0, medium: 16.0, expanded: 20.0)),
+          SizedBox(
+            height: context.responsiveValue(
+              compact: 12.0,
+              medium: 16.0,
+              expanded: 20.0,
+            ),
+          ),
           Text(
             AppLocalizations.of(context)!.account_information_title,
             style: Theme.of(context).textTheme.titleLarge,
           ),
-          SizedBox(height: context.responsiveValue(compact: 12.0, medium: 14.0, expanded: 16.0)),
+          SizedBox(
+            height: context.responsiveValue(
+              compact: 12.0,
+              medium: 14.0,
+              expanded: 16.0,
+            ),
+          ),
           AccountDisplayTime(
             title: AppLocalizations.of(context)!.account_user_name_label,
             content: user.userName,
             analytics: analytics,
           ),
-          SizedBox(height: context.responsiveValue(compact: 12.0, medium: 14.0, expanded: 16.0)),
+          SizedBox(
+            height: context.responsiveValue(
+              compact: 12.0,
+              medium: 14.0,
+              expanded: 16.0,
+            ),
+          ),
           AccountDisplayTime(
             title: AppLocalizations.of(context)!.account_email_label,
             content: user.email,
             analytics: analytics,
           ),
-          SizedBox(height: context.responsiveValue(compact: 12.0, medium: 14.0, expanded: 16.0)),
+          SizedBox(
+            height: context.responsiveValue(
+              compact: 12.0,
+              medium: 14.0,
+              expanded: 16.0,
+            ),
+          ),
           AccountDisplayTime(
-            title: AppLocalizations.of(context)!.account_subscription_plan_label,
+            title: AppLocalizations.of(
+              context,
+            )!.account_subscription_plan_label,
             content: accountInfo.planTier.displayName,
             analytics: analytics,
           ),
-          SizedBox(height: context.responsiveValue(compact: 16.0, medium: 18.0, expanded: 20.0)),
+          SizedBox(
+            height: context.responsiveValue(
+              compact: 16.0,
+              medium: 18.0,
+              expanded: 20.0,
+            ),
+          ),
           const Align(
             alignment: Alignment.centerRight,
             child: ContactSupportButton(),
           ),
-          SizedBox(height: context.responsiveValue(compact: 12.0, medium: 14.0, expanded: 16.0)),
+          SizedBox(
+            height: context.responsiveValue(
+              compact: 12.0,
+              medium: 14.0,
+              expanded: 16.0,
+            ),
+          ),
         ],
       ),
     );
@@ -318,7 +387,13 @@ class AccountDisplayTime extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         BabelText(title, style: Theme.of(context).textTheme.titleMedium),
-        SizedBox(height: context.responsiveValue(compact: 6.0, medium: 7.0, expanded: 8.0)),
+        SizedBox(
+          height: context.responsiveValue(
+            compact: 6.0,
+            medium: 7.0,
+            expanded: 8.0,
+          ),
+        ),
         Container(
           decoration: BoxDecoration(
             color: context.c.surfaceContainerLow,
@@ -419,8 +494,6 @@ class _ThemeCustomizationSection extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 27),
-        // Language Card
-        const LanguageSelectorCard(),
       ],
     );
   }
@@ -486,7 +559,13 @@ class _ThemeCard extends StatelessWidget {
                 ),
                 child: Icon(icon, color: context.c.primary, size: iconSize),
               ),
-              SizedBox(width: context.responsiveValue(compact: 12.0, medium: 13.0, expanded: 14.0)),
+              SizedBox(
+                width: context.responsiveValue(
+                  compact: 12.0,
+                  medium: 13.0,
+                  expanded: 14.0,
+                ),
+              ),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -509,7 +588,13 @@ class _ThemeCard extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: context.responsiveValue(compact: 16.0, medium: 18.0, expanded: 20.0)),
+          SizedBox(
+            height: context.responsiveValue(
+              compact: 16.0,
+              medium: 18.0,
+              expanded: 20.0,
+            ),
+          ),
           child,
         ],
       ),
