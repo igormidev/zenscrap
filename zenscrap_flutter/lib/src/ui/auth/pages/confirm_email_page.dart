@@ -6,9 +6,7 @@ import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
-import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
-import 'package:zenscrap_flutter/src/states/session/session_state.dart';
-import 'package:zenscrap_flutter/src/states/session/user_model.dart';
+import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/ui/auth/pages/sign_in_page.dart';
 import 'package:zenscrap_flutter/src/ui/auth/templates/auth_form_template.dart';
 
@@ -55,36 +53,30 @@ class ConfirmEmailPage extends ConsumerWidget {
 
           // Set the password from the stored pending data
           final password = PendingRegistrationData.password;
-          final userName = PendingRegistrationData.userName;
           if (password != null) {
             emailAuth.passwordController.text = password;
           }
 
           // Complete the registration
-          // Note: Do NOT check client.auth.isAuthenticated immediately after this call.
-          // The auth state update is asynchronous and the onAuthenticated callback
-          // will be triggered when authentication is complete.
+          // Note: finishRegistration() in Serverpod 3.x automatically authenticates
+          // the user after successful registration.
           await emailAuth.finishRegistration();
 
           // Clear the pending data
           PendingRegistrationData.clear();
 
-          // If finishRegistration() completes without throwing, registration succeeded.
-          // The EmailAuthController's onAuthenticated callback will handle the auth state.
-          // Update session state using the data we collected from the form.
-          ref.read(sessionProvider.notifier).setState(
-                SessionState.logged(
-                  user: UserModel(
-                    email: email,
-                    userName: userName ?? 'User',
-                    imageUrl: null,
-                  ),
-                ),
-              );
+          // Registration succeeded. However, we want the user to manually log in
+          // with their new credentials rather than being auto-logged in.
+          // Sign out immediately so the user can log in manually.
+          // This provides a cleaner UX where the user confirms their credentials work.
+          final client = ref.read(clientProvider);
+          await client.auth.signOutDevice();
 
           // Track successful email confirmation
           await analytics.trackAuthEmailConfirmationSuccess(email: email);
 
+          // Return true to trigger onSubmitSuccess, which calls onSuccessConfirmEmail()
+          // This will show a success dialog and switch to the Login tab.
           return true;
         } catch (e) {
           // Clear pending data on failure
