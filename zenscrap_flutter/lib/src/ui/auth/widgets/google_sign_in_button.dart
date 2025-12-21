@@ -128,39 +128,62 @@ class _ZenScrapGoogleSignInButtonState
                       // Attempt Google sign-in
                       await _googleAuthController!.signIn();
 
-                      // Check if authenticated
-                      final isAuthenticated = client.auth.isAuthenticated;
+                      // Small delay to allow the async state update to propagate
+                      // The GoogleAuthController updates state asynchronously after signIn()
+                      await Future.delayed(const Duration(milliseconds: 50));
 
-                      if (isAuthenticated) {
-                        // Track successful Google sign-in
-                        // Note: We don't have user email/name directly from AuthSuccess
-                        // It needs to be fetched from the server separately
-                        await analytics.trackEvent(
-                          eventName: 'auth_google_success',
-                          properties: {
-                            'email': 'google_user',
-                            'user_name': 'Google User',
-                          },
-                        );
+                      // Check the controller's isAuthenticated property (not client.auth.isAuthenticated)
+                      // This is updated by the GoogleAuthController after signIn() completes
+                      final isAuthenticated = _googleAuthController!.isAuthenticated;
 
-                        // Update session state
-                        // For Google sign-in, we'll use a placeholder name and fetch the real info later
-                        if (context.mounted) {
-                          ref.read(sessionProvider.notifier).setState(
-                                SessionState.logged(
-                                  user: UserModel(
-                                    email: 'google_user@google.com',
-                                    userName: 'Google User',
-                                    imageUrl: null,
-                                  ),
-                                ),
-                              );
+                      if (!isAuthenticated) {
+                        // Check if there was an error or if user cancelled
+                        final errorMsg = _googleAuthController!.errorMessage;
+                        if (errorMsg != null) {
+                          // Track Google sign-in failure with error message
+                          await analytics.trackEvent(
+                            eventName: 'auth_google_failure',
+                            properties: {'error': errorMsg},
+                          );
+
+                          if (context.mounted) {
+                            showErrorSnackbar(
+                              context,
+                              l10n.auth_google_sign_in_failed,
+                            );
+                          }
+                        } else {
+                          // User likely cancelled the sign-in flow
+                          await analytics.trackEvent(
+                            eventName: 'auth_google_cancelled',
+                          );
                         }
-                      } else {
-                        // Track cancelled/failed Google sign-in
-                        await analytics.trackEvent(
-                          eventName: 'auth_google_cancelled',
-                        );
+                        return;
+                      }
+
+                      // Track successful Google sign-in
+                      // Note: We don't have user email/name directly from AuthSuccess
+                      // It needs to be fetched from the server separately
+                      await analytics.trackEvent(
+                        eventName: 'auth_google_success',
+                        properties: {
+                          'email': 'google_user',
+                          'user_name': 'Google User',
+                        },
+                      );
+
+                      // Update session state
+                      // For Google sign-in, we'll use a placeholder name and fetch the real info later
+                      if (context.mounted) {
+                        ref.read(sessionProvider.notifier).setState(
+                              SessionState.logged(
+                                user: UserModel(
+                                  email: 'google_user@google.com',
+                                  userName: 'Google User',
+                                  imageUrl: null,
+                                ),
+                              ),
+                            );
                       }
                     } catch (e) {
                       // Track Google sign-in failure
