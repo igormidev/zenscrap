@@ -102,7 +102,13 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
 
   Future<void> sendMessage(String userPrompt) async {
     final sessionUuid = state.mapOrNull(standard: (value) => value.sessionUuid);
-    if (sessionUuid == null) return;
+    if (sessionUuid == null) {
+      talker.warning('[ThinkingStream] Cannot send message - no session UUID');
+      return;
+    }
+
+    talker.info('[ThinkingStream] Sending message for session: $sessionUuid');
+    final messageStartTime = DateTime.now();
 
     final language = ref.read(currentLanguageProvider);
     await ref
@@ -111,6 +117,7 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
         .sendPromptMessage(sessionId: sessionUuid, userPrompt: userPrompt, language: language)
         .toRawResult(
       (Stream<String> llmThinkingStream) {
+        talker.debug('[ThinkingStream] Stream started for session: $sessionUuid');
         _aiCurrentThinkingSubscription = llmThinkingStream.listen(
             (thinking) {
               state.mapOrNull(standard: (value) {
@@ -121,6 +128,12 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
               });
             },
             onDone: () {
+              final duration = DateTime.now().difference(messageStartTime);
+              talker.info(
+                '[ThinkingStream] Stream completed normally\n'
+                '  Session: $sessionUuid\n'
+                '  Duration: ${duration.inSeconds}s',
+              );
               _aiCurrentThinkingSubscription?.cancel();
               state.mapOrNull(standard: (value) {
                 Clipboard.setData(ClipboardData(
@@ -129,16 +142,47 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
               });
             },
             cancelOnError: true,
-            onError: (error) {
+            onError: (error, stackTrace) {
+              final duration = DateTime.now().difference(messageStartTime);
+              final errorType = error.runtimeType.toString();
+              final errorMessage = error.toString();
+
+              talker.error(
+                '[ThinkingStream] Stream error occurred\n'
+                '  Session: $sessionUuid\n'
+                '  Duration: ${duration.inSeconds}s\n'
+                '  Error type: $errorType\n'
+                '  Error message: $errorMessage',
+                error,
+                stackTrace,
+              );
+
               if (error is ZenScrapException) {
                 state = ScrapChatSessionState.withError(error: error);
               } else {
-                state =
-                    ScrapChatSessionState.withError(error: defaultException);
+                // Check for connection-related errors
+                final errorStringLower = errorMessage.toLowerCase();
+                final isConnectionError =
+                    errorStringLower.contains('connection') ||
+                        errorStringLower.contains('websocket') ||
+                        errorStringLower.contains('closed') ||
+                        errorStringLower.contains('socket');
+                state = ScrapChatSessionState.withError(
+                  error: isConnectionError
+                      ? connectionClosedException
+                      : defaultException,
+                );
               }
             });
       },
-      (failure) => state = ScrapChatSessionState.withError(error: failure),
+      (failure) {
+        talker.error(
+          '[ThinkingStream] Failed to start stream\n'
+          '  Session: $sessionUuid\n'
+          '  Failure: ${failure.title} - ${failure.description}',
+        );
+        state = ScrapChatSessionState.withError(error: failure);
+      },
     );
   }
 
@@ -386,12 +430,80 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
 
     await sessionResult.fold((createdSessionResponse) async {
       try {
+        final sessionStartTime = DateTime.now();
+        talker.info(
+          '[ChatStream] Starting stream subscription for session: ${createdSessionResponse.sessionId}',
+        );
+
         _chatResponseSubscription = ref
             .read(clientProvider)
             .scrappableChatSession
             .listenToScrappableRedraftSession(
                 sessionUuid: createdSessionResponse.sessionId, language: language)
-            .listen(onChange);
+            .listen(
+          (response) {
+            talker.debug(
+              '[ChatStream] Received response type: ${response.runtimeType}',
+            );
+            onChange(response);
+          },
+          onError: (error, stackTrace) {
+            final sessionDuration = DateTime.now().difference(sessionStartTime);
+            final errorType = error.runtimeType.toString();
+            final errorMessage = error.toString();
+
+            // Comprehensive error logging for diagnosis
+            talker.error(
+              '[ChatStream] Stream error occurred\n'
+              '  Session ID: ${createdSessionResponse.sessionId}\n'
+              '  Session duration: ${sessionDuration.inSeconds}s\n'
+              '  Error type: $errorType\n'
+              '  Error message: $errorMessage\n'
+              '  Current state type: ${state.runtimeType}',
+              error,
+              stackTrace,
+            );
+
+            // Log specific error characteristics for debugging
+            if (error is Error) {
+              talker.warning('[ChatStream] Error is a Dart Error (not Exception)');
+            }
+            if (errorMessage.contains('WebSocket') ||
+                errorMessage.contains('websocket')) {
+              talker.warning('[ChatStream] WebSocket-related error detected');
+            }
+            if (errorMessage.contains('closed') ||
+                errorMessage.contains('Closed')) {
+              talker.warning('[ChatStream] Connection closure detected');
+            }
+
+            if (error is ZenScrapException) {
+              state = ScrapChatSessionState.withError(error: error);
+            } else {
+              // Check if this is a connection closed error (WebSocket disconnect)
+              final errorStringLower = errorMessage.toLowerCase();
+              final isConnectionError =
+                  errorStringLower.contains('connection') ||
+                      errorStringLower.contains('websocket') ||
+                      errorStringLower.contains('closed') ||
+                      errorStringLower.contains('socket');
+              state = ScrapChatSessionState.withError(
+                error: isConnectionError
+                    ? connectionClosedException
+                    : defaultException,
+              );
+            }
+          },
+          onDone: () {
+            final sessionDuration = DateTime.now().difference(sessionStartTime);
+            talker.info(
+              '[ChatStream] Stream closed normally\n'
+              '  Session ID: ${createdSessionResponse.sessionId}\n'
+              '  Session duration: ${sessionDuration.inSeconds}s',
+            );
+          },
+          cancelOnError: false, // Don't cancel on error, let error handler manage state
+        );
 
         final Duration timeUntilExpire = createdSessionResponse.expiresIn;
         final DateTime expirationDate = DateTime.now().add(timeUntilExpire);
