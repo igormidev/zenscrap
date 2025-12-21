@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
+import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 
 /// Enumeration of all possible authentication error types.
@@ -248,6 +249,14 @@ class AuthErrorMapper {
     if (error is InvalidEmailException) {
       return AuthError(
         type: AuthErrorType.invalidEmailFormat,
+        originalError: error,
+      );
+    }
+
+    // EmailAlreadyRegisteredException - custom exception for duplicate email
+    if (error is EmailAlreadyRegisteredException) {
+      return AuthError(
+        type: AuthErrorType.emailAlreadyExists,
         originalError: error,
       );
     }
