@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart';
+import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 
 /// Enumeration of all possible authentication error types.
@@ -199,6 +200,7 @@ class AuthErrorMapper {
   /// - A String error message
   /// - An Exception object
   /// - A ServerpodException
+  /// - Serverpod 3.x auth exceptions (EmailAccountLoginException, etc.)
   /// - Any other error object
   ///
   /// [context] provides additional context about where the error occurred,
@@ -217,9 +219,37 @@ class AuthErrorMapper {
       // ignore: avoid_print
       print('[AuthErrorMapper] Mapping error: $error');
       // ignore: avoid_print
+      print('[AuthErrorMapper] Error type: ${error.runtimeType}');
+      // ignore: avoid_print
       print('[AuthErrorMapper] Error string: $errorString');
       // ignore: avoid_print
       print('[AuthErrorMapper] Context: $context');
+    }
+
+    // Handle Serverpod 3.x specific auth exceptions first
+    // These are the typed exceptions from serverpod_auth_idp_client
+
+    // EmailAccountLoginException - login failures (wrong password, rate limit)
+    if (error is EmailAccountLoginException) {
+      return _mapEmailLoginException(error);
+    }
+
+    // EmailAccountRequestException - registration failures
+    if (error is EmailAccountRequestException) {
+      return _mapEmailRequestException(error);
+    }
+
+    // EmailAccountPasswordResetException - password reset failures
+    if (error is EmailAccountPasswordResetException) {
+      return _mapPasswordResetException(error);
+    }
+
+    // InvalidEmailException - email format validation error
+    if (error is InvalidEmailException) {
+      return AuthError(
+        type: AuthErrorType.invalidEmailFormat,
+        originalError: error,
+      );
     }
 
     // Check for ServerpodException
@@ -247,6 +277,84 @@ class AuthErrorMapper {
 
     // Map based on context and error message patterns
     return _mapByPattern(errorString, error, context);
+  }
+
+  /// Maps EmailAccountLoginException to AuthError.
+  /// This handles Serverpod 3.x login-specific errors.
+  static AuthError _mapEmailLoginException(EmailAccountLoginException error) {
+    return switch (error.reason) {
+      EmailAccountLoginExceptionReason.invalidCredentials => AuthError(
+          type: AuthErrorType.invalidCredentials,
+          originalError: error,
+        ),
+      EmailAccountLoginExceptionReason.tooManyAttempts => AuthError(
+          type: AuthErrorType.loginRateLimited,
+          originalError: error,
+          suggestTryLater: true,
+        ),
+      EmailAccountLoginExceptionReason.unknown => AuthError(
+          type: AuthErrorType.unknown,
+          originalError: error,
+        ),
+    };
+  }
+
+  /// Maps EmailAccountRequestException to AuthError.
+  /// This handles Serverpod 3.x registration-specific errors.
+  static AuthError _mapEmailRequestException(
+      EmailAccountRequestException error) {
+    return switch (error.reason) {
+      EmailAccountRequestExceptionReason.expired => AuthError(
+          type: AuthErrorType.expiredVerificationCode,
+          originalError: error,
+        ),
+      EmailAccountRequestExceptionReason.invalid => AuthError(
+          type: AuthErrorType.invalidVerificationCode,
+          originalError: error,
+        ),
+      EmailAccountRequestExceptionReason.policyViolation => AuthError(
+          type: AuthErrorType.weakPassword,
+          originalError: error,
+        ),
+      EmailAccountRequestExceptionReason.tooManyAttempts => AuthError(
+          type: AuthErrorType.verificationRateLimited,
+          originalError: error,
+          suggestTryLater: true,
+        ),
+      EmailAccountRequestExceptionReason.unknown => AuthError(
+          type: AuthErrorType.unknown,
+          originalError: error,
+        ),
+    };
+  }
+
+  /// Maps EmailAccountPasswordResetException to AuthError.
+  /// This handles Serverpod 3.x password reset-specific errors.
+  static AuthError _mapPasswordResetException(
+      EmailAccountPasswordResetException error) {
+    return switch (error.reason) {
+      EmailAccountPasswordResetExceptionReason.expired => AuthError(
+          type: AuthErrorType.passwordResetCodeExpired,
+          originalError: error,
+        ),
+      EmailAccountPasswordResetExceptionReason.invalid => AuthError(
+          type: AuthErrorType.passwordResetCodeInvalid,
+          originalError: error,
+        ),
+      EmailAccountPasswordResetExceptionReason.policyViolation => AuthError(
+          type: AuthErrorType.weakPassword,
+          originalError: error,
+        ),
+      EmailAccountPasswordResetExceptionReason.tooManyAttempts => AuthError(
+          type: AuthErrorType.passwordResetRateLimited,
+          originalError: error,
+          suggestTryLater: true,
+        ),
+      EmailAccountPasswordResetExceptionReason.unknown => AuthError(
+          type: AuthErrorType.unknown,
+          originalError: error,
+        ),
+    };
   }
 
   /// Maps error messages from EmailAuthController's errorMessage property.
@@ -479,12 +587,18 @@ class AuthErrorMapper {
       'limit exceeded',
       'throttle',
       'throttled',
+      // Serverpod 3.x patterns
+      'toomanyattempts', // EmailAccountLoginExceptionReason.tooManyAttempts
+      'too many failed login attempts',
+      'too many failed registration attempts',
+      'too many failed password reset attempts',
     ];
     return patterns.any((pattern) => errorString.contains(pattern));
   }
 
   static bool _matchesInvalidCredentialsPattern(String errorString) {
     final patterns = [
+      // Generic credential patterns
       'invalid credentials',
       'invalid password',
       'wrong password',
@@ -499,6 +613,12 @@ class AuthErrorMapper {
       'login failed',
       'invalid login',
       'unauthorized',
+      // Serverpod 3.x UserFacingException messages (from convertToUserFacingException)
+      'invalid email or password',
+      'please check your credentials',
+      // Serverpod 3.x exception reason names (when toString() is called)
+      'invalidcredentials', // EmailAccountLoginExceptionReason.invalidCredentials
+      'emailaccountloginexception',
     ];
     return patterns.any((pattern) => errorString.contains(pattern));
   }
@@ -525,6 +645,11 @@ class AuthErrorMapper {
       'code invalid',
       'verification failed',
       'code mismatch',
+      // Serverpod 3.x patterns
+      'invalid verification code',
+      'please check and try again',
+      'emailaccountrequestexception',
+      'emailaccountpasswordresetexception',
     ];
     return patterns.any((pattern) => errorString.contains(pattern));
   }
@@ -536,6 +661,10 @@ class AuthErrorMapper {
       'verification expired',
       'token expired',
       'link expired',
+      // Serverpod 3.x patterns
+      'verification code has expired',
+      'password reset code has expired',
+      'please request a new one',
     ];
     return patterns.any((pattern) => errorString.contains(pattern));
   }
@@ -549,6 +678,10 @@ class AuthErrorMapper {
       'password should',
       'stronger password',
       'password strength',
+      // Serverpod 3.x patterns
+      'policyviolation', // EmailAccountRequestExceptionReason.policyViolation
+      'does not meet the requirements',
+      'choose a different password',
     ];
     return patterns.any((pattern) => errorString.contains(pattern));
   }
