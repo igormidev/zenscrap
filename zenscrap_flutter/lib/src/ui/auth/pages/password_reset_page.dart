@@ -40,7 +40,7 @@ class PasswordResetPage extends ConsumerWidget {
           ]),
         ),
       ],
-      children: [
+      aboveChildren: [
         Text(
           l10n.auth_verification_code_info,
           style: Theme.of(context).textTheme.bodyLarge,

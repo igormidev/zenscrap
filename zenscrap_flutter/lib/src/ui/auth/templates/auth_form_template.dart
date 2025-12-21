@@ -16,11 +16,15 @@ class AuthFormTemplate<T> extends ConsumerStatefulWidget {
   final String submitText;
   final Future<T?> Function(List<String> items) onSubmit;
   final FutureOr<void> Function(T data) onSubmitSuccess;
-  final List<Widget> children;
+  /// Widgets displayed above the submit button (e.g., informational text)
+  final List<Widget> aboveChildren;
+  /// Widgets displayed below the submit button (e.g., alternative auth options like Google)
+  final List<Widget> belowChildren;
   const AuthFormTemplate({
     super.key,
     required this.items,
-    this.children = const [],
+    this.aboveChildren = const [],
+    this.belowChildren = const [],
     required this.submitText,
     required this.onSubmit,
     required this.onSubmitSuccess,
@@ -96,11 +100,12 @@ class _AuthFormTemplateState<T> extends ConsumerState<AuthFormTemplate<T>> {
               ),
               SizedBox(height: itemSpacing),
             ],
-            ...widget.children,
+            ...widget.aboveChildren,
             _SubmitButton(
               submitText: widget.submitText,
               onPressed: _validateForms,
             ),
+            ...widget.belowChildren,
             SizedBox(height: itemSpacing),
           ],
         ),

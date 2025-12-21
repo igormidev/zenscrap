@@ -154,7 +154,7 @@ class LoginPage extends ConsumerWidget {
           return null;
         }
       },
-      children: const [
+      belowChildren: const [
         SizedBox(height: 8),
         ZenScrapGoogleSignInButton(),
         SizedBox(height: 16),

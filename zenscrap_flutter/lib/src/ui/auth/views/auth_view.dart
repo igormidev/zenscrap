@@ -552,8 +552,8 @@ class _DesktopAuthLayout extends StatelessWidget {
                   // Animated height container for auth form
                   AnimatedContainer(
                     height: switch (selectedAuthPage) {
-                      SelectedAuthPage.login => 300,
-                      SelectedAuthPage.signIn => 440,
+                      SelectedAuthPage.login => 400,
+                      SelectedAuthPage.signIn => 520,
                       SelectedAuthPage.passwordReset => 270,
                     },
                     duration: const Duration(milliseconds: 700),

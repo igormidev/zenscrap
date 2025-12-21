@@ -131,13 +131,20 @@ class _ZenScrapGoogleSignInButtonState
 
                       // Small delay to allow the async state update to propagate
                       // The GoogleAuthController updates state asynchronously after signIn()
-                      await Future.delayed(const Duration(milliseconds: 50));
+                      await Future.delayed(const Duration(milliseconds: 100));
+
+                      // Check if widget is still mounted after async operation
+                      if (!mounted) return;
 
                       // Check the controller's isAuthenticated property (not client.auth.isAuthenticated)
                       // This is updated by the GoogleAuthController after signIn() completes
                       final isAuthenticated = _googleAuthController!.isAuthenticated;
 
                       if (!isAuthenticated) {
+                        // Reset loading state immediately when not authenticated
+                        // This handles the case where user cancelled or an error occurred
+                        setState(() => _isLoading = false);
+
                         // Check if there was an error or if user cancelled
                         final errorMsg = _googleAuthController!.errorMessage;
                         if (errorMsg != null) {
@@ -165,6 +172,10 @@ class _ZenScrapGoogleSignInButtonState
                           );
                           // Don't show dialog for cancelled sign-in, it's a user choice
                         }
+
+                        // Dispose and nullify the controller to reset its state
+                        _googleAuthController?.dispose();
+                        _googleAuthController = null;
                         return;
                       }
 

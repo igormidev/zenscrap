@@ -128,7 +128,7 @@ class ConfirmEmailPage extends ConsumerWidget {
           return null;
         }
       },
-      children: [
+      aboveChildren: [
         Text(
           l10n.auth_check_email(email),
           style: context.t.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
