@@ -11,6 +11,7 @@ import 'package:zenscrap_server/src/core/scraping_bee.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_config.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_openai_sdk_impl.dart';
 import 'package:zenscrap_server/src/future_calls/cleanup_expired_ip_spending_future_call.dart';
+import 'package:zenscrap_server/src/future_calls/email_idp_cleanup_future_call.dart';
 import 'package:zenscrap_server/src/future_calls/monthly_subscription_credits_future_call.dart';
 import 'package:zenscrap_server/src/endpoints/public/scrappable_chat_session.dart';
 import 'package:zenscrap_server/src/routes/scrappable_api_route.dart';
@@ -144,6 +145,10 @@ void run(List<String> args) async {
     CleanupExpiredIpSpendingFutureCall(),
     CleanupExpiredIpSpendingFutureCall.callName,
   );
+  pod.registerFutureCall(
+    EmailIdpCleanupFutureCall(),
+    EmailIdpCleanupFutureCall.callName,
+  );
 
   // Start the server.
   await pod.start();
@@ -172,6 +177,7 @@ void run(List<String> args) async {
   await pod.cancelFutureCall('periodicCleanupOldAnalyticsDetails');
   await pod.cancelFutureCall('periodicAutoFixBrokenScrappables');
   await pod.cancelFutureCall(CleanupExpiredIpSpendingFutureCall.callName);
+  await pod.cancelFutureCall(EmailIdpCleanupFutureCall.callName);
 
   // Schedule future calls only if not applying migrations
   // (when applying migrations, the future call tables may not exist yet)
@@ -208,5 +214,15 @@ void run(List<String> args) async {
     null,
     const Duration(minutes: 5), // Initial delay to let server fully initialize
     identifier: CleanupExpiredIpSpendingFutureCall.callName,
+  );
+
+  // Schedule periodic cleanup of expired email authentication data
+  // Runs daily to delete expired account requests, password reset requests,
+  // and failed login attempts older than 30 days
+  await pod.futureCallWithDelay(
+    EmailIdpCleanupFutureCall.callName,
+    null,
+    const Duration(minutes: 10), // Initial delay to let server fully initialize
+    identifier: EmailIdpCleanupFutureCall.callName,
   );
 }
