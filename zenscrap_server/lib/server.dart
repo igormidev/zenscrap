@@ -43,6 +43,13 @@ void run(List<String> args) async {
         secretHashPepper: pod.getPassword('emailSecretHashPepper')!,
         sendRegistrationVerificationCode: onSendRegistrationVerificationCode,
         sendPasswordResetVerificationCode: onSendPasswordResetVerificationCode,
+        passwordValidationFunction: (password) {
+          if (password.length < 8 || password.length > 64) return false;
+          if (!password.contains(RegExp(r'[A-Z]'))) return false;
+          if (!password.contains(RegExp(r'[a-z]'))) return false;
+          if (!password.contains(RegExp(r'[0-9]'))) return false;
+          return true;
+        },
       ),
     ],
   );
