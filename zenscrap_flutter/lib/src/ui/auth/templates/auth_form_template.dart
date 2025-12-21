@@ -12,7 +12,8 @@ import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 final Lock _authLock = Lock();
 
 class AuthFormTemplate<T> extends ConsumerStatefulWidget {
-  final List<AuthFormItem> items;
+  /// Form elements - can be single [AuthFormItem] or [AuthFormRow] for side-by-side fields
+  final List<AuthFormElement> items;
   final String submitText;
   final Future<T?> Function(List<String> items) onSubmit;
   final FutureOr<void> Function(T data) onSubmitSuccess;
@@ -40,9 +41,18 @@ class _AuthFormTemplateState<T> extends ConsumerState<AuthFormTemplate<T>> {
   final List<TextEditingController> _controllers = [];
   final List<ValueNotifier<bool?>?> _isObscureText = [];
 
+  /// Flattens [AuthFormElement] list to get all individual [AuthFormItem]s
+  /// Maintains order for correct controller indexing (important for cross-field validation)
+  List<AuthFormItem> get _flatItems => widget.items.expand((element) {
+        return switch (element) {
+          AuthFormItem item => [item],
+          AuthFormRow row => row.items,
+        };
+      }).toList();
+
   @override
   void initState() {
-    for (final item in widget.items) {
+    for (final item in _flatItems) {
       _controllers.add(TextEditingController());
       if (item.obscureText) {
         _isObscureText.add(ValueNotifier(false));
@@ -73,6 +83,8 @@ class _AuthFormTemplateState<T> extends ConsumerState<AuthFormTemplate<T>> {
       expanded: 24.0,
     );
     final itemSpacing = context.responsiveValue(compact: 12.0, expanded: 16.0);
+    final flatItems = _flatItems;
+    final totalFlatItems = flatItems.length;
 
     return Form(
       key: _formKey,
@@ -82,24 +94,12 @@ class _AuthFormTemplateState<T> extends ConsumerState<AuthFormTemplate<T>> {
           padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           children: [
             SizedBox(height: itemSpacing),
-            for (var i = 0; i < widget.items.length; i++) ...[
-              _AuthFormField(
-                item: widget.items[i],
-                controller: _controllers[i],
-                isObscureText: _isObscureText[i],
-                isLast: i == widget.items.length - 1,
-                allControllers: _controllers,
-                onEditingComplete: () {
-                  final isLast = i == widget.items.length - 1;
-                  if (isLast) {
-                    _validateForms();
-                  } else {
-                    FocusScope.of(context).nextFocus();
-                  }
-                },
-              ),
-              SizedBox(height: itemSpacing),
-            ],
+            ..._buildFormElements(
+              context: context,
+              flatItems: flatItems,
+              totalFlatItems: totalFlatItems,
+              itemSpacing: itemSpacing,
+            ),
             ...widget.aboveChildren,
             _SubmitButton(
               submitText: widget.submitText,
@@ -109,6 +109,114 @@ class _AuthFormTemplateState<T> extends ConsumerState<AuthFormTemplate<T>> {
             SizedBox(height: itemSpacing),
           ],
         ),
+      ),
+    );
+  }
+
+  /// Builds form elements handling both single items and rows
+  List<Widget> _buildFormElements({
+    required BuildContext context,
+    required List<AuthFormItem> flatItems,
+    required int totalFlatItems,
+    required double itemSpacing,
+  }) {
+    final widgets = <Widget>[];
+    var flatIndex = 0;
+
+    for (final element in widget.items) {
+      switch (element) {
+        case AuthFormItem():
+          widgets.add(
+            _buildSingleField(
+              context: context,
+              flatIndex: flatIndex,
+              totalFlatItems: totalFlatItems,
+            ),
+          );
+          widgets.add(SizedBox(height: itemSpacing));
+          flatIndex++;
+
+        case AuthFormRow():
+          widgets.add(
+            _buildRowFields(
+              context: context,
+              row: element,
+              startFlatIndex: flatIndex,
+              totalFlatItems: totalFlatItems,
+              itemSpacing: itemSpacing,
+            ),
+          );
+          widgets.add(SizedBox(height: itemSpacing));
+          flatIndex += element.items.length;
+      }
+    }
+
+    return widgets;
+  }
+
+  /// Builds a single form field
+  Widget _buildSingleField({
+    required BuildContext context,
+    required int flatIndex,
+    required int totalFlatItems,
+  }) {
+    final item = _flatItems[flatIndex];
+    final isLast = flatIndex == totalFlatItems - 1;
+
+    return _AuthFormField(
+      item: item,
+      controller: _controllers[flatIndex],
+      isObscureText: _isObscureText[flatIndex],
+      isLast: isLast,
+      allControllers: _controllers,
+      onEditingComplete: () {
+        if (isLast) {
+          _validateForms();
+        } else {
+          FocusScope.of(context).nextFocus();
+        }
+      },
+    );
+  }
+
+  /// Builds a row of fields - side-by-side on expanded, stacked on compact
+  Widget _buildRowFields({
+    required BuildContext context,
+    required AuthFormRow row,
+    required int startFlatIndex,
+    required int totalFlatItems,
+    required double itemSpacing,
+  }) {
+    final fields = <Widget>[];
+    for (var i = 0; i < row.items.length; i++) {
+      fields.add(
+        _buildSingleField(
+          context: context,
+          flatIndex: startFlatIndex + i,
+          totalFlatItems: totalFlatItems,
+        ),
+      );
+    }
+
+    return context.responsiveValue(
+      // Compact: Stack vertically with spacing
+      compact: Column(
+        children: [
+          for (var i = 0; i < fields.length; i++) ...[
+            fields[i],
+            if (i < fields.length - 1) SizedBox(height: itemSpacing),
+          ],
+        ],
+      ),
+      // Expanded: Side-by-side in a row
+      expanded: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (var i = 0; i < fields.length; i++) ...[
+            if (i > 0) SizedBox(width: itemSpacing),
+            Expanded(child: fields[i]),
+          ],
+        ],
       ),
     );
   }
@@ -131,7 +239,13 @@ class _AuthFormTemplateState<T> extends ConsumerState<AuthFormTemplate<T>> {
   }
 }
 
-class AuthFormItem {
+/// Base class for form elements - can be a single item or a row of items
+sealed class AuthFormElement {
+  const AuthFormElement();
+}
+
+/// Single form field configuration
+class AuthFormItem extends AuthFormElement {
   final String hintText;
   final String labelText;
   final String? autofillHints;
@@ -148,6 +262,13 @@ class AuthFormItem {
     this.keyboardType,
     this.validatorWithItems,
   });
+}
+
+/// A row of form items displayed side-by-side on expanded screens
+/// On compact screens, items stack vertically for better usability
+class AuthFormRow extends AuthFormElement {
+  final List<AuthFormItem> items;
+  const AuthFormRow({required this.items});
 }
 
 /// Individual form field widget with proper touch target sizing

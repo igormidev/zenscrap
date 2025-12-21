@@ -62,24 +62,30 @@ class SignInPage extends ConsumerWidget {
             FormBuilderValidators.maxLength(55),
           ]),
         ),
-        AuthFormItem(
-          hintText: l10n.auth_password_hint,
-          labelText: l10n.auth_password_label,
-          autofillHints: AutofillHints.password,
-          keyboardType: TextInputType.visiblePassword,
-          obscureText: true,
-          validator: FormBuilderValidators.password(maxLength: 64),
-        ),
-        AuthFormItem(
-          hintText: l10n.auth_confirm_password_hint,
-          labelText: l10n.auth_confirm_password_label,
-          autofillHints: AutofillHints.password,
-          obscureText: true,
-          validatorWithItems: (value, currItensState) {
-            return FormBuilderValidators.password(
-              maxLength: 64,
-            ).and(FormBuilderValidators.equal(currItensState[2]))(value);
-          },
+        // Password fields displayed side-by-side on expanded screens
+        AuthFormRow(
+          items: [
+            AuthFormItem(
+              hintText: l10n.auth_password_hint,
+              labelText: l10n.auth_password_label,
+              autofillHints: AutofillHints.password,
+              keyboardType: TextInputType.visiblePassword,
+              obscureText: true,
+              validator: FormBuilderValidators.password(maxLength: 64),
+            ),
+            AuthFormItem(
+              hintText: l10n.auth_confirm_password_hint,
+              labelText: l10n.auth_confirm_password_label,
+              autofillHints: AutofillHints.password,
+              obscureText: true,
+              // Note: currItensState[2] still works because flat index is preserved
+              validatorWithItems: (value, currItensState) {
+                return FormBuilderValidators.password(
+                  maxLength: 64,
+                ).and(FormBuilderValidators.equal(currItensState[2]))(value);
+              },
+            ),
+          ],
         ),
       ],
       onSubmitSuccess: (email) {
