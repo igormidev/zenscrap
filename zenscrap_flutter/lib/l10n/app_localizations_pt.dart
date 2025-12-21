@@ -1352,6 +1352,31 @@ class AppLocalizationsPt extends AppLocalizations {
       'Google sign-in failed. Please try again or use email.';
 
   @override
+  String get email_typo_dialog_header => 'Did you mean?';
+
+  @override
+  String get email_typo_dialog_title =>
+      'We noticed a possible typo in your email address';
+
+  @override
+  String get email_typo_you_typed => 'You typed';
+
+  @override
+  String get email_typo_did_you_mean => 'Did you mean';
+
+  @override
+  String get email_typo_use_suggestion => 'Yes, use corrected email';
+
+  @override
+  String get email_typo_keep_original => 'No, I typed it correctly';
+
+  @override
+  String get auth_go_back => 'Go back';
+
+  @override
+  String get auth_change_email => 'Change email';
+
+  @override
   String get dashboard_app_title => 'Zen scrap';
 
   @override
@@ -3435,6 +3460,31 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   @override
   String get auth_google_sign_in_failed =>
       'Falha ao entrar com Google. Por favor, tente novamente ou use e-mail.';
+
+  @override
+  String get email_typo_dialog_header => 'Você quis dizer?';
+
+  @override
+  String get email_typo_dialog_title =>
+      'Notamos um possível erro de digitação no seu email';
+
+  @override
+  String get email_typo_you_typed => 'Você digitou';
+
+  @override
+  String get email_typo_did_you_mean => 'Você quis dizer';
+
+  @override
+  String get email_typo_use_suggestion => 'Sim, usar email corrigido';
+
+  @override
+  String get email_typo_keep_original => 'Não, eu digitei corretamente';
+
+  @override
+  String get auth_go_back => 'Voltar';
+
+  @override
+  String get auth_change_email => 'Mudar email';
 
   @override
   String get dashboard_app_title => 'Zen scrap';

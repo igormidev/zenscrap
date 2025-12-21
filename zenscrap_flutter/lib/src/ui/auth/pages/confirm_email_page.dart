@@ -1,5 +1,6 @@
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
@@ -15,11 +16,13 @@ class ConfirmEmailPage extends ConsumerWidget {
   final EmailAuthController emailAuth;
   final String email;
   final Future<void> Function() onSuccessChangePassword;
+  final VoidCallback? onGoBack;
   const ConfirmEmailPage({
     super.key,
     required this.emailAuth,
     required this.email,
     required this.onSuccessChangePassword,
+    this.onGoBack,
   });
 
   @override
@@ -133,8 +136,53 @@ class ConfirmEmailPage extends ConsumerWidget {
           l10n.auth_check_email(email),
           style: context.t.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
+        if (onGoBack != null) ...[
+          const SizedBox(height: 8),
+          _ChangeEmailButton(onPressed: onGoBack!, l10n: l10n),
+        ],
         const SizedBox(height: 16),
       ],
     );
+  }
+}
+
+/// A stylized button to go back and change email address.
+class _ChangeEmailButton extends StatelessWidget {
+  final VoidCallback onPressed;
+  final AppLocalizations l10n;
+
+  const _ChangeEmailButton({
+    required this.onPressed,
+    required this.l10n,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return TextButton.icon(
+      onPressed: onPressed,
+      icon: Icon(
+        Icons.arrow_back_rounded,
+        size: 18,
+        color: colorScheme.primary,
+      ),
+      label: Text(
+        l10n.auth_change_email,
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: colorScheme.primary,
+              fontWeight: FontWeight.w500,
+            ),
+      ),
+      style: TextButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    )
+        .animate()
+        .fadeIn(duration: 300.ms, delay: 200.ms)
+        .slideX(begin: -0.1, end: 0, duration: 300.ms, delay: 200.ms);
   }
 }

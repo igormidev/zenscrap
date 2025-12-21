@@ -2503,6 +2503,54 @@ abstract class AppLocalizations {
   /// **'Google sign-in failed. Please try again or use email.'**
   String get auth_google_sign_in_failed;
 
+  /// Header for email typo correction dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Did you mean?'**
+  String get email_typo_dialog_header;
+
+  /// Title explaining the typo detection
+  ///
+  /// In en, this message translates to:
+  /// **'We noticed a possible typo in your email address'**
+  String get email_typo_dialog_title;
+
+  /// Label for the original email entered
+  ///
+  /// In en, this message translates to:
+  /// **'You typed'**
+  String get email_typo_you_typed;
+
+  /// Label for the suggested correction
+  ///
+  /// In en, this message translates to:
+  /// **'Did you mean'**
+  String get email_typo_did_you_mean;
+
+  /// Button to accept the suggested email
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, use corrected email'**
+  String get email_typo_use_suggestion;
+
+  /// Button to keep the original email
+  ///
+  /// In en, this message translates to:
+  /// **'No, I typed it correctly'**
+  String get email_typo_keep_original;
+
+  /// Button to go back to the previous screen
+  ///
+  /// In en, this message translates to:
+  /// **'Go back'**
+  String get auth_go_back;
+
+  /// Button to change the email address
+  ///
+  /// In en, this message translates to:
+  /// **'Change email'**
+  String get auth_change_email;
+
   /// Application title in dashboard appbar
   ///
   /// In en, this message translates to:

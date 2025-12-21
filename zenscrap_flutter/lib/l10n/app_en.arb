@@ -1762,6 +1762,39 @@
     "description": "Google sign in failed error message"
   },
 
+  "email_typo_dialog_header": "Did you mean?",
+  "@email_typo_dialog_header": {
+    "description": "Header for email typo correction dialog"
+  },
+  "email_typo_dialog_title": "We noticed a possible typo in your email address",
+  "@email_typo_dialog_title": {
+    "description": "Title explaining the typo detection"
+  },
+  "email_typo_you_typed": "You typed",
+  "@email_typo_you_typed": {
+    "description": "Label for the original email entered"
+  },
+  "email_typo_did_you_mean": "Did you mean",
+  "@email_typo_did_you_mean": {
+    "description": "Label for the suggested correction"
+  },
+  "email_typo_use_suggestion": "Yes, use corrected email",
+  "@email_typo_use_suggestion": {
+    "description": "Button to accept the suggested email"
+  },
+  "email_typo_keep_original": "No, I typed it correctly",
+  "@email_typo_keep_original": {
+    "description": "Button to keep the original email"
+  },
+  "auth_go_back": "Go back",
+  "@auth_go_back": {
+    "description": "Button to go back to the previous screen"
+  },
+  "auth_change_email": "Change email",
+  "@auth_change_email": {
+    "description": "Button to change the email address"
+  },
+
   "dashboard_app_title": "Zen scrap",
   "@dashboard_app_title": {
     "description": "Application title in dashboard appbar"

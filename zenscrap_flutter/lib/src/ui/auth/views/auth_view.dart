@@ -117,6 +117,14 @@ class _AuthViewState extends ConsumerState<AuthView>
     _tabController.animateTo(0);
   }
 
+  void _onGoBackFromConfirmEmail() {
+    // Clear the confirm email state to go back to the sign up form.
+    // Note: We intentionally do NOT clear PendingRegistrationData here,
+    // so the form will still have access to the userName and password
+    // if the user returns to the sign up form.
+    _isConfirmEmail.value = null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final scrapChatState = ref.watch(scrapChatProvider);
@@ -178,6 +186,7 @@ class _AuthViewState extends ConsumerState<AuthView>
                   onSuccessConfirmEmail: _onSuccessConfirmEmail,
                   onChangeToPasswordReset: _onChangeToPasswordReset,
                   onSuccessChangePassword: _onSuccessChangePassword,
+                  onGoBackFromConfirmEmail: _onGoBackFromConfirmEmail,
                   scrappable: scrappable,
                 ),
                 expanded: (context, constraints) => _DesktopAuthLayout(
@@ -189,6 +198,7 @@ class _AuthViewState extends ConsumerState<AuthView>
                   onSuccessConfirmEmail: _onSuccessConfirmEmail,
                   onChangeToPasswordReset: _onChangeToPasswordReset,
                   onSuccessChangePassword: _onSuccessChangePassword,
+                  onGoBackFromConfirmEmail: _onGoBackFromConfirmEmail,
                   selectedAuthPage: _selectedAuthPage,
                   scrappable: scrappable,
                 ),
@@ -211,6 +221,7 @@ class _AuthContainer extends StatelessWidget {
     required this.onSuccessConfirmEmail,
     required this.onChangeToPasswordReset,
     required this.onSuccessChangePassword,
+    this.onGoBackFromConfirmEmail,
   });
 
   final TabController tabController;
@@ -221,6 +232,7 @@ class _AuthContainer extends StatelessWidget {
   final Future<void> Function() onSuccessConfirmEmail;
   final void Function(String) onChangeToPasswordReset;
   final void Function() onSuccessChangePassword;
+  final VoidCallback? onGoBackFromConfirmEmail;
 
   @override
   Widget build(BuildContext context) {
@@ -318,6 +330,7 @@ class _AuthContainer extends StatelessWidget {
                               emailAuth: emailAuth,
                               email: haveEmail ? email : '',
                               onSuccessChangePassword: onSuccessConfirmEmail,
+                              onGoBack: onGoBackFromConfirmEmail,
                             ),
                           ),
                         ),
@@ -408,6 +421,7 @@ class _MobileAuthLayout extends StatelessWidget {
   final Future<void> Function() onSuccessConfirmEmail;
   final void Function(String) onChangeToPasswordReset;
   final void Function() onSuccessChangePassword;
+  final VoidCallback onGoBackFromConfirmEmail;
   final Scrappable? scrappable;
 
   const _MobileAuthLayout({
@@ -419,6 +433,7 @@ class _MobileAuthLayout extends StatelessWidget {
     required this.onSuccessConfirmEmail,
     required this.onChangeToPasswordReset,
     required this.onSuccessChangePassword,
+    required this.onGoBackFromConfirmEmail,
     this.scrappable,
   });
 
@@ -467,6 +482,7 @@ class _MobileAuthLayout extends StatelessWidget {
                       onSuccessConfirmEmail: onSuccessConfirmEmail,
                       onChangeToPasswordReset: onChangeToPasswordReset,
                       onSuccessChangePassword: onSuccessChangePassword,
+                      onGoBackFromConfirmEmail: onGoBackFromConfirmEmail,
                     ),
                   ),
                   // Scrappable indicator if available
@@ -501,6 +517,7 @@ class _DesktopAuthLayout extends StatelessWidget {
   final Future<void> Function() onSuccessConfirmEmail;
   final void Function(String) onChangeToPasswordReset;
   final void Function() onSuccessChangePassword;
+  final VoidCallback onGoBackFromConfirmEmail;
   final SelectedAuthPage selectedAuthPage;
   final Scrappable? scrappable;
 
@@ -513,6 +530,7 @@ class _DesktopAuthLayout extends StatelessWidget {
     required this.onSuccessConfirmEmail,
     required this.onChangeToPasswordReset,
     required this.onSuccessChangePassword,
+    required this.onGoBackFromConfirmEmail,
     required this.selectedAuthPage,
     this.scrappable,
   });
@@ -571,6 +589,7 @@ class _DesktopAuthLayout extends StatelessWidget {
                               onSuccessConfirmEmail: onSuccessConfirmEmail,
                               onChangeToPasswordReset: onChangeToPasswordReset,
                               onSuccessChangePassword: onSuccessChangePassword,
+                              onGoBackFromConfirmEmail: onGoBackFromConfirmEmail,
                             ),
                           );
                         },
@@ -626,9 +645,9 @@ double _calculateAuthContainerHeight({
   required bool isInPasswordResetFlow,
 }) {
   // When in verification code flow (Sign Up confirmation), use smaller height
-  // since only one field is shown
+  // since only one field is shown (plus the "Change email" button)
   if (isInVerificationFlow) {
-    return 250;
+    return 290;
   }
 
   // When in password reset code flow, use height for 3 fields

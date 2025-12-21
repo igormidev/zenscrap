@@ -404,6 +404,15 @@
   "auth_google_sign_in_description": "Entre ou crie uma conta com Google",
   "auth_google_sign_in_failed": "Falha ao entrar com Google. Por favor, tente novamente ou use e-mail.",
 
+  "email_typo_dialog_header": "Você quis dizer?",
+  "email_typo_dialog_title": "Notamos um possível erro de digitação no seu email",
+  "email_typo_you_typed": "Você digitou",
+  "email_typo_did_you_mean": "Você quis dizer",
+  "email_typo_use_suggestion": "Sim, usar email corrigido",
+  "email_typo_keep_original": "Não, eu digitei corretamente",
+  "auth_go_back": "Voltar",
+  "auth_change_email": "Mudar email",
+
   "dashboard_app_title": "Zen scrap",
   "dashboard_nav_your_endpoints": "Seus endpoints",
   "dashboard_nav_marketplace": "Marketplace",

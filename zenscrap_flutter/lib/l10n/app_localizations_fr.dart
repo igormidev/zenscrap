@@ -1378,6 +1378,31 @@ class AppLocalizationsFr extends AppLocalizations {
       'Echec de la connexion Google. Veuillez reessayer ou utiliser l\'e-mail.';
 
   @override
+  String get email_typo_dialog_header => 'Did you mean?';
+
+  @override
+  String get email_typo_dialog_title =>
+      'We noticed a possible typo in your email address';
+
+  @override
+  String get email_typo_you_typed => 'You typed';
+
+  @override
+  String get email_typo_did_you_mean => 'Did you mean';
+
+  @override
+  String get email_typo_use_suggestion => 'Yes, use corrected email';
+
+  @override
+  String get email_typo_keep_original => 'No, I typed it correctly';
+
+  @override
+  String get auth_go_back => 'Go back';
+
+  @override
+  String get auth_change_email => 'Change email';
+
+  @override
   String get dashboard_app_title => 'Zen scrap';
 
   @override

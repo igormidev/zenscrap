@@ -6,7 +6,9 @@ import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/ui/auth/templates/auth_form_template.dart';
 import 'package:zenscrap_flutter/src/ui/auth/utils/auth_error_mapper.dart';
+import 'package:zenscrap_flutter/src/ui/auth/utils/email_typo_detector.dart';
 import 'package:zenscrap_flutter/src/ui/auth/widgets/auth_error_dialog.dart';
+import 'package:zenscrap_flutter/src/ui/auth/widgets/email_typo_dialog.dart';
 import 'package:zenscrap_flutter/src/ui/auth/widgets/google_sign_in_button.dart';
 
 /// Stores pending registration data between startRegistration and finishRegistration.
@@ -93,8 +95,29 @@ class SignInPage extends ConsumerWidget {
       },
       onSubmit: (List<String> items) async {
         final String userName = items[0];
-        final String email = items[1];
+        String email = items[1];
         final String password = items[2];
+
+        // Check for email typos before proceeding
+        final typoResult = EmailTypoDetector.detectTypo(email);
+        if (typoResult != null && context.mounted) {
+          final dialogResult = await showEmailTypoDialog(
+            context: context,
+            typoResult: typoResult,
+          );
+
+          if (dialogResult == null ||
+              dialogResult == EmailTypoDialogResult.cancel) {
+            // User cancelled the dialog
+            return null;
+          }
+
+          if (dialogResult == EmailTypoDialogResult.useSuggested) {
+            // User accepted the suggested correction
+            email = typoResult.suggestedEmail;
+          }
+          // If keepOriginal, continue with the original email
+        }
 
         // Track sign up attempt
         await analytics.trackAuthSignUpAttempt(
