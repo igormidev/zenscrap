@@ -51,6 +51,25 @@ void run(List<String> args) async {
           if (!password.contains(RegExp(r'[0-9]'))) return false;
           return true;
         },
+        // Rate limiting configuration
+        // Failed login: 5 attempts per 15 minutes (more lenient than default 5 per 5 min)
+        failedLoginRateLimit: RateLimit(
+          maxAttempts: 5,
+          timeframe: Duration(minutes: 15),
+        ),
+        // Password reset: 3 attempts per hour (same as default)
+        maxPasswordResetAttempts: RateLimit(
+          maxAttempts: 3,
+          timeframe: Duration(hours: 1),
+        ),
+        // Registration verification: 30 minutes lifetime, 5 attempts
+        // (more lenient than default 15 min, 3 attempts)
+        registrationVerificationCodeLifetime: Duration(minutes: 30),
+        registrationVerificationCodeAllowedAttempts: 5,
+        // Password reset verification: 30 minutes lifetime, 5 attempts
+        // (more lenient than default 15 min, 3 attempts)
+        passwordResetVerificationCodeLifetime: Duration(minutes: 30),
+        passwordResetVerificationCodeAllowedAttempts: 5,
         // Security monitoring callbacks
         onAfterAccountCreated: (
           session, {
