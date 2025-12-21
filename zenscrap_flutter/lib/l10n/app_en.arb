@@ -2555,5 +2555,178 @@
         "type": "String"
       }
     }
+  },
+
+  "authErrorInvalidCredentialsTitle": "Login Failed",
+  "@authErrorInvalidCredentialsTitle": {
+    "description": "Title for invalid credentials error dialog"
+  },
+  "authErrorInvalidCredentialsDescription": "The email or password you entered is incorrect. Please check your credentials and try again.",
+  "@authErrorInvalidCredentialsDescription": {
+    "description": "Description for invalid credentials error"
+  },
+  "authErrorAccountNotFoundDescription": "We couldn't find an account with this email address. Please check the email or create a new account.",
+  "@authErrorAccountNotFoundDescription": {
+    "description": "Description for account not found error"
+  },
+  "authErrorAccountLockedTitle": "Account Locked",
+  "@authErrorAccountLockedTitle": {
+    "description": "Title for locked/disabled account error"
+  },
+  "authErrorAccountDisabledDescription": "Your account has been disabled. Please contact support for assistance.",
+  "@authErrorAccountDisabledDescription": {
+    "description": "Description for disabled account error"
+  },
+  "authErrorAccountLockedDescription": "Your account has been temporarily locked due to security concerns. Please try again later or contact support.",
+  "@authErrorAccountLockedDescription": {
+    "description": "Description for locked account error"
+  },
+  "authErrorEmailExistsTitle": "Email Already Registered",
+  "@authErrorEmailExistsTitle": {
+    "description": "Title for email already exists error"
+  },
+  "authErrorEmailExistsDescription": "An account with this email address already exists. Please try logging in instead, or use a different email.",
+  "@authErrorEmailExistsDescription": {
+    "description": "Description for email already exists error"
+  },
+  "authErrorInvalidCodeTitle": "Invalid Code",
+  "@authErrorInvalidCodeTitle": {
+    "description": "Title for invalid verification code error"
+  },
+  "authErrorInvalidCodeDescription": "The verification code you entered is incorrect. Please check the code in your email and try again.",
+  "@authErrorInvalidCodeDescription": {
+    "description": "Description for invalid verification code error"
+  },
+  "authErrorExpiredCodeTitle": "Code Expired",
+  "@authErrorExpiredCodeTitle": {
+    "description": "Title for expired verification code error"
+  },
+  "authErrorExpiredCodeDescription": "This verification code has expired. Please request a new code and try again.",
+  "@authErrorExpiredCodeDescription": {
+    "description": "Description for expired verification code error"
+  },
+  "authErrorWeakPasswordTitle": "Password Too Weak",
+  "@authErrorWeakPasswordTitle": {
+    "description": "Title for weak password error"
+  },
+  "authErrorWeakPasswordDescription": "Please choose a stronger password. Use at least 8 characters with a mix of letters, numbers, and symbols.",
+  "@authErrorWeakPasswordDescription": {
+    "description": "Description for weak password error"
+  },
+  "authErrorInvalidEmailTitle": "Invalid Email",
+  "@authErrorInvalidEmailTitle": {
+    "description": "Title for invalid email format error"
+  },
+  "authErrorInvalidEmailDescription": "Please enter a valid email address.",
+  "@authErrorInvalidEmailDescription": {
+    "description": "Description for invalid email format error"
+  },
+  "authErrorRateLimitedTitle": "Too Many Attempts",
+  "@authErrorRateLimitedTitle": {
+    "description": "Title for rate limited error"
+  },
+  "authErrorTooManyAttemptsDescription": "You've made too many attempts. Please wait a few minutes before trying again.",
+  "@authErrorTooManyAttemptsDescription": {
+    "description": "Description for too many attempts error"
+  },
+  "authErrorLoginRateLimitedDescription": "Too many login attempts. Please wait a few minutes before trying again.",
+  "@authErrorLoginRateLimitedDescription": {
+    "description": "Description for login rate limited error"
+  },
+  "authErrorVerificationRateLimitedDescription": "Too many verification attempts. Please wait a few minutes before trying again.",
+  "@authErrorVerificationRateLimitedDescription": {
+    "description": "Description for verification rate limited error"
+  },
+  "authErrorPasswordResetCodeInvalidDescription": "The password reset code you entered is incorrect. Please check the code in your email and try again.",
+  "@authErrorPasswordResetCodeInvalidDescription": {
+    "description": "Description for invalid password reset code error"
+  },
+  "authErrorPasswordResetCodeExpiredDescription": "This password reset code has expired. Please request a new password reset and try again.",
+  "@authErrorPasswordResetCodeExpiredDescription": {
+    "description": "Description for expired password reset code error"
+  },
+  "authErrorPasswordResetRateLimitedDescription": "Too many password reset attempts. Please wait a few minutes before trying again.",
+  "@authErrorPasswordResetRateLimitedDescription": {
+    "description": "Description for password reset rate limited error"
+  },
+  "authErrorGoogleCancelledTitle": "Sign-In Cancelled",
+  "@authErrorGoogleCancelledTitle": {
+    "description": "Title for Google sign-in cancelled"
+  },
+  "authErrorGoogleCancelledDescription": "Google sign-in was cancelled. You can try again or use email sign-in instead.",
+  "@authErrorGoogleCancelledDescription": {
+    "description": "Description for Google sign-in cancelled"
+  },
+  "authErrorGoogleFailedTitle": "Google Sign-In Failed",
+  "@authErrorGoogleFailedTitle": {
+    "description": "Title for Google sign-in failed"
+  },
+  "authErrorGoogleFailedDescription": "We couldn't complete Google sign-in. Please try again or use email sign-in.",
+  "@authErrorGoogleFailedDescription": {
+    "description": "Description for Google sign-in failed"
+  },
+  "authErrorGoogleNotVerifiedTitle": "Account Not Verified",
+  "@authErrorGoogleNotVerifiedTitle": {
+    "description": "Title for Google account not verified"
+  },
+  "authErrorGoogleNotVerifiedDescription": "Your Google account email is not verified. Please verify your Google account and try again.",
+  "@authErrorGoogleNotVerifiedDescription": {
+    "description": "Description for Google account not verified"
+  },
+  "authErrorGoogleDomainRestrictedTitle": "Domain Not Allowed",
+  "@authErrorGoogleDomainRestrictedTitle": {
+    "description": "Title for Google account domain restricted"
+  },
+  "authErrorGoogleDomainRestrictedDescription": "Sign-in is restricted to specific email domains. Please use an allowed email address.",
+  "@authErrorGoogleDomainRestrictedDescription": {
+    "description": "Description for Google account domain restricted"
+  },
+  "authErrorNetworkTitle": "Connection Error",
+  "@authErrorNetworkTitle": {
+    "description": "Title for network error"
+  },
+  "authErrorNetworkDescription": "Unable to connect to the server. Please check your internet connection and try again.",
+  "@authErrorNetworkDescription": {
+    "description": "Description for network error"
+  },
+  "authErrorConnectionRefusedDescription": "Could not reach the server. Please check your internet connection and try again.",
+  "@authErrorConnectionRefusedDescription": {
+    "description": "Description for connection refused error"
+  },
+  "authErrorServerTitle": "Server Error",
+  "@authErrorServerTitle": {
+    "description": "Title for server error"
+  },
+  "authErrorServerDescription": "Something went wrong on our end. Please try again later. If the problem persists, contact support.",
+  "@authErrorServerDescription": {
+    "description": "Description for server error"
+  },
+  "authErrorTimeoutTitle": "Request Timeout",
+  "@authErrorTimeoutTitle": {
+    "description": "Title for timeout error"
+  },
+  "authErrorTimeoutDescription": "The request took too long. Please check your connection and try again.",
+  "@authErrorTimeoutDescription": {
+    "description": "Description for timeout error"
+  },
+  "authErrorUnknownTitle": "Something Went Wrong",
+  "@authErrorUnknownTitle": {
+    "description": "Title for unknown error"
+  },
+  "authErrorUnknownDescription": "An unexpected error occurred. Please try again. If the problem continues, contact support.",
+  "@authErrorUnknownDescription": {
+    "description": "Description for unknown error"
+  },
+  "authErrorButtonTryAgain": "Try Again",
+  "@authErrorButtonTryAgain": {
+    "description": "Button text for try again"
+  },
+  "authErrorButtonTryLater": "Try Later",
+  "@authErrorButtonTryLater": {
+    "description": "Button text for try later"
+  },
+  "authErrorButtonOk": "OK",
+  "@authErrorButtonOk": {
+    "description": "Button text for OK"
   }
 }

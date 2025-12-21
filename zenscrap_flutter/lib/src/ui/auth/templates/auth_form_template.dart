@@ -68,10 +68,7 @@ class _AuthFormTemplateState<T> extends ConsumerState<AuthFormTemplate<T>> {
       medium: 20.0,
       expanded: 24.0,
     );
-    final itemSpacing = context.responsiveValue(
-      compact: 12.0,
-      expanded: 16.0,
-    );
+    final itemSpacing = context.responsiveValue(compact: 12.0, expanded: 16.0);
 
     return Form(
       key: _formKey,
@@ -104,6 +101,7 @@ class _AuthFormTemplateState<T> extends ConsumerState<AuthFormTemplate<T>> {
               submitText: widget.submitText,
               onPressed: _validateForms,
             ),
+            SizedBox(height: itemSpacing),
           ],
         ),
       ),
@@ -190,7 +188,10 @@ class _AuthFormField extends StatelessWidget {
             // Responsive content padding for proper touch target on mobile
             contentPadding: context.responsiveValue(
               compact: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              expanded: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              expanded: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 12,
+              ),
             ),
             hintText: item.hintText,
             labelText: item.labelText,
@@ -210,7 +211,8 @@ class _AuthFormField extends StatelessWidget {
                     ),
                   ),
           ),
-          validator: item.validator ??
+          validator:
+              item.validator ??
               (text) {
                 return item.validatorWithItems?.call(
                   text,
@@ -228,10 +230,7 @@ class _SubmitButton extends ConsumerWidget {
   final String submitText;
   final VoidCallback onPressed;
 
-  const _SubmitButton({
-    required this.submitText,
-    required this.onPressed,
-  });
+  const _SubmitButton({required this.submitText, required this.onPressed});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -240,10 +239,7 @@ class _SubmitButton extends ConsumerWidget {
         return SizedBox(
           width: double.infinity,
           // Minimum 48px height for mobile touch target, larger on desktop
-          height: context.responsiveValue(
-            compact: 52.0,
-            expanded: 48.0,
-          ),
+          height: context.responsiveValue(compact: 52.0, expanded: 48.0),
           child: FilledButton(
             onPressed: isGlobalLoadingActive ? null : onPressed,
             style: FilledButton.styleFrom(
@@ -258,7 +254,8 @@ class _SubmitButton extends ConsumerWidget {
                 : Text(
                     submitText,
                     style: context.responsiveValue(
-                      compact: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      compact: Theme.of(context).textTheme.titleMedium
+                          ?.copyWith(
                             color: Theme.of(context).colorScheme.onPrimary,
                           ),
                       expanded: null, // Use default button text style

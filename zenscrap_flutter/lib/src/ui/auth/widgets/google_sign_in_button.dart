@@ -4,12 +4,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
-import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 import 'package:zenscrap_flutter/src/states/session/user_model.dart';
+import 'package:zenscrap_flutter/src/ui/auth/utils/auth_error_mapper.dart';
+import 'package:zenscrap_flutter/src/ui/auth/widgets/auth_error_dialog.dart';
 
 /// Google Sign-In button that handles both login and account creation.
 /// If the user has an account, it logs them in. If not, it creates an account.
@@ -147,9 +148,14 @@ class _ZenScrapGoogleSignInButtonState
                           );
 
                           if (context.mounted) {
-                            showErrorSnackbar(
-                              context,
-                              l10n.auth_google_sign_in_failed,
+                            // Map the error and show beautiful error dialog
+                            final authError = AuthErrorMapper.mapError(
+                              errorMsg,
+                              context: AuthContext.googleSignIn,
+                            );
+                            await showAuthErrorDialog(
+                              context: context,
+                              error: authError,
                             );
                           }
                         } else {
@@ -157,6 +163,7 @@ class _ZenScrapGoogleSignInButtonState
                           await analytics.trackEvent(
                             eventName: 'auth_google_cancelled',
                           );
+                          // Don't show dialog for cancelled sign-in, it's a user choice
                         }
                         return;
                       }
@@ -199,9 +206,14 @@ class _ZenScrapGoogleSignInButtonState
                       );
 
                       if (context.mounted) {
-                        showErrorSnackbar(
-                          context,
-                          l10n.auth_google_sign_in_failed,
+                        // Map the exception and show beautiful error dialog
+                        final authError = AuthErrorMapper.mapError(
+                          e,
+                          context: AuthContext.googleSignIn,
+                        );
+                        await showAuthErrorDialog(
+                          context: context,
+                          error: authError,
                         );
                       }
                     } finally {

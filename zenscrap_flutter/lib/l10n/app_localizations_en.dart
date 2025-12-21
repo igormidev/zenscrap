@@ -1950,4 +1950,157 @@ class AppLocalizationsEn extends AppLocalizations {
   String common_auto_translated(String language) {
     return 'Auto-translated from $language';
   }
+
+  @override
+  String get authErrorInvalidCredentialsTitle => 'Login Failed';
+
+  @override
+  String get authErrorInvalidCredentialsDescription =>
+      'The email or password you entered is incorrect. Please check your credentials and try again.';
+
+  @override
+  String get authErrorAccountNotFoundDescription =>
+      'We couldn\'t find an account with this email address. Please check the email or create a new account.';
+
+  @override
+  String get authErrorAccountLockedTitle => 'Account Locked';
+
+  @override
+  String get authErrorAccountDisabledDescription =>
+      'Your account has been disabled. Please contact support for assistance.';
+
+  @override
+  String get authErrorAccountLockedDescription =>
+      'Your account has been temporarily locked due to security concerns. Please try again later or contact support.';
+
+  @override
+  String get authErrorEmailExistsTitle => 'Email Already Registered';
+
+  @override
+  String get authErrorEmailExistsDescription =>
+      'An account with this email address already exists. Please try logging in instead, or use a different email.';
+
+  @override
+  String get authErrorInvalidCodeTitle => 'Invalid Code';
+
+  @override
+  String get authErrorInvalidCodeDescription =>
+      'The verification code you entered is incorrect. Please check the code in your email and try again.';
+
+  @override
+  String get authErrorExpiredCodeTitle => 'Code Expired';
+
+  @override
+  String get authErrorExpiredCodeDescription =>
+      'This verification code has expired. Please request a new code and try again.';
+
+  @override
+  String get authErrorWeakPasswordTitle => 'Password Too Weak';
+
+  @override
+  String get authErrorWeakPasswordDescription =>
+      'Please choose a stronger password. Use at least 8 characters with a mix of letters, numbers, and symbols.';
+
+  @override
+  String get authErrorInvalidEmailTitle => 'Invalid Email';
+
+  @override
+  String get authErrorInvalidEmailDescription =>
+      'Please enter a valid email address.';
+
+  @override
+  String get authErrorRateLimitedTitle => 'Too Many Attempts';
+
+  @override
+  String get authErrorTooManyAttemptsDescription =>
+      'You\'ve made too many attempts. Please wait a few minutes before trying again.';
+
+  @override
+  String get authErrorLoginRateLimitedDescription =>
+      'Too many login attempts. Please wait a few minutes before trying again.';
+
+  @override
+  String get authErrorVerificationRateLimitedDescription =>
+      'Too many verification attempts. Please wait a few minutes before trying again.';
+
+  @override
+  String get authErrorPasswordResetCodeInvalidDescription =>
+      'The password reset code you entered is incorrect. Please check the code in your email and try again.';
+
+  @override
+  String get authErrorPasswordResetCodeExpiredDescription =>
+      'This password reset code has expired. Please request a new password reset and try again.';
+
+  @override
+  String get authErrorPasswordResetRateLimitedDescription =>
+      'Too many password reset attempts. Please wait a few minutes before trying again.';
+
+  @override
+  String get authErrorGoogleCancelledTitle => 'Sign-In Cancelled';
+
+  @override
+  String get authErrorGoogleCancelledDescription =>
+      'Google sign-in was cancelled. You can try again or use email sign-in instead.';
+
+  @override
+  String get authErrorGoogleFailedTitle => 'Google Sign-In Failed';
+
+  @override
+  String get authErrorGoogleFailedDescription =>
+      'We couldn\'t complete Google sign-in. Please try again or use email sign-in.';
+
+  @override
+  String get authErrorGoogleNotVerifiedTitle => 'Account Not Verified';
+
+  @override
+  String get authErrorGoogleNotVerifiedDescription =>
+      'Your Google account email is not verified. Please verify your Google account and try again.';
+
+  @override
+  String get authErrorGoogleDomainRestrictedTitle => 'Domain Not Allowed';
+
+  @override
+  String get authErrorGoogleDomainRestrictedDescription =>
+      'Sign-in is restricted to specific email domains. Please use an allowed email address.';
+
+  @override
+  String get authErrorNetworkTitle => 'Connection Error';
+
+  @override
+  String get authErrorNetworkDescription =>
+      'Unable to connect to the server. Please check your internet connection and try again.';
+
+  @override
+  String get authErrorConnectionRefusedDescription =>
+      'Could not reach the server. Please check your internet connection and try again.';
+
+  @override
+  String get authErrorServerTitle => 'Server Error';
+
+  @override
+  String get authErrorServerDescription =>
+      'Something went wrong on our end. Please try again later. If the problem persists, contact support.';
+
+  @override
+  String get authErrorTimeoutTitle => 'Request Timeout';
+
+  @override
+  String get authErrorTimeoutDescription =>
+      'The request took too long. Please check your connection and try again.';
+
+  @override
+  String get authErrorUnknownTitle => 'Something Went Wrong';
+
+  @override
+  String get authErrorUnknownDescription =>
+      'An unexpected error occurred. Please try again. If the problem continues, contact support.';
+
+  @override
+  String get authErrorButtonTryAgain => 'Try Again';
+
+  @override
+  String get authErrorButtonTryLater => 'Try Later';
+
+  @override
+  String get authErrorButtonOk => 'OK';
 }

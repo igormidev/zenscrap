@@ -4,9 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/dialog_message.dart';
-import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/ui/auth/templates/auth_form_template.dart';
+import 'package:zenscrap_flutter/src/ui/auth/utils/auth_error_mapper.dart';
+import 'package:zenscrap_flutter/src/ui/auth/widgets/auth_error_dialog.dart';
 
 class PasswordResetValidateCodePage extends ConsumerWidget {
   final EmailAuthController emailAuth;
@@ -91,7 +92,12 @@ class PasswordResetValidateCodePage extends ConsumerWidget {
           );
 
           if (context.mounted) {
-            showErrorSnackbar(context);
+            // Map the exception and show beautiful error dialog
+            final authError = AuthErrorMapper.mapError(
+              e,
+              context: AuthContext.passwordReset,
+            );
+            await showAuthErrorDialog(context: context, error: authError);
           }
           return null;
         }

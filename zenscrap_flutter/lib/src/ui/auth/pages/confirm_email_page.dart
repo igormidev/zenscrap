@@ -4,11 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
-import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/ui/auth/pages/sign_in_page.dart';
 import 'package:zenscrap_flutter/src/ui/auth/templates/auth_form_template.dart';
+import 'package:zenscrap_flutter/src/ui/auth/utils/auth_error_mapper.dart';
+import 'package:zenscrap_flutter/src/ui/auth/widgets/auth_error_dialog.dart';
 
 class ConfirmEmailPage extends ConsumerWidget {
   final EmailAuthController emailAuth;
@@ -83,7 +84,12 @@ class ConfirmEmailPage extends ConsumerWidget {
           PendingRegistrationData.clear();
 
           if (context.mounted) {
-            showErrorSnackbar(context);
+            // Map the exception and show beautiful error dialog
+            final authError = AuthErrorMapper.mapError(
+              e,
+              context: AuthContext.verification,
+            );
+            await showAuthErrorDialog(context: context, error: authError);
           }
           return null;
         }
