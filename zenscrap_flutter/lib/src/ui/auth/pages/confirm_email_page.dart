@@ -54,13 +54,28 @@ class ConfirmEmailPage extends ConsumerWidget {
 
           // Set the password from the stored pending data
           final password = PendingRegistrationData.password;
+          // DEBUG: Log password info for troubleshooting
+          debugPrint(
+            '[DEBUG] PendingRegistrationData.password is ${password == null ? "null" : "set (length: ${password.length})"}',
+          );
           if (password != null) {
             emailAuth.passwordController.text = password;
+            debugPrint(
+              '[DEBUG] passwordController.text set to password with length: ${password.length}',
+            );
+          } else {
+            debugPrint(
+              '[DEBUG] WARNING: PendingRegistrationData.password is null! '
+              'passwordController.text will be: "${emailAuth.passwordController.text}"',
+            );
           }
 
           // Complete the registration
           // Note: finishRegistration() in Serverpod 3.x automatically authenticates
           // the user after successful registration.
+          debugPrint(
+            '[DEBUG] About to call finishRegistration() with password length: ${emailAuth.passwordController.text.length}',
+          );
           await emailAuth.finishRegistration();
 
           // Clear the pending data

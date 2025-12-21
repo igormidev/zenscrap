@@ -69,21 +69,36 @@ class LoginPage extends ConsumerWidget {
         emailAuth.emailController.text = email;
         emailAuth.passwordController.text = password;
 
+        // DEBUG: Log login attempt info
+        debugPrint(
+          '[DEBUG] Login attempt - email: $email, password length: ${password.length}',
+        );
+        debugPrint(
+          '[DEBUG] passwordController.text length: ${emailAuth.passwordController.text.length}',
+        );
+
         try {
           // Attempt login using the new IDP system
-          // Note: login() does NOT throw on invalid credentials.
-          // Instead, it triggers onError callback and sets errorMessage.
+          // Note: login() catches exceptions internally via _guarded().
+          // It sets state to EmailAuthState.error on failure and
+          // EmailAuthState.authenticated on success.
           await emailAuth.login();
 
-          // Small delay to allow the async state update to propagate
-          // The EmailAuthController updates state asynchronously after login()
-          await Future.delayed(const Duration(milliseconds: 50));
+          // DEBUG: Log authentication state immediately after login()
+          debugPrint(
+            '[DEBUG] After login() - state: ${emailAuth.state}, '
+            'isAuthenticated: ${emailAuth.isAuthenticated}, '
+            'errorMessage: ${emailAuth.errorMessage}',
+          );
 
-          // Check the controller's isAuthenticated property (not client.auth.isAuthenticated)
-          // This is updated by the EmailAuthController after login() completes
-          final isAuthenticated = emailAuth.isAuthenticated;
+          // Check the state directly - this is more reliable than isAuthenticated
+          // because isAuthenticated reads from client.auth.isAuthenticated which
+          // may have timing issues, while state is updated synchronously by _guarded()
+          final state = emailAuth.state;
+          final isSuccess = state == EmailAuthState.authenticated;
+          final isError = state == EmailAuthState.error;
 
-          if (!isAuthenticated) {
+          if (isError || !isSuccess) {
             // Track login failure - use errorMessage if available
             final errorMsg = emailAuth.errorMessage ?? 'Invalid credentials';
             await analytics.trackAuthLoginFailure(
@@ -93,12 +108,16 @@ class LoginPage extends ConsumerWidget {
 
             if (context.mounted) {
               // Map the error and show beautiful error dialog
-              final authError = emailAuth.errorMessage != null
-                  ? AuthErrorMapper.mapControllerError(
-                      emailAuth.errorMessage,
-                      context: AuthContext.login,
-                    )
-                  : AuthErrorMapper.loginFailed();
+              // Use the actual error from the controller if available
+              final error = emailAuth.error;
+              final authError = error != null
+                  ? AuthErrorMapper.mapError(error, context: AuthContext.login)
+                  : (emailAuth.errorMessage != null
+                      ? AuthErrorMapper.mapControllerError(
+                          emailAuth.errorMessage,
+                          context: AuthContext.login,
+                        )
+                      : AuthErrorMapper.loginFailed());
               showAuthErrorDialog(context: context, error: authError);
             }
 
