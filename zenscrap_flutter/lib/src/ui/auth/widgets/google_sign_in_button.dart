@@ -161,26 +161,32 @@ class _ZenScrapGoogleSignInButtonState
                         return;
                       }
 
-                      // Track successful Google sign-in
-                      // Note: We don't have user email/name directly from AuthSuccess
-                      // It needs to be fetched from the server separately
+                      // Fetch real user profile from the server
+                      final userProfileResponse =
+                          await client.userProfile.getCurrentUserProfile();
+
+                      // Track successful Google sign-in with real user info
                       await analytics.trackEvent(
                         eventName: 'auth_google_success',
                         properties: {
-                          'email': 'google_user',
-                          'user_name': 'Google User',
+                          'email': userProfileResponse.email ?? 'unknown',
+                          'user_name': userProfileResponse.userName ??
+                              userProfileResponse.fullName ??
+                              'Google User',
                         },
                       );
 
-                      // Update session state
-                      // For Google sign-in, we'll use a placeholder name and fetch the real info later
+                      // Update session state with real user profile
                       if (context.mounted) {
                         ref.read(sessionProvider.notifier).setState(
                               SessionState.logged(
                                 user: UserModel(
-                                  email: 'google_user@google.com',
-                                  userName: 'Google User',
-                                  imageUrl: null,
+                                  email: userProfileResponse.email ??
+                                      'google_user@google.com',
+                                  userName: userProfileResponse.userName ??
+                                      userProfileResponse.fullName ??
+                                      'Google User',
+                                  imageUrl: userProfileResponse.imageUrl,
                                 ),
                               ),
                             );

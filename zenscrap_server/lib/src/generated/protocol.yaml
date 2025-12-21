@@ -10,6 +10,8 @@ googleIdp:
   - login:
 refreshJwtTokens:
   - refreshAccessToken:
+userProfile:
+  - getCurrentUserProfile:
 privateAccount:
   - getAccountInfo:
 privateAiUsage:
