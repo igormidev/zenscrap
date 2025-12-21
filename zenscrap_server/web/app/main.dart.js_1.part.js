@@ -1,15 +1,15 @@
 ((a,b)=>{a[b]=a[b]||{}})(self,"$__dart_deferred_initializers__")
 $__dart_deferred_initializers__.current=function(a,b,c,$){var B,A={
-c_a(d){B.mH(d)
-return new A.vs()},
-c_b(){B.mH("pt_BR")
+c_b(d){B.mH(d)
+return new A.vt()},
+c_c(){B.mH("pt_BR")
 return new A.zG()},
-vs:function vs(){},
+vt:function vt(){},
 zG:function zG(){}},C
 B=c[0]
 A=a.updateHolder(c[3],A)
 C=c[9]
-A.vs.prototype={
+A.vt.prototype={
 gCF(){return"Create Scrappable"},
 gCH(){return"How It Works"},
 gCE(){return"Auto-Fix"},
@@ -1102,7 +1102,7 @@ gwg(){return"Criar novo endpoint"},
 gBe(){return"Mostrar original"},
 gBf(){return"Mostrar traducao"}}
 var z=a.updateTypes([]);(function inheritance(){var y=a.inherit
-y(A.vs,C.fb)
-y(A.zG,A.vs)})()
-B.N1(b.typeUniverse,JSON.parse('{"vs":{"fb":[]},"zG":{"fb":[]}}'))};
-(a=>{a["9NHWosqm+6egtcgqM/j1bc/xsug="]=a.current})($__dart_deferred_initializers__);
+y(A.vt,C.fb)
+y(A.zG,A.vt)})()
+B.N1(b.typeUniverse,JSON.parse('{"vt":{"fb":[]},"zG":{"fb":[]}}'))};
+(a=>{a["CCc132Jt2qukeupTK07e4Cw1qbw="]=a.current})($__dart_deferred_initializers__);
