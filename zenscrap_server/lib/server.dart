@@ -51,6 +51,30 @@ void run(List<String> args) async {
           if (!password.contains(RegExp(r'[0-9]'))) return false;
           return true;
         },
+        // Security monitoring callbacks
+        onAfterAccountCreated: (
+          session, {
+          required email,
+          required authUserId,
+          required emailAccountId,
+          required transaction,
+        }) async {
+          session.log(
+            'New email account created: $email '
+            '(authUserId: $authUserId, emailAccountId: $emailAccountId)',
+            level: LogLevel.info,
+          );
+        },
+        onPasswordResetCompleted: (
+          session, {
+          required emailAccountId,
+          required transaction,
+        }) {
+          session.log(
+            'Password reset completed for emailAccountId: $emailAccountId',
+            level: LogLevel.info,
+          );
+        },
       ),
     ],
   );
