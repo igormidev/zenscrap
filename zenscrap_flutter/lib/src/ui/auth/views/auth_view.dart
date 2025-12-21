@@ -312,10 +312,7 @@ class _AuthContainer extends StatelessWidget {
                           child: Container(
                             decoration: BoxDecoration(
                               color: Theme.of(context).colorScheme.onPrimary,
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(20),
-                                topRight: Radius.circular(20),
-                              ),
+                              borderRadius: BorderRadius.circular(20),
                             ),
                             child: ConfirmEmailPage(
                               emailAuth: emailAuth,
@@ -341,10 +338,7 @@ class _AuthContainer extends StatelessWidget {
                           child: Container(
                             decoration: BoxDecoration(
                               color: Theme.of(context).colorScheme.onPrimary,
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(20),
-                                topRight: Radius.circular(20),
-                              ),
+                              borderRadius: BorderRadius.circular(20),
                             ),
                             child: PasswordResetValidateCodePage(
                               key: ValueKey(email),
@@ -553,7 +547,7 @@ class _DesktopAuthLayout extends StatelessWidget {
                   AnimatedContainer(
                     height: switch (selectedAuthPage) {
                       SelectedAuthPage.login => 400,
-                      SelectedAuthPage.signIn => 520,
+                      SelectedAuthPage.signIn => 465,
                       SelectedAuthPage.passwordReset => 270,
                     },
                     duration: const Duration(milliseconds: 700),
