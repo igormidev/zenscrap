@@ -860,6 +860,13 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
               _cacheScrappingBeeExtractLogic[sessionId] =
                   chatResponse.scrappingBeeExtractLogic;
             }
+          } else if (chatResponse is UpdatedScrappableRequestResponse) {
+            // Handle request-only updates (when AI modifies request but not extract rules)
+            final updatedRequest = chatResponse.scrappableRequest;
+            if (updatedRequest != null &&
+                _cacheScrappableRequest.containsKey(sessionId)) {
+              _cacheScrappableRequest[sessionId] = updatedRequest;
+            }
           }
         });
 

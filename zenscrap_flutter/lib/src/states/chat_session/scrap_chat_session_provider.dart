@@ -168,13 +168,17 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
     if (chatResponse is UpdatedScrappableRequestResponse) {
       state.mapOrNull(
         standard: (value) {
-          state = value.copyWith(
-            data: value.data.copyWith(
-              targetRequest: value.data.targetRequest?.copyWith(
+          // Use the full ScrappableRequest if available (from AI-driven updates),
+          // otherwise fall back to individual fields (for manual endpoint updates)
+          final updatedRequest = chatResponse.scrappableRequest ??
+              value.data.targetRequest?.copyWith(
                 url: chatResponse.url,
                 pathParams: chatResponse.pathParams,
                 queryParams: chatResponse.queryParams,
-              ),
+              );
+          state = value.copyWith(
+            data: value.data.copyWith(
+              targetRequest: updatedRequest,
             ),
           );
         },
