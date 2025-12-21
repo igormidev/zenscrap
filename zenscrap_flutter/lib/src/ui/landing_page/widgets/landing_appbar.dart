@@ -71,10 +71,7 @@ class LandingAppBar extends StatelessWidget {
               medium: 24.0,
               expanded: 32.0,
             ),
-            vertical: context.responsiveValue(
-              compact: 12.0,
-              expanded: 16.0,
-            ),
+            vertical: context.responsiveValue(compact: 12.0, expanded: 16.0),
           ),
           decoration: BoxDecoration(
             color: isScrolled
@@ -146,10 +143,7 @@ class _MobileAppBarContent extends StatelessWidget {
   final VoidCallback? onMenuTap;
   final VoidCallback? onSignInTap;
 
-  const _MobileAppBarContent({
-    this.onMenuTap,
-    this.onSignInTap,
-  });
+  const _MobileAppBarContent({this.onMenuTap, this.onSignInTap});
 
   @override
   Widget build(BuildContext context) {
@@ -161,20 +155,15 @@ class _MobileAppBarContent extends StatelessWidget {
         // Language selector (compact)
         SizedBox(
           height: 34,
-          child: const LanguageSelector(),
+          child: const LanguageSelector(compact: true),
         ).animate().fadeIn(duration: 400.ms, delay: 150.ms),
-        const SizedBox(width: 8),
-        // Login button
-        _LoginButton(onTap: onSignInTap),
         const SizedBox(width: 8),
         // Hamburger menu button
         IconButton(
           onPressed: onMenuTap,
           icon: const Icon(Icons.menu_rounded),
           tooltip: 'Menu',
-          style: IconButton.styleFrom(
-            foregroundColor: context.c.onSurface,
-          ),
+          style: IconButton.styleFrom(foregroundColor: context.c.onSurface),
         ).animate().fadeIn(duration: 400.ms, delay: 200.ms),
       ],
     );
