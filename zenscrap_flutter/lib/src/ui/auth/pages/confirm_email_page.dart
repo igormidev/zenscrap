@@ -70,8 +70,19 @@ class ConfirmEmailPage extends ConsumerWidget {
           // with their new credentials rather than being auto-logged in.
           // Sign out immediately so the user can log in manually.
           // This provides a cleaner UX where the user confirms their credentials work.
+          //
+          // Note: We wrap signOutDevice() in its own try-catch because:
+          // 1. The registration has already succeeded at this point
+          // 2. signOutDevice() may throw if the session wasn't fully established yet
+          //    (race condition between finishRegistration completing and session sync)
+          // 3. We don't want a sign-out failure to show an error when registration worked
           final client = ref.read(clientProvider);
-          await client.auth.signOutDevice();
+          try {
+            await client.auth.signOutDevice();
+          } catch (e) {
+            // Ignore sign-out errors - registration already succeeded
+            // The user will just be logged in, which is also fine
+          }
 
           // Track successful email confirmation
           await analytics.trackAuthEmailConfirmationSuccess(email: email);
