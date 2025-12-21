@@ -13,6 +13,7 @@ import 'package:zenscrap_flutter/src/core/utils/custom_talker_riverpod_observer.
 import 'package:zenscrap_flutter/src/core/utils/devide_utils.dart';
 import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 import 'package:zenscrap_flutter/src/core/web/url_strategy.dart';
+import 'package:zenscrap_flutter/src/providers/auth_state_sync_provider.dart';
 import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 import 'package:zenscrap_flutter/src/providers/go_router_providers.dart';
 import 'package:zenscrap_flutter/src/providers/language_provider.dart';
@@ -151,6 +152,10 @@ class MyApp extends ConsumerStatefulWidget {
 class _MyAppState extends ConsumerState<MyApp> {
   @override
   Widget build(BuildContext context) {
+    // Initialize auth state sync provider early to listen for external auth changes
+    // (e.g., token expiration, sign-out from another device)
+    ref.watch(authStateSyncProvider);
+
     ref.listen(sessionProvider, (previous, next) {
       Future.delayed(const Duration(milliseconds: 300), () {
         next.mapOrNull(
