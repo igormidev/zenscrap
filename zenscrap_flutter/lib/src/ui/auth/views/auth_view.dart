@@ -161,9 +161,9 @@ class _AuthViewState extends ConsumerState<AuthView>
                 },
               ),
             ).animate().fadeIn(
-                  duration: const Duration(seconds: 1),
-                  delay: const Duration(milliseconds: 800),
-                ),
+              duration: const Duration(seconds: 1),
+              delay: const Duration(milliseconds: 800),
+            ),
             // Terms of Service and Privacy Policy links - bottom right corner
             _LegalLinksFooter(),
             // Main content with responsive layout
@@ -256,8 +256,14 @@ class _AuthContainer extends StatelessWidget {
                       child: TabBar(
                         controller: tabController,
                         tabs: [
-                          Tab(text: l10n.auth_login_tab, icon: Icon(Icons.login)),
-                          Tab(text: l10n.auth_sign_up_tab, icon: Icon(Icons.person_add)),
+                          Tab(
+                            text: l10n.auth_login_tab,
+                            icon: Icon(Icons.login),
+                          ),
+                          Tab(
+                            text: l10n.auth_sign_up_tab,
+                            icon: Icon(Icons.person_add),
+                          ),
                           Tab(
                             text: l10n.auth_password_reset_tab,
                             icon: Icon(Icons.vpn_key),
@@ -377,18 +383,20 @@ class _LegalLinksFooter extends StatelessWidget {
         children: [
           TermsOfServiceLink(
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.grey[600],
-                  decoration: TextDecoration.underline,
-                  decorationColor: Colors.grey[600],
-                ),
+              color: Colors.grey[600],
+              decoration: TextDecoration.underline,
+              decorationColor: Colors.grey[600],
+            ),
           ),
-          SizedBox(width: context.responsiveValue(compact: 12.0, expanded: 16.0)),
+          SizedBox(
+            width: context.responsiveValue(compact: 12.0, expanded: 16.0),
+          ),
           PrivacyPolicyLink(
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.grey[600],
-                  decoration: TextDecoration.underline,
-                  decorationColor: Colors.grey[600],
-                ),
+              color: Colors.grey[600],
+              decoration: TextDecoration.underline,
+              decorationColor: Colors.grey[600],
+            ),
           ),
         ],
       ),
@@ -443,16 +451,12 @@ class _MobileAuthLayout extends StatelessWidget {
           // Form section
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 16,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Back button and title row
-                  if (context.canPop())
-                    _BackButton(),
+                  if (context.canPop()) _BackButton(),
                   Text(
                     l10n.auth_welcome,
                     style: Theme.of(context).textTheme.headlineMedium,
@@ -531,10 +535,7 @@ class _DesktopAuthLayout extends StatelessWidget {
           // Left side - Form section
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 40,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
@@ -586,15 +587,16 @@ class _DesktopAuthLayout extends StatelessWidget {
             child: Center(
               child: AspectRatio(
                 aspectRatio: 1,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Lottie.network(
-                    'https://lottie.host/6778c6b9-32ee-401c-bc8f-97eea151b1df/U3LT3t31Wa.lottie',
-                    decoder: customDecoder,
-                    width: double.maxFinite,
-                    fit: BoxFit.fitWidth,
-                  ),
-                ).animate().fadeIn(
+                child:
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Lottie.network(
+                        'https://lottie.host/6778c6b9-32ee-401c-bc8f-97eea151b1df/U3LT3t31Wa.lottie',
+                        decoder: customDecoder,
+                        width: double.maxFinite,
+                        fit: BoxFit.fitWidth,
+                      ),
+                    ).animate().fadeIn(
                       duration: const Duration(seconds: 1),
                       delay: const Duration(milliseconds: 200),
                     ),

@@ -79,15 +79,6 @@ class EndpointEmailIdp extends _i1.EndpointEmailIdpBase {
   @override
   String get name => 'emailIdp';
 
-  /// Logs in the user and returns a new session.
-  ///
-  /// Throws an [EmailAccountLoginException] in case of errors, with reason:
-  /// - [EmailAccountLoginExceptionReason.invalidCredentials] if the email or
-  ///   password is incorrect.
-  /// - [EmailAccountLoginExceptionReason.tooManyAttempts] if there have been
-  ///   too many failed login attempts.
-  ///
-  /// Throws an [AuthUserBlockedException] if the auth user is blocked.
   @override
   _i3.Future<_i4.AuthSuccess> login({
     required String email,
@@ -97,6 +88,19 @@ class EndpointEmailIdp extends _i1.EndpointEmailIdpBase {
     'login',
     {
       'email': email,
+      'password': password,
+    },
+  );
+
+  @override
+  _i3.Future<_i4.AuthSuccess> finishRegistration({
+    required String registrationToken,
+    required String password,
+  }) => caller.callServerEndpoint<_i4.AuthSuccess>(
+    'emailIdp',
+    'finishRegistration',
+    {
+      'registrationToken': registrationToken,
       'password': password,
     },
   );
@@ -139,33 +143,6 @@ class EndpointEmailIdp extends _i1.EndpointEmailIdpBase {
     {
       'accountRequestId': accountRequestId,
       'verificationCode': verificationCode,
-    },
-  );
-
-  /// Completes a new account registration, creating a new auth user with a
-  /// profile and attaching the given email account to it.
-  ///
-  /// Throws an [EmailAccountRequestException] in case of errors, with reason:
-  /// - [EmailAccountRequestExceptionReason.expired] if the account request has
-  ///   already expired.
-  /// - [EmailAccountRequestExceptionReason.policyViolation] if the password
-  ///   does not comply with the password policy.
-  /// - [EmailAccountRequestExceptionReason.invalid] if the [registrationToken]
-  ///   is invalid.
-  ///
-  /// Throws an [AuthUserBlockedException] if the auth user is blocked.
-  ///
-  /// Returns a session for the newly created user.
-  @override
-  _i3.Future<_i4.AuthSuccess> finishRegistration({
-    required String registrationToken,
-    required String password,
-  }) => caller.callServerEndpoint<_i4.AuthSuccess>(
-    'emailIdp',
-    'finishRegistration',
-    {
-      'registrationToken': registrationToken,
-      'password': password,
     },
   );
 

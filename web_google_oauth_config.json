@@ -1,1 +1,18 @@
-{"web":{"client_id":"602145347765-dafncgl6jkbmnc3mf62qk1o0oeic5861.apps.googleusercontent.com","project_id":"gen-lang-client-0681509982","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"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","redirect_uris":["http://localhost:8082/googlesignin","https://api.zenscrap.com/googlesignin"],"javascript_origins":["http://localhost:8082","https://zenscrap.com"]}}
+{
+    "web": {
+        "client_id": "602145347765-dafncgl6jkbmnc3mf62qk1o0oeic5861.apps.googleusercontent.com",
+        "project_id": "gen-lang-client-0681509982",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_secret": "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",
+        "redirect_uris": [
+            "http://localhost:8082/googlesignin",
+            "https://api.zenscrap.com/googlesignin"
+        ],
+        "javascript_origins": [
+            "http://localhost:8082",
+            "https://zenscrap.com"
+        ]
+    }
+}
