@@ -84,6 +84,14 @@ class ConfirmEmailPage extends ConsumerWidget {
             // The user will just be logged in, which is also fine
           }
 
+          // IMPORTANT: Reset the EmailAuthController's screen state to login.
+          // After finishRegistration(), the controller's currentScreen is in a
+          // post-registration state. Even though signOutDevice() sets isAuthenticated
+          // to false, the currentScreen is not automatically reset. This causes
+          // subsequent login() calls to fail silently because the controller is
+          // not in the expected login state.
+          emailAuth.navigateTo(EmailFlowScreen.login);
+
           // Track successful email confirmation
           await analytics.trackAuthEmailConfirmationSuccess(email: email);
 
