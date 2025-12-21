@@ -129,7 +129,7 @@ class SignInPage extends ConsumerWidget {
               e,
               context: AuthContext.registration,
             );
-            await showAuthErrorDialog(context: context, error: authError);
+            showAuthErrorDialog(context: context, error: authError);
           }
           return null;
         }

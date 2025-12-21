@@ -89,7 +89,7 @@ class ConfirmEmailPage extends ConsumerWidget {
               e,
               context: AuthContext.verification,
             );
-            await showAuthErrorDialog(context: context, error: authError);
+            showAuthErrorDialog(context: context, error: authError);
           }
           return null;
         }

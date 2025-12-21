@@ -54,9 +54,9 @@ class LoginPage extends ConsumerWidget {
         ),
       ],
       onSubmitSuccess: (data) {
-        ref.read(sessionProvider.notifier).setState(SessionState.logged(
-          user: data,
-        ));
+        ref
+            .read(sessionProvider.notifier)
+            .setState(SessionState.logged(user: data));
       },
       onSubmit: (items) async {
         final String email = items[0];
@@ -99,7 +99,7 @@ class LoginPage extends ConsumerWidget {
                       context: AuthContext.login,
                     )
                   : AuthErrorMapper.loginFailed();
-              await showAuthErrorDialog(context: context, error: authError);
+              showAuthErrorDialog(context: context, error: authError);
             }
 
             return null;
@@ -115,11 +115,7 @@ class LoginPage extends ConsumerWidget {
             userName: userName,
           );
 
-          return UserModel(
-            email: email,
-            userName: userName,
-            imageUrl: null,
-          );
+          return UserModel(email: email, userName: userName, imageUrl: null);
         } catch (e) {
           // Track login failure
           await analytics.trackAuthLoginFailure(

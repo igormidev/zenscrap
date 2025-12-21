@@ -80,7 +80,7 @@ class PasswordResetPage extends ConsumerWidget {
               e,
               context: AuthContext.passwordReset,
             );
-            await showAuthErrorDialog(context: context, error: authError);
+            showAuthErrorDialog(context: context, error: authError);
           }
 
           return null;
