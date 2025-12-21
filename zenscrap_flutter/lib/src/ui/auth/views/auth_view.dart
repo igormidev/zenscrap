@@ -544,23 +544,38 @@ class _DesktopAuthLayout extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
                   // Animated height container for auth form
-                  AnimatedContainer(
-                    height: switch (selectedAuthPage) {
-                      SelectedAuthPage.login => 400,
-                      SelectedAuthPage.signIn => 465,
-                      SelectedAuthPage.passwordReset => 270,
+                  // Listens to isConfirmEmail to adjust height when showing
+                  // verification code flow (smaller form)
+                  ValueListenableBuilder<String?>(
+                    valueListenable: isConfirmEmail,
+                    builder: (context, confirmEmail, _) {
+                      return ValueListenableBuilder<String?>(
+                        valueListenable: resetPasswordEmailVN,
+                        builder: (context, resetEmail, _) {
+                          final isInVerificationFlow = confirmEmail != null;
+                          final isInPasswordResetFlow = resetEmail != null;
+
+                          return AnimatedContainer(
+                            height: _calculateAuthContainerHeight(
+                              selectedAuthPage: selectedAuthPage,
+                              isInVerificationFlow: isInVerificationFlow,
+                              isInPasswordResetFlow: isInPasswordResetFlow,
+                            ),
+                            duration: const Duration(milliseconds: 700),
+                            child: _AuthContainer(
+                              tabController: tabController,
+                              emailAuth: emailAuth,
+                              isConfirmEmail: isConfirmEmail,
+                              resetPasswordEmailVN: resetPasswordEmailVN,
+                              onChangeToConfirmEmail: onChangeToConfirmEmail,
+                              onSuccessConfirmEmail: onSuccessConfirmEmail,
+                              onChangeToPasswordReset: onChangeToPasswordReset,
+                              onSuccessChangePassword: onSuccessChangePassword,
+                            ),
+                          );
+                        },
+                      );
                     },
-                    duration: const Duration(milliseconds: 700),
-                    child: _AuthContainer(
-                      tabController: tabController,
-                      emailAuth: emailAuth,
-                      isConfirmEmail: isConfirmEmail,
-                      resetPasswordEmailVN: resetPasswordEmailVN,
-                      onChangeToConfirmEmail: onChangeToConfirmEmail,
-                      onSuccessConfirmEmail: onSuccessConfirmEmail,
-                      onChangeToPasswordReset: onChangeToPasswordReset,
-                      onSuccessChangePassword: onSuccessChangePassword,
-                    ),
                   ),
                   // Scrappable indicator if available
                   if (scrappable != null) ...[
@@ -601,6 +616,33 @@ class _DesktopAuthLayout extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Calculates the height for the auth container based on current state.
+/// Heights are adjusted when in verification/reset flows to show smaller forms.
+double _calculateAuthContainerHeight({
+  required SelectedAuthPage selectedAuthPage,
+  required bool isInVerificationFlow,
+  required bool isInPasswordResetFlow,
+}) {
+  // When in verification code flow (Sign Up confirmation), use smaller height
+  // since only one field is shown
+  if (isInVerificationFlow) {
+    return 250;
+  }
+
+  // When in password reset code flow, use height for 3 fields
+  // (code + new password + confirm password)
+  if (isInPasswordResetFlow) {
+    return 400;
+  }
+
+  // Default heights based on selected page
+  return switch (selectedAuthPage) {
+    SelectedAuthPage.login => 400,
+    SelectedAuthPage.signIn => 465,
+    SelectedAuthPage.passwordReset => 270,
+  };
 }
 
 /// Reusable back button widget for both layouts
