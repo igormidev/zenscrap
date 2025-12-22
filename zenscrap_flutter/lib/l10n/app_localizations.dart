@@ -160,6 +160,12 @@ abstract class AppLocalizations {
   /// **'Learn more'**
   String get landing_learn_more;
 
+  /// Label for language selector in mobile drawer
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get landing_drawer_language;
+
   /// Main hero section headline
   ///
   /// In en, this message translates to:
@@ -2497,6 +2503,54 @@ abstract class AppLocalizations {
   /// **'Google sign-in failed. Please try again or use email.'**
   String get auth_google_sign_in_failed;
 
+  /// Header for email typo correction dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Did you mean?'**
+  String get email_typo_dialog_header;
+
+  /// Title explaining the typo detection
+  ///
+  /// In en, this message translates to:
+  /// **'We noticed a possible typo in your email address'**
+  String get email_typo_dialog_title;
+
+  /// Label for the original email entered
+  ///
+  /// In en, this message translates to:
+  /// **'You typed'**
+  String get email_typo_you_typed;
+
+  /// Label for the suggested correction
+  ///
+  /// In en, this message translates to:
+  /// **'Did you mean'**
+  String get email_typo_did_you_mean;
+
+  /// Button to accept the suggested email
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, use corrected email'**
+  String get email_typo_use_suggestion;
+
+  /// Button to keep the original email
+  ///
+  /// In en, this message translates to:
+  /// **'No, I typed it correctly'**
+  String get email_typo_keep_original;
+
+  /// Button to go back to the previous screen
+  ///
+  /// In en, this message translates to:
+  /// **'Go back'**
+  String get auth_go_back;
+
+  /// Button to change the email address
+  ///
+  /// In en, this message translates to:
+  /// **'Change email'**
+  String get auth_change_email;
+
   /// Application title in dashboard appbar
   ///
   /// In en, this message translates to:
@@ -3538,6 +3592,282 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Creating...'**
   String get scrappables_create_dialog_creating;
+
+  /// Tooltip for showing original text (not translated)
+  ///
+  /// In en, this message translates to:
+  /// **'Show original'**
+  String get common_show_original;
+
+  /// Tooltip for showing translated text
+  ///
+  /// In en, this message translates to:
+  /// **'Show translated'**
+  String get common_show_translated;
+
+  /// Badge indicating text was auto-translated
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-translated from {language}'**
+  String common_auto_translated(String language);
+
+  /// Title for invalid credentials error dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Login Failed'**
+  String get authErrorInvalidCredentialsTitle;
+
+  /// Description for invalid credentials error
+  ///
+  /// In en, this message translates to:
+  /// **'The email or password you entered is incorrect. Please check your credentials and try again.'**
+  String get authErrorInvalidCredentialsDescription;
+
+  /// Description for account not found error
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t find an account with this email address. Please check the email or create a new account.'**
+  String get authErrorAccountNotFoundDescription;
+
+  /// Title for locked/disabled account error
+  ///
+  /// In en, this message translates to:
+  /// **'Account Locked'**
+  String get authErrorAccountLockedTitle;
+
+  /// Description for disabled account error
+  ///
+  /// In en, this message translates to:
+  /// **'Your account has been disabled. Please contact support for assistance.'**
+  String get authErrorAccountDisabledDescription;
+
+  /// Description for locked account error
+  ///
+  /// In en, this message translates to:
+  /// **'Your account has been temporarily locked due to security concerns. Please try again later or contact support.'**
+  String get authErrorAccountLockedDescription;
+
+  /// Title for email already exists error
+  ///
+  /// In en, this message translates to:
+  /// **'Email Already Registered'**
+  String get authErrorEmailExistsTitle;
+
+  /// Description for email already exists error
+  ///
+  /// In en, this message translates to:
+  /// **'An account with this email address already exists. Please try logging in instead, or use a different email.'**
+  String get authErrorEmailExistsDescription;
+
+  /// Title for invalid verification code error
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid Code'**
+  String get authErrorInvalidCodeTitle;
+
+  /// Description for invalid verification code error
+  ///
+  /// In en, this message translates to:
+  /// **'The verification code you entered is incorrect. Please check the code in your email and try again.'**
+  String get authErrorInvalidCodeDescription;
+
+  /// Title for expired verification code error
+  ///
+  /// In en, this message translates to:
+  /// **'Code Expired'**
+  String get authErrorExpiredCodeTitle;
+
+  /// Description for expired verification code error
+  ///
+  /// In en, this message translates to:
+  /// **'This verification code has expired. Please request a new code and try again.'**
+  String get authErrorExpiredCodeDescription;
+
+  /// Title for weak password error
+  ///
+  /// In en, this message translates to:
+  /// **'Password Too Weak'**
+  String get authErrorWeakPasswordTitle;
+
+  /// Description for weak password error
+  ///
+  /// In en, this message translates to:
+  /// **'Please choose a stronger password. Use at least 8 characters with a mix of letters, numbers, and symbols.'**
+  String get authErrorWeakPasswordDescription;
+
+  /// Title for invalid email format error
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid Email'**
+  String get authErrorInvalidEmailTitle;
+
+  /// Description for invalid email format error
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid email address.'**
+  String get authErrorInvalidEmailDescription;
+
+  /// Title for rate limited error
+  ///
+  /// In en, this message translates to:
+  /// **'Too Many Attempts'**
+  String get authErrorRateLimitedTitle;
+
+  /// Description for too many attempts error
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve made too many attempts. Please wait a few minutes before trying again.'**
+  String get authErrorTooManyAttemptsDescription;
+
+  /// Description for login rate limited error
+  ///
+  /// In en, this message translates to:
+  /// **'Too many login attempts. Please wait a few minutes before trying again.'**
+  String get authErrorLoginRateLimitedDescription;
+
+  /// Description for verification rate limited error
+  ///
+  /// In en, this message translates to:
+  /// **'Too many verification attempts. Please wait a few minutes before trying again.'**
+  String get authErrorVerificationRateLimitedDescription;
+
+  /// Description for invalid password reset code error
+  ///
+  /// In en, this message translates to:
+  /// **'The password reset code you entered is incorrect. Please check the code in your email and try again.'**
+  String get authErrorPasswordResetCodeInvalidDescription;
+
+  /// Description for expired password reset code error
+  ///
+  /// In en, this message translates to:
+  /// **'This password reset code has expired. Please request a new password reset and try again.'**
+  String get authErrorPasswordResetCodeExpiredDescription;
+
+  /// Description for password reset rate limited error
+  ///
+  /// In en, this message translates to:
+  /// **'Too many password reset attempts. Please wait a few minutes before trying again.'**
+  String get authErrorPasswordResetRateLimitedDescription;
+
+  /// Title for Google sign-in cancelled
+  ///
+  /// In en, this message translates to:
+  /// **'Sign-In Cancelled'**
+  String get authErrorGoogleCancelledTitle;
+
+  /// Description for Google sign-in cancelled
+  ///
+  /// In en, this message translates to:
+  /// **'Google sign-in was cancelled. You can try again or use email sign-in instead.'**
+  String get authErrorGoogleCancelledDescription;
+
+  /// Title for Google sign-in failed
+  ///
+  /// In en, this message translates to:
+  /// **'Google Sign-In Failed'**
+  String get authErrorGoogleFailedTitle;
+
+  /// Description for Google sign-in failed
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t complete Google sign-in. Please try again or use email sign-in.'**
+  String get authErrorGoogleFailedDescription;
+
+  /// Title for Google account not verified
+  ///
+  /// In en, this message translates to:
+  /// **'Account Not Verified'**
+  String get authErrorGoogleNotVerifiedTitle;
+
+  /// Description for Google account not verified
+  ///
+  /// In en, this message translates to:
+  /// **'Your Google account email is not verified. Please verify your Google account and try again.'**
+  String get authErrorGoogleNotVerifiedDescription;
+
+  /// Title for Google account domain restricted
+  ///
+  /// In en, this message translates to:
+  /// **'Domain Not Allowed'**
+  String get authErrorGoogleDomainRestrictedTitle;
+
+  /// Description for Google account domain restricted
+  ///
+  /// In en, this message translates to:
+  /// **'Sign-in is restricted to specific email domains. Please use an allowed email address.'**
+  String get authErrorGoogleDomainRestrictedDescription;
+
+  /// Title for network error
+  ///
+  /// In en, this message translates to:
+  /// **'Connection Error'**
+  String get authErrorNetworkTitle;
+
+  /// Description for network error
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to connect to the server. Please check your internet connection and try again.'**
+  String get authErrorNetworkDescription;
+
+  /// Description for connection refused error
+  ///
+  /// In en, this message translates to:
+  /// **'Could not reach the server. Please check your internet connection and try again.'**
+  String get authErrorConnectionRefusedDescription;
+
+  /// Title for server error
+  ///
+  /// In en, this message translates to:
+  /// **'Server Error'**
+  String get authErrorServerTitle;
+
+  /// Description for server error
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong on our end. Please try again later. If the problem persists, contact support.'**
+  String get authErrorServerDescription;
+
+  /// Title for timeout error
+  ///
+  /// In en, this message translates to:
+  /// **'Request Timeout'**
+  String get authErrorTimeoutTitle;
+
+  /// Description for timeout error
+  ///
+  /// In en, this message translates to:
+  /// **'The request took too long. Please check your connection and try again.'**
+  String get authErrorTimeoutDescription;
+
+  /// Title for unknown error
+  ///
+  /// In en, this message translates to:
+  /// **'Something Went Wrong'**
+  String get authErrorUnknownTitle;
+
+  /// Description for unknown error
+  ///
+  /// In en, this message translates to:
+  /// **'An unexpected error occurred. Please try again. If the problem continues, contact support.'**
+  String get authErrorUnknownDescription;
+
+  /// Button text for try again
+  ///
+  /// In en, this message translates to:
+  /// **'Try Again'**
+  String get authErrorButtonTryAgain;
+
+  /// Button text for try later
+  ///
+  /// In en, this message translates to:
+  /// **'Try Later'**
+  String get authErrorButtonTryLater;
+
+  /// Button text for OK
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get authErrorButtonOk;
 }
 
 class _AppLocalizationsDelegate

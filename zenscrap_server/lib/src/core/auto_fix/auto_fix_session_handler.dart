@@ -444,17 +444,25 @@ class AutoFixSessionHandler {
       if (schema['strict'] != null) 'strict': schema['strict'],
     };
 
+    // Get MCP API key from Serverpod passwords (configured via scloud secrets)
+    final mcpApiKey = _session.passwords['mcpApiKey'];
+    if (mcpApiKey == null || mcpApiKey.isEmpty) {
+      throw Exception('MCP API key not configured in Serverpod passwords');
+    }
+
     final tools = <Map<String, dynamic>>[
       {
         'type': 'mcp',
         'server_label': 'playwright',
         'server_url': _playwrightMcpUrl,
+        'headers': {'X-API-KEY': mcpApiKey},
         'require_approval': 'never',
       },
       {
         'type': 'mcp',
         'server_label': 'scraping_bee',
         'server_url': _scrapingBeeMcpUrl,
+        'headers': {'X-API-KEY': mcpApiKey},
         'require_approval': 'never',
       },
     ];

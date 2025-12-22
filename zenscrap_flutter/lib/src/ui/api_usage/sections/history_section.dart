@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/ui/api_usage/widgets/credit_history_list.dart';
 
 class HistorySection extends StatelessWidget {
@@ -20,11 +21,27 @@ class HistorySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final padding = context.responsiveValue(
+      compact: 16.0,
+      medium: 20.0,
+      expanded: 20.0,
+    );
+    final verticalSpacing = context.responsiveValue(
+      compact: 12.0,
+      medium: 16.0,
+      expanded: 16.0,
+    );
+    final borderRadius = context.responsiveValue(
+      compact: 12.0,
+      medium: 16.0,
+      expanded: 16.0,
+    );
+
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(padding),
       decoration: BoxDecoration(
         color: context.c.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(borderRadius),
         border: Border.all(color: context.c.outline.withAlpha(50)),
       ),
       child: Column(
@@ -34,7 +51,7 @@ class HistorySection extends StatelessWidget {
             AppLocalizations.of(context)!.api_usage_credit_history,
             style: context.t.titleLarge,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: verticalSpacing),
           Expanded(
             child: CreditHistoryList(
               creditHistory: creditHistory,

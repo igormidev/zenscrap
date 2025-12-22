@@ -27,6 +27,12 @@ final ZenScrapException defaultException = ZenScrapException(
   description: 'An unknown error occurred.',
 );
 
+final ZenScrapException connectionClosedException = ZenScrapException(
+  title: 'Connection Lost',
+  description:
+      'The connection to the server was lost. Please refresh the page and try again.',
+);
+
 Future<void> showErrorDialog(
   BuildContext context, {
   required String title,

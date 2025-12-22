@@ -544,14 +544,29 @@ class ScrappableChatSession extends Endpoint {
     required RedraftSrappableSessionId sessionUuid,
     required SupportedLanguage language,
   }) {
-    session.log('Listening to session $sessionUuid');
+    final startTime = DateTime.now();
+    session.log('[StreamLifecycle] Client started listening to session $sessionUuid');
+
     session.addWillCloseListener((session) async {
-      await _disposeSession(sessionId: sessionUuid);
+      final duration = DateTime.now().difference(startTime);
+      session.log(
+        '[StreamLifecycle] Session closing for $sessionUuid after ${duration.inSeconds}s. '
+        'Reason: willCloseListener triggered (client disconnected or session ended)',
+      );
+      await _disposeSession(sessionId: sessionUuid, dbSession: session);
     });
+
     final subject = _scrapRedraftSessions[sessionUuid];
     if (subject == null) {
+      session.log(
+        '[StreamLifecycle] ERROR: Session $sessionUuid not found in _scrapRedraftSessions. '
+        'Available sessions: ${_scrapRedraftSessions.keys.toList()}',
+        level: LogLevel.error,
+      );
       throw createTranslatedException('session_not_found', language);
     }
+
+    session.log('[StreamLifecycle] Returning stream for session $sessionUuid');
     return subject.stream;
   }
 
@@ -605,15 +620,34 @@ class ScrappableChatSession extends Endpoint {
     required String userPrompt,
     required SupportedLanguage language,
   }) async* {
-    session.log('Received message for session $sessionId');
+    session.log('[SendPrompt] Received message for session $sessionId (prompt length: ${userPrompt.length} chars)');
+
+    // Verify session state
+    final hasChatSession = _chatSessions.containsKey(sessionId);
+    final hasRedraftSession = _scrapRedraftSessions.containsKey(sessionId);
+    session.log(
+      '[SendPrompt] Session state: chatSession=$hasChatSession, redraftSession=$hasRedraftSession',
+    );
+
     final chatController = _chatSessions[sessionId];
     if (chatController == null) {
+      session.log(
+        '[SendPrompt] ERROR: Chat controller not found for session $sessionId',
+        level: LogLevel.error,
+      );
       throw createTranslatedException('session_not_found', language);
     }
 
     if (!_cacheRefTestData.containsKey(sessionId) ||
         !_cacheScrappableRequest.containsKey(sessionId) ||
         !_cacheScrappingBeeExtractLogic.containsKey(sessionId)) {
+      session.log(
+        '[SendPrompt] ERROR: Cache data missing for session $sessionId. '
+        'refTestData=${_cacheRefTestData.containsKey(sessionId)}, '
+        'scrappableRequest=${_cacheScrappableRequest.containsKey(sessionId)}, '
+        'extractLogic=${_cacheScrappingBeeExtractLogic.containsKey(sessionId)}',
+        level: LogLevel.error,
+      );
       // Internal cache error - not translated as it's a technical issue
       throw ZenScrapException(
         title: 'Cache Test Data Not Found',
@@ -623,13 +657,22 @@ class ScrappableChatSession extends Endpoint {
 
     // Add user message to chat stream IMMEDIATELY for instant UI feedback
     // This ensures the user sees their message right away, before the AI starts processing
-    _scrapRedraftSessions[sessionId]?.add(
-      MessageTextResponse(
-        role: PromptRole.user,
-        expectsFollowUp: true, // User message always expects AI response
-        messageText: userPrompt,
-      ),
-    );
+    final redraftSubject = _scrapRedraftSessions[sessionId];
+    if (redraftSubject == null) {
+      session.log(
+        '[SendPrompt] WARNING: ReplaySubject is null for session $sessionId when trying to add user message',
+        level: LogLevel.warning,
+      );
+    } else {
+      session.log('[SendPrompt] Adding user message to chat stream');
+      redraftSubject.add(
+        MessageTextResponse(
+          role: PromptRole.user,
+          expectsFollowUp: true, // User message always expects AI response
+          messageText: userPrompt,
+        ),
+      );
+    }
 
     final ThinkingSessionId thinkingSessionId = uuid.v7();
     _thinkingStream[thinkingSessionId] = StreamController<ThinkingSessionId>();
@@ -640,6 +683,8 @@ class ScrappableChatSession extends Endpoint {
       clientIpAddress = session.request.connectionInfo.remote.address
           .toString();
     }
+
+    session.log('[SendPrompt] Scheduling FutureCall for session_prompt with thinkingSessionId: $thinkingSessionId');
 
     // Put future call
     await session.serverpod.futureCallWithDelay(
@@ -653,7 +698,9 @@ class ScrappableChatSession extends Endpoint {
       const Duration(seconds: 1),
     );
 
+    session.log('[SendPrompt] Yielding thinking stream for session $sessionId');
     yield* _thinkingStream[thinkingSessionId]!.stream;
+    session.log('[SendPrompt] Thinking stream completed for session $sessionId');
   }
 }
 
@@ -666,6 +713,29 @@ Future<void> _disposeSession({
   required RedraftSrappableSessionId sessionId,
   Session? dbSession,
 }) async {
+  // Log function to use dbSession.log when available, otherwise print
+  void logMessage(String message, {LogLevel level = LogLevel.info}) {
+    if (dbSession != null) {
+      dbSession.log(message, level: level);
+    } else {
+      print('[_disposeSession] $message');
+    }
+  }
+
+  logMessage('[SessionDispose] Starting dispose for session $sessionId');
+
+  // Check if session exists in maps
+  final hadChatSession = _chatSessions.containsKey(sessionId);
+  final hadRedraftSession = _scrapRedraftSessions.containsKey(sessionId);
+  final hadAIUsage = _sessionAccountAIUsage.containsKey(sessionId);
+  final hadAnonymousSpending = _anonymousSessionSpending.containsKey(sessionId);
+
+  logMessage(
+    '[SessionDispose] Session $sessionId state before dispose: '
+    'chatSession=$hadChatSession, redraftSession=$hadRedraftSession, '
+    'aiUsage=$hadAIUsage, anonymousSpending=$hadAnonymousSpending',
+  );
+
   // Save AccountAIUsage to database if we have a session and tracked usage
   if (dbSession != null) {
     final accountAIUsage = _sessionAccountAIUsage[sessionId];
@@ -673,11 +743,12 @@ Future<void> _disposeSession({
       try {
         await AccountAIUsage.db.updateRow(dbSession, accountAIUsage);
         dbSession.log(
-          'Saved AccountAIUsage for session $sessionId: \$${accountAIUsage.totalDollarsSpentFromTotalInUSD.toStringAsFixed(4)} remaining',
+          '[SessionDispose] Saved AccountAIUsage for session $sessionId: '
+          '\$${accountAIUsage.totalDollarsSpentFromTotalInUSD.toStringAsFixed(4)} remaining',
         );
       } catch (e, s) {
         dbSession.log(
-          'Failed to save AccountAIUsage for session $sessionId',
+          '[SessionDispose] Failed to save AccountAIUsage for session $sessionId',
           exception: e,
           stackTrace: s,
           level: LogLevel.error,
@@ -693,15 +764,24 @@ Future<void> _disposeSession({
 
   // Dispose the chat controller to clean up OpenAI files
   final chatController = _chatSessions.remove(sessionId);
-  await chatController?.dispose();
+  if (chatController != null) {
+    logMessage('[SessionDispose] Disposing chat controller for session $sessionId');
+    await chatController.dispose();
+  }
 
   final subject = _scrapRedraftSessions.remove(sessionId);
-  await subject?.close();
+  if (subject != null) {
+    logMessage('[SessionDispose] Closing ReplaySubject stream for session $sessionId');
+    await subject.close();
+  }
+
   _cacheScrappableIds.remove(sessionId);
   _cacheRefTestData.remove(sessionId);
   _cacheScrappingBeeExtractLogic.remove(sessionId);
   _cacheScrappableRequest.remove(sessionId);
   _scrappableOpenedSessionsIds.removeWhere((key, value) => value == sessionId);
+
+  logMessage('[SessionDispose] Dispose completed for session $sessionId');
 }
 
 class TestScrappableDisposeFutureCall
@@ -859,6 +939,13 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
             if (_cacheScrappingBeeExtractLogic.containsKey(sessionId)) {
               _cacheScrappingBeeExtractLogic[sessionId] =
                   chatResponse.scrappingBeeExtractLogic;
+            }
+          } else if (chatResponse is UpdatedScrappableRequestResponse) {
+            // Handle request-only updates (when AI modifies request but not extract rules)
+            final updatedRequest = chatResponse.scrappableRequest;
+            if (updatedRequest != null &&
+                _cacheScrappableRequest.containsKey(sessionId)) {
+              _cacheScrappableRequest[sessionId] = updatedRequest;
             }
           }
         });

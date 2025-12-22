@@ -1714,6 +1714,37 @@ class AnalyticsService {
     );
   }
 
+  /// Track when a new (anonymous/not logged in) user encounters an error on their
+  /// first interaction with the platform.
+  ///
+  /// This is a critical event for understanding user drop-off at the very first
+  /// step of the user journey. New users who hit errors on their first attempt
+  /// are at high risk of abandoning the platform.
+  ///
+  /// This event is ONLY tracked for:
+  /// - Users who are NOT logged in (anonymous/new visitors)
+  /// - When an error occurs during their first scrappable creation attempt
+  ///
+  /// Fields:
+  /// - targetUrl: The URL the user was trying to scrape
+  /// - promptLength: Length of the user's extraction prompt
+  /// - errorMessage: The error message received
+  Future<void> trackNewUserFirstInteractionError({
+    required String targetUrl,
+    required int promptLength,
+    required String errorMessage,
+  }) async {
+    await _safeCapture(
+      eventName: 'new_user:first_interaction_error',
+      properties: {
+        'target_url': targetUrl,
+        'prompt_length': promptLength,
+        'error_message': errorMessage,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
   /// Track when user sees the session credit limit reached message
   Future<void> trackChatSessionLimitReachedView({
     required double creditsSpent,
@@ -1741,6 +1772,122 @@ class AnalyticsService {
       properties: {
         'credits_spent': creditsSpent,
         'credits_limit': creditsLimit,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  // ========================================
+  // Chat Response Error Events
+  // ========================================
+
+  /// Track when any error response is received in chat.
+  ///
+  /// This tracks all types of errors that can occur during the chat session:
+  /// - ErrorTextResponse: General AI error message
+  /// - TestEndpointCalledErrorResponse: Error when testing the endpoint
+  /// - CreditLimitReachedResponse: Session credit limit reached
+  /// - IpLimitReachedResponse: IP rate limit for anonymous users
+  /// - UserApiKeyQuotaExceededResponse: User's OpenAI API key quota exceeded
+  Future<void> trackChatResponseError({
+    required int scrappableId,
+    required String errorType,
+    required int messageCount,
+    required bool isFirstResponse,
+    String? errorMessage,
+    String? errorTitle,
+    String? errorDescription,
+  }) async {
+    await _safeCapture(
+      eventName: 'chat:response_error',
+      properties: {
+        'scrappable_id': scrappableId,
+        'error_type': errorType,
+        'message_count': messageCount,
+        'is_first_response': isFirstResponse,
+        if (errorMessage != null) 'error_message': errorMessage,
+        if (errorTitle != null) 'error_title': errorTitle,
+        if (errorDescription != null) 'error_description': errorDescription,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when the first extract rule is successfully generated.
+  ///
+  /// This is a critical event - it means the AI successfully analyzed the page
+  /// and generated working extract rules for the first time.
+  Future<void> trackChatFirstExtractRuleSuccess({
+    required int scrappableId,
+    required int messageCount,
+  }) async {
+    await _safeCapture(
+      eventName: 'chat:first_extract_rule_success',
+      properties: {
+        'scrappable_id': scrappableId,
+        'message_count': messageCount,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when an error occurs before ANY extract rule is generated.
+  ///
+  /// This is a CRITICAL event for understanding user drop-off. If a user
+  /// encounters an error before receiving their first working extract rule,
+  /// they are at very high risk of abandoning the platform.
+  ///
+  /// This is different from `trackChatResponseError` because it specifically
+  /// tracks errors that occur BEFORE the user has ever seen a successful result.
+  Future<void> trackChatFirstExtractRuleError({
+    required int scrappableId,
+    required String errorType,
+    required int messageCount,
+    String? errorMessage,
+    String? errorTitle,
+    String? errorDescription,
+  }) async {
+    await _safeCapture(
+      eventName: 'chat:first_extract_rule_error',
+      properties: {
+        'scrappable_id': scrappableId,
+        'error_type': errorType,
+        'message_count': messageCount,
+        if (errorMessage != null) 'error_message': errorMessage,
+        if (errorTitle != null) 'error_title': errorTitle,
+        if (errorDescription != null) 'error_description': errorDescription,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track any chat response received (for overall metrics).
+  ///
+  /// Response types tracked:
+  /// - message_text: Regular text message from AI
+  /// - new_extract_rule: Extract rules generated successfully
+  /// - test_endpoint_success: Endpoint test successful
+  /// - test_endpoint_error: Endpoint test failed
+  /// - updated_request: Request configuration updated
+  /// - candidate_extract_logic: Extract logic candidate update
+  /// - api_key_updated: API key was updated
+  /// - error_text: General error message
+  /// - credit_limit_reached: Session credit limit
+  /// - ip_limit_reached: IP rate limit
+  /// - user_api_key_quota_exceeded: User API key quota exceeded
+  Future<void> trackChatResponseReceived({
+    required int scrappableId,
+    required String responseType,
+    required int messageCount,
+    required bool hasReceivedExtractRule,
+  }) async {
+    await _safeCapture(
+      eventName: 'chat:response_received',
+      properties: {
+        'scrappable_id': scrappableId,
+        'response_type': responseType,
+        'message_count': messageCount,
+        'has_received_extract_rule': hasReceivedExtractRule,
         'timestamp': DateTime.now().toIso8601String(),
       },
     );

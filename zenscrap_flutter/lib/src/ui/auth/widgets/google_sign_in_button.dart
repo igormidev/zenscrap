@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
-import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 import 'package:zenscrap_flutter/src/states/session/user_model.dart';
+import 'package:zenscrap_flutter/src/ui/auth/utils/auth_error_mapper.dart';
+import 'package:zenscrap_flutter/src/ui/auth/widgets/auth_error_dialog.dart';
 
 /// Google Sign-In button that handles both login and account creation.
 /// If the user has an account, it logs them in. If not, it creates an account.
@@ -54,9 +56,9 @@ class _ZenScrapGoogleSignInButtonState
           child: Text(
             'Google Sign-In not configured. Set GOOGLE_SERVER_CLIENT_ID environment variable.',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.outline,
-                  fontStyle: FontStyle.italic,
-                ),
+              color: Theme.of(context).colorScheme.outline,
+              fontStyle: FontStyle.italic,
+            ),
             textAlign: TextAlign.center,
           ),
         );
@@ -79,17 +81,19 @@ class _ZenScrapGoogleSignInButtonState
               child: Text(
                 l10n.auth_or_divider,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.outline,
-                    ),
+                  color: Theme.of(context).colorScheme.outline,
+                ),
               ),
             ),
             const Expanded(child: Divider()),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 10),
         // Google Sign-In Button
         SizedBox(
           width: double.infinity,
+          // Minimum 48px height for mobile touch target
+          height: context.responsiveValue(compact: 52.0, expanded: 48.0),
           child: OutlinedButton.icon(
             onPressed: _isLoading
                 ? null
@@ -122,39 +126,91 @@ class _ZenScrapGoogleSignInButtonState
                       // Attempt Google sign-in
                       await _googleAuthController!.signIn();
 
-                      // Check if authenticated
-                      final isAuthenticated = client.auth.isAuthenticated;
+                      // Small delay to allow the async state update to propagate
+                      // The GoogleAuthController updates state asynchronously after signIn()
+                      await Future.delayed(const Duration(milliseconds: 100));
 
-                      if (isAuthenticated) {
-                        // Track successful Google sign-in
-                        // Note: We don't have user email/name directly from AuthSuccess
-                        // It needs to be fetched from the server separately
-                        await analytics.trackEvent(
-                          eventName: 'auth_google_success',
-                          properties: {
-                            'email': 'google_user',
-                            'user_name': 'Google User',
-                          },
-                        );
+                      // Check if widget is still mounted after async operation
+                      if (!mounted) return;
 
-                        // Update session state
-                        // For Google sign-in, we'll use a placeholder name and fetch the real info later
-                        if (context.mounted) {
-                          ref.read(sessionProvider.notifier).setState(
-                                SessionState.logged(
-                                  user: UserModel(
-                                    email: 'google_user@google.com',
-                                    userName: 'Google User',
-                                    imageUrl: null,
-                                  ),
-                                ),
-                              );
+                      // Check the controller's isAuthenticated property (not client.auth.isAuthenticated)
+                      // This is updated by the GoogleAuthController after signIn() completes
+                      final isAuthenticated =
+                          _googleAuthController!.isAuthenticated;
+
+                      if (!isAuthenticated) {
+                        // Reset loading state immediately when not authenticated
+                        // This handles the case where user cancelled or an error occurred
+                        setState(() => _isLoading = false);
+
+                        // Check if there was an error or if user cancelled
+                        final errorMsg = _googleAuthController!.errorMessage;
+                        if (errorMsg != null) {
+                          // Track Google sign-in failure with error message
+                          await analytics.trackEvent(
+                            eventName: 'auth_google_failure',
+                            properties: {'error': errorMsg},
+                          );
+
+                          if (context.mounted) {
+                            // Map the error and show beautiful error dialog
+                            final authError = AuthErrorMapper.mapError(
+                              errorMsg,
+                              context: AuthContext.googleSignIn,
+                            );
+                            await showAuthErrorDialog(
+                              context: context,
+                              error: authError,
+                            );
+                          }
+                        } else {
+                          // User likely cancelled the sign-in flow
+                          await analytics.trackEvent(
+                            eventName: 'auth_google_cancelled',
+                          );
+                          // Don't show dialog for cancelled sign-in, it's a user choice
                         }
-                      } else {
-                        // Track cancelled/failed Google sign-in
-                        await analytics.trackEvent(
-                          eventName: 'auth_google_cancelled',
-                        );
+
+                        // Dispose and nullify the controller to reset its state
+                        _googleAuthController?.dispose();
+                        _googleAuthController = null;
+                        return;
+                      }
+
+                      // Fetch real user profile from the server
+                      final userProfileResponse = await client.userProfile
+                          .getCurrentUserProfile();
+
+                      // Track successful Google sign-in with real user info
+                      await analytics.trackEvent(
+                        eventName: 'auth_google_success',
+                        properties: {
+                          'email': userProfileResponse.email ?? 'unknown',
+                          'user_name':
+                              userProfileResponse.userName ??
+                              userProfileResponse.fullName ??
+                              'Google User',
+                        },
+                      );
+
+                      // Update session state with real user profile
+                      if (context.mounted) {
+                        ref
+                            .read(sessionProvider.notifier)
+                            .setState(
+                              SessionState.logged(
+                                user: UserModel(
+                                  email:
+                                      userProfileResponse.email ??
+                                      'google_user@google.com',
+                                  userName:
+                                      userProfileResponse.userName ??
+                                      userProfileResponse.fullName ??
+                                      'Google User',
+                                  imageUrl: userProfileResponse.imageUrl,
+                                ),
+                              ),
+                            );
                       }
                     } catch (e) {
                       // Track Google sign-in failure
@@ -164,9 +220,14 @@ class _ZenScrapGoogleSignInButtonState
                       );
 
                       if (context.mounted) {
-                        showErrorSnackbar(
-                          context,
-                          l10n.auth_google_sign_in_failed,
+                        // Map the exception and show beautiful error dialog
+                        final authError = AuthErrorMapper.mapError(
+                          e,
+                          context: AuthContext.googleSignIn,
+                        );
+                        await showAuthErrorDialog(
+                          context: context,
+                          error: authError,
                         );
                       }
                     } finally {
@@ -191,9 +252,27 @@ class _ZenScrapGoogleSignInButtonState
                     errorBuilder: (context, error, stackTrace) =>
                         const Icon(Icons.g_mobiledata, size: 20),
                   ),
-            label: Text(_isLoading ? l10n.auth_signing_in : l10n.auth_continue_with_google),
+            label: Text(
+              _isLoading
+                  ? l10n.auth_signing_in
+                  : l10n.auth_continue_with_google,
+              style: context.responsiveValue(
+                compact: Theme.of(context).textTheme.titleSmall,
+                expanded: null, // Use default
+              ),
+            ),
             style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              // Responsive padding for proper touch target
+              padding: context.responsiveValue(
+                compact: const EdgeInsets.symmetric(
+                  vertical: 14,
+                  horizontal: 16,
+                ),
+                expanded: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 16,
+                ),
+              ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -204,8 +283,8 @@ class _ZenScrapGoogleSignInButtonState
         Text(
           l10n.auth_google_sign_in_description,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.outline,
-              ),
+            color: Theme.of(context).colorScheme.outline,
+          ),
           textAlign: TextAlign.center,
         ),
       ],

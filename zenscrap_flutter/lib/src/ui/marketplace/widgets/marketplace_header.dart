@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/scrappables_listage_ui_template/scrappables_search_bar.dart';
 import 'package:zenscrap_flutter/src/design_system/scrappables_listage_ui_template/category_filter_section.dart';
@@ -22,15 +23,29 @@ class MarketplaceHeader extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: 20),
+        SizedBox(
+          height: context.responsiveValue(
+            compact: 16.0,
+            medium: 20.0,
+            expanded: 20.0,
+          ),
+        ),
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              AppLocalizations.of(context)!.marketplace_title,
-              style: context.t.displaySmall,
+            Flexible(
+              child: Text(
+                AppLocalizations.of(context)!.marketplace_title,
+                style: context.t.displaySmall,
+              ),
             ),
-            const SizedBox(width: 16),
+            SizedBox(
+              width: context.responsiveValue(
+                compact: 8.0,
+                medium: 16.0,
+                expanded: 16.0,
+              ),
+            ),
             Container(
               margin: EdgeInsets.only(top: 4),
               padding: const EdgeInsets.symmetric(

@@ -181,37 +181,37 @@ class SegmentedColumnBar extends StatelessWidget {
     if (timeScope.successCount > 0) {
       final percentage =
           (timeScope.successCount / totalCount * 100).toStringAsFixed(1);
-      buffer.writeln('${l10n.api_analytics_tooltip_success_count(timeScope.successCount, percentage)}');
+      buffer.writeln(l10n.api_analytics_tooltip_success_count(timeScope.successCount, percentage));
     }
     if (timeScope.clientErrorCount > 0) {
       final percentage =
           (timeScope.clientErrorCount / totalCount * 100).toStringAsFixed(1);
-      buffer.writeln('${l10n.api_analytics_tooltip_4xx_count(timeScope.clientErrorCount, percentage)}');
+      buffer.writeln(l10n.api_analytics_tooltip_4xx_count(timeScope.clientErrorCount, percentage));
     }
     if (timeScope.serverErrorCount > 0) {
       final percentage =
           (timeScope.serverErrorCount / totalCount * 100).toStringAsFixed(1);
-      buffer.writeln('${l10n.api_analytics_tooltip_5xx_count(timeScope.serverErrorCount, percentage)}');
+      buffer.writeln(l10n.api_analytics_tooltip_5xx_count(timeScope.serverErrorCount, percentage));
     }
     if (timeScope.failedAtScrappingBeeCount > 0) {
       final percentage =
           (timeScope.failedAtScrappingBeeCount / totalCount * 100)
               .toStringAsFixed(1);
       buffer.writeln(
-          '${l10n.api_analytics_tooltip_scraping_bee_error(timeScope.failedAtScrappingBeeCount, percentage)}');
+          l10n.api_analytics_tooltip_scraping_bee_error(timeScope.failedAtScrappingBeeCount, percentage));
     }
     if (timeScope.insufficientCreditsCount > 0) {
       final percentage = (timeScope.insufficientCreditsCount / totalCount * 100)
           .toStringAsFixed(1);
       buffer.writeln(
-          '${l10n.api_analytics_tooltip_no_credits_count(timeScope.insufficientCreditsCount, percentage)}');
+          l10n.api_analytics_tooltip_no_credits_count(timeScope.insufficientCreditsCount, percentage));
     }
     if (timeScope.maxConcurrencyExceededCount > 0) {
       final percentage =
           (timeScope.maxConcurrencyExceededCount / totalCount * 100)
               .toStringAsFixed(1);
       buffer.writeln(
-          '${l10n.api_analytics_tooltip_max_concurrency_count(timeScope.maxConcurrencyExceededCount, percentage)}');
+          l10n.api_analytics_tooltip_max_concurrency_count(timeScope.maxConcurrencyExceededCount, percentage));
     }
 
     return buffer.toString().trim();

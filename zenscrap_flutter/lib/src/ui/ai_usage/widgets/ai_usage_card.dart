@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 
 /// A styled card container matching the AuthView design.
 /// Features:
@@ -18,11 +19,23 @@ class AiUsageCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final defaultPadding = context.responsiveValue(
+      compact: 16.0,
+      medium: 20.0,
+      expanded: 24.0,
+    );
+
+    final borderRadiusValue = context.responsiveValue(
+      compact: 16.0,
+      medium: 18.0,
+      expanded: 20.0,
+    );
+
     return Container(
-      padding: padding ?? const EdgeInsets.all(20),
+      padding: padding ?? EdgeInsets.all(defaultPadding),
       decoration: BoxDecoration(
         color: context.c.onPrimary,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(borderRadiusValue),
         boxShadow: const [
           BoxShadow(
             color: Colors.black12,

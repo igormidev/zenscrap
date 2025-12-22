@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/elements/zen_tab.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/providers/shared_preferences_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_state.dart';
@@ -75,8 +76,6 @@ class DashboardTemplateState extends ConsumerState<DashboardView> {
         }
       },
     );
-    // [ --------- ERROR HANDLING --------- ]
-    // [ --------- ERROR HANDLING --------- ]
 
     final onboardingFlowState = ref.watch(onboardingFlowStateProvider);
     final ZenScrapException? error = ref.watch(
@@ -86,82 +85,104 @@ class DashboardTemplateState extends ConsumerState<DashboardView> {
       dashboardLoadingProvider.select((value) => value),
     );
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final bool isCompactSize = constraints.maxWidth < 1000;
+    // Main content stack with loading and error states
+    final contentStack = _DashboardContentStack(
+      error: error,
+      isLoading: isLoading,
+      onboardingFlowState: onboardingFlowState,
+      child: widget.child,
+    );
 
-        Widget content = Stack(
+    return ResponsiveBuilder(
+      // Compact (< 600dp): Drawer with hamburger menu
+      compact: (context, constraints) => Scaffold(
+        drawer: DashboardDrawer(
+          widget: widget,
+          navigationType: NavigationType.drawer,
+          changeDrawerStyle: changeDrawerStyle,
+          isCompactMode: true,
+        ),
+        appBar: const CompactDashboardAppBar(),
+        body: contentStack,
+      ),
+      // Medium (600-839dp): Navigation Rail only
+      medium: (context, constraints) => Scaffold(
+        body: Row(
           children: [
-            if (error == null)
-              AnimatedOpacity(
-                duration: const Duration(milliseconds: 500),
-                opacity: isLoading ? 0 : 1,
-                child: Center(
-                  child: onboardingFlowState.maybeWhen<Widget>(
-                    none: () => const SizedBox.shrink(),
-                    orElse: () => widget.child,
-                  ),
-                ),
-              ),
-            if (error == null)
-              AnimatedOpacity(
-                duration: const Duration(milliseconds: 500),
-                opacity: isLoading ? 1 : 0,
-                child: isLoading
-                    ? const FullpageLoadingPage()
-                    : const SizedBox.shrink(),
-              ),
-            if (error != null) ZenErrorTab(error),
+            DashboardRail(
+              widget: widget,
+              navigationType: NavigationType.rail,
+              changeDrawerStyle: changeDrawerStyle,
+              showExpandButton: false,
+            ),
+            Expanded(child: contentStack),
           ],
-        );
-
-        if (!isCompactSize) {
-          content = Row(
-            children: [
-              switch (navigationType) {
-                NavigationType.rail => DashboardRail(
-                    widget: widget,
-                    navigationType: navigationType,
-                    changeDrawerStyle: changeDrawerStyle,
-                  ),
-                NavigationType.drawer => DashboardDrawer(
-                    widget: widget,
-                    navigationType: navigationType,
-                    changeDrawerStyle: changeDrawerStyle,
-                  ),
-              },
-              Expanded(child: content),
-            ],
-          );
-        }
-
-        return Scaffold(
-          drawer: isCompactSize
-              ? DashboardDrawer(
+        ),
+      ),
+      // Expanded (>= 840dp): Toggle between Rail and Drawer
+      expanded: (context, constraints) => Scaffold(
+        body: Row(
+          children: [
+            switch (navigationType) {
+              NavigationType.rail => DashboardRail(
                   widget: widget,
                   navigationType: navigationType,
                   changeDrawerStyle: changeDrawerStyle,
-                )
-              : null,
-          appBar: isCompactSize ? const CompactDashboardAppBar() : null,
-          body: content,
-          // bottomNavigationBar: isCompactSize
-          //     ? BottomNavigationBar(
-          //         onTap: changeTab,
-          //         backgroundColor: const Color(0xffe0b9f6),
-          //         currentIndex: currentIndex,
-          //         items: widget.items.map((item) {
-          //           return BottomNavigationBarItem(
-          //             icon: Icon(item.inactiveIcon),
-          //             activeIcon: Icon(item.activeIcon),
-          //             label: item.label,
-          //             tooltip: item.tooltip,
-          //           );
-          //         }).toList(),
-          //       )
-          //     : null,
-        );
-      },
+                ),
+              NavigationType.drawer => DashboardDrawer(
+                  widget: widget,
+                  navigationType: navigationType,
+                  changeDrawerStyle: changeDrawerStyle,
+                ),
+            },
+            Expanded(child: contentStack),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Private widget for the dashboard content stack with loading and error states.
+/// Extracted to avoid code duplication across responsive layouts.
+class _DashboardContentStack extends StatelessWidget {
+  final ZenScrapException? error;
+  final bool isLoading;
+  final OnboardingFlowState onboardingFlowState;
+  final Widget child;
+
+  const _DashboardContentStack({
+    required this.error,
+    required this.isLoading,
+    required this.onboardingFlowState,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        if (error == null)
+          AnimatedOpacity(
+            duration: const Duration(milliseconds: 500),
+            opacity: isLoading ? 0 : 1,
+            child: Center(
+              child: onboardingFlowState.maybeWhen<Widget>(
+                none: () => const SizedBox.shrink(),
+                orElse: () => child,
+              ),
+            ),
+          ),
+        if (error == null)
+          AnimatedOpacity(
+            duration: const Duration(milliseconds: 500),
+            opacity: isLoading ? 1 : 0,
+            child: isLoading
+                ? const FullpageLoadingPage()
+                : const SizedBox.shrink(),
+          ),
+        if (error != null) ZenErrorTab(error!),
+      ],
     );
   }
 }

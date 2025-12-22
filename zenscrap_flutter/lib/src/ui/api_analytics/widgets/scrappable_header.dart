@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 
 class ScrappableHeader extends StatelessWidget {
   final Scrappable scrappable;
@@ -13,7 +14,28 @@ class ScrappableHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.only(top: 20, bottom: 16, left: 20, right: 20),
+      padding: EdgeInsets.only(
+        top: context.responsiveValue(
+          compact: 16.0,
+          medium: 20.0,
+          expanded: 20.0,
+        ),
+        bottom: context.responsiveValue(
+          compact: 12.0,
+          medium: 16.0,
+          expanded: 16.0,
+        ),
+        left: context.responsiveValue(
+          compact: 16.0,
+          medium: 20.0,
+          expanded: 20.0,
+        ),
+        right: context.responsiveValue(
+          compact: 16.0,
+          medium: 20.0,
+          expanded: 20.0,
+        ),
+      ),
       decoration: BoxDecoration(
         color: context.c.surface,
         border: Border(
@@ -30,8 +52,19 @@ class ScrappableHeader extends StatelessWidget {
               Icon(
                 Icons.analytics_outlined,
                 color: context.c.primary,
+                size: context.responsiveValue(
+                  compact: 20.0,
+                  medium: 24.0,
+                  expanded: 24.0,
+                ),
               ),
-              SizedBox(width: 8),
+              SizedBox(
+                width: context.responsiveValue(
+                  compact: 8.0,
+                  medium: 8.0,
+                  expanded: 8.0,
+                ),
+              ),
               Expanded(
                 child: Text(
                   scrappable.name,

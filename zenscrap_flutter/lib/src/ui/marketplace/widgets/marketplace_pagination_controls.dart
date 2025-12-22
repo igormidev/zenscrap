@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/marketplace/marketplace_provider.dart';
@@ -23,7 +24,18 @@ class MarketplacePaginationControls extends ConsumerWidget {
         }
         
         return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          padding: EdgeInsets.symmetric(
+            horizontal: context.responsiveValue(
+              compact: 16.0,
+              medium: 20.0,
+              expanded: 20.0,
+            ),
+            vertical: context.responsiveValue(
+              compact: 12.0,
+              medium: 16.0,
+              expanded: 16.0,
+            ),
+          ),
           decoration: BoxDecoration(
             color: context.c.surface,
             border: Border(
@@ -36,13 +48,13 @@ class MarketplacePaginationControls extends ConsumerWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildPreviousButton(context, ref, pagination),
+              _PreviousButton(pagination: pagination),
               const SizedBox(width: 16),
-              ..._buildPageNumbers(context, ref, pagination),
+              ..._PageNumbers(pagination: pagination).buildPageButtons(context, ref),
               const SizedBox(width: 16),
-              _buildNextButton(context, ref, pagination),
+              _NextButton(pagination: pagination),
               const SizedBox(width: 24),
-              _buildPageInfo(context, pagination),
+              _PageInfo(pagination: pagination),
             ],
           ),
         );
@@ -50,24 +62,23 @@ class MarketplacePaginationControls extends ConsumerWidget {
       orElse: () => const SizedBox.shrink(),
     );
   }
+}
 
-  Widget _buildPreviousButton(
-    BuildContext context,
-    WidgetRef ref,
-    PaginationMetadata pagination,
-  ) {
+class _PreviousButton extends ConsumerWidget {
+  final PaginationMetadata pagination;
+
+  const _PreviousButton({required this.pagination});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     return IconButton(
       onPressed: pagination.hasPreviousPage
           ? () {
-              // Track previous page click
               ref.read(analyticsServiceProvider).trackMarketplacePaginationPrevious(
                 fromPage: pagination.currentPage,
                 toPage: pagination.currentPage - 1,
               );
-
-              ref
-                  .read(marketplaceProvider.notifier)
-                  .changePage(pagination.currentPage - 1);
+              ref.read(marketplaceProvider.notifier).changePage(pagination.currentPage - 1);
             }
           : null,
       icon: Icon(
@@ -83,24 +94,23 @@ class MarketplacePaginationControls extends ConsumerWidget {
       ),
     );
   }
+}
 
-  Widget _buildNextButton(
-    BuildContext context,
-    WidgetRef ref,
-    PaginationMetadata pagination,
-  ) {
+class _NextButton extends ConsumerWidget {
+  final PaginationMetadata pagination;
+
+  const _NextButton({required this.pagination});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     return IconButton(
       onPressed: pagination.hasNextPage
           ? () {
-              // Track next page click
               ref.read(analyticsServiceProvider).trackMarketplacePaginationNext(
                 fromPage: pagination.currentPage,
                 toPage: pagination.currentPage + 1,
               );
-
-              ref
-                  .read(marketplaceProvider.notifier)
-                  .changePage(pagination.currentPage + 1);
+              ref.read(marketplaceProvider.notifier).changePage(pagination.currentPage + 1);
             }
           : null,
       icon: Icon(
@@ -116,21 +126,21 @@ class MarketplacePaginationControls extends ConsumerWidget {
       ),
     );
   }
+}
 
-  List<Widget> _buildPageNumbers(
-    BuildContext context,
-    WidgetRef ref,
-    PaginationMetadata pagination,
-  ) {
+class _PageNumbers {
+  final PaginationMetadata pagination;
+
+  const _PageNumbers({required this.pagination});
+
+  List<Widget> buildPageButtons(BuildContext context, WidgetRef ref) {
     final currentPage = pagination.currentPage;
     final totalPages = pagination.totalPages;
     final List<Widget> pageButtons = [];
-    
-    // Calculate range of pages to show (current page +/- 3)
+
     int startPage = (currentPage - 3).clamp(1, totalPages);
     int endPage = (currentPage + 3).clamp(1, totalPages);
-    
-    // Adjust range to always show 7 pages if possible
+
     if (endPage - startPage < 6) {
       if (startPage == 1) {
         endPage = (startPage + 6).clamp(1, totalPages);
@@ -138,59 +148,64 @@ class MarketplacePaginationControls extends ConsumerWidget {
         startPage = (endPage - 6).clamp(1, totalPages);
       }
     }
-    
-    // Add first page and ellipsis if needed
+
     if (startPage > 1) {
-      pageButtons.add(_buildPageButton(context, ref, 1, currentPage));
+      pageButtons.add(_PageButton(pageNumber: 1, currentPage: currentPage));
       if (startPage > 2) {
         pageButtons.add(
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: Text(
-              '...',
-              style: context.t.bodyMedium?.copyWith(
-                color: context.c.onSurfaceVariant,
+            child: Builder(
+              builder: (context) => Text(
+                '...',
+                style: context.t.bodyMedium?.copyWith(
+                  color: context.c.onSurfaceVariant,
+                ),
               ),
             ),
           ),
         );
       }
     }
-    
-    // Add page numbers
+
     for (int i = startPage; i <= endPage; i++) {
-      pageButtons.add(_buildPageButton(context, ref, i, currentPage));
+      pageButtons.add(_PageButton(pageNumber: i, currentPage: currentPage));
     }
-    
-    // Add ellipsis and last page if needed
+
     if (endPage < totalPages) {
       if (endPage < totalPages - 1) {
         pageButtons.add(
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: Text(
-              '...',
-              style: context.t.bodyMedium?.copyWith(
-                color: context.c.onSurfaceVariant,
+            child: Builder(
+              builder: (context) => Text(
+                '...',
+                style: context.t.bodyMedium?.copyWith(
+                  color: context.c.onSurfaceVariant,
+                ),
               ),
             ),
           ),
         );
       }
-      pageButtons.add(
-        _buildPageButton(context, ref, totalPages, currentPage),
-      );
+      pageButtons.add(_PageButton(pageNumber: totalPages, currentPage: currentPage));
     }
-    
+
     return pageButtons;
   }
+}
 
-  Widget _buildPageButton(
-    BuildContext context,
-    WidgetRef ref,
-    int pageNumber,
-    int currentPage,
-  ) {
+class _PageButton extends ConsumerWidget {
+  final int pageNumber;
+  final int currentPage;
+
+  const _PageButton({
+    required this.pageNumber,
+    required this.currentPage,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     final isActive = pageNumber == currentPage;
 
     return Padding(
@@ -199,12 +214,10 @@ class MarketplacePaginationControls extends ConsumerWidget {
         onPressed: isActive
             ? null
             : () {
-                // Track page number click
                 ref.read(analyticsServiceProvider).trackMarketplacePaginationPage(
                   fromPage: currentPage,
                   toPage: pageNumber,
                 );
-
                 ref.read(marketplaceProvider.notifier).changePage(pageNumber);
               },
         style: TextButton.styleFrom(
@@ -229,8 +242,15 @@ class MarketplacePaginationControls extends ConsumerWidget {
       ),
     );
   }
+}
 
-  Widget _buildPageInfo(BuildContext context, PaginationMetadata pagination) {
+class _PageInfo extends StatelessWidget {
+  final PaginationMetadata pagination;
+
+  const _PageInfo({required this.pagination});
+
+  @override
+  Widget build(BuildContext context) {
     final startItem = ((pagination.currentPage - 1) * pagination.pageSize) + 1;
     final endItem = (pagination.currentPage * pagination.pageSize)
         .clamp(0, pagination.totalCount);

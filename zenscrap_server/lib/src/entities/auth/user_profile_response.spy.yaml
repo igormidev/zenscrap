@@ -1,0 +1,11 @@
+### Response containing authenticated user's profile information.
+class: UserProfileResponse
+fields:
+  ### The user's email address.
+  email: String?
+  ### The user's full name.
+  fullName: String?
+  ### The user's display name (username).
+  userName: String?
+  ### URL to the user's profile image.
+  imageUrl: String?

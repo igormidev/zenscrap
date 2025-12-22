@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/ui/ai_usage/widgets/ai_usage_card.dart';
 import 'package:zenscrap_flutter/src/ui/ai_usage/widgets/load_more_button.dart';
 
@@ -29,7 +30,13 @@ class AiCreditsHistorySection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(
+              context.responsiveValue(
+                compact: 16.0,
+                medium: 20.0,
+                expanded: 24.0,
+              ),
+            ),
             child: AiUsageCardHeader(
               icon: Icons.history,
               title: AppLocalizations.of(context)!.ai_usage_credit_history,
@@ -68,8 +75,14 @@ class _CreditHistoryList extends StatelessWidget {
       return _EmptyHistoryState();
     }
 
+    final horizontalPadding = context.responsiveValue(
+      compact: 16.0,
+      medium: 20.0,
+      expanded: 24.0,
+    );
+
     return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+      padding: EdgeInsets.fromLTRB(horizontalPadding, 0, horizontalPadding, horizontalPadding),
       itemCount: creditHistory.length + (hasMore ? 1 : 0),
       itemBuilder: (context, index) {
         if (index == creditHistory.length) {

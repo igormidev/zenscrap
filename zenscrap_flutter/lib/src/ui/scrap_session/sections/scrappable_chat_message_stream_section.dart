@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/convert_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/chat_scroll_controller_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/is_chat_loading_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_messages_provider.dart';
@@ -109,7 +110,28 @@ class _ScrappableChatMessageStreamSectionState
 
         return ListView.builder(
           controller: scrollController,
-          padding: const EdgeInsets.only(top: 20, bottom: 32),
+          padding: EdgeInsets.only(
+            top: context.responsiveValue(
+              compact: 12.0,
+              medium: 16.0,
+              expanded: 20.0,
+            ),
+            bottom: context.responsiveValue(
+              compact: 20.0,
+              medium: 26.0,
+              expanded: 32.0,
+            ),
+            left: context.responsiveValue(
+              compact: 8.0,
+              medium: 12.0,
+              expanded: 0.0,
+            ),
+            right: context.responsiveValue(
+              compact: 8.0,
+              medium: 12.0,
+              expanded: 0.0,
+            ),
+          ),
           itemCount: messages.length + (willHideLoading ? 0 : 1),
           itemBuilder: (context, index) {
             final bool isLastIndex = index == messages.length;
@@ -204,7 +226,14 @@ class _ChatMessageBubble extends StatelessWidget {
         bottomLeft: Radius.circular(border),
         bottomRight: Radius.circular(border),
       );
-      messagePadding = const EdgeInsets.only(left: 56, right: 0);
+      messagePadding = EdgeInsets.only(
+        left: context.responsiveValue(
+          compact: 24.0,
+          medium: 40.0,
+          expanded: 56.0,
+        ),
+        right: 0,
+      );
     } else if (isSystemMessage) {
       userName = "ZenBot";
       backgroundColor = colorScheme.surfaceContainerHighest;
@@ -219,7 +248,14 @@ class _ChatMessageBubble extends StatelessWidget {
         bottomLeft: Radius.circular(border),
         bottomRight: Radius.circular(border),
       );
-      messagePadding = const EdgeInsets.only(left: 0, right: 56);
+      messagePadding = EdgeInsets.only(
+        left: 0,
+        right: context.responsiveValue(
+          compact: 24.0,
+          medium: 40.0,
+          expanded: 56.0,
+        ),
+      );
     } else {
       // Model/AI message
       userName = "AI (CHAT GPT 5.1)";
@@ -235,7 +271,14 @@ class _ChatMessageBubble extends StatelessWidget {
         bottomLeft: Radius.circular(border),
         bottomRight: Radius.circular(border),
       );
-      messagePadding = const EdgeInsets.only(left: 0, right: 56);
+      messagePadding = EdgeInsets.only(
+        left: 0,
+        right: context.responsiveValue(
+          compact: 24.0,
+          medium: 40.0,
+          expanded: 56.0,
+        ),
+      );
     }
 
     // Override message bubble colors for specific message types (keep role icon unchanged)
@@ -392,18 +435,31 @@ class _ChatMessageBubble extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Align(
                   alignment: isUserMessage
                       ? Alignment.centerRight
                       : Alignment.centerLeft,
                   child: Container(
                     constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * 0.75,
+                      maxWidth: MediaQuery.sizeOf(context).width *
+                          context.responsiveValue(
+                            compact: 0.85,
+                            medium: 0.8,
+                            expanded: 0.75,
+                          ),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 10,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.responsiveValue(
+                        compact: 12.0,
+                        medium: 13.0,
+                        expanded: 14.0,
+                      ),
+                      vertical: context.responsiveValue(
+                        compact: 8.0,
+                        medium: 9.0,
+                        expanded: 10.0,
+                      ),
                     ),
                     decoration: BoxDecoration(
                       color: backgroundColor,

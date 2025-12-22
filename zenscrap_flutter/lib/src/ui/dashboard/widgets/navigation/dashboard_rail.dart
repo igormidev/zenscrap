@@ -7,6 +7,7 @@ import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/widgets/account_image.dart';
+import 'package:zenscrap_flutter/src/ui/dashboard/widgets/expand_button.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/widgets/version_indicator.dart';
 
 class DashboardRail extends ConsumerWidget {
@@ -15,11 +16,16 @@ class DashboardRail extends ConsumerWidget {
     required this.widget,
     required this.navigationType,
     required this.changeDrawerStyle,
+    this.showExpandButton = true,
   });
 
   final DashboardView widget;
   final NavigationType navigationType;
   final void Function(NavigationType type) changeDrawerStyle;
+
+  /// Whether to show the expand/collapse button.
+  /// Set to false for medium screens where rail is the only option.
+  final bool showExpandButton;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -59,14 +65,16 @@ class DashboardRail extends ConsumerWidget {
             ],
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(left: 8),
-          child: ExpandButton(
-            selectedNavigationType: navigationType,
-            onNavigationTypeChange: changeDrawerStyle,
+        // Only show expand button when enabled (expanded mode, not medium)
+        if (showExpandButton)
+          Padding(
+            padding: const EdgeInsets.only(left: 8),
+            child: ExpandButton(
+              selectedNavigationType: navigationType,
+              onNavigationTypeChange: changeDrawerStyle,
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
+        if (showExpandButton) const SizedBox(height: 8),
         VersionIndicator(
           versionText: (version) => AppLocalizations.of(context)!.dashboard_version_short(version),
         ),

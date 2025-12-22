@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
@@ -17,37 +18,65 @@ class PurchaseSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    final horizontalPadding = context.responsiveValue(
+      compact: 16.0,
+      medium: 20.0,
+      expanded: 20.0,
+    );
+    final verticalSpacing = context.responsiveValue(
+      compact: 12.0,
+      medium: 16.0,
+      expanded: 16.0,
+    );
+    final borderRadius = context.responsiveValue(
+      compact: 12.0,
+      medium: 16.0,
+      expanded: 16.0,
+    );
+    final cardSpacing = context.responsiveValue(
+      compact: 8.0,
+      medium: 12.0,
+      expanded: 12.0,
+    );
+    final listHeight = context.responsiveValue(
+      compact: 130.0,
+      medium: 135.0,
+      expanded: 135.0,
+    );
+
     return Container(
       decoration: BoxDecoration(
         color: context.c.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(borderRadius),
         border: Border.all(color: context.c.outline.withAlpha(50)),
       ),
       child: Column(
         children: [
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              const SizedBox(width: 20),
-              Text(
-                l10n.api_usage_purchase_credits,
-                style: context.t.titleLarge,
-              ),
-              const Spacer(),
-              Icon(
-                Icons.add_card_rounded,
-                color: context.c.primary,
-                size: 28,
-              ),
-              const SizedBox(width: 20),
-            ],
+          SizedBox(height: verticalSpacing + 4),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    l10n.api_usage_purchase_credits,
+                    style: context.t.titleLarge,
+                  ),
+                ),
+                Icon(
+                  Icons.add_card_rounded,
+                  color: context.c.primary,
+                  size: 28,
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: verticalSpacing),
           SizedBox(
-            height: 129,
+            height: listHeight,
             child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
               scrollDirection: Axis.horizontal,
               children: [
                 _CreditPackageCard(
@@ -58,7 +87,7 @@ class PurchaseSection extends ConsumerWidget {
                   onTap: () =>
                       _handlePurchase(context, ref, CreditPurchaseOption.small),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: cardSpacing),
                 _CreditPackageCard(
                   package: CreditPurchaseOption.medium,
                   credits: '1M',
@@ -69,7 +98,7 @@ class PurchaseSection extends ConsumerWidget {
                   onTap: () => _handlePurchase(
                       context, ref, CreditPurchaseOption.medium),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: cardSpacing),
                 _CreditPackageCard(
                   package: CreditPurchaseOption.large,
                   credits: '2.5M',
@@ -82,9 +111,9 @@ class PurchaseSection extends ConsumerWidget {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: verticalSpacing),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
             child: Row(
               children: [
                 Icon(
@@ -104,7 +133,7 @@ class PurchaseSection extends ConsumerWidget {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: verticalSpacing),
         ],
       ),
     );
@@ -284,19 +313,35 @@ class _CreditPackageCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cardWidth = context.responsiveValue(
+      compact: 170.0,
+      medium: 190.0,
+      expanded: 190.0,
+    );
+    final cardPadding = context.responsiveValue(
+      compact: 12.0,
+      medium: 16.0,
+      expanded: 16.0,
+    );
+    final borderRadius = context.responsiveValue(
+      compact: 8.0,
+      medium: 12.0,
+      expanded: 12.0,
+    );
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(borderRadius),
         child: Container(
-          width: 190,
-          padding: const EdgeInsets.all(16),
+          width: cardWidth,
+          padding: EdgeInsets.all(cardPadding),
           decoration: BoxDecoration(
             color: isHighlighted
                 ? context.c.primaryContainer.withAlpha(30)
                 : context.c.surfaceContainerHighest.withAlpha(30),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(borderRadius),
             border: Border.all(
               color: isHighlighted
                   ? context.c.primary.withAlpha(100)
@@ -311,31 +356,36 @@ class _CreditPackageCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    credits,
-                    style: context.t.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: isHighlighted
-                          ? context.c.primary
-                          : context.c.onSurface,
+                  Flexible(
+                    child: Text(
+                      credits,
+                      style: context.t.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: isHighlighted
+                            ? context.c.primary
+                            : context.c.onSurface,
+                      ),
                     ),
                   ),
                   if (badge != null)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: context.c.tertiary,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        badge!,
-                        style: context.t.labelSmall?.copyWith(
-                          fontSize: 9,
-                          fontWeight: FontWeight.bold,
-                          color: context.c.onTertiary,
+                    Flexible(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: context.c.tertiary,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          badge!,
+                          style: context.t.labelSmall?.copyWith(
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                            color: context.c.onTertiary,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ),
@@ -354,6 +404,8 @@ class _CreditPackageCard extends StatelessWidget {
                 style: context.t.labelSmall?.copyWith(
                   color: context.c.onSurfaceVariant.withAlpha(150),
                 ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
               ),
             ],
           ),

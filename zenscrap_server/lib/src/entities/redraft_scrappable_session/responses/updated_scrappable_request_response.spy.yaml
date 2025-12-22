@@ -5,3 +5,4 @@ fields:
   url: String
   queryParams: Map<String, String?>
   pathParams: List<String>
+  scrappableRequest: ScrappableRequest?

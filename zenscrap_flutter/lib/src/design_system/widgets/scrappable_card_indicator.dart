@@ -7,6 +7,7 @@ import 'package:zenscrap_flutter/src/core/extensions/duration_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/category_badge.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/edit_scrappable_dialog.dart';
+import 'package:zenscrap_flutter/src/design_system/widgets/translatable_text.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/ui/marketplace/pages/scrappable_details_dialog.dart';
 
@@ -79,14 +80,14 @@ class ScrappableCardIndicator extends ConsumerWidget {
             Row(
               children: [
                 Expanded(
-                  child: Text(
-                    scrappable.name,
+                  child: TranslatableTitle(
+                    text: scrappable.name,
+                    sourceLanguage: scrappable.nameLanguage,
                     style: context.t.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: context.c.onSurface,
                     ),
                     maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 if (isMyScrappable) ...[
@@ -123,14 +124,14 @@ class ScrappableCardIndicator extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 8),
-            Text(
-              scrappable.description,
+            TranslatableDescription(
+              text: scrappable.description,
+              sourceLanguage: scrappable.descriptionLanguage,
               style: context.t.bodyMedium?.copyWith(
                 color: context.c.onSurfaceVariant,
                 height: 1.4,
               ),
               maxLines: 3,
-              overflow: TextOverflow.ellipsis,
             ),
             if (hasUrl) ...[
               const SizedBox(height: 16),

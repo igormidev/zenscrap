@@ -3,6 +3,7 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/core/consts.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/ui/ai_usage/widgets/ai_usage_card.dart';
 
 /// Displays the AI credits overview including remaining credits,
@@ -33,28 +34,54 @@ class AiCreditsOverviewSection extends StatelessWidget {
             icon: Icons.auto_awesome,
             title: AppLocalizations.of(context)!.ai_usage_credits_overview,
           ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: _CreditStatCard(
+          ResponsiveGap.vertical(
+            compactSize: 16,
+            mediumSize: 18,
+            expandedSize: 20,
+          ),
+          ResponsiveBuilder(
+            compact: (context, constraints) => Column(
+              children: [
+                _CreditStatCard(
                   label: AppLocalizations.of(context)!.ai_usage_remaining_credits,
                   value: '\$${remainingCredits.toStringAsFixed(2)}',
                   valueColor: remainingCredits > 0
                       ? context.c.primary
                       : context.c.error,
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _CreditStatCard(
+                const SizedBox(height: 12),
+                _CreditStatCard(
                   label: AppLocalizations.of(context)!.ai_usage_monthly_limit,
                   value: '\$${totalCredits.toStringAsFixed(2)}',
                 ),
-              ),
-            ],
+              ],
+            ),
+            medium: (context, constraints) => Row(
+              children: [
+                Expanded(
+                  child: _CreditStatCard(
+                    label: AppLocalizations.of(context)!.ai_usage_remaining_credits,
+                    value: '\$${remainingCredits.toStringAsFixed(2)}',
+                    valueColor: remainingCredits > 0
+                        ? context.c.primary
+                        : context.c.error,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: _CreditStatCard(
+                    label: AppLocalizations.of(context)!.ai_usage_monthly_limit,
+                    value: '\$${totalCredits.toStringAsFixed(2)}',
+                  ),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 20),
+          ResponsiveGap.vertical(
+            compactSize: 16,
+            mediumSize: 18,
+            expandedSize: 20,
+          ),
           _UsageProgressBar(usagePercentage: usagePercentage),
           const SizedBox(height: 8),
           Text(

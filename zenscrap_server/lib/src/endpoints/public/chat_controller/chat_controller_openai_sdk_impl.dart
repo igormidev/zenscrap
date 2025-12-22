@@ -511,19 +511,27 @@ class ChatControllerOpenAiSdkImpl extends IChatController
     // Build input messages (no more input_file - using file_search instead)
     final input = messages.map((msg) => msg.toMap()).toList();
 
+    // Get MCP API key from Serverpod passwords (configured via scloud secrets)
+    final mcpApiKey = session.passwords['mcpApiKey'];
+    if (mcpApiKey == null || mcpApiKey.isEmpty) {
+      throw Exception('MCP API key not configured in Serverpod passwords');
+    }
+
     // Build tools array with file_search for Vector Store documentation
     final tools = <Map<String, dynamic>>[
-      // MCP tools for web scraping
+      // MCP tools for web scraping (authenticated with X-API-KEY header)
       {
         'type': 'mcp',
         'server_label': 'playwright',
         'server_url': _playwrightMcpUrl,
+        'headers': {'X-API-KEY': mcpApiKey},
         'require_approval': 'never',
       },
       {
         'type': 'mcp',
         'server_label': 'scraping_bee',
         'server_url': _scrapingBeeMcpUrl,
+        'headers': {'X-API-KEY': mcpApiKey},
         'require_approval': 'never',
       },
     ];

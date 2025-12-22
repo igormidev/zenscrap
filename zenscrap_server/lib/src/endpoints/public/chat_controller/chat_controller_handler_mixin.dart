@@ -34,26 +34,51 @@ mixin ChatControllerHandlerMixin {
     final ScrappingBeeExtractLogic? scrappingBeeExtractLogic = resp.$2;
     final ScrappableRequest? newRequest = resp.$3;
 
-    // If a new request structure was provided, log it (the caller will need to handle updating the DB)
+    // If a new request structure was provided, log it for debugging
     if (newRequest != null) {
-      session.log('AI modified the ScrappableRequest structure', level: LogLevel.info);
-      session.log('  New queryParams: ${newRequest.queryParams}', level: LogLevel.debug);
-      session.log('  New queryParamsNotRelatedToUrl: ${newRequest.queryParamsNotRelatedToUrl}', level: LogLevel.debug);
-      // TODO: The caller will need to update the ScrappableRequest in the database
+      session.log(
+        'AI modified the ScrappableRequest structure',
+        level: LogLevel.info,
+      );
+      session.log(
+        '  New queryParams: ${newRequest.queryParams}',
+        level: LogLevel.debug,
+      );
+      session.log(
+        '  New queryParamsNotRelatedToUrl: ${newRequest.queryParamsNotRelatedToUrl}',
+        level: LogLevel.debug,
+      );
     }
 
     if (scrappingBeeExtractLogic == null) {
-      // No new extract logic to test, so no verification/retry needed
+      // No new extract logic to test, so no verification/retry needed.
+      // However, if the request was modified, notify via the chat stream
+      // so the cache can be updated (similar to how extract logic is handled).
+      if (newRequest != null) {
+        chatSeason.add(
+          UpdatedScrappableRequestResponse(
+            role: PromptRole.system,
+            expectsFollowUp: false,
+            messageText: 'Request structure updated successfully.',
+            url: newRequest.url,
+            pathParams: newRequest.pathParams,
+            queryParams: newRequest.queryParams,
+            scrappableRequest: newRequest,
+          ),
+        );
+      }
       return null;
     }
 
-    chatSeason.add(MessageTextResponse(
-      role: PromptRole.system,
-      expectsFollowUp: true, // Validation will follow
-      messageText:
-          'Great, I will now test the extract rules you created to see if it works in the reference link we are using for testing.\n'
-          'Please wait a moment...',
-    ));
+    chatSeason.add(
+      MessageTextResponse(
+        role: PromptRole.system,
+        expectsFollowUp: true, // Validation will follow
+        messageText:
+            'Great, I will now test the extract rules you created to see if it works in the reference link we are using for testing.\n'
+            'Please wait a moment...',
+      ),
+    );
 
     // Prepare test payload for placeholder replacement
     final Map<String, dynamic> testPayload = {};
@@ -62,7 +87,8 @@ mixin ChatControllerHandlerMixin {
     final refQueryParamsJson = referenceTestData.referenceQueryParametersJson;
     if (refQueryParamsJson.isNotEmpty) {
       try {
-        final pathParams = jsonDecode(refQueryParamsJson) as Map<String, dynamic>;
+        final pathParams =
+            jsonDecode(refQueryParamsJson) as Map<String, dynamic>;
         testPayload.addAll(pathParams);
       } catch (e) {
         session.log(
@@ -82,11 +108,13 @@ mixin ChatControllerHandlerMixin {
         testPayload[key] = value;
       } else if (!testPayload.containsKey(key)) {
         // Provide sensible test defaults for common parameter names
-        if (key.toLowerCase().contains('search') || key.toLowerCase().contains('query')) {
+        if (key.toLowerCase().contains('search') ||
+            key.toLowerCase().contains('query')) {
           testPayload[key] = 'test query';
         } else if (key.toLowerCase().contains('page')) {
           testPayload[key] = '1';
-        } else if (key.toLowerCase().contains('min') || key.toLowerCase().contains('max')) {
+        } else if (key.toLowerCase().contains('min') ||
+            key.toLowerCase().contains('max')) {
           testPayload[key] = '0';
         } else {
           testPayload[key] = 'test value';
@@ -101,25 +129,29 @@ mixin ChatControllerHandlerMixin {
     );
 
     // Needs to validate if the rules are working...
-    final ExtractFullDataByRule extractResult =
-        await scrappingBee.fetchHtmlAndScreenshotWithLogic(
-      targetUrl: referenceTestData.referenceLinkUsed,
-      scrappingBeeExtractLogic: extractLogicWithTestValues,
-    );
+    final ExtractFullDataByRule extractResult = await scrappingBee
+        .fetchHtmlAndScreenshotWithLogic(
+          targetUrl: referenceTestData.referenceLinkUsed,
+          scrappingBeeExtractLogic: extractLogicWithTestValues,
+        );
 
     return await extractResult.when(
       withData: (result, html, pageFullscreenScreenshot) async {
-        chatSeason.add(MessageTextResponse(
-          role: PromptRole.system,
-          expectsFollowUp: true, // NewExtractRuleResponse will follow
-          messageText:
-              'New rules were tested and did not present any errors! I\'ll update the test endpoint...',
-        ));
+        chatSeason.add(
+          MessageTextResponse(
+            role: PromptRole.system,
+            expectsFollowUp: true, // NewExtractRuleResponse will follow
+            messageText:
+                'New rules were tested and did not present any errors! I\'ll update the test endpoint...',
+          ),
+        );
         final Uint8List htmlBytes = utf8.encode(html);
         final ByteData htmlByteData = ByteData.view(htmlBytes.buffer);
-        final ByteData screenshotByteData =
-            ByteData.view(pageFullscreenScreenshot.buffer);
-        ByteTestData byteTestData = referenceTestData.byteData?.copyWith(
+        final ByteData screenshotByteData = ByteData.view(
+          pageFullscreenScreenshot.buffer,
+        );
+        ByteTestData byteTestData =
+            referenceTestData.byteData?.copyWith(
               referenceHtmlPage: htmlByteData,
               referenceSiteScreenshot: screenshotByteData,
             ) ??
@@ -135,29 +167,44 @@ mixin ChatControllerHandlerMixin {
         ScrappingBeeExtractLogic newScrappingBeeLogic =
             scrappingBeeExtractLogic;
 
-        final isNew = referenceTestData.byteDataId == null ||
+        final isNew =
+            referenceTestData.byteDataId == null ||
             referenceTestData.byteData == null ||
             newScrappingBeeLogic.id == null;
 
         if (isNew) {
           await session.db.transaction((transaction) async {
-            byteTestData = await ByteTestData.db
-                .insertRow(session, byteTestData, transaction: transaction);
+            byteTestData = await ByteTestData.db.insertRow(
+              session,
+              byteTestData,
+              transaction: transaction,
+            );
             newReferenceTestData = newReferenceTestData.copyWith(
               byteDataId: byteTestData.id,
               byteData: byteTestData,
             );
             await ReferenceTestData.db.attachRow.byteData(
-                session, newReferenceTestData, byteTestData,
-                transaction: transaction);
-            await ReferenceTestData.db.updateRow(session, newReferenceTestData,
-                transaction: transaction);
-            final scrappable = await Scrappable.db
-                .findById(session, scrappableId, transaction: transaction);
+              session,
+              newReferenceTestData,
+              byteTestData,
+              transaction: transaction,
+            );
+            await ReferenceTestData.db.updateRow(
+              session,
+              newReferenceTestData,
+              transaction: transaction,
+            );
+            final scrappable = await Scrappable.db.findById(
+              session,
+              scrappableId,
+              transaction: transaction,
+            );
 
             newScrappingBeeLogic = await ScrappingBeeExtractLogic.db.insertRow(
-                session, newScrappingBeeLogic,
-                transaction: transaction);
+              session,
+              newScrappingBeeLogic,
+              transaction: transaction,
+            );
 
             // CRITICAL: Update the in-memory object with the scrappableId that was set by attachRow
             // Without this, the cached object will have scrappableId = null, and commitCurrentEditState
@@ -166,31 +213,41 @@ mixin ChatControllerHandlerMixin {
               scrappableId: scrappable!.id,
             );
             await Scrappable.db.attachRow.scrappingBeeExtractRules(
-                session, scrappable, newScrappingBeeLogic,
-                transaction: transaction);
+              session,
+              scrappable,
+              newScrappingBeeLogic,
+              transaction: transaction,
+            );
           });
         } else {
           await Future.delayed(const Duration(milliseconds: 800));
         }
 
-        chatSeason.add(NewExtractRuleResponse(
+        chatSeason.add(
+          NewExtractRuleResponse(
             role: PromptRole.system,
             expectsFollowUp: false, // Final success, no follow-up
             messageText: 'New rules were tested and did not present any errors',
-            scrapperRequest: scrapperRequest,
+            scrapperRequest: newRequest ?? scrapperRequest,
             referenceTestData: newReferenceTestData,
-            scrappingBeeExtractLogic: newScrappingBeeLogic));
+            scrappingBeeExtractLogic: newScrappingBeeLogic,
+          ),
+        );
         return null;
       },
       error: (String errorMessage) {
-        session.log('#$attemptNumber retrying due to error: $errorMessage',
-            level: LogLevel.warning);
-        chatSeason.add(ErrorTextResponse(
-          role: PromptRole.system,
-          expectsFollowUp: true, // Retry will follow
-          errorMessage:
-              'The extraction rules failed in my quality-assurance test validation. I will ask the AI to fix the selectors and try again.',
-        ));
+        session.log(
+          '#$attemptNumber retrying due to error: $errorMessage',
+          level: LogLevel.warning,
+        );
+        chatSeason.add(
+          ErrorTextResponse(
+            role: PromptRole.system,
+            expectsFollowUp: true, // Retry will follow
+            errorMessage:
+                'The extraction rules failed in my quality-assurance test validation. I will ask the AI to fix the selectors and try again.',
+          ),
+        );
         return buildRetryMessage(
           attemptNumber: attemptNumber,
           errorMessage: errorMessage,
@@ -204,8 +261,9 @@ mixin ChatControllerHandlerMixin {
     required int attemptNumber,
     required String errorMessage,
   }) {
-    final String attempt =
-        attemptNumber > 1 ? '# Attempt $attemptNumber\n' : '';
+    final String attempt = attemptNumber > 1
+        ? '# Attempt $attemptNumber\n'
+        : '';
 
     return '''${attempt}When I tried calling the scrapping bee API with the new extract rule that you just generated, I got the following error from the scrapping bee endpoint:
 ```log
@@ -245,8 +303,9 @@ extension WebScrapperChatAIResponseMapExt on WebScrapperChatAIResponse {
   (
     ChatResponse chatResponse,
     ScrappingBeeExtractLogic? newExtractLogic,
-    ScrappableRequest? newRequest
-  ) toChatResponse({
+    ScrappableRequest? newRequest,
+  )
+  toChatResponse({
     required ScrappableRequest scrapperRequest,
     required ReferenceTestData referenceTestData,
     required ScrappingBeeExtractLogic? scrappingBeeExtractLogic,
@@ -254,23 +313,23 @@ extension WebScrapperChatAIResponseMapExt on WebScrapperChatAIResponse {
   }) {
     return switch (this) {
       WebScrapperChatAIResponseJustMessage(:final String message) => (
-          MessageTextResponse(
-            role: PromptRole.model,
-            expectsFollowUp: false, // Final AI message, no follow-up
-            messageText: message,
-          ),
-          null,
-          null
+        MessageTextResponse(
+          role: PromptRole.model,
+          expectsFollowUp: false, // Final AI message, no follow-up
+          messageText: message,
         ),
+        null,
+        null,
+      ),
       WebScrapperChatAIResponseErrorMessage(:final String errorDescription) => (
-          ErrorTextResponse(
-            role: PromptRole.model,
-            expectsFollowUp: false, // AI error, no follow-up
-            errorMessage: errorDescription,
-          ),
-          null,
-          null
+        ErrorTextResponse(
+          role: PromptRole.model,
+          expectsFollowUp: false, // AI error, no follow-up
+          errorMessage: errorDescription,
         ),
+        null,
+        null,
+      ),
       WebScrapperChatAIResponseOnlyExtractRulesModified(
         :final String resumeActionMessage,
         :final ScrappingBeeFetchSettings fetchSettings,
@@ -279,31 +338,31 @@ extension WebScrapperChatAIResponseMapExt on WebScrapperChatAIResponse {
           // Create new extract rules from the AI's response
           final ScrappingBeeExtractLogic updatedExtractLogic =
               scrappingBeeExtractLogic?.copyWith(
-                    extractRules: fetchSettings.extract_rules,
-                    jsScenario: fetchSettings.js_scenario,
-                    renderJs: fetchSettings.render_js,
-                    wait: fetchSettings.wait,
-                    waitFor: fetchSettings.wait_for,
-                    waitBrowser: fetchSettings.wait_browser,
-                    premiumProxy: fetchSettings.premium_proxy,
-                    stealthProxy: fetchSettings.stealth_proxy,
-                    countryCode: fetchSettings.country_code,
-                    sessionId: fetchSettings.session_id,
-                    customGoogle: fetchSettings.custom_google,
-                  ) ??
-                  ScrappingBeeExtractLogic(
-                    extractRules: fetchSettings.extract_rules,
-                    jsScenario: fetchSettings.js_scenario,
-                    renderJs: fetchSettings.render_js,
-                    wait: fetchSettings.wait,
-                    waitFor: fetchSettings.wait_for,
-                    waitBrowser: fetchSettings.wait_browser,
-                    premiumProxy: fetchSettings.premium_proxy,
-                    stealthProxy: fetchSettings.stealth_proxy,
-                    countryCode: fetchSettings.country_code,
-                    sessionId: fetchSettings.session_id,
-                    customGoogle: fetchSettings.custom_google,
-                  );
+                extractRules: fetchSettings.extract_rules,
+                jsScenario: fetchSettings.js_scenario,
+                renderJs: fetchSettings.render_js,
+                wait: fetchSettings.wait,
+                waitFor: fetchSettings.wait_for,
+                waitBrowser: fetchSettings.wait_browser,
+                premiumProxy: fetchSettings.premium_proxy,
+                stealthProxy: fetchSettings.stealth_proxy,
+                countryCode: fetchSettings.country_code,
+                sessionId: fetchSettings.session_id,
+                customGoogle: fetchSettings.custom_google,
+              ) ??
+              ScrappingBeeExtractLogic(
+                extractRules: fetchSettings.extract_rules,
+                jsScenario: fetchSettings.js_scenario,
+                renderJs: fetchSettings.render_js,
+                wait: fetchSettings.wait,
+                waitFor: fetchSettings.wait_for,
+                waitBrowser: fetchSettings.wait_browser,
+                premiumProxy: fetchSettings.premium_proxy,
+                stealthProxy: fetchSettings.stealth_proxy,
+                countryCode: fetchSettings.country_code,
+                sessionId: fetchSettings.session_id,
+                customGoogle: fetchSettings.custom_google,
+              );
 
           return (
             CandidateExtractLogicUpdate(
@@ -315,7 +374,7 @@ extension WebScrapperChatAIResponseMapExt on WebScrapperChatAIResponse {
               scrappingBeeExtractLogic: updatedExtractLogic,
             ),
             updatedExtractLogic,
-            null // No request modification
+            null, // No request modification
           );
         }(),
       WebScrapperChatAIResponseOnlyRequestModified(
@@ -333,9 +392,10 @@ extension WebScrapperChatAIResponseMapExt on WebScrapperChatAIResponse {
           ScrappableRequest(
             url: scrappableRequest.url,
             queryParams: scrappableRequest.queryParam,
-            queryParamsNotRelatedToUrl: scrappableRequest.queryParamsNotRelatedToUrl,
+            queryParamsNotRelatedToUrl:
+                scrappableRequest.queryParamsNotRelatedToUrl,
             pathParams: scrappableRequest.pathParams,
-          )
+          ),
         ),
       WebScrapperChatAIResponseBothModified(
         :final String resumeActionMessage,
@@ -346,31 +406,31 @@ extension WebScrapperChatAIResponseMapExt on WebScrapperChatAIResponse {
           // Create new extract rules from the AI's response
           final ScrappingBeeExtractLogic updatedExtractLogic =
               scrappingBeeExtractLogic?.copyWith(
-                    extractRules: fetchSettings.extract_rules,
-                    jsScenario: fetchSettings.js_scenario,
-                    renderJs: fetchSettings.render_js,
-                    wait: fetchSettings.wait,
-                    waitFor: fetchSettings.wait_for,
-                    waitBrowser: fetchSettings.wait_browser,
-                    premiumProxy: fetchSettings.premium_proxy,
-                    stealthProxy: fetchSettings.stealth_proxy,
-                    countryCode: fetchSettings.country_code,
-                    sessionId: fetchSettings.session_id,
-                    customGoogle: fetchSettings.custom_google,
-                  ) ??
-                  ScrappingBeeExtractLogic(
-                    extractRules: fetchSettings.extract_rules,
-                    jsScenario: fetchSettings.js_scenario,
-                    renderJs: fetchSettings.render_js,
-                    wait: fetchSettings.wait,
-                    waitFor: fetchSettings.wait_for,
-                    waitBrowser: fetchSettings.wait_browser,
-                    premiumProxy: fetchSettings.premium_proxy,
-                    stealthProxy: fetchSettings.stealth_proxy,
-                    countryCode: fetchSettings.country_code,
-                    sessionId: fetchSettings.session_id,
-                    customGoogle: fetchSettings.custom_google,
-                  );
+                extractRules: fetchSettings.extract_rules,
+                jsScenario: fetchSettings.js_scenario,
+                renderJs: fetchSettings.render_js,
+                wait: fetchSettings.wait,
+                waitFor: fetchSettings.wait_for,
+                waitBrowser: fetchSettings.wait_browser,
+                premiumProxy: fetchSettings.premium_proxy,
+                stealthProxy: fetchSettings.stealth_proxy,
+                countryCode: fetchSettings.country_code,
+                sessionId: fetchSettings.session_id,
+                customGoogle: fetchSettings.custom_google,
+              ) ??
+              ScrappingBeeExtractLogic(
+                extractRules: fetchSettings.extract_rules,
+                jsScenario: fetchSettings.js_scenario,
+                renderJs: fetchSettings.render_js,
+                wait: fetchSettings.wait,
+                waitFor: fetchSettings.wait_for,
+                waitBrowser: fetchSettings.wait_browser,
+                premiumProxy: fetchSettings.premium_proxy,
+                stealthProxy: fetchSettings.stealth_proxy,
+                countryCode: fetchSettings.country_code,
+                sessionId: fetchSettings.session_id,
+                customGoogle: fetchSettings.custom_google,
+              );
 
           return (
             CandidateExtractLogicUpdate(
@@ -385,9 +445,10 @@ extension WebScrapperChatAIResponseMapExt on WebScrapperChatAIResponse {
             ScrappableRequest(
               url: scrappableRequest.url,
               queryParams: scrappableRequest.queryParam,
-              queryParamsNotRelatedToUrl: scrappableRequest.queryParamsNotRelatedToUrl,
+              queryParamsNotRelatedToUrl:
+                  scrappableRequest.queryParamsNotRelatedToUrl,
               pathParams: scrappableRequest.pathParams,
-            )
+            ),
           );
         }(),
     };

@@ -89,6 +89,8 @@ class CreateScrappableEndpoint extends Endpoint {
 
     late final String name;
     late final String description;
+    late final String nameLanguage;
+    late final String descriptionLanguage;
     late final String url;
     late final Map<String, String?> queryParams;
     late final Map<String, String?> queryParamsNotRelatedToUrl;
@@ -113,6 +115,8 @@ class CreateScrappableEndpoint extends Endpoint {
           final Map<String, dynamic> convertedData = result.content;
           name = convertedData['name'] as String;
           description = convertedData['description'] as String;
+          nameLanguage = convertedData['nameLanguage'] as String;
+          descriptionLanguage = convertedData['descriptionLanguage'] as String;
 
           // Extract scrappableRequest nested object
           final Map<String, dynamic> scrappableRequestData =
@@ -210,6 +214,8 @@ class CreateScrappableEndpoint extends Endpoint {
         Scrappable(
           name: name,
           description: description,
+          nameLanguage: nameLanguage,
+          descriptionLanguage: descriptionLanguage,
           createdAt: now,
           generalInfosUpdatedAt: now,
           extractRulesUpdatedAt: now,
@@ -288,7 +294,9 @@ You must return a JSON object with this EXACT structure:
 ```json
 {
   "name": "Short descriptive name (max 50 chars)",
+  "nameLanguage": "enUS",
   "description": "1-3 sentence description of what this URL represents",
+  "descriptionLanguage": "enUS",
   "category": "appropriate_category",
   "scrappableRequest": {
     "url": "URL with {paramName} placeholders",
@@ -299,6 +307,37 @@ You must return a JSON object with this EXACT structure:
   "referenceLinkPathParameters": {}
 }
 ```
+
+## CRITICAL: Language Detection Requirements
+
+**You MUST detect the language from the user's input and create name/description in the SAME language:**
+
+1. **Language Detection Sources:**
+   - Analyze the URL content (domain, path, query parameters)
+   - If user context is provided, detect the language from the text
+   - Look for language indicators in the URL (like .pt, .es, .fr domains or /en/, /es/ paths)
+   - Check the primary language used on the website
+
+2. **Language Assignment Rules:**
+   - The `name` and `nameLanguage` MUST match (e.g., if name is in Spanish, nameLanguage MUST be "esES")
+   - The `description` and `descriptionLanguage` MUST match
+   - If the user typed their request in a specific language, create name and description in THAT language
+   - If the URL clearly indicates a specific language (e.g., transfermarkt.pt for Portuguese), use that language
+   - Default to English ("enUS") only if no clear language is detected
+
+3. **Language Code Format:**
+   - ALWAYS use format: languageCode + countryCode (no separators)
+   - Examples: "enUS", "esES", "ptBR", "ptPT", "frFR", "deDE", "jaJP", "zhCN", "itIT", "ruRU"
+   - For country-specific variants: "ptBR" (Brazilian Portuguese), "ptPT" (European Portuguese), "enGB" (British English), "enUS" (American English)
+
+4. **Language Examples:**
+   - URL: transfermarkt.pt with Portuguese content → name: "Pesquisa de Jogador", nameLanguage: "ptPT", description: "Pesquisa jogadores de futebol no Transfermarkt...", descriptionLanguage: "ptPT"
+   - URL: amazon.es → name: "Producto de Amazon", nameLanguage: "esES"
+   - URL: github.com → name: "GitHub Repository", nameLanguage: "enUS"
+   - URL: lemonde.fr → name: "Article du Monde", nameLanguage: "frFR"
+   - User context in Spanish: "Quiero buscar productos" → name in Spanish, nameLanguage: "esES"
+
+**IMPORTANT:** The language code determines what language the user will see in their dashboard. Make it match their actual input language!
 
 ## Understanding the Structure
 
@@ -333,7 +372,9 @@ Input URL: www.mySocialMedia.com/posts/123/comments/3854?sort=asc&filter=all
 Output:
 {
   "name": "Social Media Post Comments",
+  "nameLanguage": "enUS",
   "description": "Retrieves comments for a specific post on the social media platform, with sorting and filtering options.",
+  "descriptionLanguage": "enUS",
   "category": "social_media",
   "scrappableRequest": {
     "url": "www.mySocialMedia.com/posts/{postId}/comments/{commentId}",
@@ -353,11 +394,13 @@ Output:
 EXAMPLE 2 - Search with Dynamic Query (URL-based search):
 Input URL: https://www.transfermarkt.pt?query=neymar+junior
 
-Analysis: The search term "neymar+junior" appears in the URL and varies - users will search for different players
+Analysis: The search term "neymar+junior" appears in the URL and varies - users will search for different players. The .pt domain and Portuguese content indicate Portuguese language.
 Output:
 {
-  "name": "Transfermarkt Player Search",
-  "description": "Searches for football players on Transfermarkt with variable search terms.",
+  "name": "Pesquisa de Jogadores Transfermarkt",
+  "nameLanguage": "ptPT",
+  "description": "Pesquisa jogadores de futebol no Transfermarkt com termos de pesquisa variáveis.",
+  "descriptionLanguage": "ptPT",
   "category": "sports",
   "scrappableRequest": {
     "url": "https://www.transfermarkt.pt",
@@ -382,7 +425,9 @@ Analysis:
 Output:
 {
   "name": "Shop Product Listing",
+  "nameLanguage": "enUS",
   "description": "Product listings for an e-commerce site with category filtering and configurable sorting.",
+  "descriptionLanguage": "enUS",
   "category": "ecommerce",
   "scrappableRequest": {
     "url": "https://shop.com/products/{categoryId}",
@@ -406,7 +451,9 @@ Analysis: The date and headline slug will vary for different articles
 Output:
 {
   "name": "News Article",
+  "nameLanguage": "enUS",
   "description": "Individual news articles identified by date and headline slug.",
+  "descriptionLanguage": "enUS",
   "category": "news",
   "scrappableRequest": {
     "url": "https://news.com/articles/{articleSlug}",
@@ -433,7 +480,9 @@ Analysis:
 Output:
 {
   "name": "E-commerce Product Search",
+  "nameLanguage": "enUS",
   "description": "Search for products on the e-commerce site with pagination support. Uses client-side search and page navigation.",
+  "descriptionLanguage": "enUS",
   "category": "ecommerce",
   "scrappableRequest": {
     "url": "https://shop.example.com/products",
@@ -462,7 +511,9 @@ Analysis:
 Output:
 {
   "name": "Real Estate Listings",
+  "nameLanguage": "enUS",
   "description": "Search real estate listings with dynamic filters for location, price range, and bedrooms.",
+  "descriptionLanguage": "enUS",
   "category": "real_estate",
   "scrappableRequest": {
     "url": "https://realestate.com/listings",
@@ -480,7 +531,7 @@ Output:
 
 IMPORTANT RULES:
 1. Return a structured JSON object with the nested structure shown above
-2. The top level must have: name, description, category, scrappableRequest, and referenceLinkPathParameters
+2. The top level must have: name, nameLanguage, description, descriptionLanguage, category, scrappableRequest, and referenceLinkPathParameters
 3. The scrappableRequest object must contain: url, queryParams, queryParamsNotRelatedToUrl, and pathParams
 4. Intelligently identify dynamic URL segments (numbers, IDs, slugs) and replace them with descriptive {paramName} placeholders
 5. **CRITICAL**: Think carefully about queryParams vs queryParamsNotRelatedToUrl:
@@ -583,11 +634,21 @@ final Map<String, dynamic> createScrappableJsonSchema = {
     'name': {
       'type': 'string',
       'description':
-          'A short name for the scrappable, like "MySocialMedia Posts Comments".',
+          'A short name for the scrappable, like "MySocialMedia Posts Comments". MUST be in the same language as nameLanguage indicates.',
+    },
+    'nameLanguage': {
+      'type': 'string',
+      'description':
+          'The language code for the name field in format languageCode+countryCode (no separators). Examples: "enUS", "esES", "ptBR", "ptPT", "frFR", "deDE", "jaJP", "zhCN", "itIT", "ruRU". Detect from user input or URL content.',
     },
     'description': {
       'type': 'string',
-      'description': 'A brief description of what this scrappable is for.',
+      'description': 'A brief description of what this scrappable is for. MUST be in the same language as descriptionLanguage indicates.',
+    },
+    'descriptionLanguage': {
+      'type': 'string',
+      'description':
+          'The language code for the description field in format languageCode+countryCode (no separators). Examples: "enUS", "esES", "ptBR", "ptPT", "frFR", "deDE", "jaJP", "zhCN", "itIT", "ruRU". Detect from user input or URL content.',
     },
     'category': {
       'type': 'string',
@@ -681,7 +742,9 @@ final Map<String, dynamic> createScrappableJsonSchema = {
   },
   'required': [
     'name',
+    'nameLanguage',
     'description',
+    'descriptionLanguage',
     'category',
     'scrappableRequest',
     'referenceLinkPathParameters'

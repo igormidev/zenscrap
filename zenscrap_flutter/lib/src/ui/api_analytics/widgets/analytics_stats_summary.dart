@@ -3,6 +3,7 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/core/extensions/request_status_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/ui/api_analytics/widgets/stat_card.dart';
 
 class AnalyticsStatsSummary extends StatelessWidget {
@@ -53,15 +54,31 @@ class AnalyticsStatsSummary extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const SizedBox(height: 12),
           SizedBox(
-            height: 64,
+            height: context.responsiveValue(
+              compact: 8.0,
+              medium: 12.0,
+              expanded: 12.0,
+            ),
+          ),
+          SizedBox(
+            height: context.responsiveValue(
+              compact: 56.0,
+              medium: 64.0,
+              expanded: 64.0,
+            ),
             child: ListView(
               shrinkWrap: true,
               scrollDirection: Axis.horizontal,
               padding: EdgeInsets.zero,
               children: [
-                const SizedBox(width: 16),
+                SizedBox(
+                  width: context.responsiveValue(
+                    compact: 12.0,
+                    medium: 16.0,
+                    expanded: 16.0,
+                  ),
+                ),
                 StatCard(
                   label: l10n.api_analytics_status_success,
                   count: totalSuccess,
@@ -106,11 +123,23 @@ class AnalyticsStatsSummary extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(
+            height: context.responsiveValue(
+              compact: 8.0,
+              medium: 12.0,
+              expanded: 12.0,
+            ),
+          ),
           Align(
             alignment: Alignment.centerRight,
             child: Container(
-              margin: const EdgeInsets.only(right: 16),
+              margin: EdgeInsets.only(
+                right: context.responsiveValue(
+                  compact: 12.0,
+                  medium: 16.0,
+                  expanded: 16.0,
+                ),
+              ),
               decoration: BoxDecoration(
                 color: context.c.surfaceContainerLow.withAlpha(80),
                 borderRadius: BorderRadius.circular(12),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/states/marketplace/marketplace_provider.dart';
 
@@ -18,13 +19,31 @@ class EmptyMarketplacePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Center(
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 400),
-        padding: const EdgeInsets.all(32),
+        constraints: BoxConstraints(
+          maxWidth: context.responsiveValue(
+            compact: double.infinity,
+            medium: 400.0,
+            expanded: 400.0,
+          ),
+        ),
+        padding: EdgeInsets.all(
+          context.responsiveValue(
+            compact: 24.0,
+            medium: 32.0,
+            expanded: 32.0,
+          ),
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(24),
+              padding: EdgeInsets.all(
+                context.responsiveValue(
+                  compact: 20.0,
+                  medium: 24.0,
+                  expanded: 24.0,
+                ),
+              ),
               decoration: BoxDecoration(
                 color: context.c.surfaceContainerHighest.withAlpha(51),
                 shape: BoxShape.circle,
@@ -33,11 +52,21 @@ class EmptyMarketplacePage extends ConsumerWidget {
                 isSearchResult
                     ? Icons.search_off_rounded
                     : Icons.shopping_bag_outlined,
-                size: 48,
+                size: context.responsiveValue(
+                  compact: 40.0,
+                  medium: 48.0,
+                  expanded: 48.0,
+                ),
                 color: context.c.onSurfaceVariant,
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(
+              height: context.responsiveValue(
+                compact: 20.0,
+                medium: 24.0,
+                expanded: 24.0,
+              ),
+            ),
             Text(
               isSearchResult
                   ? AppLocalizations.of(context)!.marketplace_no_results_found
@@ -45,6 +74,7 @@ class EmptyMarketplacePage extends ConsumerWidget {
               style: context.t.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),
             Text(

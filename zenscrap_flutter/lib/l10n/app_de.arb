@@ -10,6 +10,7 @@
   "landing_sign_in": "Anmelden",
   "landing_app_name": "ZenScrap",
   "landing_learn_more": "Mehr erfahren",
+  "landing_drawer_language": "Sprache",
 
   "landing_hero_title": "Web Scraper, die sich\nselbst reparieren",
   "landing_hero_subtitle": "Beschreiben Sie, was Sie extrahieren moechten. Unsere KI erstellt, testet und wartet Ihren Scraper automatisch. Kein Code. Keine CSS-Selektoren. Keine defekten Endpunkte.",
@@ -572,5 +573,8 @@
   "scrappables_selected_category": "die ausgewaehlte Kategorie",
   "scrappables_selected_categories": "die ausgewaehlten Kategorien",
   "scrappables_your_endpoints": "Ihre Endpoints",
-  "scrappables_create_new": "Neuen Endpoint erstellen"
+  "scrappables_create_new": "Neuen Endpoint erstellen",
+  "common_show_original": "Original anzeigen",
+  "common_show_translated": "Ubersetzung anzeigen",
+  "common_auto_translated": "Automatisch ubersetzt aus {language}"
 }

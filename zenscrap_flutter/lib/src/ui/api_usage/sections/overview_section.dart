@@ -3,6 +3,7 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/core/extensions/plan_tier_extension.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 
 class CreditsOverviewSection extends StatelessWidget {
   final int subscriptionCredits;
@@ -22,42 +23,63 @@ class CreditsOverviewSection extends StatelessWidget {
     final totalCredits = subscriptionCredits + purchasedCredits;
     final creditsOwnedPerMonth = planTier.apiCreditsAddedPerMonthInt;
 
+    final horizontalPadding = context.responsiveValue(
+      compact: 16.0,
+      medium: 20.0,
+      expanded: 20.0,
+    );
+    final verticalSpacing = context.responsiveValue(
+      compact: 12.0,
+      medium: 16.0,
+      expanded: 16.0,
+    );
+    final itemSpacing = context.responsiveValue(
+      compact: 8.0,
+      medium: 12.0,
+      expanded: 12.0,
+    );
+    final borderRadius = context.responsiveValue(
+      compact: 12.0,
+      medium: 16.0,
+      expanded: 16.0,
+    );
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       decoration: BoxDecoration(
         color: context.c.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(borderRadius),
         border: Border.all(color: context.c.outline.withAlpha(50)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 20),
+          SizedBox(height: verticalSpacing + 4),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                l10n.api_usage_credits_overview,
-                style: context.t.titleLarge,
+              Expanded(
+                child: Text(
+                  l10n.api_usage_credits_overview,
+                  style: context.t.titleLarge,
+                ),
               ),
               Icon(Icons.generating_tokens, color: context.c.primary, size: 28),
             ],
           ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: CreditItem(
+          SizedBox(height: verticalSpacing),
+          ResponsiveBuilder(
+            compact: (context, constraints) => Column(
+              children: [
+                _CreditItem(
                   label: l10n.api_usage_total_available,
                   description: l10n.api_usage_credits_combined_description,
                   value: totalCredits.toString(),
                   icon: Icons.check_circle,
                   isHighlighted: true,
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: CreditItem(
+                SizedBox(height: itemSpacing),
+                _CreditItem(
                   label: l10n.api_usage_subscription,
                   description: planTier == PlanTier.none
                       ? l10n.api_usage_subscribe_to_unlock
@@ -65,19 +87,50 @@ class CreditsOverviewSection extends StatelessWidget {
                   value: subscriptionCredits.toString(),
                   icon: Icons.calendar_month,
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: CreditItem(
+                SizedBox(height: itemSpacing),
+                _CreditItem(
                   label: l10n.api_usage_purchased,
                   description: l10n.api_usage_purchased_description,
                   value: purchasedCredits.toString(),
                   icon: Icons.shopping_cart,
                 ),
-              ),
-            ],
+              ],
+            ),
+            expanded: (context, constraints) => Row(
+              children: [
+                Expanded(
+                  child: _CreditItem(
+                    label: l10n.api_usage_total_available,
+                    description: l10n.api_usage_credits_combined_description,
+                    value: totalCredits.toString(),
+                    icon: Icons.check_circle,
+                    isHighlighted: true,
+                  ),
+                ),
+                SizedBox(width: itemSpacing),
+                Expanded(
+                  child: _CreditItem(
+                    label: l10n.api_usage_subscription,
+                    description: planTier == PlanTier.none
+                        ? l10n.api_usage_subscribe_to_unlock
+                        : l10n.api_usage_will_renew_monthly(creditsOwnedPerMonth),
+                    value: subscriptionCredits.toString(),
+                    icon: Icons.calendar_month,
+                  ),
+                ),
+                SizedBox(width: itemSpacing),
+                Expanded(
+                  child: _CreditItem(
+                    label: l10n.api_usage_purchased,
+                    description: l10n.api_usage_purchased_description,
+                    value: purchasedCredits.toString(),
+                    icon: Icons.shopping_cart,
+                  ),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: verticalSpacing),
           Row(
             children: [
               Icon(
@@ -96,22 +149,21 @@ class CreditsOverviewSection extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: verticalSpacing),
         ],
       ),
     );
   }
 }
 
-class CreditItem extends StatelessWidget {
+class _CreditItem extends StatelessWidget {
   final String label;
   final String value;
   final String description;
   final IconData icon;
   final bool isHighlighted;
 
-  const CreditItem({
-    super.key,
+  const _CreditItem({
     required this.label,
     required this.value,
     required this.description,
@@ -121,13 +173,29 @@ class CreditItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final padding = context.responsiveValue(
+      compact: 12.0,
+      medium: 16.0,
+      expanded: 16.0,
+    );
+    final borderRadius = context.responsiveValue(
+      compact: 8.0,
+      medium: 12.0,
+      expanded: 12.0,
+    );
+    final iconSize = context.responsiveValue(
+      compact: 16.0,
+      medium: 18.0,
+      expanded: 18.0,
+    );
+
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(padding),
       decoration: BoxDecoration(
         color: isHighlighted
             ? context.c.primaryContainer.withAlpha(100)
             : context.c.surfaceContainerHighest.withAlpha(50),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(borderRadius),
         border: isHighlighted
             ? Border.all(color: context.c.primary.withAlpha(100), width: 1.5)
             : Border.all(color: context.c.outline.withAlpha(30), width: 1),
@@ -142,7 +210,7 @@ class CreditItem extends StatelessWidget {
                 color: isHighlighted
                     ? context.c.primary
                     : context.c.onSurfaceVariant,
-                size: 18,
+                size: iconSize,
               ),
               const SizedBox(width: 8),
               Expanded(

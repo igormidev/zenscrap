@@ -1,0 +1,3 @@
+exception: EmailAlreadyRegisteredException
+fields:
+  email: String

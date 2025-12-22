@@ -4,6 +4,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
+import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
+import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 
 /// A mixin that provides scrappable creation functionality with analytics tracking.
 ///
@@ -75,6 +77,23 @@ mixin CreateScrappableMixin<T extends ConsumerStatefulWidget>
         targetUrl: targetUrl,
         errorMessage: e.toString(),
       );
+
+      // Track first interaction error specifically for anonymous/new users
+      // This is critical for understanding drop-off at the first step of the user journey
+      final isAuthenticated =
+          ref.read(sessionProvider.select((value) => value.maybeMap(
+                orElse: () => false,
+                logged: (_) => true,
+              )));
+
+      if (!isAuthenticated) {
+        await analytics.trackNewUserFirstInteractionError(
+          targetUrl: targetUrl,
+          promptLength: userPrompt.length,
+          errorMessage: e.toString(),
+        );
+      }
+
       rethrow;
     }
   }

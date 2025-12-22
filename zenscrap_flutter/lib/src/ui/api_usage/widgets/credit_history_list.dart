@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 
 class CreditHistoryList extends ConsumerWidget {
@@ -23,10 +24,26 @@ class CreditHistoryList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    final emptyStatePadding = context.responsiveValue(
+      compact: 24.0,
+      medium: 32.0,
+      expanded: 32.0,
+    );
+    final spacing = context.responsiveValue(
+      compact: 12.0,
+      medium: 16.0,
+      expanded: 16.0,
+    );
+    final borderRadius = context.responsiveValue(
+      compact: 6.0,
+      medium: 8.0,
+      expanded: 8.0,
+    );
+
     if (creditHistory.isEmpty) {
       return Center(
         child: Padding(
-          padding: const EdgeInsets.all(32),
+          padding: EdgeInsets.all(emptyStatePadding),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -35,7 +52,7 @@ class CreditHistoryList extends ConsumerWidget {
                 size: 48,
                 color: context.c.onSurface.withAlpha(100),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: spacing),
               Text(
                 l10n.api_usage_no_credit_history,
                 style: context.t.bodyLarge?.copyWith(
@@ -68,12 +85,12 @@ class CreditHistoryList extends ConsumerWidget {
             ),
             itemBuilder: (context, index) {
               final item = creditHistory[index];
-              return _buildHistoryItem(context, item);
+              return _CreditHistoryItem(item: item);
             },
           ),
         ),
         if (hasMore) ...[
-          const SizedBox(height: 16),
+          SizedBox(height: spacing),
           SizedBox(
             width: double.infinity,
             child: OutlinedButton(
@@ -90,7 +107,7 @@ class CreditHistoryList extends ConsumerWidget {
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(borderRadius),
                 ),
               ),
               child: isLoadingMore
@@ -121,8 +138,15 @@ class CreditHistoryList extends ConsumerWidget {
       ],
     );
   }
+}
 
-  Widget _buildHistoryItem(BuildContext context, ApiCreditHistoryItem item) {
+class _CreditHistoryItem extends StatelessWidget {
+  final ApiCreditHistoryItem item;
+
+  const _CreditHistoryItem({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
     // Format date

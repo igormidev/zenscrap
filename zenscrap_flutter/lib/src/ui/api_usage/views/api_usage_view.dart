@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
@@ -353,49 +354,42 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
           ),
         );
       },
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final isMobile = constraints.maxWidth < 768;
-
-          if (isMobile) {
-            return MobileLayout(
-              planTier: planTier,
-              selectedTabIndex: _selectedTabIndex,
-              onTabSelected: (index) =>
-                  setState(() => _selectedTabIndex = index),
-              apiUsage: apiUsage,
-              apiKeys: apiKeys,
-              apiKeyUsageStats: apiKeyUsageStats,
-              creditHistory: creditHistory,
-              isLoadingMoreHistory: isLoadingMoreHistory,
-              hasMoreHistory: hasMoreHistory,
-              onLoadMoreHistory: _loadMoreHistory,
-              onShowCreateApiKeyDialog: _showCreateApiKeyDialog,
-              onDeactivateApiKey: _deactivateApiKey,
-            );
-          } else {
-            return DesktopLayout(
-              isRefreshVN: _isRefreshVN,
-              apiUsage: apiUsage,
-              apiKeys: apiKeys,
-              apiKeyUsageStats: apiKeyUsageStats,
-              creditHistory: creditHistory,
-              planTier: planTier,
-              isLoadingMoreHistory: isLoadingMoreHistory,
-              hasMoreHistory: hasMoreHistory,
-              onLoadMoreHistory: _loadMoreHistory,
-              onShowCreateApiKeyDialog: _showCreateApiKeyDialog,
-              onDeactivateApiKey: _deactivateApiKey,
-              onRefresh: _handleRefresh,
-            );
-          }
-        },
+      child: ResponsiveBuilder(
+        compact: (context, constraints) => _CompactLayout(
+          planTier: planTier,
+          selectedTabIndex: _selectedTabIndex,
+          onTabSelected: (index) =>
+              setState(() => _selectedTabIndex = index),
+          apiUsage: apiUsage,
+          apiKeys: apiKeys,
+          apiKeyUsageStats: apiKeyUsageStats,
+          creditHistory: creditHistory,
+          isLoadingMoreHistory: isLoadingMoreHistory,
+          hasMoreHistory: hasMoreHistory,
+          onLoadMoreHistory: _loadMoreHistory,
+          onShowCreateApiKeyDialog: _showCreateApiKeyDialog,
+          onDeactivateApiKey: _deactivateApiKey,
+        ),
+        expanded: (context, constraints) => _ExpandedLayout(
+          isRefreshVN: _isRefreshVN,
+          apiUsage: apiUsage,
+          apiKeys: apiKeys,
+          apiKeyUsageStats: apiKeyUsageStats,
+          creditHistory: creditHistory,
+          planTier: planTier,
+          isLoadingMoreHistory: isLoadingMoreHistory,
+          hasMoreHistory: hasMoreHistory,
+          onLoadMoreHistory: _loadMoreHistory,
+          onShowCreateApiKeyDialog: _showCreateApiKeyDialog,
+          onDeactivateApiKey: _deactivateApiKey,
+          onRefresh: _handleRefresh,
+        ),
       ),
     );
   }
 }
 
-class MobileLayout extends ConsumerWidget {
+class _CompactLayout extends ConsumerWidget {
   final int selectedTabIndex;
   final PlanTier planTier;
   final Function(int) onTabSelected;
@@ -409,8 +403,7 @@ class MobileLayout extends ConsumerWidget {
   final VoidCallback onShowCreateApiKeyDialog;
   final Function(int) onDeactivateApiKey;
 
-  const MobileLayout({
-    super.key,
+  const _CompactLayout({
     required this.planTier,
     required this.selectedTabIndex,
     required this.onTabSelected,
@@ -428,17 +421,17 @@ class MobileLayout extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tabs = [
-      OverviewTab(
+      _OverviewTab(
         apiUsage: apiUsage,
         planTier: planTier,
       ),
-      ApiKeysTab(
+      _ApiKeysTab(
         apiKeys: apiKeys,
         apiKeyUsageStats: apiKeyUsageStats,
         onShowCreateApiKeyDialog: onShowCreateApiKeyDialog,
         onDeactivateApiKey: onDeactivateApiKey,
       ),
-      HistoryTab(
+      _HistoryTab(
         creditHistory: creditHistory,
         isLoadingMoreHistory: isLoadingMoreHistory,
         hasMoreHistory: hasMoreHistory,
@@ -486,7 +479,7 @@ class MobileLayout extends ConsumerWidget {
   }
 }
 
-class DesktopLayout extends StatelessWidget {
+class _ExpandedLayout extends StatelessWidget {
   final PlanTier planTier;
   final AccountApiUsage apiUsage;
   final List<AccountApiKey> apiKeys;
@@ -500,8 +493,7 @@ class DesktopLayout extends StatelessWidget {
   final ValueNotifier<bool> isRefreshVN;
   final VoidCallback onRefresh;
 
-  const DesktopLayout({
-    super.key,
+  const _ExpandedLayout({
     required this.apiUsage,
     required this.planTier,
     required this.apiKeys,
@@ -518,97 +510,119 @@ class DesktopLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final horizontalPadding = context.responsiveValue(
+      compact: 16.0,
+      medium: 24.0,
+      expanded: 32.0,
+    );
+    final verticalSpacing = context.responsiveValue(
+      compact: 16.0,
+      medium: 20.0,
+      expanded: 24.0,
+    );
+
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 1210),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    AppLocalizations.of(context)!.api_usage_page_title,
-                    style: context.t.displaySmall,
-                  ),
-                ),
-                ValueListenableBuilder(
-                    valueListenable: isRefreshVN,
-                    builder: (context, isRefresh, _) {
-                      return FilledButton.tonalIcon(
-                        onPressed: isRefresh ? null : onRefresh,
-                        label: Text(AppLocalizations.of(context)!.api_usage_refresh),
-                        icon: isRefresh
-                            ? CupertinoActivityIndicator()
-                            : Icon(Icons.refresh),
-                      );
-                    }),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: CreditsOverviewSection(
-                    planTier: planTier,
-                    subscriptionCredits:
-                        apiUsage.creditUsage!.subscriptionCredits,
-                    purchasedCredits: apiUsage.creditUsage!.purchasedCredits,
-                  ),
-                ),
-                SizedBox(width: 24),
-                Expanded(
-                  child: PurchaseSection(),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: verticalSpacing),
+              Row(
                 children: [
                   Expanded(
-                    flex: 5,
-                    child: ApiKeysSection(
-                      apiKeys: apiKeys,
-                      apiKeyUsageStats: apiKeyUsageStats,
-                      onShowCreateApiKeyDialog: onShowCreateApiKeyDialog,
-                      onDeactivateApiKey: onDeactivateApiKey,
+                    child: Text(
+                      AppLocalizations.of(context)!.api_usage_page_title,
+                      style: context.t.displaySmall,
                     ),
                   ),
-                  const SizedBox(width: 24),
+                  ValueListenableBuilder(
+                      valueListenable: isRefreshVN,
+                      builder: (context, isRefresh, _) {
+                        return FilledButton.tonalIcon(
+                          onPressed: isRefresh ? null : onRefresh,
+                          label: Text(AppLocalizations.of(context)!.api_usage_refresh),
+                          icon: isRefresh
+                              ? CupertinoActivityIndicator()
+                              : Icon(Icons.refresh),
+                        );
+                      }),
+                ],
+              ),
+              SizedBox(height: verticalSpacing),
+              Row(
+                children: [
                   Expanded(
-                    flex: 4,
-                    child: HistorySection(
-                      creditHistory: creditHistory,
-                      isLoadingMoreHistory: isLoadingMoreHistory,
-                      hasMoreHistory: hasMoreHistory,
-                      onLoadMoreHistory: onLoadMoreHistory,
+                    child: CreditsOverviewSection(
+                      planTier: planTier,
+                      subscriptionCredits:
+                          apiUsage.creditUsage!.subscriptionCredits,
+                      purchasedCredits: apiUsage.creditUsage!.purchasedCredits,
                     ),
+                  ),
+                  SizedBox(width: verticalSpacing),
+                  Expanded(
+                    child: PurchaseSection(),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 20),
-          ],
+              SizedBox(height: verticalSpacing),
+              Expanded(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 5,
+                      child: ApiKeysSection(
+                        apiKeys: apiKeys,
+                        apiKeyUsageStats: apiKeyUsageStats,
+                        onShowCreateApiKeyDialog: onShowCreateApiKeyDialog,
+                        onDeactivateApiKey: onDeactivateApiKey,
+                      ),
+                    ),
+                    SizedBox(width: verticalSpacing),
+                    Expanded(
+                      flex: 4,
+                      child: HistorySection(
+                        creditHistory: creditHistory,
+                        isLoadingMoreHistory: isLoadingMoreHistory,
+                        hasMoreHistory: hasMoreHistory,
+                        onLoadMoreHistory: onLoadMoreHistory,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: verticalSpacing),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class OverviewTab extends StatelessWidget {
+class _OverviewTab extends StatelessWidget {
   final PlanTier planTier;
   final AccountApiUsage apiUsage;
 
-  const OverviewTab(
-      {super.key, required this.apiUsage, required this.planTier});
+  const _OverviewTab({
+    required this.apiUsage,
+    required this.planTier,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final padding = context.responsiveValue(
+      compact: 16.0,
+      medium: 20.0,
+      expanded: 24.0,
+    );
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(padding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -616,7 +630,7 @@ class OverviewTab extends StatelessWidget {
             AppLocalizations.of(context)!.api_usage_overview_title,
             style: context.t.headlineMedium,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: padding),
           CreditsOverviewSection(
             planTier: planTier,
             subscriptionCredits: apiUsage.creditUsage!.subscriptionCredits,
@@ -628,14 +642,13 @@ class OverviewTab extends StatelessWidget {
   }
 }
 
-class ApiKeysTab extends StatelessWidget {
+class _ApiKeysTab extends StatelessWidget {
   final List<AccountApiKey> apiKeys;
   final Map<int, int> apiKeyUsageStats;
   final VoidCallback onShowCreateApiKeyDialog;
   final Function(int) onDeactivateApiKey;
 
-  const ApiKeysTab({
-    super.key,
+  const _ApiKeysTab({
     required this.apiKeys,
     required this.apiKeyUsageStats,
     required this.onShowCreateApiKeyDialog,
@@ -644,8 +657,14 @@ class ApiKeysTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final padding = context.responsiveValue(
+      compact: 16.0,
+      medium: 20.0,
+      expanded: 24.0,
+    );
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(padding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -653,7 +672,7 @@ class ApiKeysTab extends StatelessWidget {
             AppLocalizations.of(context)!.api_usage_api_keys,
             style: context.t.headlineMedium,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: padding),
           ApiKeysSection(
             apiKeys: apiKeys,
             apiKeyUsageStats: apiKeyUsageStats,
@@ -666,14 +685,13 @@ class ApiKeysTab extends StatelessWidget {
   }
 }
 
-class HistoryTab extends StatelessWidget {
+class _HistoryTab extends StatelessWidget {
   final List<ApiCreditHistoryItem> creditHistory;
   final bool isLoadingMoreHistory;
   final bool hasMoreHistory;
   final VoidCallback onLoadMoreHistory;
 
-  const HistoryTab({
-    super.key,
+  const _HistoryTab({
     required this.creditHistory,
     required this.isLoadingMoreHistory,
     required this.hasMoreHistory,
@@ -682,8 +700,14 @@ class HistoryTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final padding = context.responsiveValue(
+      compact: 16.0,
+      medium: 20.0,
+      expanded: 24.0,
+    );
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(padding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -691,7 +715,7 @@ class HistoryTab extends StatelessWidget {
             AppLocalizations.of(context)!.api_usage_credit_history,
             style: context.t.headlineMedium,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: padding),
           HistorySection(
             creditHistory: creditHistory,
             isLoadingMoreHistory: isLoadingMoreHistory,

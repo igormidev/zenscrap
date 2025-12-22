@@ -5,6 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/language_selector.dart';
 
 /// The navigation items in the landing page appbar.
@@ -31,6 +32,7 @@ enum LandingSection {
 
 /// Fixed floating appbar with blur effect for the landing page.
 /// Contains logo, section navigation with animated pill indicator, and login button.
+/// On mobile, shows a hamburger menu that opens a navigation drawer.
 class LandingAppBar extends StatelessWidget {
   /// Currently active section based on scroll position.
   final LandingSection? activeSection;
@@ -41,6 +43,9 @@ class LandingAppBar extends StatelessWidget {
   /// Callback when Sign In button is tapped (for analytics tracking).
   final VoidCallback? onSignInTap;
 
+  /// Callback when hamburger menu is tapped (mobile only).
+  final VoidCallback? onMenuTap;
+
   /// Whether the appbar should show a solid background (when scrolled).
   final bool isScrolled;
 
@@ -49,6 +54,7 @@ class LandingAppBar extends StatelessWidget {
     this.activeSection,
     this.onSectionTap,
     this.onSignInTap,
+    this.onMenuTap,
     this.isScrolled = false,
   });
 
@@ -59,7 +65,14 @@ class LandingAppBar extends StatelessWidget {
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          padding: EdgeInsets.symmetric(
+            horizontal: context.responsiveValue(
+              compact: 16.0,
+              medium: 24.0,
+              expanded: 32.0,
+            ),
+            vertical: context.responsiveValue(compact: 12.0, expanded: 16.0),
+          ),
           decoration: BoxDecoration(
             color: isScrolled
                 ? context.c.surface.withAlpha(220)
@@ -70,26 +83,16 @@ class LandingAppBar extends StatelessWidget {
               ),
             ),
           ),
-          child: Row(
-            children: [
-              // Logo
-              _Logo(),
-              const Spacer(),
-              // Navigation items with pill indicator
-              _NavigationBar(
-                activeSection: activeSection,
-                onSectionTap: onSectionTap,
-              ),
-              const Spacer(),
-              // Language selector
-              SizedBox(
-                height: 34,
-                child: const LanguageSelector(),
-              ).animate().fadeIn(duration: 400.ms, delay: 150.ms),
-              const SizedBox(width: 12),
-              // Login button
-              _LoginButton(onTap: onSignInTap),
-            ],
+          child: ResponsiveWidget(
+            compact: _MobileAppBarContent(
+              onMenuTap: onMenuTap,
+              onSignInTap: onSignInTap,
+            ),
+            expanded: _DesktopAppBarContent(
+              activeSection: activeSection,
+              onSectionTap: onSectionTap,
+              onSignInTap: onSignInTap,
+            ),
           ),
         ),
       ),
@@ -97,7 +100,79 @@ class LandingAppBar extends StatelessWidget {
   }
 }
 
+/// Desktop layout with full navigation bar
+class _DesktopAppBarContent extends StatelessWidget {
+  final LandingSection? activeSection;
+  final void Function(LandingSection section)? onSectionTap;
+  final VoidCallback? onSignInTap;
+
+  const _DesktopAppBarContent({
+    this.activeSection,
+    this.onSectionTap,
+    this.onSignInTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        // Logo
+        const _Logo(),
+        const Spacer(),
+        // Navigation items with pill indicator
+        _NavigationBar(
+          activeSection: activeSection,
+          onSectionTap: onSectionTap,
+        ),
+        const Spacer(),
+        // Language selector
+        SizedBox(
+          height: 34,
+          child: const LanguageSelector(),
+        ).animate().fadeIn(duration: 400.ms, delay: 150.ms),
+        const SizedBox(width: 12),
+        // Login button
+        _LoginButton(onTap: onSignInTap),
+      ],
+    );
+  }
+}
+
+/// Mobile layout with hamburger menu
+class _MobileAppBarContent extends StatelessWidget {
+  final VoidCallback? onMenuTap;
+  final VoidCallback? onSignInTap;
+
+  const _MobileAppBarContent({this.onMenuTap, this.onSignInTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        // Logo
+        const _Logo(),
+        const Spacer(),
+        // Language selector (compact)
+        SizedBox(
+          height: 34,
+          child: const LanguageSelector(compact: true),
+        ).animate().fadeIn(duration: 400.ms, delay: 150.ms),
+        const SizedBox(width: 8),
+        // Hamburger menu button
+        IconButton(
+          onPressed: onMenuTap,
+          icon: const Icon(Icons.menu_rounded),
+          tooltip: 'Menu',
+          style: IconButton.styleFrom(foregroundColor: context.c.onSurface),
+        ).animate().fadeIn(duration: 400.ms, delay: 200.ms),
+      ],
+    );
+  }
+}
+
 class _Logo extends StatelessWidget {
+  const _Logo();
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;

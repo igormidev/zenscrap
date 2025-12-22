@@ -10,10 +10,12 @@ import 'package:zenscrap_flutter/src/core/extensions/convert_extensions.dart';
 import 'package:zenscrap_flutter/src/core/extensions/date_time_extension.dart';
 import 'package:zenscrap_flutter/src/core/extensions/string_extension.dart';
 import 'package:zenscrap_flutter/src/core/mixins/curl_builder_mixin.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/category_badge.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/code_bloc.dart';
+import 'package:zenscrap_flutter/src/design_system/widgets/translatable_text.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_state.dart';
@@ -145,15 +147,53 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
     final horizontalPadding = const EdgeInsets.only(left: 24, right: 24);
 
     return AlertDialog(
-      insetPadding: const EdgeInsets.symmetric(vertical: 20),
-      titlePadding: const EdgeInsets.only(left: 24, right: 24, top: 24),
-      // contentPadding: const EdgeInsets.only(left: 24, right: 24),
+      insetPadding: EdgeInsets.symmetric(
+        vertical: context.responsiveValue(
+          compact: 16.0,
+          medium: 20.0,
+          expanded: 20.0,
+        ),
+        horizontal: context.responsiveValue(
+          compact: 16.0,
+          medium: 40.0,
+          expanded: 40.0,
+        ),
+      ),
+      titlePadding: EdgeInsets.only(
+        left: context.responsiveValue(
+          compact: 16.0,
+          medium: 24.0,
+          expanded: 24.0,
+        ),
+        right: context.responsiveValue(
+          compact: 16.0,
+          medium: 24.0,
+          expanded: 24.0,
+        ),
+        top: context.responsiveValue(
+          compact: 20.0,
+          medium: 24.0,
+          expanded: 24.0,
+        ),
+      ),
       contentPadding: EdgeInsets.zero,
-      title: SizedBox(
-        width: MediaQuery.sizeOf(context).width * 0.3,
+      title: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: context.responsiveValue(
+            compact: double.infinity,
+            medium: 500.0,
+            expanded: 600.0,
+          ),
+        ),
         child: Row(
           children: [
-            Expanded(child: BabelSelectableText(widget.scrappable.name)),
+            Expanded(
+              child: TranslatableTitle(
+                text: widget.scrappable.name,
+                sourceLanguage: widget.scrappable.nameLanguage,
+                style: context.t.titleLarge,
+              ),
+            ),
             const SizedBox(width: 8),
             InkWell(
               onTap: context.pop,
@@ -162,20 +202,34 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
           ],
         ),
       ),
-      content: SizedBox(
-        height: MediaQuery.sizeOf(context).height * 0.7,
-        width: MediaQuery.sizeOf(context).width * 0.3,
-        child: ListView(
-          padding: const EdgeInsets.only(bottom: 20, top: 6),
-          children: [
-            Padding(
-              padding: horizontalPadding,
-              child: BabelSelectableText(
-                widget.scrappable.description,
-                style: context.t.bodyMedium,
+      content: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.sizeOf(context).height * context.responsiveValue(
+            compact: 0.8,
+            medium: 0.75,
+            expanded: 0.7,
+          ),
+          maxWidth: context.responsiveValue(
+            compact: double.infinity,
+            medium: 500.0,
+            expanded: 600.0,
+          ),
+        ),
+        child: SizedBox(
+          width: double.infinity,
+          child: ListView(
+            padding: const EdgeInsets.only(bottom: 20, top: 6),
+            children: [
+              Padding(
+                padding: horizontalPadding,
+                child: TranslatableDescription(
+                  text: widget.scrappable.description,
+                  sourceLanguage: widget.scrappable.descriptionLanguage,
+                  style: context.t.bodyMedium,
+                  maxLines: 10,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
+              const SizedBox(height: 8),
             Padding(
               padding: horizontalPadding,
               child: Align(
@@ -446,12 +500,11 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
                   ),
                 ),
               ),
-            if (isMyScrappable != false) const SizedBox(height: 42),
-          ],
+              if (isMyScrappable != false) const SizedBox(height: 42),
+            ],
+          ),
         ),
       ),
-      // actions: [
-      // ],
     );
   }
 
@@ -608,8 +661,7 @@ class _AutoFixInfoSection extends StatelessWidget {
           child: Column(
             children: [
               // Status row
-              _buildInfoRow(
-                context,
+              _InfoRow(
                 icon: isEnabled
                     ? Icons.auto_fix_high_rounded
                     : Icons.auto_fix_off_rounded,
@@ -624,8 +676,7 @@ class _AutoFixInfoSection extends StatelessWidget {
               if (isEnabled) ...[
                 Divider(height: 1, color: context.c.outline.withAlpha(30)),
                 // Error threshold row
-                _buildInfoRow(
-                  context,
+                _InfoRow(
                   icon: Icons.error_outline_rounded,
                   iconColor: context.c.onSurfaceVariant,
                   title: 'Error Threshold',
@@ -635,8 +686,7 @@ class _AutoFixInfoSection extends StatelessWidget {
                 ),
                 Divider(height: 1, color: context.c.outline.withAlpha(30)),
                 // AI Model row
-                _buildInfoRow(
-                  context,
+                _InfoRow(
                   icon: _getAiModelIcon(autoFixConfig.preferredAiModel),
                   iconColor: context.c.onSurfaceVariant,
                   title: 'AI Model',
@@ -688,16 +738,27 @@ class _AutoFixInfoSection extends StatelessWidget {
       ],
     );
   }
+}
 
-  Widget _buildInfoRow(
-    BuildContext context, {
-    required IconData icon,
-    required Color iconColor,
-    required String title,
-    required String value,
-    Color? valueColor,
-    String? subtitle,
-  }) {
+class _InfoRow extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String title;
+  final String value;
+  final Color? valueColor;
+  final String? subtitle;
+
+  const _InfoRow({
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.value,
+    this.valueColor,
+    this.subtitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(12),
       child: Row(
@@ -737,7 +798,7 @@ class _AutoFixInfoSection extends StatelessWidget {
                 if (subtitle != null) ...[
                   const SizedBox(height: 2),
                   Text(
-                    subtitle,
+                    subtitle!,
                     style: context.t.bodySmall?.copyWith(
                       color: context.c.onSurfaceVariant.withAlpha(180),
                     ),

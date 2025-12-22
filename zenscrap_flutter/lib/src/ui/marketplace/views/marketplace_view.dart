@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/core/mixins/curl_builder_mixin.dart';
+import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/design_system/scrappables_listage_ui_template/scrappables_listage_template.dart';
 import 'package:zenscrap_flutter/src/design_system/scrappables_listage_ui_template/pagination_controls.dart';
 import 'package:zenscrap_flutter/src/design_system/scrappables_listage_ui_template/empty_scrappables_state.dart';
@@ -42,11 +43,23 @@ class _MarketplaceViewState extends ConsumerState<MarketplaceView>
     final marketplaceState = ref.watch(marketplaceProvider);
 
     return Padding(
-      padding: const EdgeInsets.only(right: 20),
+      padding: EdgeInsets.only(
+        right: context.responsiveValue(
+          compact: 0.0,
+          medium: 16.0,
+          expanded: 20.0,
+        ),
+      ),
       child: Column(
         children: [
           const MarketplaceHeader(),
-          SizedBox(height: 16),
+          SizedBox(
+            height: context.responsiveValue(
+              compact: 12.0,
+              medium: 16.0,
+              expanded: 16.0,
+            ),
+          ),
           Expanded(
             child: marketplaceState.when(
               initial: () => const LoadingScrappablesState(),
