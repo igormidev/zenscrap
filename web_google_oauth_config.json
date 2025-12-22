@@ -8,7 +8,7 @@
         "client_secret": "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",
         "redirect_uris": [
             "http://localhost:8082/googlesignin",
-            "https://api.zenscrap.com/googlesignin"
+            "https://zenscrap.com/googlesignin"
         ],
         "javascript_origins": [
             "http://localhost:8082",
