@@ -1,53 +1,72 @@
+import 'dart:convert';
 import 'dart:developer' as developer;
 
-import 'package:mailer/mailer.dart';
-import 'package:mailer/smtp_server.dart';
+import 'package:http/http.dart' as http;
 
+/// Sends an email using the Resend HTTP API.
+///
+/// Uses HTTPS (port 443) which is compatible with Serverpod Cloud,
+/// unlike SMTP which uses port 465 and is blocked.
+///
+/// [apiKey] - The Resend API key from Serverpod Cloud secrets
+/// [destinyEmail] - The recipient email address
+/// [subject] - The email subject
+/// [htmlMessage] - The HTML content of the email
+///
+/// Returns `true` if the email was sent successfully, `false` otherwise.
 Future<bool> sendEmail({
+  required String apiKey,
   required String destinyEmail,
   required String subject,
   required String htmlMessage,
 }) async {
-  // Note that using a username and password for gmail only works if
-  // you have two-factor authentication enabled and created an App password.
-  // Search for "gmail app password 2fa"
-  // The alternative is to use oauth.
+  const endpoint = 'https://api.resend.com/emails';
 
-  // TODO: Create admin@zenscrap.com email account with Hostinger and update credentials
-  // Temporarily using gobabel.io until Zen Scrap email is set up
-  String username = 'admin@gobabel.io';
-  String password = '5HLF7UXvE^fjD*S*4m#K';
+  // NOTE: Update this to your verified domain email once set up in Resend dashboard.
+  // For testing, you can use 'onboarding@resend.dev'.
+  // For production, verify your domain at https://resend.com/domains
+  // and use something like 'Zen Scrap <noreply@zenscrap.com>'
+  const fromEmail = 'Zen Scrap <onboarding@resend.dev>';
 
-  // final smtpServer = gmail(username, password);
-  // Configure SMTP server for Hostinger
-  final smtpServer = SmtpServer(
-    'smtp.hostinger.com',
-    port: 465,
-    username: username, // Your Hostinger email
-    password: password, // Your Hostinger email password
-    ssl: true, // Enable SSL for port 465
-  );
-  // Use the SmtpServer class to configure an SMTP server:
-  // final smtpServer = SmtpServer('smtp.domain.com');
-  // See the named arguments of SmtpServer for further configuration
-  // options.
-
-  // Create our message.
-  final message = Message()
-    ..from = Address(username, 'Zen Scrap')
-    ..recipients.add(destinyEmail)
-    ..subject = subject
-    ..html = htmlMessage;
+  final body = jsonEncode({
+    'from': fromEmail,
+    'to': [destinyEmail],
+    'subject': subject,
+    'html': htmlMessage,
+  });
 
   try {
-    final sendReport = await send(message, smtpServer);
-    developer.log('Message sent: $sendReport', name: 'sendEmail');
-    return true;
-  } on MailerException catch (e) {
-    developer.log('Message not sent.\n$e', name: 'sendEmail');
-    for (var p in e.problems) {
-      developer.log('Problem: ${p.code}: ${p.msg}', name: 'sendEmail');
+    final response = await http.post(
+      Uri.parse(endpoint),
+      headers: {
+        'Authorization': 'Bearer $apiKey',
+        'Content-Type': 'application/json',
+      },
+      body: body,
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      final responseBody = jsonDecode(response.body);
+      final emailId = responseBody['id'];
+      developer.log(
+        'Email sent successfully. Resend ID: $emailId',
+        name: 'sendEmail',
+      );
+      return true;
+    } else {
+      developer.log(
+        'Failed to send email. Status: ${response.statusCode}, Body: ${response.body}',
+        name: 'sendEmail',
+      );
+      return false;
     }
+  } catch (e, stackTrace) {
+    developer.log(
+      'Exception sending email: $e',
+      name: 'sendEmail',
+      error: e,
+      stackTrace: stackTrace,
+    );
     return false;
   }
 }

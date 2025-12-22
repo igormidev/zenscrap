@@ -44,6 +44,7 @@ class AutoFixNotificationService {
     );
 
     return sendEmail(
+      apiKey: session.passwords['resendApiKey']!,
       destinyEmail: email,
       subject: AutoFixEmailSubjects.inProgress(scrappable.name),
       htmlMessage: htmlMessage,
@@ -84,6 +85,7 @@ class AutoFixNotificationService {
     );
 
     return sendEmail(
+      apiKey: session.passwords['resendApiKey']!,
       destinyEmail: email,
       subject: AutoFixEmailSubjects.success(scrappable.name),
       htmlMessage: htmlMessage,
@@ -120,6 +122,7 @@ class AutoFixNotificationService {
     );
 
     return sendEmail(
+      apiKey: session.passwords['resendApiKey']!,
       destinyEmail: email,
       subject: AutoFixEmailSubjects.exhausted(scrappable.name),
       htmlMessage: htmlMessage,
@@ -153,6 +156,7 @@ class AutoFixNotificationService {
     );
 
     return sendEmail(
+      apiKey: session.passwords['resendApiKey']!,
       destinyEmail: email,
       subject: AutoFixEmailSubjects.brokenNoAutoFix(scrappable.name),
       htmlMessage: htmlMessage,

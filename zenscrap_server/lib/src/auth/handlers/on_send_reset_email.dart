@@ -21,6 +21,7 @@ Future<void> onSendPasswordResetVerificationCode(
   );
 
   await sendEmail(
+    apiKey: session.passwords['resendApiKey']!,
     destinyEmail: email,
     subject: 'Zen Scrap | Reset your password',
     htmlMessage: htmlText,
