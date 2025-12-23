@@ -22,11 +22,7 @@ Future<bool> sendEmail({
 }) async {
   const endpoint = 'https://api.resend.com/emails';
 
-  // NOTE: Update this to your verified domain email once set up in Resend dashboard.
-  // For testing, you can use 'onboarding@resend.dev'.
-  // For production, verify your domain at https://resend.com/domains
-  // and use something like 'Zen Scrap <noreply@zenscrap.com>'
-  const fromEmail = 'Zen Scrap <onboarding@resend.dev>';
+  const fromEmail = 'Zen Scrap <noreply@zenscrap.com>';
 
   final body = jsonEncode({
     'from': fromEmail,
