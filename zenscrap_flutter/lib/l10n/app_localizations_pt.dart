@@ -1939,6 +1939,26 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get scrappables_create_dialog_creating => 'Creating...';
+
+  @override
+  String get ip_block_reason_unknown => 'Unknown reason';
+
+  @override
+  String get ip_block_reason_tor_detected => 'Tor exit node detected';
+
+  @override
+  String get ip_block_reason_datacenter_abuser =>
+      'Datacenter IP with abuse history';
+
+  @override
+  String get ip_block_reason_known_abuser => 'Known abusive IP address';
+
+  @override
+  String get ip_block_reason_crawler_detected =>
+      'Automated bot or crawler detected';
+
+  @override
+  String get ip_block_reason_bogon_ip => 'Invalid IP address range';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -3853,4 +3873,24 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get scrappables_create_new => 'Criar novo endpoint';
+
+  @override
+  String get ip_block_reason_unknown => 'Motivo desconhecido';
+
+  @override
+  String get ip_block_reason_tor_detected => 'Nó de saída Tor detectado';
+
+  @override
+  String get ip_block_reason_datacenter_abuser =>
+      'IP de datacenter com histórico de abuso';
+
+  @override
+  String get ip_block_reason_known_abuser => 'Endereço IP abusivo conhecido';
+
+  @override
+  String get ip_block_reason_crawler_detected =>
+      'Bot ou rastreador automatizado detectado';
+
+  @override
+  String get ip_block_reason_bogon_ip => 'Faixa de endereço IP inválida';
 }

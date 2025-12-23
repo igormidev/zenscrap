@@ -1,0 +1,50 @@
+# IpValidationCache
+#
+# Caches IP validation results from ipapi.is to reduce API calls.
+# Each entry stores the validation result for an IP address and expires after 72 hours.
+#
+# The cache is automatically cleaned up by CleanupExpiredIpValidationCacheFutureCall
+# which runs every 24 hours and deletes entries older than 72 hours.
+#
+# Fields:
+# - ipAddress: The client's IP address (unique)
+# - updatedAt: When this cache entry was last updated (for expiry check)
+# - isLegitimate: Whether the IP is considered legitimate
+# - blockReason: Human-readable reason for blocking (if not legitimate)
+# - blockReasonEnums: Enum values representing the block reasons (for translation support)
+# - isVpn: Whether the IP is associated with a VPN service
+# - isProxy: Whether the IP is associated with a proxy service
+# - isTor: Whether the IP is a Tor exit node
+# - isDatacenter: Whether the IP is from a datacenter
+# - isAbuser: Whether the IP has been flagged as abusive
+# - isCrawler: Whether the IP is a known web crawler/bot
+# - isMobile: Whether the IP is from a mobile network
+# - companyName: The company/organization that owns the IP
+# - companyType: The type of company (e.g., "isp", "datacenter")
+# - countryCode: Country code of the IP location (e.g., "US", "BR")
+# - city: City of the IP location
+class: IpValidationCache
+table: ip_validation_cache
+fields:
+  ipAddress: String
+  updatedAt: DateTime
+  isLegitimate: bool
+  blockReason: String?
+  blockReasonEnums: List<IpBlockReason>?
+  isVpn: bool
+  isProxy: bool
+  isTor: bool
+  isDatacenter: bool
+  isAbuser: bool
+  isCrawler: bool
+  isMobile: bool
+  companyName: String?
+  companyType: String?
+  countryCode: String?
+  city: String?
+indexes:
+  ip_validation_cache_ip_address_unique_idx:
+    fields: ipAddress
+    unique: true
+  ip_validation_cache_updated_at_idx:
+    fields: updatedAt

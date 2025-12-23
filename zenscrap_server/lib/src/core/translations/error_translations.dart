@@ -551,6 +551,16 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.ptBR: 'Limite Muito Alto',
     SupportedLanguage.ja: 'しきい値が高すぎます',
   },
+
+  // IP Validation errors
+  'suspicious_ip_detected': {
+    SupportedLanguage.en: 'Suspicious Connection Detected',
+    SupportedLanguage.es: 'Conexion Sospechosa Detectada',
+    SupportedLanguage.de: 'Verdachtige Verbindung erkannt',
+    SupportedLanguage.fr: 'Connexion suspecte detectee',
+    SupportedLanguage.ptBR: 'Conexao Suspeita Detectada',
+    SupportedLanguage.ja: '不審な接続が検出されました',
+  },
 };
 
 // ============================================================================
@@ -818,6 +828,16 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.fr: 'Vous avez utilise tous vos credits IA pour ce mois (limite de \${limit}). Les credits seront reinitialises le mois prochain, ou vous pouvez ajouter votre propre cle API OpenAI dans les parametres du compte pour continuer sans limites.',
     SupportedLanguage.ptBR: 'Voce usou todos os seus creditos de IA para este mes (limite de \${limit}). Os creditos serao redefinidos no proximo mes, ou voce pode adicionar sua propria chave API do OpenAI nas configuracoes da conta para continuar sem limites.',
     SupportedLanguage.ja: '今月のAIクレジットをすべて使い切りました（\${limit}の制限）。クレジットは来月リセットされます。制限なく続けるにはアカウント設定でOpenAI APIキーを追加してください。',
+  },
+
+  // IP Validation errors
+  'suspicious_ip_detected': {
+    SupportedLanguage.en: 'Your connection has been flagged as suspicious ({reason}). To protect our service from abuse, we cannot process requests from VPNs, proxies, Tor, or known malicious IPs. Please disable your VPN/proxy or create an account to continue.',
+    SupportedLanguage.es: 'Tu conexion ha sido marcada como sospechosa ({reason}). Para proteger nuestro servicio del abuso, no podemos procesar solicitudes de VPNs, proxies, Tor o IPs maliciosas conocidas. Por favor, desactiva tu VPN/proxy o crea una cuenta para continuar.',
+    SupportedLanguage.de: 'Ihre Verbindung wurde als verdachtig eingestuft ({reason}). Zum Schutz unseres Dienstes vor Missbrauch konnen wir keine Anfragen von VPNs, Proxys, Tor oder bekannten bosartigen IPs verarbeiten. Bitte deaktivieren Sie Ihr VPN/Proxy oder erstellen Sie ein Konto, um fortzufahren.',
+    SupportedLanguage.fr: 'Votre connexion a ete signalee comme suspecte ({reason}). Pour proteger notre service contre les abus, nous ne pouvons pas traiter les requetes provenant de VPN, proxys, Tor ou d\'IPs malveillantes connues. Veuillez desactiver votre VPN/proxy ou creer un compte pour continuer.',
+    SupportedLanguage.ptBR: 'Sua conexao foi marcada como suspeita ({reason}). Para proteger nosso servico contra abusos, nao podemos processar solicitacoes de VPNs, proxies, Tor ou IPs maliciosos conhecidos. Por favor, desative seu VPN/proxy ou crie uma conta para continuar.',
+    SupportedLanguage.ja: 'お使いの接続が不審としてフラグ付けされました（{reason}）。サービスの悪用を防ぐため、VPN、プロキシ、Tor、または既知の悪意あるIPからのリクエストは処理できません。VPN/プロキシを無効にするか、アカウントを作成して続行してください。',
   },
 
   // Delete errors

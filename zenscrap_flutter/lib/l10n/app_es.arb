@@ -573,5 +573,12 @@
   "scrappables_selected_category": "la categoria seleccionada",
   "scrappables_selected_categories": "las categorias seleccionadas",
   "scrappables_your_endpoints": "Tus endpoints",
-  "scrappables_create_new": "Crear nuevo endpoint"
+  "scrappables_create_new": "Crear nuevo endpoint",
+
+  "ip_block_reason_unknown": "Razón desconocida",
+  "ip_block_reason_tor_detected": "Nodo de salida Tor detectado",
+  "ip_block_reason_datacenter_abuser": "IP de centro de datos con historial de abuso",
+  "ip_block_reason_known_abuser": "Dirección IP abusiva conocida",
+  "ip_block_reason_crawler_detected": "Bot o rastreador automatizado detectado",
+  "ip_block_reason_bogon_ip": "Rango de dirección IP inválido"
 }

@@ -5,6 +5,7 @@ import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/design_system/elements/ip_limit_error_view.dart';
+import 'package:zenscrap_flutter/src/design_system/elements/suspicious_ip_error_view.dart';
 import 'package:zenscrap_flutter/src/design_system/elements/zen_tab.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_state.dart';
@@ -85,6 +86,10 @@ class _InitialChatViewState extends ConsumerState<InitialChatView> {
                 // Check if this is an IP limit error
                 if (exception.title == 'Usage Limit Reached') {
                   return IpLimitErrorView(exception: exception);
+                }
+                // Check if this is a suspicious IP error
+                if (exception.title == 'Suspicious Connection Detected') {
+                  return SuspiciousIpErrorView(exception: exception);
                 }
                 // Default error handling for other errors
                 return ZenErrorTab(exception);

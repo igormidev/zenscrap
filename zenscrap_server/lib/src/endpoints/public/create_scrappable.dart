@@ -5,6 +5,7 @@ import 'package:zenscrap_server/src/core/consts.dart';
 import 'package:zenscrap_server/src/core/docs/scrappable_request_structure_guide.dart';
 import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';
 import 'package:zenscrap_server/src/core/gemini_client.dart';
+import 'package:zenscrap_server/src/core/ip_validation/ip_validation.dart';
 import 'package:zenscrap_server/src/core/translations/error_translations.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
@@ -15,6 +16,55 @@ class CreateScrappableEndpoint extends Endpoint {
     required SupportedLanguage language,
   }) async* {
     final userId = session.authenticated?.authUserId;
+
+    // =========================================================================
+    // IP Validation for Anonymous Users
+    // =========================================================================
+    // For anonymous users (not logged in), validate their IP address
+    // to detect suspicious connections (VPN, proxy, Tor, datacenter, abusers).
+    // Logged-in users bypass this check as they are already authenticated.
+    if (userId == null && session is MethodCallSession) {
+      final clientIpAddress =
+          session.request.connectionInfo.remote.address.toString();
+
+      // Get the ipapi API key from the password store
+      final ipapiApiKey = session.passwords['ipapiApiKey'] ??
+          session.serverpod.getPassword('ipapiApiKey');
+
+      if (ipapiApiKey != null && ipapiApiKey.isNotEmpty) {
+        final ipValidator = IpApiValidationService(
+          apiKey: ipapiApiKey,
+          onLog: (msg) => session.log(msg),
+        );
+
+        final validationResult = await ipValidator.validateIpWithCache(session, clientIpAddress);
+
+        if (!validationResult.isLegitimate) {
+          session.log(
+            'Blocked suspicious IP $clientIpAddress: ${validationResult.blockReason}',
+            level: LogLevel.warning,
+          );
+
+          throw createTranslatedException(
+            'suspicious_ip_detected',
+            language,
+            params: {'reason': validationResult.blockReason ?? 'Unknown'},
+          );
+        }
+
+        // Log successful validation (for debugging/analytics)
+        if (!validationResult.isFallback) {
+          session.log(
+            'IP $clientIpAddress validated successfully (country: ${validationResult.countryCode})',
+          );
+        }
+      } else {
+        session.log(
+          'Warning: ipapiApiKey not configured, skipping IP validation',
+          level: LogLevel.warning,
+        );
+      }
+    }
 
     // Validate scrappable limit for authenticated users
     if (userId != null) {

@@ -573,5 +573,12 @@
   "scrappables_selected_category": "選択したカテゴリ",
   "scrappables_selected_categories": "選択したカテゴリ",
   "scrappables_your_endpoints": "あなたのエンドポイント",
-  "scrappables_create_new": "新しいエンドポイントを作成"
+  "scrappables_create_new": "新しいエンドポイントを作成",
+
+  "ip_block_reason_unknown": "不明な理由",
+  "ip_block_reason_tor_detected": "Tor出口ノードを検出",
+  "ip_block_reason_datacenter_abuser": "不正使用履歴のあるデータセンターIP",
+  "ip_block_reason_known_abuser": "既知の不正IPアドレス",
+  "ip_block_reason_crawler_detected": "自動ボットまたはクローラーを検出",
+  "ip_block_reason_bogon_ip": "無効なIPアドレス範囲"
 }

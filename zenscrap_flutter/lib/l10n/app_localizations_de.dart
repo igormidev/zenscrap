@@ -1976,4 +1976,25 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get scrappables_create_dialog_creating => 'Creating...';
+
+  @override
+  String get ip_block_reason_unknown => 'Unbekannter Grund';
+
+  @override
+  String get ip_block_reason_tor_detected => 'Tor-Exit-Knoten erkannt';
+
+  @override
+  String get ip_block_reason_datacenter_abuser =>
+      'Rechenzentrum-IP mit Missbrauchsverlauf';
+
+  @override
+  String get ip_block_reason_known_abuser =>
+      'Bekannte missbrauchende IP-Adresse';
+
+  @override
+  String get ip_block_reason_crawler_detected =>
+      'Automatisierter Bot oder Crawler erkannt';
+
+  @override
+  String get ip_block_reason_bogon_ip => 'Ungültiger IP-Adressbereich';
 }

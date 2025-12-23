@@ -1884,4 +1884,22 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get scrappables_create_dialog_creating => 'Creating...';
+
+  @override
+  String get ip_block_reason_unknown => '不明な理由';
+
+  @override
+  String get ip_block_reason_tor_detected => 'Tor出口ノードを検出';
+
+  @override
+  String get ip_block_reason_datacenter_abuser => '不正使用履歴のあるデータセンターIP';
+
+  @override
+  String get ip_block_reason_known_abuser => '既知の不正IPアドレス';
+
+  @override
+  String get ip_block_reason_crawler_detected => '自動ボットまたはクローラーを検出';
+
+  @override
+  String get ip_block_reason_bogon_ip => '無効なIPアドレス範囲';
 }

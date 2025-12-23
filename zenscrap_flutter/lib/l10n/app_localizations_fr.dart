@@ -1984,4 +1984,24 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get scrappables_create_dialog_creating => 'Creating...';
+
+  @override
+  String get ip_block_reason_unknown => 'Raison inconnue';
+
+  @override
+  String get ip_block_reason_tor_detected => 'Nœud de sortie Tor détecté';
+
+  @override
+  String get ip_block_reason_datacenter_abuser =>
+      'IP de datacenter avec historique d\'abus';
+
+  @override
+  String get ip_block_reason_known_abuser => 'Adresse IP abusive connue';
+
+  @override
+  String get ip_block_reason_crawler_detected =>
+      'Bot ou robot automatisé détecté';
+
+  @override
+  String get ip_block_reason_bogon_ip => 'Plage d\'adresses IP invalide';
 }

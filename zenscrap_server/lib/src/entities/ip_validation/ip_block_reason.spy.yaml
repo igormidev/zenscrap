@@ -1,0 +1,15 @@
+# IpBlockReason
+#
+# Enum representing the reasons why an IP address was blocked.
+# Used for IP validation to categorize suspicious connections.
+# These values can be translated on the client side.
+enum: IpBlockReason
+serialized: byName
+default: unknown
+values:
+  - unknown
+  - torDetected
+  - datacenterAbuser
+  - knownAbuser
+  - crawlerDetected
+  - bogonIp
