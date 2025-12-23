@@ -31,6 +31,7 @@ Future<void> onSendRegistrationVerificationCode(
   );
 
   await sendEmail(
+    apiKey: session.passwords['resendApiKey']!,
     destinyEmail: email,
     subject: 'Zen Scrap | Confirm your email address',
     htmlMessage: htmlText,
