@@ -574,7 +574,9 @@
   "scrappables_selected_categories": "選択したカテゴリ",
   "scrappables_your_endpoints": "あなたのエンドポイント",
   "scrappables_create_new": "新しいエンドポイントを作成",
-
+  "common_show_original": "原文を表示",
+  "common_show_translated": "翻訳を表示",
+  "common_auto_translated": "{language}から自動翻訳",
   "ip_block_reason_unknown": "不明な理由",
   "ip_block_reason_tor_detected": "Tor出口ノードを検出",
   "ip_block_reason_datacenter_abuser": "不正使用履歴のあるデータセンターIP",

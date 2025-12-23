@@ -8,7 +8,9 @@ fields:
   generalInfosUpdatedAt: DateTime
   extractRulesUpdatedAt: DateTime
   name: String
+  nameLanguage: String?
   description: String
+  descriptionLanguage: String?
   testEndpointAvailableUntil: DateTime?
   scrappingBeeExtractRules: ScrappingBeeExtractLogic?, relation(name=scrappable_scrapping_bee_extract_logic)
   willHideFromMarketplace: bool

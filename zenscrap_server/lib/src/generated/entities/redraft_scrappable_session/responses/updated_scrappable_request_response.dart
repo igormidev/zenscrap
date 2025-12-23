@@ -20,6 +20,7 @@ abstract class UpdatedScrappableRequestResponse extends _i1.ChatResponse
     required this.url,
     required this.queryParams,
     required this.pathParams,
+    this.scrappableRequest,
   });
 
   factory UpdatedScrappableRequestResponse({
@@ -29,6 +30,7 @@ abstract class UpdatedScrappableRequestResponse extends _i1.ChatResponse
     required String url,
     required Map<String, String?> queryParams,
     required List<String> pathParams,
+    _i7.ScrappableRequest? scrappableRequest,
   }) = _UpdatedScrappableRequestResponseImpl;
 
   factory UpdatedScrappableRequestResponse.fromJson(
@@ -45,6 +47,11 @@ abstract class UpdatedScrappableRequestResponse extends _i1.ChatResponse
       pathParams: _i6.Protocol().deserialize<List<String>>(
         jsonSerialization['pathParams'],
       ),
+      scrappableRequest: jsonSerialization['scrappableRequest'] == null
+          ? null
+          : _i6.Protocol().deserialize<_i7.ScrappableRequest>(
+              jsonSerialization['scrappableRequest'],
+            ),
     );
   }
 
@@ -55,6 +62,8 @@ abstract class UpdatedScrappableRequestResponse extends _i1.ChatResponse
   Map<String, String?> queryParams;
 
   List<String> pathParams;
+
+  _i7.ScrappableRequest? scrappableRequest;
 
   /// Returns a shallow copy of this [UpdatedScrappableRequestResponse]
   /// with some or all fields replaced by the given arguments.
@@ -67,6 +76,7 @@ abstract class UpdatedScrappableRequestResponse extends _i1.ChatResponse
     String? url,
     Map<String, String?>? queryParams,
     List<String>? pathParams,
+    _i7.ScrappableRequest? scrappableRequest,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -78,6 +88,8 @@ abstract class UpdatedScrappableRequestResponse extends _i1.ChatResponse
       'url': url,
       'queryParams': queryParams.toJson(),
       'pathParams': pathParams.toJson(),
+      if (scrappableRequest != null)
+        'scrappableRequest': scrappableRequest?.toJson(),
     };
   }
 
@@ -91,6 +103,8 @@ abstract class UpdatedScrappableRequestResponse extends _i1.ChatResponse
       'url': url,
       'queryParams': queryParams.toJson(),
       'pathParams': pathParams.toJson(),
+      if (scrappableRequest != null)
+        'scrappableRequest': scrappableRequest?.toJsonForProtocol(),
     };
   }
 
@@ -109,6 +123,7 @@ class _UpdatedScrappableRequestResponseImpl
     required String url,
     required Map<String, String?> queryParams,
     required List<String> pathParams,
+    _i7.ScrappableRequest? scrappableRequest,
   }) : super._(
          role: role,
          expectsFollowUp: expectsFollowUp,
@@ -116,6 +131,7 @@ class _UpdatedScrappableRequestResponseImpl
          url: url,
          queryParams: queryParams,
          pathParams: pathParams,
+         scrappableRequest: scrappableRequest,
        );
 
   /// Returns a shallow copy of this [UpdatedScrappableRequestResponse]
@@ -129,6 +145,7 @@ class _UpdatedScrappableRequestResponseImpl
     String? url,
     Map<String, String?>? queryParams,
     List<String>? pathParams,
+    Object? scrappableRequest = _Undefined,
   }) {
     return UpdatedScrappableRequestResponse(
       role: role ?? this.role,
@@ -147,6 +164,9 @@ class _UpdatedScrappableRequestResponseImpl
             ),
           ),
       pathParams: pathParams ?? this.pathParams.map((e0) => e0).toList(),
+      scrappableRequest: scrappableRequest is _i7.ScrappableRequest?
+          ? scrappableRequest
+          : this.scrappableRequest?.copyWith(),
     );
   }
 }

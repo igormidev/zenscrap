@@ -15,6 +15,7 @@ import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.d
 import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/category_badge.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/code_bloc.dart';
+import 'package:zenscrap_flutter/src/design_system/widgets/translatable_text.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_state.dart';
@@ -186,7 +187,13 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
         ),
         child: Row(
           children: [
-            Expanded(child: BabelSelectableText(widget.scrappable.name)),
+            Expanded(
+              child: TranslatableTitle(
+                text: widget.scrappable.name,
+                sourceLanguage: widget.scrappable.nameLanguage,
+                style: context.t.titleLarge,
+              ),
+            ),
             const SizedBox(width: 8),
             InkWell(
               onTap: context.pop,
@@ -215,12 +222,14 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
             children: [
               Padding(
                 padding: horizontalPadding,
-              child: BabelSelectableText(
-                widget.scrappable.description,
-                style: context.t.bodyMedium,
+                child: TranslatableDescription(
+                  text: widget.scrappable.description,
+                  sourceLanguage: widget.scrappable.descriptionLanguage,
+                  style: context.t.bodyMedium,
+                  maxLines: 10,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
+              const SizedBox(height: 8),
             Padding(
               padding: horizontalPadding,
               child: Align(

@@ -12,6 +12,7 @@ import 'package:zenscrap_server/src/core/stripe/stripe_config.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_openai_sdk_impl.dart';
 import 'package:zenscrap_server/src/future_calls/cleanup_expired_ip_spending_future_call.dart';
 import 'package:zenscrap_server/src/future_calls/cleanup_expired_ip_validation_cache_future_call.dart';
+import 'package:zenscrap_server/src/future_calls/email_idp_cleanup_future_call.dart';
 import 'package:zenscrap_server/src/future_calls/monthly_subscription_credits_future_call.dart';
 import 'package:zenscrap_server/src/endpoints/public/scrappable_chat_session.dart';
 import 'package:zenscrap_server/src/routes/scrappable_api_route.dart';
@@ -27,17 +28,11 @@ import 'src/generated/endpoints.dart';
 
 void run(List<String> args) async {
   // Initialize Serverpod and connect it with your generated code.
-  final pod = Serverpod(
-    args,
-    Protocol(),
-    Endpoints(),
-  );
+  final pod = Serverpod(args, Protocol(), Endpoints());
 
   // Initialize authentication services with Serverpod 3.1 IDP system
   pod.initializeAuthServices(
-    tokenManagerBuilders: [
-      JwtConfigFromPasswords(),
-    ],
+    tokenManagerBuilders: [JwtConfigFromPasswords()],
     identityProviderBuilders: [
       // Google OAuth authentication
       GoogleIdpConfig(
@@ -50,6 +45,56 @@ void run(List<String> args) async {
         secretHashPepper: pod.getPassword('emailSecretHashPepper')!,
         sendRegistrationVerificationCode: onSendRegistrationVerificationCode,
         sendPasswordResetVerificationCode: onSendPasswordResetVerificationCode,
+        passwordValidationFunction: (password) {
+          if (password.length < 8 || password.length > 64) return false;
+          if (!password.contains(RegExp(r'[A-Z]'))) return false;
+          if (!password.contains(RegExp(r'[a-z]'))) return false;
+          if (!password.contains(RegExp(r'[0-9]'))) return false;
+          return true;
+        },
+        // Rate limiting configuration
+        // Failed login: 5 attempts per 15 minutes (more lenient than default 5 per 5 min)
+        failedLoginRateLimit: RateLimit(
+          maxAttempts: 5,
+          timeframe: Duration(minutes: 15),
+        ),
+        // Password reset: 3 attempts per hour (same as default)
+        maxPasswordResetAttempts: RateLimit(
+          maxAttempts: 3,
+          timeframe: Duration(hours: 1),
+        ),
+        // Registration verification: 30 minutes lifetime, 5 attempts
+        // (more lenient than default 15 min, 3 attempts)
+        registrationVerificationCodeLifetime: Duration(minutes: 30),
+        registrationVerificationCodeAllowedAttempts: 5,
+        // Password reset verification: 30 minutes lifetime, 5 attempts
+        // (more lenient than default 15 min, 3 attempts)
+        passwordResetVerificationCodeLifetime: Duration(minutes: 30),
+        passwordResetVerificationCodeAllowedAttempts: 5,
+        // Security monitoring callbacks
+        onAfterAccountCreated: (
+          session, {
+          required email,
+          required authUserId,
+          required emailAccountId,
+          required transaction,
+        }) async {
+          session.log(
+            'New email account created: $email '
+            '(authUserId: $authUserId, emailAccountId: $emailAccountId)',
+            level: LogLevel.info,
+          );
+        },
+        onPasswordResetCompleted: (
+          session, {
+          required emailAccountId,
+          required transaction,
+        }) {
+          session.log(
+            'Password reset completed for emailAccountId: $emailAccountId',
+            level: LogLevel.info,
+          );
+        },
       ),
     ],
   );
@@ -58,15 +103,20 @@ void run(List<String> args) async {
   pod.webServer.addRoute(StripeWebhookRoute(), '/stripe/webhook');
 
   // Register Scrappable API routes
-  pod.webServer
-      .addRoute(ScrappableApiRoute(isProd: false), '/api/scrappable/test');
-  pod.webServer
-      .addRoute(ScrappableApiRoute(isProd: true), '/api/scrappable/prod');
+  pod.webServer.addRoute(
+    ScrappableApiRoute(isProd: false),
+    '/api/scrappable/test',
+  );
+  pod.webServer.addRoute(
+    ScrappableApiRoute(isProd: true),
+    '/api/scrappable/prod',
+  );
 
   // Serve all files in the /static directory using Serverpod 3.0 StaticRoute
+  // Note: StaticRoute.directory internally uses '/**' path, so we only specify '/static'
   pod.webServer.addRoute(
     StaticRoute.directory(Directory('web/static')),
-    '/static/**',
+    '/static',
   );
 
   // Register legal pages (Terms of Service and Privacy Policy)
@@ -77,16 +127,15 @@ void run(List<String> args) async {
   // FlutterRoute is designed for Flutter WASM apps and automatically:
   // - Handles SPA-style routing (falls back to index.html)
   // - Adds WASM multi-threading headers (Cross-Origin-Opener-Policy, Cross-Origin-Embedder-Policy)
+  // Note: FlutterRoute internally handles all routing via injectIn, so we add it at '/' only
   final flutterAppDir = Directory('web/app');
   if (flutterAppDir.existsSync()) {
-    // Add explicit route for root path '/' to serve index.html
-    // This is needed because '/**' pattern may not match the root path in some versions
     pod.webServer.addRoute(FlutterRoute(flutterAppDir), '/');
-    pod.webServer.addRoute(FlutterRoute(flutterAppDir), '/**');
   } else {
     // ignore: avoid_print
     print(
-        '[Zenscrap] Warning: Flutter web app not found at ${flutterAppDir.path}');
+      '[Zenscrap] Warning: Flutter web app not found at ${flutterAppDir.path}',
+    );
   }
 
   final String? scrapingBeeApiKey = pod.getPassword('scrapingBeeApiKey');
@@ -116,20 +165,38 @@ void run(List<String> args) async {
 
   // // Register your future calls
   pod.registerFutureCall(
-      TestScrappableDisposeFutureCall(), 'dispose_temporary_scrappable');
+    TestScrappableDisposeFutureCall(),
+    'dispose_temporary_scrappable',
+  );
   pod.registerFutureCall(
-      MonthlySubscriptionCreditsFutureCall(), 'monthly_subscription_credits');
+    MonthlySubscriptionCreditsFutureCall(),
+    'monthly_subscription_credits',
+  );
   pod.registerFutureCall(SessionPromptFutureCall(), 'session_prompt');
   pod.registerFutureCall(
-      PeriodicSetRequestsAnalytics(), 'periodicSetRequestsAnalytics');
-  pod.registerFutureCall(PeriodicCleanupOldAnalyticsDetails(),
-      'periodicCleanupOldAnalyticsDetails');
+    PeriodicSetRequestsAnalytics(),
+    'periodicSetRequestsAnalytics',
+  );
   pod.registerFutureCall(
-      PeriodicAutoFixBrokenScrappables(), 'periodicAutoFixBrokenScrappables');
-  pod.registerFutureCall(CleanupExpiredIpSpendingFutureCall(),
-      CleanupExpiredIpSpendingFutureCall.callName);
-  pod.registerFutureCall(CleanupExpiredIpValidationCacheFutureCall(),
-      CleanupExpiredIpValidationCacheFutureCall.callName);
+    PeriodicCleanupOldAnalyticsDetails(),
+    'periodicCleanupOldAnalyticsDetails',
+  );
+  pod.registerFutureCall(
+    PeriodicAutoFixBrokenScrappables(),
+    'periodicAutoFixBrokenScrappables',
+  );
+  pod.registerFutureCall(
+    CleanupExpiredIpSpendingFutureCall(),
+    CleanupExpiredIpSpendingFutureCall.callName,
+  );
+  pod.registerFutureCall(
+    CleanupExpiredIpValidationCacheFutureCall(),
+    CleanupExpiredIpValidationCacheFutureCall.callName,
+  );
+  pod.registerFutureCall(
+    EmailIdpCleanupFutureCall(),
+    EmailIdpCleanupFutureCall.callName,
+  );
 
   // Start the server.
   await pod.start();
@@ -150,7 +217,8 @@ void run(List<String> args) async {
   } else {
     // ignore: avoid_print
     print(
-        '[Zenscrap] WARNING: OpenAI API key not configured, skipping Vector Store initialization');
+      '[Zenscrap] WARNING: OpenAI API key not configured, skipping Vector Store initialization',
+    );
   }
 
   await pod.cancelFutureCall('periodicSetRequestsAnalytics');
@@ -158,6 +226,7 @@ void run(List<String> args) async {
   await pod.cancelFutureCall('periodicAutoFixBrokenScrappables');
   await pod.cancelFutureCall(CleanupExpiredIpSpendingFutureCall.callName);
   await pod.cancelFutureCall(CleanupExpiredIpValidationCacheFutureCall.callName);
+  await pod.cancelFutureCall(EmailIdpCleanupFutureCall.callName);
 
   // Schedule future calls only if not applying migrations
   // (when applying migrations, the future call tables may not exist yet)
@@ -203,5 +272,15 @@ void run(List<String> args) async {
     null,
     const Duration(minutes: 10), // Initial delay to let server fully initialize
     identifier: CleanupExpiredIpValidationCacheFutureCall.callName,
+  );
+
+  // Schedule periodic cleanup of expired email authentication data
+  // Runs daily to delete expired account requests, password reset requests,
+  // and failed login attempts older than 30 days
+  await pod.futureCallWithDelay(
+    EmailIdpCleanupFutureCall.callName,
+    null,
+    const Duration(minutes: 15), // Initial delay to let server fully initialize
+    identifier: EmailIdpCleanupFutureCall.callName,
   );
 }

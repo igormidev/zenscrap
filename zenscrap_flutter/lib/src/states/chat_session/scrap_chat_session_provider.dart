@@ -6,6 +6,7 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/serverpod_to_result.dart';
 import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 import 'package:zenscrap_flutter/src/design_system/default_error_snackbar.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_messages_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_state.dart';
@@ -15,6 +16,10 @@ import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_stat
 class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
   StreamSubscription<ChatResponse>? _chatResponseSubscription;
   StreamSubscription<String>? _aiCurrentThinkingSubscription;
+
+  /// Tracks whether we've received a successful extract rule in this session.
+  /// Used to determine if errors occur before the first successful result.
+  bool _hasReceivedExtractRule = false;
 
   @override
   ScrapChatSessionState build() {
@@ -34,6 +39,7 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
     _aiCurrentThinkingSubscription?.cancel();
     _chatResponseSubscription = null;
     _aiCurrentThinkingSubscription = null;
+    _hasReceivedExtractRule = false;
   }
 
   Future<void> createScrappable({
@@ -96,7 +102,13 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
 
   Future<void> sendMessage(String userPrompt) async {
     final sessionUuid = state.mapOrNull(standard: (value) => value.sessionUuid);
-    if (sessionUuid == null) return;
+    if (sessionUuid == null) {
+      talker.warning('[ThinkingStream] Cannot send message - no session UUID');
+      return;
+    }
+
+    talker.info('[ThinkingStream] Sending message for session: $sessionUuid');
+    final messageStartTime = DateTime.now();
 
     final language = ref.read(currentLanguageProvider);
     await ref
@@ -105,6 +117,7 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
         .sendPromptMessage(sessionId: sessionUuid, userPrompt: userPrompt, language: language)
         .toRawResult(
       (Stream<String> llmThinkingStream) {
+        talker.debug('[ThinkingStream] Stream started for session: $sessionUuid');
         _aiCurrentThinkingSubscription = llmThinkingStream.listen(
             (thinking) {
               state.mapOrNull(standard: (value) {
@@ -115,6 +128,12 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
               });
             },
             onDone: () {
+              final duration = DateTime.now().difference(messageStartTime);
+              talker.info(
+                '[ThinkingStream] Stream completed normally\n'
+                '  Session: $sessionUuid\n'
+                '  Duration: ${duration.inSeconds}s',
+              );
               _aiCurrentThinkingSubscription?.cancel();
               state.mapOrNull(standard: (value) {
                 Clipboard.setData(ClipboardData(
@@ -123,16 +142,47 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
               });
             },
             cancelOnError: true,
-            onError: (error) {
+            onError: (error, stackTrace) {
+              final duration = DateTime.now().difference(messageStartTime);
+              final errorType = error.runtimeType.toString();
+              final errorMessage = error.toString();
+
+              talker.error(
+                '[ThinkingStream] Stream error occurred\n'
+                '  Session: $sessionUuid\n'
+                '  Duration: ${duration.inSeconds}s\n'
+                '  Error type: $errorType\n'
+                '  Error message: $errorMessage',
+                error,
+                stackTrace,
+              );
+
               if (error is ZenScrapException) {
                 state = ScrapChatSessionState.withError(error: error);
               } else {
-                state =
-                    ScrapChatSessionState.withError(error: defaultException);
+                // Check for connection-related errors
+                final errorStringLower = errorMessage.toLowerCase();
+                final isConnectionError =
+                    errorStringLower.contains('connection') ||
+                        errorStringLower.contains('websocket') ||
+                        errorStringLower.contains('closed') ||
+                        errorStringLower.contains('socket');
+                state = ScrapChatSessionState.withError(
+                  error: isConnectionError
+                      ? connectionClosedException
+                      : defaultException,
+                );
               }
             });
       },
-      (failure) => state = ScrapChatSessionState.withError(error: failure),
+      (failure) {
+        talker.error(
+          '[ThinkingStream] Failed to start stream\n'
+          '  Session: $sessionUuid\n'
+          '  Failure: ${failure.title} - ${failure.description}',
+        );
+        state = ScrapChatSessionState.withError(error: failure);
+      },
     );
   }
 
@@ -148,16 +198,31 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
   }
 
   void onChange(ChatResponse chatResponse) {
+    // Get scrappable ID and message count for analytics
+    final scrappableId = state.mapOrNull(standard: (value) => value.data.id);
+    final currentMessages = ref.read(chatMessagesProvider);
+    final messageCount = currentMessages.maybeWhen(
+      data: (messages) => messages.length,
+      orElse: () => 0,
+    );
+
+    // Track the response for analytics
+    _trackChatResponse(chatResponse, scrappableId, messageCount);
+
     if (chatResponse is UpdatedScrappableRequestResponse) {
       state.mapOrNull(
         standard: (value) {
-          state = value.copyWith(
-            data: value.data.copyWith(
-              targetRequest: value.data.targetRequest?.copyWith(
+          // Use the full ScrappableRequest if available (from AI-driven updates),
+          // otherwise fall back to individual fields (for manual endpoint updates)
+          final updatedRequest = chatResponse.scrappableRequest ??
+              value.data.targetRequest?.copyWith(
                 url: chatResponse.url,
                 pathParams: chatResponse.pathParams,
                 queryParams: chatResponse.queryParams,
-              ),
+              );
+          state = value.copyWith(
+            data: value.data.copyWith(
+              targetRequest: updatedRequest,
             ),
           );
         },
@@ -189,13 +254,135 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
         },
       );
     }
-    final currentMessages = ref.read(chatMessagesProvider);
     ref.read(chatMessagesProvider.notifier).setMessages(
           currentMessages.maybeMap(
             data: (data) => AsyncValue.data([...data.value, chatResponse]),
             orElse: () => AsyncValue.data([chatResponse]),
           ),
         );
+  }
+
+  /// Tracks chat response for analytics.
+  /// Identifies error types and tracks first extract rule success/failure.
+  void _trackChatResponse(
+    ChatResponse chatResponse,
+    int? scrappableId,
+    int messageCount,
+  ) {
+    if (scrappableId == null) return;
+
+    final analytics = ref.read(analyticsServiceProvider);
+    final responseType = _getResponseType(chatResponse);
+    final isFirstResponse = messageCount == 0;
+
+    // Track every response received
+    analytics.trackChatResponseReceived(
+      scrappableId: scrappableId,
+      responseType: responseType,
+      messageCount: messageCount,
+      hasReceivedExtractRule: _hasReceivedExtractRule,
+    );
+
+    // Check if this is an error response
+    if (_isErrorResponse(chatResponse)) {
+      _trackErrorResponse(
+        chatResponse,
+        scrappableId,
+        messageCount,
+        isFirstResponse,
+        analytics,
+      );
+      return;
+    }
+
+    // Track first successful extract rule
+    if (chatResponse is NewExtractRuleResponse && !_hasReceivedExtractRule) {
+      _hasReceivedExtractRule = true;
+      analytics.trackChatFirstExtractRuleSuccess(
+        scrappableId: scrappableId,
+        messageCount: messageCount,
+      );
+    }
+  }
+
+  /// Returns the response type string for analytics tracking.
+  String _getResponseType(ChatResponse response) {
+    // All ChatResponse subtypes are covered - switch is exhaustive
+    return switch (response) {
+      MessageTextResponse() => 'message_text',
+      NewExtractRuleResponse() => 'new_extract_rule',
+      TestEndpointCalledSuccessResponse() => 'test_endpoint_success',
+      TestEndpointCalledErrorResponse() => 'test_endpoint_error',
+      UpdatedScrappableRequestResponse() => 'updated_request',
+      CandidateExtractLogicUpdate() => 'candidate_extract_logic',
+      ApiKeyUpdatedResponse() => 'api_key_updated',
+      ErrorTextResponse() => 'error_text',
+      CreditLimitReachedResponse() => 'credit_limit_reached',
+      IpLimitReachedResponse() => 'ip_limit_reached',
+      UserApiKeyQuotaExceededResponse() => 'user_api_key_quota_exceeded',
+      SuspiciousIpResponse() => 'suspicious_ip',
+    };
+  }
+
+  /// Checks if the response is an error type.
+  bool _isErrorResponse(ChatResponse response) {
+    return response is ErrorTextResponse ||
+        response is TestEndpointCalledErrorResponse ||
+        response is CreditLimitReachedResponse ||
+        response is IpLimitReachedResponse ||
+        response is UserApiKeyQuotaExceededResponse ||
+        response is SuspiciousIpResponse;
+  }
+
+  /// Tracks error responses with detailed information.
+  void _trackErrorResponse(
+    ChatResponse chatResponse,
+    int scrappableId,
+    int messageCount,
+    bool isFirstResponse,
+    AnalyticsService analytics,
+  ) {
+    final errorType = _getResponseType(chatResponse);
+    String? errorMessage;
+    String? errorTitle;
+    String? errorDescription;
+
+    // Extract error details based on type
+    if (chatResponse is ErrorTextResponse) {
+      errorMessage = chatResponse.errorMessage;
+    } else if (chatResponse is TestEndpointCalledErrorResponse) {
+      errorTitle = chatResponse.errorTitle;
+      errorDescription = chatResponse.errorDescription;
+    } else if (chatResponse is CreditLimitReachedResponse) {
+      errorTitle = 'Credit Limit Reached';
+    } else if (chatResponse is IpLimitReachedResponse) {
+      errorTitle = 'IP Limit Reached';
+    } else if (chatResponse is UserApiKeyQuotaExceededResponse) {
+      errorTitle = 'User API Key Quota Exceeded';
+    }
+
+    // Track the error
+    analytics.trackChatResponseError(
+      scrappableId: scrappableId,
+      errorType: errorType,
+      messageCount: messageCount,
+      isFirstResponse: isFirstResponse,
+      errorMessage: errorMessage,
+      errorTitle: errorTitle,
+      errorDescription: errorDescription,
+    );
+
+    // If no extract rule has been received yet, this is a critical "first response error"
+    if (!_hasReceivedExtractRule) {
+      analytics.trackChatFirstExtractRuleError(
+        scrappableId: scrappableId,
+        errorType: errorType,
+        messageCount: messageCount,
+        errorMessage: errorMessage,
+        errorTitle: errorTitle,
+        errorDescription: errorDescription,
+      );
+    }
   }
 
   void updateScrappableDetails({
@@ -245,12 +432,80 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
 
     await sessionResult.fold((createdSessionResponse) async {
       try {
+        final sessionStartTime = DateTime.now();
+        talker.info(
+          '[ChatStream] Starting stream subscription for session: ${createdSessionResponse.sessionId}',
+        );
+
         _chatResponseSubscription = ref
             .read(clientProvider)
             .scrappableChatSession
             .listenToScrappableRedraftSession(
                 sessionUuid: createdSessionResponse.sessionId, language: language)
-            .listen(onChange);
+            .listen(
+          (response) {
+            talker.debug(
+              '[ChatStream] Received response type: ${response.runtimeType}',
+            );
+            onChange(response);
+          },
+          onError: (error, stackTrace) {
+            final sessionDuration = DateTime.now().difference(sessionStartTime);
+            final errorType = error.runtimeType.toString();
+            final errorMessage = error.toString();
+
+            // Comprehensive error logging for diagnosis
+            talker.error(
+              '[ChatStream] Stream error occurred\n'
+              '  Session ID: ${createdSessionResponse.sessionId}\n'
+              '  Session duration: ${sessionDuration.inSeconds}s\n'
+              '  Error type: $errorType\n'
+              '  Error message: $errorMessage\n'
+              '  Current state type: ${state.runtimeType}',
+              error,
+              stackTrace,
+            );
+
+            // Log specific error characteristics for debugging
+            if (error is Error) {
+              talker.warning('[ChatStream] Error is a Dart Error (not Exception)');
+            }
+            if (errorMessage.contains('WebSocket') ||
+                errorMessage.contains('websocket')) {
+              talker.warning('[ChatStream] WebSocket-related error detected');
+            }
+            if (errorMessage.contains('closed') ||
+                errorMessage.contains('Closed')) {
+              talker.warning('[ChatStream] Connection closure detected');
+            }
+
+            if (error is ZenScrapException) {
+              state = ScrapChatSessionState.withError(error: error);
+            } else {
+              // Check if this is a connection closed error (WebSocket disconnect)
+              final errorStringLower = errorMessage.toLowerCase();
+              final isConnectionError =
+                  errorStringLower.contains('connection') ||
+                      errorStringLower.contains('websocket') ||
+                      errorStringLower.contains('closed') ||
+                      errorStringLower.contains('socket');
+              state = ScrapChatSessionState.withError(
+                error: isConnectionError
+                    ? connectionClosedException
+                    : defaultException,
+              );
+            }
+          },
+          onDone: () {
+            final sessionDuration = DateTime.now().difference(sessionStartTime);
+            talker.info(
+              '[ChatStream] Stream closed normally\n'
+              '  Session ID: ${createdSessionResponse.sessionId}\n'
+              '  Session duration: ${sessionDuration.inSeconds}s',
+            );
+          },
+          cancelOnError: false, // Don't cancel on error, let error handler manage state
+        );
 
         final Duration timeUntilExpire = createdSessionResponse.expiresIn;
         final DateTime expirationDate = DateTime.now().add(timeUntilExpire);

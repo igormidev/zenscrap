@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
-import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/ui/auth/templates/auth_form_template.dart';
+import 'package:zenscrap_flutter/src/ui/auth/utils/auth_error_mapper.dart';
+import 'package:zenscrap_flutter/src/ui/auth/utils/email_typo_detector.dart';
+import 'package:zenscrap_flutter/src/ui/auth/widgets/auth_error_dialog.dart';
+import 'package:zenscrap_flutter/src/ui/auth/widgets/email_typo_dialog.dart';
 import 'package:zenscrap_flutter/src/ui/auth/widgets/google_sign_in_button.dart';
 
 /// Stores pending registration data between startRegistration and finishRegistration.
@@ -61,24 +64,30 @@ class SignInPage extends ConsumerWidget {
             FormBuilderValidators.maxLength(55),
           ]),
         ),
-        AuthFormItem(
-          hintText: l10n.auth_password_hint,
-          labelText: l10n.auth_password_label,
-          autofillHints: AutofillHints.password,
-          keyboardType: TextInputType.visiblePassword,
-          obscureText: true,
-          validator: FormBuilderValidators.password(maxLength: 64),
-        ),
-        AuthFormItem(
-          hintText: l10n.auth_confirm_password_hint,
-          labelText: l10n.auth_confirm_password_label,
-          autofillHints: AutofillHints.password,
-          obscureText: true,
-          validatorWithItems: (value, currItensState) {
-            return FormBuilderValidators.password(
-              maxLength: 64,
-            ).and(FormBuilderValidators.equal(currItensState[2]))(value);
-          },
+        // Password fields displayed side-by-side on expanded screens
+        AuthFormRow(
+          items: [
+            AuthFormItem(
+              hintText: l10n.auth_password_hint,
+              labelText: l10n.auth_password_label,
+              autofillHints: AutofillHints.password,
+              keyboardType: TextInputType.visiblePassword,
+              obscureText: true,
+              validator: FormBuilderValidators.password(maxLength: 64),
+            ),
+            AuthFormItem(
+              hintText: l10n.auth_confirm_password_hint,
+              labelText: l10n.auth_confirm_password_label,
+              autofillHints: AutofillHints.password,
+              obscureText: true,
+              // Note: currItensState[2] still works because flat index is preserved
+              validatorWithItems: (value, currItensState) {
+                return FormBuilderValidators.password(
+                  maxLength: 64,
+                ).and(FormBuilderValidators.equal(currItensState[2]))(value);
+              },
+            ),
+          ],
         ),
       ],
       onSubmitSuccess: (email) {
@@ -86,8 +95,29 @@ class SignInPage extends ConsumerWidget {
       },
       onSubmit: (List<String> items) async {
         final String userName = items[0];
-        final String email = items[1];
+        String email = items[1];
         final String password = items[2];
+
+        // Check for email typos before proceeding
+        final typoResult = EmailTypoDetector.detectTypo(email);
+        if (typoResult != null && context.mounted) {
+          final dialogResult = await showEmailTypoDialog(
+            context: context,
+            typoResult: typoResult,
+          );
+
+          if (dialogResult == null ||
+              dialogResult == EmailTypoDialogResult.cancel) {
+            // User cancelled the dialog
+            return null;
+          }
+
+          if (dialogResult == EmailTypoDialogResult.useSuggested) {
+            // User accepted the suggested correction
+            email = typoResult.suggestedEmail;
+          }
+          // If keepOriginal, continue with the original email
+        }
 
         // Track sign up attempt
         await analytics.trackAuthSignUpAttempt(
@@ -123,12 +153,17 @@ class SignInPage extends ConsumerWidget {
           PendingRegistrationData.clear();
 
           if (context.mounted) {
-            showErrorSnackbar(context);
+            // Map the exception and show beautiful error dialog
+            final authError = AuthErrorMapper.mapError(
+              e,
+              context: AuthContext.registration,
+            );
+            showAuthErrorDialog(context: context, error: authError);
           }
           return null;
         }
       },
-      children: const [
+      belowChildren: const [
         SizedBox(height: 8),
         ZenScrapGoogleSignInButton(),
         SizedBox(height: 16),

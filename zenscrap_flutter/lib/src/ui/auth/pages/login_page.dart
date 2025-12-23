@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
-import 'package:zenscrap_flutter/src/design_system/snackbar_message.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
-import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
 import 'package:zenscrap_flutter/src/states/session/user_model.dart';
 import 'package:zenscrap_flutter/src/ui/auth/templates/auth_form_template.dart';
+import 'package:zenscrap_flutter/src/ui/auth/utils/auth_error_mapper.dart';
+import 'package:zenscrap_flutter/src/ui/auth/widgets/auth_error_dialog.dart';
 import 'package:zenscrap_flutter/src/ui/auth/widgets/google_sign_in_button.dart';
 
 class LoginPage extends ConsumerWidget {
@@ -54,9 +54,9 @@ class LoginPage extends ConsumerWidget {
         ),
       ],
       onSubmitSuccess: (data) {
-        ref.read(sessionProvider.notifier).setState(SessionState.logged(
-          user: data,
-        ));
+        ref
+            .read(sessionProvider.notifier)
+            .setState(SessionState.logged(user: data));
       },
       onSubmit: (items) async {
         final String email = items[0];
@@ -69,30 +69,63 @@ class LoginPage extends ConsumerWidget {
         emailAuth.emailController.text = email;
         emailAuth.passwordController.text = password;
 
+        // DEBUG: Log login attempt info
+        debugPrint(
+          '[DEBUG] Login attempt - email: $email, password length: ${password.length}',
+        );
+        debugPrint(
+          '[DEBUG] passwordController.text length: ${emailAuth.passwordController.text.length}',
+        );
+
         try {
           // Attempt login using the new IDP system
+          // Note: login() catches exceptions internally via _guarded().
+          // It sets state to EmailAuthState.error on failure and
+          // EmailAuthState.authenticated on success.
           await emailAuth.login();
 
-          // Check if authenticated
-          final client = ref.read(clientProvider);
-          final isAuthenticated = client.auth.isAuthenticated;
+          // DEBUG: Log authentication state immediately after login()
+          debugPrint(
+            '[DEBUG] After login() - state: ${emailAuth.state}, '
+            'isAuthenticated: ${emailAuth.isAuthenticated}, '
+            'errorMessage: ${emailAuth.errorMessage}',
+          );
 
-          if (!isAuthenticated) {
-            // Track login failure
+          // Check the state directly - this is more reliable than isAuthenticated
+          // because isAuthenticated reads from client.auth.isAuthenticated which
+          // may have timing issues, while state is updated synchronously by _guarded()
+          final state = emailAuth.state;
+          final isSuccess = state == EmailAuthState.authenticated;
+          final isError = state == EmailAuthState.error;
+
+          if (isError || !isSuccess) {
+            // Track login failure - use errorMessage if available
+            final errorMsg = emailAuth.errorMessage ?? 'Invalid credentials';
             await analytics.trackAuthLoginFailure(
               email: email,
-              errorMessage: 'Invalid credentials or user not found',
+              errorMessage: errorMsg,
             );
 
             if (context.mounted) {
-              showErrorSnackbar(context);
+              // Map the error and show beautiful error dialog
+              // Use the actual error from the controller if available
+              final error = emailAuth.error;
+              final authError = error != null
+                  ? AuthErrorMapper.mapError(error, context: AuthContext.login)
+                  : (emailAuth.errorMessage != null
+                        ? AuthErrorMapper.mapControllerError(
+                            emailAuth.errorMessage,
+                            context: AuthContext.login,
+                          )
+                        : AuthErrorMapper.loginFailed());
+              showAuthErrorDialog(context: context, error: authError);
             }
 
             return null;
           }
 
-          // We use the email from the form since AuthSuccess doesn't contain user profile info
-          // Username can be fetched from server later or we use a default
+          // Login succeeded.
+          // The EmailAuthController's onAuthenticated callback handles auth state.
           const userName = 'User';
 
           // Track successful login
@@ -101,11 +134,7 @@ class LoginPage extends ConsumerWidget {
             userName: userName,
           );
 
-          return UserModel(
-            email: email,
-            userName: userName,
-            imageUrl: null,
-          );
+          return UserModel(email: email, userName: userName, imageUrl: null);
         } catch (e) {
           // Track login failure
           await analytics.trackAuthLoginFailure(
@@ -114,13 +143,18 @@ class LoginPage extends ConsumerWidget {
           );
 
           if (context.mounted) {
-            showErrorSnackbar(context);
+            // Map the exception and show beautiful error dialog
+            final authError = AuthErrorMapper.mapError(
+              e,
+              context: AuthContext.login,
+            );
+            await showAuthErrorDialog(context: context, error: authError);
           }
 
           return null;
         }
       },
-      children: const [
+      belowChildren: const [
         SizedBox(height: 8),
         ZenScrapGoogleSignInButton(),
         SizedBox(height: 16),

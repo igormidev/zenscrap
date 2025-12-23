@@ -36,5 +36,24 @@
 	<true/>
 	<key>com.posthog.posthog.DEBUG</key>
 	<true/>
+	<!-- Google Sign-In Configuration for macOS -->
+	<!-- Client ID for macOS Desktop OAuth from Google Cloud Console -->
+	<key>GIDClientID</key>
+	<string>602145347765-c40u505mg0ct5pqo9pqpiugj3hn82k3i.apps.googleusercontent.com</string>
+	<!-- Server Client ID (Web OAuth) for token verification -->
+	<key>GIDServerClientID</key>
+	<string>602145347765-dafncgl6jkbmnc3mf62qk1o0oeic5861.apps.googleusercontent.com</string>
+	<!-- URL Scheme for Google Sign-In callback (reversed client ID) -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.602145347765-c40u505mg0ct5pqo9pqpiugj3hn82k3i</string>
+			</array>
+			<key>CFBundleURLName</key>
+			<string>Google Sign-In</string>
+		</dict>
+	</array>
 </dict>
 </plist>

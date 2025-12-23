@@ -17,56 +17,58 @@ import 'package:serverpod/serverpod.dart' as _i2;
 import 'dart:async' as _i3;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _i4;
-import 'package:zenscrap_server/src/generated/entities/account/account.dart'
+import 'package:zenscrap_server/src/generated/entities/auth/user_profile_response.dart'
     as _i5;
-import 'package:zenscrap_server/src/generated/entities/supported_language.dart'
+import 'package:zenscrap_server/src/generated/entities/account/account.dart'
     as _i6;
-import 'package:zenscrap_server/src/generated/entities/account/ai_usage/ai_credit_history/paginated_ai_credit_history_response.dart'
+import 'package:zenscrap_server/src/generated/entities/supported_language.dart'
     as _i7;
-import 'package:zenscrap_server/src/generated/entities/account/ai_usage/account_ai_usage.dart'
+import 'package:zenscrap_server/src/generated/entities/account/ai_usage/ai_credit_history/paginated_ai_credit_history_response.dart'
     as _i8;
-import 'package:zenscrap_server/src/generated/entities/scrappable/auto_fix/paginated_auto_fix_session_response.dart'
+import 'package:zenscrap_server/src/generated/entities/account/ai_usage/account_ai_usage.dart'
     as _i9;
-import 'package:zenscrap_server/src/generated/entities/account/api_usage/api_credit_history/paginated_api_credit_history_response.dart'
+import 'package:zenscrap_server/src/generated/entities/scrappable/auto_fix/paginated_auto_fix_session_response.dart'
     as _i10;
-import 'package:zenscrap_server/src/generated/entities/account/account_api_key.dart'
+import 'package:zenscrap_server/src/generated/entities/account/api_usage/api_credit_history/paginated_api_credit_history_response.dart'
     as _i11;
-import 'package:zenscrap_server/src/generated/protocol.dart' as _i12;
+import 'package:zenscrap_server/src/generated/entities/account/account_api_key.dart'
+    as _i12;
+import 'package:zenscrap_server/src/generated/protocol.dart' as _i13;
 import 'package:zenscrap_server/src/generated/entities/account/api_usage/account_api_usage.dart'
-    as _i13;
-import 'package:zenscrap_server/src/generated/entities/api_key_response.dart'
     as _i14;
-import 'package:zenscrap_server/src/generated/entities/account/credit_purchase_option.dart'
+import 'package:zenscrap_server/src/generated/entities/api_key_response.dart'
     as _i15;
-import 'package:zenscrap_server/src/generated/entities/scrappable/scrappable.dart'
+import 'package:zenscrap_server/src/generated/entities/account/credit_purchase_option.dart'
     as _i16;
-import 'package:zenscrap_server/src/generated/entities/analytics/paginated_scrappable_requests_analytics.dart'
+import 'package:zenscrap_server/src/generated/entities/scrappable/scrappable.dart'
     as _i17;
-import 'package:zenscrap_server/src/generated/entities/analytics/analytics_time_scope.dart'
+import 'package:zenscrap_server/src/generated/entities/analytics/paginated_scrappable_requests_analytics.dart'
     as _i18;
-import 'package:zenscrap_server/src/generated/entities/analytics/paginated_scrappable_analytics.dart'
+import 'package:zenscrap_server/src/generated/entities/analytics/analytics_time_scope.dart'
     as _i19;
-import 'package:zenscrap_server/src/generated/entities/analytics/scrappable_usage_metrics.dart'
+import 'package:zenscrap_server/src/generated/entities/analytics/paginated_scrappable_analytics.dart'
     as _i20;
-import 'package:zenscrap_server/src/generated/entities/user_scrappables/user_paginated_scrappable_response.dart'
+import 'package:zenscrap_server/src/generated/entities/analytics/scrappable_usage_metrics.dart'
     as _i21;
-import 'package:zenscrap_server/src/generated/entities/scrappable/scraper_category.dart'
+import 'package:zenscrap_server/src/generated/entities/user_scrappables/user_paginated_scrappable_response.dart'
     as _i22;
-import 'package:zenscrap_server/src/generated/entities/create_scrappable_stream/create_scrappable_stream_item.dart'
+import 'package:zenscrap_server/src/generated/entities/scrappable/scraper_category.dart'
     as _i23;
-import 'dart:convert' as _i24;
+import 'package:zenscrap_server/src/generated/entities/create_scrappable_stream/create_scrappable_stream_item.dart'
+    as _i24;
+import 'dart:convert' as _i25;
 import 'package:zenscrap_server/src/generated/entities/scrappable/ai_model.dart'
-    as _i25;
-import 'package:zenscrap_server/src/generated/entities/marketplace/paginated_scrappable_response.dart'
     as _i26;
-import 'package:zenscrap_server/src/generated/entities/scrappable/byte_test_data.dart'
+import 'package:zenscrap_server/src/generated/entities/marketplace/paginated_scrappable_response.dart'
     as _i27;
-import 'package:zenscrap_server/src/generated/entities/account/plan_tier.dart'
+import 'package:zenscrap_server/src/generated/entities/scrappable/byte_test_data.dart'
     as _i28;
-import 'package:zenscrap_server/src/generated/entities/redraft_scrappable_session/create_session_response.dart'
+import 'package:zenscrap_server/src/generated/entities/account/plan_tier.dart'
     as _i29;
-import 'package:zenscrap_server/src/generated/entities/redraft_scrappable_session/chat_response.dart'
+import 'package:zenscrap_server/src/generated/entities/redraft_scrappable_session/create_session_response.dart'
     as _i30;
+import 'package:zenscrap_server/src/generated/entities/redraft_scrappable_session/chat_response.dart'
+    as _i31;
 import 'package:zenscrap_server/src/generated/protocol.dart';
 import 'package:zenscrap_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -180,6 +182,8 @@ class TestEndpoints {
 
   late final _RefreshJwtTokensEndpoint refreshJwtTokens;
 
+  late final _UserProfileEndpoint userProfile;
+
   late final _PrivateAccountEndpoint privateAccount;
 
   late final _PrivateAiUsageEndpoint privateAiUsage;
@@ -225,6 +229,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     refreshJwtTokens = _RefreshJwtTokensEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    userProfile = _UserProfileEndpoint(
       endpoints,
       serializationManager,
     );
@@ -297,6 +305,37 @@ class _EmailIdpEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
+  _i3.Future<_i2.UuidValue> startRegistration(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required String email,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'emailIdp',
+            method: 'startRegistration',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'emailIdp',
+          methodName: 'startRegistration',
+          parameters: _i1.testObjectToJson({'email': email}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i2.UuidValue>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
   _i3.Future<_i4.AuthSuccess> login(
     _i1.TestSessionBuilder sessionBuilder, {
     required String email,
@@ -332,22 +371,26 @@ class _EmailIdpEndpoint {
     });
   }
 
-  _i3.Future<_i2.UuidValue> startRegistration(
+  _i3.Future<_i4.AuthSuccess> finishRegistration(
     _i1.TestSessionBuilder sessionBuilder, {
-    required String email,
+    required String registrationToken,
+    required String password,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
             endpoint: 'emailIdp',
-            method: 'startRegistration',
+            method: 'finishRegistration',
           );
       try {
         var _localCallContext = await _endpointDispatch.getMethodCallContext(
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'emailIdp',
-          methodName: 'startRegistration',
-          parameters: _i1.testObjectToJson({'email': email}),
+          methodName: 'finishRegistration',
+          parameters: _i1.testObjectToJson({
+            'registrationToken': registrationToken,
+            'password': password,
+          }),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -355,7 +398,7 @@ class _EmailIdpEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i2.UuidValue>);
+                as _i3.Future<_i4.AuthSuccess>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -391,41 +434,6 @@ class _EmailIdpEndpoint {
                   _localCallContext.arguments,
                 )
                 as _i3.Future<String>);
-        return _localReturnValue;
-      } finally {
-        await _localUniqueSession.close();
-      }
-    });
-  }
-
-  _i3.Future<_i4.AuthSuccess> finishRegistration(
-    _i1.TestSessionBuilder sessionBuilder, {
-    required String registrationToken,
-    required String password,
-  }) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
-      var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
-            endpoint: 'emailIdp',
-            method: 'finishRegistration',
-          );
-      try {
-        var _localCallContext = await _endpointDispatch.getMethodCallContext(
-          createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'emailIdp',
-          methodName: 'finishRegistration',
-          parameters: _i1.testObjectToJson({
-            'registrationToken': registrationToken,
-            'password': password,
-          }),
-          serializationManager: _serializationManager,
-        );
-        var _localReturnValue =
-            await (_localCallContext.method.call(
-                  _localUniqueSession,
-                  _localCallContext.arguments,
-                )
-                as _i3.Future<_i4.AuthSuccess>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -623,6 +631,47 @@ class _RefreshJwtTokensEndpoint {
   }
 }
 
+class _UserProfileEndpoint {
+  _UserProfileEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<_i5.UserProfileResponse> getCurrentUserProfile(
+    _i1.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'userProfile',
+            method: 'getCurrentUserProfile',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'userProfile',
+          methodName: 'getCurrentUserProfile',
+          parameters: _i1.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i5.UserProfileResponse>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
 class _PrivateAccountEndpoint {
   _PrivateAccountEndpoint(
     this._endpointDispatch,
@@ -633,10 +682,10 @@ class _PrivateAccountEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i5.AccountInfo> getAccountInfo(
+  _i3.Future<_i6.AccountInfo> getAccountInfo(
     _i1.TestSessionBuilder sessionBuilder, {
     required int? initialScrappableId,
-    required _i6.SupportedLanguage language,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -660,7 +709,7 @@ class _PrivateAccountEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i5.AccountInfo>);
+                as _i3.Future<_i6.AccountInfo>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -679,10 +728,10 @@ class _PrivateAiUsageEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i7.PaginatedAICreditHistoryResponse> getAiCreditHistory(
+  _i3.Future<_i8.PaginatedAICreditHistoryResponse> getAiCreditHistory(
     _i1.TestSessionBuilder sessionBuilder, {
     required int page,
-    required _i6.SupportedLanguage language,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -706,7 +755,7 @@ class _PrivateAiUsageEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i7.PaginatedAICreditHistoryResponse>);
+                as _i3.Future<_i8.PaginatedAICreditHistoryResponse>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -714,9 +763,9 @@ class _PrivateAiUsageEndpoint {
     });
   }
 
-  _i3.Future<_i8.AccountAIUsage> getAiUsageInfo(
+  _i3.Future<_i9.AccountAIUsage> getAiUsageInfo(
     _i1.TestSessionBuilder sessionBuilder, {
-    required _i6.SupportedLanguage language,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -737,7 +786,7 @@ class _PrivateAiUsageEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i8.AccountAIUsage>);
+                as _i3.Future<_i9.AccountAIUsage>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -745,10 +794,10 @@ class _PrivateAiUsageEndpoint {
     });
   }
 
-  _i3.Future<_i8.AccountAIUsage> updateOpenAiApiKey(
+  _i3.Future<_i9.AccountAIUsage> updateOpenAiApiKey(
     _i1.TestSessionBuilder sessionBuilder, {
     String? apiKey,
-    required _i6.SupportedLanguage language,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -772,7 +821,7 @@ class _PrivateAiUsageEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i8.AccountAIUsage>);
+                as _i3.Future<_i9.AccountAIUsage>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -780,10 +829,10 @@ class _PrivateAiUsageEndpoint {
     });
   }
 
-  _i3.Future<_i9.PaginatedAutoFixSessionResponse> getAutoFixSessions(
+  _i3.Future<_i10.PaginatedAutoFixSessionResponse> getAutoFixSessions(
     _i1.TestSessionBuilder sessionBuilder, {
     required int page,
-    required _i6.SupportedLanguage language,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -807,7 +856,7 @@ class _PrivateAiUsageEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i9.PaginatedAutoFixSessionResponse>);
+                as _i3.Future<_i10.PaginatedAutoFixSessionResponse>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -826,10 +875,10 @@ class _PrivateApiUsageEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i10.PaginatedApiCreditHistoryResponse> getApiCreditHistory(
+  _i3.Future<_i11.PaginatedApiCreditHistoryResponse> getApiCreditHistory(
     _i1.TestSessionBuilder sessionBuilder, {
     required int page,
-    required _i6.SupportedLanguage language,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -853,7 +902,7 @@ class _PrivateApiUsageEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i10.PaginatedApiCreditHistoryResponse>);
+                as _i3.Future<_i11.PaginatedApiCreditHistoryResponse>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -861,10 +910,10 @@ class _PrivateApiUsageEndpoint {
     });
   }
 
-  _i3.Future<_i11.AccountApiKey> createApiKey(
+  _i3.Future<_i12.AccountApiKey> createApiKey(
     _i1.TestSessionBuilder sessionBuilder, {
     required String name,
-    required _i6.SupportedLanguage language,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -888,7 +937,7 @@ class _PrivateApiUsageEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i11.AccountApiKey>);
+                as _i3.Future<_i12.AccountApiKey>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -899,7 +948,7 @@ class _PrivateApiUsageEndpoint {
   _i3.Future<bool> deactivateApiKey(
     _i1.TestSessionBuilder sessionBuilder, {
     required int apiKeyId,
-    required _i6.SupportedLanguage language,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -931,9 +980,9 @@ class _PrivateApiUsageEndpoint {
     });
   }
 
-  _i3.Future<List<_i11.AccountApiKey>> getActiveApiKeys(
+  _i3.Future<List<_i12.AccountApiKey>> getActiveApiKeys(
     _i1.TestSessionBuilder sessionBuilder, {
-    required _i6.SupportedLanguage language,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -954,7 +1003,7 @@ class _PrivateApiUsageEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i11.AccountApiKey>>);
+                as _i3.Future<List<_i12.AccountApiKey>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -964,7 +1013,7 @@ class _PrivateApiUsageEndpoint {
 
   _i3.Future<Map<int, int>> getApiKeyUsageStats(
     _i1.TestSessionBuilder sessionBuilder, {
-    required _i6.SupportedLanguage language,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -985,7 +1034,7 @@ class _PrivateApiUsageEndpoint {
               _localUniqueSession,
               _localCallContext.arguments,
             )
-            .then((map) => _i12.Protocol().deserialize<Map<int, int>>(map));
+            .then((map) => _i13.Protocol().deserialize<Map<int, int>>(map));
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -993,9 +1042,9 @@ class _PrivateApiUsageEndpoint {
     });
   }
 
-  _i3.Future<_i13.AccountApiUsage> getApiUsageInfo(
+  _i3.Future<_i14.AccountApiUsage> getApiUsageInfo(
     _i1.TestSessionBuilder sessionBuilder, {
-    required _i6.SupportedLanguage language,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1016,7 +1065,7 @@ class _PrivateApiUsageEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i13.AccountApiUsage>);
+                as _i3.Future<_i14.AccountApiUsage>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1024,9 +1073,9 @@ class _PrivateApiUsageEndpoint {
     });
   }
 
-  _i3.Future<_i14.ApiKeyResponse> getApiKeysWithStats(
+  _i3.Future<_i15.ApiKeyResponse> getApiKeysWithStats(
     _i1.TestSessionBuilder sessionBuilder, {
-    required _i6.SupportedLanguage language,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1047,7 +1096,7 @@ class _PrivateApiUsageEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i14.ApiKeyResponse>);
+                as _i3.Future<_i15.ApiKeyResponse>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1057,8 +1106,8 @@ class _PrivateApiUsageEndpoint {
 
   _i3.Future<String> createCreditPurchaseCheckout(
     _i1.TestSessionBuilder sessionBuilder, {
-    required _i15.CreditPurchaseOption creditPackage,
-    required _i6.SupportedLanguage language,
+    required _i16.CreditPurchaseOption creditPackage,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1101,10 +1150,10 @@ class _PrivateCloneScrappableEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i16.Scrappable> cloneFromMarketplace(
+  _i3.Future<_i17.Scrappable> cloneFromMarketplace(
     _i1.TestSessionBuilder sessionBuilder, {
     required int scrappableId,
-    required _i6.SupportedLanguage language,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1128,7 +1177,7 @@ class _PrivateCloneScrappableEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i16.Scrappable>);
+                as _i3.Future<_i17.Scrappable>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1147,12 +1196,12 @@ class _PrivateScrappableAnalyticsEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i17.PaginatedScrappableRequestsAnalytics>
+  _i3.Future<_i18.PaginatedScrappableRequestsAnalytics>
   getScrappableAnalyticsWithScope(
     _i1.TestSessionBuilder sessionBuilder, {
     required int page,
-    required _i18.AnalyticsTimeScope scope,
-    required _i6.SupportedLanguage language,
+    required _i19.AnalyticsTimeScope scope,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1177,7 +1226,7 @@ class _PrivateScrappableAnalyticsEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i17.PaginatedScrappableRequestsAnalytics>);
+                as _i3.Future<_i18.PaginatedScrappableRequestsAnalytics>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1185,11 +1234,11 @@ class _PrivateScrappableAnalyticsEndpoint {
     });
   }
 
-  _i3.Future<_i19.PaginatedScrappableAnalytics> getScrappableAnalytics(
+  _i3.Future<_i20.PaginatedScrappableAnalytics> getScrappableAnalytics(
     _i1.TestSessionBuilder sessionBuilder, {
     required int scrappableId,
     required int page,
-    required _i6.SupportedLanguage language,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1214,7 +1263,7 @@ class _PrivateScrappableAnalyticsEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i19.PaginatedScrappableAnalytics>);
+                as _i3.Future<_i20.PaginatedScrappableAnalytics>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1222,10 +1271,10 @@ class _PrivateScrappableAnalyticsEndpoint {
     });
   }
 
-  _i3.Future<_i20.ScrappableUsageMetrics> getScrappableUsageMetrics(
+  _i3.Future<_i21.ScrappableUsageMetrics> getScrappableUsageMetrics(
     _i1.TestSessionBuilder sessionBuilder, {
     required int scrappableId,
-    required _i6.SupportedLanguage language,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1249,7 +1298,7 @@ class _PrivateScrappableAnalyticsEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i20.ScrappableUsageMetrics>);
+                as _i3.Future<_i21.ScrappableUsageMetrics>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1272,7 +1321,7 @@ class _PrivateSubscriptionEndpoint {
     _i1.TestSessionBuilder sessionBuilder, {
     required String planTier,
     required bool isYearly,
-    required _i6.SupportedLanguage language,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1307,7 +1356,7 @@ class _PrivateSubscriptionEndpoint {
 
   _i3.Future<Map<String, dynamic>> getSubscriptionStatus(
     _i1.TestSessionBuilder sessionBuilder, {
-    required _i6.SupportedLanguage language,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1338,7 +1387,7 @@ class _PrivateSubscriptionEndpoint {
 
   _i3.Future<bool> cancelSubscription(
     _i1.TestSessionBuilder sessionBuilder, {
-    required _i6.SupportedLanguage language,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1369,7 +1418,7 @@ class _PrivateSubscriptionEndpoint {
 
   _i3.Future<String> createCustomerPortalSession(
     _i1.TestSessionBuilder sessionBuilder, {
-    required _i6.SupportedLanguage language,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1409,12 +1458,12 @@ class _PrivateUserScrappablesEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i21.UserPaginatedScrappableResponse> call(
+  _i3.Future<_i22.UserPaginatedScrappableResponse> call(
     _i1.TestSessionBuilder sessionBuilder, {
     required int page,
     String? searchQuery,
-    List<_i22.ScraperCategory>? categories,
-    required _i6.SupportedLanguage language,
+    List<_i23.ScraperCategory>? categories,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1440,7 +1489,7 @@ class _PrivateUserScrappablesEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i21.UserPaginatedScrappableResponse>);
+                as _i3.Future<_i22.UserPaginatedScrappableResponse>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1448,10 +1497,10 @@ class _PrivateUserScrappablesEndpoint {
     });
   }
 
-  _i3.Future<_i16.Scrappable> getScrappableById(
+  _i3.Future<_i17.Scrappable> getScrappableById(
     _i1.TestSessionBuilder sessionBuilder,
     int scrappableId, {
-    required _i6.SupportedLanguage language,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1475,7 +1524,7 @@ class _PrivateUserScrappablesEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i16.Scrappable>);
+                as _i3.Future<_i17.Scrappable>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1494,13 +1543,13 @@ class _CreateScrappableEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Stream<_i23.CreateScrappableStreamItem> call(
+  _i3.Stream<_i24.CreateScrappableStreamItem> call(
     _i1.TestSessionBuilder sessionBuilder, {
     required String referenceLink,
-    required _i6.SupportedLanguage language,
+    required _i7.SupportedLanguage language,
   }) {
     var _localTestStreamManager =
-        _i1.TestStreamManager<_i23.CreateScrappableStreamItem>();
+        _i1.TestStreamManager<_i24.CreateScrappableStreamItem>();
     _i1.callStreamFunctionAndHandleExceptions(
       () async {
         var _localUniqueSession =
@@ -1515,7 +1564,7 @@ class _CreateScrappableEndpoint {
               methodName: 'call',
               arguments: {
                 'referenceLink': referenceLink,
-                'language': _i24.jsonDecode(
+                'language': _i25.jsonDecode(
                   _i2.SerializationManager.encode(language),
                 ),
               },
@@ -1547,7 +1596,7 @@ class _DeleteScrappableEndpoint {
   _i3.Future<bool> call(
     _i1.TestSessionBuilder sessionBuilder, {
     required int scrappableId,
-    required _i6.SupportedLanguage language,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1595,12 +1644,12 @@ class _EditScrappableEndpoint {
     required int scrappableId,
     required String name,
     required String description,
-    required _i6.SupportedLanguage language,
-    _i22.ScraperCategory? category,
+    required _i7.SupportedLanguage language,
+    _i23.ScraperCategory? category,
     bool? willHideFromMarketplace,
     bool? autoFixEnabled,
     int? autoFixConsecutiveErrorThreshold,
-    _i25.AiModel? autoFixPreferredAiModel,
+    _i26.AiModel? autoFixPreferredAiModel,
     bool? autoFixUseAutoAiModel,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
@@ -1653,12 +1702,12 @@ class _MarketplaceEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i26.PaginatedScrappableResponse> getItems(
+  _i3.Future<_i27.PaginatedScrappableResponse> getItems(
     _i1.TestSessionBuilder sessionBuilder, {
     required int page,
     String? searchQuery,
-    List<_i22.ScraperCategory>? categories,
-    required _i6.SupportedLanguage language,
+    List<_i23.ScraperCategory>? categories,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1684,7 +1733,7 @@ class _MarketplaceEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i26.PaginatedScrappableResponse>);
+                as _i3.Future<_i27.PaginatedScrappableResponse>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1703,10 +1752,10 @@ class _PublicScrappableEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i27.ByteTestData?> getByteTestData(
+  _i3.Future<_i28.ByteTestData?> getByteTestData(
     _i1.TestSessionBuilder sessionBuilder,
     int scrappableId, {
-    required _i6.SupportedLanguage language,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1730,7 +1779,7 @@ class _PublicScrappableEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i27.ByteTestData?>);
+                as _i3.Future<_i28.ByteTestData?>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1753,7 +1802,7 @@ class _PublicTierEndpoint {
     _i1.TestSessionBuilder sessionBuilder, {
     required String email,
     required String tierManipulationKey,
-    required _i28.PlanTier planTier,
+    required _i29.PlanTier planTier,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1800,7 +1849,7 @@ class _ScrappableChatSession {
   _i3.Future<void> commitCurrentEditState(
     _i1.TestSessionBuilder sessionBuilder, {
     required String sessionUuid,
-    required _i6.SupportedLanguage language,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1867,7 +1916,7 @@ class _ScrappableChatSession {
     _i1.TestSessionBuilder sessionBuilder, {
     required String sessionId,
     required String openAiApiKey,
-    required _i6.SupportedLanguage language,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1906,7 +1955,7 @@ class _ScrappableChatSession {
     required String url,
     required List<String> pathParams,
     required Map<String, String?> queryParams,
-    required _i6.SupportedLanguage language,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1941,10 +1990,10 @@ class _ScrappableChatSession {
     });
   }
 
-  _i3.Future<_i29.CreateSessionResponse> createSession(
+  _i3.Future<_i30.CreateSessionResponse> createSession(
     _i1.TestSessionBuilder sessionBuilder, {
     required int scrappableId,
-    required _i6.SupportedLanguage language,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1968,7 +2017,7 @@ class _ScrappableChatSession {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i29.CreateSessionResponse>);
+                as _i3.Future<_i30.CreateSessionResponse>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1976,12 +2025,12 @@ class _ScrappableChatSession {
     });
   }
 
-  _i3.Stream<_i30.ChatResponse> listenToScrappableRedraftSession(
+  _i3.Stream<_i31.ChatResponse> listenToScrappableRedraftSession(
     _i1.TestSessionBuilder sessionBuilder, {
     required String sessionUuid,
-    required _i6.SupportedLanguage language,
+    required _i7.SupportedLanguage language,
   }) {
-    var _localTestStreamManager = _i1.TestStreamManager<_i30.ChatResponse>();
+    var _localTestStreamManager = _i1.TestStreamManager<_i31.ChatResponse>();
     _i1.callStreamFunctionAndHandleExceptions(
       () async {
         var _localUniqueSession =
@@ -1996,7 +2045,7 @@ class _ScrappableChatSession {
               methodName: 'listenToScrappableRedraftSession',
               arguments: {
                 'sessionUuid': sessionUuid,
-                'language': _i24.jsonDecode(
+                'language': _i25.jsonDecode(
                   _i2.SerializationManager.encode(language),
                 ),
               },
@@ -2017,8 +2066,8 @@ class _ScrappableChatSession {
   _i3.Future<void> changeChatModel(
     _i1.TestSessionBuilder sessionBuilder, {
     required String sessionUuid,
-    required _i25.AiModel aiModel,
-    required _i6.SupportedLanguage language,
+    required _i26.AiModel aiModel,
+    required _i7.SupportedLanguage language,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -2055,7 +2104,7 @@ class _ScrappableChatSession {
     _i1.TestSessionBuilder sessionBuilder, {
     required String sessionId,
     required String userPrompt,
-    required _i6.SupportedLanguage language,
+    required _i7.SupportedLanguage language,
   }) {
     var _localTestStreamManager = _i1.TestStreamManager<String>();
     _i1.callStreamFunctionAndHandleExceptions(
@@ -2073,7 +2122,7 @@ class _ScrappableChatSession {
               arguments: {
                 'sessionId': sessionId,
                 'userPrompt': userPrompt,
-                'language': _i24.jsonDecode(
+                'language': _i25.jsonDecode(
                   _i2.SerializationManager.encode(language),
                 ),
               },

@@ -651,20 +651,6 @@
     <!-- Loading status text -->
     <div class="loading-text">Loading...</div>
   </div>
-  <script>
-    // Configure Flutter web renderer for better performance
-    window.flutterConfiguration = {
-      canvasKitVariant: "auto",
-      renderer: "canvaskit",
-      // Enable multi-threading for better performance
-      canvasKitMaximumSurfaces: 3,
-      // Increase service worker timeout to prevent timeout errors
-      serviceWorkerSettings: {
-        serviceWorkerTimeout: 10000, // 10 seconds instead of default 4 seconds
-        serviceWorkerVersion: Date.now().toString(), // Force fresh service worker
-      },
-    };
-  </script>
   <script src="flutter_bootstrap.js" async=""></script>
 
 

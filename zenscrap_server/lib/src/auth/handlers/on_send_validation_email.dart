@@ -13,8 +13,15 @@ Future<void> onSendRegistrationVerificationCode(
 }) async {
   session.log('Registration verification code for $email: $verificationCode');
 
-  // Skip email for test account
-  if (email == 'igor9ms@hotmail.com') return;
+  // Skip email for test account - ONLY in development or test mode
+  // This bypass is disabled in production and staging for security
+  final runMode = session.serverpod.runMode;
+  final isNonProductionMode = runMode == ServerpodRunMode.development ||
+      runMode == ServerpodRunMode.test;
+  if (isNonProductionMode && email == 'igor9ms@hotmail.com') {
+    session.log('Skipping email for test account in $runMode mode');
+    return;
+  }
 
   final htmlText = getHTMLEmailTemplate(
     title: 'Confirm Your Email Address',
@@ -24,6 +31,7 @@ Future<void> onSendRegistrationVerificationCode(
   );
 
   await sendEmail(
+    apiKey: session.passwords['resendApiKey']!,
     destinyEmail: email,
     subject: 'Zen Scrap | Confirm your email address',
     htmlMessage: htmlText,

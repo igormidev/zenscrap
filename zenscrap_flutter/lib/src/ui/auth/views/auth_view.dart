@@ -117,6 +117,14 @@ class _AuthViewState extends ConsumerState<AuthView>
     _tabController.animateTo(0);
   }
 
+  void _onGoBackFromConfirmEmail() {
+    // Clear the confirm email state to go back to the sign up form.
+    // Note: We intentionally do NOT clear PendingRegistrationData here,
+    // so the form will still have access to the userName and password
+    // if the user returns to the sign up form.
+    _isConfirmEmail.value = null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final scrapChatState = ref.watch(scrapChatProvider);
@@ -161,9 +169,9 @@ class _AuthViewState extends ConsumerState<AuthView>
                 },
               ),
             ).animate().fadeIn(
-                  duration: const Duration(seconds: 1),
-                  delay: const Duration(milliseconds: 800),
-                ),
+              duration: const Duration(seconds: 1),
+              delay: const Duration(milliseconds: 800),
+            ),
             // Terms of Service and Privacy Policy links - bottom right corner
             _LegalLinksFooter(),
             // Main content with responsive layout
@@ -178,6 +186,7 @@ class _AuthViewState extends ConsumerState<AuthView>
                   onSuccessConfirmEmail: _onSuccessConfirmEmail,
                   onChangeToPasswordReset: _onChangeToPasswordReset,
                   onSuccessChangePassword: _onSuccessChangePassword,
+                  onGoBackFromConfirmEmail: _onGoBackFromConfirmEmail,
                   scrappable: scrappable,
                 ),
                 expanded: (context, constraints) => _DesktopAuthLayout(
@@ -189,6 +198,7 @@ class _AuthViewState extends ConsumerState<AuthView>
                   onSuccessConfirmEmail: _onSuccessConfirmEmail,
                   onChangeToPasswordReset: _onChangeToPasswordReset,
                   onSuccessChangePassword: _onSuccessChangePassword,
+                  onGoBackFromConfirmEmail: _onGoBackFromConfirmEmail,
                   selectedAuthPage: _selectedAuthPage,
                   scrappable: scrappable,
                 ),
@@ -211,6 +221,7 @@ class _AuthContainer extends StatelessWidget {
     required this.onSuccessConfirmEmail,
     required this.onChangeToPasswordReset,
     required this.onSuccessChangePassword,
+    this.onGoBackFromConfirmEmail,
   });
 
   final TabController tabController;
@@ -221,6 +232,7 @@ class _AuthContainer extends StatelessWidget {
   final Future<void> Function() onSuccessConfirmEmail;
   final void Function(String) onChangeToPasswordReset;
   final void Function() onSuccessChangePassword;
+  final VoidCallback? onGoBackFromConfirmEmail;
 
   @override
   Widget build(BuildContext context) {
@@ -256,8 +268,14 @@ class _AuthContainer extends StatelessWidget {
                       child: TabBar(
                         controller: tabController,
                         tabs: [
-                          Tab(text: l10n.auth_login_tab, icon: Icon(Icons.login)),
-                          Tab(text: l10n.auth_sign_up_tab, icon: Icon(Icons.person_add)),
+                          Tab(
+                            text: l10n.auth_login_tab,
+                            icon: Icon(Icons.login),
+                          ),
+                          Tab(
+                            text: l10n.auth_sign_up_tab,
+                            icon: Icon(Icons.person_add),
+                          ),
                           Tab(
                             text: l10n.auth_password_reset_tab,
                             icon: Icon(Icons.vpn_key),
@@ -306,15 +324,13 @@ class _AuthContainer extends StatelessWidget {
                           child: Container(
                             decoration: BoxDecoration(
                               color: Theme.of(context).colorScheme.onPrimary,
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(20),
-                                topRight: Radius.circular(20),
-                              ),
+                              borderRadius: BorderRadius.circular(20),
                             ),
                             child: ConfirmEmailPage(
                               emailAuth: emailAuth,
                               email: haveEmail ? email : '',
                               onSuccessChangePassword: onSuccessConfirmEmail,
+                              onGoBack: onGoBackFromConfirmEmail,
                             ),
                           ),
                         ),
@@ -335,10 +351,7 @@ class _AuthContainer extends StatelessWidget {
                           child: Container(
                             decoration: BoxDecoration(
                               color: Theme.of(context).colorScheme.onPrimary,
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(20),
-                                topRight: Radius.circular(20),
-                              ),
+                              borderRadius: BorderRadius.circular(20),
                             ),
                             child: PasswordResetValidateCodePage(
                               key: ValueKey(email),
@@ -377,18 +390,20 @@ class _LegalLinksFooter extends StatelessWidget {
         children: [
           TermsOfServiceLink(
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.grey[600],
-                  decoration: TextDecoration.underline,
-                  decorationColor: Colors.grey[600],
-                ),
+              color: Colors.grey[600],
+              decoration: TextDecoration.underline,
+              decorationColor: Colors.grey[600],
+            ),
           ),
-          SizedBox(width: context.responsiveValue(compact: 12.0, expanded: 16.0)),
+          SizedBox(
+            width: context.responsiveValue(compact: 12.0, expanded: 16.0),
+          ),
           PrivacyPolicyLink(
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.grey[600],
-                  decoration: TextDecoration.underline,
-                  decorationColor: Colors.grey[600],
-                ),
+              color: Colors.grey[600],
+              decoration: TextDecoration.underline,
+              decorationColor: Colors.grey[600],
+            ),
           ),
         ],
       ),
@@ -406,6 +421,7 @@ class _MobileAuthLayout extends StatelessWidget {
   final Future<void> Function() onSuccessConfirmEmail;
   final void Function(String) onChangeToPasswordReset;
   final void Function() onSuccessChangePassword;
+  final VoidCallback onGoBackFromConfirmEmail;
   final Scrappable? scrappable;
 
   const _MobileAuthLayout({
@@ -417,6 +433,7 @@ class _MobileAuthLayout extends StatelessWidget {
     required this.onSuccessConfirmEmail,
     required this.onChangeToPasswordReset,
     required this.onSuccessChangePassword,
+    required this.onGoBackFromConfirmEmail,
     this.scrappable,
   });
 
@@ -443,16 +460,12 @@ class _MobileAuthLayout extends StatelessWidget {
           // Form section
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 16,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Back button and title row
-                  if (context.canPop())
-                    _BackButton(),
+                  if (context.canPop()) _BackButton(),
                   Text(
                     l10n.auth_welcome,
                     style: Theme.of(context).textTheme.headlineMedium,
@@ -469,6 +482,7 @@ class _MobileAuthLayout extends StatelessWidget {
                       onSuccessConfirmEmail: onSuccessConfirmEmail,
                       onChangeToPasswordReset: onChangeToPasswordReset,
                       onSuccessChangePassword: onSuccessChangePassword,
+                      onGoBackFromConfirmEmail: onGoBackFromConfirmEmail,
                     ),
                   ),
                   // Scrappable indicator if available
@@ -503,6 +517,7 @@ class _DesktopAuthLayout extends StatelessWidget {
   final Future<void> Function() onSuccessConfirmEmail;
   final void Function(String) onChangeToPasswordReset;
   final void Function() onSuccessChangePassword;
+  final VoidCallback onGoBackFromConfirmEmail;
   final SelectedAuthPage selectedAuthPage;
   final Scrappable? scrappable;
 
@@ -515,6 +530,7 @@ class _DesktopAuthLayout extends StatelessWidget {
     required this.onSuccessConfirmEmail,
     required this.onChangeToPasswordReset,
     required this.onSuccessChangePassword,
+    required this.onGoBackFromConfirmEmail,
     required this.selectedAuthPage,
     this.scrappable,
   });
@@ -531,10 +547,7 @@ class _DesktopAuthLayout extends StatelessWidget {
           // Left side - Form section
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 40,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
@@ -549,23 +562,39 @@ class _DesktopAuthLayout extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
                   // Animated height container for auth form
-                  AnimatedContainer(
-                    height: switch (selectedAuthPage) {
-                      SelectedAuthPage.login => 300,
-                      SelectedAuthPage.signIn => 440,
-                      SelectedAuthPage.passwordReset => 270,
+                  // Listens to isConfirmEmail to adjust height when showing
+                  // verification code flow (smaller form)
+                  ValueListenableBuilder<String?>(
+                    valueListenable: isConfirmEmail,
+                    builder: (context, confirmEmail, _) {
+                      return ValueListenableBuilder<String?>(
+                        valueListenable: resetPasswordEmailVN,
+                        builder: (context, resetEmail, _) {
+                          final isInVerificationFlow = confirmEmail != null;
+                          final isInPasswordResetFlow = resetEmail != null;
+
+                          return AnimatedContainer(
+                            height: _calculateAuthContainerHeight(
+                              selectedAuthPage: selectedAuthPage,
+                              isInVerificationFlow: isInVerificationFlow,
+                              isInPasswordResetFlow: isInPasswordResetFlow,
+                            ),
+                            duration: const Duration(milliseconds: 700),
+                            child: _AuthContainer(
+                              tabController: tabController,
+                              emailAuth: emailAuth,
+                              isConfirmEmail: isConfirmEmail,
+                              resetPasswordEmailVN: resetPasswordEmailVN,
+                              onChangeToConfirmEmail: onChangeToConfirmEmail,
+                              onSuccessConfirmEmail: onSuccessConfirmEmail,
+                              onChangeToPasswordReset: onChangeToPasswordReset,
+                              onSuccessChangePassword: onSuccessChangePassword,
+                              onGoBackFromConfirmEmail: onGoBackFromConfirmEmail,
+                            ),
+                          );
+                        },
+                      );
                     },
-                    duration: const Duration(milliseconds: 700),
-                    child: _AuthContainer(
-                      tabController: tabController,
-                      emailAuth: emailAuth,
-                      isConfirmEmail: isConfirmEmail,
-                      resetPasswordEmailVN: resetPasswordEmailVN,
-                      onChangeToConfirmEmail: onChangeToConfirmEmail,
-                      onSuccessConfirmEmail: onSuccessConfirmEmail,
-                      onChangeToPasswordReset: onChangeToPasswordReset,
-                      onSuccessChangePassword: onSuccessChangePassword,
-                    ),
                   ),
                   // Scrappable indicator if available
                   if (scrappable != null) ...[
@@ -586,15 +615,16 @@ class _DesktopAuthLayout extends StatelessWidget {
             child: Center(
               child: AspectRatio(
                 aspectRatio: 1,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Lottie.network(
-                    'https://lottie.host/6778c6b9-32ee-401c-bc8f-97eea151b1df/U3LT3t31Wa.lottie',
-                    decoder: customDecoder,
-                    width: double.maxFinite,
-                    fit: BoxFit.fitWidth,
-                  ),
-                ).animate().fadeIn(
+                child:
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Lottie.network(
+                        'https://lottie.host/6778c6b9-32ee-401c-bc8f-97eea151b1df/U3LT3t31Wa.lottie',
+                        decoder: customDecoder,
+                        width: double.maxFinite,
+                        fit: BoxFit.fitWidth,
+                      ),
+                    ).animate().fadeIn(
                       duration: const Duration(seconds: 1),
                       delay: const Duration(milliseconds: 200),
                     ),
@@ -605,6 +635,33 @@ class _DesktopAuthLayout extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Calculates the height for the auth container based on current state.
+/// Heights are adjusted when in verification/reset flows to show smaller forms.
+double _calculateAuthContainerHeight({
+  required SelectedAuthPage selectedAuthPage,
+  required bool isInVerificationFlow,
+  required bool isInPasswordResetFlow,
+}) {
+  // When in verification code flow (Sign Up confirmation), use smaller height
+  // since only one field is shown (plus the "Change email" button)
+  if (isInVerificationFlow) {
+    return 290;
+  }
+
+  // When in password reset code flow, use height for 3 fields
+  // (code + new password + confirm password)
+  if (isInPasswordResetFlow) {
+    return 400;
+  }
+
+  // Default heights based on selected page
+  return switch (selectedAuthPage) {
+    SelectedAuthPage.login => 388,
+    SelectedAuthPage.signIn => 455,
+    SelectedAuthPage.passwordReset => 270,
+  };
 }
 
 /// Reusable back button widget for both layouts

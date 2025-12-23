@@ -3,8 +3,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 import 'package:seo/seo.dart';
-import 'package:simple_platform/simple_platform.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
+import 'package:zenscrap_flutter/src/core/utils/devide_utils.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
@@ -121,7 +121,9 @@ class _LandingPageState extends ConsumerState<LandingPage>
       if (depthPercentage >= milestone &&
           !_trackedScrollDepthMilestones.contains(milestone)) {
         _trackedScrollDepthMilestones.add(milestone);
-        ref.read(analyticsServiceProvider).trackLandingScrollDepth(
+        ref
+            .read(analyticsServiceProvider)
+            .trackLandingScrollDepth(
               depthPercentage: milestone,
               scrollPosition: currentPosition,
               maxScrollExtent: maxExtent,
@@ -185,10 +187,13 @@ class _LandingPageState extends ConsumerState<LandingPage>
     if (_viewedSections.contains(sectionName)) return;
 
     _viewedSections.add(sectionName);
-    final scrollPosition =
-        _scrollController.hasClients ? _scrollController.offset : 0.0;
+    final scrollPosition = _scrollController.hasClients
+        ? _scrollController.offset
+        : 0.0;
 
-    ref.read(analyticsServiceProvider).trackLandingSectionView(
+    ref
+        .read(analyticsServiceProvider)
+        .trackLandingSectionView(
           sectionName: sectionName,
           sectionIndex: sectionIndex,
           scrollPosition: scrollPosition,
@@ -280,10 +285,13 @@ class _LandingPageState extends ConsumerState<LandingPage>
   void _trackNavClick(LandingSection targetSection) {
     _navClicksCount++;
     final currentSection = _activeSection?.name ?? 'unknown';
-    final scrollPosition =
-        _scrollController.hasClients ? _scrollController.offset : 0.0;
+    final scrollPosition = _scrollController.hasClients
+        ? _scrollController.offset
+        : 0.0;
 
-    ref.read(analyticsServiceProvider).trackLandingNavClick(
+    ref
+        .read(analyticsServiceProvider)
+        .trackLandingNavClick(
           sectionName: targetSection.name,
           currentSection: currentSection,
           scrollPosition: scrollPosition,
@@ -300,21 +308,25 @@ class _LandingPageState extends ConsumerState<LandingPage>
 
   /// Track "Learn more" scroll indicator click
   void _trackLearnMoreClick() {
-    final scrollPosition =
-        _scrollController.hasClients ? _scrollController.offset : 0.0;
+    final scrollPosition = _scrollController.hasClients
+        ? _scrollController.offset
+        : 0.0;
 
-    ref.read(analyticsServiceProvider).trackLandingLearnMoreClick(
-          scrollPosition: scrollPosition,
-        );
+    ref
+        .read(analyticsServiceProvider)
+        .trackLandingLearnMoreClick(scrollPosition: scrollPosition);
   }
 
   /// Track Sign In button click
   void _trackSignInClick() {
     final currentSection = _activeSection?.name ?? 'unknown';
-    final scrollPosition =
-        _scrollController.hasClients ? _scrollController.offset : 0.0;
+    final scrollPosition = _scrollController.hasClients
+        ? _scrollController.offset
+        : 0.0;
 
-    ref.read(analyticsServiceProvider).trackLandingSignInClick(
+    ref
+        .read(analyticsServiceProvider)
+        .trackLandingSignInClick(
           currentSection: currentSection,
           scrollPosition: scrollPosition,
         );
@@ -323,10 +335,13 @@ class _LandingPageState extends ConsumerState<LandingPage>
   /// Track Final CTA "Create Your First Scraper" button click
   void _trackFinalCtaCreateClick() {
     _ctaClicksCount++;
-    final scrollPosition =
-        _scrollController.hasClients ? _scrollController.offset : 0.0;
+    final scrollPosition = _scrollController.hasClients
+        ? _scrollController.offset
+        : 0.0;
 
-    ref.read(analyticsServiceProvider).trackLandingFinalCtaClick(
+    ref
+        .read(analyticsServiceProvider)
+        .trackLandingFinalCtaClick(
           buttonType: 'create_scraper',
           scrollPosition: scrollPosition,
         );
@@ -335,10 +350,13 @@ class _LandingPageState extends ConsumerState<LandingPage>
   /// Track Final CTA "Browse Marketplace" button click
   void _trackFinalCtaMarketplaceClick() {
     _ctaClicksCount++;
-    final scrollPosition =
-        _scrollController.hasClients ? _scrollController.offset : 0.0;
+    final scrollPosition = _scrollController.hasClients
+        ? _scrollController.offset
+        : 0.0;
 
-    ref.read(analyticsServiceProvider).trackLandingFinalCtaClick(
+    ref
+        .read(analyticsServiceProvider)
+        .trackLandingFinalCtaClick(
           buttonType: 'browse_marketplace',
           scrollPosition: scrollPosition,
         );
@@ -346,13 +364,16 @@ class _LandingPageState extends ConsumerState<LandingPage>
 
   /// Track engagement summary when user leaves the landing page
   void _trackEngagementSummary() {
-    final engagementTimeSeconds =
-        DateTime.now().difference(_pageViewStartTime).inSeconds;
+    final engagementTimeSeconds = DateTime.now()
+        .difference(_pageViewStartTime)
+        .inSeconds;
 
     // Only track if user spent more than 1 second on the page
     if (engagementTimeSeconds < 1) return;
 
-    ref.read(analyticsServiceProvider).trackLandingEngagement(
+    ref
+        .read(analyticsServiceProvider)
+        .trackLandingEngagement(
           engagementTimeSeconds: engagementTimeSeconds,
           maxScrollDepthPercentage: _maxScrollDepthPercentage,
           sectionsViewed: _viewedSections.toList(),
@@ -599,7 +620,8 @@ class _LandingPageContent extends StatelessWidget {
 
                     // Features Section - key on the child widget
                     SliverToBoxAdapter(
-                        child: FeaturesSection(key: featuresKey)),
+                      child: FeaturesSection(key: featuresKey),
+                    ),
 
                     // Marketplace Section - key on the child widget
                     SliverToBoxAdapter(
@@ -637,11 +659,12 @@ class _LandingPageContent extends StatelessWidget {
                 ),
 
                 // "Learn more" scroll indicator - overlays on top, fades out on scroll
-                if (learnMoreOpacity > 0)
-                  _LearnMoreIndicator(
-                    opacity: learnMoreOpacity,
-                    onTap: onLearnMoreTap,
-                  ),
+                if (DeviceUtils.isDesktop)
+                  if (learnMoreOpacity > 0)
+                    _LearnMoreIndicator(
+                      opacity: learnMoreOpacity,
+                      onTap: onLearnMoreTap,
+                    ),
               ],
             );
           },
@@ -691,12 +714,11 @@ class _PricingSection extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           SizedBox(
-              height: context.responsiveValue(compact: 32.0, expanded: 48.0)),
+            height: context.responsiveValue(compact: 32.0, expanded: 48.0),
+          ),
           SizedBox(
             height: context.responsiveValue(compact: 1200.0, expanded: 980.0),
-            child: const RawPricingPageComponent(
-              isInsideLandingPage: true,
-            ),
+            child: const RawPricingPageComponent(isInsideLandingPage: true),
           ),
         ],
       ),
@@ -704,15 +726,13 @@ class _PricingSection extends StatelessWidget {
   }
 }
 
+/// if(DeviceUtils)
 /// "Learn more" scroll indicator widget
 class _LearnMoreIndicator extends StatelessWidget {
   final double opacity;
   final VoidCallback onTap;
 
-  const _LearnMoreIndicator({
-    required this.opacity,
-    required this.onTap,
-  });
+  const _LearnMoreIndicator({required this.opacity, required this.onTap});
 
   @override
   Widget build(BuildContext context) {

@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/plan_tier_extension.dart';
+import 'package:zenscrap_flutter/src/core/mixins/create_new_scrappable_mixin.dart';
 import 'package:zenscrap_flutter/src/core/mixins/edit_scrappable.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
@@ -18,11 +18,8 @@ import 'package:zenscrap_flutter/src/design_system/widgets/scrappable_card_indic
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_state.dart';
-import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables_provider.dart';
 import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables_state.dart';
-import 'package:zenscrap_flutter/src/ui/marketplace/dialogs/upgrade_plan_dialog.dart';
-import 'package:zenscrap_flutter/src/ui/scrappables/dialogs/create_scrappable_dialog.dart';
 import 'package:zenscrap_flutter/src/ui/scrappables/pages/empty_scrappable_listage_indicator_page.dart';
 
 class UserScrappablesListage extends ConsumerStatefulWidget {
@@ -34,7 +31,7 @@ class UserScrappablesListage extends ConsumerStatefulWidget {
 }
 
 class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
-    with EditScrappable {
+    with EditScrappable, CreateNewScrappableMixin {
   @override
   void initState() {
     super.initState();
@@ -45,7 +42,6 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
 
   @override
   Widget build(BuildContext context) {
-    final analytics = ref.read(analyticsServiceProvider);
     final accountId = ref
         .watch(accountProvider)
         .mapOrNull(withData: (value) => value.accountInfo.id);
@@ -64,7 +60,7 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
 
         // We have previous data - show header with loading indicator
         return _UserScrappablesLayout(
-          analytics: analytics,
+          onTapCreateNew: _handleCreateNew,
           searchQuery: data.searchQuery,
           selectedCategories: data.selectedCategories,
           contentWidget: const LoadingScrappablesState(),
@@ -78,7 +74,7 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
         }
 
         return _UserScrappablesLayout(
-          analytics: analytics,
+          onTapCreateNew: _handleCreateNew,
           searchQuery: data.searchQuery,
           selectedCategories: data.selectedCategories,
           contentWidget: EmptyScrappablesState(
@@ -97,7 +93,7 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
         final pagination = response.pagination;
 
         // Track page view
-        analytics.trackUserScrappablesPageView(
+        ref.read(analyticsServiceProvider).trackUserScrappablesPageView(
           scrappableCount: scrappables.length,
           hasSearchQuery: searchQuery.isNotEmpty,
         );
@@ -111,6 +107,7 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
 
         // Content widget based on whether we have scrappables
         final l10n = AppLocalizations.of(context)!;
+        final analytics = ref.read(analyticsServiceProvider);
         final contentWidget = scrappables.isEmpty
             ? EmptyScrappablesState(
                 isSearchResult: true,
@@ -155,7 +152,7 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
               );
 
         return _UserScrappablesLayout(
-          analytics: analytics,
+          onTapCreateNew: _handleCreateNew,
           searchQuery: searchQuery,
           selectedCategories: selectedCategories,
           contentWidget: contentWidget,
@@ -163,24 +160,51 @@ class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
       },
     );
   }
+
+  Future<void> _handleCreateNew(
+    BuildContext context, {
+    required bool isAtLimit,
+    required int totalUserScrappables,
+    required int maxAllowed,
+    required PlanTier planTier,
+  }) async {
+    await onTapCreateNewScrappable(
+      context,
+      isAtLimit: isAtLimit,
+      totalUserScrappables: totalUserScrappables,
+      maxAllowed: maxAllowed,
+      planTier: planTier,
+    );
+  }
 }
+
+/// Callback signature for the create new scrappable action.
+typedef OnTapCreateNewCallback = Future<void> Function(
+  BuildContext context, {
+  required bool isAtLimit,
+  required int totalUserScrappables,
+  required int maxAllowed,
+  required PlanTier planTier,
+});
 
 /// Layout widget that always shows header, search, and filters
 class _UserScrappablesLayout extends ConsumerWidget {
   const _UserScrappablesLayout({
-    required this.analytics,
+    required this.onTapCreateNew,
     required this.searchQuery,
     required this.selectedCategories,
     required this.contentWidget,
   });
 
-  final dynamic analytics;
+  final OnTapCreateNewCallback onTapCreateNew;
   final String searchQuery;
   final Set<ScraperCategory> selectedCategories;
   final Widget contentWidget;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final analytics = ref.read(analyticsServiceProvider);
+
     // Get account info for plan tier
     final accountState = ref.watch(accountProvider);
     final planTier =
@@ -231,12 +255,14 @@ class _UserScrappablesLayout extends ConsumerWidget {
               ),
               const Spacer(),
               CreateNewScrappable(
-                analytics: analytics,
-                isAtLimit: isAtLimit,
-                totalUserScrappables: totalUserScrappables,
-                maxAllowed: maxAllowed,
-                planTier: planTier,
-                l10n: l10n,
+                onPressed: () => onTapCreateNew(
+                  context,
+                  isAtLimit: isAtLimit,
+                  totalUserScrappables: totalUserScrappables,
+                  maxAllowed: maxAllowed,
+                  planTier: planTier,
+                ),
+                label: l10n.scrappables_create_new,
               ),
             ],
           ),
@@ -273,57 +299,21 @@ class _UserScrappablesLayout extends ConsumerWidget {
   }
 }
 
-class CreateNewScrappable extends ConsumerWidget {
+class CreateNewScrappable extends StatelessWidget {
   const CreateNewScrappable({
     super.key,
-    required this.analytics,
-    required this.isAtLimit,
-    required this.totalUserScrappables,
-    required this.maxAllowed,
-    required this.planTier,
-    required this.l10n,
+    required this.onPressed,
+    required this.label,
   });
 
-  final dynamic analytics;
-  final bool isAtLimit;
-  final int totalUserScrappables;
-  final int maxAllowed;
-  final PlanTier planTier;
-  final AppLocalizations l10n;
+  final VoidCallback onPressed;
+  final String label;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return FilledButton.tonalIcon(
-      onPressed: () async {
-        // Track create new click
-        await analytics.trackUserScrappablesCreateNewClick();
-
-        // Check if user is at their endpoint limit
-        if (isAtLimit) {
-          if (!context.mounted) return;
-          await showEndpointLimitUpgradeDialog(
-            context,
-            currentCount: totalUserScrappables,
-            maxAllowed: maxAllowed,
-            currentPlan: planTier,
-            nextPlan: planTier.nextTier,
-          );
-          // return;
-        }
-
-        ref.read(scrapChatProvider.notifier).reset();
-        if (!context.mounted) return;
-
-        // Show the create scrappable dialog
-        final result = await CreateScrappableDialog.show(context);
-        if (result == true && context.mounted) {
-          // Navigate to /scrappable-form which shows LandingPage
-          // LandingPage handles the creatingScrappable state (shows AI thinking dialog)
-          // and switches to ScrappableEditSessionView when state becomes standard
-          context.go('/scrappable-form');
-        }
-      },
-      label: Text(l10n.scrappables_create_new),
+      onPressed: onPressed,
+      label: Text(label),
       icon: const Icon(Icons.add),
     );
   }

@@ -28,7 +28,9 @@ abstract class Scrappable implements _i1.SerializableModel {
     required this.generalInfosUpdatedAt,
     required this.extractRulesUpdatedAt,
     required this.name,
+    this.nameLanguage,
     required this.description,
+    this.descriptionLanguage,
     this.testEndpointAvailableUntil,
     this.scrappingBeeExtractRules,
     required this.willHideFromMarketplace,
@@ -51,7 +53,9 @@ abstract class Scrappable implements _i1.SerializableModel {
     required DateTime generalInfosUpdatedAt,
     required DateTime extractRulesUpdatedAt,
     required String name,
+    String? nameLanguage,
     required String description,
+    String? descriptionLanguage,
     DateTime? testEndpointAvailableUntil,
     _i2.ScrappingBeeExtractLogic? scrappingBeeExtractRules,
     required bool willHideFromMarketplace,
@@ -81,7 +85,9 @@ abstract class Scrappable implements _i1.SerializableModel {
         jsonSerialization['extractRulesUpdatedAt'],
       ),
       name: jsonSerialization['name'] as String,
+      nameLanguage: jsonSerialization['nameLanguage'] as String?,
       description: jsonSerialization['description'] as String,
+      descriptionLanguage: jsonSerialization['descriptionLanguage'] as String?,
       testEndpointAvailableUntil:
           jsonSerialization['testEndpointAvailableUntil'] == null
           ? null
@@ -146,7 +152,11 @@ abstract class Scrappable implements _i1.SerializableModel {
 
   String name;
 
+  String? nameLanguage;
+
   String description;
+
+  String? descriptionLanguage;
 
   DateTime? testEndpointAvailableUntil;
 
@@ -184,7 +194,9 @@ abstract class Scrappable implements _i1.SerializableModel {
     DateTime? generalInfosUpdatedAt,
     DateTime? extractRulesUpdatedAt,
     String? name,
+    String? nameLanguage,
     String? description,
+    String? descriptionLanguage,
     DateTime? testEndpointAvailableUntil,
     _i2.ScrappingBeeExtractLogic? scrappingBeeExtractRules,
     bool? willHideFromMarketplace,
@@ -209,7 +221,10 @@ abstract class Scrappable implements _i1.SerializableModel {
       'generalInfosUpdatedAt': generalInfosUpdatedAt.toJson(),
       'extractRulesUpdatedAt': extractRulesUpdatedAt.toJson(),
       'name': name,
+      if (nameLanguage != null) 'nameLanguage': nameLanguage,
       'description': description,
+      if (descriptionLanguage != null)
+        'descriptionLanguage': descriptionLanguage,
       if (testEndpointAvailableUntil != null)
         'testEndpointAvailableUntil': testEndpointAvailableUntil?.toJson(),
       if (scrappingBeeExtractRules != null)
@@ -250,7 +265,9 @@ class _ScrappableImpl extends Scrappable {
     required DateTime generalInfosUpdatedAt,
     required DateTime extractRulesUpdatedAt,
     required String name,
+    String? nameLanguage,
     required String description,
+    String? descriptionLanguage,
     DateTime? testEndpointAvailableUntil,
     _i2.ScrappingBeeExtractLogic? scrappingBeeExtractRules,
     required bool willHideFromMarketplace,
@@ -271,7 +288,9 @@ class _ScrappableImpl extends Scrappable {
          generalInfosUpdatedAt: generalInfosUpdatedAt,
          extractRulesUpdatedAt: extractRulesUpdatedAt,
          name: name,
+         nameLanguage: nameLanguage,
          description: description,
+         descriptionLanguage: descriptionLanguage,
          testEndpointAvailableUntil: testEndpointAvailableUntil,
          scrappingBeeExtractRules: scrappingBeeExtractRules,
          willHideFromMarketplace: willHideFromMarketplace,
@@ -298,7 +317,9 @@ class _ScrappableImpl extends Scrappable {
     DateTime? generalInfosUpdatedAt,
     DateTime? extractRulesUpdatedAt,
     String? name,
+    Object? nameLanguage = _Undefined,
     String? description,
+    Object? descriptionLanguage = _Undefined,
     Object? testEndpointAvailableUntil = _Undefined,
     Object? scrappingBeeExtractRules = _Undefined,
     bool? willHideFromMarketplace,
@@ -322,7 +343,11 @@ class _ScrappableImpl extends Scrappable {
       extractRulesUpdatedAt:
           extractRulesUpdatedAt ?? this.extractRulesUpdatedAt,
       name: name ?? this.name,
+      nameLanguage: nameLanguage is String? ? nameLanguage : this.nameLanguage,
       description: description ?? this.description,
+      descriptionLanguage: descriptionLanguage is String?
+          ? descriptionLanguage
+          : this.descriptionLanguage,
       testEndpointAvailableUntil: testEndpointAvailableUntil is DateTime?
           ? testEndpointAvailableUntil
           : this.testEndpointAvailableUntil,

@@ -5,8 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_validator/form_validator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
-import 'package:simple_platform/simple_platform.dart';
 import 'package:zenscrap_flutter/src/core/mixins/create_scrappable_mixin.dart';
+import 'package:zenscrap_flutter/src/core/utils/devide_utils.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
@@ -158,33 +158,34 @@ class _ChatViewPageState extends ConsumerState<InitialChatPage>
                             medium: 340.0,
                             expanded: 400.0,
                           ),
-                    child: SizedBox(
-                      height: context.responsiveValue(
-                        compact: 350.0,
-                        medium: 425.0,
-                        expanded: 500.0,
-                      ),
-                      child: Transform.scale(
-                        scale: context.responsiveValue(
-                          compact: 1.1,
-                          medium: 1.2,
-                          expanded: 1.3,
-                        ),
-                        child: Lottie.network(
-                          'https://lottie.host/5f15ff4c-0e86-4f26-9bbc-29afbf753eb0/okRB2OAoWp.lottie',
-                          decoder: customDecoder,
-                        ),
-                      ),
-                    )
-                        .animate()
-                        .fadeIn(
-                          duration: const Duration(seconds: 1),
-                          delay: const Duration(milliseconds: 300),
-                        )
-                        .animate(target: _isDescriptionFocussed ? 1 : 0)
-                        .fadeOut(
-                          duration: const Duration(milliseconds: 200),
-                        ),
+                    child:
+                        SizedBox(
+                              height: context.responsiveValue(
+                                compact: 350.0,
+                                medium: 425.0,
+                                expanded: 500.0,
+                              ),
+                              child: Transform.scale(
+                                scale: context.responsiveValue(
+                                  compact: 1.1,
+                                  medium: 1.2,
+                                  expanded: 1.3,
+                                ),
+                                child: Lottie.network(
+                                  'https://lottie.host/5f15ff4c-0e86-4f26-9bbc-29afbf753eb0/okRB2OAoWp.lottie',
+                                  decoder: customDecoder,
+                                ),
+                              ),
+                            )
+                            .animate()
+                            .fadeIn(
+                              duration: const Duration(seconds: 1),
+                              delay: const Duration(milliseconds: 300),
+                            )
+                            .animate(target: _isDescriptionFocussed ? 1 : 0)
+                            .fadeOut(
+                              duration: const Duration(milliseconds: 200),
+                            ),
                   ),
                   Center(
                     child: Transform.translate(
