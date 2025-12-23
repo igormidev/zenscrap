@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:posthog_flutter/posthog_flutter.dart';
+import 'package:zenscrap_flutter/src/core/utils/device_utils.dart';
 import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 
 /// Provider that initializes and provides access to PostHog analytics
@@ -29,14 +30,23 @@ class AnalyticsService {
 
   AnalyticsService(this._posthog);
 
+  /// Whether analytics logging should be performed.
+  ///
+  /// Returns true only when running on web platform.
+  /// This prevents development logs from Mac (the developer's machine) from
+  /// mixing with real user analytics data, since the app is currently web-only.
+  bool get _shouldLog => DeviceUtils.isWeb;
+
   /// Centralized, error-safe method to capture analytics events
   ///
   /// Wraps PostHog capture with try-catch to ensure analytics errors
   /// never disrupt app flow. Errors are logged via Talker.
+  /// Only logs when running on web platform (see [_shouldLog]).
   Future<void> _safeCapture({
     required String eventName,
     required Map<String, Object> properties,
   }) async {
+    if (!_shouldLog) return;
     try {
       await _posthog.capture(
         eventName: eventName,
@@ -56,10 +66,12 @@ class AnalyticsService {
   ///
   /// Wraps PostHog identify with try-catch to ensure analytics errors
   /// never disrupt app flow. Errors are logged via Talker.
+  /// Only logs when running on web platform (see [_shouldLog]).
   Future<void> _safeIdentify({
     required String userId,
     Map<String, Object>? userProperties,
   }) async {
+    if (!_shouldLog) return;
     try {
       await _posthog.identify(
         userId: userId,
@@ -79,7 +91,9 @@ class AnalyticsService {
   ///
   /// Wraps PostHog reset with try-catch to ensure analytics errors
   /// never disrupt app flow. Errors are logged via Talker.
+  /// Only logs when running on web platform (see [_shouldLog]).
   Future<void> _safeReset() async {
+    if (!_shouldLog) return;
     try {
       await _posthog.reset();
     } catch (e, stackTrace) {
@@ -96,7 +110,9 @@ class AnalyticsService {
   ///
   /// Wraps PostHog flush with try-catch to ensure analytics errors
   /// never disrupt app flow. Errors are logged via Talker.
+  /// Only logs when running on web platform (see [_shouldLog]).
   Future<void> _safeFlush() async {
+    if (!_shouldLog) return;
     try {
       await _posthog.flush();
     } catch (e, stackTrace) {
@@ -347,7 +363,7 @@ class AnalyticsService {
     );
 
     // Reset user identification
-    await _posthog.reset();
+    await _safeReset();
   }
 
   // ========================================
