@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 import 'package:seo/seo.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
-import 'package:zenscrap_flutter/src/core/utils/devide_utils.dart';
+import 'package:zenscrap_flutter/src/core/utils/device_utils.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
@@ -638,7 +639,29 @@ class _LandingPageContent extends StatelessWidget {
                       child: FinalCtaSection(
                         onScrollToTop: onScrollToTop,
                         onCreateScraperTap: onFinalCtaCreateTap,
-                        onBrowseMarketplaceTap: onFinalCtaMarketplaceTap,
+                        onBrowseMarketplaceTap: () {
+                          // Track analytics
+                          onFinalCtaMarketplaceTap();
+                          // Show login required dialog
+                          final l10n = AppLocalizations.of(context)!;
+                          showDialog<void>(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (dialogContext) => AlertDialog(
+                              title: Text(l10n.landing_marketplace_login_title),
+                              content: Text(l10n.landing_marketplace_login_message),
+                              actions: [
+                                FilledButton(
+                                  onPressed: () {
+                                    Navigator.of(dialogContext).pop();
+                                    context.push('/auth');
+                                  },
+                                  child: Text(l10n.landing_marketplace_login_ok),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ],

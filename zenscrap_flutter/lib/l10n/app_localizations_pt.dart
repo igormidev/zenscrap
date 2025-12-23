@@ -353,6 +353,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get landing_cta_marketplace_button => 'Browse Marketplace';
 
   @override
+  String get landing_marketplace_login_title => 'Login Required';
+
+  @override
+  String get landing_marketplace_login_message =>
+      'You need to log in to see the marketplace endpoints.';
+
+  @override
+  String get landing_marketplace_login_ok => 'OK';
+
+  @override
   String get landing_footer_tagline => 'AI-Powered Web Scraping';
 
   @override
@@ -2501,6 +2511,16 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get landing_cta_marketplace_button => 'Explorar Marketplace';
+
+  @override
+  String get landing_marketplace_login_title => 'Login Necessário';
+
+  @override
+  String get landing_marketplace_login_message =>
+      'Você precisa fazer login para ver os endpoints do marketplace.';
+
+  @override
+  String get landing_marketplace_login_ok => 'OK';
 
   @override
   String get landing_footer_tagline => 'Web Scraping Potencializado por IA';

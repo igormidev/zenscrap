@@ -113,6 +113,9 @@
   "landing_cta_subtitle": "Schliessen Sie sich Entwicklern an, die ihre Zeit zurueckgewonnen haben. Einmal bauen, KI fuer immer warten lassen.",
   "landing_cta_create_button": "Ersten Scraper erstellen",
   "landing_cta_marketplace_button": "Marktplatz durchsuchen",
+  "landing_marketplace_login_title": "Anmeldung erforderlich",
+  "landing_marketplace_login_message": "Sie müssen sich anmelden, um die Marketplace-Endpunkte zu sehen.",
+  "landing_marketplace_login_ok": "OK",
   "landing_footer_tagline": "KI-gesteuertes Web Scraping",
 
   "account_title": "Konto",

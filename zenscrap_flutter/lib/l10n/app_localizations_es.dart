@@ -359,6 +359,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get landing_cta_marketplace_button => 'Explorar Marketplace';
 
   @override
+  String get landing_marketplace_login_title => 'Inicio de sesión requerido';
+
+  @override
+  String get landing_marketplace_login_message =>
+      'Necesitas iniciar sesión para ver los endpoints del marketplace.';
+
+  @override
+  String get landing_marketplace_login_ok => 'OK';
+
+  @override
   String get landing_footer_tagline => 'Web Scraping Potenciado por IA';
 
   @override

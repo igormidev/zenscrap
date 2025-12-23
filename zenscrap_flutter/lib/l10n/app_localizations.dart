@@ -724,6 +724,24 @@ abstract class AppLocalizations {
   /// **'Browse Marketplace'**
   String get landing_cta_marketplace_button;
 
+  /// Dialog title when user tries to browse marketplace without logging in
+  ///
+  /// In en, this message translates to:
+  /// **'Login Required'**
+  String get landing_marketplace_login_title;
+
+  /// Dialog message when user tries to browse marketplace without logging in
+  ///
+  /// In en, this message translates to:
+  /// **'You need to log in to see the marketplace endpoints.'**
+  String get landing_marketplace_login_message;
+
+  /// OK button text for marketplace login dialog
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get landing_marketplace_login_ok;
+
   /// Footer tagline text
   ///
   /// In en, this message translates to:

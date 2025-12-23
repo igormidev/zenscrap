@@ -113,6 +113,9 @@
   "landing_cta_subtitle": "時間を取り戻した開発者の仲間入りをしましょう。一度構築すれば、AIが永遠にメンテナンスします。",
   "landing_cta_create_button": "最初のスクレイパーを作成",
   "landing_cta_marketplace_button": "マーケットプレイスを見る",
+  "landing_marketplace_login_title": "ログインが必要です",
+  "landing_marketplace_login_message": "マーケットプレイスのエンドポイントを見るにはログインが必要です。",
+  "landing_marketplace_login_ok": "OK",
   "landing_footer_tagline": "AI駆動のWebスクレイピング",
 
   "account_title": "アカウント",

@@ -9,6 +9,8 @@ class DeviceUtils {
       AppPlatform.isMacOS ||
       AppPlatform.isWindows;
 
+  static bool get isWeb => AppPlatform.isWeb;
+
   static bool get usesTouchScreen =>
       !DevicePlatform.isLinux &&
       !DevicePlatform.isWindows &&

@@ -360,6 +360,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get landing_cta_marketplace_button => 'Parcourir le Marketplace';
 
   @override
+  String get landing_marketplace_login_title => 'Connexion requise';
+
+  @override
+  String get landing_marketplace_login_message =>
+      'Vous devez vous connecter pour voir les endpoints du marketplace.';
+
+  @override
+  String get landing_marketplace_login_ok => 'OK';
+
+  @override
   String get landing_footer_tagline => 'Web Scraping propulse par l\'IA';
 
   @override

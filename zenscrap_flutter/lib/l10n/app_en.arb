@@ -422,6 +422,18 @@
   "@landing_cta_marketplace_button": {
     "description": "Final CTA browse marketplace button"
   },
+  "landing_marketplace_login_title": "Login Required",
+  "@landing_marketplace_login_title": {
+    "description": "Dialog title when user tries to browse marketplace without logging in"
+  },
+  "landing_marketplace_login_message": "You need to log in to see the marketplace endpoints.",
+  "@landing_marketplace_login_message": {
+    "description": "Dialog message when user tries to browse marketplace without logging in"
+  },
+  "landing_marketplace_login_ok": "OK",
+  "@landing_marketplace_login_ok": {
+    "description": "OK button text for marketplace login dialog"
+  },
   "landing_footer_tagline": "AI-Powered Web Scraping",
   "@landing_footer_tagline": {
     "description": "Footer tagline text"

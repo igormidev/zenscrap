@@ -113,6 +113,9 @@
   "landing_cta_subtitle": "Junte-se aos desenvolvedores que recuperaram seu tempo. Construa uma vez, deixe a IA manter para sempre.",
   "landing_cta_create_button": "Crie seu Primeiro Scraper",
   "landing_cta_marketplace_button": "Explorar Marketplace",
+  "landing_marketplace_login_title": "Login Necessário",
+  "landing_marketplace_login_message": "Você precisa fazer login para ver os endpoints do marketplace.",
+  "landing_marketplace_login_ok": "OK",
   "landing_footer_tagline": "Web Scraping Potencializado por IA",
 
   "account_title": "Conta",

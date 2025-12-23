@@ -345,6 +345,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String get landing_cta_marketplace_button => 'マーケットプレイスを見る';
 
   @override
+  String get landing_marketplace_login_title => 'ログインが必要です';
+
+  @override
+  String get landing_marketplace_login_message =>
+      'マーケットプレイスのエンドポイントを見るにはログインが必要です。';
+
+  @override
+  String get landing_marketplace_login_ok => 'OK';
+
+  @override
   String get landing_footer_tagline => 'AI駆動のWebスクレイピング';
 
   @override

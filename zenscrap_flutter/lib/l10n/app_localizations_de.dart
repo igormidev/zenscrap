@@ -359,6 +359,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get landing_cta_marketplace_button => 'Marktplatz durchsuchen';
 
   @override
+  String get landing_marketplace_login_title => 'Anmeldung erforderlich';
+
+  @override
+  String get landing_marketplace_login_message =>
+      'Sie müssen sich anmelden, um die Marketplace-Endpunkte zu sehen.';
+
+  @override
+  String get landing_marketplace_login_ok => 'OK';
+
+  @override
   String get landing_footer_tagline => 'KI-gesteuertes Web Scraping';
 
   @override
