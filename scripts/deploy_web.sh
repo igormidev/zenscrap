@@ -22,25 +22,31 @@ echo "=== ZenScrap Web Deployment Script ==="
 echo "Project root: $PROJECT_ROOT"
 echo ""
 
-# Step 1: Navigate to Flutter directory
-cd "$PROJECT_ROOT/zenscrap_flutter"
-echo "[1/6] Working in: $(pwd)"
+# Step 1: Generate Serverpod code
+echo "[1/8] Generating Serverpod code..."
+cd "$PROJECT_ROOT/zenscrap_server"
+serverpod generate
 
-# Step 2: Get dependencies
+# Step 2: Navigate to Flutter directory
 echo ""
-echo "[2/6] Getting dependencies..."
+cd "$PROJECT_ROOT/zenscrap_flutter"
+echo "[2/8] Working in: $(pwd)"
+
+# Step 3: Get dependencies
+echo ""
+echo "[3/8] Getting dependencies..."
 flutter pub get
 
-# Step 3: Analyze code
+# Step 4: Analyze code
 echo ""
-echo "[3/6] Running static analysis..."
+echo "[4/8] Running static analysis..."
 flutter analyze --no-fatal-infos || {
     echo "WARNING: Static analysis found issues (non-fatal)"
 }
 
-# Step 4: Build with all optimizations
+# Step 5: Build with all optimizations
 echo ""
-echo "[4/6] Building with WASM, release mode, and tree-shaking..."
+echo "[5/8] Building with WASM, release mode, and tree-shaking..."
 echo "      This may take a few minutes..."
 echo "      Google Client ID: $GOOGLE_SERVER_CLIENT_ID"
 flutter build web --wasm --release --tree-shake-icons \
@@ -51,18 +57,23 @@ echo ""
 echo "Build size summary:"
 du -sh "$PROJECT_ROOT/zenscrap_flutter/build/web" 2>/dev/null || true
 
-# Step 5: Copy build to server web directory
+# Step 6: Copy build to server web directory
 echo ""
-echo "[5/6] Copying build to server..."
+echo "[6/8] Copying build to server..."
 cd "$PROJECT_ROOT"
 rm -rf zenscrap_server/web/app
 cp -r zenscrap_flutter/build/web zenscrap_server/web/app
 echo "      Copied to: zenscrap_server/web/app"
 
-# Step 6: Deploy to Serverpod Cloud
+# Step 7: Create migrations
 echo ""
-echo "[6/6] Deploying to Serverpod Cloud..."
+echo "[7/8] Creating migrations..."
 cd "$PROJECT_ROOT/zenscrap_server"
+serverpod create-migration --force
+
+# Step 8: Deploy to Serverpod Cloud
+echo ""
+echo "[8/8] Deploying to Serverpod Cloud..."
 scloud deploy
 
 echo ""
