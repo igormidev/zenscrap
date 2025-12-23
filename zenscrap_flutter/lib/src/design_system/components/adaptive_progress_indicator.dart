@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:zenscrap_flutter/src/core/utils/devide_utils.dart';
+import 'package:zenscrap_flutter/src/core/utils/device_utils.dart';
 
 class AdaptiveProgressIndicator extends StatelessWidget {
   const AdaptiveProgressIndicator({super.key});

@@ -10,7 +10,7 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:flutter/material.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
 import 'package:zenscrap_flutter/src/core/utils/custom_talker_riverpod_observer.dart';
-import 'package:zenscrap_flutter/src/core/utils/devide_utils.dart';
+import 'package:zenscrap_flutter/src/core/utils/device_utils.dart';
 import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 import 'package:zenscrap_flutter/src/core/web/url_strategy.dart';
 import 'package:zenscrap_flutter/src/providers/auth_state_sync_provider.dart';
@@ -58,9 +58,14 @@ void main() async {
     serverUrl = 'https://api.zenscrap.com/';
   }
 
-  client = Client(serverUrl, connectionTimeout: Duration(minutes: 3))
-    ..connectivityMonitor = FlutterConnectivityMonitor()
-    ..authSessionManager = FlutterAuthSessionManager();
+  client =
+      Client(
+          serverUrl,
+          connectionTimeout: Duration(minutes: 4),
+          streamingConnectionTimeout: Duration(minutes: 10),
+        )
+        ..connectivityMonitor = FlutterConnectivityMonitor()
+        ..authSessionManager = FlutterAuthSessionManager();
 
   // Initialize authentication services
   await client.auth.initialize();

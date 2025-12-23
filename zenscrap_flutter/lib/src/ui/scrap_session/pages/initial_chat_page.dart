@@ -6,7 +6,7 @@ import 'package:form_validator/form_validator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 import 'package:zenscrap_flutter/src/core/mixins/create_scrappable_mixin.dart';
-import 'package:zenscrap_flutter/src/core/utils/devide_utils.dart';
+import 'package:zenscrap_flutter/src/core/utils/device_utils.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
