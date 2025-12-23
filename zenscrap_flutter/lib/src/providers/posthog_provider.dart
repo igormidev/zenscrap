@@ -1714,6 +1714,86 @@ class AnalyticsService {
     );
   }
 
+// ========================================
+  // Suspicious IP Block Events
+  // ========================================
+
+  /// Track when user sees the suspicious IP block error view
+  Future<void> trackSuspiciousIpBlockView({
+    required String errorTitle,
+    required String errorDescription,
+  }) async {
+    await _safeCapture(
+      eventName: 'suspicious_ip:block_view',
+      properties: {
+        'error_title': errorTitle,
+        'error_description': errorDescription,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user clicks "Create Account" from suspicious IP block view
+  Future<void> trackSuspiciousIpCreateAccountClick({
+    required String errorTitle,
+  }) async {
+    await _safeCapture(
+      eventName: 'suspicious_ip:create_account_click',
+      properties: {
+        'error_title': errorTitle,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user clicks "Try Again" from suspicious IP block view
+  Future<void> trackSuspiciousIpTryAgainClick() async {
+    await _safeCapture(
+      eventName: 'suspicious_ip:try_again_click',
+      properties: {
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user sees suspicious IP message in chat stream
+  Future<void> trackChatSuspiciousIpMessageView({
+    required String blockReason,
+    required bool isVpn,
+    required bool isProxy,
+    required bool isTor,
+    required bool isDatacenter,
+    required bool isAbuser,
+    String? countryCode,
+  }) async {
+    await _safeCapture(
+      eventName: 'chat:suspicious_ip_message_view',
+      properties: {
+        'block_reason': blockReason,
+        'is_vpn': isVpn,
+        'is_proxy': isProxy,
+        'is_tor': isTor,
+        'is_datacenter': isDatacenter,
+        'is_abuser': isAbuser,
+        if (countryCode != null) 'country_code': countryCode,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// Track when user clicks "Create Account" from suspicious IP chat message
+  Future<void> trackChatSuspiciousIpCreateAccountClick({
+    required String blockReason,
+  }) async {
+    await _safeCapture(
+      eventName: 'chat:suspicious_ip_create_account_click',
+      properties: {
+        'block_reason': blockReason,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
   /// Track when a new (anonymous/not logged in) user encounters an error on their
   /// first interaction with the platform.
   ///

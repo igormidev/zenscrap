@@ -2589,7 +2589,6 @@
       }
     }
   },
-
   "authErrorInvalidCredentialsTitle": "Login Failed",
   "@authErrorInvalidCredentialsTitle": {
     "description": "Title for invalid credentials error dialog"
@@ -2761,5 +2760,29 @@
   "authErrorButtonOk": "OK",
   "@authErrorButtonOk": {
     "description": "Button text for OK"
+  },
+  "ip_block_reason_unknown": "Unknown reason",
+  "@ip_block_reason_unknown": {
+    "description": "IP block reason: Unknown"
+  },
+  "ip_block_reason_tor_detected": "Tor exit node detected",
+  "@ip_block_reason_tor_detected": {
+    "description": "IP block reason: Tor network detected"
+  },
+  "ip_block_reason_datacenter_abuser": "Datacenter IP with abuse history",
+  "@ip_block_reason_datacenter_abuser": {
+    "description": "IP block reason: Datacenter IP flagged for abuse"
+  },
+  "ip_block_reason_known_abuser": "Known abusive IP address",
+  "@ip_block_reason_known_abuser": {
+    "description": "IP block reason: IP flagged for previous malicious activity"
+  },
+  "ip_block_reason_crawler_detected": "Automated bot or crawler detected",
+  "@ip_block_reason_crawler_detected": {
+    "description": "IP block reason: Bot or web crawler detected"
+  },
+  "ip_block_reason_bogon_ip": "Invalid IP address range",
+  "@ip_block_reason_bogon_ip": {
+    "description": "IP block reason: Bogon (invalid/reserved) IP range"
   }
 }

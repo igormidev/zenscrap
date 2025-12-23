@@ -2006,11 +2006,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get common_show_original => 'Original anzeigen';
 
   @override
-  String get common_show_translated => 'Ubersetzung anzeigen';
+  String get common_show_translated => 'Übersetzung anzeigen';
 
   @override
   String common_auto_translated(String language) {
-    return 'Automatisch ubersetzt aus $language';
+    return 'Automatisch übersetzt aus $language';
   }
 
   @override
@@ -2165,4 +2165,25 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get authErrorButtonOk => 'OK';
+
+  @override
+  String get ip_block_reason_unknown => 'Unbekannter Grund';
+
+  @override
+  String get ip_block_reason_tor_detected => 'Tor-Exit-Knoten erkannt';
+
+  @override
+  String get ip_block_reason_datacenter_abuser =>
+      'Rechenzentrum-IP mit Missbrauchsverlauf';
+
+  @override
+  String get ip_block_reason_known_abuser =>
+      'Bekannte missbrauchende IP-Adresse';
+
+  @override
+  String get ip_block_reason_crawler_detected =>
+      'Automatisierter Bot oder Crawler erkannt';
+
+  @override
+  String get ip_block_reason_bogon_ip => 'Ungültiger IP-Adressbereich';
 }

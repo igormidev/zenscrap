@@ -3868,6 +3868,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'OK'**
   String get authErrorButtonOk;
+
+  /// IP block reason: Unknown
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown reason'**
+  String get ip_block_reason_unknown;
+
+  /// IP block reason: Tor network detected
+  ///
+  /// In en, this message translates to:
+  /// **'Tor exit node detected'**
+  String get ip_block_reason_tor_detected;
+
+  /// IP block reason: Datacenter IP flagged for abuse
+  ///
+  /// In en, this message translates to:
+  /// **'Datacenter IP with abuse history'**
+  String get ip_block_reason_datacenter_abuser;
+
+  /// IP block reason: IP flagged for previous malicious activity
+  ///
+  /// In en, this message translates to:
+  /// **'Known abusive IP address'**
+  String get ip_block_reason_known_abuser;
+
+  /// IP block reason: Bot or web crawler detected
+  ///
+  /// In en, this message translates to:
+  /// **'Automated bot or crawler detected'**
+  String get ip_block_reason_crawler_detected;
+
+  /// IP block reason: Bogon (invalid/reserved) IP range
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid IP address range'**
+  String get ip_block_reason_bogon_ip;
 }
 
 class _AppLocalizationsDelegate

@@ -11,6 +11,7 @@ import 'package:zenscrap_server/src/core/scraping_bee.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_config.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_openai_sdk_impl.dart';
 import 'package:zenscrap_server/src/future_calls/cleanup_expired_ip_spending_future_call.dart';
+import 'package:zenscrap_server/src/future_calls/cleanup_expired_ip_validation_cache_future_call.dart';
 import 'package:zenscrap_server/src/future_calls/email_idp_cleanup_future_call.dart';
 import 'package:zenscrap_server/src/future_calls/monthly_subscription_credits_future_call.dart';
 import 'package:zenscrap_server/src/endpoints/public/scrappable_chat_session.dart';
@@ -189,6 +190,10 @@ void run(List<String> args) async {
     CleanupExpiredIpSpendingFutureCall.callName,
   );
   pod.registerFutureCall(
+    CleanupExpiredIpValidationCacheFutureCall(),
+    CleanupExpiredIpValidationCacheFutureCall.callName,
+  );
+  pod.registerFutureCall(
     EmailIdpCleanupFutureCall(),
     EmailIdpCleanupFutureCall.callName,
   );
@@ -220,6 +225,7 @@ void run(List<String> args) async {
   await pod.cancelFutureCall('periodicCleanupOldAnalyticsDetails');
   await pod.cancelFutureCall('periodicAutoFixBrokenScrappables');
   await pod.cancelFutureCall(CleanupExpiredIpSpendingFutureCall.callName);
+  await pod.cancelFutureCall(CleanupExpiredIpValidationCacheFutureCall.callName);
   await pod.cancelFutureCall(EmailIdpCleanupFutureCall.callName);
 
   // Schedule future calls only if not applying migrations
@@ -259,13 +265,22 @@ void run(List<String> args) async {
     identifier: CleanupExpiredIpSpendingFutureCall.callName,
   );
 
+  // Schedule periodic cleanup of expired IP validation cache entries
+  // Runs every 24 hours to delete entries older than 72 hours
+  await pod.futureCallWithDelay(
+    CleanupExpiredIpValidationCacheFutureCall.callName,
+    null,
+    const Duration(minutes: 10), // Initial delay to let server fully initialize
+    identifier: CleanupExpiredIpValidationCacheFutureCall.callName,
+  );
+
   // Schedule periodic cleanup of expired email authentication data
   // Runs daily to delete expired account requests, password reset requests,
   // and failed login attempts older than 30 days
   await pod.futureCallWithDelay(
     EmailIdpCleanupFutureCall.callName,
     null,
-    const Duration(minutes: 10), // Initial delay to let server fully initialize
+    const Duration(minutes: 15), // Initial delay to let server fully initialize
     identifier: EmailIdpCleanupFutureCall.callName,
   );
 }

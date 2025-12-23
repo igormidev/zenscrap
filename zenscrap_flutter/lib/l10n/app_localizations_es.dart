@@ -2006,7 +2006,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String common_auto_translated(String language) {
-    return 'Traducido automaticamente de $language';
+    return 'Traducido automáticamente de $language';
   }
 
   @override
@@ -2161,4 +2161,24 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get authErrorButtonOk => 'OK';
+
+  @override
+  String get ip_block_reason_unknown => 'Razón desconocida';
+
+  @override
+  String get ip_block_reason_tor_detected => 'Nodo de salida Tor detectado';
+
+  @override
+  String get ip_block_reason_datacenter_abuser =>
+      'IP de centro de datos con historial de abuso';
+
+  @override
+  String get ip_block_reason_known_abuser => 'Dirección IP abusiva conocida';
+
+  @override
+  String get ip_block_reason_crawler_detected =>
+      'Bot o rastreador automatizado detectado';
+
+  @override
+  String get ip_block_reason_bogon_ip => 'Rango de dirección IP inválido';
 }

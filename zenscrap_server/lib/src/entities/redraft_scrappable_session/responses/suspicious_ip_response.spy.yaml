@@ -1,0 +1,42 @@
+# SuspiciousIpResponse
+#
+# This response is sent when a user's IP address is detected as suspicious
+# by the IP validation service (ipapi.is). Suspicious IPs include:
+# - VPN services
+# - Proxy servers
+# - Tor exit nodes
+# - Known datacenter IPs (with abuse history)
+# - Known abusive IPs
+# - Crawler/bot IPs
+#
+# This is a security measure to prevent abuse of the anonymous user features.
+# Unlike IpLimitReachedResponse (which indicates spending limit reached),
+# this response indicates the IP itself is flagged as suspicious.
+#
+# Users can resolve this by:
+# - Disabling VPN/proxy
+# - Using a residential IP connection
+# - Creating an account (logged in users bypass this check)
+#
+# Fields:
+# - messageText: Human-readable explanation
+# - blockReason: Specific reason the IP was blocked (e.g., "VPN detected")
+# - blockReasonEnums: Enum values representing the block reasons (for translation support)
+# - isVpn: Whether a VPN was detected
+# - isProxy: Whether a proxy was detected
+# - isTor: Whether Tor was detected
+# - isDatacenter: Whether it's a datacenter IP
+# - isAbuser: Whether it's a known abuser IP
+# - countryCode: Country of the IP (for logging/debugging)
+class: SuspiciousIpResponse
+extends: ChatResponse
+fields:
+  messageText: String
+  blockReason: String
+  blockReasonEnums: List<IpBlockReason>
+  isVpn: bool
+  isProxy: bool
+  isTor: bool
+  isDatacenter: bool
+  isAbuser: bool
+  countryCode: String?

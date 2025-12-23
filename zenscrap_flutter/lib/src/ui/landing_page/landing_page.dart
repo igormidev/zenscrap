@@ -24,6 +24,7 @@ import 'package:zenscrap_flutter/src/ui/landing_page/widgets/landing_mobile_draw
 import 'package:zenscrap_flutter/src/ui/scrap_session/view/scrappable_edit_session.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/creating_scrappable_dialog.dart';
 import 'package:zenscrap_flutter/src/design_system/elements/ip_limit_error_view.dart';
+import 'package:zenscrap_flutter/src/design_system/elements/suspicious_ip_error_view.dart';
 import 'package:zenscrap_flutter/src/design_system/elements/zen_tab.dart';
 
 /// Main landing page that combines all sections into a scrollable experience.
@@ -426,6 +427,9 @@ class _LandingPageState extends ConsumerState<LandingPage>
       withError: (exception) {
         if (exception.title == 'Usage Limit Reached') {
           return Scaffold(body: IpLimitErrorView(exception: exception));
+        }
+        if (exception.title == 'Suspicious Connection Detected') {
+          return Scaffold(body: SuspiciousIpErrorView(exception: exception));
         }
         return Scaffold(body: ZenErrorTab(exception));
       },

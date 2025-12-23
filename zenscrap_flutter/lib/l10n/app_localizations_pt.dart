@@ -2128,6 +2128,26 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get authErrorButtonOk => 'OK';
+
+  @override
+  String get ip_block_reason_unknown => 'Unknown reason';
+
+  @override
+  String get ip_block_reason_tor_detected => 'Tor exit node detected';
+
+  @override
+  String get ip_block_reason_datacenter_abuser =>
+      'Datacenter IP with abuse history';
+
+  @override
+  String get ip_block_reason_known_abuser => 'Known abusive IP address';
+
+  @override
+  String get ip_block_reason_crawler_detected =>
+      'Automated bot or crawler detected';
+
+  @override
+  String get ip_block_reason_bogon_ip => 'Invalid IP address range';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -4072,10 +4092,30 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get common_show_original => 'Mostrar original';
 
   @override
-  String get common_show_translated => 'Mostrar traducao';
+  String get common_show_translated => 'Mostrar tradução';
 
   @override
   String common_auto_translated(String language) {
     return 'Traduzido automaticamente de $language';
   }
+
+  @override
+  String get ip_block_reason_unknown => 'Motivo desconhecido';
+
+  @override
+  String get ip_block_reason_tor_detected => 'Nó de saída Tor detectado';
+
+  @override
+  String get ip_block_reason_datacenter_abuser =>
+      'IP de datacenter com histórico de abuso';
+
+  @override
+  String get ip_block_reason_known_abuser => 'Endereço IP abusivo conhecido';
+
+  @override
+  String get ip_block_reason_crawler_detected =>
+      'Bot ou rastreador automatizado detectado';
+
+  @override
+  String get ip_block_reason_bogon_ip => 'Faixa de endereço IP inválida';
 }

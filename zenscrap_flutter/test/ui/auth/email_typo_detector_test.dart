@@ -1060,9 +1060,9 @@ void main() {
         final result = EmailTypoDetector.detectTypo('igor9ms@hotmal.com');
         expect(result, isNotNull);
         expect(result!.originalEmail, equals('igor9ms@hotmal.com'));
-        expect(result!.suggestedEmail, equals('igor9ms@hotmail.com'));
-        expect(result!.originalDomain, equals('hotmal.com'));
-        expect(result!.suggestedDomain, equals('hotmail.com'));
+        expect(result.suggestedEmail, equals('igor9ms@hotmail.com'));
+        expect(result.originalDomain, equals('hotmal.com'));
+        expect(result.suggestedDomain, equals('hotmail.com'));
       });
     });
 

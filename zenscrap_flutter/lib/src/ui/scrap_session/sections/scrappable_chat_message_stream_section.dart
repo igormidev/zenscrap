@@ -401,6 +401,23 @@ class _ChatMessageBubble extends StatelessWidget {
         textColor: textColor,
         backgroundColor: backgroundColor,
       );
+    } else if (message is SuspiciousIpResponse) {
+      final suspiciousIpMsg = message as SuspiciousIpResponse;
+      // Override to warning colors
+      backgroundColor = colorScheme.errorContainer;
+      textColor = colorScheme.onErrorContainer;
+      messageContent = _SuspiciousIpMessage(
+        messageText: suspiciousIpMsg.messageText,
+        blockReason: suspiciousIpMsg.blockReason,
+        isVpn: suspiciousIpMsg.isVpn,
+        isProxy: suspiciousIpMsg.isProxy,
+        isTor: suspiciousIpMsg.isTor,
+        isDatacenter: suspiciousIpMsg.isDatacenter,
+        isAbuser: suspiciousIpMsg.isAbuser,
+        countryCode: suspiciousIpMsg.countryCode,
+        textColor: textColor,
+        backgroundColor: backgroundColor,
+      );
     }
 
     return Padding(
@@ -1808,6 +1825,289 @@ class _IpLimitReachedMessageState
           totalSpentUsd: widget.totalSpentUsd,
           spendingLimitUsd: widget.spendingLimitUsd,
           timeUntilResetSeconds: _remainingTime.inSeconds,
+        );
+
+    // Navigate to the AuthView for sign up
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const AuthView()));
+  }
+}
+
+/// Widget that displays when an anonymous user is blocked due to suspicious IP
+/// (VPN, proxy, Tor, datacenter, etc.). Shows the reason and a CTA to create an account.
+class _SuspiciousIpMessage extends ConsumerStatefulWidget {
+  final String messageText;
+  final String blockReason;
+  final bool isVpn;
+  final bool isProxy;
+  final bool isTor;
+  final bool isDatacenter;
+  final bool isAbuser;
+  final String? countryCode;
+  final Color textColor;
+  final Color backgroundColor;
+
+  const _SuspiciousIpMessage({
+    required this.messageText,
+    required this.blockReason,
+    required this.isVpn,
+    required this.isProxy,
+    required this.isTor,
+    required this.isDatacenter,
+    required this.isAbuser,
+    this.countryCode,
+    required this.textColor,
+    required this.backgroundColor,
+  });
+
+  @override
+  ConsumerState<_SuspiciousIpMessage> createState() =>
+      _SuspiciousIpMessageState();
+}
+
+class _SuspiciousIpMessageState extends ConsumerState<_SuspiciousIpMessage> {
+  bool _hasTrackedView = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _trackView();
+  }
+
+  void _trackView() {
+    if (!_hasTrackedView) {
+      _hasTrackedView = true;
+      ref.read(analyticsServiceProvider).trackChatSuspiciousIpMessageView(
+            blockReason: widget.blockReason,
+            isVpn: widget.isVpn,
+            isProxy: widget.isProxy,
+            isTor: widget.isTor,
+            isDatacenter: widget.isDatacenter,
+            isAbuser: widget.isAbuser,
+            countryCode: widget.countryCode,
+          );
+    }
+  }
+
+  String _getDetectionLabel() {
+    final detections = <String>[];
+    if (widget.isVpn) detections.add('VPN');
+    if (widget.isProxy) detections.add('Proxy');
+    if (widget.isTor) detections.add('Tor');
+    if (widget.isDatacenter) detections.add('Datacenter');
+    if (widget.isAbuser) detections.add('Known Abuser');
+    return detections.isNotEmpty ? detections.join(', ') : 'Suspicious';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Header with shield icon
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: colorScheme.error.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                Icons.shield_outlined,
+                size: 18,
+                color: colorScheme.error,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                'Suspicious Connection Detected',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: widget.textColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+
+        // Detection reason
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: widget.textColor.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: widget.textColor.withValues(alpha: 0.15)),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.warning_amber_rounded,
+                size: 20,
+                color: colorScheme.error,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Detected',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: widget.textColor.withValues(alpha: 0.7),
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      _getDetectionLabel(),
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        color: colorScheme.error,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        // What you can do section
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: colorScheme.primaryContainer.withValues(alpha: 0.3),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: colorScheme.primary.withValues(alpha: 0.2),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.lightbulb_outline_rounded,
+                    size: 18,
+                    color: colorScheme.primary,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'What you can do',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: colorScheme.onPrimaryContainer,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              _buildSolutionItem(
+                Icons.vpn_key_off_rounded,
+                'Disable your VPN, proxy, or Tor',
+                colorScheme,
+                theme,
+              ),
+              const SizedBox(height: 6),
+              _buildSolutionItem(
+                Icons.wifi_rounded,
+                'Use a regular internet connection',
+                colorScheme,
+                theme,
+              ),
+              const SizedBox(height: 6),
+              _buildSolutionItem(
+                Icons.person_add_rounded,
+                'Or create an account to bypass this check',
+                colorScheme,
+                theme,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        // Message text
+        SelectableText(
+          widget.messageText,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: widget.textColor.withValues(alpha: 0.9),
+            height: 1.5,
+          ),
+        ),
+
+        // CTA Button - sign up to bypass restriction
+        const SizedBox(height: 16),
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton.icon(
+            onPressed: () => _navigateToSignUp(context),
+            icon: const Icon(Icons.person_add_rounded, size: 18),
+            label: const Text('Create Account'),
+            style: FilledButton.styleFrom(
+              backgroundColor: colorScheme.primary,
+              foregroundColor: colorScheme.onPrimary,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Registered users can use ZenScrap from any network',
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: widget.textColor.withValues(alpha: 0.6),
+            fontStyle: FontStyle.italic,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSolutionItem(
+    IconData icon,
+    String text,
+    ColorScheme colorScheme,
+    ThemeData theme,
+  ) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(
+          icon,
+          size: 14,
+          color: colorScheme.primary.withValues(alpha: 0.8),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            text,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onPrimaryContainer.withValues(alpha: 0.9),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _navigateToSignUp(BuildContext context) {
+    // Track the click event
+    ref.read(analyticsServiceProvider).trackChatSuspiciousIpCreateAccountClick(
+          blockReason: widget.blockReason,
         );
 
     // Navigate to the AuthView for sign up

@@ -320,6 +320,7 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
       CreditLimitReachedResponse() => 'credit_limit_reached',
       IpLimitReachedResponse() => 'ip_limit_reached',
       UserApiKeyQuotaExceededResponse() => 'user_api_key_quota_exceeded',
+      SuspiciousIpResponse() => 'suspicious_ip',
     };
   }
 
@@ -329,7 +330,8 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
         response is TestEndpointCalledErrorResponse ||
         response is CreditLimitReachedResponse ||
         response is IpLimitReachedResponse ||
-        response is UserApiKeyQuotaExceededResponse;
+        response is UserApiKeyQuotaExceededResponse ||
+        response is SuspiciousIpResponse;
   }
 
   /// Tracks error responses with detailed information.

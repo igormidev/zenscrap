@@ -2128,4 +2128,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authErrorButtonOk => 'OK';
+
+  @override
+  String get ip_block_reason_unknown => 'Unknown reason';
+
+  @override
+  String get ip_block_reason_tor_detected => 'Tor exit node detected';
+
+  @override
+  String get ip_block_reason_datacenter_abuser =>
+      'Datacenter IP with abuse history';
+
+  @override
+  String get ip_block_reason_known_abuser => 'Known abusive IP address';
+
+  @override
+  String get ip_block_reason_crawler_detected =>
+      'Automated bot or crawler detected';
+
+  @override
+  String get ip_block_reason_bogon_ip => 'Invalid IP address range';
 }

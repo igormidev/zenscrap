@@ -575,6 +575,12 @@
   "scrappables_your_endpoints": "Ihre Endpoints",
   "scrappables_create_new": "Neuen Endpoint erstellen",
   "common_show_original": "Original anzeigen",
-  "common_show_translated": "Ubersetzung anzeigen",
-  "common_auto_translated": "Automatisch ubersetzt aus {language}"
+  "common_show_translated": "Übersetzung anzeigen",
+  "common_auto_translated": "Automatisch übersetzt aus {language}",
+  "ip_block_reason_unknown": "Unbekannter Grund",
+  "ip_block_reason_tor_detected": "Tor-Exit-Knoten erkannt",
+  "ip_block_reason_datacenter_abuser": "Rechenzentrum-IP mit Missbrauchsverlauf",
+  "ip_block_reason_known_abuser": "Bekannte missbrauchende IP-Adresse",
+  "ip_block_reason_crawler_detected": "Automatisierter Bot oder Crawler erkannt",
+  "ip_block_reason_bogon_ip": "Ungültiger IP-Adressbereich"
 }
