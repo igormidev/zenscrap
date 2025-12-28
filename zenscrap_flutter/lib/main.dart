@@ -62,7 +62,7 @@ void main() async {
       Client(
           serverUrl,
           connectionTimeout: Duration(minutes: 4),
-          streamingConnectionTimeout: Duration(minutes: 10),
+          streamingConnectionTimeout: Duration(hours: 2),
         )
         ..connectivityMonitor = FlutterConnectivityMonitor()
         ..authSessionManager = FlutterAuthSessionManager();

@@ -2512,6 +2512,9 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i42.ErrorTextResponse) {
       return _i42.ErrorTextResponse.fromJson(data) as T;
     }
+    if (t == _i42.HeartbeatResponse) {
+      return _i42.HeartbeatResponse.fromJson(data) as T;
+    }
     if (t == _i42.IpLimitReachedResponse) {
       return _i42.IpLimitReachedResponse.fromJson(data) as T;
     }
@@ -2787,6 +2790,9 @@ class Protocol extends _i1.SerializationManagerServer {
     }
     if (t == _i1.getType<_i42.ErrorTextResponse?>()) {
       return (data != null ? _i42.ErrorTextResponse.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i42.HeartbeatResponse?>()) {
+      return (data != null ? _i42.HeartbeatResponse.fromJson(data) : null) as T;
     }
     if (t == _i1.getType<_i42.IpLimitReachedResponse?>()) {
       return (data != null ? _i42.IpLimitReachedResponse.fromJson(data) : null)
@@ -3156,6 +3162,7 @@ class Protocol extends _i1.SerializationManagerServer {
       _i42.CandidateExtractLogicUpdate => 'CandidateExtractLogicUpdate',
       _i42.CreditLimitReachedResponse => 'CreditLimitReachedResponse',
       _i42.ErrorTextResponse => 'ErrorTextResponse',
+      _i42.HeartbeatResponse => 'HeartbeatResponse',
       _i42.IpLimitReachedResponse => 'IpLimitReachedResponse',
       _i42.MessageTextResponse => 'MessageTextResponse',
       _i42.NewExtractRuleResponse => 'NewExtractRuleResponse',
@@ -3285,6 +3292,8 @@ class Protocol extends _i1.SerializationManagerServer {
         return 'CreditLimitReachedResponse';
       case _i42.ErrorTextResponse():
         return 'ErrorTextResponse';
+      case _i42.HeartbeatResponse():
+        return 'HeartbeatResponse';
       case _i42.IpLimitReachedResponse():
         return 'IpLimitReachedResponse';
       case _i42.MessageTextResponse():
@@ -3494,6 +3503,9 @@ class Protocol extends _i1.SerializationManagerServer {
     }
     if (dataClassName == 'ErrorTextResponse') {
       return deserialize<_i42.ErrorTextResponse>(data['data']);
+    }
+    if (dataClassName == 'HeartbeatResponse') {
+      return deserialize<_i42.HeartbeatResponse>(data['data']);
     }
     if (dataClassName == 'IpLimitReachedResponse') {
       return deserialize<_i42.IpLimitReachedResponse>(data['data']);

@@ -1,0 +1,4 @@
+class: HeartbeatResponse
+extends: ChatResponse
+fields:
+    timestamp: DateTime
