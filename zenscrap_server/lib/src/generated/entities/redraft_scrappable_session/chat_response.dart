@@ -22,6 +22,7 @@ part 'responses/api_key_updated_response.dart';
 part 'responses/candidate_extract_logic_update.dart';
 part 'responses/credit_limit_reached_response.dart';
 part 'responses/error_text_response.dart';
+part 'responses/heartbeat_response.dart';
 part 'responses/ip_limit_reached_response.dart';
 part 'responses/message_text_response.dart';
 part 'responses/new_extract_rule_response.dart';

@@ -26,6 +26,11 @@ _cacheScrappingBeeExtractLogic = {};
 final Map<RedraftSrappableSessionId, ScrappableRequest>
 _cacheScrappableRequest = {};
 
+/// Heartbeat timers to prevent infrastructure idle timeout (typically 60s).
+/// Many load balancers/proxies close WebSocket connections after ~60s of inactivity.
+/// Since AI processing can take 60-180s, we send heartbeats every 20s to keep alive.
+final Map<RedraftSrappableSessionId, Timer> _heartbeatTimers = {};
+
 // =============================================================================
 // AI Usage Credit Tracking
 // =============================================================================
@@ -221,7 +226,10 @@ class ScrappableChatSession extends Endpoint {
     // Validate user is authenticated
     final userId = session.authenticated?.authUserId;
     if (userId == null) {
-      throw createTranslatedException('authentication_required_api_key', language);
+      throw createTranslatedException(
+        'authentication_required_api_key',
+        language,
+      );
     }
 
     // Validate API key format (basic check)
@@ -346,11 +354,12 @@ class ScrappableChatSession extends Endpoint {
     // to detect suspicious connections (VPN, proxy, Tor, datacenter, abusers).
     // Logged-in users bypass this check as they are already authenticated.
     if (!isLoggedIn && session is MethodCallSession) {
-      final clientIpAddress =
-          session.request.connectionInfo.remote.address.toString();
+      final clientIpAddress = session.request.connectionInfo.remote.address
+          .toString();
 
       // Get the ipapi API key from the password store
-      final ipapiApiKey = session.passwords['ipapiApiKey'] ??
+      final ipapiApiKey =
+          session.passwords['ipapiApiKey'] ??
           session.serverpod.getPassword('ipapiApiKey');
 
       if (ipapiApiKey != null && ipapiApiKey.isNotEmpty) {
@@ -359,7 +368,10 @@ class ScrappableChatSession extends Endpoint {
           onLog: (msg) => session.log(msg),
         );
 
-        final validationResult = await ipValidator.validateIpWithCache(session, clientIpAddress);
+        final validationResult = await ipValidator.validateIpWithCache(
+          session,
+          clientIpAddress,
+        );
 
         if (!validationResult.isLegitimate) {
           session.log(
@@ -424,7 +436,10 @@ class ScrappableChatSession extends Endpoint {
         include: AccountInfo.include(accountAIUsage: AccountAIUsage.include()),
       );
       if (accountInfo == null || accountInfo.id != scrappable.accountId) {
-        throw createTranslatedException('authentication_required_session', language);
+        throw createTranslatedException(
+          'authentication_required_session',
+          language,
+        );
       }
 
       // Get AI usage for logged-in user
@@ -447,7 +462,10 @@ class ScrappableChatSession extends Endpoint {
           throw createTranslatedException(
             'ai_credits_exhausted',
             language,
-            params: {'limit': '\$${kDefaultMonthlyAICreditsInDollars.toStringAsFixed(2)}'},
+            params: {
+              'limit':
+                  '\$${kDefaultMonthlyAICreditsInDollars.toStringAsFixed(2)}',
+            },
           );
         }
       }
@@ -477,7 +495,10 @@ class ScrappableChatSession extends Endpoint {
             throw createTranslatedException(
               'ai_credits_exhausted',
               language,
-              params: {'limit': '\$${kDefaultMonthlyAICreditsInDollars.toStringAsFixed(2)}'},
+              params: {
+                'limit':
+                    '\$${kDefaultMonthlyAICreditsInDollars.toStringAsFixed(2)}',
+              },
             );
           }
         }
@@ -594,29 +615,38 @@ class ScrappableChatSession extends Endpoint {
     required RedraftSrappableSessionId sessionUuid,
     required SupportedLanguage language,
   }) {
-    final startTime = DateTime.now();
-    session.log('[StreamLifecycle] Client started listening to session $sessionUuid');
-
-    session.addWillCloseListener((session) async {
-      final duration = DateTime.now().difference(startTime);
-      session.log(
-        '[StreamLifecycle] Session closing for $sessionUuid after ${duration.inSeconds}s. '
-        'Reason: willCloseListener triggered (client disconnected or session ended)',
-      );
-      await _disposeSession(sessionId: sessionUuid, dbSession: session);
+    // Clean up session when client disconnects
+    session.addWillCloseListener((closingSession) async {
+      await _disposeSession(sessionId: sessionUuid);
     });
 
     final subject = _scrapRedraftSessions[sessionUuid];
     if (subject == null) {
-      session.log(
-        '[StreamLifecycle] ERROR: Session $sessionUuid not found in _scrapRedraftSessions. '
-        'Available sessions: ${_scrapRedraftSessions.keys.toList()}',
-        level: LogLevel.error,
-      );
       throw createTranslatedException('session_not_found', language);
     }
 
-    session.log('[StreamLifecycle] Returning stream for session $sessionUuid');
+    // Start heartbeat timer to prevent infrastructure idle timeout (~60s).
+    // AI processing can take 60-180s, so we send heartbeats every 20s.
+    _heartbeatTimers[sessionUuid]?.cancel();
+    _heartbeatTimers[sessionUuid] = Timer.periodic(
+      const Duration(seconds: 20),
+      (timer) {
+        final heartbeatSubject = _scrapRedraftSessions[sessionUuid];
+        if (heartbeatSubject != null && !heartbeatSubject.isClosed) {
+          heartbeatSubject.add(
+            HeartbeatResponse(
+              role: PromptRole.system,
+              expectsFollowUp: false,
+              timestamp: DateTime.now(),
+            ),
+          );
+        } else {
+          timer.cancel();
+          _heartbeatTimers.remove(sessionUuid);
+        }
+      },
+    );
+
     return subject.stream;
   }
 
@@ -640,7 +670,10 @@ class ScrappableChatSession extends Endpoint {
     if (aiModel == AiModel.powerful) {
       final authenticationInfo = session.authenticated;
       if (authenticationInfo == null) {
-        throw createTranslatedException('authentication_required_ai_model', language);
+        throw createTranslatedException(
+          'authentication_required_ai_model',
+          language,
+        );
       }
 
       final userId = authenticationInfo.authUserId;
@@ -670,59 +703,29 @@ class ScrappableChatSession extends Endpoint {
     required String userPrompt,
     required SupportedLanguage language,
   }) async* {
-    session.log('[SendPrompt] Received message for session $sessionId (prompt length: ${userPrompt.length} chars)');
-
-    // Verify session state
-    final hasChatSession = _chatSessions.containsKey(sessionId);
-    final hasRedraftSession = _scrapRedraftSessions.containsKey(sessionId);
-    session.log(
-      '[SendPrompt] Session state: chatSession=$hasChatSession, redraftSession=$hasRedraftSession',
-    );
-
     final chatController = _chatSessions[sessionId];
     if (chatController == null) {
-      session.log(
-        '[SendPrompt] ERROR: Chat controller not found for session $sessionId',
-        level: LogLevel.error,
-      );
       throw createTranslatedException('session_not_found', language);
     }
 
     if (!_cacheRefTestData.containsKey(sessionId) ||
         !_cacheScrappableRequest.containsKey(sessionId) ||
         !_cacheScrappingBeeExtractLogic.containsKey(sessionId)) {
-      session.log(
-        '[SendPrompt] ERROR: Cache data missing for session $sessionId. '
-        'refTestData=${_cacheRefTestData.containsKey(sessionId)}, '
-        'scrappableRequest=${_cacheScrappableRequest.containsKey(sessionId)}, '
-        'extractLogic=${_cacheScrappingBeeExtractLogic.containsKey(sessionId)}',
-        level: LogLevel.error,
-      );
-      // Internal cache error - not translated as it's a technical issue
       throw ZenScrapException(
         title: 'Cache Test Data Not Found',
         description: 'No cache test data found for session $sessionId.',
       );
     }
 
-    // Add user message to chat stream IMMEDIATELY for instant UI feedback
-    // This ensures the user sees their message right away, before the AI starts processing
+    // Add user message to chat stream for instant UI feedback
     final redraftSubject = _scrapRedraftSessions[sessionId];
-    if (redraftSubject == null) {
-      session.log(
-        '[SendPrompt] WARNING: ReplaySubject is null for session $sessionId when trying to add user message',
-        level: LogLevel.warning,
-      );
-    } else {
-      session.log('[SendPrompt] Adding user message to chat stream');
-      redraftSubject.add(
-        MessageTextResponse(
-          role: PromptRole.user,
-          expectsFollowUp: true, // User message always expects AI response
-          messageText: userPrompt,
-        ),
-      );
-    }
+    redraftSubject?.add(
+      MessageTextResponse(
+        role: PromptRole.user,
+        expectsFollowUp: true,
+        messageText: userPrompt,
+      ),
+    );
 
     final ThinkingSessionId thinkingSessionId = uuid.v7();
     _thinkingStream[thinkingSessionId] = StreamController<ThinkingSessionId>();
@@ -734,9 +737,6 @@ class ScrappableChatSession extends Endpoint {
           .toString();
     }
 
-    session.log('[SendPrompt] Scheduling FutureCall for session_prompt with thinkingSessionId: $thinkingSessionId');
-
-    // Put future call
     await session.serverpod.futureCallWithDelay(
       'session_prompt',
       SessionPrompt(
@@ -748,9 +748,9 @@ class ScrappableChatSession extends Endpoint {
       const Duration(seconds: 1),
     );
 
-    session.log('[SendPrompt] Yielding thinking stream for session $sessionId');
-    yield* _thinkingStream[thinkingSessionId]!.stream;
-    session.log('[SendPrompt] Thinking stream completed for session $sessionId');
+    await for (final data in _thinkingStream[thinkingSessionId]!.stream) {
+      yield data;
+    }
   }
 }
 
@@ -763,43 +763,15 @@ Future<void> _disposeSession({
   required RedraftSrappableSessionId sessionId,
   Session? dbSession,
 }) async {
-  // Log function to use dbSession.log when available, otherwise print
-  void logMessage(String message, {LogLevel level = LogLevel.info}) {
-    if (dbSession != null) {
-      dbSession.log(message, level: level);
-    } else {
-      // ignore: avoid_print
-      print('[_disposeSession] $message');
-    }
-  }
-
-  logMessage('[SessionDispose] Starting dispose for session $sessionId');
-
-  // Check if session exists in maps
-  final hadChatSession = _chatSessions.containsKey(sessionId);
-  final hadRedraftSession = _scrapRedraftSessions.containsKey(sessionId);
-  final hadAIUsage = _sessionAccountAIUsage.containsKey(sessionId);
-  final hadAnonymousSpending = _anonymousSessionSpending.containsKey(sessionId);
-
-  logMessage(
-    '[SessionDispose] Session $sessionId state before dispose: '
-    'chatSession=$hadChatSession, redraftSession=$hadRedraftSession, '
-    'aiUsage=$hadAIUsage, anonymousSpending=$hadAnonymousSpending',
-  );
-
   // Save AccountAIUsage to database if we have a session and tracked usage
   if (dbSession != null) {
     final accountAIUsage = _sessionAccountAIUsage[sessionId];
     if (accountAIUsage != null && accountAIUsage.id != null) {
       try {
         await AccountAIUsage.db.updateRow(dbSession, accountAIUsage);
-        dbSession.log(
-          '[SessionDispose] Saved AccountAIUsage for session $sessionId: '
-          '\$${accountAIUsage.totalDollarsSpentFromTotalInUSD.toStringAsFixed(4)} remaining',
-        );
       } catch (e, s) {
         dbSession.log(
-          '[SessionDispose] Failed to save AccountAIUsage for session $sessionId',
+          'Failed to save AccountAIUsage for session $sessionId',
           exception: e,
           stackTrace: s,
           level: LogLevel.error,
@@ -808,31 +780,25 @@ Future<void> _disposeSession({
     }
   }
 
-  // Clean up AI usage tracking maps
+  // Clean up all session resources
   _sessionAccountAIUsage.remove(sessionId);
   _anonymousSessionSpending.remove(sessionId);
   _sessionUsesOwnApiKey.remove(sessionId);
 
-  // Dispose the chat controller to clean up OpenAI files
+  _heartbeatTimers[sessionId]?.cancel();
+  _heartbeatTimers.remove(sessionId);
+
   final chatController = _chatSessions.remove(sessionId);
-  if (chatController != null) {
-    logMessage('[SessionDispose] Disposing chat controller for session $sessionId');
-    await chatController.dispose();
-  }
+  await chatController?.dispose();
 
   final subject = _scrapRedraftSessions.remove(sessionId);
-  if (subject != null) {
-    logMessage('[SessionDispose] Closing ReplaySubject stream for session $sessionId');
-    await subject.close();
-  }
+  await subject?.close();
 
   _cacheScrappableIds.remove(sessionId);
   _cacheRefTestData.remove(sessionId);
   _cacheScrappingBeeExtractLogic.remove(sessionId);
   _cacheScrappableRequest.remove(sessionId);
   _scrappableOpenedSessionsIds.removeWhere((key, value) => value == sessionId);
-
-  logMessage('[SessionDispose] Dispose completed for session $sessionId');
 }
 
 class TestScrappableDisposeFutureCall
@@ -977,29 +943,28 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
     final StreamController<ChatResponse> chatSeason =
         StreamController<ChatResponse>();
 
-    final StreamSubscription<ChatResponse> subsChatSeason = chatSeason.stream
-        .listen((ChatResponse chatResponse) {
-          _scrapRedraftSessions[sessionId]?.add(chatResponse);
-          if (chatResponse is NewExtractRuleResponse) {
-            if (_cacheRefTestData.containsKey(sessionId)) {
-              _cacheRefTestData[sessionId] = chatResponse.referenceTestData;
-            }
-            if (_cacheScrappableRequest.containsKey(sessionId)) {
-              _cacheScrappableRequest[sessionId] = chatResponse.scrapperRequest;
-            }
-            if (_cacheScrappingBeeExtractLogic.containsKey(sessionId)) {
-              _cacheScrappingBeeExtractLogic[sessionId] =
-                  chatResponse.scrappingBeeExtractLogic;
-            }
-          } else if (chatResponse is UpdatedScrappableRequestResponse) {
-            // Handle request-only updates (when AI modifies request but not extract rules)
-            final updatedRequest = chatResponse.scrappableRequest;
-            if (updatedRequest != null &&
-                _cacheScrappableRequest.containsKey(sessionId)) {
-              _cacheScrappableRequest[sessionId] = updatedRequest;
-            }
-          }
-        });
+    final StreamSubscription<ChatResponse>
+    subsChatSeason = chatSeason.stream.listen((ChatResponse chatResponse) {
+      _scrapRedraftSessions[sessionId]?.add(chatResponse);
+      if (chatResponse is NewExtractRuleResponse) {
+        if (_cacheRefTestData.containsKey(sessionId)) {
+          _cacheRefTestData[sessionId] = chatResponse.referenceTestData;
+        }
+        if (_cacheScrappableRequest.containsKey(sessionId)) {
+          _cacheScrappableRequest[sessionId] = chatResponse.scrapperRequest;
+        }
+        if (_cacheScrappingBeeExtractLogic.containsKey(sessionId)) {
+          _cacheScrappingBeeExtractLogic[sessionId] =
+              chatResponse.scrappingBeeExtractLogic;
+        }
+      } else if (chatResponse is UpdatedScrappableRequestResponse) {
+        final updatedRequest = chatResponse.scrappableRequest;
+        if (updatedRequest != null &&
+            _cacheScrappableRequest.containsKey(sessionId)) {
+          _cacheScrappableRequest[sessionId] = updatedRequest;
+        }
+      }
+    });
 
     final StreamSubscription<String>
     subLlmThinking = llmThinking.stream.listen((event) {

@@ -1,12 +1,12 @@
 ((a,b)=>{a[b]=a[b]||{}})(self,"$__dart_deferred_initializers__")
 $__dart_deferred_initializers__.current=function(a,b,c,$){var B,A={
-c_N(){B.mM("de")
-return new A.zF()},
-zF:function zF(){}},C
+c_R(){B.mM("de")
+return new A.zH()},
+zH:function zH(){}},C
 B=c[0]
 A=a.updateHolder(c[4],A)
 C=c[9]
-A.zF.prototype={
+A.zH.prototype={
 gCR(){return"Scrappable erstellen"},
 gCT(){return"So funktioniert's"},
 gCQ(){return"Auto-Reparatur"},
@@ -593,6 +593,6 @@ gGN(){return"Try Again"},
 gGO(){return"Try Later"},
 gGM(){return"OK"}}
 var z=a.updateTypes([]);(function inheritance(){var y=a.inherit
-y(A.zF,C.fb)})()
-B.Nb(b.typeUniverse,JSON.parse('{"zF":{"fb":[]}}'))};
-(a=>{a["gkuZ0RTYKxRio+URKmrE9tZEW7g="]=a.current})($__dart_deferred_initializers__);
+y(A.zH,C.fc)})()
+B.Ne(b.typeUniverse,JSON.parse('{"zH":{"fc":[]}}'))};
+(a=>{a["ag7ZmQQhpqJQckHI8/0klVp1PyE="]=a.current})($__dart_deferred_initializers__);
