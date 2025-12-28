@@ -1,15 +1,15 @@
 ((a,b)=>{a[b]=a[b]||{}})(self,"$__dart_deferred_initializers__")
 $__dart_deferred_initializers__.current=function(a,b,c,$){var B,A={
-c_S(d){B.mM(d)
-return new A.vu()},
-c_T(){B.mM("pt_BR")
-return new A.zK()},
-vu:function vu(){},
-zK:function zK(){}},C
+c_W(d){B.mM(d)
+return new A.vv()},
+c_X(){B.mM("pt_BR")
+return new A.zM()},
+vv:function vv(){},
+zM:function zM(){}},C
 B=c[0]
 A=a.updateHolder(c[3],A)
 C=c[9]
-A.vu.prototype={
+A.vv.prototype={
 gCR(){return"Create Scrappable"},
 gCT(){return"How It Works"},
 gCQ(){return"Auto-Fix"},
@@ -595,7 +595,7 @@ gHj(){return"An unexpected error occurred. Please try again. If the problem cont
 gGN(){return"Try Again"},
 gGO(){return"Try Later"},
 gGM(){return"OK"}}
-A.zK.prototype={
+A.zM.prototype={
 gCR(){return"Criar Scrappable"},
 gCT(){return"Como Funciona"},
 gCQ(){return"Auto-Reparo"},
@@ -1122,7 +1122,7 @@ gwi(){return"Criar novo endpoint"},
 gBh(){return"Mostrar original"},
 gBi(){return"Mostrar tradu\xe7\xe3o"}}
 var z=a.updateTypes([]);(function inheritance(){var y=a.inherit
-y(A.vu,C.fb)
-y(A.zK,A.vu)})()
-B.Nb(b.typeUniverse,JSON.parse('{"vu":{"fb":[]},"zK":{"fb":[]}}'))};
-(a=>{a["v9F51usO9pV+oYqpMJWgVe53IOk="]=a.current})($__dart_deferred_initializers__);
+y(A.vv,C.fc)
+y(A.zM,A.vv)})()
+B.Ne(b.typeUniverse,JSON.parse('{"vv":{"fc":[]},"zM":{"fc":[]}}'))};
+(a=>{a["DjCV7c7+qXvT05BWQDJvqCdH7Bw="]=a.current})($__dart_deferred_initializers__);
