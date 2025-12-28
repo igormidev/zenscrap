@@ -91,17 +91,15 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
 
     // Start creation after dialog is closed (fire and forget)
     // ignore: unawaited_futures
-    createScrappableWithTracking(
-      targetUrl: targetUrl,
-      userPrompt: userPrompt,
-    );
+    createScrappableWithTracking(targetUrl: targetUrl, userPrompt: userPrompt);
   }
 
   String? _validateUrl(String? value) {
     final l10n = AppLocalizations.of(context)!;
     // Normalize URL for validation
-    final normalizedUrl =
-        value?.startsWith('http') == true ? value : 'http://$value';
+    final normalizedUrl = value?.startsWith('http') == true
+        ? value
+        : 'http://$value';
 
     return ValidationBuilder()
         .url(l10n.landing_hero_url_validation_invalid)
@@ -223,11 +221,11 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
         ),
       ),
     ).animate().scale(
-          begin: const Offset(0.9, 0.9),
-          end: const Offset(1, 1),
-          duration: 200.ms,
-          curve: Curves.easeOutBack,
-        );
+      begin: const Offset(0.9, 0.9),
+      end: const Offset(1, 1),
+      duration: 200.ms,
+      curve: Curves.easeOutBack,
+    );
   }
 
   Widget _buildHeader(BuildContext context, AppLocalizations l10n) {
@@ -327,9 +325,7 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
       decoration: BoxDecoration(
         color: context.c.secondaryContainer.withAlpha(60),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: context.c.secondary.withAlpha(40),
-        ),
+        border: Border.all(color: context.c.secondary.withAlpha(40)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -367,12 +363,9 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
       children: [
         Row(
           children: [
-            Icon(
-              Icons.link_rounded,
-              size: 18,
-              color: context.c.primary,
-            ),
+            Icon(Icons.link_rounded, size: 18, color: context.c.primary),
             const SizedBox(width: 8),
+
             Text(
               l10n.landing_hero_target_url_label,
               style: context.t.labelLarge?.copyWith(
@@ -405,29 +398,19 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(
-                color: context.c.outline.withAlpha(40),
-              ),
+              borderSide: BorderSide(color: context.c.outline.withAlpha(40)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(
-                color: context.c.primary,
-                width: 2,
-              ),
+              borderSide: BorderSide(color: context.c.primary, width: 2),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(
-                color: context.c.error,
-              ),
+              borderSide: BorderSide(color: context.c.error),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(
-                color: context.c.error,
-                width: 2,
-              ),
+              borderSide: BorderSide(color: context.c.error, width: 2),
             ),
           ),
           onFieldSubmitted: (_) => _promptFocusNode.requestFocus(),
@@ -483,29 +466,19 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(
-                  color: context.c.outline.withAlpha(40),
-                ),
+                borderSide: BorderSide(color: context.c.outline.withAlpha(40)),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(
-                  color: context.c.primary,
-                  width: 2,
-                ),
+                borderSide: BorderSide(color: context.c.primary, width: 2),
               ),
               errorBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(
-                  color: context.c.error,
-                ),
+                borderSide: BorderSide(color: context.c.error),
               ),
               focusedErrorBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(
-                  color: context.c.error,
-                  width: 2,
-                ),
+                borderSide: BorderSide(color: context.c.error, width: 2),
               ),
               contentPadding: const EdgeInsets.all(16),
             ),
@@ -551,8 +524,9 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
                     height: 18,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      valueColor:
-                          AlwaysStoppedAnimation<Color>(context.c.onPrimary),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        context.c.onPrimary,
+                      ),
                     ),
                   )
                 : const Icon(Icons.auto_awesome_rounded, size: 18),

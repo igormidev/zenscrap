@@ -333,9 +333,10 @@ class _MobileHeroLayout extends StatelessWidget {
                 .slideY(begin: -0.1, end: 0),
             const SizedBox(height: 24),
             // Trust badges - responsive
-            const TrustBadgesRow()
-                .animate()
-                .fadeIn(duration: 600.ms, delay: 500.ms),
+            const TrustBadgesRow().animate().fadeIn(
+              duration: 600.ms,
+              delay: 500.ms,
+            ),
             const SizedBox(height: 32),
             // Form - full width on mobile
             _HeroForm(
@@ -386,33 +387,57 @@ class _HeroForm extends StatelessWidget {
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: isMobile ? double.infinity : 480),
         child: Column(
-          crossAxisAlignment:
-              isMobile ? CrossAxisAlignment.stretch : CrossAxisAlignment.start,
+          crossAxisAlignment: isMobile
+              ? CrossAxisAlignment.stretch
+              : CrossAxisAlignment.start,
           children: [
-            ZenTextfield(
-                  controller: referenceLinkEC,
-                  labelText: l10n.landing_hero_target_url_label,
-                  hintText: l10n.landing_hero_target_url_hint,
-                  onSubmitted: (_) => onSubmit(),
-                  maxLines: 1,
-                  validator: (s) => ValidationBuilder()
-                      .url(l10n.landing_hero_url_validation_invalid)
-                      .minLength(10, l10n.landing_hero_url_validation_min_length)
-                      .maxLength(
-                          500, l10n.landing_hero_url_validation_max_length)
-                      .build()(
-                    s?.startsWith('http') == true ? s : 'http://$s',
+            SizedBox(
+              height: 68,
+              child: Column(
+                children: [
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    height: isDescriptionFocused ? 0 : 18,
                   ),
-                )
-                .animate()
-                .fadeIn(duration: 500.ms, delay: 600.ms)
-                .slideY(begin: 0.2, end: 0),
-            const SizedBox(height: 16),
+                  ZenTextfield(
+                        controller: referenceLinkEC,
+                        labelText: l10n.landing_hero_target_url_label,
+                        hintText: l10n.landing_hero_target_url_hint,
+                        onSubmitted: (_) => onSubmit(),
+                        maxLines: 1,
+                        validator: (s) =>
+                            ValidationBuilder()
+                                .url(l10n.landing_hero_url_validation_invalid)
+                                .minLength(
+                                  10,
+                                  l10n.landing_hero_url_validation_min_length,
+                                )
+                                .maxLength(
+                                  500,
+                                  l10n.landing_hero_url_validation_max_length,
+                                )
+                                .build()(
+                              s?.startsWith('http') == true ? s : 'http://$s',
+                            ),
+                      )
+                      .animate()
+                      .fadeIn(duration: 500.ms, delay: 600.ms)
+                      .slideY(begin: 0.2, end: 0),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
             AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   height: isDescriptionFocused ? 200 : 56,
                   child: Focus(
                     onFocusChange: (hasFocus) {
+                      if (hasFocus &&
+                          isDescriptionFocused &&
+                          promptText.trim().isEmpty) {
+                        onDescriptionFocusChange(false);
+                        return;
+                      }
                       if (hasFocus && !isDescriptionFocused) {
                         onDescriptionFocusChange(true);
                       } else if (!hasFocus && isDescriptionFocused) {
@@ -432,9 +457,13 @@ class _HeroForm extends StatelessWidget {
                       onSubmitted: (_) => onSubmit(),
                       validator: ValidationBuilder()
                           .minLength(
-                              10, l10n.landing_hero_prompt_validation_min_length)
-                          .maxLength(2200,
-                              l10n.landing_hero_prompt_validation_max_length)
+                            10,
+                            l10n.landing_hero_prompt_validation_min_length,
+                          )
+                          .maxLength(
+                            2200,
+                            l10n.landing_hero_prompt_validation_max_length,
+                          )
                           .build(),
                     ),
                   ),
@@ -540,4 +569,3 @@ class _MobileCtaButton extends StatelessWidget {
         .slideY(begin: 0.2, end: 0);
   }
 }
-
