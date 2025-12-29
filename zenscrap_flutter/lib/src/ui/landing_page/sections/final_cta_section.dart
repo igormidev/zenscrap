@@ -3,8 +3,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
-import 'package:zenscrap_flutter/src/ui/legal/terms_of_service_dialog.dart';
-import 'package:zenscrap_flutter/src/ui/legal/privacy_policy_dialog.dart';
+import 'package:zenscrap_flutter/src/ui/legal/widgets/terms_of_service_link.dart';
+import 'package:zenscrap_flutter/src/ui/legal/widgets/privacy_policy_link.dart';
 
 /// Final call-to-action section at the bottom of the landing page.
 /// Drives urgency and provides a clear path to action.
