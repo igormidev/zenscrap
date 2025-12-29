@@ -29,7 +29,6 @@ class ScrappableAnalyticsCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedItem = ref.watch(selectedScrappableProvider);
     final isSelected = selectedItem?.scrappable.id == item.scrappable.id;
-    final l10n = AppLocalizations.of(context)!;
 
     // Get current user's account ID to determine ownership
     final currentAccountId = ref.watch(accountProvider).mapOrNull(
@@ -89,8 +88,14 @@ class ScrappableAnalyticsCard extends ConsumerWidget {
                 : null,
           ),
           child: hasData
-              ? _buildCardWithData(context, isSelected, totalRequests, isOwnedByUser, l10n)
-              : EmptyIndicatorOfRequests(item: item, isSelected: isSelected, isOwnedByUser: isOwnedByUser),
+              ? _CardWithDataContent(
+                  item: item,
+                  isSelected: isSelected,
+                  totalRequests: totalRequests,
+                  isOwnedByUser: isOwnedByUser,
+                  maxTotalCount: maxTotalCount,
+                )
+              : _EmptyIndicatorOfRequests(item: item, isSelected: isSelected, isOwnedByUser: isOwnedByUser),
         ),
       )
           .animate()
@@ -99,8 +104,27 @@ class ScrappableAnalyticsCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildCardWithData(
-      BuildContext context, bool isSelected, int totalRequests, bool isOwnedByUser, AppLocalizations l10n) {
+}
+
+/// Widget that displays the card content when there is data
+class _CardWithDataContent extends StatelessWidget {
+  final ScrappableRequestsAnalyticsItem item;
+  final bool isSelected;
+  final int totalRequests;
+  final bool isOwnedByUser;
+  final double maxTotalCount;
+
+  const _CardWithDataContent({
+    required this.item,
+    required this.isSelected,
+    required this.totalRequests,
+    required this.isOwnedByUser,
+    required this.maxTotalCount,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     // Fixed heights to prevent overflow
     const headerHeight = 28.0;
     const ownershipBadgeHeight = 18.0;
@@ -272,9 +296,8 @@ class ScrappableAnalyticsCard extends ConsumerWidget {
   }
 }
 
-class EmptyIndicatorOfRequests extends StatelessWidget {
-  const EmptyIndicatorOfRequests({
-    super.key,
+class _EmptyIndicatorOfRequests extends StatelessWidget {
+  const _EmptyIndicatorOfRequests({
     required this.item,
     required this.isSelected,
     required this.isOwnedByUser,
