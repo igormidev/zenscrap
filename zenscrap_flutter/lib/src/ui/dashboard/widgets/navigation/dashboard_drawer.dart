@@ -5,7 +5,7 @@ import 'package:zenscrap_flutter/src/states/dashboard/dashboard_index_provider.d
 import 'package:zenscrap_flutter/src/states/dashboard/possible_navigations_provider.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
-import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
+import 'package:zenscrap_flutter/src/ui/dashboard/views/dashboard_view.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/widgets/account_image.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/widgets/expand_button.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/widgets/version_indicator.dart';

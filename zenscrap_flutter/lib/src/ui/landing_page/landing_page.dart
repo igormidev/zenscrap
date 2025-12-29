@@ -12,7 +12,7 @@ import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_state.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
-import 'package:zenscrap_flutter/src/ui/dashboard/pages/pricing_page.dart';
+import 'package:zenscrap_flutter/src/ui/dashboard/widgets/raw_pricing_component.dart';
 import 'package:zenscrap_flutter/src/ui/landing_page/sections/auto_fix_section.dart';
 import 'package:zenscrap_flutter/src/ui/landing_page/sections/features_section.dart';
 import 'package:zenscrap_flutter/src/ui/landing_page/sections/final_cta_section.dart';
