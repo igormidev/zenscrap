@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/states/marketplace/marketplace_provider.dart';
 import 'package:zenscrap_flutter/src/states/marketplace/marketplace_state.dart';
-import 'package:zenscrap_flutter/src/ui/marketplace/pages/scrappable_details_dialog.dart';
+import 'package:zenscrap_flutter/src/ui/marketplace/dialogs/scrappable_details_dialog.dart';
 import 'package:zenscrap_flutter/src/ui/marketplace/widgets/scrappable_usage_metrics_widget.dart';
 
 import '../../helpers/responsive_test_helpers.dart';

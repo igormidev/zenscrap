@@ -9,7 +9,7 @@ import 'package:zenscrap_flutter/src/design_system/widgets/category_badge.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/edit_scrappable_dialog.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/translatable_text.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
-import 'package:zenscrap_flutter/src/ui/marketplace/pages/scrappable_details_dialog.dart';
+import 'package:zenscrap_flutter/src/ui/marketplace/dialogs/scrappable_details_dialog.dart';
 
 enum ScrappableCardSource { userScrappables, marketplace }
 
