@@ -22,7 +22,7 @@ import 'package:zenscrap_flutter/src/ui/landing_page/sections/marketplace_sectio
 import 'package:zenscrap_flutter/src/ui/landing_page/sections/problem_section.dart';
 import 'package:zenscrap_flutter/src/ui/landing_page/widgets/landing_appbar.dart';
 import 'package:zenscrap_flutter/src/ui/landing_page/widgets/landing_mobile_drawer.dart';
-import 'package:zenscrap_flutter/src/ui/scrap_session/view/scrappable_edit_session.dart';
+import 'package:zenscrap_flutter/src/ui/scrap_session/view/scrappable_edit_session_view.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/creating_scrappable_dialog.dart';
 import 'package:zenscrap_flutter/src/design_system/elements/ip_limit_error_view.dart';
 import 'package:zenscrap_flutter/src/design_system/elements/suspicious_ip_error_view.dart';

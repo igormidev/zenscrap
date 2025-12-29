@@ -62,25 +62,24 @@ class UrlSyntaxHighlightTextField extends EditableText {
 }
 
 /// Alternative approach using TextFormField with custom buildCounter
-class UrlHighlightedTextFormField extends StatefulWidget {
+class _UrlHighlightedTextFormField extends StatefulWidget {
   final TextEditingController controller;
   final String? hintText;
   final ValueChanged<String>? onChanged;
 
-  const UrlHighlightedTextFormField({
-    super.key,
+  const _UrlHighlightedTextFormField({
     required this.controller,
     this.hintText,
     this.onChanged,
   });
 
   @override
-  State<UrlHighlightedTextFormField> createState() =>
+  State<_UrlHighlightedTextFormField> createState() =>
       _UrlHighlightedTextFormFieldState();
 }
 
 class _UrlHighlightedTextFormFieldState
-    extends State<UrlHighlightedTextFormField> {
+    extends State<_UrlHighlightedTextFormField> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -96,7 +95,7 @@ class _UrlHighlightedTextFormFieldState
           ),
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            child: _buildHighlightedText(context),
+            child: _HighlightedText(text: widget.controller.text),
           ),
         ),
         const SizedBox(height: 8),
@@ -127,9 +126,16 @@ class _UrlHighlightedTextFormFieldState
       ],
     );
   }
+}
 
-  Widget _buildHighlightedText(BuildContext context) {
-    final text = widget.controller.text;
+/// Widget that displays URL text with highlighted path parameters
+class _HighlightedText extends StatelessWidget {
+  final String text;
+
+  const _HighlightedText({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
     if (text.isEmpty) {
       return Text(
         'URL preview will appear here',

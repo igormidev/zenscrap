@@ -105,24 +105,40 @@ class _CreatingScrappableDialogState
             horizontal: 40,
             vertical: 24,
           ),
-          child: _buildDialogContent(
-            context,
-            referenceLink,
-            thinkingChunks,
-            groundingMetadata,
+          child: _DialogContent(
+            referenceLink: referenceLink,
+            thinkingChunks: thinkingChunks,
+            groundingMetadata: groundingMetadata,
+            scrollController: _scrollController,
+            pulseController: _pulseController,
+            waveController: _waveController,
           ),
         );
       },
       orElse: () => const SizedBox.shrink(),
     );
   }
+}
 
-  Widget _buildDialogContent(
-    BuildContext context,
-    String referenceLink,
-    List<String> thinkingChunks,
-    GroundingMetadataInfo? groundingMetadata,
-  ) {
+class _DialogContent extends StatelessWidget {
+  final String referenceLink;
+  final List<String> thinkingChunks;
+  final GroundingMetadataInfo? groundingMetadata;
+  final ScrollController scrollController;
+  final AnimationController pulseController;
+  final AnimationController waveController;
+
+  const _DialogContent({
+    required this.referenceLink,
+    required this.thinkingChunks,
+    required this.groundingMetadata,
+    required this.scrollController,
+    required this.pulseController,
+    required this.waveController,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     final dialogWidth = (screenSize.width * 0.6).clamp(400.0, 800.0);
     final dialogHeight = (screenSize.height * 0.75).clamp(400.0, 700.0);
@@ -154,24 +170,43 @@ class _CreatingScrappableDialogState
         borderRadius: BorderRadius.circular(28),
         child: Column(
           children: [
-            _buildHeader(context, referenceLink, thinkingChunks.length),
+            _Header(
+              referenceLink: referenceLink,
+              thoughtCount: thinkingChunks.length,
+              pulseController: pulseController,
+              waveController: waveController,
+            ),
             Expanded(
-              child: _buildThinkingContent(context, thinkingChunks),
+              child: _ThinkingContent(
+                thinkingChunks: thinkingChunks,
+                scrollController: scrollController,
+              ),
             ),
             if (groundingMetadata != null)
-              _buildGroundingInfo(context, groundingMetadata),
-            _buildStatusBar(context),
+              _GroundingInfo(grounding: groundingMetadata!),
+            _StatusBar(pulseController: pulseController),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildHeader(
-    BuildContext context,
-    String referenceLink,
-    int thoughtCount,
-  ) {
+class _Header extends StatelessWidget {
+  final String referenceLink;
+  final int thoughtCount;
+  final AnimationController pulseController;
+  final AnimationController waveController;
+
+  const _Header({
+    required this.referenceLink,
+    required this.thoughtCount,
+    required this.pulseController,
+    required this.waveController,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -194,7 +229,7 @@ class _CreatingScrappableDialogState
         children: [
           Row(
             children: [
-              _buildAnimatedIcon(context),
+              _AnimatedIcon(pulseController: pulseController),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
@@ -223,15 +258,25 @@ class _CreatingScrappableDialogState
             ],
           ),
           const SizedBox(height: 16),
-          _buildProgressBar(context, thoughtCount),
+          _ProgressBar(
+            thoughtCount: thoughtCount,
+            waveController: waveController,
+          ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildAnimatedIcon(BuildContext context) {
+class _AnimatedIcon extends StatelessWidget {
+  final AnimationController pulseController;
+
+  const _AnimatedIcon({required this.pulseController});
+
+  @override
+  Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _pulseController,
+      animation: pulseController,
       builder: (context, child) {
         return Container(
           width: 52,
@@ -240,15 +285,15 @@ class _CreatingScrappableDialogState
             shape: BoxShape.circle,
             gradient: RadialGradient(
               colors: [
-                context.c.primary.withValues(alpha: 0.15 + _pulseController.value * 0.2),
+                context.c.primary.withValues(alpha: 0.15 + pulseController.value * 0.2),
                 context.c.primary.withValues(alpha: 0.05),
               ],
             ),
             boxShadow: [
               BoxShadow(
-                color: context.c.primary.withValues(alpha: 0.25 * _pulseController.value),
-                blurRadius: 16 * _pulseController.value,
-                spreadRadius: 4 * _pulseController.value,
+                color: context.c.primary.withValues(alpha: 0.25 * pulseController.value),
+                blurRadius: 16 * pulseController.value,
+                spreadRadius: 4 * pulseController.value,
               ),
             ],
           ),
@@ -261,19 +306,30 @@ class _CreatingScrappableDialogState
       },
     );
   }
+}
 
-  Widget _buildProgressBar(BuildContext context, int thoughtCount) {
+class _ProgressBar extends StatelessWidget {
+  final int thoughtCount;
+  final AnimationController waveController;
+
+  const _ProgressBar({
+    required this.thoughtCount,
+    required this.waveController,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(4),
           child: AnimatedBuilder(
-            animation: _waveController,
+            animation: waveController,
             builder: (context, child) {
               return CustomPaint(
                 size: const Size(double.infinity, 6),
                 painter: _WaveProgressPainter(
-                  progress: _waveController.value,
+                  progress: waveController.value,
                   color: context.c.primary,
                   backgroundColor: context.c.surfaceContainerHighest,
                 ),
@@ -294,7 +350,7 @@ class _CreatingScrappableDialogState
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _buildPulsingDot(context),
+                const _PulsingDot(),
                 const SizedBox(width: 8),
                 Text(
                   'AI is thinking...',
@@ -310,8 +366,13 @@ class _CreatingScrappableDialogState
       ],
     );
   }
+}
 
-  Widget _buildPulsingDot(BuildContext context) {
+class _PulsingDot extends StatelessWidget {
+  const _PulsingDot();
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       width: 8,
       height: 8,
@@ -333,11 +394,19 @@ class _CreatingScrappableDialogState
           duration: 700.ms,
         );
   }
+}
 
-  Widget _buildThinkingContent(
-    BuildContext context,
-    List<String> thinkingChunks,
-  ) {
+class _ThinkingContent extends StatelessWidget {
+  final List<String> thinkingChunks;
+  final ScrollController scrollController;
+
+  const _ThinkingContent({
+    required this.thinkingChunks,
+    required this.scrollController,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     if (thinkingChunks.isEmpty) {
       return Center(
         child: Column(
@@ -374,7 +443,7 @@ class _CreatingScrappableDialogState
     }
 
     return ListView.builder(
-      controller: _scrollController,
+      controller: scrollController,
       padding: const EdgeInsets.all(16),
       itemCount: thinkingChunks.length,
       itemBuilder: (context, index) {
@@ -389,11 +458,15 @@ class _CreatingScrappableDialogState
       },
     );
   }
+}
 
-  Widget _buildGroundingInfo(
-    BuildContext context,
-    GroundingMetadataInfo grounding,
-  ) {
+class _GroundingInfo extends StatelessWidget {
+  final GroundingMetadataInfo grounding;
+
+  const _GroundingInfo({required this.grounding});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(12),
@@ -431,8 +504,15 @@ class _CreatingScrappableDialogState
       ),
     ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.1);
   }
+}
 
-  Widget _buildStatusBar(BuildContext context) {
+class _StatusBar extends StatelessWidget {
+  final AnimationController pulseController;
+
+  const _StatusBar({required this.pulseController});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       decoration: BoxDecoration(
@@ -446,7 +526,7 @@ class _CreatingScrappableDialogState
       child: Row(
         children: [
           AnimatedBuilder(
-            animation: _pulseController,
+            animation: pulseController,
             builder: (context, child) {
               return Container(
                 width: 10,
@@ -456,11 +536,11 @@ class _CreatingScrappableDialogState
                   color: Color.lerp(
                     context.c.primary,
                     context.c.tertiary,
-                    _pulseController.value,
+                    pulseController.value,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: context.c.primary.withValues(alpha: 0.3 * (1 - _pulseController.value)),
+                      color: context.c.primary.withValues(alpha: 0.3 * (1 - pulseController.value)),
                       blurRadius: 8,
                       spreadRadius: 2,
                     ),

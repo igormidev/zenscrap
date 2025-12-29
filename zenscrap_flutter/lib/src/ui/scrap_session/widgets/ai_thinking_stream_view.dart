@@ -82,18 +82,42 @@ class _AiThinkingStreamViewState extends State<AiThinkingStreamView>
       ),
       child: Column(
         children: [
-          _buildHeader(context),
-          Expanded(
-            child: _buildThinkingContent(context),
+          _Header(
+            referenceLink: widget.referenceLink,
+            thinkingChunksCount: widget.thinkingChunks.length,
+            pulseController: _pulseController,
+            brainWaveController: _brainWaveController,
           ),
-          if (widget.groundingMetadata != null) _buildGroundingInfo(context),
-          _buildStatusBar(context),
+          Expanded(
+            child: _ThinkingContent(
+              thinkingChunks: widget.thinkingChunks,
+              scrollController: _scrollController,
+            ),
+          ),
+          if (widget.groundingMetadata != null)
+            _GroundingInfo(groundingMetadata: widget.groundingMetadata!),
+          _StatusBar(pulseController: _pulseController),
         ],
       ),
     );
   }
+}
 
-  Widget _buildHeader(BuildContext context) {
+class _Header extends StatelessWidget {
+  final String referenceLink;
+  final int thinkingChunksCount;
+  final AnimationController pulseController;
+  final AnimationController brainWaveController;
+
+  const _Header({
+    required this.referenceLink,
+    required this.thinkingChunksCount,
+    required this.pulseController,
+    required this.brainWaveController,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -109,7 +133,7 @@ class _AiThinkingStreamViewState extends State<AiThinkingStreamView>
           Row(
             children: [
               // Animated brain icon
-              _buildAnimatedBrainIcon(context),
+              _AnimatedBrainIcon(pulseController: pulseController),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
@@ -124,7 +148,7 @@ class _AiThinkingStreamViewState extends State<AiThinkingStreamView>
                     ).animate().fadeIn(duration: 400.ms).slideX(begin: -0.1),
                     const SizedBox(height: 4),
                     Text(
-                      widget.referenceLink,
+                      referenceLink,
                       style: context.t.bodyMedium?.copyWith(
                         color: context.c.primary,
                         fontFamily: 'monospace',
@@ -139,15 +163,25 @@ class _AiThinkingStreamViewState extends State<AiThinkingStreamView>
           ),
           const SizedBox(height: 16),
           // Progress indicator
-          _buildProgressIndicator(context),
+          _ProgressIndicator(
+            thinkingChunksCount: thinkingChunksCount,
+            brainWaveController: brainWaveController,
+          ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildAnimatedBrainIcon(BuildContext context) {
+class _AnimatedBrainIcon extends StatelessWidget {
+  final AnimationController pulseController;
+
+  const _AnimatedBrainIcon({required this.pulseController});
+
+  @override
+  Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _pulseController,
+      animation: pulseController,
       builder: (context, child) {
         return Container(
           width: 56,
@@ -156,15 +190,15 @@ class _AiThinkingStreamViewState extends State<AiThinkingStreamView>
             shape: BoxShape.circle,
             gradient: RadialGradient(
               colors: [
-                context.c.primary.withValues(alpha: 0.2 + _pulseController.value * 0.3),
+                context.c.primary.withValues(alpha: 0.2 + pulseController.value * 0.3),
                 context.c.primary.withValues(alpha: 0.1),
               ],
             ),
             boxShadow: [
               BoxShadow(
-                color: context.c.primary.withValues(alpha: 0.3 * _pulseController.value),
-                blurRadius: 20 * _pulseController.value,
-                spreadRadius: 5 * _pulseController.value,
+                color: context.c.primary.withValues(alpha: 0.3 * pulseController.value),
+                blurRadius: 20 * pulseController.value,
+                spreadRadius: 5 * pulseController.value,
               ),
             ],
           ),
@@ -177,8 +211,19 @@ class _AiThinkingStreamViewState extends State<AiThinkingStreamView>
       },
     );
   }
+}
 
-  Widget _buildProgressIndicator(BuildContext context) {
+class _ProgressIndicator extends StatelessWidget {
+  final int thinkingChunksCount;
+  final AnimationController brainWaveController;
+
+  const _ProgressIndicator({
+    required this.thinkingChunksCount,
+    required this.brainWaveController,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       children: [
         Row(
@@ -187,12 +232,12 @@ class _AiThinkingStreamViewState extends State<AiThinkingStreamView>
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(4),
                 child: AnimatedBuilder(
-                  animation: _brainWaveController,
+                  animation: brainWaveController,
                   builder: (context, child) {
                     return CustomPaint(
                       size: const Size(double.infinity, 8),
                       painter: _WavePainter(
-                        progress: _brainWaveController.value,
+                        progress: brainWaveController.value,
                         color: context.c.primary,
                         backgroundColor: context.c.surfaceContainerHighest,
                       ),
@@ -208,7 +253,7 @@ class _AiThinkingStreamViewState extends State<AiThinkingStreamView>
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '${widget.thinkingChunks.length} thoughts processed',
+              '$thinkingChunksCount thoughts processed',
               style: context.t.labelSmall?.copyWith(
                 color: context.c.onSurfaceVariant,
               ),
@@ -250,9 +295,20 @@ class _AiThinkingStreamViewState extends State<AiThinkingStreamView>
       ],
     );
   }
+}
 
-  Widget _buildThinkingContent(BuildContext context) {
-    if (widget.thinkingChunks.isEmpty) {
+class _ThinkingContent extends StatelessWidget {
+  final List<String> thinkingChunks;
+  final ScrollController scrollController;
+
+  const _ThinkingContent({
+    required this.thinkingChunks,
+    required this.scrollController,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (thinkingChunks.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -288,12 +344,12 @@ class _AiThinkingStreamViewState extends State<AiThinkingStreamView>
     }
 
     return ListView.builder(
-      controller: _scrollController,
+      controller: scrollController,
       padding: const EdgeInsets.all(16),
-      itemCount: widget.thinkingChunks.length,
+      itemCount: thinkingChunks.length,
       itemBuilder: (context, index) {
-        final chunk = widget.thinkingChunks[index];
-        final isLatest = index == widget.thinkingChunks.length - 1;
+        final chunk = thinkingChunks[index];
+        final isLatest = index == thinkingChunks.length - 1;
 
         return _ThinkingChunkCard(
           chunk: chunk,
@@ -303,11 +359,15 @@ class _AiThinkingStreamViewState extends State<AiThinkingStreamView>
       },
     );
   }
+}
 
-  Widget _buildGroundingInfo(BuildContext context) {
-    final grounding = widget.groundingMetadata;
-    if (grounding == null) return const SizedBox.shrink();
+class _GroundingInfo extends StatelessWidget {
+  final GroundingMetadataInfo groundingMetadata;
 
+  const _GroundingInfo({required this.groundingMetadata});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
@@ -338,12 +398,12 @@ class _AiThinkingStreamViewState extends State<AiThinkingStreamView>
               ),
             ],
           ),
-          if (grounding.searchQueries.isNotEmpty) ...[
+          if (groundingMetadata.searchQueries.isNotEmpty) ...[
             const SizedBox(height: 12),
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: grounding.searchQueries.map((query) {
+              children: groundingMetadata.searchQueries.map((query) {
                 return Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -372,10 +432,10 @@ class _AiThinkingStreamViewState extends State<AiThinkingStreamView>
               }).toList(),
             ),
           ],
-          if (grounding.sources.isNotEmpty) ...[
+          if (groundingMetadata.sources.isNotEmpty) ...[
             const SizedBox(height: 12),
             Text(
-              '${grounding.sources.length} sources referenced',
+              '${groundingMetadata.sources.length} sources referenced',
               style: context.t.labelSmall?.copyWith(
                 color: context.c.onTertiaryContainer.withValues(alpha: 0.7),
               ),
@@ -385,8 +445,15 @@ class _AiThinkingStreamViewState extends State<AiThinkingStreamView>
       ),
     ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1);
   }
+}
 
-  Widget _buildStatusBar(BuildContext context) {
+class _StatusBar extends StatelessWidget {
+  final AnimationController pulseController;
+
+  const _StatusBar({required this.pulseController});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       decoration: BoxDecoration(
@@ -399,7 +466,7 @@ class _AiThinkingStreamViewState extends State<AiThinkingStreamView>
       ),
       child: Row(
         children: [
-          _buildPulsingDot(context),
+          _PulsingDot(pulseController: pulseController),
           const SizedBox(width: 12),
           Text(
             'Gemini 3 Pro is analyzing your URL pattern...',
@@ -417,10 +484,17 @@ class _AiThinkingStreamViewState extends State<AiThinkingStreamView>
       ),
     );
   }
+}
 
-  Widget _buildPulsingDot(BuildContext context) {
+class _PulsingDot extends StatelessWidget {
+  final AnimationController pulseController;
+
+  const _PulsingDot({required this.pulseController});
+
+  @override
+  Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _pulseController,
+      animation: pulseController,
       builder: (context, child) {
         return Container(
           width: 10,
@@ -430,11 +504,11 @@ class _AiThinkingStreamViewState extends State<AiThinkingStreamView>
             color: Color.lerp(
               context.c.primary,
               context.c.tertiary,
-              _pulseController.value,
+              pulseController.value,
             ),
             boxShadow: [
               BoxShadow(
-                color: context.c.primary.withValues(alpha: 0.4 * (1 - _pulseController.value)),
+                color: context.c.primary.withValues(alpha: 0.4 * (1 - pulseController.value)),
                 blurRadius: 8,
                 spreadRadius: 2,
               ),

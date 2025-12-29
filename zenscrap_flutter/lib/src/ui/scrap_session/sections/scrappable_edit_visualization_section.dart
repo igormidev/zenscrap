@@ -6,8 +6,8 @@ import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.d
 import 'package:zenscrap_flutter/src/design_system/widgets/edit_scrappable_dialog.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 
-class ScrappableEditVisualization extends ConsumerStatefulWidget {
-  const ScrappableEditVisualization({
+class ScrappableEditVisualizationSection extends ConsumerStatefulWidget {
+  const ScrappableEditVisualizationSection({
     super.key,
     required this.scrappable,
   });
@@ -15,11 +15,11 @@ class ScrappableEditVisualization extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
-      _ScrappableEditVisualizationState();
+      _ScrappableEditVisualizationSectionState();
 }
 
-class _ScrappableEditVisualizationState
-    extends ConsumerState<ScrappableEditVisualization> with EditScrappable {
+class _ScrappableEditVisualizationSectionState
+    extends ConsumerState<ScrappableEditVisualizationSection> with EditScrappable {
   @override
   Widget build(BuildContext context) {
     return Container(

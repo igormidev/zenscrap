@@ -147,7 +147,7 @@ class _ScrappableChatMessageStreamSectionState
             }
 
             if (isLastIndex && !willHideLoading) {
-              return GenericLoadingBubble();
+              return const _GenericLoadingBubble();
             }
 
             final message = messages[index];
@@ -162,8 +162,8 @@ class _ScrappableChatMessageStreamSectionState
   }
 }
 
-class GenericLoadingBubble extends StatelessWidget {
-  const GenericLoadingBubble({super.key});
+class _GenericLoadingBubble extends StatelessWidget {
+  const _GenericLoadingBubble();
 
   @override
   Widget build(BuildContext context) {
@@ -2012,25 +2012,25 @@ class _SuspiciousIpMessageState extends ConsumerState<_SuspiciousIpMessage> {
                 ],
               ),
               const SizedBox(height: 8),
-              _buildSolutionItem(
-                Icons.vpn_key_off_rounded,
-                'Disable your VPN, proxy, or Tor',
-                colorScheme,
-                theme,
+              _SolutionItem(
+                icon: Icons.vpn_key_off_rounded,
+                text: 'Disable your VPN, proxy, or Tor',
+                colorScheme: colorScheme,
+                theme: theme,
               ),
               const SizedBox(height: 6),
-              _buildSolutionItem(
-                Icons.wifi_rounded,
-                'Use a regular internet connection',
-                colorScheme,
-                theme,
+              _SolutionItem(
+                icon: Icons.wifi_rounded,
+                text: 'Use a regular internet connection',
+                colorScheme: colorScheme,
+                theme: theme,
               ),
               const SizedBox(height: 6),
-              _buildSolutionItem(
-                Icons.person_add_rounded,
-                'Or create an account to bypass this check',
-                colorScheme,
-                theme,
+              _SolutionItem(
+                icon: Icons.person_add_rounded,
+                text: 'Or create an account to bypass this check',
+                colorScheme: colorScheme,
+                theme: theme,
               ),
             ],
           ),
@@ -2077,12 +2077,36 @@ class _SuspiciousIpMessageState extends ConsumerState<_SuspiciousIpMessage> {
     );
   }
 
-  Widget _buildSolutionItem(
-    IconData icon,
-    String text,
-    ColorScheme colorScheme,
-    ThemeData theme,
-  ) {
+
+  void _navigateToSignUp(BuildContext context) {
+    // Track the click event
+    ref.read(analyticsServiceProvider).trackChatSuspiciousIpCreateAccountClick(
+          blockReason: widget.blockReason,
+        );
+
+    // Navigate to the AuthView for sign up
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const AuthView()));
+  }
+}
+
+/// A widget that displays a solution item with an icon and text
+class _SolutionItem extends StatelessWidget {
+  final IconData icon;
+  final String text;
+  final ColorScheme colorScheme;
+  final ThemeData theme;
+
+  const _SolutionItem({
+    required this.icon,
+    required this.text,
+    required this.colorScheme,
+    required this.theme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -2102,17 +2126,5 @@ class _SuspiciousIpMessageState extends ConsumerState<_SuspiciousIpMessage> {
         ),
       ],
     );
-  }
-
-  void _navigateToSignUp(BuildContext context) {
-    // Track the click event
-    ref.read(analyticsServiceProvider).trackChatSuspiciousIpCreateAccountClick(
-          blockReason: widget.blockReason,
-        );
-
-    // Navigate to the AuthView for sign up
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute(builder: (context) => const AuthView()));
   }
 }
