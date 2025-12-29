@@ -62,7 +62,7 @@ class _EmailTypoDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             // Header with icon
-            _buildHeader(context, colorScheme),
+            _TypoDialogHeader(colorScheme: colorScheme),
 
             // Content
             Padding(
@@ -85,7 +85,12 @@ class _EmailTypoDialog extends StatelessWidget {
                   const SizedBox(height: 20),
 
                   // Email comparison cards
-                  _buildEmailComparisonCards(context, colorScheme, theme, l10n),
+                  _EmailComparisonCards(
+                    typoResult: typoResult,
+                    colorScheme: colorScheme,
+                    theme: theme,
+                    l10n: l10n,
+                  ),
 
                   const SizedBox(height: 24),
                 ],
@@ -93,7 +98,7 @@ class _EmailTypoDialog extends StatelessWidget {
             ),
 
             // Action buttons
-            _buildActionButtons(context, colorScheme, theme, l10n),
+            _TypoActionButtons(l10n: l10n),
           ],
         ),
       ),
@@ -102,8 +107,16 @@ class _EmailTypoDialog extends StatelessWidget {
         .fadeIn(duration: 200.ms)
         .scale(begin: const Offset(0.95, 0.95), end: const Offset(1, 1), duration: 250.ms, curve: Curves.easeOutBack);
   }
+}
 
-  Widget _buildHeader(BuildContext context, ColorScheme colorScheme) {
+/// Header section with animated icon and title
+class _TypoDialogHeader extends StatelessWidget {
+  final ColorScheme colorScheme;
+
+  const _TypoDialogHeader({required this.colorScheme});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
@@ -152,13 +165,24 @@ class _EmailTypoDialog extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildEmailComparisonCards(
-    BuildContext context,
-    ColorScheme colorScheme,
-    ThemeData theme,
-    AppLocalizations l10n,
-  ) {
+/// Email comparison cards showing original and suggested emails
+class _EmailComparisonCards extends StatelessWidget {
+  final EmailTypoResult typoResult;
+  final ColorScheme colorScheme;
+  final ThemeData theme;
+  final AppLocalizations l10n;
+
+  const _EmailComparisonCards({
+    required this.typoResult,
+    required this.colorScheme,
+    required this.theme,
+    required this.l10n,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       children: [
         // Original email (with error highlight)
@@ -205,13 +229,16 @@ class _EmailTypoDialog extends StatelessWidget {
       ],
     );
   }
+}
 
-  Widget _buildActionButtons(
-    BuildContext context,
-    ColorScheme colorScheme,
-    ThemeData theme,
-    AppLocalizations l10n,
-  ) {
+/// Action buttons for the typo dialog
+class _TypoActionButtons extends StatelessWidget {
+  final AppLocalizations l10n;
+
+  const _TypoActionButtons({required this.l10n});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       child: Column(

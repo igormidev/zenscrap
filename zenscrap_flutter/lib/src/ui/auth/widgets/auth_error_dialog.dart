@@ -93,27 +93,54 @@ class AuthErrorDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             // Top section with icon
-            _buildIconSection(context, colorScheme, iconSize, padding),
+            _ErrorIconSection(
+              errorType: error.type,
+              colorScheme: colorScheme,
+              iconSize: iconSize,
+              padding: padding,
+            ),
 
             // Content section
-            _buildContentSection(context, colorScheme, padding),
+            _ErrorContentSection(
+              error: error,
+              l10n: l10n,
+              colorScheme: colorScheme,
+              padding: padding,
+            ),
 
             // Button section
-            _buildButtonSection(context, colorScheme, padding),
+            _ErrorButtonSection(
+              error: error,
+              l10n: l10n,
+              colorScheme: colorScheme,
+              padding: padding,
+              onDismiss: onDismiss,
+            ),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildIconSection(
-    BuildContext context,
-    ColorScheme colorScheme,
-    double iconSize,
-    double padding,
-  ) {
-    final iconData = _getIconForError(error.type);
-    final iconColor = _getColorForError(error.type, colorScheme);
+/// Icon section widget for auth error dialog
+class _ErrorIconSection extends StatelessWidget {
+  final AuthErrorType errorType;
+  final ColorScheme colorScheme;
+  final double iconSize;
+  final double padding;
+
+  const _ErrorIconSection({
+    required this.errorType,
+    required this.colorScheme,
+    required this.iconSize,
+    required this.padding,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final iconData = _getIconForError(errorType);
+    final iconColor = _getColorForError(errorType, colorScheme);
     final backgroundColor = iconColor.withValues(alpha: 0.12);
 
     return Container(
@@ -157,12 +184,24 @@ class AuthErrorDialog extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildContentSection(
-    BuildContext context,
-    ColorScheme colorScheme,
-    double padding,
-  ) {
+/// Content section widget for auth error dialog
+class _ErrorContentSection extends StatelessWidget {
+  final AuthError error;
+  final AppLocalizations l10n;
+  final ColorScheme colorScheme;
+  final double padding;
+
+  const _ErrorContentSection({
+    required this.error,
+    required this.l10n,
+    required this.colorScheme,
+    required this.padding,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     final title = error.getTitle(l10n);
     final description = error.getDescription(l10n);
 
@@ -196,12 +235,26 @@ class AuthErrorDialog extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildButtonSection(
-    BuildContext context,
-    ColorScheme colorScheme,
-    double padding,
-  ) {
+/// Button section widget for auth error dialog
+class _ErrorButtonSection extends StatelessWidget {
+  final AuthError error;
+  final AppLocalizations l10n;
+  final ColorScheme colorScheme;
+  final double padding;
+  final VoidCallback onDismiss;
+
+  const _ErrorButtonSection({
+    required this.error,
+    required this.l10n,
+    required this.colorScheme,
+    required this.padding,
+    required this.onDismiss,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     final buttonText = error.getButtonText(l10n);
     final buttonColor = _getButtonColor(error.type, colorScheme);
 
@@ -234,130 +287,132 @@ class AuthErrorDialog extends StatelessWidget {
       ),
     );
   }
+}
 
-  IconData _getIconForError(AuthErrorType type) {
-    switch (type) {
-      // Login/credential errors
-      case AuthErrorType.invalidCredentials:
-      case AuthErrorType.accountNotFound:
-        return Icons.lock_outline_rounded;
-      case AuthErrorType.accountDisabled:
-      case AuthErrorType.accountLocked:
-        return Icons.block_rounded;
+// Helper functions for error styling (file-private)
 
-      // Registration errors
-      case AuthErrorType.emailAlreadyExists:
-        return Icons.email_outlined;
-      case AuthErrorType.invalidVerificationCode:
-      case AuthErrorType.passwordResetCodeInvalid:
-        return Icons.pin_outlined;
-      case AuthErrorType.expiredVerificationCode:
-      case AuthErrorType.passwordResetCodeExpired:
-        return Icons.timer_off_outlined;
-      case AuthErrorType.weakPassword:
-        return Icons.password_rounded;
-      case AuthErrorType.invalidEmailFormat:
-        return Icons.alternate_email_rounded;
+IconData _getIconForError(AuthErrorType type) {
+  switch (type) {
+    // Login/credential errors
+    case AuthErrorType.invalidCredentials:
+    case AuthErrorType.accountNotFound:
+      return Icons.lock_outline_rounded;
+    case AuthErrorType.accountDisabled:
+    case AuthErrorType.accountLocked:
+      return Icons.block_rounded;
 
-      // Rate limiting
-      case AuthErrorType.tooManyAttempts:
-      case AuthErrorType.loginRateLimited:
-      case AuthErrorType.verificationRateLimited:
-      case AuthErrorType.passwordResetRateLimited:
-        return Icons.hourglass_top_rounded;
+    // Registration errors
+    case AuthErrorType.emailAlreadyExists:
+      return Icons.email_outlined;
+    case AuthErrorType.invalidVerificationCode:
+    case AuthErrorType.passwordResetCodeInvalid:
+      return Icons.pin_outlined;
+    case AuthErrorType.expiredVerificationCode:
+    case AuthErrorType.passwordResetCodeExpired:
+      return Icons.timer_off_outlined;
+    case AuthErrorType.weakPassword:
+      return Icons.password_rounded;
+    case AuthErrorType.invalidEmailFormat:
+      return Icons.alternate_email_rounded;
 
-      // Google Sign-In errors
-      case AuthErrorType.googleSignInCancelled:
-        return Icons.cancel_outlined;
-      case AuthErrorType.googleSignInFailed:
-        return Icons.g_mobiledata_rounded;
-      case AuthErrorType.googleAccountNotVerified:
-        return Icons.verified_user_outlined;
-      case AuthErrorType.googleAccountDomainRestricted:
-        return Icons.domain_disabled_rounded;
+    // Rate limiting
+    case AuthErrorType.tooManyAttempts:
+    case AuthErrorType.loginRateLimited:
+    case AuthErrorType.verificationRateLimited:
+    case AuthErrorType.passwordResetRateLimited:
+      return Icons.hourglass_top_rounded;
 
-      // Network/server errors
-      case AuthErrorType.networkError:
-      case AuthErrorType.connectionRefused:
-        return Icons.wifi_off_rounded;
-      case AuthErrorType.serverError:
-        return Icons.cloud_off_rounded;
-      case AuthErrorType.timeout:
-        return Icons.schedule_rounded;
+    // Google Sign-In errors
+    case AuthErrorType.googleSignInCancelled:
+      return Icons.cancel_outlined;
+    case AuthErrorType.googleSignInFailed:
+      return Icons.g_mobiledata_rounded;
+    case AuthErrorType.googleAccountNotVerified:
+      return Icons.verified_user_outlined;
+    case AuthErrorType.googleAccountDomainRestricted:
+      return Icons.domain_disabled_rounded;
 
-      // Unknown
-      case AuthErrorType.unknown:
-        return Icons.error_outline_rounded;
-    }
+    // Network/server errors
+    case AuthErrorType.networkError:
+    case AuthErrorType.connectionRefused:
+      return Icons.wifi_off_rounded;
+    case AuthErrorType.serverError:
+      return Icons.cloud_off_rounded;
+    case AuthErrorType.timeout:
+      return Icons.schedule_rounded;
+
+    // Unknown
+    case AuthErrorType.unknown:
+      return Icons.error_outline_rounded;
   }
+}
 
-  Color _getColorForError(AuthErrorType type, ColorScheme colorScheme) {
-    switch (type) {
-      // User-correctable errors - use warning/error color
-      case AuthErrorType.invalidCredentials:
-      case AuthErrorType.accountNotFound:
-      case AuthErrorType.invalidVerificationCode:
-      case AuthErrorType.passwordResetCodeInvalid:
-      case AuthErrorType.weakPassword:
-      case AuthErrorType.invalidEmailFormat:
-        return colorScheme.error;
+Color _getColorForError(AuthErrorType type, ColorScheme colorScheme) {
+  switch (type) {
+    // User-correctable errors - use warning/error color
+    case AuthErrorType.invalidCredentials:
+    case AuthErrorType.accountNotFound:
+    case AuthErrorType.invalidVerificationCode:
+    case AuthErrorType.passwordResetCodeInvalid:
+    case AuthErrorType.weakPassword:
+    case AuthErrorType.invalidEmailFormat:
+      return colorScheme.error;
 
-      // Account issues - more serious, use error
-      case AuthErrorType.accountDisabled:
-      case AuthErrorType.accountLocked:
-      case AuthErrorType.emailAlreadyExists:
-        return colorScheme.error;
+    // Account issues - more serious, use error
+    case AuthErrorType.accountDisabled:
+    case AuthErrorType.accountLocked:
+    case AuthErrorType.emailAlreadyExists:
+      return colorScheme.error;
 
-      // Time-related issues - use orange/amber
-      case AuthErrorType.expiredVerificationCode:
-      case AuthErrorType.passwordResetCodeExpired:
-      case AuthErrorType.timeout:
-        return Colors.orange.shade700;
+    // Time-related issues - use orange/amber
+    case AuthErrorType.expiredVerificationCode:
+    case AuthErrorType.passwordResetCodeExpired:
+    case AuthErrorType.timeout:
+      return Colors.orange.shade700;
 
-      // Rate limiting - use amber to indicate temporary
-      case AuthErrorType.tooManyAttempts:
-      case AuthErrorType.loginRateLimited:
-      case AuthErrorType.verificationRateLimited:
-      case AuthErrorType.passwordResetRateLimited:
-        return Colors.amber.shade700;
+    // Rate limiting - use amber to indicate temporary
+    case AuthErrorType.tooManyAttempts:
+    case AuthErrorType.loginRateLimited:
+    case AuthErrorType.verificationRateLimited:
+    case AuthErrorType.passwordResetRateLimited:
+      return Colors.amber.shade700;
 
-      // Google-specific - use Google's colors or neutral
-      case AuthErrorType.googleSignInCancelled:
-        return colorScheme.outline;
-      case AuthErrorType.googleSignInFailed:
-      case AuthErrorType.googleAccountNotVerified:
-      case AuthErrorType.googleAccountDomainRestricted:
-        return colorScheme.error;
+    // Google-specific - use Google's colors or neutral
+    case AuthErrorType.googleSignInCancelled:
+      return colorScheme.outline;
+    case AuthErrorType.googleSignInFailed:
+    case AuthErrorType.googleAccountNotVerified:
+    case AuthErrorType.googleAccountDomainRestricted:
+      return colorScheme.error;
 
-      // Network/server - use a distinct color
-      case AuthErrorType.networkError:
-      case AuthErrorType.connectionRefused:
-      case AuthErrorType.serverError:
-        return Colors.blueGrey.shade600;
+    // Network/server - use a distinct color
+    case AuthErrorType.networkError:
+    case AuthErrorType.connectionRefused:
+    case AuthErrorType.serverError:
+      return Colors.blueGrey.shade600;
 
-      // Unknown - neutral error color
-      case AuthErrorType.unknown:
-        return colorScheme.error;
-    }
+    // Unknown - neutral error color
+    case AuthErrorType.unknown:
+      return colorScheme.error;
   }
+}
 
-  Color _getButtonColor(AuthErrorType type, ColorScheme colorScheme) {
-    // For cancelled actions, use a less prominent color
-    if (type == AuthErrorType.googleSignInCancelled) {
-      return colorScheme.primary;
-    }
-
-    // For server/network errors, use primary color (not user's fault)
-    if (type == AuthErrorType.networkError ||
-        type == AuthErrorType.connectionRefused ||
-        type == AuthErrorType.serverError ||
-        type == AuthErrorType.timeout) {
-      return colorScheme.primary;
-    }
-
-    // For user-correctable errors, use primary
+Color _getButtonColor(AuthErrorType type, ColorScheme colorScheme) {
+  // For cancelled actions, use a less prominent color
+  if (type == AuthErrorType.googleSignInCancelled) {
     return colorScheme.primary;
   }
+
+  // For server/network errors, use primary color (not user's fault)
+  if (type == AuthErrorType.networkError ||
+      type == AuthErrorType.connectionRefused ||
+      type == AuthErrorType.serverError ||
+      type == AuthErrorType.timeout) {
+    return colorScheme.primary;
+  }
+
+  // For user-correctable errors, use primary
+  return colorScheme.primary;
 }
 
 /// Extension to easily show auth error dialogs from anywhere.
