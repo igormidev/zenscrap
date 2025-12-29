@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 
+// Re-export AiUsageCardHeader for convenience
+export 'package:zenscrap_flutter/src/ui/ai_usage/widgets/ai_usage_card_header.dart';
+
 /// A styled card container matching the AuthView design.
 /// Features:
 /// - White/onPrimary background
@@ -45,45 +48,6 @@ class AiUsageCard extends StatelessWidget {
         ],
       ),
       child: child,
-    );
-  }
-}
-
-/// A header widget for card sections with icon and title
-class AiUsageCardHeader extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final Color? iconColor;
-  final Widget? trailing;
-
-  const AiUsageCardHeader({
-    super.key,
-    required this.icon,
-    required this.title,
-    this.iconColor,
-    this.trailing,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(
-          icon,
-          color: iconColor ?? context.c.primary,
-          size: 24,
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            title,
-            style: context.t.titleLarge?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-        if (trailing != null) trailing!,
-      ],
     );
   }
 }
