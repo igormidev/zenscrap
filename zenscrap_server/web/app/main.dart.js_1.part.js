@@ -1,15 +1,15 @@
 ((a,b)=>{a[b]=a[b]||{}})(self,"$__dart_deferred_initializers__")
 $__dart_deferred_initializers__.current=function(a,b,c,$){var B,A={
-c_W(d){B.mM(d)
-return new A.vv()},
-c_X(){B.mM("pt_BR")
-return new A.zM()},
-vv:function vv(){},
-zM:function zM(){}},C
+c0_(d){B.mK(d)
+return new A.vu()},
+c00(){B.mK("pt_BR")
+return new A.zL()},
+vu:function vu(){},
+zL:function zL(){}},C
 B=c[0]
 A=a.updateHolder(c[3],A)
 C=c[9]
-A.vv.prototype={
+A.vu.prototype={
 gCR(){return"Create Scrappable"},
 gCT(){return"How It Works"},
 gCQ(){return"Auto-Fix"},
@@ -267,7 +267,7 @@ gAj(){return"Api Credits & Keys"},
 gAq(){return"Refresh"},
 gAs(){return"Retry"},
 grY(){return"Overview"},
-gov(){return"API Keys"},
+gou(){return"API Keys"},
 grV(){return"History"},
 gAi(){return"API Usage Overview"},
 grS(){return"Credit History"},
@@ -594,8 +594,13 @@ gHk(){return"Something Went Wrong"},
 gHj(){return"An unexpected error occurred. Please try again. If the problem continues, contact support."},
 gGN(){return"Try Again"},
 gGO(){return"Try Later"},
-gGM(){return"OK"}}
-A.zM.prototype={
+gGM(){return"OK"},
+gIE(){return"Payment Successful!"},
+gID(){return"Thank you for upgrading your subscription. Your account is being updated."},
+gIC(){return"What's Next?"},
+gIB(){return"Your subscription will be active within a few minutes. Please refresh your account page to see your updated subscription status and new features."},
+gIA(){return"Go to Account"}}
+A.zL.prototype={
 gCR(){return"Criar Scrappable"},
 gCT(){return"Como Funciona"},
 gCQ(){return"Auto-Reparo"},
@@ -843,7 +848,7 @@ gAj(){return"Creditos e Chaves API"},
 gAq(){return"Atualizar"},
 gAs(){return"Tentar novamente"},
 grY(){return"Visao Geral"},
-gov(){return"Chaves API"},
+gou(){return"Chaves API"},
 grV(){return"Historico"},
 gAi(){return"Visao Geral do Uso da API"},
 grS(){return"Historico de Creditos"},
@@ -1122,7 +1127,7 @@ gwi(){return"Criar novo endpoint"},
 gBh(){return"Mostrar original"},
 gBi(){return"Mostrar tradu\xe7\xe3o"}}
 var z=a.updateTypes([]);(function inheritance(){var y=a.inherit
-y(A.vv,C.fc)
-y(A.zM,A.vv)})()
-B.Ne(b.typeUniverse,JSON.parse('{"vv":{"fc":[]},"zM":{"fc":[]}}'))};
-(a=>{a["DjCV7c7+qXvT05BWQDJvqCdH7Bw="]=a.current})($__dart_deferred_initializers__);
+y(A.vu,C.fc)
+y(A.zL,A.vu)})()
+B.Ne(b.typeUniverse,JSON.parse('{"vu":{"fc":[]},"zL":{"fc":[]}}'))};
+(a=>{a["qteEI3bTfHaHu+g1Zk40693jBPg="]=a.current})($__dart_deferred_initializers__);

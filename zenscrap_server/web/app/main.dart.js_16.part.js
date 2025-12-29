@@ -1,12 +1,12 @@
 ((a,b)=>{a[b]=a[b]||{}})(self,"$__dart_deferred_initializers__")
 $__dart_deferred_initializers__.current=function(a,b,c,$){var B,A={
-c_V(){B.mM("ja")
-return new A.zL()},
-zL:function zL(){}},C
+c_Z(){B.mK("ja")
+return new A.zK()},
+zK:function zK(){}},C
 B=c[0]
 A=a.updateHolder(c[8],A)
 C=c[9]
-A.zL.prototype={
+A.zK.prototype={
 gCR(){return"Scrappable\u3092\u4f5c\u6210"},
 gCT(){return"\u4f7f\u3044\u65b9"},
 gCQ(){return"\u81ea\u52d5\u4fee\u5fa9"},
@@ -264,7 +264,7 @@ gAj(){return"API\u30af\u30ec\u30b8\u30c3\u30c8\uff06\u30ad\u30fc"},
 gAq(){return"\u66f4\u65b0"},
 gAs(){return"\u518d\u8a66\u884c"},
 grY(){return"\u6982\u8981"},
-gov(){return"API\u30ad\u30fc"},
+gou(){return"API\u30ad\u30fc"},
 grV(){return"\u5c65\u6b74"},
 gAi(){return"API\u4f7f\u7528\u72b6\u6cc1\u306e\u6982\u8981"},
 grS(){return"\u30af\u30ec\u30b8\u30c3\u30c8\u5c65\u6b74"},
@@ -591,8 +591,13 @@ gHk(){return"Something Went Wrong"},
 gHj(){return"An unexpected error occurred. Please try again. If the problem continues, contact support."},
 gGN(){return"Try Again"},
 gGO(){return"Try Later"},
-gGM(){return"OK"}}
+gGM(){return"OK"},
+gIE(){return"Payment Successful!"},
+gID(){return"Thank you for upgrading your subscription. Your account is being updated."},
+gIC(){return"What's Next?"},
+gIB(){return"Your subscription will be active within a few minutes. Please refresh your account page to see your updated subscription status and new features."},
+gIA(){return"Go to Account"}}
 var z=a.updateTypes([]);(function inheritance(){var y=a.inherit
-y(A.zL,C.fc)})()
-B.Ne(b.typeUniverse,JSON.parse('{"zL":{"fc":[]}}'))};
-(a=>{a["/zR8TiY076v/IC5zBhyV8SPkL+k="]=a.current})($__dart_deferred_initializers__);
+y(A.zK,C.fc)})()
+B.Ne(b.typeUniverse,JSON.parse('{"zK":{"fc":[]}}'))};
+(a=>{a["1VcfHa0Ehk4rWDDD4/mtjopiJME="]=a.current})($__dart_deferred_initializers__);

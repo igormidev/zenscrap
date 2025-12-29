@@ -2796,5 +2796,26 @@
   "ip_block_reason_bogon_ip": "Invalid IP address range",
   "@ip_block_reason_bogon_ip": {
     "description": "IP block reason: Bogon (invalid/reserved) IP range"
+  },
+
+  "payment_success_title": "Payment Successful!",
+  "@payment_success_title": {
+    "description": "Title for payment success page"
+  },
+  "payment_success_message": "Thank you for upgrading your subscription. Your account is being updated.",
+  "@payment_success_message": {
+    "description": "Message for payment success page"
+  },
+  "payment_success_instructions_title": "What's Next?",
+  "@payment_success_instructions_title": {
+    "description": "Instructions section title on payment success page"
+  },
+  "payment_success_instructions_message": "Your subscription will be active within a few minutes. Please refresh your account page to see your updated subscription status and new features.",
+  "@payment_success_instructions_message": {
+    "description": "Instructions message on payment success page"
+  },
+  "payment_success_go_to_account": "Go to Account",
+  "@payment_success_go_to_account": {
+    "description": "Button text to navigate to account page from payment success"
   }
 }

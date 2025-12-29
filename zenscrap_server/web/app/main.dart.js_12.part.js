@@ -1,12 +1,12 @@
 ((a,b)=>{a[b]=a[b]||{}})(self,"$__dart_deferred_initializers__")
 $__dart_deferred_initializers__.current=function(a,b,c,$){var B,A={
-c_S(){B.mM("en")
-return new A.zI()},
-zI:function zI(){}},C
+c_W(){B.mK("en")
+return new A.zH()},
+zH:function zH(){}},C
 B=c[0]
 A=a.updateHolder(c[5],A)
 C=c[9]
-A.zI.prototype={
+A.zH.prototype={
 gCR(){return"Create Scrappable"},
 gCT(){return"How It Works"},
 gCQ(){return"Auto-Fix"},
@@ -264,7 +264,7 @@ gAj(){return"Api Credits & Keys"},
 gAq(){return"Refresh"},
 gAs(){return"Retry"},
 grY(){return"Overview"},
-gov(){return"API Keys"},
+gou(){return"API Keys"},
 grV(){return"History"},
 gAi(){return"API Usage Overview"},
 grS(){return"Credit History"},
@@ -591,8 +591,13 @@ gHk(){return"Something Went Wrong"},
 gHj(){return"An unexpected error occurred. Please try again. If the problem continues, contact support."},
 gGN(){return"Try Again"},
 gGO(){return"Try Later"},
-gGM(){return"OK"}}
+gGM(){return"OK"},
+gIE(){return"Payment Successful!"},
+gID(){return"Thank you for upgrading your subscription. Your account is being updated."},
+gIC(){return"What's Next?"},
+gIB(){return"Your subscription will be active within a few minutes. Please refresh your account page to see your updated subscription status and new features."},
+gIA(){return"Go to Account"}}
 var z=a.updateTypes([]);(function inheritance(){var y=a.inherit
-y(A.zI,C.fc)})()
-B.Ne(b.typeUniverse,JSON.parse('{"zI":{"fc":[]}}'))};
-(a=>{a["WKxuDnJmVQkA6Gx9lvILMkVj48E="]=a.current})($__dart_deferred_initializers__);
+y(A.zH,C.fc)})()
+B.Ne(b.typeUniverse,JSON.parse('{"zH":{"fc":[]}}'))};
+(a=>{a["l16MCh7lnRKPEosOszFBj/lBlpU="]=a.current})($__dart_deferred_initializers__);

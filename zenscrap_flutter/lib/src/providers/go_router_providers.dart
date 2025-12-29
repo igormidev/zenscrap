@@ -16,6 +16,7 @@ import 'package:zenscrap_flutter/src/ui/dashboard/pages/pricing_page.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
 import 'package:zenscrap_flutter/src/ui/marketplace/views/marketplace_view.dart';
 import 'package:zenscrap_flutter/src/ui/landing_page/landing_page.dart';
+import 'package:zenscrap_flutter/src/ui/payment/views/payment_success_view.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/view/initial_chat_view.dart';
 import 'package:zenscrap_flutter/src/ui/scrappables/view/user_scrappables_listage.dart';
 
@@ -62,9 +63,10 @@ class RouterNotifier extends Notifier<GoRouter> {
             return null;
           }
 
-          // Allow unauthenticated access to auth, splash, and landing page routes
+          // Allow unauthenticated access to auth, splash, landing page, and payment success routes
           if (path.contains('/scrappable-form') == false &&
-              path.contains('/splash') == false) {
+              path.contains('/splash') == false &&
+              path.contains('/success') == false) {
             return '/scrappable-form'; // Redirect to landing page
           }
         } else {
@@ -97,6 +99,13 @@ class RouterNotifier extends Notifier<GoRouter> {
               return InitialChatView(scrappableId: scrappableId);
             }
             return const LandingPage();
+          },
+        ),
+        GoRoute(
+          path: '/success',
+          builder: (context, state) {
+            final sessionId = state.uri.queryParameters['session_id'];
+            return PaymentSuccessView(sessionId: sessionId);
           },
         ),
         ShellRoute(

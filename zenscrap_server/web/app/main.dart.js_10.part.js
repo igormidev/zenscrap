@@ -1,12 +1,12 @@
 ((a,b)=>{a[b]=a[b]||{}})(self,"$__dart_deferred_initializers__")
 $__dart_deferred_initializers__.current=function(a,b,c,$){var B,A={
-c_R(){B.mM("de")
-return new A.zH()},
-zH:function zH(){}},C
+c_V(){B.mK("de")
+return new A.zG()},
+zG:function zG(){}},C
 B=c[0]
 A=a.updateHolder(c[4],A)
 C=c[9]
-A.zH.prototype={
+A.zG.prototype={
 gCR(){return"Scrappable erstellen"},
 gCT(){return"So funktioniert's"},
 gCQ(){return"Auto-Reparatur"},
@@ -264,7 +264,7 @@ gAj(){return"API-Guthaben & Schluessel"},
 gAq(){return"Aktualisieren"},
 gAs(){return"Erneut versuchen"},
 grY(){return"Uebersicht"},
-gov(){return"API-Schluessel"},
+gou(){return"API-Schluessel"},
 grV(){return"Verlauf"},
 gAi(){return"API-Nutzungsuebersicht"},
 grS(){return"Guthaben-Verlauf"},
@@ -591,8 +591,13 @@ gHk(){return"Something Went Wrong"},
 gHj(){return"An unexpected error occurred. Please try again. If the problem continues, contact support."},
 gGN(){return"Try Again"},
 gGO(){return"Try Later"},
-gGM(){return"OK"}}
+gGM(){return"OK"},
+gIE(){return"Payment Successful!"},
+gID(){return"Thank you for upgrading your subscription. Your account is being updated."},
+gIC(){return"What's Next?"},
+gIB(){return"Your subscription will be active within a few minutes. Please refresh your account page to see your updated subscription status and new features."},
+gIA(){return"Go to Account"}}
 var z=a.updateTypes([]);(function inheritance(){var y=a.inherit
-y(A.zH,C.fc)})()
-B.Ne(b.typeUniverse,JSON.parse('{"zH":{"fc":[]}}'))};
-(a=>{a["ag7ZmQQhpqJQckHI8/0klVp1PyE="]=a.current})($__dart_deferred_initializers__);
+y(A.zG,C.fc)})()
+B.Ne(b.typeUniverse,JSON.parse('{"zG":{"fc":[]}}'))};
+(a=>{a["K78OODXteapSs++Ha+2+GKQwhQU="]=a.current})($__dart_deferred_initializers__);
