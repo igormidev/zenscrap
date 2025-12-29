@@ -18,7 +18,7 @@ import 'package:zenscrap_flutter/src/ui/marketplace/views/marketplace_view.dart'
 import 'package:zenscrap_flutter/src/ui/landing_page/landing_page.dart';
 import 'package:zenscrap_flutter/src/ui/payment/views/payment_success_view.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/view/initial_chat_view.dart';
-import 'package:zenscrap_flutter/src/ui/scrappables/view/user_scrappables_listage.dart';
+import 'package:zenscrap_flutter/src/ui/scrappables/views/user_scrappables_listage_view.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -113,7 +113,7 @@ class RouterNotifier extends Notifier<GoRouter> {
           routes: [
             GoRoute(
               path: DashboardNavigationType.userEndpoints.routeOnClick!,
-              builder: (context, state) => UserScrappablesListage(),
+              builder: (context, state) => const UserScrappablesListageView(),
             ),
             GoRoute(
               path: DashboardNavigationType.marketPlace.routeOnClick!,

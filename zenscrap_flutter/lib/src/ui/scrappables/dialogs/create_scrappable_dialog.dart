@@ -118,8 +118,6 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-
     // Responsive dialog sizing
     final dialogMaxWidth = context.responsiveValue(
       compact: MediaQuery.sizeOf(context).width * 0.9, // 90% on mobile
@@ -161,7 +159,7 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
             mainAxisSize: MainAxisSize.min,
             children: [
               // Header
-              _buildHeader(context, l10n),
+              _DialogHeader(isCreating: _isCreating),
 
               // Content
               Flexible(
@@ -188,7 +186,7 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Description
-                      _buildDescription(context, l10n),
+                      const _DialogDescription(),
                       SizedBox(
                         height: context.responsiveValue(
                           compact: 20.0,
@@ -198,7 +196,12 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
                       ),
 
                       // URL Field
-                      _buildUrlField(context, l10n),
+                      _UrlFormField(
+                        controller: _urlController,
+                        isCreating: _isCreating,
+                        onFieldSubmitted: _promptFocusNode.requestFocus,
+                        validator: _validateUrl,
+                      ),
                       SizedBox(
                         height: context.responsiveValue(
                           compact: 16.0,
@@ -208,14 +211,24 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
                       ),
 
                       // Prompt Field
-                      _buildPromptField(context, l10n),
+                      _PromptFormField(
+                        controller: _promptController,
+                        focusNode: _promptFocusNode,
+                        isCreating: _isCreating,
+                        isExpanded: _isPromptExpanded,
+                        validator: _validatePrompt,
+                      ),
                     ],
                   ),
                 ),
               ),
 
               // Actions
-              _buildActions(context, l10n),
+              _DialogActions(
+                isCreating: _isCreating,
+                onCancel: () => Navigator.of(context).pop(),
+                onCreate: _handleCreate,
+              ),
             ],
           ),
         ),
@@ -228,7 +241,19 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
     );
   }
 
-  Widget _buildHeader(BuildContext context, AppLocalizations l10n) {
+}
+
+/// Dialog header with gradient background and icon
+class _DialogHeader extends StatelessWidget {
+  const _DialogHeader({
+    required this.isCreating,
+  });
+
+  final bool isCreating;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final headerPadding = context.responsiveValue(
       compact: 20.0,
       medium: 24.0,
@@ -308,7 +333,7 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
             ),
           ),
           IconButton(
-            onPressed: _isCreating ? null : () => Navigator.of(context).pop(),
+            onPressed: isCreating ? null : () => Navigator.of(context).pop(),
             icon: Icon(
               Icons.close_rounded,
               color: context.c.onPrimaryContainer.withAlpha(180),
@@ -318,8 +343,15 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
       ),
     ).animate().fadeIn(duration: 200.ms).slideY(begin: -0.1, end: 0);
   }
+}
 
-  Widget _buildDescription(BuildContext context, AppLocalizations l10n) {
+/// Dialog description with info icon
+class _DialogDescription extends StatelessWidget {
+  const _DialogDescription();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -356,8 +388,25 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
       ),
     ).animate().fadeIn(delay: 100.ms).slideX(begin: -0.1, end: 0);
   }
+}
 
-  Widget _buildUrlField(BuildContext context, AppLocalizations l10n) {
+/// URL input field with validation
+class _UrlFormField extends StatelessWidget {
+  const _UrlFormField({
+    required this.controller,
+    required this.isCreating,
+    required this.onFieldSubmitted,
+    required this.validator,
+  });
+
+  final TextEditingController controller;
+  final bool isCreating;
+  final VoidCallback onFieldSubmitted;
+  final String? Function(String?) validator;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -365,7 +414,6 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
           children: [
             Icon(Icons.link_rounded, size: 18, color: context.c.primary),
             const SizedBox(width: 8),
-
             Text(
               l10n.landing_hero_target_url_label,
               style: context.t.labelLarge?.copyWith(
@@ -377,11 +425,11 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
         ),
         const SizedBox(height: 10),
         TextFormField(
-          controller: _urlController,
-          enabled: !_isCreating,
+          controller: controller,
+          enabled: !isCreating,
           keyboardType: TextInputType.url,
           textInputAction: TextInputAction.next,
-          validator: _validateUrl,
+          validator: validator,
           autovalidateMode: AutovalidateMode.onUserInteraction,
           decoration: InputDecoration(
             hintText: l10n.landing_hero_target_url_hint,
@@ -413,13 +461,32 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
               borderSide: BorderSide(color: context.c.error, width: 2),
             ),
           ),
-          onFieldSubmitted: (_) => _promptFocusNode.requestFocus(),
+          onFieldSubmitted: (_) => onFieldSubmitted(),
         ),
       ],
     ).animate().fadeIn(delay: 150.ms).slideX(begin: -0.1, end: 0);
   }
+}
 
-  Widget _buildPromptField(BuildContext context, AppLocalizations l10n) {
+/// Prompt input field with expandable height
+class _PromptFormField extends StatelessWidget {
+  const _PromptFormField({
+    required this.controller,
+    required this.focusNode,
+    required this.isCreating,
+    required this.isExpanded,
+    required this.validator,
+  });
+
+  final TextEditingController controller;
+  final FocusNode focusNode;
+  final bool isCreating;
+  final bool isExpanded;
+  final String? Function(String?) validator;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -443,16 +510,16 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
         const SizedBox(height: 10),
         AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          height: _isPromptExpanded ? 160 : 56,
+          height: isExpanded ? 160 : 56,
           child: TextFormField(
-            controller: _promptController,
-            focusNode: _promptFocusNode,
-            enabled: !_isCreating,
+            controller: controller,
+            focusNode: focusNode,
+            enabled: !isCreating,
             maxLines: null,
             minLines: null,
             expands: true,
             textAlignVertical: TextAlignVertical.top,
-            validator: _validatePrompt,
+            validator: validator,
             autovalidateMode: AutovalidateMode.onUserInteraction,
             decoration: InputDecoration(
               hintText: l10n.landing_hero_prompt_hint,
@@ -487,8 +554,23 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
       ],
     ).animate().fadeIn(delay: 200.ms).slideX(begin: -0.1, end: 0);
   }
+}
 
-  Widget _buildActions(BuildContext context, AppLocalizations l10n) {
+/// Dialog action buttons (cancel and create)
+class _DialogActions extends StatelessWidget {
+  const _DialogActions({
+    required this.isCreating,
+    required this.onCancel,
+    required this.onCreate,
+  });
+
+  final bool isCreating;
+  final VoidCallback onCancel;
+  final VoidCallback onCreate;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final actionPadding = context.responsiveValue(
       compact: 20.0,
       medium: 24.0,
@@ -511,14 +593,14 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
           const SizedBox(width: 16),
           // Cancel button
           TextButton(
-            onPressed: _isCreating ? null : () => Navigator.of(context).pop(),
+            onPressed: isCreating ? null : onCancel,
             child: Text(l10n.scrappables_create_dialog_cancel),
           ),
           const SizedBox(width: 12),
           // Create button
           FilledButton.icon(
-            onPressed: _isCreating ? null : _handleCreate,
-            icon: _isCreating
+            onPressed: isCreating ? null : onCreate,
+            icon: isCreating
                 ? SizedBox(
                     width: 18,
                     height: 18,
@@ -531,7 +613,7 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
                   )
                 : const Icon(Icons.auto_awesome_rounded, size: 18),
             label: Text(
-              _isCreating
+              isCreating
                   ? l10n.scrappables_create_dialog_creating
                   : l10n.scrappables_create_dialog_create,
             ),

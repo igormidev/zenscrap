@@ -21,16 +21,17 @@ import 'package:zenscrap_flutter/src/states/account/account_state.dart';
 import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables_provider.dart';
 import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables_state.dart';
 import 'package:zenscrap_flutter/src/ui/scrappables/pages/empty_scrappable_listage_indicator_page.dart';
+import 'package:zenscrap_flutter/src/ui/scrappables/widgets/create_new_scrappable.dart';
 
-class UserScrappablesListage extends ConsumerStatefulWidget {
-  const UserScrappablesListage({super.key});
+class UserScrappablesListageView extends ConsumerStatefulWidget {
+  const UserScrappablesListageView({super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
-      _UserScrappablesListageState();
+      _UserScrappablesListageViewState();
 }
 
-class _UserScrappablesListageState extends ConsumerState<UserScrappablesListage>
+class _UserScrappablesListageViewState extends ConsumerState<UserScrappablesListageView>
     with EditScrappable, CreateNewScrappableMixin {
   @override
   void initState() {
@@ -295,26 +296,6 @@ class _UserScrappablesLayout extends ConsumerWidget {
           Expanded(child: contentWidget),
         ],
       ),
-    );
-  }
-}
-
-class CreateNewScrappable extends StatelessWidget {
-  const CreateNewScrappable({
-    super.key,
-    required this.onPressed,
-    required this.label,
-  });
-
-  final VoidCallback onPressed;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return FilledButton.tonalIcon(
-      onPressed: onPressed,
-      label: Text(label),
-      icon: const Icon(Icons.add),
     );
   }
 }
