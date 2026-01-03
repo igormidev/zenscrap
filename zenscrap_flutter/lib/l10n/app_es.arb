@@ -565,6 +565,8 @@
   "scrap_session_unused_path_params": "Parametros de Ruta No Usados",
   "scrap_session_request_updated": "Solicitud de scrappable actualizada exitosamente!",
   "scrap_session_close": "Cerrar",
+  "scrap_session_chat_loading_disabled_tooltip": "Deshabilitado mientras la IA esta procesando",
+  "scrap_session_chat_loading_test_notice": "La IA esta procesando una solicitud. Por favor espera antes de ejecutar pruebas.",
 
   "scrappables_empty_title": "Aun no has creado ningun scrappable.",
   "scrappables_create_first": "Crea tu primer scrappable",

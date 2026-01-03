@@ -1953,6 +1953,14 @@ class AppLocalizationsDe extends AppLocalizations {
   String get scrap_session_close => 'Schliessen';
 
   @override
+  String get scrap_session_chat_loading_disabled_tooltip =>
+      'Deaktiviert wahrend die KI verarbeitet';
+
+  @override
+  String get scrap_session_chat_loading_test_notice =>
+      'Die KI verarbeitet eine Anfrage. Bitte warten Sie, bevor Sie Tests ausfuhren.';
+
+  @override
   String get scrappables_empty_title =>
       'Sie haben noch keine Scrappables erstellt.';
 

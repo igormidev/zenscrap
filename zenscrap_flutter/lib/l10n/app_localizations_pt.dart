@@ -1916,6 +1916,14 @@ class AppLocalizationsPt extends AppLocalizations {
   String get scrap_session_close => 'Close';
 
   @override
+  String get scrap_session_chat_loading_disabled_tooltip =>
+      'Disabled while AI is processing';
+
+  @override
+  String get scrap_session_chat_loading_test_notice =>
+      'AI is processing a request. Please wait before running tests.';
+
+  @override
   String get scrappables_empty_title =>
       'You did not create any scrappables yet.';
 
@@ -4087,6 +4095,14 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get scrap_session_close => 'Fechar';
+
+  @override
+  String get scrap_session_chat_loading_disabled_tooltip =>
+      'Desabilitado enquanto a IA esta processando';
+
+  @override
+  String get scrap_session_chat_loading_test_notice =>
+      'A IA esta processando uma solicitacao. Por favor aguarde antes de executar testes.';
 
   @override
   String get scrappables_empty_title =>

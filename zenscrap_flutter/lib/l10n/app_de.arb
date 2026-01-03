@@ -565,6 +565,8 @@
   "scrap_session_unused_path_params": "Nicht verwendete Pfadparameter",
   "scrap_session_request_updated": "Scrappable-Anfrage erfolgreich aktualisiert!",
   "scrap_session_close": "Schliessen",
+  "scrap_session_chat_loading_disabled_tooltip": "Deaktiviert wahrend die KI verarbeitet",
+  "scrap_session_chat_loading_test_notice": "Die KI verarbeitet eine Anfrage. Bitte warten Sie, bevor Sie Tests ausfuhren.",
 
   "scrappables_empty_title": "Sie haben noch keine Scrappables erstellt.",
   "scrappables_create_first": "Erstellen Sie Ihr erstes Scrappable",

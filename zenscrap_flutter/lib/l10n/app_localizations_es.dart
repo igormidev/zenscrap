@@ -1950,6 +1950,14 @@ class AppLocalizationsEs extends AppLocalizations {
   String get scrap_session_close => 'Cerrar';
 
   @override
+  String get scrap_session_chat_loading_disabled_tooltip =>
+      'Deshabilitado mientras la IA esta procesando';
+
+  @override
+  String get scrap_session_chat_loading_test_notice =>
+      'La IA esta procesando una solicitud. Por favor espera antes de ejecutar pruebas.';
+
+  @override
   String get scrappables_empty_title => 'Aun no has creado ningun scrappable.';
 
   @override

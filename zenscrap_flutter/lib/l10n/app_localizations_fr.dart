@@ -1960,6 +1960,14 @@ class AppLocalizationsFr extends AppLocalizations {
   String get scrap_session_close => 'Fermer';
 
   @override
+  String get scrap_session_chat_loading_disabled_tooltip =>
+      'Desactive pendant le traitement de l\'IA';
+
+  @override
+  String get scrap_session_chat_loading_test_notice =>
+      'L\'IA traite une requete. Veuillez patienter avant d\'executer les tests.';
+
+  @override
   String get scrappables_empty_title =>
       'Vous n\'avez pas encore cree de scrappables.';
 

@@ -4,6 +4,8 @@ import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.d
 import 'package:zenscrap_flutter/src/ui/scrap_session/dialogs/test_endpoint_dialog.dart';
 
 class TestEndpointButton extends StatelessWidget {
+  /// When true, the "Run Test" button inside the dialog will be disabled.
+  final bool isChatLoading;
   final int scrappableId;
   final ScrappableRequest? scrappableRequest;
   final ReferenceTestData? testData;
@@ -26,6 +28,7 @@ class TestEndpointButton extends StatelessWidget {
     this.targetTime,
     this.isTestMode = true,
     this.apiKey,
+    this.isChatLoading = false,
   });
 
   @override
@@ -51,6 +54,7 @@ class TestEndpointButton extends StatelessWidget {
             isTestMode: isTestMode,
             targetTime: targetTime,
             apiKey: apiKey,
+            isChatLoading: isChatLoading,
           ),
         );
       },

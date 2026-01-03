@@ -1,5 +1,6 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 
 class PathParametersSection extends StatelessWidget {
@@ -7,11 +8,15 @@ class PathParametersSection extends StatelessWidget {
   final VoidCallback onAddPathParam;
   final void Function(String param) onRemovePathParam;
 
+  /// When true, the Add Path Parameter button will be disabled.
+  final bool isChatLoading;
+
   const PathParametersSection({
     super.key,
     required this.pathParams,
     required this.onAddPathParam,
     required this.onRemovePathParam,
+    this.isChatLoading = false,
   });
 
   @override
@@ -58,17 +63,24 @@ class PathParametersSection extends StatelessWidget {
                 onDelete: () => onRemovePathParam(param),
               ),
             ),
-            ActionChip(
-              avatar: Icon(
-                Icons.add,
-                size: 18,
-                color: context.c.primary,
-              ),
-              label: const Text('Add Path Parameter'),
-              onPressed: onAddPathParam,
-              backgroundColor: context.c.primaryContainer.withAlpha(77),
-              side: BorderSide(
-                color: context.c.primary.withAlpha(128),
+            Tooltip(
+              message: isChatLoading
+                  ? AppLocalizations.of(context)!.scrap_session_chat_loading_disabled_tooltip
+                  : '',
+              child: ActionChip(
+                avatar: Icon(
+                  Icons.add,
+                  size: 18,
+                  color: isChatLoading
+                      ? context.c.onSurface.withAlpha(100)
+                      : context.c.primary,
+                ),
+                label: const Text('Add Path Parameter'),
+                onPressed: isChatLoading ? null : onAddPathParam,
+                backgroundColor: context.c.primaryContainer.withAlpha(77),
+                side: BorderSide(
+                  color: context.c.primary.withAlpha(128),
+                ),
               ),
             ),
           ],

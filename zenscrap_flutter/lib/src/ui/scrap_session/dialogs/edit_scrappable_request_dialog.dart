@@ -15,10 +15,14 @@ class EditScrappableRequestDialog extends ConsumerStatefulWidget {
   final ScrappableRequest scrappableRequest;
   final int scrappableId;
 
+  /// When true, action buttons like Save Changes and Add Parameter will be disabled.
+  final bool isChatLoading;
+
   const EditScrappableRequestDialog({
     super.key,
     required this.scrappableRequest,
     required this.scrappableId,
+    this.isChatLoading = false,
   });
 
   @override
@@ -355,14 +359,21 @@ class _EditScrappableRequestDialogState
                           const SizedBox(height: 12),
                           SizedBox(
                             height: 48,
-                            child: FilledButton.icon(
-                              onPressed: _hasChanges ? _handleSave : null,
-                              icon: const Icon(Icons.save),
-                              label: Text(l10n.scrap_session_save_changes),
-                              style: FilledButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 24,
-                                  vertical: 16,
+                            child: Tooltip(
+                              message: widget.isChatLoading
+                                  ? l10n.scrap_session_chat_loading_disabled_tooltip
+                                  : '',
+                              child: FilledButton.icon(
+                                onPressed: (_hasChanges && !widget.isChatLoading)
+                                    ? _handleSave
+                                    : null,
+                                icon: const Icon(Icons.save),
+                                label: Text(l10n.scrap_session_save_changes),
+                                style: FilledButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 24,
+                                    vertical: 16,
+                                  ),
                                 ),
                               ),
                             ),
@@ -396,14 +407,21 @@ class _EditScrappableRequestDialogState
                           const SizedBox(width: 12),
                           SizedBox(
                             height: 48,
-                            child: FilledButton.icon(
-                              onPressed: _hasChanges ? _handleSave : null,
-                              icon: const Icon(Icons.save),
-                              label: Text(l10n.scrap_session_save_changes),
-                              style: FilledButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 24,
-                                  vertical: 16,
+                            child: Tooltip(
+                              message: widget.isChatLoading
+                                  ? l10n.scrap_session_chat_loading_disabled_tooltip
+                                  : '',
+                              child: FilledButton.icon(
+                                onPressed: (_hasChanges && !widget.isChatLoading)
+                                    ? _handleSave
+                                    : null,
+                                icon: const Icon(Icons.save),
+                                label: Text(l10n.scrap_session_save_changes),
+                                style: FilledButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 24,
+                                    vertical: 16,
+                                  ),
                                 ),
                               ),
                             ),
@@ -418,6 +436,7 @@ class _EditScrappableRequestDialogState
                       pathParams: _pathParams,
                       onAddPathParam: _handleAddPathParam,
                       onRemovePathParam: _handleRemovePathParam,
+                      isChatLoading: widget.isChatLoading,
                     ),
                     const SizedBox(height: 8),
 
@@ -427,6 +446,7 @@ class _EditScrappableRequestDialogState
                       onAddQueryParam: _handleAddQueryParam,
                       onRemoveQueryParam: _handleRemoveQueryParam,
                       onEditQueryParam: _handleEditQueryParam,
+                      isChatLoading: widget.isChatLoading,
                     ),
                   ],
                 ),

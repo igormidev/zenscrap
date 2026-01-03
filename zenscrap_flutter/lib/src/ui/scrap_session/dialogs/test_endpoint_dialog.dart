@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
@@ -25,6 +26,9 @@ class TestEndpointDialog extends ConsumerStatefulWidget {
   /// Required when [isTestMode] is false. The API key for production calls.
   final String? apiKey;
 
+  /// When true, the Run Test button will be disabled with a notice.
+  final bool isChatLoading;
+
   const TestEndpointDialog({
     super.key,
     required this.scrappableId,
@@ -33,6 +37,7 @@ class TestEndpointDialog extends ConsumerStatefulWidget {
     this.isTestMode = true,
     this.targetTime,
     this.apiKey,
+    this.isChatLoading = false,
   }) : assert(
          isTestMode ? targetTime != null : apiKey != null,
          isTestMode
@@ -329,6 +334,7 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
                     statusCode: _statusCode,
                     responseTimeMs: _responseTimeMs,
                     elapsedMsNotifier: _elapsedMs,
+                    isChatLoading: widget.isChatLoading,
                   ),
                   expanded: (context, constraints) => _ExpandedDialogLayout(
                     pathParamControllers: _pathParamControllers,
@@ -341,6 +347,7 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
                     statusCode: _statusCode,
                     responseTimeMs: _responseTimeMs,
                     elapsedMsNotifier: _elapsedMs,
+                    isChatLoading: widget.isChatLoading,
                   ),
                 ),
               ),
@@ -493,12 +500,14 @@ class _ParametersPanel extends StatelessWidget {
   final Map<String, TextEditingController> queryParamControllers;
   final bool isLoading;
   final VoidCallback onTest;
+  final bool isChatLoading;
 
   const _ParametersPanel({
     required this.pathParamControllers,
     required this.queryParamControllers,
     required this.isLoading,
     required this.onTest,
+    this.isChatLoading = false,
   });
 
   @override
@@ -556,27 +565,67 @@ class _ParametersPanel extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        // Run Test button
-        FilledButton.icon(
-          onPressed: isLoading ? null : onTest,
-          icon: isLoading
-              ? SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: context.c.onPrimary,
+        // Chat loading notice
+        if (isChatLoading) ...[
+          Tooltip(
+            message: AppLocalizations.of(context)!.scrap_session_chat_loading_disabled_tooltip,
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: context.c.tertiaryContainer.withAlpha(80),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: context.c.tertiary.withAlpha(80),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    size: 18,
+                    color: context.c.tertiary,
                   ),
-                )
-              : const Icon(Icons.play_arrow_rounded, size: 20),
-          label: Text(
-            isLoading ? 'Running...' : 'Run Test',
-            style: const TextStyle(fontWeight: FontWeight.w600),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      AppLocalizations.of(context)!.scrap_session_chat_loading_test_notice,
+                      style: context.t.bodySmall?.copyWith(
+                        color: context.c.onSurface,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-          style: FilledButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+          const SizedBox(height: 12),
+        ],
+        // Run Test button
+        Tooltip(
+          message: isChatLoading
+              ? AppLocalizations.of(context)!.scrap_session_chat_loading_disabled_tooltip
+              : '',
+          child: FilledButton.icon(
+            onPressed: (isLoading || isChatLoading) ? null : onTest,
+            icon: isLoading
+                ? SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: context.c.onPrimary,
+                    ),
+                  )
+                : const Icon(Icons.play_arrow_rounded, size: 20),
+            label: Text(
+              isLoading ? 'Running...' : 'Run Test',
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+            style: FilledButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
           ),
         ),
@@ -1185,6 +1234,7 @@ class _CompactDialogLayout extends StatefulWidget {
   final int? statusCode;
   final int? responseTimeMs;
   final ValueNotifier<int> elapsedMsNotifier;
+  final bool isChatLoading;
 
   const _CompactDialogLayout({
     required this.pathParamControllers,
@@ -1197,6 +1247,7 @@ class _CompactDialogLayout extends StatefulWidget {
     required this.statusCode,
     required this.responseTimeMs,
     required this.elapsedMsNotifier,
+    this.isChatLoading = false,
   });
 
   @override
@@ -1244,6 +1295,7 @@ class _CompactDialogLayoutState extends State<_CompactDialogLayout>
                   // Auto-switch to response tab after test
                   _tabController.animateTo(1);
                 },
+                isChatLoading: widget.isChatLoading,
               ),
               _ResponsePanel(
                 isLoading: widget.isLoading,
@@ -1274,6 +1326,7 @@ class _ExpandedDialogLayout extends StatelessWidget {
   final int? statusCode;
   final int? responseTimeMs;
   final ValueNotifier<int> elapsedMsNotifier;
+  final bool isChatLoading;
 
   const _ExpandedDialogLayout({
     required this.pathParamControllers,
@@ -1286,6 +1339,7 @@ class _ExpandedDialogLayout extends StatelessWidget {
     required this.statusCode,
     required this.responseTimeMs,
     required this.elapsedMsNotifier,
+    this.isChatLoading = false,
   });
 
   @override
@@ -1304,12 +1358,13 @@ class _ExpandedDialogLayout extends StatelessWidget {
                 expanded: 340,
               ),
               child: _ParametersPanel(
-            pathParamControllers: pathParamControllers,
-            queryParamControllers: queryParamControllers,
-            isLoading: isLoading,
-            onTest: onTest,
-          ),
-        ),
+                pathParamControllers: pathParamControllers,
+                queryParamControllers: queryParamControllers,
+                isLoading: isLoading,
+                onTest: onTest,
+                isChatLoading: isChatLoading,
+              ),
+            ),
         const SizedBox(width: 24),
         // Response Panel
         Expanded(

@@ -565,6 +565,8 @@
   "scrap_session_unused_path_params": "未使用のパスパラメータ",
   "scrap_session_request_updated": "Scrappableリクエストが正常に更新されました!",
   "scrap_session_close": "閉じる",
+  "scrap_session_chat_loading_disabled_tooltip": "AI処理中のため無効",
+  "scrap_session_chat_loading_test_notice": "AIがリクエストを処理しています。テストを実行する前にお待ちください。",
 
   "scrappables_empty_title": "まだスクラッパブルを作成していません。",
   "scrappables_create_first": "最初のスクラッパブルを作成",

@@ -3503,6 +3503,18 @@ abstract class AppLocalizations {
   /// **'Close'**
   String get scrap_session_close;
 
+  /// Tooltip shown on disabled buttons when chat is loading
+  ///
+  /// In en, this message translates to:
+  /// **'Disabled while AI is processing'**
+  String get scrap_session_chat_loading_disabled_tooltip;
+
+  /// Notice shown in test dialog when chat is loading
+  ///
+  /// In en, this message translates to:
+  /// **'AI is processing a request. Please wait before running tests.'**
+  String get scrap_session_chat_loading_test_notice;
+
   /// Title shown when user has no scrappables
   ///
   /// In en, this message translates to:

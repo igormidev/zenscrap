@@ -1863,6 +1863,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get scrap_session_close => '閉じる';
 
   @override
+  String get scrap_session_chat_loading_disabled_tooltip => 'AI処理中のため無効';
+
+  @override
+  String get scrap_session_chat_loading_test_notice =>
+      'AIがリクエストを処理しています。テストを実行する前にお待ちください。';
+
+  @override
   String get scrappables_empty_title => 'まだスクラッパブルを作成していません。';
 
   @override

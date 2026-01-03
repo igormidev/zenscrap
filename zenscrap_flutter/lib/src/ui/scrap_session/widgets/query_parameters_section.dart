@@ -1,5 +1,6 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 
 class QueryParametersSection extends StatelessWidget {
@@ -8,12 +9,16 @@ class QueryParametersSection extends StatelessWidget {
   final void Function(String key) onRemoveQueryParam;
   final void Function(String key) onEditQueryParam;
 
+  /// When true, the Add Query Parameter button will be disabled.
+  final bool isChatLoading;
+
   const QueryParametersSection({
     super.key,
     required this.queryParams,
     required this.onAddQueryParam,
     required this.onRemoveQueryParam,
     required this.onEditQueryParam,
+    this.isChatLoading = false,
   });
 
   @override
@@ -93,13 +98,18 @@ class QueryParametersSection extends StatelessWidget {
                 .toList(),
           ),
         const SizedBox(height: 12),
-        OutlinedButton.icon(
-          onPressed: onAddQueryParam,
-          icon: const Icon(Icons.add),
-          label: const Text('Add Query Parameter'),
-          style: OutlinedButton.styleFrom(
-            foregroundColor: context.c.primary,
-            side: BorderSide(color: context.c.primary),
+        Tooltip(
+          message: isChatLoading
+              ? AppLocalizations.of(context)!.scrap_session_chat_loading_disabled_tooltip
+              : '',
+          child: OutlinedButton.icon(
+            onPressed: isChatLoading ? null : onAddQueryParam,
+            icon: const Icon(Icons.add),
+            label: const Text('Add Query Parameter'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: context.c.primary,
+              side: BorderSide(color: context.c.primary),
+            ),
           ),
         ),
       ],
