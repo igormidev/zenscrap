@@ -50,7 +50,7 @@ class MarketplacePaginationControls extends ConsumerWidget {
             children: [
               _PreviousButton(pagination: pagination),
               const SizedBox(width: 16),
-              ..._PageNumbers(pagination: pagination).buildPageButtons(context, ref),
+              _PageNumbersList(pagination: pagination),
               const SizedBox(width: 16),
               _NextButton(pagination: pagination),
               const SizedBox(width: 24),
@@ -128,12 +128,14 @@ class _NextButton extends ConsumerWidget {
   }
 }
 
-class _PageNumbers {
+/// Widget that displays the page number buttons for pagination.
+class _PageNumbersList extends StatelessWidget {
   final PaginationMetadata pagination;
 
-  const _PageNumbers({required this.pagination});
+  const _PageNumbersList({required this.pagination});
 
-  List<Widget> buildPageButtons(BuildContext context, WidgetRef ref) {
+  @override
+  Widget build(BuildContext context) {
     final currentPage = pagination.currentPage;
     final totalPages = pagination.totalPages;
     final List<Widget> pageButtons = [];
@@ -152,19 +154,7 @@ class _PageNumbers {
     if (startPage > 1) {
       pageButtons.add(_PageButton(pageNumber: 1, currentPage: currentPage));
       if (startPage > 2) {
-        pageButtons.add(
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: Builder(
-              builder: (context) => Text(
-                '...',
-                style: context.t.bodyMedium?.copyWith(
-                  color: context.c.onSurfaceVariant,
-                ),
-              ),
-            ),
-          ),
-        );
+        pageButtons.add(const _EllipsisText());
       }
     }
 
@@ -174,24 +164,33 @@ class _PageNumbers {
 
     if (endPage < totalPages) {
       if (endPage < totalPages - 1) {
-        pageButtons.add(
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: Builder(
-              builder: (context) => Text(
-                '...',
-                style: context.t.bodyMedium?.copyWith(
-                  color: context.c.onSurfaceVariant,
-                ),
-              ),
-            ),
-          ),
-        );
+        pageButtons.add(const _EllipsisText());
       }
       pageButtons.add(_PageButton(pageNumber: totalPages, currentPage: currentPage));
     }
 
-    return pageButtons;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: pageButtons,
+    );
+  }
+}
+
+/// Widget for displaying the ellipsis between page numbers.
+class _EllipsisText extends StatelessWidget {
+  const _EllipsisText();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: Text(
+        '...',
+        style: context.t.bodyMedium?.copyWith(
+          color: context.c.onSurfaceVariant,
+        ),
+      ),
+    );
   }
 }
 

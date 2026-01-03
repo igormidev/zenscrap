@@ -18,6 +18,16 @@ class ScrappableRequestsAnalyticsCard extends StatelessWidget {
     this.isSelected = false,
   });
 
+  int _calculateMaxCount() {
+    return item.data.map((hourData) {
+      return hourData.successCount +
+          hourData.clientErrorCount +
+          hourData.serverErrorCount +
+          hourData.insufficientCreditsCount +
+          hourData.maxConcurrencyExceededCount;
+    }).reduce(math.max);
+  }
+
   @override
   Widget build(BuildContext context) {
     final maxCount = _calculateMaxCount();
@@ -45,21 +55,29 @@ class ScrappableRequestsAnalyticsCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeader(context),
+              _Header(item: item),
               const SizedBox(height: 16),
-              _buildStatusChips(context),
+              _StatusChipsSection(item: item),
               const SizedBox(height: 16),
-              _buildChart(context, maxCount),
+              _ChartSection(item: item, maxCount: maxCount),
               const SizedBox(height: 8),
-              _buildTimeLabels(context),
+              _TimeLabelsRow(item: item),
             ],
           ),
         ),
       ),
     );
   }
-  
-  Widget _buildHeader(BuildContext context) {
+}
+
+/// Header section displaying scrappable name and description
+class _Header extends StatelessWidget {
+  final ScrappableRequestsAnalyticsItem item;
+
+  const _Header({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
@@ -101,43 +119,46 @@ class ScrappableRequestsAnalyticsCard extends StatelessWidget {
       ],
     );
   }
-  
-  Widget _buildStatusChips(BuildContext context) {
+}
+
+/// Status chips section showing request counts by status
+class _StatusChipsSection extends StatelessWidget {
+  final ScrappableRequestsAnalyticsItem item;
+
+  const _StatusChipsSection({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Wrap(
       spacing: 8,
       runSpacing: 8,
       children: [
         if (item.maxConcurrencyExceededTotalCount > 0)
-          _buildStatusChip(
-            context: context,
+          _StatusChip(
             label: l10n.api_analytics_max_concurrency_exceeded,
             count: item.maxConcurrencyExceededTotalCount,
             color: RequestStatus.maxConcurrencyExceeded.color,
           ),
         if (item.insufficientCreditsTotalCount > 0)
-          _buildStatusChip(
-            context: context,
+          _StatusChip(
             label: l10n.api_analytics_insufficient_credits_chip,
             count: item.insufficientCreditsTotalCount,
             color: RequestStatus.insufficientCredits.color,
           ),
-        _buildStatusChip(
-          context: context,
+        _StatusChip(
           label: l10n.api_analytics_status_2xx,
           count: item.successTotalCount,
           color: RequestStatus.success.color,
         ),
         if (item.clientErrorTotalCount > 0)
-          _buildStatusChip(
-            context: context,
+          _StatusChip(
             label: l10n.api_analytics_status_4xx,
             count: item.clientErrorTotalCount,
             color: RequestStatus.clientError.color,
           ),
         if (item.serverErrorTotalCount > 0)
-          _buildStatusChip(
-            context: context,
+          _StatusChip(
             label: l10n.api_analytics_status_5xx,
             count: item.serverErrorTotalCount,
             color: RequestStatus.serverError.color,
@@ -145,13 +166,22 @@ class ScrappableRequestsAnalyticsCard extends StatelessWidget {
       ],
     );
   }
-  
-  Widget _buildStatusChip({
-    required BuildContext context,
-    required String label,
-    required int count,
-    required Color color,
-  }) {
+}
+
+/// Individual status chip widget
+class _StatusChip extends StatelessWidget {
+  final String label;
+  final int count;
+  final Color color;
+
+  const _StatusChip({
+    required this.label,
+    required this.count,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
@@ -171,30 +201,54 @@ class ScrappableRequestsAnalyticsCard extends StatelessWidget {
       ),
     );
   }
-  
-  Widget _buildChart(BuildContext context, int maxCount) {
+}
+
+/// Chart section showing bar chart of requests over time
+class _ChartSection extends StatelessWidget {
+  final ScrappableRequestsAnalyticsItem item;
+  final int maxCount;
+
+  const _ChartSection({
+    required this.item,
+    required this.maxCount,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return SizedBox(
       height: 120,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: item.data.map((hourData) {
           return Expanded(
-            child: _buildBar(context, hourData, maxCount),
+            child: _BarColumn(hourData: hourData, maxCount: maxCount),
           );
         }).toList(),
       ),
     );
   }
-  
-  Widget _buildBar(BuildContext context, ScrappableRequestPerTimeScope hourData, int maxCount) {
-    final totalRequests = hourData.successCount + 
-        hourData.clientErrorCount + 
+}
+
+/// Individual bar column in the chart
+class _BarColumn extends StatelessWidget {
+  final ScrappableRequestPerTimeScope hourData;
+  final int maxCount;
+
+  const _BarColumn({
+    required this.hourData,
+    required this.maxCount,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final totalRequests = hourData.successCount +
+        hourData.clientErrorCount +
         hourData.serverErrorCount +
         hourData.insufficientCreditsCount +
         hourData.maxConcurrencyExceededCount;
-    
+
     final barHeight = maxCount > 0 ? (totalRequests / maxCount) * 100 : 0.0;
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2),
       child: Column(
@@ -243,35 +297,35 @@ class ScrappableRequestsAnalyticsCard extends StatelessWidget {
             ),
             child: Stack(
               children: [
-                _buildBarSegment(
+                _BarSegmentWidget(
                   height: barHeight,
                   value: hourData.successCount,
                   total: totalRequests,
                   color: RequestStatus.success.color,
-                  isBottom: true,
+                  offset: 0,
                 ),
-                _buildBarSegment(
+                _BarSegmentWidget(
                   height: barHeight,
                   value: hourData.clientErrorCount,
                   total: totalRequests,
                   color: RequestStatus.clientError.color,
                   offset: hourData.successCount,
                 ),
-                _buildBarSegment(
+                _BarSegmentWidget(
                   height: barHeight,
                   value: hourData.serverErrorCount,
                   total: totalRequests,
                   color: RequestStatus.serverError.color,
                   offset: hourData.successCount + hourData.clientErrorCount,
                 ),
-                _buildBarSegment(
+                _BarSegmentWidget(
                   height: barHeight,
                   value: hourData.insufficientCreditsCount,
                   total: totalRequests,
                   color: RequestStatus.insufficientCredits.color,
                   offset: hourData.successCount + hourData.clientErrorCount + hourData.serverErrorCount,
                 ),
-                _buildBarSegment(
+                _BarSegmentWidget(
                   height: barHeight,
                   value: hourData.maxConcurrencyExceededCount,
                   total: totalRequests,
@@ -285,20 +339,31 @@ class ScrappableRequestsAnalyticsCard extends StatelessWidget {
       ),
     );
   }
-  
-  Widget _buildBarSegment({
-    required double height,
-    required int value,
-    required int total,
-    required Color color,
-    int offset = 0,
-    bool isBottom = false,
-  }) {
+}
+
+/// Individual segment within a bar
+class _BarSegmentWidget extends StatelessWidget {
+  final double height;
+  final int value;
+  final int total;
+  final Color color;
+  final int offset;
+
+  const _BarSegmentWidget({
+    required this.height,
+    required this.value,
+    required this.total,
+    required this.color,
+    required this.offset,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     if (value == 0) return const SizedBox.shrink();
-    
+
     final segmentHeight = total > 0 ? (value / total) * height : 0.0;
     final offsetHeight = total > 0 ? (offset / total) * height : 0.0;
-    
+
     return Positioned(
       bottom: offsetHeight,
       left: 0,
@@ -309,10 +374,18 @@ class ScrappableRequestsAnalyticsCard extends StatelessWidget {
       ),
     );
   }
-  
-  Widget _buildTimeLabels(BuildContext context) {
+}
+
+/// Time labels row showing start and end times
+class _TimeLabelsRow extends StatelessWidget {
+  final ScrappableRequestsAnalyticsItem item;
+
+  const _TimeLabelsRow({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
     final dateFormat = DateFormat('HH:mm');
-    
+
     return Row(
       children: [
         Text(
@@ -332,15 +405,5 @@ class ScrappableRequestsAnalyticsCard extends StatelessWidget {
         ),
       ],
     );
-  }
-  
-  int _calculateMaxCount() {
-    return item.data.map((hourData) {
-      return hourData.successCount +
-          hourData.clientErrorCount +
-          hourData.serverErrorCount +
-          hourData.insufficientCreditsCount +
-          hourData.maxConcurrencyExceededCount;
-    }).reduce(math.max);
   }
 }

@@ -127,8 +127,7 @@ class _AuthFormTemplateState<T> extends ConsumerState<AuthFormTemplate<T>> {
       switch (element) {
         case AuthFormItem():
           widgets.add(
-            _buildSingleField(
-              context: context,
+            _createSingleField(
               flatIndex: flatIndex,
               totalFlatItems: totalFlatItems,
             ),
@@ -138,8 +137,7 @@ class _AuthFormTemplateState<T> extends ConsumerState<AuthFormTemplate<T>> {
 
         case AuthFormRow():
           widgets.add(
-            _buildRowFields(
-              context: context,
+            _createRowFields(
               row: element,
               startFlatIndex: flatIndex,
               totalFlatItems: totalFlatItems,
@@ -154,70 +152,44 @@ class _AuthFormTemplateState<T> extends ConsumerState<AuthFormTemplate<T>> {
     return widgets;
   }
 
-  /// Builds a single form field
-  Widget _buildSingleField({
-    required BuildContext context,
+  /// Creates a single form field widget
+  _SingleFormField _createSingleField({
     required int flatIndex,
     required int totalFlatItems,
   }) {
     final item = _flatItems[flatIndex];
     final isLast = flatIndex == totalFlatItems - 1;
 
-    return _AuthFormField(
+    return _SingleFormField(
       item: item,
       controller: _controllers[flatIndex],
       isObscureText: _isObscureText[flatIndex],
       isLast: isLast,
       allControllers: _controllers,
-      onEditingComplete: () {
-        if (isLast) {
-          _validateForms();
-        } else {
-          FocusScope.of(context).nextFocus();
-        }
-      },
+      onValidateForms: _validateForms,
     );
   }
 
-  /// Builds a row of fields - side-by-side on expanded, stacked on compact
-  Widget _buildRowFields({
-    required BuildContext context,
+  /// Creates a row of fields widget - side-by-side on expanded, stacked on compact
+  _RowFormFields _createRowFields({
     required AuthFormRow row,
     required int startFlatIndex,
     required int totalFlatItems,
     required double itemSpacing,
   }) {
-    final fields = <Widget>[];
+    final fieldConfigs = <_SingleFormField>[];
     for (var i = 0; i < row.items.length; i++) {
-      fields.add(
-        _buildSingleField(
-          context: context,
+      fieldConfigs.add(
+        _createSingleField(
           flatIndex: startFlatIndex + i,
           totalFlatItems: totalFlatItems,
         ),
       );
     }
 
-    return context.responsiveValue(
-      // Compact: Stack vertically with spacing
-      compact: Column(
-        children: [
-          for (var i = 0; i < fields.length; i++) ...[
-            fields[i],
-            if (i < fields.length - 1) SizedBox(height: itemSpacing),
-          ],
-        ],
-      ),
-      // Expanded: Side-by-side in a row
-      expanded: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          for (var i = 0; i < fields.length; i++) ...[
-            if (i > 0) SizedBox(width: itemSpacing),
-            Expanded(child: fields[i]),
-          ],
-        ],
-      ),
+    return _RowFormFields(
+      fields: fieldConfigs,
+      itemSpacing: itemSpacing,
     );
   }
 
@@ -390,6 +362,79 @@ class _SubmitButton extends ConsumerWidget {
           ),
         );
       },
+    );
+  }
+}
+
+/// Single form field widget that wraps _AuthFormField with proper callbacks
+class _SingleFormField extends StatelessWidget {
+  final AuthFormItem item;
+  final TextEditingController controller;
+  final ValueNotifier<bool?>? isObscureText;
+  final bool isLast;
+  final List<TextEditingController> allControllers;
+  final VoidCallback onValidateForms;
+
+  const _SingleFormField({
+    required this.item,
+    required this.controller,
+    required this.isObscureText,
+    required this.isLast,
+    required this.allControllers,
+    required this.onValidateForms,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return _AuthFormField(
+      item: item,
+      controller: controller,
+      isObscureText: isObscureText,
+      isLast: isLast,
+      allControllers: allControllers,
+      onEditingComplete: () {
+        if (isLast) {
+          onValidateForms();
+        } else {
+          FocusScope.of(context).nextFocus();
+        }
+      },
+    );
+  }
+}
+
+/// Row of form fields - side-by-side on expanded, stacked on compact
+class _RowFormFields extends StatelessWidget {
+  final List<_SingleFormField> fields;
+  final double itemSpacing;
+
+  const _RowFormFields({
+    required this.fields,
+    required this.itemSpacing,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return context.responsiveValue(
+      // Compact: Stack vertically with spacing
+      compact: Column(
+        children: [
+          for (var i = 0; i < fields.length; i++) ...[
+            fields[i],
+            if (i < fields.length - 1) SizedBox(height: itemSpacing),
+          ],
+        ],
+      ),
+      // Expanded: Side-by-side in a row
+      expanded: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (var i = 0; i < fields.length; i++) ...[
+            if (i > 0) SizedBox(width: itemSpacing),
+            Expanded(child: fields[i]),
+          ],
+        ],
+      ),
     );
   }
 }

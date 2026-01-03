@@ -166,7 +166,7 @@ class _UpgradePlanDialogState extends ConsumerState<_UpgradePlanDialog> {
                   const SizedBox(height: 24),
 
                   // Benefits list
-                  ..._getBenefitsForPlan(widget.targetPlan),
+                  _PlanBenefitsList(plan: widget.targetPlan),
 
                   const SizedBox(height: 32),
 
@@ -292,90 +292,6 @@ class _UpgradePlanDialogState extends ConsumerState<_UpgradePlanDialog> {
     );
   }
   
-  List<Widget> _getBenefitsForPlan(PlanTier plan) {
-    switch (plan) {
-      case PlanTier.ultra:
-        return [
-          _BenefitItem(
-            icon: Icons.copy_all_rounded,
-            title: 'One-Click Clone',
-            description: 'Instantly copy any marketplace scrappable to your collection',
-          ),
-          const SizedBox(height: 12),
-          _BenefitItem(
-            icon: Icons.edit_note_rounded,
-            title: 'Full Customization',
-            description: 'Modify extraction rules, URLs, and parameters to your needs',
-          ),
-          const SizedBox(height: 12),
-          _BenefitItem(
-            icon: Icons.rocket_launch_rounded,
-            title: 'Save Development Time',
-            description: 'Build on existing scrappables instead of starting from scratch',
-          ),
-          const SizedBox(height: 12),
-          _BenefitItem(
-            icon: Icons.all_inclusive_rounded,
-            title: 'Plus Everything in Ultra',
-            description: '4M API credits, 100 concurrent requests, priority support & more',
-          ),
-        ];
-      case PlanTier.pro:
-        return [
-          _BenefitItem(
-            icon: Icons.psychology_rounded,
-            title: 'Advanced AI Models',
-            description: 'Access to Gemini 2.5 Pro for better extraction accuracy',
-          ),
-          const SizedBox(height: 12),
-          _BenefitItem(
-            icon: Icons.api_rounded,
-            title: '1,000,000 API Credits',
-            description: 'Plenty of requests for growing projects',
-          ),
-          const SizedBox(height: 12),
-          _BenefitItem(
-            icon: Icons.speed_rounded,
-            title: '30 Concurrent Requests',
-            description: '3x more concurrent requests than Basic',
-          ),
-          const SizedBox(height: 12),
-          _BenefitItem(
-            icon: Icons.hub_rounded,
-            title: '10 Active Endpoints',
-            description: 'Create more scraping endpoints for your projects',
-          ),
-        ];
-      case PlanTier.basic:
-        return [
-          _BenefitItem(
-            icon: Icons.timer_off_rounded,
-            title: 'No Time Limits',
-            description: 'Endpoints never expire unlike the free tier',
-          ),
-          const SizedBox(height: 12),
-          _BenefitItem(
-            icon: Icons.api_rounded,
-            title: '250,000 API Credits',
-            description: 'Perfect for side projects and small applications',
-          ),
-          const SizedBox(height: 12),
-          _BenefitItem(
-            icon: Icons.speed_rounded,
-            title: '10 Concurrent Requests',
-            description: 'Handle multiple requests simultaneously',
-          ),
-          const SizedBox(height: 12),
-          _BenefitItem(
-            icon: Icons.hub_rounded,
-            title: '3 Active Endpoints',
-            description: 'Create and manage up to 3 scraping endpoints',
-          ),
-        ];
-      default:
-        return [];
-    }
-  }
   
   String _getPricingText(PlanTier plan) {
     switch (plan) {
@@ -414,6 +330,128 @@ class _UpgradePlanDialogState extends ConsumerState<_UpgradePlanDialog> {
       default:
         return '';
     }
+  }
+}
+
+/// Widget that displays the benefits list for a specific plan tier.
+class _PlanBenefitsList extends StatelessWidget {
+  final PlanTier plan;
+
+  const _PlanBenefitsList({required this.plan});
+
+  @override
+  Widget build(BuildContext context) {
+    return switch (plan) {
+      PlanTier.ultra => const _UltraPlanBenefits(),
+      PlanTier.pro => const _ProPlanBenefits(),
+      PlanTier.basic => const _BasicPlanBenefits(),
+      _ => const SizedBox.shrink(),
+    };
+  }
+}
+
+class _UltraPlanBenefits extends StatelessWidget {
+  const _UltraPlanBenefits();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      children: [
+        _BenefitItem(
+          icon: Icons.copy_all_rounded,
+          title: 'One-Click Clone',
+          description: 'Instantly copy any marketplace scrappable to your collection',
+        ),
+        SizedBox(height: 12),
+        _BenefitItem(
+          icon: Icons.edit_note_rounded,
+          title: 'Full Customization',
+          description: 'Modify extraction rules, URLs, and parameters to your needs',
+        ),
+        SizedBox(height: 12),
+        _BenefitItem(
+          icon: Icons.rocket_launch_rounded,
+          title: 'Save Development Time',
+          description: 'Build on existing scrappables instead of starting from scratch',
+        ),
+        SizedBox(height: 12),
+        _BenefitItem(
+          icon: Icons.all_inclusive_rounded,
+          title: 'Plus Everything in Ultra',
+          description: '4M API credits, 100 concurrent requests, priority support & more',
+        ),
+      ],
+    );
+  }
+}
+
+class _ProPlanBenefits extends StatelessWidget {
+  const _ProPlanBenefits();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      children: [
+        _BenefitItem(
+          icon: Icons.psychology_rounded,
+          title: 'Advanced AI Models',
+          description: 'Access to Gemini 2.5 Pro for better extraction accuracy',
+        ),
+        SizedBox(height: 12),
+        _BenefitItem(
+          icon: Icons.api_rounded,
+          title: '1,000,000 API Credits',
+          description: 'Plenty of requests for growing projects',
+        ),
+        SizedBox(height: 12),
+        _BenefitItem(
+          icon: Icons.speed_rounded,
+          title: '30 Concurrent Requests',
+          description: '3x more concurrent requests than Basic',
+        ),
+        SizedBox(height: 12),
+        _BenefitItem(
+          icon: Icons.hub_rounded,
+          title: '10 Active Endpoints',
+          description: 'Create more scraping endpoints for your projects',
+        ),
+      ],
+    );
+  }
+}
+
+class _BasicPlanBenefits extends StatelessWidget {
+  const _BasicPlanBenefits();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      children: [
+        _BenefitItem(
+          icon: Icons.timer_off_rounded,
+          title: 'No Time Limits',
+          description: 'Endpoints never expire unlike the free tier',
+        ),
+        SizedBox(height: 12),
+        _BenefitItem(
+          icon: Icons.api_rounded,
+          title: '250,000 API Credits',
+          description: 'Perfect for side projects and small applications',
+        ),
+        SizedBox(height: 12),
+        _BenefitItem(
+          icon: Icons.speed_rounded,
+          title: '10 Concurrent Requests',
+          description: 'Handle multiple requests simultaneously',
+        ),
+        SizedBox(height: 12),
+        _BenefitItem(
+          icon: Icons.hub_rounded,
+          title: '3 Active Endpoints',
+          description: 'Create and manage up to 3 scraping endpoints',
+        ),
+      ],
+    );
   }
 }
 

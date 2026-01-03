@@ -3922,6 +3922,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Invalid IP address range'**
   String get ip_block_reason_bogon_ip;
+
+  /// Title for payment success page
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Successful!'**
+  String get payment_success_title;
+
+  /// Message for payment success page
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you for upgrading your subscription. Your account is being updated.'**
+  String get payment_success_message;
+
+  /// Instructions section title on payment success page
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s Next?'**
+  String get payment_success_instructions_title;
+
+  /// Instructions message on payment success page
+  ///
+  /// In en, this message translates to:
+  /// **'Your subscription will be active within a few minutes. Please refresh your account page to see your updated subscription status and new features.'**
+  String get payment_success_instructions_message;
+
+  /// Button text to navigate to account page from payment success
+  ///
+  /// In en, this message translates to:
+  /// **'Go to Account'**
+  String get payment_success_go_to_account;
 }
 
 class _AppLocalizationsDelegate

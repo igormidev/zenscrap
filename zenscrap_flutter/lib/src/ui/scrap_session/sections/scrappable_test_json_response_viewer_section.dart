@@ -8,12 +8,12 @@ import 'package:lottie/lottie.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
 
-class ScrappableTestJsonResponseViewer extends StatefulWidget {
+class ScrappableTestJsonResponseViewerSection extends StatefulWidget {
   final Map<String, dynamic>? testResponse;
   final ByteData? htmlData;
   final ByteData? screenshotData;
 
-  const ScrappableTestJsonResponseViewer({
+  const ScrappableTestJsonResponseViewerSection({
     super.key,
     required this.testResponse,
     this.htmlData,
@@ -21,12 +21,12 @@ class ScrappableTestJsonResponseViewer extends StatefulWidget {
   });
 
   @override
-  State<ScrappableTestJsonResponseViewer> createState() =>
-      _ScrappableTestJsonResponseViewerState();
+  State<ScrappableTestJsonResponseViewerSection> createState() =>
+      _ScrappableTestJsonResponseViewerSectionState();
 }
 
-class _ScrappableTestJsonResponseViewerState
-    extends State<ScrappableTestJsonResponseViewer>
+class _ScrappableTestJsonResponseViewerSectionState
+    extends State<ScrappableTestJsonResponseViewerSection>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   bool _isJsonHovered = false;

@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_flutter/src/states/dashboard/onboarding_flow_provider.dart';
 import 'package:zenscrap_flutter/src/states/dashboard/onboarding_flow_state.dart';
-import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
+import 'package:zenscrap_flutter/src/ui/dashboard/views/dashboard_view.dart';
 
 final possibleNavigationsProvider =
     Provider<List<DashboardNavigationType>>((ref) {

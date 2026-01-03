@@ -83,7 +83,7 @@ class QueryParametersSection extends StatelessWidget {
           Column(
             children: queryParams.entries
                 .map(
-                  (entry) => QueryParameterCard(
+                  (entry) => _QueryParameterCard(
                     paramKey: entry.key,
                     paramValue: entry.value,
                     onDelete: () => onRemoveQueryParam(entry.key),
@@ -107,14 +107,13 @@ class QueryParametersSection extends StatelessWidget {
   }
 }
 
-class QueryParameterCard extends StatelessWidget {
+class _QueryParameterCard extends StatelessWidget {
   final String paramKey;
   final String? paramValue;
   final VoidCallback onDelete;
   final VoidCallback onEdit;
 
-  const QueryParameterCard({
-    super.key,
+  const _QueryParameterCard({
     required this.paramKey,
     required this.paramValue,
     required this.onDelete,

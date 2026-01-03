@@ -21,8 +21,8 @@ import 'package:zenscrap_flutter/src/ui/auth/pages/sign_in_page.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/scrappable_card_indicator.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_state.dart';
-import 'package:zenscrap_flutter/src/ui/legal/terms_of_service_dialog.dart';
-import 'package:zenscrap_flutter/src/ui/legal/privacy_policy_dialog.dart';
+import 'package:zenscrap_flutter/src/ui/legal/widgets/terms_of_service_link.dart';
+import 'package:zenscrap_flutter/src/ui/legal/widgets/privacy_policy_link.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 
 class AuthView extends ConsumerStatefulWidget {

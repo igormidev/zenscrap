@@ -7,7 +7,7 @@ import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/sections/scrappable_chat_message_stream_section.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/sections/scrappable_curl_section.dart';
-import 'package:zenscrap_flutter/src/ui/scrap_session/sections/scrappable_test_response.dart';
+import 'package:zenscrap_flutter/src/ui/scrap_session/sections/scrappable_test_response_section.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/discard_changes_button.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/zen_chat_textfield.dart';
 
@@ -137,7 +137,7 @@ class _CompactLayout extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Expanded(
-                        child: ScrappableTestResponse(
+                        child: ScrappableTestResponseSection(
                           scrappable: scrappable,
                           testData: testData,
                         ),
@@ -244,7 +244,7 @@ class _ExpandedLayout extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Expanded(
-                  child: ScrappableTestResponse(
+                  child: ScrappableTestResponseSection(
                     scrappable: scrappable,
                     testData: testData,
                   ),

@@ -17,7 +17,7 @@ import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_prov
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_state.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_state.dart';
-import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
+import 'package:zenscrap_flutter/src/ui/dashboard/views/dashboard_view.dart';
 
 class DeployButton extends ConsumerStatefulWidget {
   final int scrappableId;

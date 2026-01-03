@@ -12,7 +12,7 @@ import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_state.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
-import 'package:zenscrap_flutter/src/ui/dashboard/pages/pricing_page.dart';
+import 'package:zenscrap_flutter/src/ui/dashboard/widgets/raw_pricing_component.dart';
 import 'package:zenscrap_flutter/src/ui/landing_page/sections/auto_fix_section.dart';
 import 'package:zenscrap_flutter/src/ui/landing_page/sections/features_section.dart';
 import 'package:zenscrap_flutter/src/ui/landing_page/sections/final_cta_section.dart';
@@ -22,7 +22,7 @@ import 'package:zenscrap_flutter/src/ui/landing_page/sections/marketplace_sectio
 import 'package:zenscrap_flutter/src/ui/landing_page/sections/problem_section.dart';
 import 'package:zenscrap_flutter/src/ui/landing_page/widgets/landing_appbar.dart';
 import 'package:zenscrap_flutter/src/ui/landing_page/widgets/landing_mobile_drawer.dart';
-import 'package:zenscrap_flutter/src/ui/scrap_session/view/scrappable_edit_session.dart';
+import 'package:zenscrap_flutter/src/ui/scrap_session/view/scrappable_edit_session_view.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/creating_scrappable_dialog.dart';
 import 'package:zenscrap_flutter/src/design_system/elements/ip_limit_error_view.dart';
 import 'package:zenscrap_flutter/src/design_system/elements/suspicious_ip_error_view.dart';

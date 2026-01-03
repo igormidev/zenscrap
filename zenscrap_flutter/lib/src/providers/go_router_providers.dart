@@ -13,11 +13,12 @@ import 'package:zenscrap_flutter/src/ui/api_usage/views/api_usage_view.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/splash_view.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/pages/pricing_page.dart';
-import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
+import 'package:zenscrap_flutter/src/ui/dashboard/views/dashboard_view.dart';
 import 'package:zenscrap_flutter/src/ui/marketplace/views/marketplace_view.dart';
 import 'package:zenscrap_flutter/src/ui/landing_page/landing_page.dart';
+import 'package:zenscrap_flutter/src/ui/payment/views/payment_success_view.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/view/initial_chat_view.dart';
-import 'package:zenscrap_flutter/src/ui/scrappables/view/user_scrappables_listage.dart';
+import 'package:zenscrap_flutter/src/ui/scrappables/views/user_scrappables_listage_view.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -62,9 +63,10 @@ class RouterNotifier extends Notifier<GoRouter> {
             return null;
           }
 
-          // Allow unauthenticated access to auth, splash, and landing page routes
+          // Allow unauthenticated access to auth, splash, landing page, and payment success routes
           if (path.contains('/scrappable-form') == false &&
-              path.contains('/splash') == false) {
+              path.contains('/splash') == false &&
+              path.contains('/success') == false) {
             return '/scrappable-form'; // Redirect to landing page
           }
         } else {
@@ -99,12 +101,19 @@ class RouterNotifier extends Notifier<GoRouter> {
             return const LandingPage();
           },
         ),
+        GoRoute(
+          path: '/success',
+          builder: (context, state) {
+            final sessionId = state.uri.queryParameters['session_id'];
+            return PaymentSuccessView(sessionId: sessionId);
+          },
+        ),
         ShellRoute(
           navigatorKey: _shellNavigatorKey,
           routes: [
             GoRoute(
               path: DashboardNavigationType.userEndpoints.routeOnClick!,
-              builder: (context, state) => UserScrappablesListage(),
+              builder: (context, state) => const UserScrappablesListageView(),
             ),
             GoRoute(
               path: DashboardNavigationType.marketPlace.routeOnClick!,

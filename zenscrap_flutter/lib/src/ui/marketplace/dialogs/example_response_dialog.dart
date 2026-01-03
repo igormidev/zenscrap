@@ -235,7 +235,7 @@ class _ExampleResponseDialogState extends ConsumerState<ExampleResponseDialog>
                         expanded: 24.0,
                       ),
                     ),
-                    child: ReferenceLinkWidget(widget: widget),
+                    child: _ReferenceLinkWidget(widget: widget),
                   ),
                   const SizedBox(height: 4),
                   Padding(
@@ -428,19 +428,18 @@ class _ExampleResponseDialogState extends ConsumerState<ExampleResponseDialog>
   }
 }
 
-class ReferenceLinkWidget extends StatefulWidget {
-  const ReferenceLinkWidget({
-    super.key,
+class _ReferenceLinkWidget extends StatefulWidget {
+  const _ReferenceLinkWidget({
     required this.widget,
   });
 
   final ExampleResponseDialog widget;
 
   @override
-  State<ReferenceLinkWidget> createState() => _ReferenceLinkWidgetState();
+  State<_ReferenceLinkWidget> createState() => _ReferenceLinkWidgetState();
 }
 
-class _ReferenceLinkWidgetState extends State<ReferenceLinkWidget> {
+class _ReferenceLinkWidgetState extends State<_ReferenceLinkWidget> {
   bool _isHovered = false;
 
   String get _url =>

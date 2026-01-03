@@ -301,7 +301,7 @@ class _AccountInformationCard extends StatelessWidget {
               expanded: 16.0,
             ),
           ),
-          AccountDisplayTime(
+          _AccountDisplayTime(
             title: AppLocalizations.of(context)!.account_user_name_label,
             content: user.userName,
             analytics: analytics,
@@ -313,7 +313,7 @@ class _AccountInformationCard extends StatelessWidget {
               expanded: 16.0,
             ),
           ),
-          AccountDisplayTime(
+          _AccountDisplayTime(
             title: AppLocalizations.of(context)!.account_email_label,
             content: user.email,
             analytics: analytics,
@@ -325,7 +325,7 @@ class _AccountInformationCard extends StatelessWidget {
               expanded: 16.0,
             ),
           ),
-          AccountDisplayTime(
+          _AccountDisplayTime(
             title: AppLocalizations.of(
               context,
             )!.account_subscription_plan_label,
@@ -356,13 +356,12 @@ class _AccountInformationCard extends StatelessWidget {
   }
 }
 
-class AccountDisplayTime extends StatelessWidget {
+class _AccountDisplayTime extends StatelessWidget {
   final String title;
   final String content;
   final String? copyText;
   final AnalyticsService analytics;
-  const AccountDisplayTime({
-    super.key,
+  const _AccountDisplayTime({
     required this.title,
     required this.content,
     required this.analytics,

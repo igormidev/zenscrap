@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:zenscrap_flutter/src/ui/dashboard/views/scrappables_dashboard.dart';
+import 'package:zenscrap_flutter/src/ui/dashboard/views/dashboard_view.dart';
 
 import '../../helpers/responsive_test_helpers.dart';
 

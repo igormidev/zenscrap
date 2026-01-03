@@ -11,7 +11,7 @@ import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_prov
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_state.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/fullscreen_loading_page.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/pages/initial_chat_page.dart';
-import 'package:zenscrap_flutter/src/ui/scrap_session/view/scrappable_edit_session.dart';
+import 'package:zenscrap_flutter/src/ui/scrap_session/view/scrappable_edit_session_view.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/creating_scrappable_dialog.dart';
 
 class InitialChatView extends ConsumerStatefulWidget {

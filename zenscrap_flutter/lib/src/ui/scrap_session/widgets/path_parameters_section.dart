@@ -53,7 +53,7 @@ class PathParametersSection extends StatelessWidget {
           runSpacing: 8,
           children: [
             ...pathParams.map(
-              (param) => PathParameterChip(
+              (param) => _PathParameterChip(
                 paramName: param,
                 onDelete: () => onRemovePathParam(param),
               ),
@@ -78,12 +78,11 @@ class PathParametersSection extends StatelessWidget {
   }
 }
 
-class PathParameterChip extends StatelessWidget {
+class _PathParameterChip extends StatelessWidget {
   final String paramName;
   final VoidCallback onDelete;
 
-  const PathParameterChip({
-    super.key,
+  const _PathParameterChip({
     required this.paramName,
     required this.onDelete,
   });

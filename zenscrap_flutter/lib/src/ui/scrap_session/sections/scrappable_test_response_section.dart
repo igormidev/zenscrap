@@ -3,23 +3,23 @@ import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/src/core/extensions/convert_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/elements/animated_switch.dart';
-import 'package:zenscrap_flutter/src/ui/scrap_session/sections/scrappable_edit_visualization.dart';
-import 'package:zenscrap_flutter/src/ui/scrap_session/sections/scrappable_test_json_response_viewer.dart';
+import 'package:zenscrap_flutter/src/ui/scrap_session/sections/scrappable_edit_visualization_section.dart';
+import 'package:zenscrap_flutter/src/ui/scrap_session/sections/scrappable_test_json_response_viewer_section.dart';
 
-class ScrappableTestResponse extends StatefulWidget {
+class ScrappableTestResponseSection extends StatefulWidget {
   final Scrappable scrappable;
   final ReferenceTestData? testData;
-  const ScrappableTestResponse({
+  const ScrappableTestResponseSection({
     super.key,
     required this.scrappable,
     required this.testData,
   });
 
   @override
-  State<ScrappableTestResponse> createState() => _ScrappableTestResponseState();
+  State<ScrappableTestResponseSection> createState() => _ScrappableTestResponseSectionState();
 }
 
-class _ScrappableTestResponseState extends State<ScrappableTestResponse>
+class _ScrappableTestResponseSectionState extends State<ScrappableTestResponseSection>
     with TickerProviderStateMixin {
   late final TabController tabController =
       TabController(length: 2, vsync: this);
@@ -54,12 +54,12 @@ class _ScrappableTestResponseState extends State<ScrappableTestResponse>
           child: TabBarView(
             controller: tabController,
             children: [
-              ScrappableTestJsonResponseViewer(
+              ScrappableTestJsonResponseViewerSection(
                 testResponse: mappedResponse,
                 htmlData: testData.byteData?.referenceHtmlPage,
                 screenshotData: testData.byteData?.referenceSiteScreenshot,
               ),
-              ScrappableEditVisualization(
+              ScrappableEditVisualizationSection(
                 scrappable: widget.scrappable,
               ),
             ],
