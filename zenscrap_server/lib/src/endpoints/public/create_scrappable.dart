@@ -23,7 +23,11 @@ class CreateScrappableEndpoint extends Endpoint {
     // For anonymous users (not logged in), validate their IP address
     // to detect suspicious connections (VPN, proxy, Tor, datacenter, abusers).
     // Logged-in users bypass this check as they are already authenticated.
-    if (userId == null && session is MethodCallSession) {
+    // Skip in development/test mode since localhost IPs are detected as bogon.
+    final runMode = session.serverpod.runMode;
+    final isNonProductionMode = runMode == ServerpodRunMode.development ||
+        runMode == ServerpodRunMode.test;
+    if (!isNonProductionMode && userId == null && session is MethodCallSession) {
       final clientIpAddress =
           session.request.connectionInfo.remote.address.toString();
 
