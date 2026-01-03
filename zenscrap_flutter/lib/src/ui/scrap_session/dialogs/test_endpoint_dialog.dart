@@ -277,24 +277,24 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
+    final dialogWidth = context.responsiveValue(
+      compact: MediaQuery.sizeOf(context).width * 0.95,
+      medium: 700.0,
+      expanded: 1000.0,
+    );
+    final dialogHeight = MediaQuery.sizeOf(context).height *
+        context.responsiveValue(
+          compact: 0.9,
+          medium: 0.85,
+          expanded: 0.8,
+        );
+
+    return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      contentPadding: EdgeInsets.zero,
-      content: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: context.responsiveValue(
-            compact: double.infinity,
-            medium: 700,
-            expanded: 1000,
-          ),
-          maxHeight: MediaQuery.sizeOf(context).height *
-              context.responsiveValue(
-                compact: 0.9,
-                medium: 0.85,
-                expanded: 0.8,
-              ),
-        ),
-        child: Container(
+      child: SizedBox(
+        width: dialogWidth,
+        height: dialogHeight,
+        child: Padding(
           padding: EdgeInsets.all(
             context.responsiveValue(
               compact: 16.0,

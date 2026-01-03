@@ -45,8 +45,9 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection>
     if (widget.testData == null) {
       displayCurlCommand = 'No test data available';
     } else {
-      final examplePayload =
-          tryDecode(widget.testData!.referenceQueryParametersJson);
+      final examplePayload = tryDecode(
+        widget.testData!.referenceQueryParametersJson,
+      );
 
       displayCurlCommand = buildSimpleCurl(
         isDisplayCurl: true,
@@ -94,7 +95,7 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection>
                 testData: widget.testData,
                 scrappingBeeExtractLogic: widget.scrappingBeeExtractLogic,
                 scrappableRequest: widget.scrappableRequest,
-              )
+              ),
             ],
           ),
         ),
@@ -124,7 +125,7 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection>
           testData: widget.testData,
           scrappingBeeExtractLogic: widget.scrappingBeeExtractLogic,
           scrappableRequest: widget.scrappableRequest,
-        )
+        ),
       ],
     );
   }
