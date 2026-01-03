@@ -29,6 +29,9 @@ class TestEndpointDialog extends ConsumerStatefulWidget {
   /// When true, the Run Test button will be disabled with a notice.
   final bool isChatLoading;
 
+  /// When true, the Run Test button will be disabled (session expired).
+  final bool isExpired;
+
   const TestEndpointDialog({
     super.key,
     required this.scrappableId,
@@ -38,6 +41,7 @@ class TestEndpointDialog extends ConsumerStatefulWidget {
     this.targetTime,
     this.apiKey,
     this.isChatLoading = false,
+    this.isExpired = false,
   }) : assert(
          isTestMode ? targetTime != null : apiKey != null,
          isTestMode
@@ -335,6 +339,7 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
                     responseTimeMs: _responseTimeMs,
                     elapsedMsNotifier: _elapsedMs,
                     isChatLoading: widget.isChatLoading,
+                    isExpired: widget.isExpired,
                   ),
                   expanded: (context, constraints) => _ExpandedDialogLayout(
                     pathParamControllers: _pathParamControllers,
@@ -348,6 +353,7 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
                     responseTimeMs: _responseTimeMs,
                     elapsedMsNotifier: _elapsedMs,
                     isChatLoading: widget.isChatLoading,
+                    isExpired: widget.isExpired,
                   ),
                 ),
               ),
@@ -501,6 +507,7 @@ class _ParametersPanel extends StatelessWidget {
   final bool isLoading;
   final VoidCallback onTest;
   final bool isChatLoading;
+  final bool isExpired;
 
   const _ParametersPanel({
     required this.pathParamControllers,
@@ -508,6 +515,7 @@ class _ParametersPanel extends StatelessWidget {
     required this.isLoading,
     required this.onTest,
     this.isChatLoading = false,
+    this.isExpired = false,
   });
 
   @override
@@ -565,8 +573,43 @@ class _ParametersPanel extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
+        // Session expired notice
+        if (isExpired) ...[
+          Tooltip(
+            message: AppLocalizations.of(context)!.scrap_session_session_expired_tooltip,
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: context.c.errorContainer.withAlpha(80),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: context.c.error.withAlpha(80),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.timer_off_outlined,
+                    size: 18,
+                    color: context.c.error,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      AppLocalizations.of(context)!.scrap_session_session_expired_test_notice,
+                      style: context.t.bodySmall?.copyWith(
+                        color: context.c.onSurface,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
         // Chat loading notice
-        if (isChatLoading) ...[
+        if (isChatLoading && !isExpired) ...[
           Tooltip(
             message: AppLocalizations.of(context)!.scrap_session_chat_loading_disabled_tooltip,
             child: Container(
@@ -602,11 +645,13 @@ class _ParametersPanel extends StatelessWidget {
         ],
         // Run Test button
         Tooltip(
-          message: isChatLoading
-              ? AppLocalizations.of(context)!.scrap_session_chat_loading_disabled_tooltip
-              : '',
+          message: isExpired
+              ? AppLocalizations.of(context)!.scrap_session_session_expired_tooltip
+              : (isChatLoading
+                  ? AppLocalizations.of(context)!.scrap_session_chat_loading_disabled_tooltip
+                  : ''),
           child: FilledButton.icon(
-            onPressed: (isLoading || isChatLoading) ? null : onTest,
+            onPressed: (isLoading || isChatLoading || isExpired) ? null : onTest,
             icon: isLoading
                 ? SizedBox(
                     width: 18,
@@ -1235,6 +1280,7 @@ class _CompactDialogLayout extends StatefulWidget {
   final int? responseTimeMs;
   final ValueNotifier<int> elapsedMsNotifier;
   final bool isChatLoading;
+  final bool isExpired;
 
   const _CompactDialogLayout({
     required this.pathParamControllers,
@@ -1248,6 +1294,7 @@ class _CompactDialogLayout extends StatefulWidget {
     required this.responseTimeMs,
     required this.elapsedMsNotifier,
     this.isChatLoading = false,
+    this.isExpired = false,
   });
 
   @override
@@ -1296,6 +1343,7 @@ class _CompactDialogLayoutState extends State<_CompactDialogLayout>
                   _tabController.animateTo(1);
                 },
                 isChatLoading: widget.isChatLoading,
+                isExpired: widget.isExpired,
               ),
               _ResponsePanel(
                 isLoading: widget.isLoading,
@@ -1327,6 +1375,7 @@ class _ExpandedDialogLayout extends StatelessWidget {
   final int? responseTimeMs;
   final ValueNotifier<int> elapsedMsNotifier;
   final bool isChatLoading;
+  final bool isExpired;
 
   const _ExpandedDialogLayout({
     required this.pathParamControllers,
@@ -1340,6 +1389,7 @@ class _ExpandedDialogLayout extends StatelessWidget {
     required this.responseTimeMs,
     required this.elapsedMsNotifier,
     this.isChatLoading = false,
+    this.isExpired = false,
   });
 
   @override
@@ -1363,6 +1413,7 @@ class _ExpandedDialogLayout extends StatelessWidget {
                 isLoading: isLoading,
                 onTest: onTest,
                 isChatLoading: isChatLoading,
+                isExpired: isExpired,
               ),
             ),
         const SizedBox(width: 24),

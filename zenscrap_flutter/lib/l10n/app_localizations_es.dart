@@ -1958,6 +1958,14 @@ class AppLocalizationsEs extends AppLocalizations {
       'La IA esta procesando una solicitud. Por favor espera antes de ejecutar pruebas.';
 
   @override
+  String get scrap_session_session_expired_tooltip =>
+      'Sesion expirada - despliega para continuar';
+
+  @override
+  String get scrap_session_session_expired_test_notice =>
+      'Tu sesion de prueba ha expirado. Despliega el endpoint para continuar usandolo.';
+
+  @override
   String get scrappables_empty_title => 'Aun no has creado ningun scrappable.';
 
   @override

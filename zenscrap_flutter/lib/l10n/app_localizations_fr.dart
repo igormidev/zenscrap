@@ -1968,6 +1968,14 @@ class AppLocalizationsFr extends AppLocalizations {
       'L\'IA traite une requete. Veuillez patienter avant d\'executer les tests.';
 
   @override
+  String get scrap_session_session_expired_tooltip =>
+      'Session expiree - deployez pour continuer';
+
+  @override
+  String get scrap_session_session_expired_test_notice =>
+      'Votre session de test a expire. Deployez le point de terminaison pour continuer a l\'utiliser.';
+
+  @override
   String get scrappables_empty_title =>
       'Vous n\'avez pas encore cree de scrappables.';
 

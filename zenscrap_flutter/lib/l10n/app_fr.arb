@@ -567,6 +567,8 @@
   "scrap_session_close": "Fermer",
   "scrap_session_chat_loading_disabled_tooltip": "Desactive pendant le traitement de l'IA",
   "scrap_session_chat_loading_test_notice": "L'IA traite une requete. Veuillez patienter avant d'executer les tests.",
+  "scrap_session_session_expired_tooltip": "Session expiree - deployez pour continuer",
+  "scrap_session_session_expired_test_notice": "Votre session de test a expire. Deployez le point de terminaison pour continuer a l'utiliser.",
 
   "scrappables_empty_title": "Vous n'avez pas encore cree de scrappables.",
   "scrappables_create_first": "Creez votre premier scrappable",

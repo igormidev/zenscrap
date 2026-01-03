@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/dialogs/test_endpoint_dialog.dart';
 
@@ -31,19 +32,30 @@ class TestEndpointButton extends StatelessWidget {
     this.isChatLoading = false,
   });
 
+  /// Check if the session is expired (only applies to test mode)
+  bool get _isExpired {
+    if (!isTestMode || targetTime == null) return false;
+    return DateTime.now().isAfter(targetTime!);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (scrappableRequest == null) {
       return const SizedBox.shrink();
     }
+
+    final isExpired = _isExpired;
 
     return IconButton(
       icon: Icon(
         Icons.science,
         size: 18,
-        color: context.c.tertiary,
+        color: isExpired ? context.c.onSurface.withAlpha(100) : context.c.tertiary,
       ),
-      tooltip: 'Test endpoint',
+      tooltip: isExpired
+          ? l10n.scrap_session_session_expired_tooltip
+          : 'Test endpoint',
       onPressed: () {
         showDialog(
           context: context,
@@ -55,6 +67,7 @@ class TestEndpointButton extends StatelessWidget {
             targetTime: targetTime,
             apiKey: apiKey,
             isChatLoading: isChatLoading,
+            isExpired: isExpired,
           ),
         );
       },

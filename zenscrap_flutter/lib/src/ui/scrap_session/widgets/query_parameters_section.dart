@@ -12,6 +12,9 @@ class QueryParametersSection extends StatelessWidget {
   /// When true, the Add Query Parameter button will be disabled.
   final bool isChatLoading;
 
+  /// When true, the session has expired and the Add Query Parameter button will be disabled.
+  final bool isExpired;
+
   const QueryParametersSection({
     super.key,
     required this.queryParams,
@@ -19,6 +22,7 @@ class QueryParametersSection extends StatelessWidget {
     required this.onRemoveQueryParam,
     required this.onEditQueryParam,
     this.isChatLoading = false,
+    this.isExpired = false,
   });
 
   @override
@@ -99,11 +103,13 @@ class QueryParametersSection extends StatelessWidget {
           ),
         const SizedBox(height: 12),
         Tooltip(
-          message: isChatLoading
-              ? AppLocalizations.of(context)!.scrap_session_chat_loading_disabled_tooltip
-              : '',
+          message: isExpired
+              ? AppLocalizations.of(context)!.scrap_session_session_expired_tooltip
+              : (isChatLoading
+                  ? AppLocalizations.of(context)!.scrap_session_chat_loading_disabled_tooltip
+                  : ''),
           child: OutlinedButton.icon(
-            onPressed: isChatLoading ? null : onAddQueryParam,
+            onPressed: (isChatLoading || isExpired) ? null : onAddQueryParam,
             icon: const Icon(Icons.add),
             label: const Text('Add Query Parameter'),
             style: OutlinedButton.styleFrom(

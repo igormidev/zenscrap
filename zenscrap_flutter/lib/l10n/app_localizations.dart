@@ -3515,6 +3515,18 @@ abstract class AppLocalizations {
   /// **'AI is processing a request. Please wait before running tests.'**
   String get scrap_session_chat_loading_test_notice;
 
+  /// Tooltip shown on disabled buttons when session has expired
+  ///
+  /// In en, this message translates to:
+  /// **'Session expired - deploy to continue'**
+  String get scrap_session_session_expired_tooltip;
+
+  /// Notice shown in test dialog when session has expired
+  ///
+  /// In en, this message translates to:
+  /// **'Your test session has expired. Deploy the endpoint to continue using it.'**
+  String get scrap_session_session_expired_test_notice;
+
   /// Title shown when user has no scrappables
   ///
   /// In en, this message translates to:

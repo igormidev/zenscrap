@@ -18,11 +18,15 @@ class EditScrappableRequestDialog extends ConsumerStatefulWidget {
   /// When true, action buttons like Save Changes and Add Parameter will be disabled.
   final bool isChatLoading;
 
+  /// When true, the session has expired and action buttons will be disabled.
+  final bool isExpired;
+
   const EditScrappableRequestDialog({
     super.key,
     required this.scrappableRequest,
     required this.scrappableId,
     this.isChatLoading = false,
+    this.isExpired = false,
   });
 
   @override
@@ -360,11 +364,13 @@ class _EditScrappableRequestDialogState
                           SizedBox(
                             height: 48,
                             child: Tooltip(
-                              message: widget.isChatLoading
-                                  ? l10n.scrap_session_chat_loading_disabled_tooltip
-                                  : '',
+                              message: widget.isExpired
+                                  ? l10n.scrap_session_session_expired_tooltip
+                                  : (widget.isChatLoading
+                                      ? l10n.scrap_session_chat_loading_disabled_tooltip
+                                      : ''),
                               child: FilledButton.icon(
-                                onPressed: (_hasChanges && !widget.isChatLoading)
+                                onPressed: (_hasChanges && !widget.isChatLoading && !widget.isExpired)
                                     ? _handleSave
                                     : null,
                                 icon: const Icon(Icons.save),
@@ -408,11 +414,13 @@ class _EditScrappableRequestDialogState
                           SizedBox(
                             height: 48,
                             child: Tooltip(
-                              message: widget.isChatLoading
-                                  ? l10n.scrap_session_chat_loading_disabled_tooltip
-                                  : '',
+                              message: widget.isExpired
+                                  ? l10n.scrap_session_session_expired_tooltip
+                                  : (widget.isChatLoading
+                                      ? l10n.scrap_session_chat_loading_disabled_tooltip
+                                      : ''),
                               child: FilledButton.icon(
-                                onPressed: (_hasChanges && !widget.isChatLoading)
+                                onPressed: (_hasChanges && !widget.isChatLoading && !widget.isExpired)
                                     ? _handleSave
                                     : null,
                                 icon: const Icon(Icons.save),
@@ -437,6 +445,7 @@ class _EditScrappableRequestDialogState
                       onAddPathParam: _handleAddPathParam,
                       onRemovePathParam: _handleRemovePathParam,
                       isChatLoading: widget.isChatLoading,
+                      isExpired: widget.isExpired,
                     ),
                     const SizedBox(height: 8),
 
@@ -447,6 +456,7 @@ class _EditScrappableRequestDialogState
                       onRemoveQueryParam: _handleRemoveQueryParam,
                       onEditQueryParam: _handleEditQueryParam,
                       isChatLoading: widget.isChatLoading,
+                      isExpired: widget.isExpired,
                     ),
                   ],
                 ),

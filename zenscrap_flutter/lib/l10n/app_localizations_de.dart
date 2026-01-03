@@ -1961,6 +1961,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Die KI verarbeitet eine Anfrage. Bitte warten Sie, bevor Sie Tests ausfuhren.';
 
   @override
+  String get scrap_session_session_expired_tooltip =>
+      'Sitzung abgelaufen - bereitstellen zum Fortfahren';
+
+  @override
+  String get scrap_session_session_expired_test_notice =>
+      'Ihre Testsitzung ist abgelaufen. Stellen Sie den Endpunkt bereit, um ihn weiter zu nutzen.';
+
+  @override
   String get scrappables_empty_title =>
       'Sie haben noch keine Scrappables erstellt.';
 

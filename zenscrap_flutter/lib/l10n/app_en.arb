@@ -2519,6 +2519,14 @@
   "@scrap_session_chat_loading_test_notice": {
     "description": "Notice shown in test dialog when chat is loading"
   },
+  "scrap_session_session_expired_tooltip": "Session expired - deploy to continue",
+  "@scrap_session_session_expired_tooltip": {
+    "description": "Tooltip shown on disabled buttons when session has expired"
+  },
+  "scrap_session_session_expired_test_notice": "Your test session has expired. Deploy the endpoint to continue using it.",
+  "@scrap_session_session_expired_test_notice": {
+    "description": "Notice shown in test dialog when session has expired"
+  },
 
   "scrappables_empty_title": "You did not create any scrappables yet.",
   "@scrappables_empty_title": {

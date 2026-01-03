@@ -11,12 +11,16 @@ class PathParametersSection extends StatelessWidget {
   /// When true, the Add Path Parameter button will be disabled.
   final bool isChatLoading;
 
+  /// When true, the session has expired and the Add Path Parameter button will be disabled.
+  final bool isExpired;
+
   const PathParametersSection({
     super.key,
     required this.pathParams,
     required this.onAddPathParam,
     required this.onRemovePathParam,
     this.isChatLoading = false,
+    this.isExpired = false,
   });
 
   @override
@@ -64,19 +68,21 @@ class PathParametersSection extends StatelessWidget {
               ),
             ),
             Tooltip(
-              message: isChatLoading
-                  ? AppLocalizations.of(context)!.scrap_session_chat_loading_disabled_tooltip
-                  : '',
+              message: isExpired
+                  ? AppLocalizations.of(context)!.scrap_session_session_expired_tooltip
+                  : (isChatLoading
+                      ? AppLocalizations.of(context)!.scrap_session_chat_loading_disabled_tooltip
+                      : ''),
               child: ActionChip(
                 avatar: Icon(
                   Icons.add,
                   size: 18,
-                  color: isChatLoading
+                  color: (isChatLoading || isExpired)
                       ? context.c.onSurface.withAlpha(100)
                       : context.c.primary,
                 ),
                 label: const Text('Add Path Parameter'),
-                onPressed: isChatLoading ? null : onAddPathParam,
+                onPressed: (isChatLoading || isExpired) ? null : onAddPathParam,
                 backgroundColor: context.c.primaryContainer.withAlpha(77),
                 side: BorderSide(
                   color: context.c.primary.withAlpha(128),

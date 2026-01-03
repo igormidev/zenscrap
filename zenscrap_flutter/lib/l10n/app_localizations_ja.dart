@@ -1870,6 +1870,13 @@ class AppLocalizationsJa extends AppLocalizations {
       'AIがリクエストを処理しています。テストを実行する前にお待ちください。';
 
   @override
+  String get scrap_session_session_expired_tooltip => 'セッション期限切れ - デプロイして続行';
+
+  @override
+  String get scrap_session_session_expired_test_notice =>
+      'テストセッションの有効期限が切れました。エンドポイントをデプロイして使用を続けてください。';
+
+  @override
   String get scrappables_empty_title => 'まだスクラッパブルを作成していません。';
 
   @override

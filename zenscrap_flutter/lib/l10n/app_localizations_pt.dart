@@ -1924,6 +1924,14 @@ class AppLocalizationsPt extends AppLocalizations {
       'AI is processing a request. Please wait before running tests.';
 
   @override
+  String get scrap_session_session_expired_tooltip =>
+      'Session expired - deploy to continue';
+
+  @override
+  String get scrap_session_session_expired_test_notice =>
+      'Your test session has expired. Deploy the endpoint to continue using it.';
+
+  @override
   String get scrappables_empty_title =>
       'You did not create any scrappables yet.';
 
@@ -4103,6 +4111,14 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   @override
   String get scrap_session_chat_loading_test_notice =>
       'A IA esta processando uma solicitacao. Por favor aguarde antes de executar testes.';
+
+  @override
+  String get scrap_session_session_expired_tooltip =>
+      'Sessao expirada - implante para continuar';
+
+  @override
+  String get scrap_session_session_expired_test_notice =>
+      'Sua sessao de teste expirou. Implante o endpoint para continuar usando-o.';
 
   @override
   String get scrappables_empty_title =>

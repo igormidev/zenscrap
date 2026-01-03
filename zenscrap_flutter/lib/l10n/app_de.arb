@@ -567,6 +567,8 @@
   "scrap_session_close": "Schliessen",
   "scrap_session_chat_loading_disabled_tooltip": "Deaktiviert wahrend die KI verarbeitet",
   "scrap_session_chat_loading_test_notice": "Die KI verarbeitet eine Anfrage. Bitte warten Sie, bevor Sie Tests ausfuhren.",
+  "scrap_session_session_expired_tooltip": "Sitzung abgelaufen - bereitstellen zum Fortfahren",
+  "scrap_session_session_expired_test_notice": "Ihre Testsitzung ist abgelaufen. Stellen Sie den Endpunkt bereit, um ihn weiter zu nutzen.",
 
   "scrappables_empty_title": "Sie haben noch keine Scrappables erstellt.",
   "scrappables_create_first": "Erstellen Sie Ihr erstes Scrappable",

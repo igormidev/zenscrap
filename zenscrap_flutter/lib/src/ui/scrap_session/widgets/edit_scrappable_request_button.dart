@@ -11,12 +11,22 @@ class EditScrappableRequestButton extends StatelessWidget {
   /// When true, action buttons inside the dialog will be disabled.
   final bool isChatLoading;
 
+  /// The session expiration time (for test mode).
+  final DateTime? targetTime;
+
   const EditScrappableRequestButton({
     super.key,
     required this.scrappableRequest,
     required this.scrappableId,
     this.isChatLoading = false,
+    this.targetTime,
   });
+
+  /// Check if the session is expired
+  bool get _isExpired {
+    if (targetTime == null) return false;
+    return DateTime.now().isAfter(targetTime!);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,13 +35,17 @@ class EditScrappableRequestButton extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
+    final isExpired = _isExpired;
+
     return IconButton(
       icon: Icon(
         Icons.edit,
         size: 18,
-        color: context.c.primary,
+        color: isExpired ? context.c.onSurface.withAlpha(100) : context.c.primary,
       ),
-      tooltip: l10n.scrap_session_edit_request,
+      tooltip: isExpired
+          ? l10n.scrap_session_session_expired_tooltip
+          : l10n.scrap_session_edit_request,
       onPressed: () {
         showDialog(
           context: context,
@@ -39,6 +53,7 @@ class EditScrappableRequestButton extends StatelessWidget {
             scrappableRequest: scrappableRequest!,
             scrappableId: scrappableId,
             isChatLoading: isChatLoading,
+            isExpired: isExpired,
           ),
         );
       },
