@@ -280,10 +280,7 @@ class ScrappableChatSession extends Endpoint {
       ApiKeyUpdatedResponse(
         role: PromptRole.system,
         expectsFollowUp: false,
-        messageText:
-            'Your OpenAI API key has been successfully configured. '
-            'You can now continue chatting without using platform credits. '
-            'Your API key is securely stored and will be used for all future messages.',
+        messageText: getErrorDescription('chat_api_key_configured', language),
       ),
     );
   }
@@ -320,7 +317,10 @@ class ScrappableChatSession extends Endpoint {
         role: PromptRole.system,
         expectsFollowUp:
             false, // Configuration update notification, no follow-up
-        messageText: 'Scrappable request configuration updated successfully',
+        messageText: getErrorDescription(
+          'chat_scrappable_request_updated',
+          language,
+        ),
         url: url,
         pathParams: pathParams,
         queryParams: queryParams,
@@ -722,6 +722,7 @@ class ScrappableChatSession extends Endpoint {
         userPrompt: userPrompt,
         thinkingSessionId: thinkingSessionId,
         clientIpAddress: clientIpAddress,
+        language: language,
       ),
       const Duration(seconds: 1),
     );
@@ -795,6 +796,7 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
     final ThinkingSessionId thinkingSessionId = object.thinkingSessionId;
     final String sessionId = object.sessionId;
     final String userPrompt = object.userPrompt;
+    final SupportedLanguage language = object.language;
 
     final chatController = _chatSessions[sessionId];
     if (chatController == null) {
@@ -802,7 +804,7 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
         ErrorTextResponse(
           role: PromptRole.system,
           expectsFollowUp: false, // Terminal error, no follow-up
-          errorMessage: 'Session not found or has been closed.',
+          errorMessage: getErrorDescription('chat_session_closed', language),
         ),
       );
       return;
@@ -839,9 +841,14 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
             IpLimitReachedResponse(
               role: PromptRole.system,
               expectsFollowUp: false,
-              messageText:
-                  'You have reached the spending limit for your IP address (\$${kAnonymousIpSpendingLimitInDollars.toStringAsFixed(2)}). '
-                  'This limit resets after 7 days, or you can create an account to get monthly credits.',
+              messageText: getErrorDescriptionWithParams(
+                'chat_ip_limit',
+                language,
+                {
+                  'limit':
+                      '\$${kAnonymousIpSpendingLimitInDollars.toStringAsFixed(2)}',
+                },
+              ),
               timeUntilReset: timeUntilReset.isNegative
                   ? Duration.zero
                   : timeUntilReset,
@@ -866,9 +873,10 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
             CreditLimitReachedResponse(
               role: PromptRole.system,
               expectsFollowUp: false,
-              messageText:
-                  'You have exhausted your AI credits for this month. '
-                  'Your credits will reset at the beginning of next month, or you can add your own OpenAI API key in account settings to continue without limits.',
+              messageText: getErrorDescription(
+                'chat_credits_exhausted_logged_in',
+                language,
+              ),
               creditsSpent:
                   kDefaultMonthlyAICreditsInDollars - remainingCredits,
               creditsLimit: kDefaultMonthlyAICreditsInDollars,
@@ -886,9 +894,14 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
             CreditLimitReachedResponse(
               role: PromptRole.system,
               expectsFollowUp: false,
-              messageText:
-                  'You have reached the spending limit for this anonymous session (\$${kAnonymousSessionSpendingLimitInDollars.toStringAsFixed(2)}). '
-                  'Please create an account to continue using the AI assistant with monthly credits.',
+              messageText: getErrorDescriptionWithParams(
+                'chat_credits_exhausted_anonymous',
+                language,
+                {
+                  'limit':
+                      '\$${kAnonymousSessionSpendingLimitInDollars.toStringAsFixed(2)}',
+                },
+              ),
               creditsSpent: anonymousSpending,
               creditsLimit: kAnonymousSessionSpendingLimitInDollars,
               canUseOwnApiKey: false, // Must sign up first
@@ -911,7 +924,10 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
         ErrorTextResponse(
           role: PromptRole.system,
           expectsFollowUp: false, // Terminal error, no follow-up
-          errorMessage: 'Session test data not found or has been closed.',
+          errorMessage: getErrorDescription(
+            'chat_session_data_closed',
+            language,
+          ),
         ),
       );
       return;
@@ -967,6 +983,7 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
         scrapperRequest: scrapperRequest,
         scrappingBeeExtractLogic: scrappingBeeExtractLogic,
         thinkingStream: llmThinking,
+        language: language,
       );
 
       // =========================================================================
@@ -1073,15 +1090,16 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
       // Determine the appropriate message based on whether the user is using their own key
       final String messageText;
       if (usesOwnApiKey) {
-        messageText =
-            'Your OpenAI API key has run out of credits. '
-            'Please add credits to your OpenAI account at platform.openai.com, '
-            'or remove your API key from account settings to use platform credits instead.';
+        messageText = getErrorDescription(
+          'chat_user_api_key_quota',
+          language,
+        );
       } else {
         // This shouldn't happen normally, but handle it gracefully
-        messageText =
-            'The OpenAI API returned a quota error. '
-            'Please try again later or contact support if the issue persists.';
+        messageText = getErrorDescription(
+          'chat_openai_quota_error',
+          language,
+        );
       }
 
       _scrapRedraftSessions[sessionId]?.add(
@@ -1098,7 +1116,11 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
         ErrorTextResponse(
           role: PromptRole.system,
           expectsFollowUp: false, // Terminal error, no follow-up
-          errorMessage: 'An error occurred while sending the message:\n$e',
+          errorMessage: getErrorDescriptionWithParams(
+            'chat_message_error',
+            language,
+            {'error': e.toString()},
+          ),
         ),
       );
       session.log(

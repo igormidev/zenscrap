@@ -11,6 +11,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
+import '../../entities/supported_language.dart' as _i2;
 
 abstract class SessionPrompt implements _i1.SerializableModel {
   SessionPrompt._({
@@ -18,6 +19,7 @@ abstract class SessionPrompt implements _i1.SerializableModel {
     required this.sessionId,
     required this.thinkingSessionId,
     this.clientIpAddress,
+    required this.language,
   });
 
   factory SessionPrompt({
@@ -25,6 +27,7 @@ abstract class SessionPrompt implements _i1.SerializableModel {
     required String sessionId,
     required String thinkingSessionId,
     String? clientIpAddress,
+    required _i2.SupportedLanguage language,
   }) = _SessionPromptImpl;
 
   factory SessionPrompt.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -33,6 +36,9 @@ abstract class SessionPrompt implements _i1.SerializableModel {
       sessionId: jsonSerialization['sessionId'] as String,
       thinkingSessionId: jsonSerialization['thinkingSessionId'] as String,
       clientIpAddress: jsonSerialization['clientIpAddress'] as String?,
+      language: _i2.SupportedLanguage.fromJson(
+        (jsonSerialization['language'] as String),
+      ),
     );
   }
 
@@ -44,6 +50,8 @@ abstract class SessionPrompt implements _i1.SerializableModel {
 
   String? clientIpAddress;
 
+  _i2.SupportedLanguage language;
+
   /// Returns a shallow copy of this [SessionPrompt]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
@@ -52,6 +60,7 @@ abstract class SessionPrompt implements _i1.SerializableModel {
     String? sessionId,
     String? thinkingSessionId,
     String? clientIpAddress,
+    _i2.SupportedLanguage? language,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -61,6 +70,7 @@ abstract class SessionPrompt implements _i1.SerializableModel {
       'sessionId': sessionId,
       'thinkingSessionId': thinkingSessionId,
       if (clientIpAddress != null) 'clientIpAddress': clientIpAddress,
+      'language': language.toJson(),
     };
   }
 
@@ -78,11 +88,13 @@ class _SessionPromptImpl extends SessionPrompt {
     required String sessionId,
     required String thinkingSessionId,
     String? clientIpAddress,
+    required _i2.SupportedLanguage language,
   }) : super._(
          userPrompt: userPrompt,
          sessionId: sessionId,
          thinkingSessionId: thinkingSessionId,
          clientIpAddress: clientIpAddress,
+         language: language,
        );
 
   /// Returns a shallow copy of this [SessionPrompt]
@@ -94,6 +106,7 @@ class _SessionPromptImpl extends SessionPrompt {
     String? sessionId,
     String? thinkingSessionId,
     Object? clientIpAddress = _Undefined,
+    _i2.SupportedLanguage? language,
   }) {
     return SessionPrompt(
       userPrompt: userPrompt ?? this.userPrompt,
@@ -102,6 +115,7 @@ class _SessionPromptImpl extends SessionPrompt {
       clientIpAddress: clientIpAddress is String?
           ? clientIpAddress
           : this.clientIpAddress,
+      language: language ?? this.language,
     );
   }
 }

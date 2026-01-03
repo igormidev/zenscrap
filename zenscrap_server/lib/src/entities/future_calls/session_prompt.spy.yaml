@@ -8,9 +8,11 @@
 # - sessionId: The chat session identifier
 # - thinkingSessionId: ID for streaming the AI's thinking process
 # - clientIpAddress: The client's IP address (for anonymous user rate limiting)
+# - language: The user's preferred language for response messages
 class: SessionPrompt
 fields:
   userPrompt: String
   sessionId: String
   thinkingSessionId: String
   clientIpAddress: String?
+  language: SupportedLanguage

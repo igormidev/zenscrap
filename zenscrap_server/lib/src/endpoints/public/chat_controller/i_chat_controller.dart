@@ -41,6 +41,7 @@ abstract class IChatController {
 
   /// Sends a message and returns the cost of the API call in USD.
   /// The cost is calculated based on the model used and tokens consumed.
+  /// [language] is used for translating system messages in the chat.
   Future<SendMessageResult> sendMessage({
     required Session session,
     required String userPrompt,
@@ -49,6 +50,7 @@ abstract class IChatController {
     required ScrappingBeeExtractLogic? scrappingBeeExtractLogic,
     required StreamController<ChatResponse> chatSeason,
     required StreamController<String> thinkingStream,
+    required SupportedLanguage language,
   });
 
   /// Disposes of session-specific resources (e.g., uploaded files).

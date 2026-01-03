@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/core/auto_fix/auto_fix_session_handler.dart';
 import 'package:zenscrap_server/src/core/consts.dart';
+import 'package:zenscrap_server/src/core/translations/error_translations.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_handler_mixin.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/i_chat_controller.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/openai_prompt_builder.dart';
@@ -363,6 +364,7 @@ class ChatControllerOpenAiSdkImpl extends IChatController
     required ScrappingBeeExtractLogic? scrappingBeeExtractLogic,
     required StreamController<ChatResponse> chatSeason,
     required StreamController<String> thinkingStream,
+    required SupportedLanguage language,
   }) async {
     var attemptPrompt = userPrompt;
 
@@ -401,6 +403,7 @@ class ChatControllerOpenAiSdkImpl extends IChatController
           chatSeason: chatSeason,
           attemptNumber: attempt,
           thinkingSentences: result.thinkingSentences,
+          language: language,
         );
 
         if (retryContent == null) {
@@ -427,7 +430,7 @@ class ChatControllerOpenAiSdkImpl extends IChatController
         );
 
         // Stream a detailed error message to the user
-        final errorMessage = _formatErrorForUser(error);
+        final errorMessage = _formatErrorForUser(error, language);
         chatSeason.add(
           ErrorTextResponse(
             role: PromptRole.system,
@@ -1065,49 +1068,64 @@ Thinking Buffer (${thinkingContent.length} chars): ${thinkingContent.isEmpty ? "
   }
 
   /// Formats an error into a user-friendly message
-  String _formatErrorForUser(Object error) {
+  String _formatErrorForUser(Object error, SupportedLanguage language) {
     final errorStr = error.toString();
 
     // Check for common error patterns and provide helpful messages
     if (errorStr.contains('Failed to parse structured response')) {
-      return 'The AI model returned an unexpected response format. '
-          'This can happen when the model is processing complex requests with multiple tool calls. '
-          'Please try again with a simpler request, or contact support if the issue persists.\n\n'
-          'Technical details: $errorStr';
+      return getErrorDescriptionWithParams(
+        'chat_parse_error',
+        language,
+        {'error': errorStr},
+      );
     }
 
     if (errorStr.contains('OpenAI error 4')) {
       // 4xx errors
       if (errorStr.contains('401')) {
-        return 'Authentication error with OpenAI API. Please check the API key configuration.';
+        return getErrorDescription('chat_auth_error', language);
       }
       if (errorStr.contains('429')) {
-        return 'Rate limit exceeded. Please wait a moment and try again.';
+        return getErrorDescription('chat_rate_limit', language);
       }
       if (errorStr.contains('400')) {
-        return 'Invalid request to OpenAI API. This might be a configuration issue. '
-            'Technical details: $errorStr';
+        return getErrorDescriptionWithParams(
+          'chat_invalid_request',
+          language,
+          {'error': errorStr},
+        );
       }
-      return 'OpenAI API error: $errorStr';
+      return getErrorDescriptionWithParams(
+        'chat_message_error',
+        language,
+        {'error': errorStr},
+      );
     }
 
     if (errorStr.contains('OpenAI error 5')) {
-      // 5xx errors
-      return 'OpenAI service is temporarily unavailable. Please try again in a few moments.';
+      // 5xx errors - use a generic message for service unavailable
+      return getErrorDescription('chat_rate_limit', language);
     }
 
     if (errorStr.contains('OpenAI streaming error')) {
-      return 'An error occurred while streaming the AI response: $errorStr';
+      return getErrorDescriptionWithParams(
+        'chat_message_error',
+        language,
+        {'error': errorStr},
+      );
     }
 
     if (errorStr.contains('SocketException') ||
         errorStr.contains('Connection')) {
-      return 'Network connection error. Please check your internet connection and try again.';
+      return getErrorDescription('chat_rate_limit', language);
     }
 
     // Default error message
-    return 'An error occurred while processing your request: $errorStr\n\n'
-        'Please try again. If the issue persists, try simplifying your request.';
+    return getErrorDescriptionWithParams(
+      'chat_message_error',
+      language,
+      {'error': errorStr},
+    );
   }
 }
 

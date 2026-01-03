@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/core/mixins/api_helper_mixin.dart';
 import 'package:zenscrap_server/src/core/scraping_bee.dart';
+import 'package:zenscrap_server/src/core/translations/error_translations.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/web_scraper_ai_models.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
@@ -23,6 +24,7 @@ mixin ChatControllerHandlerMixin {
     required ScrappingBeeExtractLogic? scrappingBeeLogic,
     required StreamController<ChatResponse> chatSeason,
     required List<String> thinkingSentences,
+    required SupportedLanguage language,
   }) async {
     final resp = response.toChatResponse(
       referenceTestData: referenceTestData,
@@ -59,7 +61,10 @@ mixin ChatControllerHandlerMixin {
           UpdatedScrappableRequestResponse(
             role: PromptRole.system,
             expectsFollowUp: false,
-            messageText: 'Request structure updated successfully.',
+            messageText: getErrorDescription(
+              'chat_scrappable_request_updated',
+              language,
+            ),
             url: newRequest.url,
             pathParams: newRequest.pathParams,
             queryParams: newRequest.queryParams,
@@ -74,9 +79,7 @@ mixin ChatControllerHandlerMixin {
       MessageTextResponse(
         role: PromptRole.system,
         expectsFollowUp: true, // Validation will follow
-        messageText:
-            'Great, I will now test the extract rules you created to see if it works in the reference link we are using for testing.\n'
-            'Please wait a moment...',
+        messageText: getErrorDescription('chat_testing_rules', language),
       ),
     );
 
@@ -141,8 +144,7 @@ mixin ChatControllerHandlerMixin {
           MessageTextResponse(
             role: PromptRole.system,
             expectsFollowUp: true, // NewExtractRuleResponse will follow
-            messageText:
-                'New rules were tested and did not present any errors! I\'ll update the test endpoint...',
+            messageText: getErrorDescription('chat_rules_success', language),
           ),
         );
         final Uint8List htmlBytes = utf8.encode(html);
@@ -227,7 +229,10 @@ mixin ChatControllerHandlerMixin {
           NewExtractRuleResponse(
             role: PromptRole.system,
             expectsFollowUp: false, // Final success, no follow-up
-            messageText: 'New rules were tested and did not present any errors',
+            messageText: getErrorDescription(
+              'chat_rules_success_final',
+              language,
+            ),
             scrapperRequest: newRequest ?? scrapperRequest,
             referenceTestData: newReferenceTestData,
             scrappingBeeExtractLogic: newScrappingBeeLogic,
@@ -244,8 +249,7 @@ mixin ChatControllerHandlerMixin {
           ErrorTextResponse(
             role: PromptRole.system,
             expectsFollowUp: true, // Retry will follow
-            errorMessage:
-                'The extraction rules failed in my quality-assurance test validation. I will ask the AI to fix the selectors and try again.',
+            errorMessage: getErrorDescription('chat_rules_failed', language),
           ),
         );
         return buildRetryMessage(
