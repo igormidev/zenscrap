@@ -99,10 +99,7 @@ class ScrappableChatSession extends Endpoint {
   }) async {
     final int? scrappableId = _cacheScrappableIds[sessionUuid];
     if (scrappableId == null) {
-      throw ZenScrapException(
-        title: 'Cache Scrappable ID Not Found',
-        description: 'No cache scrappable ID found for session $sessionUuid.',
-      );
+      throw createTranslatedException('cache_scrappable_id_not_found', language);
     }
     final userId = session.authenticated?.authUserId;
     final ReferenceTestData? testData = _cacheRefTestData[sessionUuid];
@@ -113,10 +110,7 @@ class ScrappableChatSession extends Endpoint {
     if (testData == null ||
         scrappingBeeExtractLogic == null ||
         scrappableRequest == null) {
-      throw ZenScrapException(
-        title: 'Cache Test Data Not Found',
-        description: 'No cache test data found for session $sessionUuid.',
-      );
+      throw createTranslatedException('cache_test_data_not_found', language);
     }
     await session.db.transaction((transaction) async {
       try {
@@ -149,10 +143,9 @@ class ScrappableChatSession extends Endpoint {
         }
 
         if (scrappable == null) {
-          throw ZenScrapException(
-            title: 'Scrappable Not Found or Access Denied',
-            description:
-                'Unable to find scrappable with id $scrappableId or you do not have permission to modify it.',
+          throw createTranslatedException(
+            'scrappable_not_found_or_no_access',
+            language,
           );
         }
 
@@ -310,11 +303,7 @@ class ScrappableChatSession extends Endpoint {
 
     final ScrappableRequest? cachedRequest = _cacheScrappableRequest[sessionId];
     if (cachedRequest == null) {
-      // Internal error - scrappable request should exist in cache
-      throw ZenScrapException(
-        title: 'Scrappable Request Not Found',
-        description: 'No scrappable request found for session $sessionId.',
-      );
+      throw createTranslatedException('scrappable_request_not_found', language);
     }
 
     // Update the cached scrappable request
@@ -515,22 +504,14 @@ class ScrappableChatSession extends Endpoint {
         'No reference test data found for scrappable with id ${scrappable.id}.',
         level: LogLevel.error,
       );
-      throw ZenScrapException(
-        title: 'Reference Test Data Not Found',
-        description:
-            'No reference test data found for scrappable with id ${scrappable.id}.',
-      );
+      throw createTranslatedException('reference_test_data_not_found', language);
     }
     if (scrapperRequest == null) {
       session.log(
         'No target request found for scrappable with id ${scrappable.id}.',
         level: LogLevel.error,
       );
-      throw ZenScrapException(
-        title: 'Target Request Not Found',
-        description:
-            'No target request found for scrappable with id ${scrappable.id}.',
-      );
+      throw createTranslatedException('target_request_not_found', language);
     }
     final bool isAlreadyAnyOpenedSession = _scrappableOpenedSessionsIds
         .containsKey(scrappable.id!);
@@ -554,11 +535,7 @@ class ScrappableChatSession extends Endpoint {
           session.serverpod.getPassword('openAiApiKey') ??
           '';
       if (openAiApiKey.isEmpty) {
-        throw ZenScrapException(
-          title: 'OpenAI API Key Missing',
-          description:
-              'The server is not configured with an OpenAI API key. Please add it to the password store.',
-        );
+        throw createTranslatedException('openai_api_key_missing', language);
       }
     }
 
@@ -715,10 +692,7 @@ class ScrappableChatSession extends Endpoint {
     if (!_cacheRefTestData.containsKey(sessionId) ||
         !_cacheScrappableRequest.containsKey(sessionId) ||
         !_cacheScrappingBeeExtractLogic.containsKey(sessionId)) {
-      throw ZenScrapException(
-        title: 'Cache Test Data Not Found',
-        description: 'No cache test data found for session $sessionId.',
-      );
+      throw createTranslatedException('cache_test_data_not_found', language);
     }
 
     // Add user message to chat stream for instant UI feedback

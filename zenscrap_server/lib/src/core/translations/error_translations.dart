@@ -561,6 +561,56 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.ptBR: 'Conexao Suspeita Detectada',
     SupportedLanguage.ja: '不審な接続が検出されました',
   },
+
+  // Chat session errors
+  'cache_scrappable_id_not_found': {
+    SupportedLanguage.en: 'Cache Scrappable ID Not Found',
+    SupportedLanguage.es: 'ID de Scrappable en Cache No Encontrado',
+    SupportedLanguage.de: 'Cache-Scrappable-ID nicht gefunden',
+    SupportedLanguage.fr: 'ID de Scrappable en cache non trouve',
+    SupportedLanguage.ptBR: 'ID de Scrappable em Cache Nao Encontrado',
+    SupportedLanguage.ja: 'キャッシュされたScrappable IDが見つかりません',
+  },
+  'cache_test_data_not_found': {
+    SupportedLanguage.en: 'Cache Test Data Not Found',
+    SupportedLanguage.es: 'Datos de Prueba en Cache No Encontrados',
+    SupportedLanguage.de: 'Cache-Testdaten nicht gefunden',
+    SupportedLanguage.fr: 'Donnees de test en cache non trouvees',
+    SupportedLanguage.ptBR: 'Dados de Teste em Cache Nao Encontrados',
+    SupportedLanguage.ja: 'キャッシュされたテストデータが見つかりません',
+  },
+  'scrappable_request_not_found': {
+    SupportedLanguage.en: 'Scrappable Request Not Found',
+    SupportedLanguage.es: 'Solicitud de Scrappable No Encontrada',
+    SupportedLanguage.de: 'Scrappable-Anfrage nicht gefunden',
+    SupportedLanguage.fr: 'Requete Scrappable non trouvee',
+    SupportedLanguage.ptBR: 'Solicitacao de Scrappable Nao Encontrada',
+    SupportedLanguage.ja: 'Scrappableリクエストが見つかりません',
+  },
+  'reference_test_data_not_found': {
+    SupportedLanguage.en: 'Reference Test Data Not Found',
+    SupportedLanguage.es: 'Datos de Prueba de Referencia No Encontrados',
+    SupportedLanguage.de: 'Referenz-Testdaten nicht gefunden',
+    SupportedLanguage.fr: 'Donnees de test de reference non trouvees',
+    SupportedLanguage.ptBR: 'Dados de Teste de Referencia Nao Encontrados',
+    SupportedLanguage.ja: 'リファレンステストデータが見つかりません',
+  },
+  'target_request_not_found': {
+    SupportedLanguage.en: 'Target Request Not Found',
+    SupportedLanguage.es: 'Solicitud Objetivo No Encontrada',
+    SupportedLanguage.de: 'Zielanfrage nicht gefunden',
+    SupportedLanguage.fr: 'Requete cible non trouvee',
+    SupportedLanguage.ptBR: 'Solicitacao Alvo Nao Encontrada',
+    SupportedLanguage.ja: 'ターゲットリクエストが見つかりません',
+  },
+  'openai_api_key_missing': {
+    SupportedLanguage.en: 'OpenAI API Key Missing',
+    SupportedLanguage.es: 'Clave API de OpenAI Faltante',
+    SupportedLanguage.de: 'OpenAI API-Schlussel fehlt',
+    SupportedLanguage.fr: 'Cle API OpenAI manquante',
+    SupportedLanguage.ptBR: 'Chave API do OpenAI Ausente',
+    SupportedLanguage.ja: 'OpenAI APIキーがありません',
+  },
 };
 
 // ============================================================================
@@ -1214,5 +1264,55 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.fr: 'Le seuil d\'erreurs auto-fix ne peut pas depasser 5000.',
     SupportedLanguage.ptBR: 'O limite de erros do auto-fix nao pode exceder 5000.',
     SupportedLanguage.ja: '自動修正のエラーしきい値は5000を超えることはできません。',
+  },
+
+  // Chat session error descriptions
+  'cache_scrappable_id_not_found': {
+    SupportedLanguage.en: 'No cached scrappable ID found for this session. The session may have expired or been closed.',
+    SupportedLanguage.es: 'No se encontro ID de scrappable en cache para esta sesion. La sesion puede haber expirado o sido cerrada.',
+    SupportedLanguage.de: 'Keine zwischengespeicherte Scrappable-ID fur diese Sitzung gefunden. Die Sitzung ist moglicherweise abgelaufen oder wurde geschlossen.',
+    SupportedLanguage.fr: 'Aucun ID de scrappable en cache trouve pour cette session. La session a peut-etre expire ou ete fermee.',
+    SupportedLanguage.ptBR: 'Nenhum ID de scrappable em cache encontrado para esta sessao. A sessao pode ter expirado ou sido fechada.',
+    SupportedLanguage.ja: 'このセッションのキャッシュされたScrappable IDが見つかりません。セッションが期限切れまたは閉じられた可能性があります。',
+  },
+  'cache_test_data_not_found': {
+    SupportedLanguage.en: 'No cached test data found for this session. The session may have expired or been closed.',
+    SupportedLanguage.es: 'No se encontraron datos de prueba en cache para esta sesion. La sesion puede haber expirado o sido cerrada.',
+    SupportedLanguage.de: 'Keine zwischengespeicherten Testdaten fur diese Sitzung gefunden. Die Sitzung ist moglicherweise abgelaufen oder wurde geschlossen.',
+    SupportedLanguage.fr: 'Aucune donnee de test en cache trouvee pour cette session. La session a peut-etre expire ou ete fermee.',
+    SupportedLanguage.ptBR: 'Nenhum dado de teste em cache encontrado para esta sessao. A sessao pode ter expirado ou sido fechada.',
+    SupportedLanguage.ja: 'このセッションのキャッシュされたテストデータが見つかりません。セッションが期限切れまたは閉じられた可能性があります。',
+  },
+  'scrappable_request_not_found': {
+    SupportedLanguage.en: 'No scrappable request configuration found for this session.',
+    SupportedLanguage.es: 'No se encontro configuracion de solicitud de scrappable para esta sesion.',
+    SupportedLanguage.de: 'Keine Scrappable-Anfragekonfiguration fur diese Sitzung gefunden.',
+    SupportedLanguage.fr: 'Aucune configuration de requete scrappable trouvee pour cette session.',
+    SupportedLanguage.ptBR: 'Nenhuma configuracao de solicitacao de scrappable encontrada para esta sessao.',
+    SupportedLanguage.ja: 'このセッションのScrappableリクエスト設定が見つかりません。',
+  },
+  'reference_test_data_not_found': {
+    SupportedLanguage.en: 'No reference test data found for this scrappable. Please ensure the scrappable has been properly configured.',
+    SupportedLanguage.es: 'No se encontraron datos de prueba de referencia para este scrappable. Asegurese de que el scrappable este correctamente configurado.',
+    SupportedLanguage.de: 'Keine Referenz-Testdaten fur dieses Scrappable gefunden. Stellen Sie sicher, dass das Scrappable korrekt konfiguriert ist.',
+    SupportedLanguage.fr: 'Aucune donnee de test de reference trouvee pour ce scrappable. Assurez-vous que le scrappable est correctement configure.',
+    SupportedLanguage.ptBR: 'Nenhum dado de teste de referencia encontrado para este scrappable. Certifique-se de que o scrappable esteja configurado corretamente.',
+    SupportedLanguage.ja: 'このScrappableのリファレンステストデータが見つかりません。Scrappableが正しく設定されていることを確認してください。',
+  },
+  'target_request_not_found': {
+    SupportedLanguage.en: 'No target request configuration found for this scrappable. Please ensure the scrappable has been properly configured.',
+    SupportedLanguage.es: 'No se encontro configuracion de solicitud objetivo para este scrappable. Asegurese de que el scrappable este correctamente configurado.',
+    SupportedLanguage.de: 'Keine Zielanfragekonfiguration fur dieses Scrappable gefunden. Stellen Sie sicher, dass das Scrappable korrekt konfiguriert ist.',
+    SupportedLanguage.fr: 'Aucune configuration de requete cible trouvee pour ce scrappable. Assurez-vous que le scrappable est correctement configure.',
+    SupportedLanguage.ptBR: 'Nenhuma configuracao de solicitacao alvo encontrada para este scrappable. Certifique-se de que o scrappable esteja configurado corretamente.',
+    SupportedLanguage.ja: 'このScrappableのターゲットリクエスト設定が見つかりません。Scrappableが正しく設定されていることを確認してください。',
+  },
+  'openai_api_key_missing': {
+    SupportedLanguage.en: 'The server is not configured with an OpenAI API key. Please contact support.',
+    SupportedLanguage.es: 'El servidor no esta configurado con una clave API de OpenAI. Por favor, contacte con soporte.',
+    SupportedLanguage.de: 'Der Server ist nicht mit einem OpenAI API-Schlussel konfiguriert. Bitte kontaktieren Sie den Support.',
+    SupportedLanguage.fr: 'Le serveur n\'est pas configure avec une cle API OpenAI. Veuillez contacter le support.',
+    SupportedLanguage.ptBR: 'O servidor nao esta configurado com uma chave API do OpenAI. Por favor, entre em contato com o suporte.',
+    SupportedLanguage.ja: 'サーバーにOpenAI APIキーが設定されていません。サポートにお問い合わせください。',
   },
 };
