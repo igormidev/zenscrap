@@ -69,6 +69,14 @@ class PrivateSubscriptionEndpoint extends Endpoint {
           if (apiUsage != null) {
             ApiHelperMixin.resetNanoId(apiUsage.nanoId);
           }
+
+          // Re-fetch with includes to return complete data
+          final updatedAccountInfo = await AccountInfo.db.findById(
+            session,
+            accountInfo.id!,
+            include: _accountInfoInclude,
+          );
+          return updatedAccountInfo ?? accountInfo;
         }
         return accountInfo;
       }
@@ -113,7 +121,14 @@ class PrivateSubscriptionEndpoint extends Endpoint {
         if (apiUsage != null) {
           ApiHelperMixin.resetNanoId(apiUsage.nanoId);
         }
-        return accountInfo;
+
+        // Re-fetch with includes to return complete data
+        final updatedAccountInfo = await AccountInfo.db.findById(
+          session,
+          accountInfo.id!,
+          include: _accountInfoInclude,
+        );
+        return updatedAccountInfo ?? accountInfo;
       }
 
       // Extract subscription details

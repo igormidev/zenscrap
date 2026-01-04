@@ -35,6 +35,7 @@ privateScrappableAnalytics:
   - getScrappableAnalytics:
   - getScrappableUsageMetrics:
 privateSubscription:
+  - syncSubscriptionFromStripe:
   - createCheckoutSession:
   - getSubscriptionStatus:
   - cancelSubscription:
