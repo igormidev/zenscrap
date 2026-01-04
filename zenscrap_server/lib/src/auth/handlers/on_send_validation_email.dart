@@ -13,13 +13,12 @@ Future<void> onSendRegistrationVerificationCode(
 }) async {
   session.log('Registration verification code for $email: $verificationCode');
 
-  // Skip email for test account - ONLY in development or test mode
-  // This bypass is disabled in production and staging for security
+  // Skip email sending in development/test mode - just print to terminal
   final runMode = session.serverpod.runMode;
   final isNonProductionMode = runMode == ServerpodRunMode.development ||
       runMode == ServerpodRunMode.test;
-  if (isNonProductionMode && email == 'igor9ms@hotmail.com') {
-    session.log('Skipping email for test account in $runMode mode');
+  if (isNonProductionMode) {
+    session.log('[$runMode] Skipping email - verification code: $verificationCode');
     return;
   }
 

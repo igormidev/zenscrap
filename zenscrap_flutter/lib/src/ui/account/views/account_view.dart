@@ -359,13 +359,11 @@ class _AccountInformationCard extends StatelessWidget {
 class _AccountDisplayTime extends StatelessWidget {
   final String title;
   final String content;
-  final String? copyText;
   final AnalyticsService analytics;
   const _AccountDisplayTime({
     required this.title,
     required this.content,
     required this.analytics,
-    this.copyText,
   });
 
   @override
@@ -412,13 +410,12 @@ class _AccountDisplayTime extends StatelessWidget {
               ),
               IconButton(
                 onPressed: () async {
-                  final textToCopy = copyText ?? content;
-                  await Clipboard.setData(ClipboardData(text: textToCopy));
+                  await Clipboard.setData(ClipboardData(text: content));
 
                   // Track copy action
                   await analytics.trackAccountInfoCopy(
                     fieldName: title,
-                    fieldValue: textToCopy,
+                    fieldValue: content,
                   );
                 },
                 icon: const Icon(Icons.copy),

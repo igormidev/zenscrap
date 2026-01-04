@@ -13,6 +13,15 @@ Future<void> onSendPasswordResetVerificationCode(
 }) async {
   session.log('Password reset verification code for $email: $verificationCode');
 
+  // Skip email sending in development/test mode - just print to terminal
+  final runMode = session.serverpod.runMode;
+  final isNonProductionMode = runMode == ServerpodRunMode.development ||
+      runMode == ServerpodRunMode.test;
+  if (isNonProductionMode) {
+    session.log('[$runMode] Skipping email - verification code: $verificationCode');
+    return;
+  }
+
   final htmlText = getHTMLEmailTemplate(
     title: 'Reset password code',
     description:
