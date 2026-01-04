@@ -184,6 +184,18 @@
       height: 20px;
     }
 
+    /* Session ID */
+    .session-id {
+      margin-top: 16px;
+      font-size: 0.75rem;
+      color: var(--on-surface-variant);
+      opacity: 0.5;
+      word-break: break-all;
+      font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
+      opacity: 0;
+      animation: fadeSlideUp 0.5s ease-out 1s forwards;
+    }
+
     /* Animations */
     @keyframes scaleIn {
       0% {
@@ -353,6 +365,9 @@
         <span id="button-text">Go to Account</span>
       </a>
     </div>
+
+    <!-- Session ID (shown only if present in URL) -->
+    <p class="session-id" id="session-id" style="display: none;"></p>
   </div>
 
   <script>
@@ -452,10 +467,23 @@
       }
     }
 
+    // Display session ID if present in URL
+    function displaySessionId() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const sessionId = urlParams.get('session_id');
+
+      if (sessionId) {
+        const sessionIdElement = document.getElementById('session-id');
+        sessionIdElement.textContent = 'Session: ' + sessionId;
+        sessionIdElement.style.display = 'block';
+      }
+    }
+
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
       detectLanguageAndApply();
       createConfetti();
+      displaySessionId();
     });
   </script>
 </body>
