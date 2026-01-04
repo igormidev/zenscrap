@@ -674,7 +674,6 @@ class ScrappableChatSession extends Endpoint {
       }
     }
 
-    _chatSessions.remove(sessionUuid);
     await _chatSessions[sessionUuid]?.changeModel(aiModel);
   }
 
