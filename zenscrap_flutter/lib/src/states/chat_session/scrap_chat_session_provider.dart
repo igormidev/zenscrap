@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:result_dart/result_dart.dart';
@@ -32,7 +33,9 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
   }
 
   void reset() {
-    ref.read(chatMessagesProvider.notifier).setMessages(const AsyncValue.data([]));
+    ref
+        .read(chatMessagesProvider.notifier)
+        .setMessages(const AsyncValue.data([]));
     state = ScrapChatSessionState.blank();
 
     _chatResponseSubscription?.cancel();
@@ -58,25 +61,30 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
       GroundingMetadataInfo? groundingMetadata;
 
       final language = ref.read(currentLanguageProvider);
-      await for (final item in ref.read(clientProvider).createScrappable(referenceLink: targetUrl, language: language)) {
+      await for (final item
+          in ref
+              .read(clientProvider)
+              .createScrappable(referenceLink: targetUrl, language: language)) {
         if (item is CreateScrappableThinkingChunk) {
           // Update state with new thinking chunk
-          state.mapOrNull(creatingScrappable: (current) {
-            state = current.copyWith(
-              thinkingChunks: [...current.thinkingChunks, item.thinkingText],
-            );
-          });
+          state.mapOrNull(
+            creatingScrappable: (current) {
+              state = current.copyWith(
+                thinkingChunks: [...current.thinkingChunks, item.thinkingText],
+              );
+            },
+          );
         } else if (item is CreateScrappableResult) {
           // Store the final result
           createdScrappable = item.scrappable;
           groundingMetadata = item.grounding;
 
           // Update state with grounding info before transitioning
-          state.mapOrNull(creatingScrappable: (current) {
-            state = current.copyWith(
-              groundingMetadata: groundingMetadata,
-            );
-          });
+          state.mapOrNull(
+            creatingScrappable: (current) {
+              state = current.copyWith(groundingMetadata: groundingMetadata);
+            },
+          );
         }
       }
 
@@ -108,56 +116,70 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
     await ref
         .read(clientProvider)
         .scrappableChatSession
-        .sendPromptMessage(sessionId: sessionUuid, userPrompt: userPrompt, language: language)
+        .sendPromptMessage(
+          sessionId: sessionUuid,
+          userPrompt: userPrompt,
+          language: language,
+        )
         .toRawResult(
-      (Stream<String> llmThinkingStream) {
-        _aiCurrentThinkingSubscription = llmThinkingStream.listen(
-            (thinking) {
-              state.mapOrNull(standard: (value) {
-                final currentStream = value.llmThinkingStream ?? [];
-                state = value.copyWith(
-                  llmThinkingStream: [...currentStream, thinking],
+          (Stream<String> llmThinkingStream) {
+            _aiCurrentThinkingSubscription = llmThinkingStream.listen(
+              (thinking) {
+                state.mapOrNull(
+                  standard: (value) {
+                    final currentStream = value.llmThinkingStream ?? [];
+                    state = value.copyWith(
+                      llmThinkingStream: [...currentStream, thinking],
+                    );
+                  },
                 );
-              });
-            },
-            onDone: () {
-              _aiCurrentThinkingSubscription?.cancel();
-              state.mapOrNull(standard: (value) {
-                Clipboard.setData(ClipboardData(
-                    text: value.llmThinkingStream?.join('\n') ?? ''));
-                state = value.copyWith(llmThinkingStream: null);
-              });
-            },
-            cancelOnError: true,
-            onError: (error, stackTrace) {
-              logError(error, stackTrace);
-
-              // If we already received a successful result, ignore late errors
-              // (e.g., WebSocket closing after success)
-              if (_hasReceivedExtractRule) return;
-
-              if (error is ZenScrapException) {
-                state = ScrapChatSessionState.withError(error: error);
-              } else {
-                final errorStringLower = error.toString().toLowerCase();
-                final isConnectionError =
-                    errorStringLower.contains('connection') ||
-                        errorStringLower.contains('websocket') ||
-                        errorStringLower.contains('closed') ||
-                        errorStringLower.contains('socket');
-                state = ScrapChatSessionState.withError(
-                  error: isConnectionError
-                      ? connectionClosedException
-                      : defaultException,
+              },
+              onDone: () {
+                _aiCurrentThinkingSubscription?.cancel();
+                state.mapOrNull(
+                  standard: (value) {
+                    if (kDebugMode) {
+                      Clipboard.setData(
+                        ClipboardData(
+                          text: value.llmThinkingStream?.join('\n') ?? '',
+                        ),
+                      );
+                    }
+                    state = value.copyWith(llmThinkingStream: null);
+                  },
                 );
-              }
-            });
-      },
-      (failure) {
-        logError(failure);
-        state = ScrapChatSessionState.withError(error: failure);
-      },
-    );
+              },
+              cancelOnError: true,
+              onError: (error, stackTrace) {
+                logError(error, stackTrace);
+
+                // If we already received a successful result, ignore late errors
+                // (e.g., WebSocket closing after success)
+                if (_hasReceivedExtractRule) return;
+
+                if (error is ZenScrapException) {
+                  state = ScrapChatSessionState.withError(error: error);
+                } else {
+                  final errorStringLower = error.toString().toLowerCase();
+                  final isConnectionError =
+                      errorStringLower.contains('connection') ||
+                      errorStringLower.contains('websocket') ||
+                      errorStringLower.contains('closed') ||
+                      errorStringLower.contains('socket');
+                  state = ScrapChatSessionState.withError(
+                    error: isConnectionError
+                        ? connectionClosedException
+                        : defaultException,
+                  );
+                }
+              },
+            );
+          },
+          (failure) {
+            logError(failure);
+            state = ScrapChatSessionState.withError(error: failure);
+          },
+        );
   }
 
   Future<void> endSession() async {
@@ -188,16 +210,15 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
         standard: (value) {
           // Use the full ScrappableRequest if available (from AI-driven updates),
           // otherwise fall back to individual fields (for manual endpoint updates)
-          final updatedRequest = chatResponse.scrappableRequest ??
+          final updatedRequest =
+              chatResponse.scrappableRequest ??
               value.data.targetRequest?.copyWith(
                 url: chatResponse.url,
                 pathParams: chatResponse.pathParams,
                 queryParams: chatResponse.queryParams,
               );
           state = value.copyWith(
-            data: value.data.copyWith(
-              targetRequest: updatedRequest,
-            ),
+            data: value.data.copyWith(targetRequest: updatedRequest),
           );
         },
       );
@@ -228,7 +249,9 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
         },
       );
     }
-    ref.read(chatMessagesProvider.notifier).setMessages(
+    ref
+        .read(chatMessagesProvider.notifier)
+        .setMessages(
           currentMessages.maybeMap(
             data: (data) => AsyncValue.data([...data.value, chatResponse]),
             orElse: () => AsyncValue.data([chatResponse]),
@@ -406,64 +429,69 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
         .createSession(scrappableId: scrappable.id!, language: language)
         .toResult;
 
-    await sessionResult.fold((createdSessionResponse) async {
-      try {
-        _chatResponseSubscription = ref
-            .read(clientProvider)
-            .scrappableChatSession
-            .listenToScrappableRedraftSession(
-                sessionUuid: createdSessionResponse.sessionId, language: language)
-            .listen(
-          (response) {
-            // Ignore heartbeat responses - they keep the connection alive
-            // during long AI processing (infrastructure has ~60s idle timeout)
-            if (response is HeartbeatResponse) return;
+    await sessionResult.fold(
+      (createdSessionResponse) async {
+        try {
+          _chatResponseSubscription = ref
+              .read(clientProvider)
+              .scrappableChatSession
+              .listenToScrappableRedraftSession(
+                sessionUuid: createdSessionResponse.sessionId,
+                language: language,
+              )
+              .listen(
+                (response) {
+                  // Ignore heartbeat responses - they keep the connection alive
+                  // during long AI processing (infrastructure has ~60s idle timeout)
+                  if (response is HeartbeatResponse) return;
 
-            onChange(response);
-          },
-          onError: (error, stackTrace) {
-            logError(error, stackTrace);
+                  onChange(response);
+                },
+                onError: (error, stackTrace) {
+                  logError(error, stackTrace);
 
-            // If we already received a successful result, ignore late errors
-            // (e.g., WebSocket closing after success)
-            if (_hasReceivedExtractRule) return;
+                  // If we already received a successful result, ignore late errors
+                  // (e.g., WebSocket closing after success)
+                  if (_hasReceivedExtractRule) return;
 
-            if (error is ZenScrapException) {
-              state = ScrapChatSessionState.withError(error: error);
-            } else {
-              final errorStringLower = error.toString().toLowerCase();
-              final isConnectionError =
-                  errorStringLower.contains('connection') ||
-                      errorStringLower.contains('websocket') ||
-                      errorStringLower.contains('closed') ||
-                      errorStringLower.contains('socket') ||
-                      errorStringLower.contains('upgrade');
-              state = ScrapChatSessionState.withError(
-                error: isConnectionError
-                    ? connectionClosedException
-                    : defaultException,
+                  if (error is ZenScrapException) {
+                    state = ScrapChatSessionState.withError(error: error);
+                  } else {
+                    final errorStringLower = error.toString().toLowerCase();
+                    final isConnectionError =
+                        errorStringLower.contains('connection') ||
+                        errorStringLower.contains('websocket') ||
+                        errorStringLower.contains('closed') ||
+                        errorStringLower.contains('socket') ||
+                        errorStringLower.contains('upgrade');
+                    state = ScrapChatSessionState.withError(
+                      error: isConnectionError
+                          ? connectionClosedException
+                          : defaultException,
+                    );
+                  }
+                },
+                cancelOnError: false,
               );
-            }
-          },
-          cancelOnError: false,
-        );
 
-        final Duration timeUntilExpire = createdSessionResponse.expiresIn;
-        final DateTime expirationDate = DateTime.now().add(timeUntilExpire);
+          final Duration timeUntilExpire = createdSessionResponse.expiresIn;
+          final DateTime expirationDate = DateTime.now().add(timeUntilExpire);
 
-        state = ScrapChatSessionState.standard(
-          data: scrappable,
-          sessionUuid: createdSessionResponse.sessionId,
-          testExpirationDate: expirationDate,
-          llmThinkingStream: null,
-        );
-      } catch (error, stackTrace) {
-        logError(error, stackTrace);
-        state = ScrapChatSessionState.withError(error: defaultException);
-      }
-    }, (failure) async {
-      state = ScrapChatSessionState.withError(error: failure);
-    });
+          state = ScrapChatSessionState.standard(
+            data: scrappable,
+            sessionUuid: createdSessionResponse.sessionId,
+            testExpirationDate: expirationDate,
+            llmThinkingStream: null,
+          );
+        } catch (error, stackTrace) {
+          logError(error, stackTrace);
+          state = ScrapChatSessionState.withError(error: defaultException);
+        }
+      },
+      (failure) async {
+        state = ScrapChatSessionState.withError(error: failure);
+      },
+    );
   }
 
   Future<ResultDart<void, ZenScrapException>> commitCurrentChanges() async {
@@ -488,10 +516,15 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
     await ref
         .read(clientProvider)
         .scrappableChatSession
-        .updateUserApiKey(sessionId: sessionUuid, openAiApiKey: apiKey, language: language);
+        .updateUserApiKey(
+          sessionId: sessionUuid,
+          openAiApiKey: apiKey,
+          language: language,
+        );
   }
 }
 
 final scrapChatProvider =
     NotifierProvider<ScrapChatSessionNotifier, ScrapChatSessionState>(
-        ScrapChatSessionNotifier.new);
+      ScrapChatSessionNotifier.new,
+    );
