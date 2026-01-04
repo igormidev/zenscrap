@@ -179,251 +179,205 @@ class _ExampleResponseDialogState extends ConsumerState<ExampleResponseDialog>
       expanded: screenHeight * 0.6 + 92,
     );
 
-    return Stack(
-      children: [
-        AlertDialog(
-          title: Text(AppLocalizations.of(context)!.marketplace_example_response),
-          insetPadding: EdgeInsets.symmetric(
-            vertical: context.responsiveValue(
-              compact: 16.0,
-              medium: 20.0,
-              expanded: 20.0,
-            ),
-            horizontal: context.responsiveValue(
-              compact: 16.0,
-              medium: 8.0,
-              expanded: 8.0,
-            ),
-          ),
-          titlePadding: EdgeInsets.only(
-            left: context.responsiveValue(
-              compact: 16.0,
-              medium: 24.0,
-              expanded: 24.0,
-            ),
-            right: context.responsiveValue(
-              compact: 16.0,
-              medium: 24.0,
-              expanded: 24.0,
-            ),
-            top: context.responsiveValue(
-              compact: 20.0,
-              medium: 24.0,
-              expanded: 24.0,
-            ),
-          ),
-          contentPadding: EdgeInsets.zero,
-          content: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight: contentHeight,
-              maxWidth: context.responsiveValue(
-                compact: double.infinity,
-                medium: 500.0,
-                expanded: 600.0,
-              ),
-            ),
-            child: SizedBox(
-              width: double.infinity,
-              child: Column(
-                children: [
-                  const SizedBox(height: 8),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: context.responsiveValue(
-                        compact: 16.0,
-                        medium: 24.0,
-                        expanded: 24.0,
-                      ),
-                    ),
-                    child: _ReferenceLinkWidget(widget: widget),
-                  ),
-                  const SizedBox(height: 4),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: context.responsiveValue(
-                        compact: 16.0,
-                        medium: 24.0,
-                        expanded: 24.0,
-                      ),
-                    ),
-                    child: ZenAnimatedSwitch(
-                      tabController: _tabController,
-                      tabs: [
-                        AnimatedSwitchItem(AppLocalizations.of(context)!.marketplace_tab_result, fontSize: 16),
-                        AnimatedSwitchItem(AppLocalizations.of(context)!.marketplace_tab_html, fontSize: 16),
-                        AnimatedSwitchItem(AppLocalizations.of(context)!.marketplace_tab_screenshot, fontSize: 16),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Expanded(
-                    child: TabBarView(
-                      controller: _tabController,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(
-                            left: context.responsiveValue(
-                              compact: 16.0,
-                              medium: 24.0,
-                              expanded: 24.0,
-                            ),
-                            right: context.responsiveValue(
-                              compact: 16.0,
-                              medium: 24.0,
-                              expanded: 24.0,
-                            ),
-                          ),
-                          child: _ResultTab(
-                            scrappable: widget.scrappable,
-                            fontSize: _resultFontSize,
-                            isHovered: _isResultHovered,
-                            onHoverChanged: (value) =>
-                                setState(() => _isResultHovered = value),
-                            onCopy: () {
-                              final decodedJson = tryDecode(widget
-                                  .scrappable.referenceTestData?.scrapResultJson);
-                              if (decodedJson != null) {
-                                final jsonString =
-                                    const JsonEncoder.withIndent('  ')
-                                        .convert(decodedJson);
-                                Clipboard.setData(
-                                    ClipboardData(text: jsonString));
-                                _showToastMessage(AppLocalizations.of(context)!.marketplace_result_copied);
-                              }
-                            },
-                            onIncreaseFontSize: () {
-                              setState(() {
-                                _resultFontSize =
-                                    (_resultFontSize + 2).clamp(10, 24);
-                                _saveFontSize('example_response_result_font',
-                                    _resultFontSize);
-                              });
-                            },
-                            onDecreaseFontSize: () {
-                              setState(() {
-                                _resultFontSize =
-                                    (_resultFontSize - 2).clamp(10, 24);
-                                _saveFontSize('example_response_result_font',
-                                    _resultFontSize);
-                              });
-                            },
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(
-                            left: context.responsiveValue(
-                              compact: 8.0,
-                              medium: 8.0,
-                              expanded: 8.0,
-                            ),
-                            right: context.responsiveValue(
-                              compact: 8.0,
-                              medium: 8.0,
-                              expanded: 8.0,
-                            ),
-                          ),
-                          child: _HtmlTab(
-                            htmlData: _htmlData,
-                            isLoading: _isLoadingHtml,
-                            fontSize: _htmlFontSize,
-                            isHovered: _isHtmlHovered,
-                            onHoverChanged: (value) =>
-                                setState(() => _isHtmlHovered = value),
-                            onCopy: () {
-                              if (_htmlData != null) {
-                                final htmlString =
-                                    utf8.decode(_htmlData!.buffer.asUint8List());
-                                Clipboard.setData(
-                                    ClipboardData(text: htmlString));
-                                _showToastMessage(AppLocalizations.of(context)!.marketplace_html_copied);
-                              }
-                            },
-                            onIncreaseFontSize: () {
-                              setState(() {
-                                _htmlFontSize = (_htmlFontSize + 2).clamp(10, 24);
-                                _saveFontSize(
-                                    'example_response_html_font', _htmlFontSize);
-                              });
-                            },
-                            onDecreaseFontSize: () {
-                              setState(() {
-                                _htmlFontSize = (_htmlFontSize - 2).clamp(10, 24);
-                                _saveFontSize(
-                                    'example_response_html_font', _htmlFontSize);
-                              });
-                            },
-                          ),
-                        ),
-                        ClipRRect(
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(24),
-                            bottomRight: Radius.circular(24),
-                          ),
-                          child: _ScreenshotTab(
-                            screenshotData: _screenshotData,
-                            isLoading: _isLoadingScreenshot,
-                            isHovered: _isScreenshotHovered,
-                            onHoverChanged: (value) =>
-                                setState(() => _isScreenshotHovered = value),
-                            onCopy: () {
-                              _showToastMessage(AppLocalizations.of(context)!.marketplace_screenshot_info_copied);
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+    final horizontalPadding = context.responsiveValue(
+      compact: 16.0,
+      medium: 24.0,
+      expanded: 24.0,
+    );
+
+    return Material(
+      elevation: 6,
+      color: Theme.of(context).dialogTheme.backgroundColor ?? Theme.of(context).colorScheme.surfaceContainerHigh,
+      borderRadius: BorderRadius.circular(28),
+      clipBehavior: Clip.antiAlias,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: contentHeight,
+          maxWidth: 1000.0,
         ),
-        if (_showToast)
-          Positioned(
-            top: 80,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                decoration: BoxDecoration(
-                  color: context.c.surface,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withAlpha(77),
-                      blurRadius: 16,
-                      offset: const Offset(0, 4),
+        child: Stack(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: horizontalPadding,
+                    right: horizontalPadding,
+                    top: context.responsiveValue(
+                      compact: 20.0,
+                      medium: 24.0,
+                      expanded: 24.0,
                     ),
-                  ],
+                    bottom: 8,
+                  ),
+                  child: Text(
+                    AppLocalizations.of(context)!.marketplace_example_response,
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.check_circle,
-                      color: context.c.primary,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      _toastMessage,
-                      style: context.t.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w500,
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                  child: _ReferenceLinkWidget(widget: widget),
+                ),
+                const SizedBox(height: 4),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                  child: ZenAnimatedSwitch(
+                    tabController: _tabController,
+                    tabs: [
+                      AnimatedSwitchItem(AppLocalizations.of(context)!.marketplace_tab_result, fontSize: 16),
+                      AnimatedSwitchItem(AppLocalizations.of(context)!.marketplace_tab_html, fontSize: 16),
+                      AnimatedSwitchItem(AppLocalizations.of(context)!.marketplace_tab_screenshot, fontSize: 16),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                        child: _ResultTab(
+                          scrappable: widget.scrappable,
+                          fontSize: _resultFontSize,
+                          isHovered: _isResultHovered,
+                          onHoverChanged: (value) =>
+                              setState(() => _isResultHovered = value),
+                          onCopy: () {
+                            final decodedJson = tryDecode(widget
+                                .scrappable.referenceTestData?.scrapResultJson);
+                            if (decodedJson != null) {
+                              final jsonString =
+                                  const JsonEncoder.withIndent('  ')
+                                      .convert(decodedJson);
+                              Clipboard.setData(
+                                  ClipboardData(text: jsonString));
+                              _showToastMessage(AppLocalizations.of(context)!.marketplace_result_copied);
+                            }
+                          },
+                          onIncreaseFontSize: () {
+                            setState(() {
+                              _resultFontSize =
+                                  (_resultFontSize + 2).clamp(10, 24);
+                              _saveFontSize('example_response_result_font',
+                                  _resultFontSize);
+                            });
+                          },
+                          onDecreaseFontSize: () {
+                            setState(() {
+                              _resultFontSize =
+                                  (_resultFontSize - 2).clamp(10, 24);
+                              _saveFontSize('example_response_result_font',
+                                  _resultFontSize);
+                            });
+                          },
+                        ),
                       ),
-                    ),
-                  ],
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: _HtmlTab(
+                          htmlData: _htmlData,
+                          isLoading: _isLoadingHtml,
+                          fontSize: _htmlFontSize,
+                          isHovered: _isHtmlHovered,
+                          onHoverChanged: (value) =>
+                              setState(() => _isHtmlHovered = value),
+                          onCopy: () {
+                            if (_htmlData != null) {
+                              final htmlString =
+                                  utf8.decode(_htmlData!.buffer.asUint8List());
+                              Clipboard.setData(
+                                  ClipboardData(text: htmlString));
+                              _showToastMessage(AppLocalizations.of(context)!.marketplace_html_copied);
+                            }
+                          },
+                          onIncreaseFontSize: () {
+                            setState(() {
+                              _htmlFontSize = (_htmlFontSize + 2).clamp(10, 24);
+                              _saveFontSize(
+                                  'example_response_html_font', _htmlFontSize);
+                            });
+                          },
+                          onDecreaseFontSize: () {
+                            setState(() {
+                              _htmlFontSize = (_htmlFontSize - 2).clamp(10, 24);
+                              _saveFontSize(
+                                  'example_response_html_font', _htmlFontSize);
+                            });
+                          },
+                        ),
+                      ),
+                      ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(24),
+                          bottomRight: Radius.circular(24),
+                        ),
+                        child: _ScreenshotTab(
+                          screenshotData: _screenshotData,
+                          isLoading: _isLoadingScreenshot,
+                          isHovered: _isScreenshotHovered,
+                          onHoverChanged: (value) =>
+                              setState(() => _isScreenshotHovered = value),
+                          onCopy: () {
+                            _showToastMessage(AppLocalizations.of(context)!.marketplace_screenshot_info_copied);
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              )
-                  .animate()
-                  .fadeIn(duration: 200.ms)
-                  .scale(begin: const Offset(0.8, 0.8))
-                  .then(delay: 1600.ms)
-                  .fadeOut(duration: 200.ms),
+              ],
             ),
-          ),
-      ],
+            if (_showToast)
+              Positioned(
+                top: 60,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: context.c.surface,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withAlpha(77),
+                          blurRadius: 16,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.check_circle,
+                          color: context.c.primary,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          _toastMessage,
+                          style: context.t.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                      .animate()
+                      .fadeIn(duration: 200.ms)
+                      .scale(begin: const Offset(0.8, 0.8))
+                      .then(delay: 1600.ms)
+                      .fadeOut(duration: 200.ms),
+                ),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }

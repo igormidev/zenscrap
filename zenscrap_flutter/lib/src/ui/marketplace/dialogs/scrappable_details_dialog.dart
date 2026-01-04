@@ -8,21 +8,14 @@ import 'package:zenscrap_flutter/src/ui/marketplace/dialogs/scrappable_info_dial
 class ScrappableDetailsDialog extends ConsumerWidget {
   final Scrappable scrappable;
 
-  const ScrappableDetailsDialog({
-    super.key,
-    required this.scrappable,
-  });
+  const ScrappableDetailsDialog({super.key, required this.scrappable});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ResponsiveBuilder(
       compact: (context, constraints) => SingleChildScrollView(
         padding: EdgeInsets.all(
-          context.responsiveValue(
-            compact: 16.0,
-            medium: 24.0,
-            expanded: 32.0,
-          ),
+          context.responsiveValue(compact: 16.0, medium: 24.0, expanded: 32.0),
         ),
         child: Column(
           children: [
@@ -32,21 +25,35 @@ class ScrappableDetailsDialog extends ConsumerWidget {
           ],
         ),
       ),
-      medium: (context, constraints) => Row(
-        spacing: 16,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Expanded(child: ExampleResponseDialog(scrappable: scrappable)),
-          Expanded(child: ScrappableInfoDialog(scrappable: scrappable)),
-        ],
+      medium: (context, constraints) => Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1000),
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Row(
+              spacing: 16,
+              children: [
+                Expanded(child: ExampleResponseDialog(scrappable: scrappable)),
+                Expanded(child: ScrappableInfoDialog(scrappable: scrappable)),
+              ],
+            ),
+          ),
+        ),
       ),
-      expanded: (context, constraints) => Row(
-        spacing: 16,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Expanded(child: ExampleResponseDialog(scrappable: scrappable)),
-          Expanded(child: ScrappableInfoDialog(scrappable: scrappable)),
-        ],
+      expanded: (context, constraints) => Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1000),
+          child: Padding(
+            padding: const EdgeInsets.all(32.0),
+            child: Row(
+              spacing: 16,
+              children: [
+                Expanded(child: ExampleResponseDialog(scrappable: scrappable)),
+                Expanded(child: ScrappableInfoDialog(scrappable: scrappable)),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

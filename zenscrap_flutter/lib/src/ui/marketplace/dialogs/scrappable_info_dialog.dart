@@ -143,79 +143,59 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
     );
     final isNewScrappable = widget.scrappable.accountId == null;
     final horizontalPadding = const EdgeInsets.only(left: 24, right: 24);
+    final titleHorizontalPadding = context.responsiveValue(
+      compact: 16.0,
+      medium: 24.0,
+      expanded: 24.0,
+    );
 
-    return AlertDialog(
-      insetPadding: EdgeInsets.symmetric(
-        vertical: context.responsiveValue(
-          compact: 16.0,
-          medium: 20.0,
-          expanded: 20.0,
-        ),
-        horizontal: context.responsiveValue(
-          compact: 16.0,
-          medium: 8.0,
-          expanded: 8.0,
-        ),
-      ),
-      titlePadding: EdgeInsets.only(
-        left: context.responsiveValue(
-          compact: 16.0,
-          medium: 24.0,
-          expanded: 24.0,
-        ),
-        right: context.responsiveValue(
-          compact: 16.0,
-          medium: 24.0,
-          expanded: 24.0,
-        ),
-        top: context.responsiveValue(
-          compact: 20.0,
-          medium: 24.0,
-          expanded: 24.0,
-        ),
-      ),
-      contentPadding: EdgeInsets.zero,
-      title: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: context.responsiveValue(
-            compact: double.infinity,
-            medium: 550.0,
-            expanded: 700.0,
-          ),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: TranslatableTitle(
-                text: widget.scrappable.name,
-                sourceLanguage: widget.scrappable.nameLanguage,
-                style: context.t.titleLarge,
-              ),
-            ),
-            const SizedBox(width: 8),
-            InkWell(
-              onTap: context.pop,
-              child: Icon(Icons.close, color: context.c.onSurfaceVariant),
-            ),
-          ],
-        ),
-      ),
-      content: ConstrainedBox(
+    return Material(
+      elevation: 6,
+      color: Theme.of(context).dialogTheme.backgroundColor ?? Theme.of(context).colorScheme.surfaceContainerHigh,
+      borderRadius: BorderRadius.circular(28),
+      clipBehavior: Clip.antiAlias,
+      child: ConstrainedBox(
         constraints: BoxConstraints(
           maxHeight: MediaQuery.sizeOf(context).height * context.responsiveValue(
             compact: 0.8,
             medium: 0.75,
             expanded: 0.7,
           ),
-          maxWidth: context.responsiveValue(
-            compact: double.infinity,
-            medium: 550.0,
-            expanded: 700.0,
-          ),
+          maxWidth: 1000.0,
         ),
-        child: SizedBox(
-          width: double.infinity,
-          child: ListView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(
+                left: titleHorizontalPadding,
+                right: titleHorizontalPadding,
+                top: context.responsiveValue(
+                  compact: 20.0,
+                  medium: 24.0,
+                  expanded: 24.0,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TranslatableTitle(
+                      text: widget.scrappable.name,
+                      sourceLanguage: widget.scrappable.nameLanguage,
+                      style: context.t.titleLarge,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  InkWell(
+                    onTap: context.pop,
+                    child: Icon(Icons.close, color: context.c.onSurfaceVariant),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView(
             padding: const EdgeInsets.only(bottom: 20, top: 6),
             children: [
               Padding(
@@ -502,8 +482,10 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
             ],
           ),
         ),
-      ),
-    );
+      ],
+    ),
+  ),
+);
   }
 
   String _formatFullDate(DateTime date) {
