@@ -45,6 +45,9 @@ class RouterNotifier extends Notifier<GoRouter> {
       ],
       redirect: (context, state) {
         final path = state.fullPath;
+        if (path?.contains('success') ?? false) {
+          return '/success';
+        }
 
         // Don't redirect while session is still loading
         if (isLoading) {
@@ -91,8 +94,9 @@ class RouterNotifier extends Notifier<GoRouter> {
           path: '/scrappable-form',
           builder: (context, state) {
             final scrappableIdStr = state.uri.queryParameters['id'];
-            final int? scrappableId =
-                scrappableIdStr != null ? int.tryParse(scrappableIdStr) : null;
+            final int? scrappableId = scrappableIdStr != null
+                ? int.tryParse(scrappableIdStr)
+                : null;
             // If editing an existing scrappable, use InitialChatView
             // Otherwise, show the landing page
             if (scrappableId != null) {
@@ -155,4 +159,6 @@ class RouterNotifier extends Notifier<GoRouter> {
   }
 }
 
-final routerProvider = NotifierProvider<RouterNotifier, GoRouter>(RouterNotifier.new);
+final routerProvider = NotifierProvider<RouterNotifier, GoRouter>(
+  RouterNotifier.new,
+);
