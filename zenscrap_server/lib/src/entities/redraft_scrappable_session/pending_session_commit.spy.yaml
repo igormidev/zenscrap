@@ -1,0 +1,27 @@
+# PendingSessionCommit
+#
+# Stores session data when a chat session expires, allowing users to deploy
+# their scrappable changes even after the 1-hour session timeout.
+#
+# When a session is disposed (either by timeout or disconnect), instead of
+# losing the cached data, it's saved to the database. Users then have 24 hours
+# to deploy their changes via the commitCurrentEditState endpoint.
+#
+# The record is automatically cleaned up after 24 hours via a periodic FutureCall.
+#
+# Fields:
+# - sessionId: The unique session UUID (same as RedraftSrappableSessionId)
+# - scrappableId: The ID of the Scrappable being edited
+# - createdAt: When this pending commit was created (used for cleanup)
+class: PendingSessionCommit
+table: pending_session_commit
+fields:
+  sessionId: String
+  scrappableId: int
+  createdAt: DateTime
+indexes:
+  pending_session_commit_session_idx:
+    fields: sessionId
+    unique: true
+  pending_session_commit_created_at_idx:
+    fields: createdAt

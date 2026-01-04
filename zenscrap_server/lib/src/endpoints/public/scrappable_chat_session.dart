@@ -97,22 +97,51 @@ class ScrappableChatSession extends Endpoint {
     required RedraftSrappableSessionId sessionUuid,
     required SupportedLanguage language,
   }) async {
-    final int? scrappableId = _cacheScrappableIds[sessionUuid];
+    // =========================================================================
+    // Check for data in cache first, then fall back to pending commit in DB
+    // =========================================================================
+    int? scrappableId = _cacheScrappableIds[sessionUuid];
+    PendingSessionCommit? pendingCommit;
+    bool isFromPendingCommit = false;
+
     if (scrappableId == null) {
-      throw createTranslatedException('cache_scrappable_id_not_found', language);
+      // Session expired - check for pending commit in database
+      pendingCommit = await PendingSessionCommit.db.findFirstRow(
+        session,
+        where: (t) => t.sessionId.equals(sessionUuid),
+      );
+
+      if (pendingCommit == null) {
+        throw createTranslatedException('cache_scrappable_id_not_found', language);
+      }
+
+      scrappableId = pendingCommit.scrappableId;
+      isFromPendingCommit = true;
+      session.log(
+        'Using pending commit for session $sessionUuid (scrappable $scrappableId)',
+      );
     }
+
     final userId = session.authenticated?.authUserId;
-    final ReferenceTestData? testData = _cacheRefTestData[sessionUuid];
+
+    // For pending commits, the data was already saved to DB in _savePendingSessionData
+    // so we don't need to load from cache. For active sessions, get from cache.
+    final ReferenceTestData? testData =
+        isFromPendingCommit ? null : _cacheRefTestData[sessionUuid];
     final ScrappingBeeExtractLogic? scrappingBeeExtractLogic =
-        _cacheScrappingBeeExtractLogic[sessionUuid];
+        isFromPendingCommit ? null : _cacheScrappingBeeExtractLogic[sessionUuid];
     final ScrappableRequest? scrappableRequest =
-        _cacheScrappableRequest[sessionUuid];
-    if (testData == null ||
-        testData.byteData == null ||
-        scrappingBeeExtractLogic == null ||
-        scrappableRequest == null) {
+        isFromPendingCommit ? null : _cacheScrappableRequest[sessionUuid];
+
+    // Validate cache data for active sessions
+    if (!isFromPendingCommit &&
+        (testData == null ||
+            testData.byteData == null ||
+            scrappingBeeExtractLogic == null ||
+            scrappableRequest == null)) {
       throw createTranslatedException('cache_test_data_not_found', language);
     }
+
     await session.db.transaction((transaction) async {
       try {
         final Scrappable? scrappable;
@@ -150,32 +179,47 @@ class ScrappableChatSession extends Endpoint {
           );
         }
 
+        // Always update the Scrappable's extractRulesUpdatedAt timestamp
         await Scrappable.db.updateRow(
           session,
           scrappable.copyWith(extractRulesUpdatedAt: DateTime.now()),
           transaction: transaction,
         );
 
-        await ScrappingBeeExtractLogic.db.updateRow(
-          session,
-          scrappingBeeExtractLogic,
-          transaction: transaction,
-        );
-        await ScrappableRequest.db.updateRow(
-          session,
-          scrappableRequest,
-          transaction: transaction,
-        );
-        await ByteTestData.db.updateRow(
-          session,
-          testData.byteData!,
-          transaction: transaction,
-        );
-        await ReferenceTestData.db.updateRow(
-          session,
-          testData,
-          transaction: transaction,
-        );
+        if (isFromPendingCommit) {
+          // Data was already saved to DB in _savePendingSessionData
+          // Just delete the pending commit record
+          await PendingSessionCommit.db.deleteRow(
+            session,
+            pendingCommit!,
+            transaction: transaction,
+          );
+          session.log(
+            'Committed from pending session $sessionUuid, deleted pending record',
+          );
+        } else {
+          // Active session - save all cached data to DB
+          await ScrappingBeeExtractLogic.db.updateRow(
+            session,
+            scrappingBeeExtractLogic!,
+            transaction: transaction,
+          );
+          await ScrappableRequest.db.updateRow(
+            session,
+            scrappableRequest!,
+            transaction: transaction,
+          );
+          await ByteTestData.db.updateRow(
+            session,
+            testData!.byteData!,
+            transaction: transaction,
+          );
+          await ReferenceTestData.db.updateRow(
+            session,
+            testData,
+            transaction: transaction,
+          );
+        }
       } catch (e, s) {
         session.log(
           'Failed to commit changes for session $sessionUuid',
@@ -757,6 +801,14 @@ Future<void> _disposeSession({
         );
       }
     }
+
+    // =========================================================================
+    // Save pending session data before clearing caches
+    // =========================================================================
+    // This allows users to deploy their changes even after the session expires.
+    // The data is saved to the database and a PendingSessionCommit record is
+    // created so commitCurrentEditState can find it later.
+    await _savePendingSessionData(sessionId: sessionId, session: dbSession);
   }
 
   // Clean up all session resources
@@ -778,6 +830,115 @@ Future<void> _disposeSession({
   _cacheScrappingBeeExtractLogic.remove(sessionId);
   _cacheScrappableRequest.remove(sessionId);
   _scrappableOpenedSessionsIds.removeWhere((key, value) => value == sessionId);
+}
+
+/// Saves the cached session data to the database before the session is disposed.
+/// Creates a [PendingSessionCommit] record so the user can deploy changes later.
+Future<void> _savePendingSessionData({
+  required RedraftSrappableSessionId sessionId,
+  required Session session,
+}) async {
+  final scrappableId = _cacheScrappableIds[sessionId];
+  if (scrappableId == null) {
+    session.log(
+      'No scrappable ID found for session $sessionId, skipping pending data save',
+      level: LogLevel.debug,
+    );
+    return;
+  }
+
+  final testData = _cacheRefTestData[sessionId];
+  final extractLogic = _cacheScrappingBeeExtractLogic[sessionId];
+  final request = _cacheScrappableRequest[sessionId];
+
+  if (testData == null || request == null) {
+    session.log(
+      'Missing cache data for session $sessionId (testData: ${testData != null}, request: ${request != null}), skipping pending data save',
+      level: LogLevel.debug,
+    );
+    return;
+  }
+
+  try {
+    await session.db.transaction((transaction) async {
+      // Save byte data if present
+      if (testData.byteData != null && testData.byteData!.id != null) {
+        await ByteTestData.db.updateRow(
+          session,
+          testData.byteData!,
+          transaction: transaction,
+        );
+      }
+
+      // Save reference test data
+      if (testData.id != null) {
+        await ReferenceTestData.db.updateRow(
+          session,
+          testData,
+          transaction: transaction,
+        );
+      }
+
+      // Save extract logic
+      if (extractLogic != null && extractLogic.id != null) {
+        await ScrappingBeeExtractLogic.db.updateRow(
+          session,
+          extractLogic,
+          transaction: transaction,
+        );
+      }
+
+      // Save request
+      if (request.id != null) {
+        await ScrappableRequest.db.updateRow(
+          session,
+          request,
+          transaction: transaction,
+        );
+      }
+
+      // Check if a pending commit already exists (e.g., from a previous dispose attempt)
+      final existingPending = await PendingSessionCommit.db.findFirstRow(
+        session,
+        where: (t) => t.sessionId.equals(sessionId),
+        transaction: transaction,
+      );
+
+      if (existingPending != null) {
+        // Update existing record with new timestamp
+        await PendingSessionCommit.db.updateRow(
+          session,
+          existingPending.copyWith(createdAt: DateTime.now()),
+          transaction: transaction,
+        );
+        session.log(
+          'Updated existing pending commit for session $sessionId (scrappable $scrappableId)',
+        );
+      } else {
+        // Create new pending commit record
+        await PendingSessionCommit.db.insertRow(
+          session,
+          PendingSessionCommit(
+            sessionId: sessionId,
+            scrappableId: scrappableId,
+            createdAt: DateTime.now(),
+          ),
+          transaction: transaction,
+        );
+        session.log(
+          'Created pending commit for session $sessionId (scrappable $scrappableId)',
+        );
+      }
+    });
+  } catch (e, s) {
+    session.log(
+      'Failed to save pending session data for session $sessionId',
+      exception: e,
+      stackTrace: s,
+      level: LogLevel.error,
+    );
+    // Don't rethrow - we still want to clean up the session even if saving fails
+  }
 }
 
 class TestScrappableDisposeFutureCall

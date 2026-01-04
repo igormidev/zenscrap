@@ -14,6 +14,13 @@ const double kAnonymousIpSpendingLimitInDollars = 17.50;
 /// This allows users to use the platform again after the cooldown period.
 const Duration kAnonymousIpSpendingResetDuration = Duration(days: 7);
 
+/// Duration after which pending session commits are cleaned up.
+/// This gives users 24 hours to deploy changes after their session expires.
+const Duration kPendingSessionCommitMaxAge = Duration(hours: 24);
+
+/// Interval at which the pending session commit cleanup FutureCall runs.
+const Duration kPendingSessionCommitCleanupInterval = Duration(hours: 1);
+
 // =============================================================================
 // OpenAI GPT-5 Family Pricing (as of December 2025)
 // Prices per million tokens

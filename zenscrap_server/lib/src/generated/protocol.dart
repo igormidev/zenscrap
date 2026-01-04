@@ -67,32 +67,34 @@ import 'entities/monthly_credits_data.dart' as _i41;
 import 'entities/redraft_scrappable_session/chat_response.dart' as _i42;
 import 'entities/redraft_scrappable_session/create_session_response.dart'
     as _i43;
-import 'entities/redraft_scrappable_session/prompt_role_enum.dart' as _i44;
-import 'entities/scrappable/ai_model.dart' as _i45;
-import 'entities/scrappable/auto_fix/auto_fix_attempt.dart' as _i46;
-import 'entities/scrappable/auto_fix/auto_fix_attempt_status.dart' as _i47;
-import 'entities/scrappable/auto_fix/auto_fix_config.dart' as _i48;
-import 'entities/scrappable/auto_fix/auto_fix_session.dart' as _i49;
-import 'entities/scrappable/auto_fix/auto_fix_session_status.dart' as _i50;
+import 'entities/redraft_scrappable_session/pending_session_commit.dart'
+    as _i44;
+import 'entities/redraft_scrappable_session/prompt_role_enum.dart' as _i45;
+import 'entities/scrappable/ai_model.dart' as _i46;
+import 'entities/scrappable/auto_fix/auto_fix_attempt.dart' as _i47;
+import 'entities/scrappable/auto_fix/auto_fix_attempt_status.dart' as _i48;
+import 'entities/scrappable/auto_fix/auto_fix_config.dart' as _i49;
+import 'entities/scrappable/auto_fix/auto_fix_session.dart' as _i50;
+import 'entities/scrappable/auto_fix/auto_fix_session_status.dart' as _i51;
 import 'entities/scrappable/auto_fix/paginated_auto_fix_session_response.dart'
-    as _i51;
-import 'entities/scrappable/byte_test_data.dart' as _i52;
-import 'entities/scrappable/reference_test_data.dart' as _i53;
-import 'entities/scrappable/request_status.dart' as _i54;
-import 'entities/scrappable/scraper_category.dart' as _i55;
-import 'entities/scrappable/scrappable.dart' as _i56;
-import 'entities/scrappable/scrappable_analytics.dart' as _i57;
-import 'entities/scrappable/scrappable_average_duration.dart' as _i58;
-import 'entities/scrappable/scrappable_request.dart' as _i59;
-import 'entities/scrappable/scrapping_bee_extract_logic.dart' as _i60;
-import 'entities/supported_language.dart' as _i61;
+    as _i52;
+import 'entities/scrappable/byte_test_data.dart' as _i53;
+import 'entities/scrappable/reference_test_data.dart' as _i54;
+import 'entities/scrappable/request_status.dart' as _i55;
+import 'entities/scrappable/scraper_category.dart' as _i56;
+import 'entities/scrappable/scrappable.dart' as _i57;
+import 'entities/scrappable/scrappable_analytics.dart' as _i58;
+import 'entities/scrappable/scrappable_average_duration.dart' as _i59;
+import 'entities/scrappable/scrappable_request.dart' as _i60;
+import 'entities/scrappable/scrapping_bee_extract_logic.dart' as _i61;
+import 'entities/supported_language.dart' as _i62;
 import 'entities/user_scrappables/user_paginated_scrappable_response.dart'
-    as _i62;
-import 'entities/zenscrap_exception.dart' as _i63;
+    as _i63;
+import 'entities/zenscrap_exception.dart' as _i64;
 import 'package:zenscrap_server/src/generated/entities/account/account_api_key.dart'
-    as _i64;
-import 'package:zenscrap_server/src/generated/entities/scrappable/scraper_category.dart'
     as _i65;
+import 'package:zenscrap_server/src/generated/entities/scrappable/scraper_category.dart'
+    as _i66;
 export 'email_already_registered_exception.dart';
 export 'entities/account/account.dart';
 export 'entities/account/account_api_key.dart';
@@ -132,6 +134,7 @@ export 'entities/marketplace/pagination_metadata.dart';
 export 'entities/monthly_credits_data.dart';
 export 'entities/redraft_scrappable_session/chat_response.dart';
 export 'entities/redraft_scrappable_session/create_session_response.dart';
+export 'entities/redraft_scrappable_session/pending_session_commit.dart';
 export 'entities/redraft_scrappable_session/prompt_role_enum.dart';
 export 'entities/scrappable/ai_model.dart';
 export 'entities/scrappable/auto_fix/auto_fix_attempt.dart';
@@ -1691,6 +1694,82 @@ class Protocol extends _i1.SerializationManagerServer {
       managed: true,
     ),
     _i2.TableDefinition(
+      name: 'pending_session_commit',
+      dartName: 'PendingSessionCommit',
+      schema: 'public',
+      module: 'zenscrap',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'nextval(\'pending_session_commit_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'sessionId',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'scrappableId',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _i2.ColumnDefinition(
+          name: 'createdAt',
+          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'pending_session_commit_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        ),
+        _i2.IndexDefinition(
+          indexName: 'pending_session_commit_session_idx',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'sessionId',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+        _i2.IndexDefinition(
+          indexName: 'pending_session_commit_created_at_idx',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'createdAt',
+            ),
+          ],
+          type: 'btree',
+          isUnique: false,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _i2.TableDefinition(
       name: 'scrappable',
       dartName: 'Scrappable',
       schema: 'public',
@@ -2542,65 +2621,68 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i43.CreateSessionResponse) {
       return _i43.CreateSessionResponse.fromJson(data) as T;
     }
-    if (t == _i44.PromptRole) {
-      return _i44.PromptRole.fromJson(data) as T;
+    if (t == _i44.PendingSessionCommit) {
+      return _i44.PendingSessionCommit.fromJson(data) as T;
     }
-    if (t == _i45.AiModel) {
-      return _i45.AiModel.fromJson(data) as T;
+    if (t == _i45.PromptRole) {
+      return _i45.PromptRole.fromJson(data) as T;
     }
-    if (t == _i46.AutoFixAttempt) {
-      return _i46.AutoFixAttempt.fromJson(data) as T;
+    if (t == _i46.AiModel) {
+      return _i46.AiModel.fromJson(data) as T;
     }
-    if (t == _i47.AutoFixAttemptStatus) {
-      return _i47.AutoFixAttemptStatus.fromJson(data) as T;
+    if (t == _i47.AutoFixAttempt) {
+      return _i47.AutoFixAttempt.fromJson(data) as T;
     }
-    if (t == _i48.AutoFixConfig) {
-      return _i48.AutoFixConfig.fromJson(data) as T;
+    if (t == _i48.AutoFixAttemptStatus) {
+      return _i48.AutoFixAttemptStatus.fromJson(data) as T;
     }
-    if (t == _i49.AutoFixSession) {
-      return _i49.AutoFixSession.fromJson(data) as T;
+    if (t == _i49.AutoFixConfig) {
+      return _i49.AutoFixConfig.fromJson(data) as T;
     }
-    if (t == _i50.AutoFixSessionStatus) {
-      return _i50.AutoFixSessionStatus.fromJson(data) as T;
+    if (t == _i50.AutoFixSession) {
+      return _i50.AutoFixSession.fromJson(data) as T;
     }
-    if (t == _i51.PaginatedAutoFixSessionResponse) {
-      return _i51.PaginatedAutoFixSessionResponse.fromJson(data) as T;
+    if (t == _i51.AutoFixSessionStatus) {
+      return _i51.AutoFixSessionStatus.fromJson(data) as T;
     }
-    if (t == _i52.ByteTestData) {
-      return _i52.ByteTestData.fromJson(data) as T;
+    if (t == _i52.PaginatedAutoFixSessionResponse) {
+      return _i52.PaginatedAutoFixSessionResponse.fromJson(data) as T;
     }
-    if (t == _i53.ReferenceTestData) {
-      return _i53.ReferenceTestData.fromJson(data) as T;
+    if (t == _i53.ByteTestData) {
+      return _i53.ByteTestData.fromJson(data) as T;
     }
-    if (t == _i54.RequestStatus) {
-      return _i54.RequestStatus.fromJson(data) as T;
+    if (t == _i54.ReferenceTestData) {
+      return _i54.ReferenceTestData.fromJson(data) as T;
     }
-    if (t == _i55.ScraperCategory) {
-      return _i55.ScraperCategory.fromJson(data) as T;
+    if (t == _i55.RequestStatus) {
+      return _i55.RequestStatus.fromJson(data) as T;
     }
-    if (t == _i56.Scrappable) {
-      return _i56.Scrappable.fromJson(data) as T;
+    if (t == _i56.ScraperCategory) {
+      return _i56.ScraperCategory.fromJson(data) as T;
     }
-    if (t == _i57.ScrappableAnalytics) {
-      return _i57.ScrappableAnalytics.fromJson(data) as T;
+    if (t == _i57.Scrappable) {
+      return _i57.Scrappable.fromJson(data) as T;
     }
-    if (t == _i58.ScrappableAverageDuration) {
-      return _i58.ScrappableAverageDuration.fromJson(data) as T;
+    if (t == _i58.ScrappableAnalytics) {
+      return _i58.ScrappableAnalytics.fromJson(data) as T;
     }
-    if (t == _i59.ScrappableRequest) {
-      return _i59.ScrappableRequest.fromJson(data) as T;
+    if (t == _i59.ScrappableAverageDuration) {
+      return _i59.ScrappableAverageDuration.fromJson(data) as T;
     }
-    if (t == _i60.ScrappingBeeExtractLogic) {
-      return _i60.ScrappingBeeExtractLogic.fromJson(data) as T;
+    if (t == _i60.ScrappableRequest) {
+      return _i60.ScrappableRequest.fromJson(data) as T;
     }
-    if (t == _i61.SupportedLanguage) {
-      return _i61.SupportedLanguage.fromJson(data) as T;
+    if (t == _i61.ScrappingBeeExtractLogic) {
+      return _i61.ScrappingBeeExtractLogic.fromJson(data) as T;
     }
-    if (t == _i62.UserPaginatedScrappableResponse) {
-      return _i62.UserPaginatedScrappableResponse.fromJson(data) as T;
+    if (t == _i62.SupportedLanguage) {
+      return _i62.SupportedLanguage.fromJson(data) as T;
     }
-    if (t == _i63.ZenScrapException) {
-      return _i63.ZenScrapException.fromJson(data) as T;
+    if (t == _i63.UserPaginatedScrappableResponse) {
+      return _i63.UserPaginatedScrappableResponse.fromJson(data) as T;
+    }
+    if (t == _i64.ZenScrapException) {
+      return _i64.ZenScrapException.fromJson(data) as T;
     }
     if (t == _i1.getType<_i5.EmailAlreadyRegisteredException?>()) {
       return (data != null
@@ -2838,89 +2920,93 @@ class Protocol extends _i1.SerializationManagerServer {
       return (data != null ? _i43.CreateSessionResponse.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i44.PromptRole?>()) {
-      return (data != null ? _i44.PromptRole.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i45.AiModel?>()) {
-      return (data != null ? _i45.AiModel.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i46.AutoFixAttempt?>()) {
-      return (data != null ? _i46.AutoFixAttempt.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i47.AutoFixAttemptStatus?>()) {
-      return (data != null ? _i47.AutoFixAttemptStatus.fromJson(data) : null)
+    if (t == _i1.getType<_i44.PendingSessionCommit?>()) {
+      return (data != null ? _i44.PendingSessionCommit.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i48.AutoFixConfig?>()) {
-      return (data != null ? _i48.AutoFixConfig.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i45.PromptRole?>()) {
+      return (data != null ? _i45.PromptRole.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i49.AutoFixSession?>()) {
-      return (data != null ? _i49.AutoFixSession.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i46.AiModel?>()) {
+      return (data != null ? _i46.AiModel.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i50.AutoFixSessionStatus?>()) {
-      return (data != null ? _i50.AutoFixSessionStatus.fromJson(data) : null)
+    if (t == _i1.getType<_i47.AutoFixAttempt?>()) {
+      return (data != null ? _i47.AutoFixAttempt.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i48.AutoFixAttemptStatus?>()) {
+      return (data != null ? _i48.AutoFixAttemptStatus.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i51.PaginatedAutoFixSessionResponse?>()) {
+    if (t == _i1.getType<_i49.AutoFixConfig?>()) {
+      return (data != null ? _i49.AutoFixConfig.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i50.AutoFixSession?>()) {
+      return (data != null ? _i50.AutoFixSession.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i51.AutoFixSessionStatus?>()) {
+      return (data != null ? _i51.AutoFixSessionStatus.fromJson(data) : null)
+          as T;
+    }
+    if (t == _i1.getType<_i52.PaginatedAutoFixSessionResponse?>()) {
       return (data != null
-              ? _i51.PaginatedAutoFixSessionResponse.fromJson(data)
+              ? _i52.PaginatedAutoFixSessionResponse.fromJson(data)
               : null)
           as T;
     }
-    if (t == _i1.getType<_i52.ByteTestData?>()) {
-      return (data != null ? _i52.ByteTestData.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i53.ByteTestData?>()) {
+      return (data != null ? _i53.ByteTestData.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i53.ReferenceTestData?>()) {
-      return (data != null ? _i53.ReferenceTestData.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i54.ReferenceTestData?>()) {
+      return (data != null ? _i54.ReferenceTestData.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i54.RequestStatus?>()) {
-      return (data != null ? _i54.RequestStatus.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i55.RequestStatus?>()) {
+      return (data != null ? _i55.RequestStatus.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i55.ScraperCategory?>()) {
-      return (data != null ? _i55.ScraperCategory.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i56.ScraperCategory?>()) {
+      return (data != null ? _i56.ScraperCategory.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i56.Scrappable?>()) {
-      return (data != null ? _i56.Scrappable.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i57.Scrappable?>()) {
+      return (data != null ? _i57.Scrappable.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i57.ScrappableAnalytics?>()) {
-      return (data != null ? _i57.ScrappableAnalytics.fromJson(data) : null)
+    if (t == _i1.getType<_i58.ScrappableAnalytics?>()) {
+      return (data != null ? _i58.ScrappableAnalytics.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i58.ScrappableAverageDuration?>()) {
+    if (t == _i1.getType<_i59.ScrappableAverageDuration?>()) {
       return (data != null
-              ? _i58.ScrappableAverageDuration.fromJson(data)
+              ? _i59.ScrappableAverageDuration.fromJson(data)
               : null)
           as T;
     }
-    if (t == _i1.getType<_i59.ScrappableRequest?>()) {
-      return (data != null ? _i59.ScrappableRequest.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i60.ScrappableRequest?>()) {
+      return (data != null ? _i60.ScrappableRequest.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i60.ScrappingBeeExtractLogic?>()) {
+    if (t == _i1.getType<_i61.ScrappingBeeExtractLogic?>()) {
       return (data != null
-              ? _i60.ScrappingBeeExtractLogic.fromJson(data)
+              ? _i61.ScrappingBeeExtractLogic.fromJson(data)
               : null)
           as T;
     }
-    if (t == _i1.getType<_i61.SupportedLanguage?>()) {
-      return (data != null ? _i61.SupportedLanguage.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i62.SupportedLanguage?>()) {
+      return (data != null ? _i62.SupportedLanguage.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i62.UserPaginatedScrappableResponse?>()) {
+    if (t == _i1.getType<_i63.UserPaginatedScrappableResponse?>()) {
       return (data != null
-              ? _i62.UserPaginatedScrappableResponse.fromJson(data)
+              ? _i63.UserPaginatedScrappableResponse.fromJson(data)
               : null)
           as T;
     }
-    if (t == _i1.getType<_i63.ZenScrapException?>()) {
-      return (data != null ? _i63.ZenScrapException.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i64.ZenScrapException?>()) {
+      return (data != null ? _i64.ZenScrapException.fromJson(data) : null) as T;
     }
-    if (t == List<_i56.Scrappable>) {
-      return (data as List).map((e) => deserialize<_i56.Scrappable>(e)).toList()
+    if (t == List<_i57.Scrappable>) {
+      return (data as List).map((e) => deserialize<_i57.Scrappable>(e)).toList()
           as T;
     }
-    if (t == _i1.getType<List<_i56.Scrappable>?>()) {
+    if (t == _i1.getType<List<_i57.Scrappable>?>()) {
       return (data != null
               ? (data as List)
-                    .map((e) => deserialize<_i56.Scrappable>(e))
+                    .map((e) => deserialize<_i57.Scrappable>(e))
                     .toList()
               : null)
           as T;
@@ -2967,9 +3053,9 @@ class Protocol extends _i1.SerializationManagerServer {
               : null)
           as T;
     }
-    if (t == List<_i57.ScrappableAnalytics>) {
+    if (t == List<_i58.ScrappableAnalytics>) {
       return (data as List)
-              .map((e) => deserialize<_i57.ScrappableAnalytics>(e))
+              .map((e) => deserialize<_i58.ScrappableAnalytics>(e))
               .toList()
           as T;
     }
@@ -3029,37 +3115,37 @@ class Protocol extends _i1.SerializationManagerServer {
           )
           as T;
     }
-    if (t == List<_i46.AutoFixAttempt>) {
+    if (t == List<_i47.AutoFixAttempt>) {
       return (data as List)
-              .map((e) => deserialize<_i46.AutoFixAttempt>(e))
+              .map((e) => deserialize<_i47.AutoFixAttempt>(e))
               .toList()
           as T;
     }
-    if (t == _i1.getType<List<_i46.AutoFixAttempt>?>()) {
+    if (t == _i1.getType<List<_i47.AutoFixAttempt>?>()) {
       return (data != null
               ? (data as List)
-                    .map((e) => deserialize<_i46.AutoFixAttempt>(e))
+                    .map((e) => deserialize<_i47.AutoFixAttempt>(e))
                     .toList()
               : null)
           as T;
     }
-    if (t == List<_i49.AutoFixSession>) {
+    if (t == List<_i50.AutoFixSession>) {
       return (data as List)
-              .map((e) => deserialize<_i49.AutoFixSession>(e))
+              .map((e) => deserialize<_i50.AutoFixSession>(e))
               .toList()
           as T;
     }
-    if (t == _i1.getType<List<_i57.ScrappableAnalytics>?>()) {
+    if (t == _i1.getType<List<_i58.ScrappableAnalytics>?>()) {
       return (data != null
               ? (data as List)
-                    .map((e) => deserialize<_i57.ScrappableAnalytics>(e))
+                    .map((e) => deserialize<_i58.ScrappableAnalytics>(e))
                     .toList()
               : null)
           as T;
     }
-    if (t == List<_i64.AccountApiKey>) {
+    if (t == List<_i65.AccountApiKey>) {
       return (data as List)
-              .map((e) => deserialize<_i64.AccountApiKey>(e))
+              .map((e) => deserialize<_i65.AccountApiKey>(e))
               .toList()
           as T;
     }
@@ -3078,16 +3164,16 @@ class Protocol extends _i1.SerializationManagerServer {
           )
           as T;
     }
-    if (t == List<_i65.ScraperCategory>) {
+    if (t == List<_i66.ScraperCategory>) {
       return (data as List)
-              .map((e) => deserialize<_i65.ScraperCategory>(e))
+              .map((e) => deserialize<_i66.ScraperCategory>(e))
               .toList()
           as T;
     }
-    if (t == _i1.getType<List<_i65.ScraperCategory>?>()) {
+    if (t == _i1.getType<List<_i66.ScraperCategory>?>()) {
       return (data != null
               ? (data as List)
-                    .map((e) => deserialize<_i65.ScraperCategory>(e))
+                    .map((e) => deserialize<_i66.ScraperCategory>(e))
                     .toList()
               : null)
           as T;
@@ -3174,26 +3260,27 @@ class Protocol extends _i1.SerializationManagerServer {
         'UpdatedScrappableRequestResponse',
       _i42.UserApiKeyQuotaExceededResponse => 'UserApiKeyQuotaExceededResponse',
       _i43.CreateSessionResponse => 'CreateSessionResponse',
-      _i44.PromptRole => 'PromptRole',
-      _i45.AiModel => 'AiModel',
-      _i46.AutoFixAttempt => 'AutoFixAttempt',
-      _i47.AutoFixAttemptStatus => 'AutoFixAttemptStatus',
-      _i48.AutoFixConfig => 'AutoFixConfig',
-      _i49.AutoFixSession => 'AutoFixSession',
-      _i50.AutoFixSessionStatus => 'AutoFixSessionStatus',
-      _i51.PaginatedAutoFixSessionResponse => 'PaginatedAutoFixSessionResponse',
-      _i52.ByteTestData => 'ByteTestData',
-      _i53.ReferenceTestData => 'ReferenceTestData',
-      _i54.RequestStatus => 'RequestStatus',
-      _i55.ScraperCategory => 'ScraperCategory',
-      _i56.Scrappable => 'Scrappable',
-      _i57.ScrappableAnalytics => 'ScrappableAnalytics',
-      _i58.ScrappableAverageDuration => 'ScrappableAverageDuration',
-      _i59.ScrappableRequest => 'ScrappableRequest',
-      _i60.ScrappingBeeExtractLogic => 'ScrappingBeeExtractLogic',
-      _i61.SupportedLanguage => 'SupportedLanguage',
-      _i62.UserPaginatedScrappableResponse => 'UserPaginatedScrappableResponse',
-      _i63.ZenScrapException => 'ZenScrapException',
+      _i44.PendingSessionCommit => 'PendingSessionCommit',
+      _i45.PromptRole => 'PromptRole',
+      _i46.AiModel => 'AiModel',
+      _i47.AutoFixAttempt => 'AutoFixAttempt',
+      _i48.AutoFixAttemptStatus => 'AutoFixAttemptStatus',
+      _i49.AutoFixConfig => 'AutoFixConfig',
+      _i50.AutoFixSession => 'AutoFixSession',
+      _i51.AutoFixSessionStatus => 'AutoFixSessionStatus',
+      _i52.PaginatedAutoFixSessionResponse => 'PaginatedAutoFixSessionResponse',
+      _i53.ByteTestData => 'ByteTestData',
+      _i54.ReferenceTestData => 'ReferenceTestData',
+      _i55.RequestStatus => 'RequestStatus',
+      _i56.ScraperCategory => 'ScraperCategory',
+      _i57.Scrappable => 'Scrappable',
+      _i58.ScrappableAnalytics => 'ScrappableAnalytics',
+      _i59.ScrappableAverageDuration => 'ScrappableAverageDuration',
+      _i60.ScrappableRequest => 'ScrappableRequest',
+      _i61.ScrappingBeeExtractLogic => 'ScrappingBeeExtractLogic',
+      _i62.SupportedLanguage => 'SupportedLanguage',
+      _i63.UserPaginatedScrappableResponse => 'UserPaginatedScrappableResponse',
+      _i64.ZenScrapException => 'ZenScrapException',
       _ => null,
     };
   }
@@ -3312,45 +3399,47 @@ class Protocol extends _i1.SerializationManagerServer {
         return 'UserApiKeyQuotaExceededResponse';
       case _i43.CreateSessionResponse():
         return 'CreateSessionResponse';
-      case _i44.PromptRole():
+      case _i44.PendingSessionCommit():
+        return 'PendingSessionCommit';
+      case _i45.PromptRole():
         return 'PromptRole';
-      case _i45.AiModel():
+      case _i46.AiModel():
         return 'AiModel';
-      case _i46.AutoFixAttempt():
+      case _i47.AutoFixAttempt():
         return 'AutoFixAttempt';
-      case _i47.AutoFixAttemptStatus():
+      case _i48.AutoFixAttemptStatus():
         return 'AutoFixAttemptStatus';
-      case _i48.AutoFixConfig():
+      case _i49.AutoFixConfig():
         return 'AutoFixConfig';
-      case _i49.AutoFixSession():
+      case _i50.AutoFixSession():
         return 'AutoFixSession';
-      case _i50.AutoFixSessionStatus():
+      case _i51.AutoFixSessionStatus():
         return 'AutoFixSessionStatus';
-      case _i51.PaginatedAutoFixSessionResponse():
+      case _i52.PaginatedAutoFixSessionResponse():
         return 'PaginatedAutoFixSessionResponse';
-      case _i52.ByteTestData():
+      case _i53.ByteTestData():
         return 'ByteTestData';
-      case _i53.ReferenceTestData():
+      case _i54.ReferenceTestData():
         return 'ReferenceTestData';
-      case _i54.RequestStatus():
+      case _i55.RequestStatus():
         return 'RequestStatus';
-      case _i55.ScraperCategory():
+      case _i56.ScraperCategory():
         return 'ScraperCategory';
-      case _i56.Scrappable():
+      case _i57.Scrappable():
         return 'Scrappable';
-      case _i57.ScrappableAnalytics():
+      case _i58.ScrappableAnalytics():
         return 'ScrappableAnalytics';
-      case _i58.ScrappableAverageDuration():
+      case _i59.ScrappableAverageDuration():
         return 'ScrappableAverageDuration';
-      case _i59.ScrappableRequest():
+      case _i60.ScrappableRequest():
         return 'ScrappableRequest';
-      case _i60.ScrappingBeeExtractLogic():
+      case _i61.ScrappingBeeExtractLogic():
         return 'ScrappingBeeExtractLogic';
-      case _i61.SupportedLanguage():
+      case _i62.SupportedLanguage():
         return 'SupportedLanguage';
-      case _i62.UserPaginatedScrappableResponse():
+      case _i63.UserPaginatedScrappableResponse():
         return 'UserPaginatedScrappableResponse';
-      case _i63.ZenScrapException():
+      case _i64.ZenScrapException():
         return 'ZenScrapException';
     }
     className = _i2.Protocol().getClassNameForObject(data);
@@ -3534,65 +3623,68 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName == 'CreateSessionResponse') {
       return deserialize<_i43.CreateSessionResponse>(data['data']);
     }
+    if (dataClassName == 'PendingSessionCommit') {
+      return deserialize<_i44.PendingSessionCommit>(data['data']);
+    }
     if (dataClassName == 'PromptRole') {
-      return deserialize<_i44.PromptRole>(data['data']);
+      return deserialize<_i45.PromptRole>(data['data']);
     }
     if (dataClassName == 'AiModel') {
-      return deserialize<_i45.AiModel>(data['data']);
+      return deserialize<_i46.AiModel>(data['data']);
     }
     if (dataClassName == 'AutoFixAttempt') {
-      return deserialize<_i46.AutoFixAttempt>(data['data']);
+      return deserialize<_i47.AutoFixAttempt>(data['data']);
     }
     if (dataClassName == 'AutoFixAttemptStatus') {
-      return deserialize<_i47.AutoFixAttemptStatus>(data['data']);
+      return deserialize<_i48.AutoFixAttemptStatus>(data['data']);
     }
     if (dataClassName == 'AutoFixConfig') {
-      return deserialize<_i48.AutoFixConfig>(data['data']);
+      return deserialize<_i49.AutoFixConfig>(data['data']);
     }
     if (dataClassName == 'AutoFixSession') {
-      return deserialize<_i49.AutoFixSession>(data['data']);
+      return deserialize<_i50.AutoFixSession>(data['data']);
     }
     if (dataClassName == 'AutoFixSessionStatus') {
-      return deserialize<_i50.AutoFixSessionStatus>(data['data']);
+      return deserialize<_i51.AutoFixSessionStatus>(data['data']);
     }
     if (dataClassName == 'PaginatedAutoFixSessionResponse') {
-      return deserialize<_i51.PaginatedAutoFixSessionResponse>(data['data']);
+      return deserialize<_i52.PaginatedAutoFixSessionResponse>(data['data']);
     }
     if (dataClassName == 'ByteTestData') {
-      return deserialize<_i52.ByteTestData>(data['data']);
+      return deserialize<_i53.ByteTestData>(data['data']);
     }
     if (dataClassName == 'ReferenceTestData') {
-      return deserialize<_i53.ReferenceTestData>(data['data']);
+      return deserialize<_i54.ReferenceTestData>(data['data']);
     }
     if (dataClassName == 'RequestStatus') {
-      return deserialize<_i54.RequestStatus>(data['data']);
+      return deserialize<_i55.RequestStatus>(data['data']);
     }
     if (dataClassName == 'ScraperCategory') {
-      return deserialize<_i55.ScraperCategory>(data['data']);
+      return deserialize<_i56.ScraperCategory>(data['data']);
     }
     if (dataClassName == 'Scrappable') {
-      return deserialize<_i56.Scrappable>(data['data']);
+      return deserialize<_i57.Scrappable>(data['data']);
     }
     if (dataClassName == 'ScrappableAnalytics') {
-      return deserialize<_i57.ScrappableAnalytics>(data['data']);
+      return deserialize<_i58.ScrappableAnalytics>(data['data']);
     }
     if (dataClassName == 'ScrappableAverageDuration') {
-      return deserialize<_i58.ScrappableAverageDuration>(data['data']);
+      return deserialize<_i59.ScrappableAverageDuration>(data['data']);
     }
     if (dataClassName == 'ScrappableRequest') {
-      return deserialize<_i59.ScrappableRequest>(data['data']);
+      return deserialize<_i60.ScrappableRequest>(data['data']);
     }
     if (dataClassName == 'ScrappingBeeExtractLogic') {
-      return deserialize<_i60.ScrappingBeeExtractLogic>(data['data']);
+      return deserialize<_i61.ScrappingBeeExtractLogic>(data['data']);
     }
     if (dataClassName == 'SupportedLanguage') {
-      return deserialize<_i61.SupportedLanguage>(data['data']);
+      return deserialize<_i62.SupportedLanguage>(data['data']);
     }
     if (dataClassName == 'UserPaginatedScrappableResponse') {
-      return deserialize<_i62.UserPaginatedScrappableResponse>(data['data']);
+      return deserialize<_i63.UserPaginatedScrappableResponse>(data['data']);
     }
     if (dataClassName == 'ZenScrapException') {
-      return deserialize<_i63.ZenScrapException>(data['data']);
+      return deserialize<_i64.ZenScrapException>(data['data']);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);
@@ -3656,26 +3748,28 @@ class Protocol extends _i1.SerializationManagerServer {
         return _i35.AnonymousIpSpending.t;
       case _i37.IpValidationCache:
         return _i37.IpValidationCache.t;
-      case _i46.AutoFixAttempt:
-        return _i46.AutoFixAttempt.t;
-      case _i48.AutoFixConfig:
-        return _i48.AutoFixConfig.t;
-      case _i49.AutoFixSession:
-        return _i49.AutoFixSession.t;
-      case _i52.ByteTestData:
-        return _i52.ByteTestData.t;
-      case _i53.ReferenceTestData:
-        return _i53.ReferenceTestData.t;
-      case _i56.Scrappable:
-        return _i56.Scrappable.t;
-      case _i57.ScrappableAnalytics:
-        return _i57.ScrappableAnalytics.t;
-      case _i58.ScrappableAverageDuration:
-        return _i58.ScrappableAverageDuration.t;
-      case _i59.ScrappableRequest:
-        return _i59.ScrappableRequest.t;
-      case _i60.ScrappingBeeExtractLogic:
-        return _i60.ScrappingBeeExtractLogic.t;
+      case _i44.PendingSessionCommit:
+        return _i44.PendingSessionCommit.t;
+      case _i47.AutoFixAttempt:
+        return _i47.AutoFixAttempt.t;
+      case _i49.AutoFixConfig:
+        return _i49.AutoFixConfig.t;
+      case _i50.AutoFixSession:
+        return _i50.AutoFixSession.t;
+      case _i53.ByteTestData:
+        return _i53.ByteTestData.t;
+      case _i54.ReferenceTestData:
+        return _i54.ReferenceTestData.t;
+      case _i57.Scrappable:
+        return _i57.Scrappable.t;
+      case _i58.ScrappableAnalytics:
+        return _i58.ScrappableAnalytics.t;
+      case _i59.ScrappableAverageDuration:
+        return _i59.ScrappableAverageDuration.t;
+      case _i60.ScrappableRequest:
+        return _i60.ScrappableRequest.t;
+      case _i61.ScrappingBeeExtractLogic:
+        return _i61.ScrappingBeeExtractLogic.t;
     }
     return null;
   }

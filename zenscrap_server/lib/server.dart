@@ -12,6 +12,7 @@ import 'package:zenscrap_server/src/core/stripe/stripe_config.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_openai_sdk_impl.dart';
 import 'package:zenscrap_server/src/future_calls/cleanup_expired_ip_spending_future_call.dart';
 import 'package:zenscrap_server/src/future_calls/cleanup_expired_ip_validation_cache_future_call.dart';
+import 'package:zenscrap_server/src/future_calls/cleanup_expired_pending_commits_future_call.dart';
 import 'package:zenscrap_server/src/future_calls/email_idp_cleanup_future_call.dart';
 import 'package:zenscrap_server/src/future_calls/monthly_subscription_credits_future_call.dart';
 import 'package:zenscrap_server/src/endpoints/public/scrappable_chat_session.dart';
@@ -201,6 +202,10 @@ void run(List<String> args) async {
     EmailIdpCleanupFutureCall(),
     EmailIdpCleanupFutureCall.callName,
   );
+  pod.registerFutureCall(
+    CleanupExpiredPendingCommitsFutureCall(),
+    CleanupExpiredPendingCommitsFutureCall.callName,
+  );
 
   // Start the server.
   await pod.start();
@@ -231,6 +236,7 @@ void run(List<String> args) async {
   await pod.cancelFutureCall(CleanupExpiredIpSpendingFutureCall.callName);
   await pod.cancelFutureCall(CleanupExpiredIpValidationCacheFutureCall.callName);
   await pod.cancelFutureCall(EmailIdpCleanupFutureCall.callName);
+  await pod.cancelFutureCall(CleanupExpiredPendingCommitsFutureCall.callName);
 
   // Schedule future calls only if not applying migrations
   // (when applying migrations, the future call tables may not exist yet)
@@ -286,5 +292,14 @@ void run(List<String> args) async {
     null,
     const Duration(minutes: 15), // Initial delay to let server fully initialize
     identifier: EmailIdpCleanupFutureCall.callName,
+  );
+
+  // Schedule periodic cleanup of expired pending session commits
+  // Runs hourly to delete pending commits older than 24 hours
+  await pod.futureCallWithDelay(
+    CleanupExpiredPendingCommitsFutureCall.callName,
+    null,
+    const Duration(minutes: 20), // Initial delay to let server fully initialize
+    identifier: CleanupExpiredPendingCommitsFutureCall.callName,
   );
 }
