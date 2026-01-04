@@ -611,6 +611,14 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.ptBR: 'Chave API do OpenAI Ausente',
     SupportedLanguage.ja: 'OpenAI APIキーがありません',
   },
+  'gemini_api_key_missing': {
+    SupportedLanguage.en: 'Gemini API Key Missing',
+    SupportedLanguage.es: 'Clave API de Gemini Faltante',
+    SupportedLanguage.de: 'Gemini API-Schlussel fehlt',
+    SupportedLanguage.fr: 'Cle API Gemini manquante',
+    SupportedLanguage.ptBR: 'Chave API do Gemini Ausente',
+    SupportedLanguage.ja: 'Gemini APIキーがありません',
+  },
 
   // Chat message titles (used as keys for chat response messages)
   'chat_session_closed': {
@@ -1428,6 +1436,14 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.fr: 'Le serveur n\'est pas configure avec une cle API OpenAI. Veuillez contacter le support.',
     SupportedLanguage.ptBR: 'O servidor nao esta configurado com uma chave API do OpenAI. Por favor, entre em contato com o suporte.',
     SupportedLanguage.ja: 'サーバーにOpenAI APIキーが設定されていません。サポートにお問い合わせください。',
+  },
+  'gemini_api_key_missing': {
+    SupportedLanguage.en: 'The server is not configured with a Gemini API key. Please contact support.',
+    SupportedLanguage.es: 'El servidor no esta configurado con una clave API de Gemini. Por favor, contacte con soporte.',
+    SupportedLanguage.de: 'Der Server ist nicht mit einem Gemini API-Schlussel konfiguriert. Bitte kontaktieren Sie den Support.',
+    SupportedLanguage.fr: 'Le serveur n\'est pas configure avec une cle API Gemini. Veuillez contacter le support.',
+    SupportedLanguage.ptBR: 'O servidor nao esta configurado com uma chave API do Gemini. Por favor, entre em contato com o suporte.',
+    SupportedLanguage.ja: 'サーバーにGemini APIキーが設定されていません。サポートにお問い合わせください。',
   },
 
   // Chat message descriptions

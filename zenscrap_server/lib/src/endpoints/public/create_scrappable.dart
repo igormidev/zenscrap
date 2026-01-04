@@ -138,8 +138,16 @@ class CreateScrappableEndpoint extends Endpoint {
       }
     }
 
+    // Get Gemini API key from password store with fallback pattern
+    final geminiApiKey = session.passwords['geminiApiKey'] ??
+        session.serverpod.getPassword('geminiApiKey');
+
+    if (geminiApiKey == null || geminiApiKey.isEmpty) {
+      throw createTranslatedException('gemini_api_key_missing', language);
+    }
+
     // Create GeminiClient and stream the response
-    final geminiClient = GeminiClient(apiKey: session.passwords['geminiApiKey']!);
+    final geminiClient = GeminiClient(apiKey: geminiApiKey);
 
     late final String name;
     late final String description;
