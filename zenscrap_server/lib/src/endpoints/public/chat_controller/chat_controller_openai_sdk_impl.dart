@@ -573,7 +573,14 @@ class ChatControllerOpenAiSdkImpl extends IChatController
     };
 
     final client = http.Client();
-    final request = http.Request('POST', Uri.parse(_openAiResponsesUrl))
+    final jsonBuffer = StringBuffer();
+    final thinkingBuffer = StringBuffer();
+    Map<String, dynamic>? parsedFromCompletion;
+    var tokenUsage = _TokenUsage.zero;
+    final List<String> receivedEventTypes = [];
+
+    try {
+      final request = http.Request('POST', Uri.parse(_openAiResponsesUrl))
       ..headers.addAll({
         'Authorization': 'Bearer $_openAiApiKey',
         'Content-Type': 'application/json',
@@ -618,12 +625,6 @@ class ChatControllerOpenAiSdkImpl extends IChatController
     final lines = streamedResponse.stream
         .transform(utf8.decoder)
         .transform(const LineSplitter());
-
-    final jsonBuffer = StringBuffer();
-    final thinkingBuffer = StringBuffer();
-    Map<String, dynamic>? parsedFromCompletion;
-    _TokenUsage tokenUsage = _TokenUsage.zero;
-    final List<String> receivedEventTypes = [];
 
     await for (final line in lines) {
       if (line.isEmpty || !line.startsWith('data:')) continue;
@@ -724,8 +725,9 @@ class ChatControllerOpenAiSdkImpl extends IChatController
         }
       }
     }
-
-    client.close();
+    } finally {
+      client.close();
+    }
 
     session.log(
       'Stream completed. Event types received: ${receivedEventTypes.join(", ")}',
