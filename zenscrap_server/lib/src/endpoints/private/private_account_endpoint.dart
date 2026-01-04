@@ -52,12 +52,12 @@ class PrivateAccountEndpoint extends Endpoint {
     final acountApiKey = '$nanoId::${_uuid.v7()}';
     try {
       return await session.db.transaction((transaction) async {
-        // Create CreditUsage first with 100 initial credits for free tier
+        // Create CreditUsage first with 1000 initial credits for free tier
         final creditUsage = await CreditUsage.db.insertRow(
           session,
           CreditUsage(
             purchasedCredits: 0,
-            subscriptionCredits: 100, // Free tier gets 100 credits initially
+            subscriptionCredits: 1000, // Free tier gets 1000 credits initially
           ),
           transaction: transaction,
         );
@@ -87,7 +87,7 @@ class PrivateAccountEndpoint extends Endpoint {
             await MonthlySubscriptionApiCreditDeposit.db.insertRow(
           session,
           MonthlySubscriptionApiCreditDeposit(
-            creditsAmount: 100, // Initial free tier credits
+            creditsAmount: 1000, // Initial free tier credits
             planTier: PlanTier.none, // Free tier
           ),
           transaction: transaction,
