@@ -1107,13 +1107,16 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
       _scrapRedraftSessions[sessionId]?.add(chatResponse);
       if (chatResponse is NewExtractRuleResponse) {
         if (_cacheRefTestData.containsKey(sessionId)) {
-          // Preserve database id and byteDataId from existing cached object
+          // Preserve database id from existing cached object for updates.
+          // Use the response's byteDataId if available (set by insertRow for new records),
+          // otherwise fall back to existing cached value.
           final existingTestData = _cacheRefTestData[sessionId];
-          _cacheRefTestData[sessionId] = chatResponse.referenceTestData
-              .copyWith(
-                id: existingTestData?.id,
-                byteDataId: existingTestData?.byteDataId,
-              );
+          final responseTestData = chatResponse.referenceTestData;
+          _cacheRefTestData[sessionId] = responseTestData.copyWith(
+            id: existingTestData?.id,
+            byteDataId:
+                responseTestData.byteDataId ?? existingTestData?.byteDataId,
+          );
         }
         if (_cacheScrappableRequest.containsKey(sessionId)) {
           // Preserve database id from existing cached object
