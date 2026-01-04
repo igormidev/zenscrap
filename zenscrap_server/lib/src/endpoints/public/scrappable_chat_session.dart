@@ -957,14 +957,14 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
               .copyWith(id: existingRequest?.id);
         }
         if (_cacheScrappingBeeExtractLogic.containsKey(sessionId)) {
-          // Preserve database id and scrappableId from existing cached object
+          // Use the response's id/scrappableId if available (set by insertRow for new records),
+          // otherwise fall back to existing cached values
           final existingLogic = _cacheScrappingBeeExtractLogic[sessionId];
-          _cacheScrappingBeeExtractLogic[sessionId] = chatResponse
-              .scrappingBeeExtractLogic
-              .copyWith(
-                id: existingLogic?.id,
-                scrappableId: existingLogic?.scrappableId,
-              );
+          final responseLogic = chatResponse.scrappingBeeExtractLogic;
+          _cacheScrappingBeeExtractLogic[sessionId] = responseLogic.copyWith(
+            id: responseLogic.id ?? existingLogic?.id,
+            scrappableId: responseLogic.scrappableId ?? existingLogic?.scrappableId,
+          );
         }
       } else if (chatResponse is UpdatedScrappableRequestResponse) {
         final updatedRequest = chatResponse.scrappableRequest;
