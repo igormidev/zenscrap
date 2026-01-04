@@ -26,6 +26,7 @@ class _PaymentSuccessViewState extends ConsumerState<PaymentSuccessView>
   @override
   void initState() {
     super.initState();
+    print('Payment successful view initialized.');
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
@@ -87,10 +88,7 @@ class _PaymentSuccessViewState extends ConsumerState<PaymentSuccessView>
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   // Success Icon with animation
-                  _SuccessIcon(
-                    size: iconSize,
-                    color: context.c.primary,
-                  )
+                  _SuccessIcon(size: iconSize, color: context.c.primary)
                       .animate(controller: _controller)
                       .scale(
                         begin: const Offset(0.5, 0.5),
@@ -108,44 +106,36 @@ class _PaymentSuccessViewState extends ConsumerState<PaymentSuccessView>
 
                   // Success Title
                   Text(
-                    l10n.payment_success_title,
-                    style: context.responsiveValue(
-                      compact: context.t.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: context.c.onSurface,
-                      ),
-                      expanded: context.t.headlineLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: context.c.onSurface,
-                      ),
-                    ),
-                    textAlign: TextAlign.center,
-                  )
+                        l10n.payment_success_title,
+                        style: context.responsiveValue(
+                          compact: context.t.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: context.c.onSurface,
+                          ),
+                          expanded: context.t.headlineLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: context.c.onSurface,
+                          ),
+                        ),
+                        textAlign: TextAlign.center,
+                      )
                       .animate(controller: _controller)
                       .fadeIn(delay: 200.ms, duration: 400.ms)
-                      .slideY(
-                        begin: 0.3,
-                        end: 0,
-                        curve: Curves.easeOut,
-                      ),
+                      .slideY(begin: 0.3, end: 0, curve: Curves.easeOut),
 
                   const SizedBox(height: 16),
 
                   // Success Message
                   Text(
-                    l10n.payment_success_message,
-                    style: context.t.bodyLarge?.copyWith(
-                      color: context.c.onSurfaceVariant,
-                    ),
-                    textAlign: TextAlign.center,
-                  )
+                        l10n.payment_success_message,
+                        style: context.t.bodyLarge?.copyWith(
+                          color: context.c.onSurfaceVariant,
+                        ),
+                        textAlign: TextAlign.center,
+                      )
                       .animate(controller: _controller)
                       .fadeIn(delay: 400.ms, duration: 400.ms)
-                      .slideY(
-                        begin: 0.3,
-                        end: 0,
-                        curve: Curves.easeOut,
-                      ),
+                      .slideY(begin: 0.3, end: 0, curve: Curves.easeOut),
 
                   SizedBox(
                     height: context.responsiveValue(
@@ -156,16 +146,12 @@ class _PaymentSuccessViewState extends ConsumerState<PaymentSuccessView>
 
                   // Information Card
                   _InstructionCard(
-                    title: l10n.payment_success_instructions_title,
-                    message: l10n.payment_success_instructions_message,
-                  )
+                        title: l10n.payment_success_instructions_title,
+                        message: l10n.payment_success_instructions_message,
+                      )
                       .animate(controller: _controller)
                       .fadeIn(delay: 600.ms, duration: 400.ms)
-                      .slideY(
-                        begin: 0.3,
-                        end: 0,
-                        curve: Curves.easeOut,
-                      ),
+                      .slideY(begin: 0.3, end: 0, curve: Curves.easeOut),
 
                   SizedBox(
                     height: context.responsiveValue(
@@ -176,32 +162,28 @@ class _PaymentSuccessViewState extends ConsumerState<PaymentSuccessView>
 
                   // Action Button
                   SizedBox(
-                    width: double.infinity,
-                    child: FilledButton.icon(
-                      onPressed: _goToDashboard,
-                      icon: const Icon(Icons.dashboard_rounded),
-                      label: Text(l10n.payment_success_go_to_account),
-                      style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 32.0,
-                          vertical: 16.0,
+                        width: double.infinity,
+                        child: FilledButton.icon(
+                          onPressed: _goToDashboard,
+                          icon: const Icon(Icons.dashboard_rounded),
+                          label: Text(l10n.payment_success_go_to_account),
+                          style: FilledButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 32.0,
+                              vertical: 16.0,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  )
+                      )
                       .animate(controller: _controller)
                       .fadeIn(delay: 800.ms, duration: 400.ms)
-                      .slideY(
-                        begin: 0.3,
-                        end: 0,
-                        curve: Curves.easeOut,
-                      ),
+                      .slideY(begin: 0.3, end: 0, curve: Curves.easeOut),
 
                   const SizedBox(height: 16),
 
                   // Session ID debug info (only in debug mode)
                   if (widget.sessionId != null)
-                    Text(
+                    SelectableText(
                       'Session: ${widget.sessionId}',
                       style: context.t.labelSmall?.copyWith(
                         color: context.c.onSurfaceVariant.withAlpha(128),
@@ -222,10 +204,7 @@ class _SuccessIcon extends StatelessWidget {
   final double size;
   final Color color;
 
-  const _SuccessIcon({
-    required this.size,
-    required this.color,
-  });
+  const _SuccessIcon({required this.size, required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -235,16 +214,9 @@ class _SuccessIcon extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: color.withAlpha(26), // 10% opacity
-        border: Border.all(
-          color: color,
-          width: 3,
-        ),
+        border: Border.all(color: color, width: 3),
       ),
-      child: Icon(
-        Icons.check_rounded,
-        size: size * 0.6,
-        color: color,
-      ),
+      child: Icon(Icons.check_rounded, size: size * 0.6, color: color),
     );
   }
 }
@@ -254,10 +226,7 @@ class _InstructionCard extends StatelessWidget {
   final String title;
   final String message;
 
-  const _InstructionCard({
-    required this.title,
-    required this.message,
-  });
+  const _InstructionCard({required this.title, required this.message});
 
   @override
   Widget build(BuildContext context) {
