@@ -373,6 +373,15 @@ class AppLocalizationsJa extends AppLocalizations {
   String get account_subscription_plan_label => 'ご契約プラン';
 
   @override
+  String get account_subscription_sync => '同期';
+
+  @override
+  String get account_subscription_syncing => '同期中...';
+
+  @override
+  String get account_subscription_sync_success => 'サブスクリプションを同期しました';
+
+  @override
   String get account_appearance_title => '外観';
 
   @override

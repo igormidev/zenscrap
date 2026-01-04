@@ -540,6 +540,21 @@ class AnalyticsService {
     );
   }
 
+  /// Track when user syncs subscription from Stripe
+  Future<void> trackSubscriptionSync({
+    required bool success,
+    required String planTier,
+  }) async {
+    await _safeCapture(
+      eventName: 'account:subscription_sync',
+      properties: {
+        'success': success,
+        'plan_tier': planTier,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
   // ========================================
   // Scrappable Creation Flow Events (InitialChatPage)
   // ========================================

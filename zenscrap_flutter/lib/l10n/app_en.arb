@@ -459,6 +459,18 @@
   "@account_subscription_plan_label": {
     "description": "Label for subscription plan field"
   },
+  "account_subscription_sync": "Sync",
+  "@account_subscription_sync": {
+    "description": "Button text to sync subscription from Stripe"
+  },
+  "account_subscription_syncing": "Syncing...",
+  "@account_subscription_syncing": {
+    "description": "Loading text while syncing subscription"
+  },
+  "account_subscription_sync_success": "Subscription synced successfully",
+  "@account_subscription_sync_success": {
+    "description": "Success message after syncing subscription"
+  },
   "account_appearance_title": "Appearance",
   "@account_appearance_title": {
     "description": "Title for appearance/theme customization section"

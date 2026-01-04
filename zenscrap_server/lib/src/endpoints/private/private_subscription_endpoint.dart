@@ -10,6 +10,196 @@ class PrivateSubscriptionEndpoint extends Endpoint {
   @override
   bool get requireLogin => true;
 
+  /// Syncs subscription status from Stripe using the user's email.
+  /// This is useful when webhook delivery failed or user wants to manually refresh.
+  Future<AccountInfo> syncSubscriptionFromStripe(
+    Session session, {
+    SupportedLanguage language = SupportedLanguage.en,
+  }) async {
+    // Get authenticated user
+    final authenticationInfo = session.authenticated;
+    if (authenticationInfo == null) {
+      throw _authenticationFailed(language);
+    }
+    final authenticatedUserId = authenticationInfo.authUserId;
+
+    // Get user profile for email
+    final userProfile = await session.authenticated?.userProfile(session);
+    final customerEmail = userProfile?.email;
+
+    if (customerEmail == null) {
+      throw _userEmailNotFound(language);
+    }
+
+    // Get account info with includes
+    var accountInfo = await AccountInfo.db.findFirstRow(
+      session,
+      where: (t) => t.authUserId.equals(authenticatedUserId),
+      include: _accountInfoInclude,
+    );
+
+    if (accountInfo == null) {
+      throw _accountNotFound(language);
+    }
+
+    try {
+      // Search for customer by email in Stripe
+      final customers = await StripeApi.listCustomersByEmail(
+        secretKey: StripeConfig.secretKey,
+        email: customerEmail,
+      );
+
+      if (customers.isEmpty) {
+        session.log('No Stripe customer found for email: $customerEmail');
+        // No Stripe customer - ensure account reflects no subscription
+        if (accountInfo.stripeCustomerId != null ||
+            accountInfo.stripeSubscriptionId != null) {
+          accountInfo.stripeCustomerId = null;
+          accountInfo.stripeSubscriptionId = null;
+          accountInfo.subscriptionStatus = null;
+          accountInfo.planTier = PlanTier.none;
+          accountInfo.subscriptionEndDate = null;
+          await AccountInfo.db.updateRow(session, accountInfo);
+
+          // Reset cache
+          final apiUsage = await AccountApiUsage.db.findById(
+            session,
+            accountInfo.accountApiUsageId,
+          );
+          if (apiUsage != null) {
+            ApiHelperMixin.resetNanoId(apiUsage.nanoId);
+          }
+        }
+        return accountInfo;
+      }
+
+      final stripeCustomer = customers.first;
+      final customerId = stripeCustomer['id'] as String;
+
+      // Get subscriptions for this customer
+      final subscriptions = await StripeApi.listSubscriptionsForCustomer(
+        secretKey: StripeConfig.secretKey,
+        customerId: customerId,
+      );
+
+      // Find the most relevant subscription (active > trialing > others)
+      Map<String, dynamic>? activeSubscription;
+      for (final sub in subscriptions) {
+        final status = sub['status'] as String?;
+        if (status == 'active' || status == 'trialing') {
+          activeSubscription = sub;
+          break;
+        }
+      }
+
+      // If no active subscription, check for other states
+      activeSubscription ??= subscriptions.isNotEmpty ? subscriptions.first : null;
+
+      if (activeSubscription == null) {
+        session.log('No subscriptions found for customer: $customerId');
+        // Customer exists but no subscriptions
+        accountInfo.stripeCustomerId = customerId;
+        accountInfo.stripeSubscriptionId = null;
+        accountInfo.subscriptionStatus = null;
+        accountInfo.planTier = PlanTier.none;
+        accountInfo.subscriptionEndDate = null;
+        await AccountInfo.db.updateRow(session, accountInfo);
+
+        // Reset cache
+        final apiUsage = await AccountApiUsage.db.findById(
+          session,
+          accountInfo.accountApiUsageId,
+        );
+        if (apiUsage != null) {
+          ApiHelperMixin.resetNanoId(apiUsage.nanoId);
+        }
+        return accountInfo;
+      }
+
+      // Extract subscription details
+      final subscriptionId = activeSubscription['id'] as String;
+      final status = activeSubscription['status'] as String?;
+      final currentPeriodEnd = activeSubscription['current_period_end'] as int?;
+
+      // Get the price ID to determine the plan tier
+      final items = activeSubscription['items'] as Map<String, dynamic>?;
+      final data = items?['data'] as List<dynamic>?;
+      final firstItem = data?.firstOrNull as Map<String, dynamic>?;
+      final price = firstItem?['price'] as Map<String, dynamic>?;
+      final priceId = price?['id'] as String?;
+
+      // Determine plan tier from price ID
+      final newPlanTier = _getPlanTierFromPriceId(priceId);
+
+      // Update account info
+      accountInfo.stripeCustomerId = customerId;
+      accountInfo.stripeSubscriptionId = subscriptionId;
+      accountInfo.subscriptionStatus = status;
+      accountInfo.planTier = newPlanTier;
+
+      if (currentPeriodEnd != null) {
+        accountInfo.subscriptionEndDate =
+            DateTime.fromMillisecondsSinceEpoch(currentPeriodEnd * 1000);
+      }
+
+      await AccountInfo.db.updateRow(session, accountInfo);
+
+      // Reset cache
+      final apiUsage = await AccountApiUsage.db.findById(
+        session,
+        accountInfo.accountApiUsageId,
+      );
+      if (apiUsage != null) {
+        ApiHelperMixin.resetNanoId(apiUsage.nanoId);
+      }
+
+      session.log(
+          'Synced subscription from Stripe for account ${accountInfo.id}: '
+          'plan=$newPlanTier, status=$status');
+
+      // Re-fetch with includes to return complete data
+      final updatedAccountInfo = await AccountInfo.db.findById(
+        session,
+        accountInfo.id!,
+        include: _accountInfoInclude,
+      );
+
+      return updatedAccountInfo ?? accountInfo;
+    } catch (e) {
+      session.log('Failed to sync subscription from Stripe: $e');
+      throw _syncSubscriptionFailed(language);
+    }
+  }
+
+  PlanTier _getPlanTierFromPriceId(String? priceId) {
+    if (priceId == null) {
+      return PlanTier.none;
+    }
+
+    if (priceId == StripeConfig.basicPriceIdMonthly ||
+        priceId == StripeConfig.basicPriceIdYearly) {
+      return PlanTier.basic;
+    } else if (priceId == StripeConfig.proPriceIdMonthly ||
+        priceId == StripeConfig.proPriceIdYearly) {
+      return PlanTier.pro;
+    } else if (priceId == StripeConfig.ultraPriceIdMonthly ||
+        priceId == StripeConfig.ultraPriceIdYearly) {
+      return PlanTier.ultra;
+    }
+
+    return PlanTier.none;
+  }
+
+  final _accountInfoInclude = AccountInfo.include(
+    authUser: AuthUser.include(),
+    accountApiUsage: AccountApiUsage.include(
+      apiKeys: AccountApiKey.includeList(
+        limit: 10,
+        orderBy: (p0) => p0.createdAt,
+      ),
+    ),
+  );
+
   Future<String> createCheckoutSession(
     Session session, {
     required String planTier,
@@ -223,3 +413,6 @@ ZenScrapException _noStripeCustomer(SupportedLanguage lang) =>
 
 ZenScrapException _customerPortalFailed(SupportedLanguage lang) =>
     createTranslatedException('customer_portal_failed', lang);
+
+ZenScrapException _syncSubscriptionFailed(SupportedLanguage lang) =>
+    createTranslatedException('sync_subscription_failed', lang);

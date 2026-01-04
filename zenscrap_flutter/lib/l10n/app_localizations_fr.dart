@@ -388,6 +388,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get account_subscription_plan_label => 'Votre abonnement';
 
   @override
+  String get account_subscription_sync => 'Synchroniser';
+
+  @override
+  String get account_subscription_syncing => 'Synchronisation...';
+
+  @override
+  String get account_subscription_sync_success =>
+      'Abonnement synchronise avec succes';
+
+  @override
   String get account_appearance_title => 'Apparence';
 
   @override

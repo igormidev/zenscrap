@@ -941,6 +941,14 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.ptBR: 'Email do usuario nao encontrado.',
     SupportedLanguage.ja: 'ユーザーのメールアドレスが見つかりません。',
   },
+  'sync_subscription_failed': {
+    SupportedLanguage.en: 'Failed to sync subscription from Stripe. Please try again later.',
+    SupportedLanguage.es: 'Error al sincronizar la suscripcion desde Stripe. Por favor, intentelo mas tarde.',
+    SupportedLanguage.de: 'Fehler beim Synchronisieren des Abonnements von Stripe. Bitte versuchen Sie es spater erneut.',
+    SupportedLanguage.fr: 'Echec de la synchronisation de l\'abonnement depuis Stripe. Veuillez reessayer plus tard.',
+    SupportedLanguage.ptBR: 'Falha ao sincronizar assinatura do Stripe. Por favor, tente novamente mais tarde.',
+    SupportedLanguage.ja: 'Stripeからのサブスクリプションの同期に失敗しました。後でもう一度お試しください。',
+  },
 
   // Access errors
   'access_denied_permission': {

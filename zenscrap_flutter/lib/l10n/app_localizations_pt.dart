@@ -381,6 +381,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get account_subscription_plan_label => 'Your subscription plan';
 
   @override
+  String get account_subscription_sync => 'Sync';
+
+  @override
+  String get account_subscription_syncing => 'Syncing...';
+
+  @override
+  String get account_subscription_sync_success =>
+      'Subscription synced successfully';
+
+  @override
   String get account_appearance_title => 'Appearance';
 
   @override
@@ -2572,6 +2582,16 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get account_subscription_plan_label => 'Seu plano de assinatura';
+
+  @override
+  String get account_subscription_sync => 'Sincronizar';
+
+  @override
+  String get account_subscription_syncing => 'Sincronizando...';
+
+  @override
+  String get account_subscription_sync_success =>
+      'Assinatura sincronizada com sucesso';
 
   @override
   String get account_appearance_title => 'Aparencia';

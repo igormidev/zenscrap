@@ -778,6 +778,24 @@ abstract class AppLocalizations {
   /// **'Your subscription plan'**
   String get account_subscription_plan_label;
 
+  /// Button text to sync subscription from Stripe
+  ///
+  /// In en, this message translates to:
+  /// **'Sync'**
+  String get account_subscription_sync;
+
+  /// Loading text while syncing subscription
+  ///
+  /// In en, this message translates to:
+  /// **'Syncing...'**
+  String get account_subscription_syncing;
+
+  /// Success message after syncing subscription
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription synced successfully'**
+  String get account_subscription_sync_success;
+
   /// Title for appearance/theme customization section
   ///
   /// In en, this message translates to:

@@ -19,6 +19,7 @@ import 'package:zenscrap_flutter/src/states/theme/theme_provider.dart';
 import 'package:zenscrap_flutter/src/states/theme/theme_state.dart';
 import 'package:zenscrap_flutter/src/ui/account/widgets/brightness_picker.dart';
 import 'package:zenscrap_flutter/src/ui/account/widgets/color_option.dart';
+import 'package:zenscrap_flutter/src/ui/account/widgets/subscription_sync_tile.dart';
 
 class AccountView extends ConsumerWidget {
   const AccountView({super.key});
@@ -325,11 +326,8 @@ class _AccountInformationCard extends StatelessWidget {
               expanded: 16.0,
             ),
           ),
-          _AccountDisplayTile(
-            title: AppLocalizations.of(
-              context,
-            )!.account_subscription_plan_label,
-            content: accountInfo.planTier.displayName,
+          SubscriptionSyncTile(
+            accountInfo: accountInfo,
             analytics: analytics,
           ),
           SizedBox(

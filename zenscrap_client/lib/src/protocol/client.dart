@@ -557,6 +557,16 @@ class EndpointPrivateSubscription extends _i2.EndpointRef {
   @override
   String get name => 'privateSubscription';
 
+  /// Syncs subscription status from Stripe using the user's email.
+  /// This is useful when webhook delivery failed or user wants to manually refresh.
+  _i3.Future<_i6.AccountInfo> syncSubscriptionFromStripe({
+    required _i7.SupportedLanguage language,
+  }) => caller.callServerEndpoint<_i6.AccountInfo>(
+    'privateSubscription',
+    'syncSubscriptionFromStripe',
+    {'language': language},
+  );
+
   _i3.Future<String> createCheckoutSession({
     required String planTier,
     required bool isYearly,

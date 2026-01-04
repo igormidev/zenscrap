@@ -229,6 +229,68 @@ class StripeApi {
     }
   }
 
+  /// List customers by email to find if user has a Stripe customer record
+  static Future<List<Map<String, dynamic>>> listCustomersByEmail({
+    required String secretKey,
+    required String email,
+  }) async {
+    final client = HttpClient();
+    try {
+      final uri = Uri.parse('$baseUrl/customers').replace(
+        queryParameters: {'email': email, 'limit': '1'},
+      );
+      final request = await client.getUrl(uri);
+
+      request.headers.set('Authorization', 'Bearer $secretKey');
+
+      final response = await request.close();
+      final responseBody = await response.transform(utf8.decoder).join();
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(responseBody) as Map<String, dynamic>;
+        final customers = data['data'] as List<dynamic>;
+        return customers.cast<Map<String, dynamic>>();
+      } else {
+        throw Exception('Failed to list customers: $responseBody');
+      }
+    } finally {
+      client.close();
+    }
+  }
+
+  /// List subscriptions for a customer
+  static Future<List<Map<String, dynamic>>> listSubscriptionsForCustomer({
+    required String secretKey,
+    required String customerId,
+  }) async {
+    final client = HttpClient();
+    try {
+      final uri = Uri.parse('$baseUrl/subscriptions').replace(
+        queryParameters: {
+          'customer': customerId,
+          'status': 'all',
+          'limit': '10',
+        },
+      );
+      final request = await client.getUrl(uri);
+
+      request.headers.set('Authorization', 'Bearer $secretKey');
+
+      final response = await request.close();
+      final responseBody = await response.transform(utf8.decoder).join();
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(responseBody) as Map<String, dynamic>;
+        final subscriptions = data['data'] as List<dynamic>;
+        return subscriptions.cast<Map<String, dynamic>>();
+      } else {
+        throw Exception('Failed to list subscriptions: $responseBody');
+      }
+    } finally {
+      client.close();
+    }
+  }
+
   static bool verifyWebhookSignature({
     required String payload,
     required String signature,

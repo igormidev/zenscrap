@@ -867,6 +867,27 @@ class Endpoints extends _i1.EndpointDispatch {
       name: 'privateSubscription',
       endpoint: endpoints['privateSubscription']!,
       methodConnectors: {
+        'syncSubscriptionFromStripe': _i1.MethodConnector(
+          name: 'syncSubscriptionFromStripe',
+          params: {
+            'language': _i1.ParameterDescription(
+              name: 'language',
+              type: _i1.getType<_i20.SupportedLanguage>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['privateSubscription']
+                          as _i11.PrivateSubscriptionEndpoint)
+                      .syncSubscriptionFromStripe(
+                        session,
+                        language: params['language'],
+                      ),
+        ),
         'createCheckoutSession': _i1.MethodConnector(
           name: 'createCheckoutSession',
           params: {
