@@ -19,6 +19,7 @@ import 'package:zenscrap_server/src/routes/scrappable_api_route.dart';
 import 'package:zenscrap_server/src/webhooks/stripe_webhook.dart';
 import 'package:zenscrap_server/src/web/routes/terms_of_service_route.dart';
 import 'package:zenscrap_server/src/web/routes/privacy_policy_route.dart';
+import 'package:zenscrap_server/src/web/routes/payment_success_route.dart';
 import 'src/generated/protocol.dart';
 import 'src/generated/endpoints.dart';
 
@@ -122,6 +123,9 @@ void run(List<String> args) async {
   // Register legal pages (Terms of Service and Privacy Policy)
   pod.webServer.addRoute(TermsOfServiceRoute(), '/terms-of-service');
   pod.webServer.addRoute(PrivacyPolicyRoute(), '/privacy-policy');
+
+  // Register payment success page (shown after successful Stripe checkout)
+  pod.webServer.addRoute(PaymentSuccessRoute(), '/success');
 
   // Setup Flutter web app using Serverpod 3.0 FlutterRoute (catch-all for remaining routes)
   // FlutterRoute is designed for Flutter WASM apps and automatically:

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Payment Successful - ZenScrap</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #607D8B;
+      --primary-light: #90A4AE;
+      --primary-dark: #455A64;
+      --primary-container: #ECEFF1;
+      --on-primary-container: #263238;
+      --surface: #FAFAFA;
+      --on-surface: #1a1a1a;
+      --on-surface-variant: #5f6368;
+      --success-green: #4CAF50;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+      background-color: var(--surface);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+    }
+
+    /* Success Icon */
+    .success-icon-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 32px;
+      opacity: 0;
+      transform: scale(0.5);
+      animation: scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    .success-icon {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background-color: rgba(96, 125, 139, 0.1);
+      border: 3px solid var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .success-icon svg {
+      width: 60px;
+      height: 60px;
+      color: var(--primary);
+      stroke-dasharray: 100;
+      stroke-dashoffset: 100;
+      animation: drawCheck 0.5s ease-out 0.3s forwards;
+    }
+
+    /* Animated ring */
+    .success-icon::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 3px solid var(--primary);
+      opacity: 0;
+      animation: ripple 1s ease-out 0.5s;
+    }
+
+    /* Title */
+    .title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--on-surface);
+      margin-bottom: 12px;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeSlideUp 0.5s ease-out 0.2s forwards;
+    }
+
+    /* Message */
+    .message {
+      font-size: 1.1rem;
+      color: var(--on-surface-variant);
+      margin-bottom: 40px;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeSlideUp 0.5s ease-out 0.4s forwards;
+    }
+
+    /* Instruction Card */
+    .instruction-card {
+      background-color: var(--primary-container);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: left;
+      margin-bottom: 40px;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeSlideUp 0.5s ease-out 0.6s forwards;
+    }
+
+    .instruction-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .instruction-icon {
+      width: 24px;
+      height: 24px;
+      color: var(--on-primary-container);
+      flex-shrink: 0;
+    }
+
+    .instruction-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--on-primary-container);
+    }
+
+    .instruction-message {
+      font-size: 0.95rem;
+      color: var(--on-primary-container);
+      line-height: 1.7;
+    }
+
+    /* Button */
+    .button-wrapper {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeSlideUp 0.5s ease-out 0.8s forwards;
+    }
+
+    .go-to-account-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 16px 32px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      background-color: var(--primary);
+      border: none;
+      border-radius: 100px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(96, 125, 139, 0.25);
+    }
+
+    .go-to-account-btn:hover {
+      background-color: var(--primary-dark);
+      box-shadow: 0 4px 16px rgba(96, 125, 139, 0.35);
+      transform: translateY(-2px);
+    }
+
+    .go-to-account-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(96, 125, 139, 0.25);
+    }
+
+    .button-icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* Animations */
+    @keyframes scaleIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.5);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes drawCheck {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    @keyframes ripple {
+      0% {
+        transform: scale(1);
+        opacity: 0.5;
+      }
+      100% {
+        transform: scale(1.5);
+        opacity: 0;
+      }
+    }
+
+    @keyframes fadeSlideUp {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 480px) {
+      body {
+        padding: 16px;
+      }
+
+      .success-icon {
+        width: 80px;
+        height: 80px;
+      }
+
+      .success-icon svg {
+        width: 48px;
+        height: 48px;
+      }
+
+      .title {
+        font-size: 1.5rem;
+      }
+
+      .message {
+        font-size: 1rem;
+        margin-bottom: 32px;
+      }
+
+      .instruction-card {
+        padding: 20px;
+        margin-bottom: 32px;
+      }
+
+      .instruction-title {
+        font-size: 1rem;
+      }
+
+      .instruction-message {
+        font-size: 0.9rem;
+      }
+
+      .go-to-account-btn {
+        padding: 14px 24px;
+        font-size: 0.95rem;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .container {
+        max-width: 550px;
+      }
+
+      .success-icon {
+        width: 120px;
+        height: 120px;
+      }
+
+      .success-icon svg {
+        width: 72px;
+        height: 72px;
+      }
+
+      .title {
+        font-size: 2.25rem;
+      }
+
+      .instruction-card {
+        padding: 28px;
+      }
+    }
+
+    /* Confetti animation on load */
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background-color: var(--primary);
+      border-radius: 2px;
+      pointer-events: none;
+      animation: confettiFall 3s ease-out forwards;
+      z-index: 1000;
+    }
+
+    @keyframes confettiFall {
+      0% {
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Success Icon -->
+    <div class="success-icon-wrapper">
+      <div class="success-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Title -->
+    <h1 class="title" id="title">Payment Successful!</h1>
+
+    <!-- Message -->
+    <p class="message" id="message">Thank you for upgrading your subscription. Your account is being updated.</p>
+
+    <!-- Instruction Card -->
+    <div class="instruction-card">
+      <div class="instruction-header">
+        <svg class="instruction-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span class="instruction-title" id="instructions-title">What's Next?</span>
+      </div>
+      <p class="instruction-message" id="instructions-message">Your subscription will be active within a few minutes. Please refresh your account page to see your updated subscription status and new features.</p>
+    </div>
+
+    <!-- Go to Account Button -->
+    <div class="button-wrapper">
+      <a href="/dashboard/account" class="go-to-account-btn" id="go-to-account-btn">
+        <svg class="button-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+        </svg>
+        <span id="button-text">Go to Account</span>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // Translations
+    const translations = {
+      en: {
+        title: "Payment Successful!",
+        message: "Thank you for upgrading your subscription. Your account is being updated.",
+        instructions_title: "What's Next?",
+        instructions_message: "Your subscription will be active within a few minutes. Please refresh your account page to see your updated subscription status and new features.",
+        button: "Go to Account"
+      },
+      es: {
+        title: "\u00A1Pago Exitoso!",
+        message: "Gracias por actualizar tu suscripci\u00F3n. Tu cuenta est\u00E1 siendo actualizada.",
+        instructions_title: "\u00BFQu\u00E9 sigue?",
+        instructions_message: "Tu suscripci\u00F3n estar\u00E1 activa en unos minutos. Por favor actualiza la p\u00E1gina de tu cuenta para ver el estado actualizado de tu suscripci\u00F3n y las nuevas funciones.",
+        button: "Ir a la Cuenta"
+      },
+      de: {
+        title: "Zahlung Erfolgreich!",
+        message: "Vielen Dank f\u00FCr das Upgrade Ihres Abonnements. Ihr Konto wird aktualisiert.",
+        instructions_title: "Was kommt als N\u00E4chstes?",
+        instructions_message: "Ihr Abonnement wird innerhalb weniger Minuten aktiv sein. Bitte aktualisieren Sie Ihre Kontoseite, um den aktualisierten Abonnementstatus und neue Funktionen zu sehen.",
+        button: "Zum Konto"
+      },
+      fr: {
+        title: "Paiement R\u00E9ussi!",
+        message: "Merci d'avoir mis \u00E0 niveau votre abonnement. Votre compte est en cours de mise \u00E0 jour.",
+        instructions_title: "Et Maintenant?",
+        instructions_message: "Votre abonnement sera actif dans quelques minutes. Veuillez actualiser votre page de compte pour voir le statut mis \u00E0 jour de votre abonnement et les nouvelles fonctionnalit\u00E9s.",
+        button: "Aller au Compte"
+      },
+      pt: {
+        title: "Pagamento Bem-Sucedido!",
+        message: "Obrigado por atualizar sua assinatura. Sua conta est\u00E1 sendo atualizada.",
+        instructions_title: "E Agora?",
+        instructions_message: "Sua assinatura estar\u00E1 ativa em alguns minutos. Por favor, atualize a p\u00E1gina da sua conta para ver o status atualizado da sua assinatura e os novos recursos.",
+        button: "Ir para a Conta"
+      },
+      ja: {
+        title: "\u652F\u6255\u3044\u6210\u529F\uFF01",
+        message: "\u30B5\u30D6\u30B9\u30AF\u30EA\u30D7\u30B7\u30E7\u30F3\u306E\u30A2\u30C3\u30D7\u30B0\u30EC\u30FC\u30C9\u3042\u308A\u304C\u3068\u3046\u3054\u3056\u3044\u307E\u3059\u3002\u30A2\u30AB\u30A6\u30F3\u30C8\u3092\u66F4\u65B0\u4E2D\u3067\u3059\u3002",
+        instructions_title: "\u6B21\u306F\u4F55\uFF1F",
+        instructions_message: "\u30B5\u30D6\u30B9\u30AF\u30EA\u30D7\u30B7\u30E7\u30F3\u306F\u6570\u5206\u4EE5\u5185\u306B\u6709\u52B9\u306B\u306A\u308A\u307E\u3059\u3002\u30A2\u30AB\u30A6\u30F3\u30C8\u30DA\u30FC\u30B8\u3092\u66F4\u65B0\u3057\u3066\u3001\u66F4\u65B0\u3055\u308C\u305F\u30B5\u30D6\u30B9\u30AF\u30EA\u30D7\u30B7\u30E7\u30F3\u30B9\u30C6\u30FC\u30BF\u30B9\u3068\u65B0\u6A5F\u80FD\u3092\u78BA\u8A8D\u3057\u3066\u304F\u3060\u3055\u3044\u3002",
+        button: "\u30A2\u30AB\u30A6\u30F3\u30C8\u3078"
+      }
+    };
+
+    // Detect user's browser language and apply translations
+    function detectLanguageAndApply() {
+      const browserLang = navigator.language || navigator.userLanguage || 'en';
+      const langCode = browserLang.split('-')[0].toLowerCase();
+
+      // Map pt_BR and pt-BR to pt
+      let targetLang = langCode;
+      if (langCode === 'pt') {
+        targetLang = 'pt';
+      }
+
+      // Fall back to English if language not supported
+      const lang = translations[targetLang] || translations['en'];
+
+      // Apply translations
+      document.getElementById('title').textContent = lang.title;
+      document.getElementById('message').textContent = lang.message;
+      document.getElementById('instructions-title').textContent = lang.instructions_title;
+      document.getElementById('instructions-message').textContent = lang.instructions_message;
+      document.getElementById('button-text').textContent = lang.button;
+
+      // Update HTML lang attribute
+      document.documentElement.lang = targetLang;
+    }
+
+    // Create confetti effect
+    function createConfetti() {
+      const colors = ['#607D8B', '#90A4AE', '#4CAF50', '#81C784', '#B0BEC5', '#78909C'];
+      const confettiCount = 50;
+
+      for (let i = 0; i < confettiCount; i++) {
+        setTimeout(() => {
+          const confetti = document.createElement('div');
+          confetti.className = 'confetti';
+          confetti.style.left = Math.random() * 100 + 'vw';
+          confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+          confetti.style.width = (Math.random() * 8 + 5) + 'px';
+          confetti.style.height = (Math.random() * 8 + 5) + 'px';
+          confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+          confetti.style.animationDelay = (Math.random() * 0.5) + 's';
+          document.body.appendChild(confetti);
+
+          // Remove confetti after animation
+          setTimeout(() => {
+            confetti.remove();
+          }, 4000);
+        }, i * 30);
+      }
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      detectLanguageAndApply();
+      createConfetti();
+    });
+  </script>
+</body>
+</html>
