@@ -546,70 +546,72 @@ class _DesktopAuthLayout extends StatelessWidget {
           const SizedBox(width: 20),
           // Left side - Form section
           Expanded(
-            child: Padding(
+            child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (context.canPop()) ...[
-                    _BackButton(),
-                    const SizedBox(height: 8),
-                  ],
-                  Text(
-                    l10n.auth_welcome,
-                    style: Theme.of(context).textTheme.displayLarge,
+              // crossAxisAlignment: CrossAxisAlignment.start,
+              // mainAxisSize: MainAxisSize.min,
+              children: [
+                if (context.canPop()) ...[
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: const _BackButton(),
                   ),
-                  const SizedBox(height: 20),
-                  // Animated height container for auth form
-                  // Listens to isConfirmEmail to adjust height when showing
-                  // verification code flow (smaller form)
-                  ValueListenableBuilder<String?>(
-                    valueListenable: isConfirmEmail,
-                    builder: (context, confirmEmail, _) {
-                      return ValueListenableBuilder<String?>(
-                        valueListenable: resetPasswordEmailVN,
-                        builder: (context, resetEmail, _) {
-                          final isInVerificationFlow = confirmEmail != null;
-                          final isInPasswordResetFlow = resetEmail != null;
-
-                          return AnimatedContainer(
-                            height: _calculateAuthContainerHeight(
-                              selectedAuthPage: selectedAuthPage,
-                              isInVerificationFlow: isInVerificationFlow,
-                              isInPasswordResetFlow: isInPasswordResetFlow,
-                            ),
-                            duration: const Duration(milliseconds: 700),
-                            child: _AuthContainer(
-                              tabController: tabController,
-                              emailAuth: emailAuth,
-                              isConfirmEmail: isConfirmEmail,
-                              resetPasswordEmailVN: resetPasswordEmailVN,
-                              onChangeToConfirmEmail: onChangeToConfirmEmail,
-                              onSuccessConfirmEmail: onSuccessConfirmEmail,
-                              onChangeToPasswordReset: onChangeToPasswordReset,
-                              onSuccessChangePassword: onSuccessChangePassword,
-                              onGoBackFromConfirmEmail: onGoBackFromConfirmEmail,
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  ),
-                  // Scrappable indicator if available
-                  if (scrappable != null) ...[
-                    const SizedBox(height: 16),
-                    ScrappableCardIndicator(
-                      accountId: null,
-                      scrappable: scrappable!,
-                    ),
-                  ],
-                  const SizedBox(height: 16),
-                  const ContactSupportButton(),
+                  const SizedBox(height: 8),
                 ],
-              ),
+                Text(
+                  l10n.auth_welcome,
+                  style: Theme.of(context).textTheme.displayLarge,
+                ),
+                const SizedBox(height: 20),
+                // Animated height container for auth form
+                // Listens to isConfirmEmail to adjust height when showing
+                // verification code flow (smaller form)
+                ValueListenableBuilder<String?>(
+                  valueListenable: isConfirmEmail,
+                  builder: (context, confirmEmail, _) {
+                    return ValueListenableBuilder<String?>(
+                      valueListenable: resetPasswordEmailVN,
+                      builder: (context, resetEmail, _) {
+                        final isInVerificationFlow = confirmEmail != null;
+                        final isInPasswordResetFlow = resetEmail != null;
+
+                        return AnimatedContainer(
+                          height: _calculateAuthContainerHeight(
+                            selectedAuthPage: selectedAuthPage,
+                            isInVerificationFlow: isInVerificationFlow,
+                            isInPasswordResetFlow: isInPasswordResetFlow,
+                          ),
+                          duration: const Duration(milliseconds: 700),
+                          child: _AuthContainer(
+                            tabController: tabController,
+                            emailAuth: emailAuth,
+                            isConfirmEmail: isConfirmEmail,
+                            resetPasswordEmailVN: resetPasswordEmailVN,
+                            onChangeToConfirmEmail: onChangeToConfirmEmail,
+                            onSuccessConfirmEmail: onSuccessConfirmEmail,
+                            onChangeToPasswordReset: onChangeToPasswordReset,
+                            onSuccessChangePassword: onSuccessChangePassword,
+                            onGoBackFromConfirmEmail: onGoBackFromConfirmEmail,
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+                // Scrappable indicator if available
+                if (scrappable != null) ...[
+                  const SizedBox(height: 16),
+                  ScrappableCardIndicator(
+                    accountId: null,
+                    scrappable: scrappable!,
+                  ),
+                ],
+                const SizedBox(height: 16),
+                const ContactSupportButton(),
+              ],
             ),
           ),
+
           // Right side - Lottie animation
           Expanded(
             child: Center(
