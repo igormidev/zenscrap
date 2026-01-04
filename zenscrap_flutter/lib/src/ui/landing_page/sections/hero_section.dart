@@ -171,7 +171,7 @@ class _DesktopHeroLayout extends StatelessWidget {
     final subheadlineSize =
         (context.t.titleMedium?.fontSize ?? 16) * scaleFactor;
     final verticalSpacing = (24 * scaleFactor).clamp(12.0, 32.0);
-    final formSpacing = (48 * scaleFactor).clamp(24.0, 64.0);
+    final formSpacing = (30 * scaleFactor).clamp(24.0, 64.0);
     final horizontalPadding = (60 * scaleFactor).clamp(24.0, 80.0);
     final verticalPadding = (40 * scaleFactor).clamp(16.0, 56.0);
 
@@ -196,37 +196,41 @@ class _DesktopHeroLayout extends StatelessWidget {
                 Seo.text(
                   text: AppLocalizations.of(context)!.landing_hero_title,
                   style: TextTagStyle.h1,
-                  child: Text(
-                        AppLocalizations.of(context)!.landing_hero_title,
-                        style: context.t.displayLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: context.c.onSurface,
-                          height: 1.1,
-                          fontSize: headlineSize,
-                        ),
-                      )
-                      .animate()
-                      .fadeIn(duration: 600.ms, delay: 200.ms)
-                      .slideX(begin: -0.1, end: 0),
+                  child:
+                      Text(
+                            AppLocalizations.of(context)!.landing_hero_title,
+                            style: context.t.displayLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: context.c.onSurface,
+                              height: 1.1,
+                              fontSize: headlineSize,
+                            ),
+                          )
+                          .animate()
+                          .fadeIn(duration: 600.ms, delay: 200.ms)
+                          .slideX(begin: -0.1, end: 0),
                 ),
                 SizedBox(height: verticalSpacing),
                 // Subheadline
                 Seo.text(
                   text: AppLocalizations.of(context)!.landing_hero_subtitle,
-                  child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 520),
-                        child: Text(
-                          AppLocalizations.of(context)!.landing_hero_subtitle,
-                          style: context.t.titleMedium?.copyWith(
-                            color: context.c.onSurfaceVariant,
-                            height: 1.6,
-                            fontSize: subheadlineSize,
-                          ),
-                        ),
-                      )
-                      .animate()
-                      .fadeIn(duration: 600.ms, delay: 400.ms)
-                      .slideX(begin: -0.1, end: 0),
+                  child:
+                      ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 520),
+                            child: Text(
+                              AppLocalizations.of(
+                                context,
+                              )!.landing_hero_subtitle,
+                              style: context.t.titleMedium?.copyWith(
+                                color: context.c.onSurfaceVariant,
+                                height: 1.6,
+                                fontSize: subheadlineSize,
+                              ),
+                            ),
+                          )
+                          .animate()
+                          .fadeIn(duration: 600.ms, delay: 400.ms)
+                          .slideX(begin: -0.1, end: 0),
                 ),
                 SizedBox(height: formSpacing),
                 // Form
@@ -317,34 +321,36 @@ class _MobileHeroLayout extends StatelessWidget {
             Seo.text(
               text: l10n.landing_hero_title,
               style: TextTagStyle.h1,
-              child: Text(
-                    l10n.landing_hero_title,
-                    style: context.t.headlineLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: context.c.onSurface,
-                      height: 1.1,
-                    ),
-                    textAlign: TextAlign.center,
-                  )
-                  .animate()
-                  .fadeIn(duration: 600.ms, delay: 200.ms)
-                  .slideY(begin: -0.1, end: 0),
+              child:
+                  Text(
+                        l10n.landing_hero_title,
+                        style: context.t.headlineLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: context.c.onSurface,
+                          height: 1.1,
+                        ),
+                        textAlign: TextAlign.center,
+                      )
+                      .animate()
+                      .fadeIn(duration: 600.ms, delay: 200.ms)
+                      .slideY(begin: -0.1, end: 0),
             ),
             const SizedBox(height: 16),
             // Subheadline - centered on mobile
             Seo.text(
               text: l10n.landing_hero_subtitle,
-              child: Text(
-                    l10n.landing_hero_subtitle,
-                    style: context.t.bodyLarge?.copyWith(
-                      color: context.c.onSurfaceVariant,
-                      height: 1.5,
-                    ),
-                    textAlign: TextAlign.center,
-                  )
-                  .animate()
-                  .fadeIn(duration: 600.ms, delay: 400.ms)
-                  .slideY(begin: -0.1, end: 0),
+              child:
+                  Text(
+                        l10n.landing_hero_subtitle,
+                        style: context.t.bodyLarge?.copyWith(
+                          color: context.c.onSurfaceVariant,
+                          height: 1.5,
+                        ),
+                        textAlign: TextAlign.center,
+                      )
+                      .animate()
+                      .fadeIn(duration: 600.ms, delay: 400.ms)
+                      .slideY(begin: -0.1, end: 0),
             ),
             const SizedBox(height: 24),
             // Trust badges - responsive
@@ -445,43 +451,45 @@ class _HeroForm extends StatelessWidget {
             AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   height: isDescriptionFocused ? 200 : 56,
-                  child: Focus(
-                    onFocusChange: (hasFocus) {
-                      if (hasFocus &&
-                          isDescriptionFocused &&
-                          promptText.trim().isEmpty) {
-                        onDescriptionFocusChange(false);
-                        return;
-                      }
-                      if (hasFocus && !isDescriptionFocused) {
-                        onDescriptionFocusChange(true);
-                      } else if (!hasFocus && isDescriptionFocused) {
-                        if (promptText.trim().isNotEmpty) {
-                          return;
-                        }
-                        onDescriptionFocusChange(false);
-                      }
-                    },
-                    child: ZenTextfield(
-                      controller: promptEC,
-                      labelText: l10n.landing_hero_prompt_label,
-                      hintText: l10n.landing_hero_prompt_hint,
-                      expands: true,
-                      maxLines: null,
-                      minLines: null,
-                      onSubmitted: (_) => onSubmit(),
-                      validator: ValidationBuilder()
-                          .minLength(
-                            10,
-                            l10n.landing_hero_prompt_validation_min_length,
+                  child:
+                      (ZenTextfield(
+                            controller: promptEC,
+                            labelText: l10n.landing_hero_prompt_label,
+                            hintText: l10n.landing_hero_prompt_hint,
+                            expands: true,
+                            maxLines: null,
+                            minLines: null,
+                            onTapOutside: (_) {
+                              if (isDescriptionFocused) {
+                                if (promptEC.text.trim().isNotEmpty) {
+                                  return;
+                                }
+                                onDescriptionFocusChange(false);
+                              }
+                            },
+                            onTap: () {
+                              if (isDescriptionFocused &&
+                                  promptText.trim().isEmpty) {
+                                onDescriptionFocusChange(false);
+                                return;
+                              }
+                              if (!isDescriptionFocused) {
+                                onDescriptionFocusChange(true);
+                              }
+                            },
+                            onSubmitted: (_) => onSubmit(),
+                            validator: ValidationBuilder()
+                                .minLength(
+                                  10,
+                                  l10n.landing_hero_prompt_validation_min_length,
+                                )
+                                .maxLength(
+                                  2200,
+                                  l10n.landing_hero_prompt_validation_max_length,
+                                )
+                                .build(),
                           )
-                          .maxLength(
-                            2200,
-                            l10n.landing_hero_prompt_validation_max_length,
-                          )
-                          .build(),
-                    ),
-                  ),
+                          as StatefulWidget),
                 )
                 .animate()
                 .fadeIn(duration: 500.ms, delay: 700.ms)

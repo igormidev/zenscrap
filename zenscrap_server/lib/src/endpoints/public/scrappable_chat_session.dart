@@ -945,7 +945,10 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
           _cacheRefTestData[sessionId] = chatResponse.referenceTestData;
         }
         if (_cacheScrappableRequest.containsKey(sessionId)) {
-          _cacheScrappableRequest[sessionId] = chatResponse.scrapperRequest;
+          // Preserve database id from existing cached object
+          final existingRequest = _cacheScrappableRequest[sessionId];
+          _cacheScrappableRequest[sessionId] = chatResponse.scrapperRequest
+              .copyWith(id: existingRequest?.id);
         }
         if (_cacheScrappingBeeExtractLogic.containsKey(sessionId)) {
           _cacheScrappingBeeExtractLogic[sessionId] =
@@ -955,7 +958,10 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
         final updatedRequest = chatResponse.scrappableRequest;
         if (updatedRequest != null &&
             _cacheScrappableRequest.containsKey(sessionId)) {
-          _cacheScrappableRequest[sessionId] = updatedRequest;
+          // Preserve database id from existing cached object
+          final existingRequest = _cacheScrappableRequest[sessionId];
+          _cacheScrappableRequest[sessionId] =
+              updatedRequest.copyWith(id: existingRequest?.id);
         }
       }
     });

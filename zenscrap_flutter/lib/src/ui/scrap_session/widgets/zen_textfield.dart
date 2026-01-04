@@ -13,6 +13,8 @@ class ZenTextfield extends StatefulWidget {
   final String? Function(String?)? validator;
   final AutovalidateMode autovalidateMode;
   final ValueChanged<String>? onChanged;
+  final void Function()? onTap;
+  final void Function(PointerDownEvent event)? onTapOutside;
 
   const ZenTextfield({
     super.key,
@@ -28,6 +30,8 @@ class ZenTextfield extends StatefulWidget {
     this.validator,
     this.autovalidateMode = AutovalidateMode.disabled,
     this.onChanged,
+    this.onTap,
+    this.onTapOutside,
   });
 
   @override
@@ -83,6 +87,8 @@ class _ZenTextfieldState extends State<ZenTextfield> {
         expands: widget.expands,
         textAlign: TextAlign.start,
         textAlignVertical: TextAlignVertical.top,
+        onTap: widget.onTap,
+        onTapOutside: widget.onTapOutside,
         decoration: InputDecoration(
           contentPadding: EdgeInsets.only(left: 16, top: 16, bottom: 16),
           label: ValueListenableBuilder(
@@ -96,9 +102,7 @@ class _ZenTextfieldState extends State<ZenTextfield> {
             child: Text(widget.labelText),
           ),
           hintText: widget.hintText,
-          hintStyle: TextStyle(
-            color: Theme.of(context).colorScheme.outline,
-          ),
+          hintStyle: TextStyle(color: Theme.of(context).colorScheme.outline),
           hoverColor: Colors.transparent,
           border: OutlineInputBorder(
             borderSide: BorderSide.none,
