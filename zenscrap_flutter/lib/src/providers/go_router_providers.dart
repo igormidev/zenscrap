@@ -44,9 +44,12 @@ class RouterNotifier extends Notifier<GoRouter> {
         if (kDebugMode) TalkerRouteObserver(talker),
       ],
       redirect: (context, state) {
-        final path = state.fullPath;
-        if (path?.contains('success') ?? false) {
-          return '/success';
+        final path = state.uri.path;
+
+        // Allow /success route without any redirects (preserves query parameters)
+        // This is critical for Stripe payment success redirects
+        if (path == '/success' || path.startsWith('/success')) {
+          return null;
         }
 
         // Don't redirect while session is still loading
@@ -57,7 +60,7 @@ class RouterNotifier extends Notifier<GoRouter> {
         if (path == '/splash') {
           return null;
         }
-        if (path == null) {
+        if (path.isEmpty || path == '/') {
           return '/splash';
         }
 
@@ -66,10 +69,9 @@ class RouterNotifier extends Notifier<GoRouter> {
             return null;
           }
 
-          // Allow unauthenticated access to auth, splash, landing page, and payment success routes
+          // Allow unauthenticated access to auth, splash, and landing page routes
           if (path.contains('/scrappable-form') == false &&
-              path.contains('/splash') == false &&
-              path.contains('/success') == false) {
+              path.contains('/splash') == false) {
             return '/scrappable-form'; // Redirect to landing page
           }
         } else {
