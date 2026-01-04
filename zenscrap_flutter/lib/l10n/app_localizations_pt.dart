@@ -2184,23 +2184,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get ip_block_reason_bogon_ip => 'Invalid IP address range';
-
-  @override
-  String get payment_success_title => 'Payment Successful!';
-
-  @override
-  String get payment_success_message =>
-      'Thank you for upgrading your subscription. Your account is being updated.';
-
-  @override
-  String get payment_success_instructions_title => 'What\'s Next?';
-
-  @override
-  String get payment_success_instructions_message =>
-      'Your subscription will be active within a few minutes. Please refresh your account page to see your updated subscription status and new features.';
-
-  @override
-  String get payment_success_go_to_account => 'Go to Account';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).

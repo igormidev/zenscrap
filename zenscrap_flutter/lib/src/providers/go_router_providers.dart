@@ -16,7 +16,6 @@ import 'package:zenscrap_flutter/src/ui/dashboard/pages/pricing_page.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/views/dashboard_view.dart';
 import 'package:zenscrap_flutter/src/ui/marketplace/views/marketplace_view.dart';
 import 'package:zenscrap_flutter/src/ui/landing_page/landing_page.dart';
-import 'package:zenscrap_flutter/src/ui/payment/views/payment_success_view.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/view/initial_chat_view.dart';
 import 'package:zenscrap_flutter/src/ui/scrappables/views/user_scrappables_listage_view.dart';
 
@@ -45,12 +44,6 @@ class RouterNotifier extends Notifier<GoRouter> {
       ],
       redirect: (context, state) {
         final path = state.uri.path;
-
-        // Allow /success route without any redirects (preserves query parameters)
-        // This is critical for Stripe payment success redirects
-        if (path == '/success' || path.startsWith('/success')) {
-          return null;
-        }
 
         // Don't redirect while session is still loading
         if (isLoading) {
@@ -105,13 +98,6 @@ class RouterNotifier extends Notifier<GoRouter> {
               return InitialChatView(scrappableId: scrappableId);
             }
             return const LandingPage();
-          },
-        ),
-        GoRoute(
-          path: '/success',
-          builder: (context, state) {
-            final sessionId = state.uri.queryParameters['session_id'];
-            return PaymentSuccessView(sessionId: sessionId);
           },
         ),
         ShellRoute(

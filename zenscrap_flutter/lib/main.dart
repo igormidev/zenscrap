@@ -163,16 +163,7 @@ class _MyAppState extends ConsumerState<MyApp> {
 
     ref.listen(sessionProvider, (previous, next) {
       Future.delayed(const Duration(milliseconds: 300), () {
-        // Get the current route path to check if we should skip redirection
         final router = ref.read(routerProvider);
-        final currentPath = router.routeInformationProvider.value.uri.path;
-
-        // Don't redirect if user is on special routes like payment success
-        // These routes should be preserved even after session state changes
-        if (currentPath == '/success' || currentPath.startsWith('/success')) {
-          return;
-        }
-
         next.mapOrNull(
           logged: (value) {
             router.go(DashboardNavigationType.userEndpoints.routeOnClick!);
