@@ -52,6 +52,8 @@ class AutoFixConstants {
 /// - Cooldown period prevents spam-fixing
 /// - Batch limit prevents overloading the system
 class PeriodicAutoFixBrokenScrappables extends FutureCall {
+  static const String callName = 'periodicAutoFixBrokenScrappables';
+
   @override
   Future<void> invoke(Session session, SerializableModel? _) async {
     try {
@@ -528,10 +530,10 @@ class PeriodicAutoFixBrokenScrappables extends FutureCall {
   /// Schedules the next periodic run
   Future<void> _scheduleNextRun(Session session) async {
     await session.serverpod.futureCallWithDelay(
-      'periodicAutoFixBrokenScrappables',
+      callName,
       null,
       AutoFixConstants.checkInterval,
-      identifier: 'periodicAutoFixBrokenScrappables',
+      identifier: callName,
     );
   }
 }
@@ -553,15 +555,15 @@ Future<void> startPeriodicAutoFix(Serverpod serverpod) async {
   // Register the FutureCall
   serverpod.registerFutureCall(
     PeriodicAutoFixBrokenScrappables(),
-    'periodicAutoFixBrokenScrappables',
+    PeriodicAutoFixBrokenScrappables.callName,
   );
 
   // Schedule the first run after a short delay
   // This gives the server time to fully initialize
   await serverpod.futureCallWithDelay(
-    'periodicAutoFixBrokenScrappables',
+    PeriodicAutoFixBrokenScrappables.callName,
     null,
     const Duration(seconds: 30),
-    identifier: 'periodicAutoFixBrokenScrappables',
+    identifier: PeriodicAutoFixBrokenScrappables.callName,
   );
 }

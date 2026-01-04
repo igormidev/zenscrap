@@ -1157,6 +1157,8 @@ class AnalyticsPayload {
 }
 
 class PeriodicSetRequestsAnalytics extends FutureCall {
+  static const String callName = 'periodicSetRequestsAnalytics';
+
   @override
   Future<void> invoke(Session session, SerializableModel? _) async {
     Map<ScrappableId, Map<NanoId, Map<ApiKey, List<AnalyticsPayload>>>>
@@ -1187,10 +1189,10 @@ class PeriodicSetRequestsAnalytics extends FutureCall {
 
     // Schedule the next execution
     await session.serverpod.futureCallWithDelay(
-      'periodicSetRequestsAnalytics',
+      callName,
       null,
       ApiHelperConfig.analyticsBatchInterval,
-      identifier: 'periodicSetRequestsAnalytics',
+      identifier: callName,
     );
   }
 }
@@ -1251,6 +1253,8 @@ class PeriodicCacheCleanup extends FutureCall {
 }
 
 class PeriodicCleanupOldAnalyticsDetails extends FutureCall {
+  static const String callName = 'periodicCleanupOldAnalyticsDetails';
+
   @override
   Future<void> invoke(Session session, SerializableModel? _) async {
     try {
@@ -1284,10 +1288,10 @@ class PeriodicCleanupOldAnalyticsDetails extends FutureCall {
 
     // Schedule the next execution
     await session.serverpod.futureCallWithDelay(
-      'periodicCleanupOldAnalyticsDetails',
+      callName,
       null,
       ApiHelperConfig.analyticsCleanupInterval,
-      identifier: 'periodicCleanupOldAnalyticsDetails',
+      identifier: callName,
     );
   }
 

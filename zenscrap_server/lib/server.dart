@@ -171,24 +171,27 @@ void run(List<String> args) async {
   // // Register your future calls
   pod.registerFutureCall(
     TestScrappableDisposeFutureCall(),
-    'dispose_temporary_scrappable',
+    TestScrappableDisposeFutureCall.callName,
   );
   pod.registerFutureCall(
     MonthlySubscriptionCreditsFutureCall(),
-    'monthly_subscription_credits',
+    MonthlySubscriptionCreditsFutureCall.callName,
   );
-  pod.registerFutureCall(SessionPromptFutureCall(), 'session_prompt');
+  pod.registerFutureCall(
+    SessionPromptFutureCall(),
+    SessionPromptFutureCall.callName,
+  );
   pod.registerFutureCall(
     PeriodicSetRequestsAnalytics(),
-    'periodicSetRequestsAnalytics',
+    PeriodicSetRequestsAnalytics.callName,
   );
   pod.registerFutureCall(
     PeriodicCleanupOldAnalyticsDetails(),
-    'periodicCleanupOldAnalyticsDetails',
+    PeriodicCleanupOldAnalyticsDetails.callName,
   );
   pod.registerFutureCall(
     PeriodicAutoFixBrokenScrappables(),
-    'periodicAutoFixBrokenScrappables',
+    PeriodicAutoFixBrokenScrappables.callName,
   );
   pod.registerFutureCall(
     CleanupExpiredIpSpendingFutureCall(),
@@ -230,9 +233,9 @@ void run(List<String> args) async {
     );
   }
 
-  await pod.cancelFutureCall('periodicSetRequestsAnalytics');
-  await pod.cancelFutureCall('periodicCleanupOldAnalyticsDetails');
-  await pod.cancelFutureCall('periodicAutoFixBrokenScrappables');
+  await pod.cancelFutureCall(PeriodicSetRequestsAnalytics.callName);
+  await pod.cancelFutureCall(PeriodicCleanupOldAnalyticsDetails.callName);
+  await pod.cancelFutureCall(PeriodicAutoFixBrokenScrappables.callName);
   await pod.cancelFutureCall(CleanupExpiredIpSpendingFutureCall.callName);
   await pod.cancelFutureCall(CleanupExpiredIpValidationCacheFutureCall.callName);
   await pod.cancelFutureCall(EmailIdpCleanupFutureCall.callName);
@@ -244,26 +247,26 @@ void run(List<String> args) async {
 
   // Schedule periodic analytics batching
   await pod.futureCallWithDelay(
-    'periodicSetRequestsAnalytics',
+    PeriodicSetRequestsAnalytics.callName,
     null,
     Duration(minutes: 2),
-    identifier: 'periodicSetRequestsAnalytics',
+    identifier: PeriodicSetRequestsAnalytics.callName,
   );
 
   await pod.futureCallWithDelay(
-    'periodicCleanupOldAnalyticsDetails',
+    PeriodicCleanupOldAnalyticsDetails.callName,
     null,
     const Duration(hours: 1),
-    identifier: 'periodicCleanupOldAnalyticsDetails',
+    identifier: PeriodicCleanupOldAnalyticsDetails.callName,
   );
 
   // Schedule periodic auto-fix for broken scrappables
   // Runs every 5 minutes to detect and fix scrappables with consecutive errors
   await pod.futureCallWithDelay(
-    'periodicAutoFixBrokenScrappables',
+    PeriodicAutoFixBrokenScrappables.callName,
     null,
     const Duration(seconds: 30), // Initial delay to let server fully initialize
-    identifier: 'periodicAutoFixBrokenScrappables',
+    identifier: PeriodicAutoFixBrokenScrappables.callName,
   );
 
   // Schedule periodic cleanup of expired anonymous IP spending records

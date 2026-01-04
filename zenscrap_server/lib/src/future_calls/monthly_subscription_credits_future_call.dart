@@ -5,6 +5,8 @@ import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class MonthlySubscriptionCreditsFutureCall extends FutureCall {
+  static const String callName = 'monthly_subscription_credits';
+
   @override
   Future<void> invoke(Session session, SerializableModel? object) async {
     if (object is! MonthlyCreditsData) {
@@ -175,7 +177,7 @@ class MonthlySubscriptionCreditsFutureCall extends FutureCall {
     } finally {
       // Schedule the next monthly credit addition (30 days from now)
       await session.serverpod.futureCallWithDelay(
-        'monthly_subscription_credits',
+        callName,
         MonthlyCreditsData(
           accountInfoId: object.accountInfoId,
         ),

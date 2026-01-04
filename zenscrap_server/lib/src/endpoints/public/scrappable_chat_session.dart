@@ -620,7 +620,7 @@ class ScrappableChatSession extends Endpoint {
     );
     session.log('Created session $sessionUuid for scrappable ${scrappable.id}');
     await session.serverpod.futureCallWithDelay(
-      'dispose_temporary_scrappable',
+      TestScrappableDisposeFutureCall.callName,
       response,
       duration + Duration(minutes: 1),
     );
@@ -760,7 +760,7 @@ class ScrappableChatSession extends Endpoint {
     }
 
     await session.serverpod.futureCallWithDelay(
-      'session_prompt',
+      SessionPromptFutureCall.callName,
       SessionPrompt(
         sessionId: sessionId,
         userPrompt: userPrompt,
@@ -943,6 +943,8 @@ Future<void> _savePendingSessionData({
 
 class TestScrappableDisposeFutureCall
     extends FutureCall<CreateSessionResponse> {
+  static const String callName = 'dispose_temporary_scrappable';
+
   @override
   Future<void> invoke(Session session, CreateSessionResponse? object) async {
     if (object == null) return;
@@ -951,6 +953,8 @@ class TestScrappableDisposeFutureCall
 }
 
 class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
+  static const String callName = 'session_prompt';
+
   @override
   Future<void> invoke(Session session, SessionPrompt? object) async {
     if (object == null) return;
