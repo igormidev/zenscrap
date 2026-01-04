@@ -378,7 +378,7 @@ class _MobileHeroLayout extends StatelessWidget {
 }
 
 /// Shared form widget for both layouts
-class _HeroForm extends StatelessWidget {
+class _HeroForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
   final TextEditingController referenceLinkEC;
   final TextEditingController promptEC;
@@ -400,15 +400,23 @@ class _HeroForm extends StatelessWidget {
   });
 
   @override
+  State<_HeroForm> createState() => _HeroFormState();
+}
+
+class _HeroFormState extends State<_HeroForm> {
+  final FocusNode _promptFocusNode = FocusNode();
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
     return Form(
-      key: formKey,
+      key: widget.formKey,
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: isMobile ? double.infinity : 480),
+        constraints: BoxConstraints(
+          maxWidth: widget.isMobile ? double.infinity : 480,
+        ),
         child: Column(
-          crossAxisAlignment: isMobile
+          crossAxisAlignment: widget.isMobile
               ? CrossAxisAlignment.stretch
               : CrossAxisAlignment.start,
           children: [
@@ -418,13 +426,13 @@ class _HeroForm extends StatelessWidget {
                 children: [
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    height: isDescriptionFocused ? 0 : 18,
+                    height: widget.isDescriptionFocused ? 0 : 18,
                   ),
                   ZenTextfield(
-                        controller: referenceLinkEC,
+                        controller: widget.referenceLinkEC,
                         labelText: l10n.landing_hero_target_url_label,
                         hintText: l10n.landing_hero_target_url_hint,
-                        onSubmitted: (_) => onSubmit(),
+                        onSubmitted: (_) => widget.onSubmit(),
                         maxLines: 1,
                         validator: (s) =>
                             ValidationBuilder()
@@ -450,34 +458,36 @@ class _HeroForm extends StatelessWidget {
             const SizedBox(height: 8),
             AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  height: isDescriptionFocused ? 200 : 56,
+                  height: widget.isDescriptionFocused ? 200 : 56,
                   child:
                       (ZenTextfield(
-                            controller: promptEC,
+                            focusNode: _promptFocusNode,
+                            controller: widget.promptEC,
                             labelText: l10n.landing_hero_prompt_label,
                             hintText: l10n.landing_hero_prompt_hint,
                             expands: true,
                             maxLines: null,
                             minLines: null,
                             onTapOutside: (_) {
-                              if (isDescriptionFocused) {
-                                if (promptEC.text.trim().isNotEmpty) {
+                              _promptFocusNode.unfocus();
+                              if (widget.isDescriptionFocused) {
+                                if (widget.promptEC.text.trim().isNotEmpty) {
                                   return;
                                 }
-                                onDescriptionFocusChange(false);
+                                widget.onDescriptionFocusChange(false);
                               }
                             },
                             onTap: () {
-                              if (isDescriptionFocused &&
-                                  promptText.trim().isEmpty) {
-                                onDescriptionFocusChange(false);
+                              if (widget.isDescriptionFocused &&
+                                  widget.promptText.trim().isEmpty) {
+                                widget.onDescriptionFocusChange(false);
                                 return;
                               }
-                              if (!isDescriptionFocused) {
-                                onDescriptionFocusChange(true);
+                              if (!widget.isDescriptionFocused) {
+                                widget.onDescriptionFocusChange(true);
                               }
                             },
-                            onSubmitted: (_) => onSubmit(),
+                            onSubmitted: (_) => widget.onSubmit(),
                             validator: ValidationBuilder()
                                 .minLength(
                                   10,
@@ -495,10 +505,10 @@ class _HeroForm extends StatelessWidget {
                 .fadeIn(duration: 500.ms, delay: 700.ms)
                 .slideY(begin: 0.2, end: 0),
             const SizedBox(height: 24),
-            if (isMobile)
-              _MobileCtaButton(onSubmit: onSubmit)
+            if (widget.isMobile)
+              _MobileCtaButton(onSubmit: widget.onSubmit)
             else
-              _DesktopCtaRow(onSubmit: onSubmit),
+              _DesktopCtaRow(onSubmit: widget.onSubmit),
           ],
         ),
       ),
