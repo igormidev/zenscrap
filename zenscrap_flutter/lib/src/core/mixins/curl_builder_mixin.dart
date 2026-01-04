@@ -1,6 +1,25 @@
 import 'dart:convert';
 
 mixin CurlBuilderMixin {
+  /// Converts the Serverpod API host to the web server host.
+  ///
+  /// In Serverpod Cloud, the API routes (RPC endpoints) are at api.domain.com,
+  /// but webServer routes (added via addRoute) are at www.domain.com.
+  ///
+  /// - localhost:8080 (API) → localhost:8082 (web server)
+  /// - api.zenscrap.com → www.zenscrap.com
+  String _apiHostToWebHost(String apiHost) {
+    // Handle localhost development
+    if (apiHost.contains('localhost:8080')) {
+      return apiHost.replaceAll('localhost:8080', 'localhost:8082');
+    }
+    // Handle production: api.domain.com → www.domain.com
+    if (apiHost.contains('://api.')) {
+      return apiHost.replaceAll('://api.', '://www.');
+    }
+    return apiHost;
+  }
+
   String buildSimpleCurl({
     required String baseUrl,
     required int scrappableId,
@@ -10,10 +29,13 @@ mixin CurlBuilderMixin {
     Map<String, dynamic>? examplePayload,
     Map<String, String>? additionalHeaders,
   }) {
+    // Convert API host to web server host for webServer routes
+    final webBaseUrl = _apiHostToWebHost(baseUrl);
+
     // Determine the endpoint based on prod/test mode (Route format)
     final String endpoint =
         isProd ? '/api/scrappable/prod' : '/api/scrappable/test';
-    final String url = '$baseUrl$endpoint';
+    final String url = '$webBaseUrl$endpoint';
 
     // Build the request payload
     final Map<String, dynamic> payload = {
@@ -58,6 +80,11 @@ mixin CurlBuilderMixin {
       }
     }
 
-    return result.replaceAll('//api', '/api');
+    // Fix any double slashes in the URL path (but not in the protocol ://)
+    // This handles cases where baseUrl ends with / and endpoint starts with /
+    return result.replaceAllMapped(
+      RegExp(r'(https?:)//+|//+'),
+      (match) => match.group(1) != null ? '${match.group(1)}//' : '/',
+    );
   }
 }

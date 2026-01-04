@@ -39,7 +39,8 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection>
   void initState() {
     super.initState();
     final client = ref.read(clientProvider);
-    final baseUrl = client.host.replaceAll('localhost:8080/', 'localhost:8082');
+    // Pass the raw client.host - the mixin handles localhost/production domain conversion
+    final baseUrl = client.host;
 
     // Handle test data and extract payload
     if (widget.testData == null) {

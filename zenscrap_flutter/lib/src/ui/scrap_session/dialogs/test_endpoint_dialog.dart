@@ -57,6 +57,22 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
   final Map<String, TextEditingController> _pathParamControllers = {};
   final Map<String, TextEditingController> _queryParamControllers = {};
 
+  /// Converts the Serverpod API host to the web server host.
+  ///
+  /// In Serverpod Cloud, the API routes (RPC endpoints) are at api.domain.com,
+  /// but webServer routes (added via addRoute) are at www.domain.com.
+  String _apiHostToWebHost(String apiHost) {
+    // Handle localhost development
+    if (apiHost.contains('localhost:8080')) {
+      return apiHost.replaceAll('localhost:8080', 'localhost:8082');
+    }
+    // Handle production: api.domain.com → www.domain.com
+    if (apiHost.contains('://api.')) {
+      return apiHost.replaceAll('://api.', '://www.');
+    }
+    return apiHost;
+  }
+
   bool _isLoading = false;
   String? _responseJson;
   String? _errorMessage;
@@ -162,12 +178,9 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
         }
       });
 
-      // Get base URL from client
+      // Get base URL from client and convert to web server host
       final client = ref.read(clientProvider);
-      final baseUrl = client.host.replaceAll(
-        'localhost:8080/',
-        'localhost:8082',
-      );
+      final baseUrl = _apiHostToWebHost(client.host);
       final endpoint = widget.isTestMode
           ? '$baseUrl/api/scrappable/test'
           : '$baseUrl/api/scrappable/prod';
