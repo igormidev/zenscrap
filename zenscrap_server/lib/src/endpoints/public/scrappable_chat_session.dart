@@ -108,6 +108,7 @@ class ScrappableChatSession extends Endpoint {
     final ScrappableRequest? scrappableRequest =
         _cacheScrappableRequest[sessionUuid];
     if (testData == null ||
+        testData.byteData == null ||
         scrappingBeeExtractLogic == null ||
         scrappableRequest == null) {
       throw createTranslatedException('cache_test_data_not_found', language);
