@@ -941,7 +941,13 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
       _scrapRedraftSessions[sessionId]?.add(chatResponse);
       if (chatResponse is NewExtractRuleResponse) {
         if (_cacheRefTestData.containsKey(sessionId)) {
-          _cacheRefTestData[sessionId] = chatResponse.referenceTestData;
+          // Preserve database id and byteDataId from existing cached object
+          final existingTestData = _cacheRefTestData[sessionId];
+          _cacheRefTestData[sessionId] = chatResponse.referenceTestData
+              .copyWith(
+                id: existingTestData?.id,
+                byteDataId: existingTestData?.byteDataId,
+              );
         }
         if (_cacheScrappableRequest.containsKey(sessionId)) {
           // Preserve database id from existing cached object
@@ -950,8 +956,14 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
               .copyWith(id: existingRequest?.id);
         }
         if (_cacheScrappingBeeExtractLogic.containsKey(sessionId)) {
-          _cacheScrappingBeeExtractLogic[sessionId] =
-              chatResponse.scrappingBeeExtractLogic;
+          // Preserve database id and scrappableId from existing cached object
+          final existingLogic = _cacheScrappingBeeExtractLogic[sessionId];
+          _cacheScrappingBeeExtractLogic[sessionId] = chatResponse
+              .scrappingBeeExtractLogic
+              .copyWith(
+                id: existingLogic?.id,
+                scrappableId: existingLogic?.scrappableId,
+              );
         }
       } else if (chatResponse is UpdatedScrappableRequestResponse) {
         final updatedRequest = chatResponse.scrappableRequest;
