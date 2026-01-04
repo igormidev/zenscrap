@@ -153,8 +153,8 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
         ),
         horizontal: context.responsiveValue(
           compact: 16.0,
-          medium: 40.0,
-          expanded: 40.0,
+          medium: 8.0,
+          expanded: 8.0,
         ),
       ),
       titlePadding: EdgeInsets.only(
@@ -179,8 +179,8 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
         constraints: BoxConstraints(
           maxWidth: context.responsiveValue(
             compact: double.infinity,
-            medium: 500.0,
-            expanded: 600.0,
+            medium: 550.0,
+            expanded: 700.0,
           ),
         ),
         child: Row(
@@ -209,8 +209,8 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
           ),
           maxWidth: context.responsiveValue(
             compact: double.infinity,
-            medium: 500.0,
-            expanded: 600.0,
+            medium: 550.0,
+            expanded: 700.0,
           ),
         ),
         child: SizedBox(

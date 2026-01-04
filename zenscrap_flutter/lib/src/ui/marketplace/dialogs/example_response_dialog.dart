@@ -191,8 +191,8 @@ class _ExampleResponseDialogState extends ConsumerState<ExampleResponseDialog>
             ),
             horizontal: context.responsiveValue(
               compact: 16.0,
-              medium: 40.0,
-              expanded: 40.0,
+              medium: 8.0,
+              expanded: 8.0,
             ),
           ),
           titlePadding: EdgeInsets.only(

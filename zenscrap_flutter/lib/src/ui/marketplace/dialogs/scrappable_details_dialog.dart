@@ -33,19 +33,19 @@ class ScrappableDetailsDialog extends ConsumerWidget {
         ),
       ),
       medium: (context, constraints) => Row(
-        spacing: 24,
+        spacing: 16,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Flexible(child: ExampleResponseDialog(scrappable: scrappable)),
-          Flexible(child: ScrappableInfoDialog(scrappable: scrappable)),
+          Expanded(child: ExampleResponseDialog(scrappable: scrappable)),
+          Expanded(child: ScrappableInfoDialog(scrappable: scrappable)),
         ],
       ),
       expanded: (context, constraints) => Row(
-        spacing: 32,
+        spacing: 16,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Flexible(child: ExampleResponseDialog(scrappable: scrappable)),
-          Flexible(child: ScrappableInfoDialog(scrappable: scrappable)),
+          Expanded(child: ExampleResponseDialog(scrappable: scrappable)),
+          Expanded(child: ScrappableInfoDialog(scrappable: scrappable)),
         ],
       ),
     );
