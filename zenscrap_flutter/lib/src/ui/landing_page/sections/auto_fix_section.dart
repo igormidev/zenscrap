@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:seo/seo.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
@@ -39,12 +40,15 @@ class AutoFixSection extends StatelessWidget {
                   color: context.c.onTertiary,
                 ),
                 const SizedBox(width: 6),
-                Text(
-                  l10n.landing_autofix_badge,
-                  style: context.t.labelSmall?.copyWith(
-                    color: context.c.onTertiary,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.2,
+                Seo.text(
+                  text: l10n.landing_autofix_badge,
+                  child: Text(
+                    l10n.landing_autofix_badge,
+                    style: context.t.labelSmall?.copyWith(
+                      color: context.c.onTertiary,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
+                    ),
                   ),
                 ),
               ],
@@ -54,38 +58,45 @@ class AutoFixSection extends StatelessWidget {
               .fadeIn(duration: 400.ms)
               .scale(begin: const Offset(0.8, 0.8), end: const Offset(1, 1)),
           const SizedBox(height: 24),
-          Text(
-            l10n.landing_autofix_title,
-            style: context.responsiveValue(
-              compact: context.t.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: context.c.onSurface,
-              ),
-              expanded: context.t.displaySmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: context.c.onSurface,
-              ),
-            ),
-            textAlign: TextAlign.center,
-          )
-              .animate()
-              .fadeIn(duration: 600.ms, delay: 100.ms)
-              .slideY(begin: 0.2, end: 0),
-          const SizedBox(height: 16),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 700),
+          Seo.text(
+            text: l10n.landing_autofix_title,
+            style: TextTagStyle.h2,
             child: Text(
-              l10n.landing_autofix_subtitle,
-              style: context.t.titleMedium?.copyWith(
-                color: context.c.onSurfaceVariant,
-                height: 1.6,
+              l10n.landing_autofix_title,
+              style: context.responsiveValue(
+                compact: context.t.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: context.c.onSurface,
+                ),
+                expanded: context.t.displaySmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: context.c.onSurface,
+                ),
               ),
               textAlign: TextAlign.center,
-            ),
-          )
-              .animate()
-              .fadeIn(duration: 600.ms, delay: 200.ms)
-              .slideY(begin: 0.2, end: 0),
+            )
+                .animate()
+                .fadeIn(duration: 600.ms, delay: 100.ms)
+                .slideY(begin: 0.2, end: 0),
+          ),
+          const SizedBox(height: 16),
+          Seo.text(
+            text: l10n.landing_autofix_subtitle,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 700),
+              child: Text(
+                l10n.landing_autofix_subtitle,
+                style: context.t.titleMedium?.copyWith(
+                  color: context.c.onSurfaceVariant,
+                  height: 1.6,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            )
+                .animate()
+                .fadeIn(duration: 600.ms, delay: 200.ms)
+                .slideY(begin: 0.2, end: 0),
+          ),
           SizedBox(height: context.responsiveValue(compact: 40.0, expanded: 64.0)),
           // Responsive steps layout
           ResponsiveWidget(
@@ -233,18 +244,25 @@ class _NotificationsCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  l10n.landing_autofix_notifications_title,
-                  style: context.t.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: context.c.onSurface,
+                Seo.text(
+                  text: l10n.landing_autofix_notifications_title,
+                  style: TextTagStyle.h3,
+                  child: Text(
+                    l10n.landing_autofix_notifications_title,
+                    style: context.t.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: context.c.onSurface,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  l10n.landing_autofix_notifications_description,
-                  style: context.t.bodyMedium?.copyWith(
-                    color: context.c.onSurfaceVariant,
+                Seo.text(
+                  text: l10n.landing_autofix_notifications_description,
+                  child: Text(
+                    l10n.landing_autofix_notifications_description,
+                    style: context.t.bodyMedium?.copyWith(
+                      color: context.c.onSurfaceVariant,
+                    ),
                   ),
                 ),
               ],
@@ -374,22 +392,29 @@ class _AutoFixStep extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        Text(
-          title,
-          style: context.t.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: context.c.onSurface,
+        Seo.text(
+          text: title,
+          style: TextTagStyle.h3,
+          child: Text(
+            title,
+            style: context.t.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: context.c.onSurface,
+            ),
+            textAlign: TextAlign.center,
           ),
-          textAlign: TextAlign.center,
         ),
         const SizedBox(height: 8),
-        Text(
-          description,
-          style: context.t.bodySmall?.copyWith(
-            color: context.c.onSurfaceVariant,
-            height: 1.5,
+        Seo.text(
+          text: description,
+          child: Text(
+            description,
+            style: context.t.bodySmall?.copyWith(
+              color: context.c.onSurfaceVariant,
+              height: 1.5,
+            ),
+            textAlign: TextAlign.center,
           ),
-          textAlign: TextAlign.center,
         ),
       ],
     )
@@ -454,11 +479,15 @@ class _ComparisonColumn extends StatelessWidget {
                 color: color,
               ),
               const SizedBox(width: 8),
-              Text(
-                title,
-                style: context.t.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: color,
+              Seo.text(
+                text: title,
+                style: TextTagStyle.h3,
+                child: Text(
+                  title,
+                  style: context.t.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
                 ),
               ),
             ],
@@ -478,10 +507,13 @@ class _ComparisonColumn extends StatelessWidget {
                     ),
                     const SizedBox(width: 10),
                     Expanded(
-                      child: Text(
-                        item,
-                        style: context.t.bodyMedium?.copyWith(
-                          color: context.c.onSurface,
+                      child: Seo.text(
+                        text: item,
+                        child: Text(
+                          item,
+                          style: context.t.bodyMedium?.copyWith(
+                            color: context.c.onSurface,
+                          ),
                         ),
                       ),
                     ),

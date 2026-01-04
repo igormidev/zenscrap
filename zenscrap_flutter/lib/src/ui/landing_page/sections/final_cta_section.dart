@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:seo/seo.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
@@ -39,40 +40,47 @@ class FinalCtaSection extends StatelessWidget {
       // Transparent background to show Lottie behind
       child: Column(
         children: [
-          Text(
-            l10n.landing_cta_title,
-            style: context.responsiveValue(
-              compact: context.t.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: context.c.onSurface,
-                height: 1.2,
-              ),
-              expanded: context.t.displaySmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: context.c.onSurface,
-                height: 1.2,
-              ),
-            ),
-            textAlign: TextAlign.center,
-          )
-              .animate()
-              .fadeIn(duration: 600.ms, delay: 100.ms)
-              .slideY(begin: 0.2, end: 0),
-          const SizedBox(height: 24),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 600),
+          Seo.text(
+            text: l10n.landing_cta_title,
+            style: TextTagStyle.h2,
             child: Text(
-              l10n.landing_cta_subtitle,
-              style: context.t.titleMedium?.copyWith(
-                color: context.c.onSurfaceVariant,
-                height: 1.6,
+              l10n.landing_cta_title,
+              style: context.responsiveValue(
+                compact: context.t.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: context.c.onSurface,
+                  height: 1.2,
+                ),
+                expanded: context.t.displaySmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: context.c.onSurface,
+                  height: 1.2,
+                ),
               ),
               textAlign: TextAlign.center,
-            ),
-          )
-              .animate()
-              .fadeIn(duration: 600.ms, delay: 200.ms)
-              .slideY(begin: 0.2, end: 0),
+            )
+                .animate()
+                .fadeIn(duration: 600.ms, delay: 100.ms)
+                .slideY(begin: 0.2, end: 0),
+          ),
+          const SizedBox(height: 24),
+          Seo.text(
+            text: l10n.landing_cta_subtitle,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 600),
+              child: Text(
+                l10n.landing_cta_subtitle,
+                style: context.t.titleMedium?.copyWith(
+                  color: context.c.onSurfaceVariant,
+                  height: 1.6,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            )
+                .animate()
+                .fadeIn(duration: 600.ms, delay: 200.ms)
+                .slideY(begin: 0.2, end: 0),
+          ),
           SizedBox(height: context.responsiveValue(compact: 32.0, expanded: 48.0)),
           // Responsive CTA buttons
           _CtaButtons(
@@ -307,18 +315,24 @@ class _DesktopFooter extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
-          l10n.landing_app_name,
-          style: context.t.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: context.c.primary,
+        Seo.text(
+          text: l10n.landing_app_name,
+          child: Text(
+            l10n.landing_app_name,
+            style: context.t.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: context.c.primary,
+            ),
           ),
         ),
         const SizedBox(width: 8),
-        Text(
-          '• ${l10n.landing_footer_tagline}',
-          style: context.t.bodyMedium?.copyWith(
-            color: context.c.onSurfaceVariant,
+        Seo.text(
+          text: l10n.landing_footer_tagline,
+          child: Text(
+            '• ${l10n.landing_footer_tagline}',
+            style: context.t.bodyMedium?.copyWith(
+              color: context.c.onSurfaceVariant,
+            ),
           ),
         ),
         const SizedBox(width: 16),
@@ -357,22 +371,28 @@ class _MobileFooter extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              l10n.landing_app_name,
-              style: context.t.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: context.c.primary,
+            Seo.text(
+              text: l10n.landing_app_name,
+              child: Text(
+                l10n.landing_app_name,
+                style: context.t.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: context.c.primary,
+                ),
               ),
             ),
           ],
         ),
         const SizedBox(height: 8),
-        Text(
-          l10n.landing_footer_tagline,
-          style: context.t.bodyMedium?.copyWith(
-            color: context.c.onSurfaceVariant,
+        Seo.text(
+          text: l10n.landing_footer_tagline,
+          child: Text(
+            l10n.landing_footer_tagline,
+            style: context.t.bodyMedium?.copyWith(
+              color: context.c.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
           ),
-          textAlign: TextAlign.center,
         ),
         const SizedBox(height: 16),
         Row(
@@ -417,10 +437,13 @@ class _TrustIndicator extends StatelessWidget {
           color: context.c.onSurfaceVariant.withAlpha(180),
         ),
         const SizedBox(width: 8),
-        Text(
-          text,
-          style: context.t.bodyMedium?.copyWith(
-            color: context.c.onSurfaceVariant,
+        Seo.text(
+          text: text,
+          child: Text(
+            text,
+            style: context.t.bodyMedium?.copyWith(
+              color: context.c.onSurfaceVariant,
+            ),
           ),
         ),
       ],

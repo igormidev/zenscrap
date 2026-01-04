@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:seo/seo.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
@@ -63,12 +64,15 @@ class _TrustBadge extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         Flexible(
-          child: Text(
-            text,
-            style: context.t.bodyMedium?.copyWith(
-              color: context.c.onSurfaceVariant,
+          child: Seo.text(
+            text: text,
+            child: Text(
+              text,
+              style: context.t.bodyMedium?.copyWith(
+                color: context.c.onSurfaceVariant,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
-            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],

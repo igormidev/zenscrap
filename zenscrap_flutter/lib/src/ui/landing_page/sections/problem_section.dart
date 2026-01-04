@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:seo/seo.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
@@ -22,38 +23,45 @@ class ProblemSection extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text(
-            l10n.landing_problem_title,
-            style: context.responsiveValue(
-              compact: context.t.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: context.c.onSurface,
-              ),
-              expanded: context.t.displaySmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: context.c.onSurface,
-              ),
-            ),
-            textAlign: TextAlign.center,
-          )
-              .animate()
-              .fadeIn(duration: 600.ms, delay: 100.ms)
-              .slideY(begin: 0.2, end: 0),
-          const SizedBox(height: 16),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 700),
+          Seo.text(
+            text: l10n.landing_problem_title,
+            style: TextTagStyle.h2,
             child: Text(
-              l10n.landing_problem_subtitle,
-              style: context.t.titleMedium?.copyWith(
-                color: context.c.onSurfaceVariant,
-                height: 1.6,
+              l10n.landing_problem_title,
+              style: context.responsiveValue(
+                compact: context.t.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: context.c.onSurface,
+                ),
+                expanded: context.t.displaySmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: context.c.onSurface,
+                ),
               ),
               textAlign: TextAlign.center,
-            ),
-          )
-              .animate()
-              .fadeIn(duration: 600.ms, delay: 200.ms)
-              .slideY(begin: 0.2, end: 0),
+            )
+                .animate()
+                .fadeIn(duration: 600.ms, delay: 100.ms)
+                .slideY(begin: 0.2, end: 0),
+          ),
+          const SizedBox(height: 16),
+          Seo.text(
+            text: l10n.landing_problem_subtitle,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 700),
+              child: Text(
+                l10n.landing_problem_subtitle,
+                style: context.t.titleMedium?.copyWith(
+                  color: context.c.onSurfaceVariant,
+                  height: 1.6,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            )
+                .animate()
+                .fadeIn(duration: 600.ms, delay: 200.ms)
+                .slideY(begin: 0.2, end: 0),
+          ),
           SizedBox(height: context.responsiveValue(compact: 40.0, expanded: 64.0)),
           // Responsive problem cards
           ResponsiveBuilder(
@@ -206,19 +214,26 @@ class _ProblemCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        title,
-                        style: context.t.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: context.c.onSurface,
+                      Seo.text(
+                        text: title,
+                        style: TextTagStyle.h3,
+                        child: Text(
+                          title,
+                          style: context.t.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: context.c.onSurface,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        description,
-                        style: context.t.bodyMedium?.copyWith(
-                          color: context.c.onSurfaceVariant,
-                          height: 1.5,
+                      Seo.text(
+                        text: description,
+                        child: Text(
+                          description,
+                          style: context.t.bodyMedium?.copyWith(
+                            color: context.c.onSurfaceVariant,
+                            height: 1.5,
+                          ),
                         ),
                       ),
                     ],
@@ -242,19 +257,26 @@ class _ProblemCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                Text(
-                  title,
-                  style: context.t.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: context.c.onSurface,
+                Seo.text(
+                  text: title,
+                  style: TextTagStyle.h3,
+                  child: Text(
+                    title,
+                    style: context.t.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: context.c.onSurface,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  description,
-                  style: context.t.bodyMedium?.copyWith(
-                    color: context.c.onSurfaceVariant,
-                    height: 1.5,
+                Seo.text(
+                  text: description,
+                  child: Text(
+                    description,
+                    style: context.t.bodyMedium?.copyWith(
+                      color: context.c.onSurfaceVariant,
+                      height: 1.5,
+                    ),
                   ),
                 ),
               ],

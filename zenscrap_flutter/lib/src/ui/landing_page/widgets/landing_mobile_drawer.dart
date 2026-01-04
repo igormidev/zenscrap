@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:seo/seo.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/language_selector.dart';
@@ -68,12 +69,15 @@ class LandingMobileDrawer extends StatelessWidget {
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: Text(
-                          l10n.landing_drawer_language,
-                          style: context.t.bodyMedium?.copyWith(
-                            color: context.c.onSurfaceVariant,
+                        child: Seo.text(
+                          text: l10n.landing_drawer_language,
+                          child: Text(
+                            l10n.landing_drawer_language,
+                            style: context.t.bodyMedium?.copyWith(
+                              color: context.c.onSurfaceVariant,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -132,11 +136,14 @@ class _DrawerHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          Text(
-            l10n.landing_app_name,
-            style: context.t.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: context.c.onSurface,
+          Seo.text(
+            text: l10n.landing_app_name,
+            child: Text(
+              l10n.landing_app_name,
+              style: context.t.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: context.c.onSurface,
+              ),
             ),
           ),
         ],
@@ -175,11 +182,14 @@ class _DrawerNavItem extends StatelessWidget {
         _icon,
         color: isActive ? context.c.primary : context.c.onSurfaceVariant,
       ),
-      title: Text(
-        section.getLabel(context),
-        style: context.t.bodyLarge?.copyWith(
-          color: isActive ? context.c.primary : context.c.onSurface,
-          fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+      title: Seo.text(
+        text: section.getLabel(context),
+        child: Text(
+          section.getLabel(context),
+          style: context.t.bodyLarge?.copyWith(
+            color: isActive ? context.c.primary : context.c.onSurface,
+            fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+          ),
         ),
       ),
       selected: isActive,

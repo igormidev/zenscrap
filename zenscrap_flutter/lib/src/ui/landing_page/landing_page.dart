@@ -648,8 +648,15 @@ class _LandingPageContent extends StatelessWidget {
                             context: context,
                             barrierDismissible: false,
                             builder: (dialogContext) => AlertDialog(
-                              title: Text(l10n.landing_marketplace_login_title),
-                              content: Text(l10n.landing_marketplace_login_message),
+                              title: Seo.text(
+                                text: l10n.landing_marketplace_login_title,
+                                style: TextTagStyle.h3,
+                                child: Text(l10n.landing_marketplace_login_title),
+                              ),
+                              content: Seo.text(
+                                text: l10n.landing_marketplace_login_message,
+                                child: Text(l10n.landing_marketplace_login_message),
+                              ),
                               actions: [
                                 FilledButton(
                                   onPressed: () {
@@ -714,27 +721,34 @@ class _PricingSection extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text(
-            AppLocalizations.of(context)!.landing_pricing_title,
-            style: context.responsiveValue(
-              compact: context.t.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: context.c.onSurface,
+          Seo.text(
+            text: AppLocalizations.of(context)!.landing_pricing_title,
+            style: TextTagStyle.h2,
+            child: Text(
+              AppLocalizations.of(context)!.landing_pricing_title,
+              style: context.responsiveValue(
+                compact: context.t.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: context.c.onSurface,
+                ),
+                expanded: context.t.displaySmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: context.c.onSurface,
+                ),
               ),
-              expanded: context.t.displaySmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: context.c.onSurface,
-              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
-          Text(
-            AppLocalizations.of(context)!.landing_pricing_subtitle,
-            style: context.t.titleMedium?.copyWith(
-              color: context.c.onSurfaceVariant,
+          Seo.text(
+            text: AppLocalizations.of(context)!.landing_pricing_subtitle,
+            child: Text(
+              AppLocalizations.of(context)!.landing_pricing_subtitle,
+              style: context.t.titleMedium?.copyWith(
+                color: context.c.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
           ),
           SizedBox(
             height: context.responsiveValue(compact: 32.0, expanded: 48.0),
@@ -776,10 +790,13 @@ class _LearnMoreIndicator extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      AppLocalizations.of(context)!.landing_learn_more,
-                      style: context.t.labelMedium?.copyWith(
-                        color: context.c.onSurfaceVariant,
+                    Seo.text(
+                      text: AppLocalizations.of(context)!.landing_learn_more,
+                      child: Text(
+                        AppLocalizations.of(context)!.landing_learn_more,
+                        style: context.t.labelMedium?.copyWith(
+                          color: context.c.onSurfaceVariant,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 8),

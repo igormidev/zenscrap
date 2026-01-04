@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
+import 'package:seo/seo.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
@@ -192,11 +193,14 @@ class _Logo extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        Text(
-          l10n.landing_app_name,
-          style: context.t.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: context.c.onSurface,
+        Seo.text(
+          text: l10n.landing_app_name,
+          child: Text(
+            l10n.landing_app_name,
+            style: context.t.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: context.c.onSurface,
+            ),
           ),
         ),
       ],
@@ -270,15 +274,18 @@ class _NavItemState extends State<_NavItem> {
                       : Colors.transparent),
             borderRadius: BorderRadius.circular(24),
           ),
-          child: Text(
-            widget.section.getLabel(context),
-            style: context.t.labelLarge?.copyWith(
-              color: widget.isActive
-                  ? context.c.onPrimary
-                  : (_isHovered
-                        ? context.c.primary
-                        : context.c.onSurfaceVariant),
-              fontWeight: widget.isActive ? FontWeight.w600 : FontWeight.normal,
+          child: Seo.text(
+            text: widget.section.getLabel(context),
+            child: Text(
+              widget.section.getLabel(context),
+              style: context.t.labelLarge?.copyWith(
+                color: widget.isActive
+                    ? context.c.onPrimary
+                    : (_isHovered
+                          ? context.c.primary
+                          : context.c.onSurfaceVariant),
+                fontWeight: widget.isActive ? FontWeight.w600 : FontWeight.normal,
+              ),
             ),
           ),
         ),

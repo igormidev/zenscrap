@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_validator/form_validator.dart';
 import 'package:lottie/lottie.dart';
+import 'package:seo/seo.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/core/mixins/create_scrappable_mixin.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
@@ -192,34 +193,41 @@ class _DesktopHeroLayout extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Headline
-                Text(
-                      AppLocalizations.of(context)!.landing_hero_title,
-                      style: context.t.displayLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: context.c.onSurface,
-                        height: 1.1,
-                        fontSize: headlineSize,
-                      ),
-                    )
-                    .animate()
-                    .fadeIn(duration: 600.ms, delay: 200.ms)
-                    .slideX(begin: -0.1, end: 0),
+                Seo.text(
+                  text: AppLocalizations.of(context)!.landing_hero_title,
+                  style: TextTagStyle.h1,
+                  child: Text(
+                        AppLocalizations.of(context)!.landing_hero_title,
+                        style: context.t.displayLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: context.c.onSurface,
+                          height: 1.1,
+                          fontSize: headlineSize,
+                        ),
+                      )
+                      .animate()
+                      .fadeIn(duration: 600.ms, delay: 200.ms)
+                      .slideX(begin: -0.1, end: 0),
+                ),
                 SizedBox(height: verticalSpacing),
                 // Subheadline
-                ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 520),
-                      child: Text(
-                        AppLocalizations.of(context)!.landing_hero_subtitle,
-                        style: context.t.titleMedium?.copyWith(
-                          color: context.c.onSurfaceVariant,
-                          height: 1.6,
-                          fontSize: subheadlineSize,
+                Seo.text(
+                  text: AppLocalizations.of(context)!.landing_hero_subtitle,
+                  child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 520),
+                        child: Text(
+                          AppLocalizations.of(context)!.landing_hero_subtitle,
+                          style: context.t.titleMedium?.copyWith(
+                            color: context.c.onSurfaceVariant,
+                            height: 1.6,
+                            fontSize: subheadlineSize,
+                          ),
                         ),
-                      ),
-                    )
-                    .animate()
-                    .fadeIn(duration: 600.ms, delay: 400.ms)
-                    .slideX(begin: -0.1, end: 0),
+                      )
+                      .animate()
+                      .fadeIn(duration: 600.ms, delay: 400.ms)
+                      .slideX(begin: -0.1, end: 0),
+                ),
                 SizedBox(height: formSpacing),
                 // Form
                 _HeroForm(
@@ -306,31 +314,38 @@ class _MobileHeroLayout extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // Headline - centered on mobile
-            Text(
-                  l10n.landing_hero_title,
-                  style: context.t.headlineLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: context.c.onSurface,
-                    height: 1.1,
-                  ),
-                  textAlign: TextAlign.center,
-                )
-                .animate()
-                .fadeIn(duration: 600.ms, delay: 200.ms)
-                .slideY(begin: -0.1, end: 0),
+            Seo.text(
+              text: l10n.landing_hero_title,
+              style: TextTagStyle.h1,
+              child: Text(
+                    l10n.landing_hero_title,
+                    style: context.t.headlineLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: context.c.onSurface,
+                      height: 1.1,
+                    ),
+                    textAlign: TextAlign.center,
+                  )
+                  .animate()
+                  .fadeIn(duration: 600.ms, delay: 200.ms)
+                  .slideY(begin: -0.1, end: 0),
+            ),
             const SizedBox(height: 16),
             // Subheadline - centered on mobile
-            Text(
-                  l10n.landing_hero_subtitle,
-                  style: context.t.bodyLarge?.copyWith(
-                    color: context.c.onSurfaceVariant,
-                    height: 1.5,
-                  ),
-                  textAlign: TextAlign.center,
-                )
-                .animate()
-                .fadeIn(duration: 600.ms, delay: 400.ms)
-                .slideY(begin: -0.1, end: 0),
+            Seo.text(
+              text: l10n.landing_hero_subtitle,
+              child: Text(
+                    l10n.landing_hero_subtitle,
+                    style: context.t.bodyLarge?.copyWith(
+                      color: context.c.onSurfaceVariant,
+                      height: 1.5,
+                    ),
+                    textAlign: TextAlign.center,
+                  )
+                  .animate()
+                  .fadeIn(duration: 600.ms, delay: 400.ms)
+                  .slideY(begin: -0.1, end: 0),
+            ),
             const SizedBox(height: 24),
             // Trust badges - responsive
             const TrustBadgesRow().animate().fadeIn(
@@ -510,11 +525,14 @@ class _DesktopCtaRow extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 16),
-            Text(
-              l10n.landing_hero_free_label,
-              style: context.t.labelLarge?.copyWith(
-                color: context.c.primary,
-                fontWeight: FontWeight.w600,
+            Seo.text(
+              text: l10n.landing_hero_free_label,
+              child: Text(
+                l10n.landing_hero_free_label,
+                style: context.t.labelLarge?.copyWith(
+                  color: context.c.primary,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ],
@@ -555,11 +573,14 @@ class _MobileCtaButton extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            Text(
-              l10n.landing_hero_free_label,
-              style: context.t.labelLarge?.copyWith(
-                color: context.c.primary,
-                fontWeight: FontWeight.w600,
+            Seo.text(
+              text: l10n.landing_hero_free_label,
+              child: Text(
+                l10n.landing_hero_free_label,
+                style: context.t.labelLarge?.copyWith(
+                  color: context.c.primary,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ],
