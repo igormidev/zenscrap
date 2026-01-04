@@ -81,7 +81,6 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection>
               EditScrappableRequestButton(
                 scrappableRequest: widget.scrappableRequest,
                 scrappableId: widget.scrappableId,
-                isChatLoading: true,
                 targetTime: widget.targetTime,
               ),
               TestEndpointButton(
@@ -89,7 +88,6 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection>
                 scrappableRequest: widget.scrappableRequest,
                 testData: widget.testData,
                 targetTime: widget.targetTime,
-                isChatLoading: true,
               ),
               RemainingTimeIndicator(widget.targetTime),
             ],

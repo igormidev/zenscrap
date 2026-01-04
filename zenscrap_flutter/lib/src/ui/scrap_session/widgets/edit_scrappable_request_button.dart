@@ -8,17 +8,13 @@ class EditScrappableRequestButton extends StatelessWidget {
   final ScrappableRequest? scrappableRequest;
   final int scrappableId;
 
-  /// When true, action buttons inside the dialog will be disabled.
-  final bool isChatLoading;
-
-  /// The session expiration time (for test mode).
+  /// The session expiration time for real-time expiration tracking.
   final DateTime? targetTime;
 
   const EditScrappableRequestButton({
     super.key,
     required this.scrappableRequest,
     required this.scrappableId,
-    this.isChatLoading = false,
     this.targetTime,
   });
 
@@ -52,8 +48,7 @@ class EditScrappableRequestButton extends StatelessWidget {
           builder: (context) => EditScrappableRequestDialog(
             scrappableRequest: scrappableRequest!,
             scrappableId: scrappableId,
-            isChatLoading: isChatLoading,
-            isExpired: isExpired,
+            targetTime: targetTime,
           ),
         );
       },

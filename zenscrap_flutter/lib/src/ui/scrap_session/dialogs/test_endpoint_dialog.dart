@@ -9,6 +9,7 @@ import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
+import 'package:zenscrap_flutter/src/states/chat_session/is_chat_loading_provider.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/animated_thinking_dots.dart';
 
 class TestEndpointDialog extends ConsumerStatefulWidget {
@@ -26,12 +27,6 @@ class TestEndpointDialog extends ConsumerStatefulWidget {
   /// Required when [isTestMode] is false. The API key for production calls.
   final String? apiKey;
 
-  /// When true, the Run Test button will be disabled with a notice.
-  final bool isChatLoading;
-
-  /// When true, the Run Test button will be disabled (session expired).
-  final bool isExpired;
-
   const TestEndpointDialog({
     super.key,
     required this.scrappableId,
@@ -40,8 +35,6 @@ class TestEndpointDialog extends ConsumerStatefulWidget {
     this.isTestMode = true,
     this.targetTime,
     this.apiKey,
-    this.isChatLoading = false,
-    this.isExpired = false,
   }) : assert(
          isTestMode ? targetTime != null : apiKey != null,
          isTestMode
@@ -85,10 +78,32 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
   Timer? _elapsedTimer;
   final ValueNotifier<int> _elapsedMs = ValueNotifier<int>(0);
 
+  // Real-time expiration tracking (only for test mode)
+  late final ValueNotifier<bool> _isExpired;
+  Timer? _expirationTimer;
+
   @override
   void initState() {
     super.initState();
     _initializeControllers();
+    _initializeExpirationTracking();
+  }
+
+  void _initializeExpirationTracking() {
+    // Initialize expiration state
+    final targetTime = widget.targetTime;
+    if (widget.isTestMode && targetTime != null) {
+      _isExpired = ValueNotifier(DateTime.now().isAfter(targetTime));
+      // Update every second to check for expiration
+      _expirationTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+        final nowExpired = DateTime.now().isAfter(targetTime);
+        if (_isExpired.value != nowExpired) {
+          _isExpired.value = nowExpired;
+        }
+      });
+    } else {
+      _isExpired = ValueNotifier(false);
+    }
   }
 
   void _initializeControllers() {
@@ -132,6 +147,8 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
     }
     _elapsedTimer?.cancel();
     _elapsedMs.dispose();
+    _expirationTimer?.cancel();
+    _isExpired.dispose();
     super.dispose();
   }
 
@@ -299,6 +316,9 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
 
   @override
   Widget build(BuildContext context) {
+    // Watch isChatLoading from provider for real-time updates
+    final isChatLoading = ref.watch(isChatLoadingProvider);
+
     final dialogWidth = context.responsiveValue(
       compact: MediaQuery.sizeOf(context).width * 0.95,
       medium: 700.0,
@@ -339,35 +359,41 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
                 ),
               ),
               Expanded(
-                child: ResponsiveBuilder(
-                  compact: (context, constraints) => _CompactDialogLayout(
-                    pathParamControllers: _pathParamControllers,
-                    queryParamControllers: _queryParamControllers,
-                    isLoading: _isLoading,
-                    onTest: _handleTest,
-                    responseJson: _responseJson,
-                    errorMessage: _errorMessage,
-                    hasTestedOnce: _hasTestedOnce,
-                    statusCode: _statusCode,
-                    responseTimeMs: _responseTimeMs,
-                    elapsedMsNotifier: _elapsedMs,
-                    isChatLoading: widget.isChatLoading,
-                    isExpired: widget.isExpired,
-                  ),
-                  expanded: (context, constraints) => _ExpandedDialogLayout(
-                    pathParamControllers: _pathParamControllers,
-                    queryParamControllers: _queryParamControllers,
-                    isLoading: _isLoading,
-                    onTest: _handleTest,
-                    responseJson: _responseJson,
-                    errorMessage: _errorMessage,
-                    hasTestedOnce: _hasTestedOnce,
-                    statusCode: _statusCode,
-                    responseTimeMs: _responseTimeMs,
-                    elapsedMsNotifier: _elapsedMs,
-                    isChatLoading: widget.isChatLoading,
-                    isExpired: widget.isExpired,
-                  ),
+                // Listen to isExpired changes for real-time updates
+                child: ValueListenableBuilder<bool>(
+                  valueListenable: _isExpired,
+                  builder: (context, isExpired, _) {
+                    return ResponsiveBuilder(
+                      compact: (context, constraints) => _CompactDialogLayout(
+                        pathParamControllers: _pathParamControllers,
+                        queryParamControllers: _queryParamControllers,
+                        isLoading: _isLoading,
+                        onTest: _handleTest,
+                        responseJson: _responseJson,
+                        errorMessage: _errorMessage,
+                        hasTestedOnce: _hasTestedOnce,
+                        statusCode: _statusCode,
+                        responseTimeMs: _responseTimeMs,
+                        elapsedMsNotifier: _elapsedMs,
+                        isChatLoading: isChatLoading,
+                        isExpired: isExpired,
+                      ),
+                      expanded: (context, constraints) => _ExpandedDialogLayout(
+                        pathParamControllers: _pathParamControllers,
+                        queryParamControllers: _queryParamControllers,
+                        isLoading: _isLoading,
+                        onTest: _handleTest,
+                        responseJson: _responseJson,
+                        errorMessage: _errorMessage,
+                        hasTestedOnce: _hasTestedOnce,
+                        statusCode: _statusCode,
+                        responseTimeMs: _responseTimeMs,
+                        elapsedMsNotifier: _elapsedMs,
+                        isChatLoading: isChatLoading,
+                        isExpired: isExpired,
+                      ),
+                    );
+                  },
                 ),
               ),
             ],

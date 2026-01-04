@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +9,7 @@ import 'package:zenscrap_flutter/src/design_system/default_error_snackbar.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
+import 'package:zenscrap_flutter/src/states/chat_session/is_chat_loading_provider.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/path_parameters_section.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/query_parameters_section.dart';
 import 'package:zenscrap_flutter/src/ui/scrap_session/widgets/url_syntax_textfield.dart';
@@ -15,18 +18,14 @@ class EditScrappableRequestDialog extends ConsumerStatefulWidget {
   final ScrappableRequest scrappableRequest;
   final int scrappableId;
 
-  /// When true, action buttons like Save Changes and Add Parameter will be disabled.
-  final bool isChatLoading;
-
-  /// When true, the session has expired and action buttons will be disabled.
-  final bool isExpired;
+  /// The session expiration time for real-time expiration tracking.
+  final DateTime? targetTime;
 
   const EditScrappableRequestDialog({
     super.key,
     required this.scrappableRequest,
     required this.scrappableId,
-    this.isChatLoading = false,
-    this.isExpired = false,
+    this.targetTime,
   });
 
   @override
@@ -41,6 +40,10 @@ class _EditScrappableRequestDialogState
   late Map<String, String?> _queryParams;
   bool _hasChanges = false;
 
+  // Real-time expiration tracking
+  late final ValueNotifier<bool> _isExpired;
+  Timer? _expirationTimer;
+
   @override
   void initState() {
     super.initState();
@@ -52,12 +55,33 @@ class _EditScrappableRequestDialogState
     // Initialize the controller with path parameters
     _urlController.updatePathParameters(_pathParams);
     _urlController.addListener(_onUrlChanged);
+
+    // Initialize expiration tracking
+    _initializeExpirationTracking();
+  }
+
+  void _initializeExpirationTracking() {
+    final targetTime = widget.targetTime;
+    if (targetTime != null) {
+      _isExpired = ValueNotifier(DateTime.now().isAfter(targetTime));
+      // Update every second to check for expiration
+      _expirationTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+        final nowExpired = DateTime.now().isAfter(targetTime);
+        if (_isExpired.value != nowExpired) {
+          _isExpired.value = nowExpired;
+        }
+      });
+    } else {
+      _isExpired = ValueNotifier(false);
+    }
   }
 
   @override
   void dispose() {
     _urlController.removeListener(_onUrlChanged);
     _urlController.dispose();
+    _expirationTimer?.cancel();
+    _isExpired.dispose();
     super.dispose();
   }
 
@@ -232,8 +256,14 @@ class _EditScrappableRequestDialogState
 
   @override
   Widget build(BuildContext context) {
+    // Watch isChatLoading from provider for real-time updates
+    final isChatLoading = ref.watch(isChatLoadingProvider);
+
     final l10n = AppLocalizations.of(context)!;
-    return Dialog(
+    return ValueListenableBuilder<bool>(
+      valueListenable: _isExpired,
+      builder: (context, isExpired, _) {
+        return Dialog(
       child: ConstrainedBox(
         constraints: BoxConstraints(
           maxWidth: context.responsiveValue(
@@ -364,13 +394,13 @@ class _EditScrappableRequestDialogState
                           SizedBox(
                             height: 48,
                             child: Tooltip(
-                              message: widget.isExpired
+                              message: isExpired
                                   ? l10n.scrap_session_session_expired_tooltip
-                                  : (widget.isChatLoading
+                                  : (isChatLoading
                                       ? l10n.scrap_session_chat_loading_disabled_tooltip
                                       : ''),
                               child: FilledButton.icon(
-                                onPressed: (_hasChanges && !widget.isChatLoading && !widget.isExpired)
+                                onPressed: (_hasChanges && !isChatLoading && !isExpired)
                                     ? _handleSave
                                     : null,
                                 icon: const Icon(Icons.save),
@@ -414,13 +444,13 @@ class _EditScrappableRequestDialogState
                           SizedBox(
                             height: 48,
                             child: Tooltip(
-                              message: widget.isExpired
+                              message: isExpired
                                   ? l10n.scrap_session_session_expired_tooltip
-                                  : (widget.isChatLoading
+                                  : (isChatLoading
                                       ? l10n.scrap_session_chat_loading_disabled_tooltip
                                       : ''),
                               child: FilledButton.icon(
-                                onPressed: (_hasChanges && !widget.isChatLoading && !widget.isExpired)
+                                onPressed: (_hasChanges && !isChatLoading && !isExpired)
                                     ? _handleSave
                                     : null,
                                 icon: const Icon(Icons.save),
@@ -444,8 +474,8 @@ class _EditScrappableRequestDialogState
                       pathParams: _pathParams,
                       onAddPathParam: _handleAddPathParam,
                       onRemovePathParam: _handleRemovePathParam,
-                      isChatLoading: widget.isChatLoading,
-                      isExpired: widget.isExpired,
+                      isChatLoading: isChatLoading,
+                      isExpired: isExpired,
                     ),
                     const SizedBox(height: 8),
 
@@ -455,8 +485,8 @@ class _EditScrappableRequestDialogState
                       onAddQueryParam: _handleAddQueryParam,
                       onRemoveQueryParam: _handleRemoveQueryParam,
                       onEditQueryParam: _handleEditQueryParam,
-                      isChatLoading: widget.isChatLoading,
-                      isExpired: widget.isExpired,
+                      isChatLoading: isChatLoading,
+                      isExpired: isExpired,
                     ),
                   ],
                 ),
@@ -466,6 +496,8 @@ class _EditScrappableRequestDialogState
         ),
       ),
       ),
+        );
+      },
     );
   }
 }
