@@ -94,7 +94,7 @@ class CreditsOverviewSection extends StatelessWidget {
                         ),
                         SizedBox(width: itemSpacing),
                         SizedBox(
-                          width: 190,
+                          width: 170,
                           child: _CreditItem(
                             label: l10n.api_usage_subscription,
                             description: planTier == PlanTier.none
@@ -214,6 +214,10 @@ class _CreditItem extends StatelessWidget {
       expanded: 18.0,
     );
 
+    final style = context.t.labelSmall?.copyWith(
+      color: context.c.onSurfaceVariant.withAlpha(150),
+    );
+
     return Container(
       padding: EdgeInsets.all(padding),
       decoration: BoxDecoration(
@@ -250,13 +254,7 @@ class _CreditItem extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          Text(
-            description,
-            maxLines: 2,
-            style: context.t.labelSmall?.copyWith(
-              color: context.c.onSurfaceVariant.withAlpha(150),
-            ),
-          ),
+          Expanded(child: Text(description, maxLines: 2, style: style)),
           const SizedBox(height: 8),
           Text(
             value,

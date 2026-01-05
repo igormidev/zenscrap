@@ -4,24 +4,24 @@ extension PlanTierExtension on PlanTier {
   String get apiCreditsAddedPerMonth {
     return switch (this) {
       PlanTier.none => '1K',
-      PlanTier.basic => '50K',
-      PlanTier.pro => '200K',
-      PlanTier.ultra => '1M',
+      PlanTier.basic => '250K',
+      PlanTier.pro => '1M',
+      PlanTier.ultra => '4M',
     };
   }
 
   int get apiCreditsAddedPerMonthInt {
     return switch (this) {
       PlanTier.none => 1000,
-      PlanTier.basic => 50000,
-      PlanTier.pro => 200000,
-      PlanTier.ultra => 1000000,
+      PlanTier.basic => 250000,
+      PlanTier.pro => 1000000,
+      PlanTier.ultra => 4000000,
     };
   }
 
   String get displayName {
     return switch (this) {
-      PlanTier.none => 'None',
+      PlanTier.none => 'Free',
       PlanTier.basic => 'Basic',
       PlanTier.pro => 'Pro',
       PlanTier.ultra => 'Ultra',
