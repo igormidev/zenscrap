@@ -45,7 +45,6 @@ class CreditsOverviewSection extends StatelessWidget {
     );
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       decoration: BoxDecoration(
         color: context.c.surface,
         borderRadius: BorderRadius.circular(borderRadius),
@@ -58,6 +57,7 @@ class CreditsOverviewSection extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              SizedBox(width: horizontalPadding),
               Expanded(
                 child: Text(
                   l10n.api_usage_credits_overview,
@@ -65,74 +65,99 @@ class CreditsOverviewSection extends StatelessWidget {
                 ),
               ),
               Icon(Icons.generating_tokens, color: context.c.primary, size: 28),
+              SizedBox(width: horizontalPadding),
             ],
           ),
           SizedBox(height: verticalSpacing),
-          ResponsiveBuilder(
-            compact: (context, constraints) => Column(
-              children: [
-                _CreditItem(
-                  label: l10n.api_usage_total_available,
-                  description: l10n.api_usage_credits_combined_description,
-                  value: totalCredits.toString(),
-                  icon: Icons.check_circle,
-                  isHighlighted: true,
-                ),
-                SizedBox(height: itemSpacing),
-                _CreditItem(
-                  label: l10n.api_usage_subscription,
-                  description: planTier == PlanTier.none
-                      ? l10n.api_usage_subscribe_to_unlock
-                      : l10n.api_usage_will_renew_monthly(creditsOwnedPerMonth),
-                  value: subscriptionCredits.toString(),
-                  icon: Icons.calendar_month,
-                ),
-                SizedBox(height: itemSpacing),
-                _CreditItem(
-                  label: l10n.api_usage_purchased,
-                  description: l10n.api_usage_purchased_description,
-                  value: purchasedCredits.toString(),
-                  icon: Icons.shopping_cart,
-                ),
-              ],
-            ),
-            expanded: (context, constraints) => Row(
-              children: [
-                Expanded(
-                  child: _CreditItem(
-                    label: l10n.api_usage_total_available,
-                    description: l10n.api_usage_credits_combined_description,
-                    value: totalCredits.toString(),
-                    icon: Icons.check_circle,
-                    isHighlighted: true,
-                  ),
-                ),
-                SizedBox(width: itemSpacing),
-                Expanded(
-                  child: _CreditItem(
-                    label: l10n.api_usage_subscription,
-                    description: planTier == PlanTier.none
-                        ? l10n.api_usage_subscribe_to_unlock
-                        : l10n.api_usage_will_renew_monthly(creditsOwnedPerMonth),
-                    value: subscriptionCredits.toString(),
-                    icon: Icons.calendar_month,
-                  ),
-                ),
-                SizedBox(width: itemSpacing),
-                Expanded(
-                  child: _CreditItem(
-                    label: l10n.api_usage_purchased,
-                    description: l10n.api_usage_purchased_description,
-                    value: purchasedCredits.toString(),
-                    icon: Icons.shopping_cart,
-                  ),
-                ),
-              ],
+          Expanded(
+            child: LayoutBuilder(
+              builder: (context, contraints) {
+                final isSmallHeight = contraints.maxHeight < 140;
+                if (isSmallHeight) {
+                  return SizedBox(
+                    height: double.infinity,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      shrinkWrap: true,
+                      padding: EdgeInsets.only(left: 20),
+                      children: [
+                        SizedBox(
+                          width: 160,
+                          child: _CreditItem(
+                            label: l10n.api_usage_total_available,
+                            description:
+                                l10n.api_usage_credits_combined_description,
+                            value: totalCredits.toString(),
+                            icon: Icons.check_circle,
+                            isHighlighted: true,
+                          ),
+                        ),
+                        SizedBox(width: itemSpacing),
+                        SizedBox(
+                          width: 190,
+                          child: _CreditItem(
+                            label: l10n.api_usage_subscription,
+                            description: planTier == PlanTier.none
+                                ? l10n.api_usage_subscribe_to_unlock
+                                : l10n.api_usage_will_renew_monthly(
+                                    creditsOwnedPerMonth,
+                                  ),
+                            value: subscriptionCredits.toString(),
+                            icon: Icons.calendar_month,
+                          ),
+                        ),
+                        SizedBox(width: itemSpacing),
+                        SizedBox(
+                          width: 200,
+                          child: _CreditItem(
+                            label: l10n.api_usage_purchased,
+                            description: l10n.api_usage_purchased_description,
+                            value: purchasedCredits.toString(),
+                            icon: Icons.shopping_cart,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return ListView(
+                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                  children: [
+                    _CreditItem(
+                      label: l10n.api_usage_total_available,
+                      description: l10n.api_usage_credits_combined_description,
+                      value: totalCredits.toString(),
+                      icon: Icons.check_circle,
+                      isHighlighted: true,
+                    ),
+                    SizedBox(height: itemSpacing),
+                    _CreditItem(
+                      label: l10n.api_usage_subscription,
+                      description: planTier == PlanTier.none
+                          ? l10n.api_usage_subscribe_to_unlock
+                          : l10n.api_usage_will_renew_monthly(
+                              creditsOwnedPerMonth,
+                            ),
+                      value: subscriptionCredits.toString(),
+                      icon: Icons.calendar_month,
+                    ),
+                    SizedBox(height: itemSpacing),
+                    _CreditItem(
+                      label: l10n.api_usage_purchased,
+                      description: l10n.api_usage_purchased_description,
+                      value: purchasedCredits.toString(),
+                      icon: Icons.shopping_cart,
+                    ),
+                  ],
+                );
+              },
             ),
           ),
           SizedBox(height: verticalSpacing),
           Row(
             children: [
+              SizedBox(width: horizontalPadding),
               Icon(
                 Icons.info_outline_rounded,
                 size: 14,

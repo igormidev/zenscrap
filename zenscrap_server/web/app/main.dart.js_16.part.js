@@ -1,12 +1,12 @@
 ((a,b)=>{a[b]=a[b]||{}})(self,"$__dart_deferred_initializers__")
 $__dart_deferred_initializers__.current=function(a,b,c,$){var B,A={
-c0C(){B.mO("ja")
-return new A.zN()},
-zN:function zN(){}},C
+c0F(){B.mP("ja")
+return new A.zO()},
+zO:function zO(){}},C
 B=c[0]
 A=a.updateHolder(c[8],A)
 C=c[9]
-A.zN.prototype={
+A.zO.prototype={
 gD3(){return"Scrappable\u3092\u4f5c\u6210"},
 gD5(){return"\u4f7f\u3044\u65b9"},
 gD2(){return"\u81ea\u52d5\u4fee\u5fa9"},
@@ -600,6 +600,6 @@ gGX(){return"Try Again"},
 gGY(){return"Try Later"},
 gGW(){return"OK"}}
 var z=a.updateTypes([]);(function inheritance(){var y=a.inherit
-y(A.zN,C.fe)})()
-B.Nh(b.typeUniverse,JSON.parse('{"zN":{"fe":[]}}'))};
-(a=>{a["AgaNXadeAH49qC/GycIo6WDL5ew="]=a.current})($__dart_deferred_initializers__);
+y(A.zO,C.fe)})()
+B.Ni(b.typeUniverse,JSON.parse('{"zO":{"fe":[]}}'))};
+(a=>{a["f14SK6zDMhp8oK0/KhopZo13Dqw="]=a.current})($__dart_deferred_initializers__);

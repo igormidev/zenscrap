@@ -42,6 +42,54 @@ class ApiKeysSection extends StatelessWidget {
       expanded: 32.0,
     );
 
+    final headerRow = Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: Text(
+            AppLocalizations.of(context)!.api_usage_api_keys,
+            style: context.t.titleLarge,
+          ),
+        ),
+        SizedBox(width: 8),
+        // Use icon-only button on compact screens to prevent overflow
+        context.windowSizeClass == WindowSizeClass.compact
+            ? IconButton.filled(
+                onPressed: onShowCreateApiKeyDialog,
+                icon: const Icon(Icons.add),
+                tooltip: AppLocalizations.of(context)!.api_usage_create_key,
+              )
+            : ElevatedButton.icon(
+                onPressed: onShowCreateApiKeyDialog,
+                icon: const Icon(Icons.add),
+                label: Text(AppLocalizations.of(context)!.api_usage_create_key),
+              ),
+      ],
+    );
+
+    final emptyState = Center(
+      child: Padding(
+        padding: EdgeInsets.all(emptyStatePadding),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.key_off,
+              size: 48,
+              color: context.c.onSurface.withAlpha(100),
+            ),
+            SizedBox(height: verticalSpacing),
+            Text(
+              AppLocalizations.of(context)!.api_usage_no_api_keys,
+              style: context.t.bodyLarge?.copyWith(
+                color: context.c.onSurface.withAlpha(150),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       decoration: BoxDecoration(
@@ -49,80 +97,68 @@ class ApiKeysSection extends StatelessWidget {
         borderRadius: BorderRadius.circular(borderRadius),
         border: Border.all(color: context.c.outline.withAlpha(50)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: verticalSpacing),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  AppLocalizations.of(context)!.api_usage_api_keys,
-                  style: context.t.titleLarge,
-                ),
-              ),
-              SizedBox(width: 8),
-              // Use icon-only button on compact screens to prevent overflow
-              context.windowSizeClass == WindowSizeClass.compact
-                  ? IconButton.filled(
-                      onPressed: onShowCreateApiKeyDialog,
-                      icon: const Icon(Icons.add),
-                      tooltip:
-                          AppLocalizations.of(context)!.api_usage_create_key,
-                    )
-                  : ElevatedButton.icon(
-                      onPressed: onShowCreateApiKeyDialog,
-                      icon: const Icon(Icons.add),
-                      label: Text(
-                          AppLocalizations.of(context)!.api_usage_create_key),
-                    ),
-            ],
-          ),
-          SizedBox(height: verticalSpacing),
-          if (apiKeys.isEmpty)
-            Center(
-              child: Padding(
-                padding: EdgeInsets.all(emptyStatePadding),
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.key_off,
-                      size: 48,
-                      color: context.c.onSurface.withAlpha(100),
-                    ),
-                    SizedBox(height: verticalSpacing),
-                    Text(
-                      AppLocalizations.of(context)!.api_usage_no_api_keys,
-                      style: context.t.bodyLarge?.copyWith(
-                        color: context.c.onSurface.withAlpha(150),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            )
-          else
-            Expanded(
-              child: ListView.separated(
-                padding: EdgeInsets.only(bottom: verticalSpacing),
-                itemCount: apiKeys.length,
-                separatorBuilder: (context, index) =>
-                    SizedBox(height: verticalSpacing),
-                itemBuilder: (context, index) {
-                  final apiKey = apiKeys[index];
-                  final usageCount = apiKeyUsageStats[apiKey.id] ?? 0;
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isUnbounded = constraints.maxHeight == double.infinity;
 
-                  return ApiKeyCard(
-                    apiKey: apiKey,
-                    usageCount: usageCount,
-                    canDelete: apiKeys.length > 1,
-                    onDelete: () => onDeactivateApiKey(apiKey.id!),
-                  );
-                },
-              ),
-            ),
-        ],
+          if (apiKeys.isEmpty) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: isUnbounded ? MainAxisSize.min : MainAxisSize.max,
+              children: [
+                SizedBox(height: verticalSpacing),
+                headerRow,
+                SizedBox(height: verticalSpacing),
+                emptyState,
+              ],
+            );
+          }
+
+          final listView = ListView.separated(
+            shrinkWrap: isUnbounded,
+            physics: isUnbounded ? const NeverScrollableScrollPhysics() : null,
+            padding: EdgeInsets.only(bottom: verticalSpacing),
+            itemCount: apiKeys.length,
+            separatorBuilder: (context, index) =>
+                SizedBox(height: verticalSpacing),
+            itemBuilder: (context, index) {
+              final apiKey = apiKeys[index];
+              final usageCount = apiKeyUsageStats[apiKey.id] ?? 0;
+
+              return ApiKeyCard(
+                apiKey: apiKey,
+                usageCount: usageCount,
+                canDelete: apiKeys.length > 1,
+                onDelete: () => onDeactivateApiKey(apiKey.id!),
+              );
+            },
+          );
+
+          if (isUnbounded) {
+            // In scrollable context (tablet mode) - shrink-wrap
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(height: verticalSpacing),
+                headerRow,
+                SizedBox(height: verticalSpacing),
+                listView,
+              ],
+            );
+          } else {
+            // In bounded context (desktop mode) - expand to fill
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: verticalSpacing),
+                headerRow,
+                SizedBox(height: verticalSpacing),
+                Expanded(child: listView),
+              ],
+            );
+          }
+        },
       ),
     );
   }

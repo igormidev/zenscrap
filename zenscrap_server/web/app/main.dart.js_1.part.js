@@ -1,11 +1,11 @@
 ((a,b)=>{a[b]=a[b]||{}})(self,"$__dart_deferred_initializers__")
 $__dart_deferred_initializers__.current=function(a,b,c,$){var B,A={
-c0D(d){B.mO(d)
+c0G(d){B.mP(d)
 return new A.vy()},
-c0E(){B.mO("pt_BR")
-return new A.zO()},
+c0H(){B.mP("pt_BR")
+return new A.zP()},
 vy:function vy(){},
-zO:function zO(){}},C
+zP:function zP(){}},C
 B=c[0]
 A=a.updateHolder(c[3],A)
 C=c[9]
@@ -602,7 +602,7 @@ gHt(){return"An unexpected error occurred. Please try again. If the problem cont
 gGX(){return"Try Again"},
 gGY(){return"Try Later"},
 gGW(){return"OK"}}
-A.zO.prototype={
+A.zP.prototype={
 gD3(){return"Criar Scrappable"},
 gD5(){return"Como Funciona"},
 gD2(){return"Auto-Reparo"},
@@ -1137,6 +1137,6 @@ gBN(){return"Mostrar original"},
 gBO(){return"Mostrar tradu\xe7\xe3o"}}
 var z=a.updateTypes([]);(function inheritance(){var y=a.inherit
 y(A.vy,C.fe)
-y(A.zO,A.vy)})()
-B.Nh(b.typeUniverse,JSON.parse('{"vy":{"fe":[]},"zO":{"fe":[]}}'))};
-(a=>{a["vqgaz2MJKJriPF+HnEH7v/zLVFE="]=a.current})($__dart_deferred_initializers__);
+y(A.zP,A.vy)})()
+B.Ni(b.typeUniverse,JSON.parse('{"vy":{"fe":[]},"zP":{"fe":[]}}'))};
+(a=>{a["3ASXLAfv9Sv9/WIZVwQk02hxpFo="]=a.current})($__dart_deferred_initializers__);

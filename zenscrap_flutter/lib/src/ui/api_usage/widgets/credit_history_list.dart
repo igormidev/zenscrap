@@ -73,69 +73,95 @@ class CreditHistoryList extends ConsumerWidget {
       );
     }
 
-    return Column(
-      children: [
-        Expanded(
-          child: ListView.separated(
-            shrinkWrap: true,
-            itemCount: creditHistory.length,
-            separatorBuilder: (context, index) => Divider(
-              color: context.c.outline.withAlpha(50),
-              height: 1,
-            ),
-            itemBuilder: (context, index) {
-              final item = creditHistory[index];
-              return _CreditHistoryItem(item: item);
-            },
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isUnbounded = constraints.maxHeight == double.infinity;
+
+        final listView = ListView.separated(
+          shrinkWrap: isUnbounded,
+          physics: isUnbounded ? const NeverScrollableScrollPhysics() : null,
+          itemCount: creditHistory.length,
+          separatorBuilder: (context, index) => Divider(
+            color: context.c.outline.withAlpha(50),
+            height: 1,
           ),
-        ),
-        if (hasMore) ...[
-          SizedBox(height: spacing),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton(
-              onPressed: isLoadingMore
-                  ? null
-                  : () {
-                      // Track load more history click
-                      ref.read(analyticsServiceProvider).trackApiUsageLoadMoreHistoryClick(
-                        currentCount: creditHistory.length,
-                        hasMore: hasMore,
-                      );
-                      onLoadMore();
-                    },
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(borderRadius),
-                ),
-              ),
-              child: isLoadingMore
-                  ? SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          context.c.primary,
-                        ),
-                      ),
-                    )
-                  : Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.expand_more,
-                          size: 20,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(l10n.api_usage_load_more),
-                      ],
+          itemBuilder: (context, index) {
+            final item = creditHistory[index];
+            return _CreditHistoryItem(item: item);
+          },
+        );
+
+        final loadMoreButton = hasMore
+            ? SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: isLoadingMore
+                      ? null
+                      : () {
+                          // Track load more history click
+                          ref.read(analyticsServiceProvider).trackApiUsageLoadMoreHistoryClick(
+                            currentCount: creditHistory.length,
+                            hasMore: hasMore,
+                          );
+                          onLoadMore();
+                        },
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(borderRadius),
                     ),
-            ),
-          ),
-        ],
-      ],
+                  ),
+                  child: isLoadingMore
+                      ? SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              context.c.primary,
+                            ),
+                          ),
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.expand_more,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(l10n.api_usage_load_more),
+                          ],
+                        ),
+                ),
+              )
+            : null;
+
+        if (isUnbounded) {
+          // In scrollable context (tablet mode) - shrink-wrap, no internal scrolling
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              listView,
+              if (loadMoreButton != null) ...[
+                SizedBox(height: spacing),
+                loadMoreButton,
+              ],
+            ],
+          );
+        } else {
+          // In bounded context (desktop mode) - expand to fill, scroll internally
+          return Column(
+            children: [
+              Expanded(child: listView),
+              if (loadMoreButton != null) ...[
+                SizedBox(height: spacing),
+                loadMoreButton,
+              ],
+            ],
+          );
+        }
+      },
     );
   }
 }

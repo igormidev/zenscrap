@@ -3,7 +3,7 @@ import 'package:zenscrap_client/zenscrap_client.dart';
 extension PlanTierExtension on PlanTier {
   String get apiCreditsAddedPerMonth {
     return switch (this) {
-      PlanTier.none => '0',
+      PlanTier.none => '1K',
       PlanTier.basic => '50K',
       PlanTier.pro => '200K',
       PlanTier.ultra => '1M',
@@ -12,7 +12,7 @@ extension PlanTierExtension on PlanTier {
 
   int get apiCreditsAddedPerMonthInt {
     return switch (this) {
-      PlanTier.none => 0,
+      PlanTier.none => 1000,
       PlanTier.basic => 50000,
       PlanTier.pro => 200000,
       PlanTier.ultra => 1000000,

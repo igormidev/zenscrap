@@ -37,6 +37,13 @@ class HistorySection extends StatelessWidget {
       expanded: 16.0,
     );
 
+    final historyList = CreditHistoryList(
+      creditHistory: creditHistory,
+      isLoadingMore: isLoadingMoreHistory,
+      hasMore: hasMoreHistory,
+      onLoadMore: onLoadMoreHistory,
+    );
+
     return Container(
       padding: EdgeInsets.all(padding),
       decoration: BoxDecoration(
@@ -44,23 +51,39 @@ class HistorySection extends StatelessWidget {
         borderRadius: BorderRadius.circular(borderRadius),
         border: Border.all(color: context.c.outline.withAlpha(50)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            AppLocalizations.of(context)!.api_usage_credit_history,
-            style: context.t.titleLarge,
-          ),
-          SizedBox(height: verticalSpacing),
-          Expanded(
-            child: CreditHistoryList(
-              creditHistory: creditHistory,
-              isLoadingMore: isLoadingMoreHistory,
-              hasMore: hasMoreHistory,
-              onLoadMore: onLoadMoreHistory,
-            ),
-          ),
-        ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isUnbounded = constraints.maxHeight == double.infinity;
+
+          if (isUnbounded) {
+            // In scrollable context (tablet mode) - no expansion needed
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.api_usage_credit_history,
+                  style: context.t.titleLarge,
+                ),
+                SizedBox(height: verticalSpacing),
+                historyList,
+              ],
+            );
+          } else {
+            // In bounded context (desktop mode) - expand to fill
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.api_usage_credit_history,
+                  style: context.t.titleLarge,
+                ),
+                SizedBox(height: verticalSpacing),
+                Expanded(child: historyList),
+              ],
+            );
+          }
+        },
       ),
     );
   }

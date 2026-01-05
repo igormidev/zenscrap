@@ -76,15 +76,18 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
     if (!mounted) return null;
 
     // Track create API key submit
-    ref.read(analyticsServiceProvider).trackApiUsageCreateApiKeySubmit(
-          keyName: name,
-        );
+    ref
+        .read(analyticsServiceProvider)
+        .trackApiUsageCreateApiKeySubmit(keyName: name);
 
-    final newKey =
-        await ref.read(apiKeysProvider.notifier).createApiKey(context, name);
+    final newKey = await ref
+        .read(apiKeysProvider.notifier)
+        .createApiKey(context, name);
     if (newKey != null && mounted) {
       // Track successful creation
-      ref.read(analyticsServiceProvider).trackApiUsageCreateApiKeySuccess(
+      ref
+          .read(analyticsServiceProvider)
+          .trackApiUsageCreateApiKeySuccess(
             keyId: newKey.id!,
             keyName: newKey.name,
           );
@@ -97,7 +100,9 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context)!.api_usage_new_api_key_created),
+        title: Text(
+          AppLocalizations.of(context)!.api_usage_new_api_key_created,
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,13 +135,17 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
                       // Track copy API key from dialog
                       ref
                           .read(analyticsServiceProvider)
-                          .trackApiUsageCopyApiKeyDialog(
-                            keyId: apiKey.id!,
-                          );
+                          .trackApiUsageCopyApiKeyDialog(keyId: apiKey.id!);
 
                       Clipboard.setData(ClipboardData(text: apiKey.apiKey));
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(AppLocalizations.of(context)!.api_usage_api_key_copied)),
+                        SnackBar(
+                          content: Text(
+                            AppLocalizations.of(
+                              context,
+                            )!.api_usage_api_key_copied,
+                          ),
+                        ),
                       );
                     },
                   ),
@@ -157,42 +166,38 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
 
   Future<void> _deactivateApiKey(int keyId) async {
     // Find the key name for tracking
-    final apiKeys = ref.read(apiKeysProvider).maybeWhen(
-          loaded: (keys, _) => keys,
-          orElse: () => <AccountApiKey>[],
-        );
+    final apiKeys = ref
+        .read(apiKeysProvider)
+        .maybeWhen(loaded: (keys, _) => keys, orElse: () => <AccountApiKey>[]);
     final apiKey = apiKeys.firstWhere((key) => key.id == keyId);
 
     // Track deactivate click
-    ref.read(analyticsServiceProvider).trackApiUsageDeactivateApiKeyClick(
-          keyId: keyId,
-          keyName: apiKey.name,
-        );
+    ref
+        .read(analyticsServiceProvider)
+        .trackApiUsageDeactivateApiKeyClick(keyId: keyId, keyName: apiKey.name);
 
     // Show confirmation dialog
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(AppLocalizations.of(context)!.api_usage_deactivate_api_key),
-        content: Text(AppLocalizations.of(context)!.api_usage_deactivate_confirmation),
+        content: Text(
+          AppLocalizations.of(context)!.api_usage_deactivate_confirmation,
+        ),
         actions: [
           TextButton(
             onPressed: () {
               // Track cancel
               ref
                   .read(analyticsServiceProvider)
-                  .trackApiUsageDeactivateApiKeyCancel(
-                    keyId: keyId,
-                  );
+                  .trackApiUsageDeactivateApiKeyCancel(keyId: keyId);
               Navigator.of(context).pop(false);
             },
             child: Text(AppLocalizations.of(context)!.api_usage_cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            style: TextButton.styleFrom(
-              foregroundColor: context.c.error,
-            ),
+            style: TextButton.styleFrom(foregroundColor: context.c.error),
             child: Text(AppLocalizations.of(context)!.api_usage_deactivate),
           ),
         ],
@@ -202,7 +207,9 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
     if (confirm != true) return;
 
     // Track confirm
-    ref.read(analyticsServiceProvider).trackApiUsageDeactivateApiKeyConfirm(
+    ref
+        .read(analyticsServiceProvider)
+        .trackApiUsageDeactivateApiKeyConfirm(
           keyId: keyId,
           keyName: apiKey.name,
         );
@@ -217,9 +224,7 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
 
     final newKey = await showDialog<AccountApiKey?>(
       context: context,
-      builder: (context) => CreateApiKeyDialog(
-        onCreateApiKey: _createApiKey,
-      ),
+      builder: (context) => CreateApiKeyDialog(onCreateApiKey: _createApiKey),
     );
 
     // Show the API key dialog AFTER the create dialog is fully closed
@@ -231,7 +236,9 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
   @override
   Widget build(BuildContext context) {
     final analytics = ref.read(analyticsServiceProvider);
-    final planTier = ref.watch(accountProvider).maybeWhen(
+    final planTier = ref
+        .watch(accountProvider)
+        .maybeWhen(
           withData: (account) => account.planTier,
           orElse: () => PlanTier.none,
         );
@@ -240,23 +247,13 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
     final creditHistoryState = ref.watch(apiCreditHistoryProvider);
 
     // Check if any provider is loading
-    final isLoading = apiUsageState.maybeWhen(
-          loading: () => true,
-          orElse: () => false,
-        ) ||
-        apiKeysState.maybeWhen(
-          loading: () => true,
-          orElse: () => false,
-        ) ||
-        creditHistoryState.maybeWhen(
-          loading: () => true,
-          orElse: () => false,
-        );
+    final isLoading =
+        apiUsageState.maybeWhen(loading: () => true, orElse: () => false) ||
+        apiKeysState.maybeWhen(loading: () => true, orElse: () => false) ||
+        creditHistoryState.maybeWhen(loading: () => true, orElse: () => false);
 
     if (isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     // Check for errors
@@ -272,10 +269,7 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
           children: [
             Icon(Icons.error_outline, size: 64, color: context.c.error),
             const SizedBox(height: 16),
-            Text(
-              apiUsageError.title,
-              style: context.t.headlineSmall,
-            ),
+            Text(apiUsageError.title, style: context.t.headlineSmall),
             const SizedBox(height: 8),
             Text(
               apiUsageError.description,
@@ -328,13 +322,12 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
     );
 
     if (apiUsage == null) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     // Track page view with credit and API key data
-    final totalCredits = (apiUsage.creditUsage?.subscriptionCredits ?? 0) +
+    final totalCredits =
+        (apiUsage.creditUsage?.subscriptionCredits ?? 0) +
         (apiUsage.creditUsage?.purchasedCredits ?? 0);
     analytics.trackApiUsagePageView(
       subscriptionCredits: apiUsage.creditUsage?.subscriptionCredits ?? 0,
@@ -348,18 +341,14 @@ class _ApiUsageViewState extends ConsumerState<ApiUsageView> {
       builder: (context, isRefresh, child) {
         return Opacity(
           opacity: isRefresh ? 0.5 : 1.0,
-          child: IgnorePointer(
-            ignoring: isRefresh,
-            child: child!,
-          ),
+          child: IgnorePointer(ignoring: isRefresh, child: child!),
         );
       },
       child: ResponsiveBuilder(
         compact: (context, constraints) => _CompactLayout(
           planTier: planTier,
           selectedTabIndex: _selectedTabIndex,
-          onTabSelected: (index) =>
-              setState(() => _selectedTabIndex = index),
+          onTabSelected: (index) => setState(() => _selectedTabIndex = index),
           apiUsage: apiUsage,
           apiKeys: apiKeys,
           apiKeyUsageStats: apiKeyUsageStats,
@@ -421,10 +410,7 @@ class _CompactLayout extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tabs = [
-      _OverviewTab(
-        apiUsage: apiUsage,
-        planTier: planTier,
-      ),
+      _OverviewTab(apiUsage: apiUsage, planTier: planTier),
       _ApiKeysTab(
         apiKeys: apiKeys,
         apiKeyUsageStats: apiKeyUsageStats,
@@ -440,18 +426,21 @@ class _CompactLayout extends ConsumerWidget {
     ];
 
     final l10n = AppLocalizations.of(context)!;
-    final tabNames = [l10n.api_usage_overview, l10n.api_usage_api_keys, l10n.api_usage_history];
+    final tabNames = [
+      l10n.api_usage_overview,
+      l10n.api_usage_api_keys,
+      l10n.api_usage_history,
+    ];
 
     return Scaffold(
-      body: IndexedStack(
-        index: selectedTabIndex,
-        children: tabs,
-      ),
+      body: IndexedStack(index: selectedTabIndex, children: tabs),
       bottomNavigationBar: NavigationBar(
         selectedIndex: selectedTabIndex,
         onDestinationSelected: (index) {
           // Track tab selection
-          ref.read(analyticsServiceProvider).trackApiUsageMobileTabSelect(
+          ref
+              .read(analyticsServiceProvider)
+              .trackApiUsageMobileTabSelect(
                 tabName: tabNames[index],
                 tabIndex: index,
               );
@@ -539,36 +528,42 @@ class _ExpandedLayout extends StatelessWidget {
                     ),
                   ),
                   ValueListenableBuilder(
-                      valueListenable: isRefreshVN,
-                      builder: (context, isRefresh, _) {
-                        return FilledButton.tonalIcon(
-                          onPressed: isRefresh ? null : onRefresh,
-                          label: Text(AppLocalizations.of(context)!.api_usage_refresh),
-                          icon: isRefresh
-                              ? CupertinoActivityIndicator()
-                              : Icon(Icons.refresh),
-                        );
-                      }),
+                    valueListenable: isRefreshVN,
+                    builder: (context, isRefresh, _) {
+                      return FilledButton.tonalIcon(
+                        onPressed: isRefresh ? null : onRefresh,
+                        label: Text(
+                          AppLocalizations.of(context)!.api_usage_refresh,
+                        ),
+                        icon: isRefresh
+                            ? CupertinoActivityIndicator()
+                            : Icon(Icons.refresh),
+                      );
+                    },
+                  ),
                 ],
               ),
               SizedBox(height: verticalSpacing),
-              Row(
-                children: [
-                  Expanded(
-                    child: CreditsOverviewSection(
-                      planTier: planTier,
-                      subscriptionCredits:
-                          apiUsage.creditUsage!.subscriptionCredits,
-                      purchasedCredits: apiUsage.creditUsage!.purchasedCredits,
+              SizedBox(
+                height: 250,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: CreditsOverviewSection(
+                        planTier: planTier,
+                        subscriptionCredits:
+                            apiUsage.creditUsage!.subscriptionCredits,
+                        purchasedCredits:
+                            apiUsage.creditUsage!.purchasedCredits,
+                      ),
                     ),
-                  ),
-                  SizedBox(width: verticalSpacing),
-                  Expanded(
-                    child: PurchaseSection(),
-                  ),
-                ],
+                    SizedBox(width: verticalSpacing),
+                    Expanded(child: PurchaseSection()),
+                  ],
+                ),
               ),
               SizedBox(height: verticalSpacing),
+
               Expanded(
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -608,10 +603,7 @@ class _OverviewTab extends StatelessWidget {
   final PlanTier planTier;
   final AccountApiUsage apiUsage;
 
-  const _OverviewTab({
-    required this.apiUsage,
-    required this.planTier,
-  });
+  const _OverviewTab({required this.apiUsage, required this.planTier});
 
   @override
   Widget build(BuildContext context) {
