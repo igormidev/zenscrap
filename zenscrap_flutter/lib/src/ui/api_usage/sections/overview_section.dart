@@ -79,7 +79,7 @@ class CreditsOverviewSection extends StatelessWidget {
                     child: ListView(
                       scrollDirection: Axis.horizontal,
                       shrinkWrap: true,
-                      padding: EdgeInsets.only(left: 20),
+                      padding: EdgeInsets.only(left: 20, right: 20),
                       children: [
                         SizedBox(
                           width: 160,

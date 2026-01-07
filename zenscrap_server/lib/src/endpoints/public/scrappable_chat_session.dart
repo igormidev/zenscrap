@@ -613,7 +613,7 @@ class ScrappableChatSession extends Endpoint {
       );
     }
 
-    final duration = const Duration(hours: 1);
+    final duration = const Duration(hours: 3);
     final response = CreateSessionResponse(
       expiresIn: duration,
       sessionId: sessionUuid,
