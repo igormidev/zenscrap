@@ -175,7 +175,21 @@ final class InitialPayloadDataEditingExistingWebScrapper
 }
 
 /// JSON schema passed to OpenAI for the structured response.
-/// Note: Using non-strict mode due to complex optional object requirements
+///
+/// **Why `strict: false`?**
+/// This schema uses a discriminated union pattern where different fields are
+/// required based on `responseType`. OpenAI's strict mode requires ALL properties
+/// to appear in every response, which doesn't work well with:
+/// - Optional nested objects (`scrappingBeeFetchSettings`, `scrappableRequest`)
+/// - Conditional requirements based on response type
+///
+/// **Consequence of non-strict mode:**
+/// The AI may occasionally return null for "required" fields or omit them entirely.
+/// The `parseStructuredResponse()` function handles these cases defensively with
+/// sensible defaults (e.g., `render_js: false` if null).
+///
+/// The schema still declares fields as required to encourage the AI to return
+/// proper values - it's "aspirational" rather than "contractual".
 const Map<String, dynamic> webScraperResponseJsonSchema = {
   'name': 'WebScraperResponse',
   'strict': false,
@@ -351,15 +365,23 @@ WebScrapperChatAIResponse parseStructuredResponse(
               ? waitRaw
               : (waitRaw is String ? int.tryParse(waitRaw) : null);
 
+          // Handle boolean fields defensively - see schema comment above.
+          // Since strict: false, AI might return null for "required" booleans.
+          // Default to false (most conservative/cheapest option for ScrapingBee).
+          final renderJs =
+              scrappingBeeFetchSettingsData['render_js'] as bool? ?? false;
+          final premiumProxy =
+              scrappingBeeFetchSettingsData['premium_proxy'] as bool? ?? false;
+          final stealthProxy =
+              scrappingBeeFetchSettingsData['stealth_proxy'] as bool? ?? false;
+
           fetchSettings = ScrappingBeeFetchSettings(
             url: scrappingBeeFetchSettingsData['url'] as String,
             extract_rules: extractRules,
             js_scenario: jsScenario,
-            render_js: scrappingBeeFetchSettingsData['render_js'] as bool,
-            premium_proxy:
-                scrappingBeeFetchSettingsData['premium_proxy'] as bool,
-            stealth_proxy:
-                scrappingBeeFetchSettingsData['stealth_proxy'] as bool,
+            render_js: renderJs,
+            premium_proxy: premiumProxy,
+            stealth_proxy: stealthProxy,
             wait: wait,
             wait_for: scrappingBeeFetchSettingsData['wait_for'] as String?,
             wait_browser:

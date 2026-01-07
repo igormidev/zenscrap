@@ -50,12 +50,20 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection>
         widget.testData!.referenceQueryParametersJson,
       );
 
+      // Get queryParams and queryParamsNotRelatedToUrl from scrappableRequest
+      // These show all available parameters (with placeholders for required ones)
+      final targetQueryParams = widget.scrappableRequest?.queryParams;
+      final targetQueryParamsNotRelatedToUrl =
+          widget.scrappableRequest?.queryParamsNotRelatedToUrl;
+
       displayCurlCommand = buildSimpleCurl(
         isDisplayCurl: true,
         baseUrl: baseUrl,
         scrappableId: widget.scrappableId,
         isProd: false, // This is the test endpoint
         examplePayload: examplePayload,
+        queryParams: targetQueryParams,
+        queryParamsNotRelatedToUrl: targetQueryParamsNotRelatedToUrl,
       );
       copiableCurlCommand = buildSimpleCurl(
         isDisplayCurl: false,
@@ -63,6 +71,8 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection>
         scrappableId: widget.scrappableId,
         isProd: false, // This is the test endpoint
         examplePayload: examplePayload,
+        queryParams: targetQueryParams,
+        queryParamsNotRelatedToUrl: targetQueryParamsNotRelatedToUrl,
       );
     }
   }

@@ -419,8 +419,10 @@ $scrappableRequestStructureGuide
   * Example: ?category=laptops → {"category": null}
 - **Variable IDs**: ?id=..., ?user=..., ?product=...
   * Example: ?productId=12345 → {"productId": null}
-- **Pagination**: ?page=..., ?offset=..., ?start=...
+- **Pagination**: ?page=..., ?offset=..., ?start=..., ?pageIndex=..., ?index=...
   * Example: ?page=1 → {"page": null}
+  * Example: ?pageIndex=0 → {"pageIndex": null}
+  * Example: ?offset=20 → {"offset": null}
 
 **Query Parameters** - Keep as static (actual value) if they are:
 - Configuration options that rarely change
@@ -528,15 +530,16 @@ Output:
   }
 }
 
-EXAMPLE 5 - E-commerce with Client-Side Search (queryParamsNotRelatedToUrl):
+EXAMPLE 5 - E-commerce with Client-Side Search and Pagination (queryParamsNotRelatedToUrl):
 Input URL: https://shop.example.com/products
-User Context: "I want to search for products and navigate through pages"
+User Context: "I want to search for products and add pagination index"
 
 Analysis:
 - The URL doesn't have search or pagination params
 - But the site has a search box and page navigation buttons (client-side only)
+- User explicitly asked for "pagination index" → Create a `pageIndex` parameter
 - Create parameters in queryParamsNotRelatedToUrl for search and pagination
-- These will be used as {searchQuery} and {currentPage} placeholders in js_scenario
+- These will be used as {searchQuery} and {pageIndex} placeholders in js_scenario
 - They will NOT be added to the URL
 
 Output:
@@ -551,14 +554,21 @@ Output:
     "queryParams": {},
     "queryParamsNotRelatedToUrl": {
       "searchQuery": null,
-      "currentPage": null
+      "pageIndex": null
     },
     "pathParams": []
   },
   "referenceLinkPathParameters": {}
 }
 
-Note: The searchQuery and currentPage parameters will be used as {searchQuery} and {currentPage} placeholders in the extraction rules that the AI will create later. They will be replaced at runtime with values from the user's API payload.
+Note: The searchQuery and pageIndex parameters will be used as {searchQuery} and {pageIndex} placeholders in the extraction rules that the AI will create later. They will be replaced at runtime with values from the user's API payload.
+
+**IMPORTANT - Pagination Parameter Naming:**
+When user mentions pagination, ALWAYS add a pagination-related parameter:
+- "pagination index" / "index of pagination" → Add `pageIndex` (0-based index)
+- "page number" → Add `pageNumber` (1-based number)
+- "pagination" / "navigate pages" → Add `pageIndex` or `currentPage`
+- "offset" → Add `offset`
 
 EXAMPLE 6 - Site with Filters (queryParamsNotRelatedToUrl):
 Input URL: https://realestate.com/listings
@@ -681,6 +691,15 @@ This context may give you clues about:
 - The purpose of the scraper
 
 Use this information to better identify dynamic parameters!
+
+**CRITICAL - Parse User Context for Parameters:**
+If the user mentions ANY of these, you MUST add the corresponding parameter in queryParamsNotRelatedToUrl:
+- "pagination", "page", "index", "navigate pages" → Add `pageIndex: null`
+- "search", "query", "filter by text" → Add `searchQuery: null`
+- "filter by X" → Add a parameter for X (e.g., "filter by category" → `category: null`)
+- "sort", "order by" → Add `sortBy: null` or `sortOrder: null`
+
+Example: User says "add pagination index" → You MUST add `"pageIndex": null` in queryParamsNotRelatedToUrl
 ''' : ''}
 
 Return only raw json, without anything more (not even md notations like "```" in the begining... just the raw json).

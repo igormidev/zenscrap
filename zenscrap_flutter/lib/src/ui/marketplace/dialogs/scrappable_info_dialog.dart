@@ -78,6 +78,12 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
       );
     }
 
+    // Get queryParams and queryParamsNotRelatedToUrl from targetRequest
+    // These show all available parameters (with placeholders for required ones)
+    final targetQueryParams = widget.scrappable.targetRequest?.queryParams;
+    final targetQueryParamsNotRelatedToUrl =
+        widget.scrappable.targetRequest?.queryParamsNotRelatedToUrl;
+
     setState(() {
       displayCurlCommand = buildSimpleCurl(
         isDisplayCurl: true,
@@ -86,6 +92,8 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
         isProd: true, // Marketplace always uses prod endpoint
         apiKey: selectedApiKey!.apiKey,
         examplePayload: examplePayload,
+        queryParams: targetQueryParams,
+        queryParamsNotRelatedToUrl: targetQueryParamsNotRelatedToUrl,
       );
       copiableCurlCommand = buildSimpleCurl(
         isDisplayCurl: false,
@@ -94,6 +102,8 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
         isProd: true, // Marketplace always uses prod endpoint
         apiKey: selectedApiKey!.apiKey,
         examplePayload: examplePayload,
+        queryParams: targetQueryParams,
+        queryParamsNotRelatedToUrl: targetQueryParamsNotRelatedToUrl,
       );
     });
   }
@@ -151,16 +161,20 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
 
     return Material(
       elevation: 6,
-      color: Theme.of(context).dialogTheme.backgroundColor ?? Theme.of(context).colorScheme.surfaceContainerHigh,
+      color:
+          Theme.of(context).dialogTheme.backgroundColor ??
+          Theme.of(context).colorScheme.surfaceContainerHigh,
       borderRadius: BorderRadius.circular(28),
       clipBehavior: Clip.antiAlias,
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxHeight: MediaQuery.sizeOf(context).height * context.responsiveValue(
-            compact: 0.8,
-            medium: 0.75,
-            expanded: 0.7,
-          ),
+          maxHeight:
+              MediaQuery.sizeOf(context).height *
+              context.responsiveValue(
+                compact: 0.8,
+                medium: 0.75,
+                expanded: 0.7,
+              ),
           maxWidth: 1000.0,
         ),
         child: Column(
@@ -196,296 +210,314 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
             ),
             Expanded(
               child: ListView(
-            padding: const EdgeInsets.only(bottom: 20, top: 6),
-            children: [
-              Padding(
-                padding: horizontalPadding,
-                child: TranslatableDescription(
-                  text: widget.scrappable.description,
-                  sourceLanguage: widget.scrappable.descriptionLanguage,
-                  style: context.t.bodyMedium,
-                  maxLines: 10,
-                ),
-              ),
-              const SizedBox(height: 8),
-            Padding(
-              padding: horizontalPadding,
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: CategoryBadge(scrappable: widget.scrappable),
-              ),
-            ),
-            if (widget.scrappable.targetRequest?.url != null) ...[
-              const SizedBox(height: 16),
-              Padding(
-                padding: horizontalPadding,
-                child: Text(
-                  AppLocalizations.of(context)!.marketplace_target_url,
-                  style: context.t.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              BabelSelectableText(
-                '<pC>${widget.scrappable.targetRequest!.url.shortUrl}<pC>'
-                // There are a lot of {var}
-                .replaceAllMapped(
-                  RegExp(r'\{[^}]+\}'),
-                  (match) => '<code>${match[0]}<code>',
-                ),
-                style: context.t.bodyMedium?.copyWith(),
-                padding: horizontalPadding,
-                styleMapping: {
-                  '<code>': (_, style) => style.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.tertiary,
-                    backgroundColor: context.c.surfaceContainerHighest
-                        .withAlpha(26),
-                  ),
-                },
-              ),
-            ],
-            if (selectedApiKey != null) ...[
-              const SizedBox(height: 8),
-              Container(
-                margin: horizontalPadding,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: context.c.surfaceContainerHighest.withAlpha(77),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: context.c.outline.withAlpha(51)),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.vpn_key,
-                      size: 16,
-                      color: context.c.onSurfaceVariant,
+                padding: const EdgeInsets.only(bottom: 20, top: 6),
+                children: [
+                  Padding(
+                    padding: horizontalPadding,
+                    child: TranslatableDescription(
+                      text: widget.scrappable.description,
+                      sourceLanguage: widget.scrappable.descriptionLanguage,
+                      style: context.t.bodyMedium,
+                      maxLines: 10,
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      selectedApiKey!.name,
-                      style: context.t.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w500,
+                  ),
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: horizontalPadding,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: CategoryBadge(scrappable: widget.scrappable),
+                    ),
+                  ),
+                  if (widget.scrappable.targetRequest?.url != null) ...[
+                    const SizedBox(height: 16),
+                    Padding(
+                      padding: horizontalPadding,
+                      child: Text(
+                        AppLocalizations.of(context)!.marketplace_target_url,
+                        style: context.t.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      '(${selectedApiKey!.apiKey.substring(0, 8)}...)',
-                      style: context.t.bodySmall?.copyWith(
-                        fontFamily: 'monospace',
-                        color: context.c.onSurfaceVariant,
+                    BabelSelectableText(
+                      '<pC>${widget.scrappable.targetRequest!.url.shortUrl}<pC>'
+                      // There are a lot of {var}
+                      .replaceAllMapped(
+                        RegExp(r'\{[^}]+\}'),
+                        (match) => '<code>${match[0]}<code>',
+                      ),
+                      style: context.t.bodyMedium?.copyWith(),
+                      padding: horizontalPadding,
+                      styleMapping: {
+                        '<code>': (_, style) => style.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.tertiary,
+                          backgroundColor: context.c.surfaceContainerHighest
+                              .withAlpha(26),
+                        ),
+                      },
+                    ),
+                  ],
+                  if (selectedApiKey != null) ...[
+                    const SizedBox(height: 8),
+                    Container(
+                      margin: horizontalPadding,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: context.c.surfaceContainerHighest.withAlpha(77),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: context.c.outline.withAlpha(51),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.vpn_key,
+                            size: 16,
+                            color: context.c.onSurfaceVariant,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            selectedApiKey!.name,
+                            style: context.t.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '(${selectedApiKey!.apiKey.substring(0, 8)}...)',
+                            style: context.t.bodySmall?.copyWith(
+                              fontFamily: 'monospace',
+                              color: context.c.onSurfaceVariant,
+                            ),
+                          ),
+                          if (apiKeys.length > 1) ...[
+                            const Spacer(),
+                            TextButton.icon(
+                              onPressed: _selectApiKey,
+                              icon: const Icon(Icons.swap_horiz, size: 18),
+                              label: Text(
+                                AppLocalizations.of(
+                                  context,
+                                )!.marketplace_change,
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                     ),
-                    if (apiKeys.length > 1) ...[
-                      const Spacer(),
-                      TextButton.icon(
-                        onPressed: _selectApiKey,
-                        icon: const Icon(Icons.swap_horiz, size: 18),
-                        label: Text(
-                          AppLocalizations.of(context)!.marketplace_change,
+                    const SizedBox(height: 12),
+                    Padding(
+                      padding: horizontalPadding,
+                      child: Row(
+                        children: [
+                          Text(
+                            AppLocalizations.of(
+                              context,
+                            )!.marketplace_curl_command,
+                            style: context.t.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Spacer(),
+                          if (widget.scrappable.targetRequest != null)
+                            SizedBox(
+                              height: 28,
+                              child: FilledButton.icon(
+                                style: FilledButton.styleFrom(
+                                  iconAlignment: IconAlignment.end,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 0,
+                                  ),
+                                ),
+                                onPressed: () => _openTestDialog(context),
+                                icon: const Icon(Icons.science, size: 15),
+                                label: Padding(
+                                  padding: const EdgeInsets.only(bottom: 2),
+                                  child: Text(
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.marketplace_test_endpoint,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Padding(
+                      padding: horizontalPadding,
+                      child: CodeBlock(
+                        copyTooltipMessage: AppLocalizations.of(
+                          context,
+                        )!.marketplace_copy_curl_command,
+                        code: displayCurlCommand,
+                        copyCode: copiableCurlCommand,
+                        fontSize: 12,
+                      ),
+                    ),
+                    if (widget.scrappable.scrappingBeeExtractRules != null) ...[
+                      const SizedBox(height: 24),
+                      Padding(
+                        padding: horizontalPadding,
+                        child: Text(
+                          AppLocalizations.of(
+                            context,
+                          )!.marketplace_api_configuration,
+                          style: context.t.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Padding(
+                        padding: horizontalPadding,
+                        child: ScrappingBeeCostTable(
+                          extractLogic:
+                              widget.scrappable.scrappingBeeExtractRules!,
                         ),
                       ),
                     ],
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-              Padding(
-                padding: horizontalPadding,
-                child: Row(
-                  children: [
-                    Text(
-                      AppLocalizations.of(context)!.marketplace_curl_command,
-                      style: context.t.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+                    // Auto-Fix Configuration Section
+                    if (widget.scrappable.autoFixConfig != null) ...[
+                      const SizedBox(height: 24),
+                      Padding(
+                        padding: horizontalPadding,
+                        child: _AutoFixInfoSection(
+                          autoFixConfig: widget.scrappable.autoFixConfig!,
+                        ),
                       ),
-                    ),
-                    Spacer(),
-                    if (widget.scrappable.targetRequest != null)
-                      SizedBox(
-                        height: 28,
-                        child: FilledButton.icon(
-                          style: FilledButton.styleFrom(
-                            iconAlignment: IconAlignment.end,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 0,
-                            ),
-                          ),
-                          onPressed: () => _openTestDialog(context),
-                          icon: const Icon(Icons.science, size: 15),
-                          label: Padding(
-                            padding: const EdgeInsets.only(bottom: 2),
+                    ],
+                    if (isNewScrappable == false) ...[
+                      const SizedBox(height: 24),
+                      Padding(
+                        padding: horizontalPadding,
+                        child: ScrappableUsageMetricsWidget(
+                          scrappableId: widget.scrappable.id!,
+                        ),
+                      ),
+                    ],
+                  ] else if (!isLoggedIn) ...[
+                    const SizedBox(height: 24),
+                    Container(
+                      margin: horizontalPadding,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: context.c.primaryContainer.withAlpha(51),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: context.c.primary.withAlpha(77),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.info_outline, color: context.c.primary),
+                          const SizedBox(width: 12),
+                          Expanded(
                             child: Text(
                               AppLocalizations.of(
                                 context,
-                              )!.marketplace_test_endpoint,
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
+                              )!.marketplace_login_required,
+                              style: context.t.bodyMedium?.copyWith(
+                                color: context.c.onPrimaryContainer,
                               ),
                             ),
                           ),
+                        ],
+                      ),
+                    ),
+                  ] else if (apiKeys.isEmpty) ...[
+                    const SizedBox(height: 24),
+                    Container(
+                      margin: horizontalPadding,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: context.c.errorContainer.withAlpha(26),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: context.c.error.withAlpha(51),
                         ),
                       ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 8),
-              Padding(
-                padding: horizontalPadding,
-                child: CodeBlock(
-                  copyTooltipMessage: AppLocalizations.of(
-                    context,
-                  )!.marketplace_copy_curl_command,
-                  code: displayCurlCommand,
-                  copyCode: copiableCurlCommand,
-                  fontSize: 12,
-                ),
-              ),
-              if (widget.scrappable.scrappingBeeExtractRules != null) ...[
-                const SizedBox(height: 24),
-                Padding(
-                  padding: horizontalPadding,
-                  child: Text(
-                    AppLocalizations.of(context)!.marketplace_api_configuration,
-                    style: context.t.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Padding(
-                  padding: horizontalPadding,
-                  child: ScrappingBeeCostTable(
-                    extractLogic: widget.scrappable.scrappingBeeExtractRules!,
-                  ),
-                ),
-              ],
-              // Auto-Fix Configuration Section
-              if (widget.scrappable.autoFixConfig != null) ...[
-                const SizedBox(height: 24),
-                Padding(
-                  padding: horizontalPadding,
-                  child: _AutoFixInfoSection(
-                    autoFixConfig: widget.scrappable.autoFixConfig!,
-                  ),
-                ),
-              ],
-              if (isNewScrappable == false) ...[
-                const SizedBox(height: 24),
-                Padding(
-                  padding: horizontalPadding,
-                  child: ScrappableUsageMetricsWidget(
-                    scrappableId: widget.scrappable.id!,
-                  ),
-                ),
-              ],
-            ] else if (!isLoggedIn) ...[
-              const SizedBox(height: 24),
-              Container(
-                margin: horizontalPadding,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: context.c.primaryContainer.withAlpha(51),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: context.c.primary.withAlpha(77)),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.info_outline, color: context.c.primary),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        AppLocalizations.of(
-                          context,
-                        )!.marketplace_login_required,
-                        style: context.t.bodyMedium?.copyWith(
-                          color: context.c.onPrimaryContainer,
-                        ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.warning_amber_rounded,
+                            color: context.c.error,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              AppLocalizations.of(
+                                context,
+                              )!.marketplace_no_api_keys,
+                              style: context.t.bodyMedium?.copyWith(
+                                color: context.c.error,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
-                ),
-              ),
-            ] else if (apiKeys.isEmpty) ...[
-              const SizedBox(height: 24),
-              Container(
-                margin: horizontalPadding,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: context.c.errorContainer.withAlpha(26),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: context.c.error.withAlpha(51)),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.warning_amber_rounded, color: context.c.error),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        AppLocalizations.of(context)!.marketplace_no_api_keys,
-                        style: context.t.bodyMedium?.copyWith(
-                          color: context.c.error,
+                  const SizedBox(height: 16),
+                  Padding(
+                    padding: horizontalPadding,
+                    child: Text(
+                      AppLocalizations.of(context)!.marketplace_created_date(
+                        _formatFullDate(widget.scrappable.createdAt),
+                      ),
+                      style: context.t.bodySmall?.copyWith(
+                        color: context.c.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: horizontalPadding,
+                    child: Text(
+                      AppLocalizations.of(
+                        context,
+                      )!.marketplace_last_logic_modification(
+                        widget.scrappable.extractRulesUpdatedAt.formatToDisplay,
+                      ),
+                      style: context.t.bodySmall?.copyWith(
+                        color: context.c.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  if (isMyScrappable == false)
+                    Padding(
+                      padding: horizontalPadding,
+                      child: FilledButton.icon(
+                        onPressed: () => _handleClone(context),
+                        icon: const Icon(Icons.copy_rounded),
+                        label: Text(
+                          AppLocalizations.of(
+                            context,
+                          )!.marketplace_clone_to_my_endpoints,
                         ),
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ],
-            const SizedBox(height: 16),
-            Padding(
-              padding: horizontalPadding,
-              child: Text(
-                AppLocalizations.of(context)!.marketplace_created_date(
-                  _formatFullDate(widget.scrappable.createdAt),
-                ),
-                style: context.t.bodySmall?.copyWith(
-                  color: context.c.onSurfaceVariant,
-                ),
+                  if (isMyScrappable != false) const SizedBox(height: 42),
+                ],
               ),
             ),
-            const SizedBox(height: 8),
-            Padding(
-              padding: horizontalPadding,
-              child: Text(
-                AppLocalizations.of(
-                  context,
-                )!.marketplace_last_logic_modification(
-                  widget.scrappable.extractRulesUpdatedAt.formatToDisplay,
-                ),
-                style: context.t.bodySmall?.copyWith(
-                  color: context.c.onSurfaceVariant,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            if (isMyScrappable == false)
-              Padding(
-                padding: horizontalPadding,
-                child: FilledButton.icon(
-                  onPressed: () => _handleClone(context),
-                  icon: const Icon(Icons.copy_rounded),
-                  label: Text(
-                    AppLocalizations.of(
-                      context,
-                    )!.marketplace_clone_to_my_endpoints,
-                  ),
-                ),
-              ),
-              if (isMyScrappable != false) const SizedBox(height: 42),
-            ],
-          ),
+          ],
         ),
-      ],
-    ),
-  ),
-);
+      ),
+    );
   }
 
   String _formatFullDate(DateTime date) {
