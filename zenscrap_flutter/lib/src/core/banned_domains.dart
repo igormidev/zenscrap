@@ -3,9 +3,10 @@
 /// These domains are either too difficult to scrape reliably or have
 /// strict anti-scraping measures that make the experience poor for users.
 ///
-/// The check matches:
+/// The check uses a regex with word boundaries to match:
 /// - The exact domain (e.g., instagram.com)
 /// - All subdomains (e.g., www.instagram.com, api.instagram.com)
+/// - But NOT partial matches (e.g., "notinstagram.com" won't match)
 ///
 /// This list mirrors the server-side list in `banned_domains.dart`.
 const List<String> kBannedDomains = [
@@ -119,43 +120,40 @@ const List<String> kBannedDomains = [
   'z.cn',
 ];
 
-/// Checks if a URL belongs to a banned domain.
+/// Pre-compiled regex pattern for matching banned domains.
 ///
-/// Returns the banned domain if found, or `null` if the URL is allowed.
+/// Uses word boundaries (`\b`) to ensure we match whole domain segments:
+/// - "www.instagram.com" ✓ matches (word boundary before 'instagram')
+/// - "instagram.com" ✓ matches
+/// - "notinstagram.com" ✗ no match (no word boundary between 't' and 'i')
+///
+/// The capturing group extracts the matched domain for error messages.
+final RegExp _bannedDomainRegex = RegExp(
+  r'\b(' +
+      kBannedDomains.map((d) => RegExp.escape(d)).join('|') +
+      r')\b',
+  caseSensitive: false,
+);
+
+/// Returns the banned domain that matches the URL, or null if not banned.
+///
+/// Uses a single regex match - no URI parsing, no loops.
 ///
 /// Example:
 /// ```dart
 /// getBannedDomainFromUrl('https://www.instagram.com/post/123'); // 'instagram.com'
 /// getBannedDomainFromUrl('https://api.facebook.com/v1/data'); // 'facebook.com'
 /// getBannedDomainFromUrl('https://example.com'); // null
+/// getBannedDomainFromUrl('https://notinstagram.com'); // null (no false positives)
 /// ```
 String? getBannedDomainFromUrl(String url) {
-  final Uri? uri = Uri.tryParse(url);
-  final String host;
-
-  if (uri == null || uri.host.isEmpty) {
-    final uriWithScheme = Uri.tryParse('https://$url');
-    if (uriWithScheme == null || uriWithScheme.host.isEmpty) {
-      return null;
-    }
-    host = uriWithScheme.host.toLowerCase();
-  } else {
-    host = uri.host.toLowerCase();
-  }
-
-  for (final bannedDomain in kBannedDomains) {
-    if (host == bannedDomain || host.endsWith('.$bannedDomain')) {
-      return bannedDomain;
-    }
-  }
-
-  return null;
+  final match = _bannedDomainRegex.firstMatch(url);
+  return match?.group(1)?.toLowerCase();
 }
 
 /// Checks if a URL belongs to a banned domain.
 ///
-/// Returns `true` if the URL's host matches or is a subdomain of any
-/// domain in [kBannedDomains].
+/// Returns `true` if the URL contains any domain from [kBannedDomains].
 bool isUrlFromBannedDomain(String url) {
-  return getBannedDomainFromUrl(url) != null;
+  return _bannedDomainRegex.hasMatch(url);
 }
