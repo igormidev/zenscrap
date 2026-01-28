@@ -1659,7 +1659,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get marketplace_html_copied => 'HTML copied to clipboard';
 
   @override
-  String get marketplace_screenshot_info_copied => 'Screenshot info copied';
+  String get marketplace_screenshot_info_copied =>
+      'Screenshot copied to clipboard';
+
+  @override
+  String get marketplace_screenshot_copy_error =>
+      'Could not copy screenshot. Try right-click and save image instead.';
 
   @override
   String get marketplace_target_url => 'Target URL:';

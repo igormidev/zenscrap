@@ -1687,6 +1687,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Informacion de captura copiada';
 
   @override
+  String get marketplace_screenshot_copy_error =>
+      'Could not copy screenshot. Try right-click and save image instead.';
+
+  @override
   String get marketplace_target_url => 'URL de Destino:';
 
   @override

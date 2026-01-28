@@ -3047,11 +3047,17 @@ abstract class AppLocalizations {
   /// **'HTML copied to clipboard'**
   String get marketplace_html_copied;
 
-  /// Snackbar message when screenshot info is copied
+  /// Snackbar message when screenshot is copied
   ///
   /// In en, this message translates to:
-  /// **'Screenshot info copied'**
+  /// **'Screenshot copied to clipboard'**
   String get marketplace_screenshot_info_copied;
+
+  /// Error message when screenshot copy fails
+  ///
+  /// In en, this message translates to:
+  /// **'Could not copy screenshot. Try right-click and save image instead.'**
+  String get marketplace_screenshot_copy_error;
 
   /// Label for target URL field
   ///

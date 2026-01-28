@@ -16,6 +16,7 @@ import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.d
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/providers/shared_preferences_provider.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
+import 'package:zenscrap_flutter/src/ui/marketplace/widgets/screenshot_viewer/screenshot_viewer.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 enum ResponseTab { result, html, screenshot }
@@ -40,7 +41,6 @@ class _ExampleResponseDialogState extends ConsumerState<ExampleResponseDialog>
   double _htmlFontSize = 14.0;
   bool _isResultHovered = false;
   bool _isHtmlHovered = false;
-  bool _isScreenshotHovered = false;
 
   // Lazy loading states
   ByteData? _htmlData;
@@ -314,14 +314,14 @@ class _ExampleResponseDialogState extends ConsumerState<ExampleResponseDialog>
                           bottomLeft: Radius.circular(24),
                           bottomRight: Radius.circular(24),
                         ),
-                        child: _ScreenshotTab(
+                        child: _ScreenshotTabWrapper(
                           screenshotData: _screenshotData,
                           isLoading: _isLoadingScreenshot,
-                          isHovered: _isScreenshotHovered,
-                          onHoverChanged: (value) =>
-                              setState(() => _isScreenshotHovered = value),
-                          onCopy: () {
+                          onCopySuccess: () {
                             _showToastMessage(AppLocalizations.of(context)!.marketplace_screenshot_info_copied);
+                          },
+                          onCopyError: () {
+                            _showToastMessage(AppLocalizations.of(context)!.marketplace_screenshot_copy_error);
                           },
                         ),
                       ),
@@ -620,79 +620,36 @@ class _HtmlTab extends StatelessWidget {
   }
 }
 
-class _ScreenshotTab extends StatefulWidget {
+/// Wrapper for the screenshot tab that handles loading and empty states
+class _ScreenshotTabWrapper extends StatelessWidget {
   final ByteData? screenshotData;
   final bool isLoading;
-  final bool isHovered;
-  final ValueChanged<bool> onHoverChanged;
-  final VoidCallback onCopy;
+  final VoidCallback? onCopySuccess;
+  final VoidCallback? onCopyError;
 
-  const _ScreenshotTab({
+  const _ScreenshotTabWrapper({
     required this.screenshotData,
     required this.isLoading,
-    required this.isHovered,
-    required this.onHoverChanged,
-    required this.onCopy,
+    this.onCopySuccess,
+    this.onCopyError,
   });
 
   @override
-  State<_ScreenshotTab> createState() => _ScreenshotTabState();
-}
-
-class _ScreenshotTabState extends State<_ScreenshotTab> {
-  final TransformationController _transformationController =
-      TransformationController();
-
-  @override
-  void dispose() {
-    _transformationController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    if (widget.isLoading) {
+    if (isLoading) {
       return const Center(
         child: CircularProgressIndicator(),
       );
     }
 
-    if (widget.screenshotData == null) {
+    if (screenshotData == null) {
       return _EmptyStateWidget(message: AppLocalizations.of(context)!.marketplace_no_screenshot);
     }
 
-    return MouseRegion(
-      onEnter: (_) => widget.onHoverChanged(true),
-      onExit: (_) => widget.onHoverChanged(false),
-      child: Stack(
-        children: [
-          InteractiveViewer(
-            transformationController: _transformationController,
-            minScale: 0.5,
-            maxScale: 4.0,
-            boundaryMargin: const EdgeInsets.all(double.infinity),
-            panEnabled: true,
-            scaleEnabled: true,
-            child: Container(
-              width: double.infinity,
-              height: double.infinity,
-              color: Colors.black,
-              child: Image.memory(
-                widget.screenshotData!.buffer.asUint8List(),
-                fit: BoxFit.contain,
-              ),
-            ),
-          ),
-          if (widget.isHovered)
-            Positioned(
-              top: 8,
-              right: 8,
-              child: _ScreenshotControls(
-                onCopy: widget.onCopy,
-              ),
-            ),
-        ],
-      ),
+    return ScreenshotViewer(
+      screenshotData: screenshotData!,
+      onCopySuccess: onCopySuccess,
+      onCopyError: onCopyError,
     );
   }
 }
@@ -750,39 +707,6 @@ class _HoverControls extends StatelessWidget {
             constraints: const BoxConstraints(),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _ScreenshotControls extends StatelessWidget {
-  final VoidCallback onCopy;
-
-  const _ScreenshotControls({
-    required this.onCopy,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: context.c.surface,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(26),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: IconButton(
-        icon: const Icon(Icons.copy, size: 18),
-        onPressed: onCopy,
-        tooltip: AppLocalizations.of(context)!.marketplace_copy,
-        padding: const EdgeInsets.all(4),
-        constraints: const BoxConstraints(),
       ),
     );
   }

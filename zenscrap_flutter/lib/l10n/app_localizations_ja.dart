@@ -1617,6 +1617,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get marketplace_screenshot_info_copied => 'スクリーンショット情報をコピーしました';
 
   @override
+  String get marketplace_screenshot_copy_error =>
+      'Could not copy screenshot. Try right-click and save image instead.';
+
+  @override
   String get marketplace_target_url => '対象URL:';
 
   @override

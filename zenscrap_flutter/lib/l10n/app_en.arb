@@ -2181,9 +2181,13 @@
   "@marketplace_html_copied": {
     "description": "Snackbar message when HTML is copied"
   },
-  "marketplace_screenshot_info_copied": "Screenshot info copied",
+  "marketplace_screenshot_info_copied": "Screenshot copied to clipboard",
   "@marketplace_screenshot_info_copied": {
-    "description": "Snackbar message when screenshot info is copied"
+    "description": "Snackbar message when screenshot is copied"
+  },
+  "marketplace_screenshot_copy_error": "Could not copy screenshot. Try right-click and save image instead.",
+  "@marketplace_screenshot_copy_error": {
+    "description": "Error message when screenshot copy fails"
   },
   "marketplace_target_url": "Target URL:",
   "@marketplace_target_url": {
