@@ -57,9 +57,9 @@ dependencies:
   talker_flutter: ^5.1.5
   talker_riverpod_logger: ^5.1.5
 
-  serverpod_flutter: 3.1.1
-  serverpod_auth_idp_client: 3.1.1
-  serverpod_auth_idp_flutter: 3.1.1
+  serverpod_flutter: 3.2.3
+  serverpod_auth_idp_client: 3.2.3
+  serverpod_auth_idp_flutter: 3.2.3
 
   translator: ^1.0.4+1
   executor: ^2.2.5
