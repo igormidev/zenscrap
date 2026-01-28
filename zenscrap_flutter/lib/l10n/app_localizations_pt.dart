@@ -1397,6 +1397,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get auth_change_email => 'Change email';
 
   @override
+  String get auth_incomplete_scrappable_warning_title => 'Endpoint not ready';
+
+  @override
+  String get auth_incomplete_scrappable_warning_message =>
+      'This endpoint is still being configured. It won\'t be attached to your account until you finish the AI chat session and deploy it.';
+
+  @override
   String get dashboard_app_title => 'Zen scrap';
 
   @override
@@ -3561,6 +3568,13 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get auth_change_email => 'Mudar email';
+
+  @override
+  String get auth_incomplete_scrappable_warning_title => 'Endpoint incompleto';
+
+  @override
+  String get auth_incomplete_scrappable_warning_message =>
+      'Este endpoint ainda está sendo configurado. Ele não será anexado à sua conta até que você finalize a sessão de chat com a IA e faça o deploy.';
 
   @override
   String get dashboard_app_title => 'Zen scrap';
