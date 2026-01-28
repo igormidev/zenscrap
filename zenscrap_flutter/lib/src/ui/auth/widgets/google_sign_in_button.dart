@@ -175,7 +175,6 @@ class _ZenScrapGoogleSignInButtonState
         // - On web: renders Google's iframe-based button (GoogleSignInWebButton)
         // - On native: renders a custom button that calls authenticate()
         // Google Sign-In Widget from Serverpod
-        // Uses default wrapper which handles both web (iframe) and native properly
         GoogleSignInWidget(
           controller: _googleAuthController,
           // Button styling
@@ -186,6 +185,16 @@ class _ZenScrapGoogleSignInButtonState
           shape: GSIButtonShape.pill,
           logoAlignment: GSIButtonLogoAlignment.left,
           minimumWidth: 280,
+          // On web, Google's iframe already has its own border styling,
+          // so we return child directly without extra wrapper to avoid double borders
+          buttonWrapper: kIsWeb
+              ? ({
+                  required GoogleSignInStyle style,
+                  required Widget child,
+                  required VoidCallback? onPressed,
+                }) =>
+                  child
+              : null, // Native uses default wrapper
         ),
         const SizedBox(height: 8),
         Text(
