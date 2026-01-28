@@ -63,11 +63,39 @@ class PasswordResetPage extends ConsumerWidget {
           // Start password reset - this sends a verification code
           await emailAuth.startPasswordReset();
 
+          // Check the state - startPasswordReset swallows exceptions
+          // and sets state to error instead of throwing
+          final state = emailAuth.state;
+          final isError = state == EmailAuthState.error;
+
+          if (isError) {
+            // Track password reset failure
+            final errorMsg = emailAuth.errorMessage ?? 'Password reset failed';
+            await analytics.trackAuthPasswordResetFailure(
+              email: email,
+              errorMessage: errorMsg,
+            );
+
+            if (context.mounted) {
+              // Map the error and show error dialog
+              final error = emailAuth.error;
+              final authError = error != null
+                  ? AuthErrorMapper.mapError(
+                      error,
+                      context: AuthContext.passwordReset,
+                    )
+                  : AuthErrorMapper.passwordResetFailed();
+              showAuthErrorDialog(context: context, error: authError);
+            }
+            return null;
+          }
+
           // Track successful code sent
           await analytics.trackAuthPasswordResetCodeSent(email: email);
 
           return email;
         } catch (e) {
+          // Fallback for any unexpected exceptions
           // Track password reset failure
           await analytics.trackAuthPasswordResetFailure(
             email: email,

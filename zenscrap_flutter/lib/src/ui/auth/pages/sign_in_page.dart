@@ -136,6 +136,35 @@ class SignInPage extends ConsumerWidget {
           // Start registration - this sends a verification code to the email
           await emailAuth.startRegistration();
 
+          // Check the state - startRegistration swallows exceptions
+          // and sets state to error instead of throwing
+          final state = emailAuth.state;
+          final isError = state == EmailAuthState.error;
+
+          if (isError) {
+            // Track sign up failure
+            final errorMsg = emailAuth.errorMessage ?? 'Registration failed';
+            await analytics.trackAuthSignUpFailure(
+              email: email,
+              errorMessage: errorMsg,
+            );
+
+            PendingRegistrationData.clear();
+
+            if (context.mounted) {
+              // Map the error and show error dialog
+              final error = emailAuth.error;
+              final authError = error != null
+                  ? AuthErrorMapper.mapError(
+                      error,
+                      context: AuthContext.registration,
+                    )
+                  : AuthErrorMapper.registrationFailed();
+              showAuthErrorDialog(context: context, error: authError);
+            }
+            return null;
+          }
+
           // Track successful sign up initiation
           await analytics.trackAuthSignUpSuccess(
             email: email,
@@ -144,6 +173,7 @@ class SignInPage extends ConsumerWidget {
 
           return email;
         } catch (e) {
+          // Fallback for any unexpected exceptions
           // Track sign up failure
           await analytics.trackAuthSignUpFailure(
             email: email,
