@@ -418,6 +418,8 @@
   "email_typo_keep_original": "Não, eu digitei corretamente",
   "auth_go_back": "Voltar",
   "auth_change_email": "Mudar email",
+  "auth_incomplete_scrappable_warning_title": "Endpoint incompleto",
+  "auth_incomplete_scrappable_warning_message": "Este endpoint ainda está sendo configurado. Ele não será anexado à sua conta até que você finalize a sessão de chat com a IA e faça o deploy.",
 
   "dashboard_app_title": "Zen scrap",
   "dashboard_nav_your_endpoints": "Seus endpoints",

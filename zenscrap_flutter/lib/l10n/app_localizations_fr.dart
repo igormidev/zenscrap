@@ -1423,6 +1423,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get auth_change_email => 'Change email';
 
   @override
+  String get auth_incomplete_scrappable_warning_title => 'Endpoint not ready';
+
+  @override
+  String get auth_incomplete_scrappable_warning_message =>
+      'This endpoint is still being configured. It won\'t be attached to your account until you finish the AI chat session and deploy it.';
+
+  @override
   String get dashboard_app_title => 'Zen scrap';
 
   @override

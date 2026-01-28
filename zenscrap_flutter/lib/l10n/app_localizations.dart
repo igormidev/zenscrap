@@ -2587,6 +2587,18 @@ abstract class AppLocalizations {
   /// **'Change email'**
   String get auth_change_email;
 
+  /// Warning title when scrappable has no extract rules
+  ///
+  /// In en, this message translates to:
+  /// **'Endpoint not ready'**
+  String get auth_incomplete_scrappable_warning_title;
+
+  /// Warning message explaining why incomplete scrappable won't be attached
+  ///
+  /// In en, this message translates to:
+  /// **'This endpoint is still being configured. It won\'t be attached to your account until you finish the AI chat session and deploy it.'**
+  String get auth_incomplete_scrappable_warning_message;
+
   /// Application title in dashboard appbar
   ///
   /// In en, this message translates to:

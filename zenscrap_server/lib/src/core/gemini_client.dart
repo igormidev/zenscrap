@@ -17,20 +17,20 @@ class GeminiClient {
   /// Base URL for the Generative Language API
   static const _baseUrl = 'https://generativelanguage.googleapis.com/v1beta';
 
-  /// Default model for Gemini 3 Pro
-  static const defaultModel = 'gemini-3-pro-preview';
+  /// Default model for Gemini 3 Flash
+  static const defaultModel = 'gemini-3-flash-preview';
 
   GeminiClient({required this.apiKey})
-      : _dio = Dio(
-          BaseOptions(
-            baseUrl: _baseUrl,
-            headers: {'Content-Type': 'application/json'},
-            // Gemini 3 with "high" thinking level + web search grounding
-            // can take 3-5 minutes for complex research tasks
-            connectTimeout: const Duration(seconds: 60),
-            receiveTimeout: const Duration(minutes: 6),
-          ),
-        );
+    : _dio = Dio(
+        BaseOptions(
+          baseUrl: _baseUrl,
+          headers: {'Content-Type': 'application/json'},
+          // Gemini 3 with "high" thinking level + web search grounding
+          // can take 3-5 minutes for complex research tasks
+          connectTimeout: const Duration(seconds: 60),
+          receiveTimeout: const Duration(minutes: 6),
+        ),
+      );
 
   /// Generates content with Google Search grounding and structured JSON output.
   ///
@@ -393,10 +393,12 @@ class GeminiClient {
     }
 
     // Get the text content (should be JSON)
-    final textPart = parts.firstWhere(
-      (p) => (p as Map<String, dynamic>).containsKey('text'),
-      orElse: () => <String, dynamic>{},
-    ) as Map<String, dynamic>;
+    final textPart =
+        parts.firstWhere(
+              (p) => (p as Map<String, dynamic>).containsKey('text'),
+              orElse: () => <String, dynamic>{},
+            )
+            as Map<String, dynamic>;
 
     final textContent = textPart['text'] as String?;
     if (textContent == null || textContent.isEmpty) {
@@ -464,7 +466,8 @@ class GroundingMetadata {
   GroundingMetadata({required this.searchQueries, required this.sources});
 
   factory GroundingMetadata.fromJson(Map<String, dynamic> json) {
-    final queries = (json['webSearchQueries'] as List?)
+    final queries =
+        (json['webSearchQueries'] as List?)
             ?.map((q) => q.toString())
             .toList() ??
         [];

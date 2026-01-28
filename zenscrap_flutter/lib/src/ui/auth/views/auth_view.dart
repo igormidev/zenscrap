@@ -20,6 +20,7 @@ import 'package:zenscrap_flutter/src/ui/auth/pages/password_reset_validate_code_
 import 'package:zenscrap_flutter/src/ui/auth/pages/sign_in_page.dart';
 import 'package:zenscrap_flutter/src/design_system/widgets/scrappable_card_indicator.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_provider.dart';
+import 'package:zenscrap_flutter/src/ui/auth/widgets/incomplete_scrappable_warning_card.dart';
 import 'package:zenscrap_flutter/src/states/chat_session/scrap_chat_session_state.dart';
 import 'package:zenscrap_flutter/src/ui/legal/widgets/terms_of_service_link.dart';
 import 'package:zenscrap_flutter/src/ui/legal/widgets/privacy_policy_link.dart';
@@ -487,6 +488,11 @@ class _MobileAuthLayout extends StatelessWidget {
                   ),
                   // Scrappable indicator if available
                   if (scrappable != null) ...[
+                    // Show warning if scrappable is incomplete (no extract rules)
+                    if (scrappable!.scrappingBeeExtractRules == null) ...[
+                      const SizedBox(height: 12),
+                      const IncompleteScrappableWarningCard(),
+                    ],
                     const SizedBox(height: 12),
                     ScrappableCardIndicator(
                       accountId: null,
@@ -600,6 +606,11 @@ class _DesktopAuthLayout extends StatelessWidget {
                 ),
                 // Scrappable indicator if available
                 if (scrappable != null) ...[
+                  // Show warning if scrappable is incomplete (no extract rules)
+                  if (scrappable!.scrappingBeeExtractRules == null) ...[
+                    const SizedBox(height: 16),
+                    const IncompleteScrappableWarningCard(),
+                  ],
                   const SizedBox(height: 16),
                   ScrappableCardIndicator(
                     accountId: null,

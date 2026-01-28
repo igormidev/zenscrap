@@ -25,8 +25,6 @@ import 'package:zenscrap_flutter/src/core/theme/app_theme.dart';
 import 'package:zenscrap_flutter/src/states/theme/theme_provider.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/views/dashboard_view.dart';
 
-late final Client client;
-
 /*
  /$$$$$$$$  /$$$$$$  /$$$$$$$      /$$$$$$$  /$$$$$$$  /$$$$$$  /$$$$$$   /$$$$$$ 
 |____ /$$/ /$$__  $$| $$__  $$    /$$_____/ /$$_____/ /$$__  $$|____  $$ /$$__  $$
@@ -57,6 +55,7 @@ void main() async {
   } else {
     serverUrl = 'https://api.zenscrap.com/';
   }
+  final Client client;
 
   client =
       Client(

@@ -12,9 +12,10 @@ apiServer:
   publicScheme: https
 
 # Configuration for the Insights server.
+# For Serverpod Cloud, this points to the cloud-hosted Insights endpoint
 insightsServer:
   port: 8081
-  publicHost: insights.zenscrap.com
+  publicHost: thezenscrapper.insights.serverpod.space
   publicPort: 443
   publicScheme: https
 

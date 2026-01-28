@@ -241,6 +241,29 @@ class PrivateAccountEndpoint extends Endpoint {
       return;
     }
 
+    // =========================================================================
+    // Validate scrappable completeness before attaching
+    // =========================================================================
+    // A scrappable is considered "complete" when it has extract rules defined.
+    // Without extract rules, the scrappable cannot be used via API.
+    // We silently skip attachment for incomplete scrappables - the user must
+    // finish configuring the scrappable in the chat session before it can be
+    // attached to their account.
+    final hasExtractRules = await ScrappingBeeExtractLogic.db.count(
+      session,
+      where: (t) => t.scrappableId.equals(targetAttachScrappableId),
+      transaction: transaction,
+    ) > 0;
+
+    if (!hasExtractRules) {
+      session.log(
+        'Skipping attachment of incomplete scrappable $targetAttachScrappableId '
+        '(no extract rules defined)',
+        level: LogLevel.info,
+      );
+      return; // Silently skip - don't throw error, just don't attach
+    }
+
     // Validate endpoint limit before attaching
     final currentScrappablesCount = await Scrappable.db.count(
       session,

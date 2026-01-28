@@ -1818,6 +1818,14 @@
   "@auth_change_email": {
     "description": "Button to change the email address"
   },
+  "auth_incomplete_scrappable_warning_title": "Endpoint not ready",
+  "@auth_incomplete_scrappable_warning_title": {
+    "description": "Warning title when scrappable has no extract rules"
+  },
+  "auth_incomplete_scrappable_warning_message": "This endpoint is still being configured. It won't be attached to your account until you finish the AI chat session and deploy it.",
+  "@auth_incomplete_scrappable_warning_message": {
+    "description": "Warning message explaining why incomplete scrappable won't be attached"
+  },
 
   "dashboard_app_title": "Zen scrap",
   "@dashboard_app_title": {

@@ -119,7 +119,6 @@ Use prefixes based on the feature/page where the translation is used:
 | `landing_` | Landing page content |
 | `account_` | Account/settings pages |
 | `ai_usage_` | AI usage tracking pages |
-| `scrap_session_` | Scrappable editing session |
 | `dashboard_` | Dashboard views |
 | `common_` | Shared across multiple features |
 | `error_` | Error messages |

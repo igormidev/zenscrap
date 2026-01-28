@@ -49,6 +49,7 @@ class TestEndpointDialog extends ConsumerStatefulWidget {
 class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
   final Map<String, TextEditingController> _pathParamControllers = {};
   final Map<String, TextEditingController> _queryParamControllers = {};
+  final Map<String, TextEditingController> _clientSideParamControllers = {};
 
   /// Converts the Serverpod API host to the web server host.
   ///
@@ -112,9 +113,14 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
       _pathParamControllers[param] = TextEditingController();
     }
 
-    // Initialize query parameter controllers
+    // Initialize query parameter controllers (URL-based params)
     widget.scrappableRequest.queryParams.forEach((key, value) {
       _queryParamControllers[key] = TextEditingController(text: value ?? '');
+    });
+
+    // Initialize client-side parameter controllers (js_scenario/extract_rules placeholders)
+    widget.scrappableRequest.queryParamsNotRelatedToUrl.forEach((key, value) {
+      _clientSideParamControllers[key] = TextEditingController(text: value ?? '');
     });
 
     // Pre-fill with test data if available
@@ -129,6 +135,8 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
             _pathParamControllers[key]!.text = value?.toString() ?? '';
           } else if (_queryParamControllers.containsKey(key)) {
             _queryParamControllers[key]!.text = value?.toString() ?? '';
+          } else if (_clientSideParamControllers.containsKey(key)) {
+            _clientSideParamControllers[key]!.text = value?.toString() ?? '';
           }
         });
       } catch (e) {
@@ -143,6 +151,9 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
       controller.dispose();
     }
     for (final controller in _queryParamControllers.values) {
+      controller.dispose();
+    }
+    for (final controller in _clientSideParamControllers.values) {
       controller.dispose();
     }
     _elapsedTimer?.cancel();
@@ -190,6 +201,12 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
       });
 
       _queryParamControllers.forEach((key, controller) {
+        if (controller.text.isNotEmpty) {
+          payload[key] = controller.text;
+        }
+      });
+
+      _clientSideParamControllers.forEach((key, controller) {
         if (controller.text.isNotEmpty) {
           payload[key] = controller.text;
         }
@@ -367,6 +384,7 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
                       compact: (context, constraints) => _CompactDialogLayout(
                         pathParamControllers: _pathParamControllers,
                         queryParamControllers: _queryParamControllers,
+                        clientSideParamControllers: _clientSideParamControllers,
                         isLoading: _isLoading,
                         onTest: _handleTest,
                         responseJson: _responseJson,
@@ -381,6 +399,7 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
                       expanded: (context, constraints) => _ExpandedDialogLayout(
                         pathParamControllers: _pathParamControllers,
                         queryParamControllers: _queryParamControllers,
+                        clientSideParamControllers: _clientSideParamControllers,
                         isLoading: _isLoading,
                         onTest: _handleTest,
                         responseJson: _responseJson,
@@ -543,6 +562,7 @@ class _RemainingTimeChipState extends State<_RemainingTimeChip> {
 class _ParametersPanel extends StatelessWidget {
   final Map<String, TextEditingController> pathParamControllers;
   final Map<String, TextEditingController> queryParamControllers;
+  final Map<String, TextEditingController> clientSideParamControllers;
   final bool isLoading;
   final VoidCallback onTest;
   final bool isChatLoading;
@@ -551,6 +571,7 @@ class _ParametersPanel extends StatelessWidget {
   const _ParametersPanel({
     required this.pathParamControllers,
     required this.queryParamControllers,
+    required this.clientSideParamControllers,
     required this.isLoading,
     required this.onTest,
     this.isChatLoading = false,
@@ -594,17 +615,28 @@ class _ParametersPanel extends StatelessWidget {
                       subtitle: 'Values to replace {placeholders} in the URL',
                       controllers: pathParamControllers,
                     ),
-                    if (queryParamControllers.isNotEmpty)
+                    if (queryParamControllers.isNotEmpty ||
+                        clientSideParamControllers.isNotEmpty)
                       const SizedBox(height: 20),
                   ],
-                  if (queryParamControllers.isNotEmpty)
+                  if (queryParamControllers.isNotEmpty) ...[
                     _ParameterSection(
                       title: 'Query Parameters',
                       subtitle: 'Values appended as ?key=value',
                       controllers: queryParamControllers,
                     ),
+                    if (clientSideParamControllers.isNotEmpty)
+                      const SizedBox(height: 20),
+                  ],
+                  if (clientSideParamControllers.isNotEmpty)
+                    _ParameterSection(
+                      title: 'Dynamic Parameters',
+                      subtitle: 'Used in extraction rules (not added to URL)',
+                      controllers: clientSideParamControllers,
+                    ),
                   if (pathParamControllers.isEmpty &&
-                      queryParamControllers.isEmpty)
+                      queryParamControllers.isEmpty &&
+                      clientSideParamControllers.isEmpty)
                     const _NoParametersWidget(),
                 ],
               ),
@@ -1310,6 +1342,7 @@ class _EmptyState extends StatelessWidget {
 class _CompactDialogLayout extends StatefulWidget {
   final Map<String, TextEditingController> pathParamControllers;
   final Map<String, TextEditingController> queryParamControllers;
+  final Map<String, TextEditingController> clientSideParamControllers;
   final bool isLoading;
   final VoidCallback onTest;
   final String? responseJson;
@@ -1324,6 +1357,7 @@ class _CompactDialogLayout extends StatefulWidget {
   const _CompactDialogLayout({
     required this.pathParamControllers,
     required this.queryParamControllers,
+    required this.clientSideParamControllers,
     required this.isLoading,
     required this.onTest,
     required this.responseJson,
@@ -1375,6 +1409,7 @@ class _CompactDialogLayoutState extends State<_CompactDialogLayout>
               _ParametersPanel(
                 pathParamControllers: widget.pathParamControllers,
                 queryParamControllers: widget.queryParamControllers,
+                clientSideParamControllers: widget.clientSideParamControllers,
                 isLoading: widget.isLoading,
                 onTest: () {
                   widget.onTest();
@@ -1405,6 +1440,7 @@ class _CompactDialogLayoutState extends State<_CompactDialogLayout>
 class _ExpandedDialogLayout extends StatelessWidget {
   final Map<String, TextEditingController> pathParamControllers;
   final Map<String, TextEditingController> queryParamControllers;
+  final Map<String, TextEditingController> clientSideParamControllers;
   final bool isLoading;
   final VoidCallback onTest;
   final String? responseJson;
@@ -1419,6 +1455,7 @@ class _ExpandedDialogLayout extends StatelessWidget {
   const _ExpandedDialogLayout({
     required this.pathParamControllers,
     required this.queryParamControllers,
+    required this.clientSideParamControllers,
     required this.isLoading,
     required this.onTest,
     required this.responseJson,
@@ -1449,6 +1486,7 @@ class _ExpandedDialogLayout extends StatelessWidget {
               child: _ParametersPanel(
                 pathParamControllers: pathParamControllers,
                 queryParamControllers: queryParamControllers,
+                clientSideParamControllers: clientSideParamControllers,
                 isLoading: isLoading,
                 onTest: onTest,
                 isChatLoading: isChatLoading,
