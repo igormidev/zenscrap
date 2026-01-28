@@ -60,7 +60,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Autenticacion Fallida',
     SupportedLanguage.de: 'Authentifizierung fehlgeschlagen',
     SupportedLanguage.fr: 'Echec de l\'authentification',
-    SupportedLanguage.ptBR: 'Falha na Autenticacao',
+    SupportedLanguage.ptBR: 'Falha na Autenticação',
     SupportedLanguage.ja: '認証に失敗しました',
   },
   'user_not_authenticated': {
@@ -68,7 +68,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Usuario No Autenticado',
     SupportedLanguage.de: 'Benutzer nicht authentifiziert',
     SupportedLanguage.fr: 'Utilisateur non authentifie',
-    SupportedLanguage.ptBR: 'Usuario Nao Autenticado',
+    SupportedLanguage.ptBR: 'Usuário Não Autenticado',
     SupportedLanguage.ja: 'ユーザーが認証されていません',
   },
 
@@ -78,7 +78,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Cuenta No Encontrada',
     SupportedLanguage.de: 'Konto nicht gefunden',
     SupportedLanguage.fr: 'Compte non trouve',
-    SupportedLanguage.ptBR: 'Conta Nao Encontrada',
+    SupportedLanguage.ptBR: 'Conta Não Encontrada',
     SupportedLanguage.ja: 'アカウントが見つかりません',
   },
   'account_creation_failed': {
@@ -86,7 +86,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Error al Crear Cuenta',
     SupportedLanguage.de: 'Kontoerstellung fehlgeschlagen',
     SupportedLanguage.fr: 'Echec de la creation du compte',
-    SupportedLanguage.ptBR: 'Falha na Criacao da Conta',
+    SupportedLanguage.ptBR: 'Falha na Criação da Conta',
     SupportedLanguage.ja: 'アカウントの作成に失敗しました',
   },
   'database_error': {
@@ -104,7 +104,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Scrappable No Encontrado',
     SupportedLanguage.de: 'Scrappable nicht gefunden',
     SupportedLanguage.fr: 'Scrappable non trouve',
-    SupportedLanguage.ptBR: 'Scrappable Nao Encontrado',
+    SupportedLanguage.ptBR: 'Scrappable Não Encontrado',
     SupportedLanguage.ja: 'Scrappableが見つかりません',
   },
   'scrappable_already_attached': {
@@ -112,7 +112,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Scrappable Ya Vinculado',
     SupportedLanguage.de: 'Scrappable bereits angehangt',
     SupportedLanguage.fr: 'Scrappable deja attache',
-    SupportedLanguage.ptBR: 'Scrappable Ja Vinculado',
+    SupportedLanguage.ptBR: 'Scrappable Já Vinculado',
     SupportedLanguage.ja: 'Scrappableは既に関連付けられています',
   },
   'endpoint_limit_reached': {
@@ -128,7 +128,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Dominio No Soportado',
     SupportedLanguage.de: 'Domain nicht unterstutzt',
     SupportedLanguage.fr: 'Domaine non pris en charge',
-    SupportedLanguage.ptBR: 'Dominio Nao Suportado',
+    SupportedLanguage.ptBR: 'Domínio Não Suportado',
     SupportedLanguage.ja: 'サポートされていないドメイン',
   },
 
@@ -138,7 +138,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Clave API No Encontrada',
     SupportedLanguage.de: 'API-Schlussel nicht gefunden',
     SupportedLanguage.fr: 'Cle API non trouvee',
-    SupportedLanguage.ptBR: 'Chave API Nao Encontrada',
+    SupportedLanguage.ptBR: 'Chave API Não Encontrada',
     SupportedLanguage.ja: 'APIキーが見つかりません',
   },
   'cannot_deactivate_api_key': {
@@ -146,7 +146,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'No Se Puede Desactivar',
     SupportedLanguage.de: 'Kann nicht deaktiviert werden',
     SupportedLanguage.fr: 'Impossible de desactiver',
-    SupportedLanguage.ptBR: 'Nao e Possivel Desativar',
+    SupportedLanguage.ptBR: 'Não é Possível Desativar',
     SupportedLanguage.ja: '無効化できません',
   },
 
@@ -156,7 +156,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Se Requiere Plan Ultra',
     SupportedLanguage.de: 'Ultra-Plan erforderlich',
     SupportedLanguage.fr: 'Plan Ultra requis',
-    SupportedLanguage.ptBR: 'Plano Ultra Necessario',
+    SupportedLanguage.ptBR: 'Plano Ultra Necessário',
     SupportedLanguage.ja: 'Ultraプランが必要です',
   },
   'upgrade_required': {
@@ -164,7 +164,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Actualizacion Requerida',
     SupportedLanguage.de: 'Upgrade erforderlich',
     SupportedLanguage.fr: 'Mise a niveau requise',
-    SupportedLanguage.ptBR: 'Atualizacao Necessaria',
+    SupportedLanguage.ptBR: 'Atualização Necessária',
     SupportedLanguage.ja: 'アップグレードが必要です',
   },
   'checkout_creation_failed': {
@@ -172,7 +172,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Error al Crear Checkout',
     SupportedLanguage.de: 'Checkout-Erstellung fehlgeschlagen',
     SupportedLanguage.fr: 'Echec de la creation du paiement',
-    SupportedLanguage.ptBR: 'Falha na Criacao do Checkout',
+    SupportedLanguage.ptBR: 'Falha na Criação do Checkout',
     SupportedLanguage.ja: 'チェックアウトの作成に失敗しました',
   },
   'no_active_subscription': {
@@ -188,7 +188,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Ya Suscrito',
     SupportedLanguage.de: 'Bereits abonniert',
     SupportedLanguage.fr: 'Deja abonne',
-    SupportedLanguage.ptBR: 'Ja Inscrito',
+    SupportedLanguage.ptBR: 'Já Inscrito',
     SupportedLanguage.ja: '既に購読済みです',
   },
   'subscription_error': {
@@ -212,7 +212,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Correo del Usuario No Encontrado',
     SupportedLanguage.de: 'Benutzer-E-Mail nicht gefunden',
     SupportedLanguage.fr: 'Email de l\'utilisateur non trouve',
-    SupportedLanguage.ptBR: 'Email do Usuario Nao Encontrado',
+    SupportedLanguage.ptBR: 'Email do Usuário Não Encontrado',
     SupportedLanguage.ja: 'ユーザーのメールが見つかりません',
   },
 
@@ -230,7 +230,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Permiso Denegado',
     SupportedLanguage.de: 'Berechtigung verweigert',
     SupportedLanguage.fr: 'Permission refusee',
-    SupportedLanguage.ptBR: 'Permissao Negada',
+    SupportedLanguage.ptBR: 'Permissão Negada',
     SupportedLanguage.ja: '権限がありません',
   },
 
@@ -248,7 +248,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Creditos de IA Agotados',
     SupportedLanguage.de: 'KI-Guthaben aufgebraucht',
     SupportedLanguage.fr: 'Credits IA epuises',
-    SupportedLanguage.ptBR: 'Creditos de IA Esgotados',
+    SupportedLanguage.ptBR: 'Créditos de IA Esgotados',
     SupportedLanguage.ja: 'AIクレジットが不足しています',
   },
 
@@ -258,7 +258,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Ya Eliminado',
     SupportedLanguage.de: 'Bereits geloscht',
     SupportedLanguage.fr: 'Deja supprime',
-    SupportedLanguage.ptBR: 'Ja Excluido',
+    SupportedLanguage.ptBR: 'Já Excluído',
     SupportedLanguage.ja: '既に削除されています',
   },
   'delete_failed': {
@@ -284,7 +284,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Nombre Invalido',
     SupportedLanguage.de: 'Unzultiger Name',
     SupportedLanguage.fr: 'Nom invalide',
-    SupportedLanguage.ptBR: 'Nome Invalido',
+    SupportedLanguage.ptBR: 'Nome Inválido',
     SupportedLanguage.ja: '無効な名前',
   },
   'name_too_long': {
@@ -300,7 +300,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Descripcion Invalida',
     SupportedLanguage.de: 'Unzultige Beschreibung',
     SupportedLanguage.fr: 'Description invalide',
-    SupportedLanguage.ptBR: 'Descricao Invalida',
+    SupportedLanguage.ptBR: 'Descrição Inválida',
     SupportedLanguage.ja: '無効な説明',
   },
   'description_too_long': {
@@ -308,7 +308,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Descripcion Muy Larga',
     SupportedLanguage.de: 'Beschreibung zu lang',
     SupportedLanguage.fr: 'Description trop longue',
-    SupportedLanguage.ptBR: 'Descricao Muito Longa',
+    SupportedLanguage.ptBR: 'Descrição Muito Longa',
     SupportedLanguage.ja: '説明が長すぎます',
   },
   'invalid_api_key': {
@@ -316,7 +316,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Clave API Invalida',
     SupportedLanguage.de: 'Unzultiger API-Schlussel',
     SupportedLanguage.fr: 'Cle API invalide',
-    SupportedLanguage.ptBR: 'Chave API Invalida',
+    SupportedLanguage.ptBR: 'Chave API Inválida',
     SupportedLanguage.ja: '無効なAPIキー',
   },
 
@@ -326,7 +326,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Scrappable No Disponible',
     SupportedLanguage.de: 'Scrappable nicht verfugbar',
     SupportedLanguage.fr: 'Scrappable non disponible',
-    SupportedLanguage.ptBR: 'Scrappable Nao Disponivel',
+    SupportedLanguage.ptBR: 'Scrappable Não Disponível',
     SupportedLanguage.ja: 'Scrappableは利用できません',
   },
 
@@ -336,7 +336,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Sesion No Encontrada',
     SupportedLanguage.de: 'Sitzung nicht gefunden',
     SupportedLanguage.fr: 'Session non trouvee',
-    SupportedLanguage.ptBR: 'Sessao Nao Encontrada',
+    SupportedLanguage.ptBR: 'Sessão Não Encontrada',
     SupportedLanguage.ja: 'セッションが見つかりません',
   },
   'session_already_opened': {
@@ -344,7 +344,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Sesion Ya Abierta',
     SupportedLanguage.de: 'Sitzung bereits geoffnet',
     SupportedLanguage.fr: 'Session deja ouverte',
-    SupportedLanguage.ptBR: 'Sessao Ja Aberta',
+    SupportedLanguage.ptBR: 'Sessão Já Aberta',
     SupportedLanguage.ja: 'セッションは既に開いています',
   },
   'ai_usage_record_not_found': {
@@ -352,7 +352,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Registro de Uso de IA No Encontrado',
     SupportedLanguage.de: 'KI-Nutzungsdatensatz nicht gefunden',
     SupportedLanguage.fr: 'Enregistrement d\'utilisation IA non trouve',
-    SupportedLanguage.ptBR: 'Registro de Uso de IA Nao Encontrado',
+    SupportedLanguage.ptBR: 'Registro de Uso de IA Não Encontrado',
     SupportedLanguage.ja: 'AI使用記録が見つかりません',
   },
   'failed_to_save_api_key': {
@@ -370,7 +370,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Error en la Generacion de IA',
     SupportedLanguage.de: 'KI-Generierung fehlgeschlagen',
     SupportedLanguage.fr: 'Echec de la generation IA',
-    SupportedLanguage.ptBR: 'Falha na Geracao de IA',
+    SupportedLanguage.ptBR: 'Falha na Geração de IA',
     SupportedLanguage.ja: 'AI生成に失敗しました',
   },
 
@@ -380,7 +380,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Se Requiere Plan Ultra',
     SupportedLanguage.de: 'Ultra-Plan erforderlich',
     SupportedLanguage.fr: 'Plan Ultra requis',
-    SupportedLanguage.ptBR: 'Plano Ultra Necessario',
+    SupportedLanguage.ptBR: 'Plano Ultra Necessário',
     SupportedLanguage.ja: 'Ultraプランが必要です',
   },
 
@@ -390,7 +390,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Parametro de Ruta Faltante',
     SupportedLanguage.de: 'Fehlender Pfadparameter',
     SupportedLanguage.fr: 'Parametre de chemin manquant',
-    SupportedLanguage.ptBR: 'Parametro de Caminho Faltando',
+    SupportedLanguage.ptBR: 'Parâmetro de Caminho Faltando',
     SupportedLanguage.ja: 'パスパラメータがありません',
   },
   'unexpected_error': {
@@ -406,7 +406,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Datos de Prueba No Encontrados',
     SupportedLanguage.de: 'Testdaten nicht gefunden',
     SupportedLanguage.fr: 'Donnees de test non trouvees',
-    SupportedLanguage.ptBR: 'Dados de Teste Nao Encontrados',
+    SupportedLanguage.ptBR: 'Dados de Teste Não Encontrados',
     SupportedLanguage.ja: 'テストデータが見つかりません',
   },
   'no_credit_usage_model': {
@@ -414,7 +414,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Modelo de Uso de Creditos No Encontrado',
     SupportedLanguage.de: 'Kein Kreditnutzungsmodell gefunden',
     SupportedLanguage.fr: 'Modele d\'utilisation des credits non trouve',
-    SupportedLanguage.ptBR: 'Modelo de Uso de Creditos Nao Encontrado',
+    SupportedLanguage.ptBR: 'Modelo de Uso de Créditos Não Encontrado',
     SupportedLanguage.ja: 'クレジット使用モデルが見つかりません',
   },
   'api_key_not_found_active': {
@@ -422,7 +422,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Clave API Valida No Encontrada',
     SupportedLanguage.de: 'Gultiger API-Schlussel nicht gefunden',
     SupportedLanguage.fr: 'Cle API valide non trouvee',
-    SupportedLanguage.ptBR: 'Chave API Valida Nao Encontrada',
+    SupportedLanguage.ptBR: 'Chave API Válida Não Encontrada',
     SupportedLanguage.ja: '有効なAPIキーが見つかりません',
   },
   'no_active_test_session': {
@@ -430,7 +430,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Sesion de Prueba Activa No Encontrada',
     SupportedLanguage.de: 'Keine aktive Testsitzung gefunden',
     SupportedLanguage.fr: 'Aucune session de test active trouvee',
-    SupportedLanguage.ptBR: 'Sessao de Teste Ativa Nao Encontrada',
+    SupportedLanguage.ptBR: 'Sessão de Teste Ativa Não Encontrada',
     SupportedLanguage.ja: 'アクティブなテストセッションが見つかりません',
   },
   'test_period_expired': {
@@ -438,7 +438,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Periodo de Prueba Expirado',
     SupportedLanguage.de: 'Testzeitraum abgelaufen',
     SupportedLanguage.fr: 'Periode de test expiree',
-    SupportedLanguage.ptBR: 'Periodo de Teste Expirado',
+    SupportedLanguage.ptBR: 'Período de Teste Expirado',
     SupportedLanguage.ja: 'テスト期間が終了しました',
   },
   'api_key_database_not_found': {
@@ -446,7 +446,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Clave API No Encontrada',
     SupportedLanguage.de: 'API-Schlussel nicht gefunden',
     SupportedLanguage.fr: 'Cle API non trouvee',
-    SupportedLanguage.ptBR: 'Chave API Nao Encontrada',
+    SupportedLanguage.ptBR: 'Chave API Não Encontrada',
     SupportedLanguage.ja: 'APIキーが見つかりません',
   },
   'insufficient_credits': {
@@ -454,7 +454,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Creditos Insuficientes',
     SupportedLanguage.de: 'Unzureichendes Guthaben',
     SupportedLanguage.fr: 'Credits insuffisants',
-    SupportedLanguage.ptBR: 'Creditos Insuficientes',
+    SupportedLanguage.ptBR: 'Créditos Insuficientes',
     SupportedLanguage.ja: 'クレジットが不足しています',
   },
   'missing_extract_rules': {
@@ -462,7 +462,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Reglas de Extraccion Faltantes',
     SupportedLanguage.de: 'Fehlende Extraktionsregeln',
     SupportedLanguage.fr: 'Regles d\'extraction manquantes',
-    SupportedLanguage.ptBR: 'Regras de Extracao Faltando',
+    SupportedLanguage.ptBR: 'Regras de Extração Faltando',
     SupportedLanguage.ja: '抽出ルールがありません',
   },
   'invalid_api_key_account': {
@@ -470,7 +470,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Clave API Invalida',
     SupportedLanguage.de: 'Ungultiger API-Schlussel',
     SupportedLanguage.fr: 'Cle API invalide',
-    SupportedLanguage.ptBR: 'Chave API Invalida',
+    SupportedLanguage.ptBR: 'Chave API Inválida',
     SupportedLanguage.ja: '無効なAPIキー',
   },
   'concurrency_limit_exceeded': {
@@ -478,7 +478,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Limite de Concurrencia Excedido',
     SupportedLanguage.de: 'Gleichzeitigkeitslimit uberschritten',
     SupportedLanguage.fr: 'Limite de concurrence depassee',
-    SupportedLanguage.ptBR: 'Limite de Concorrencia Excedido',
+    SupportedLanguage.ptBR: 'Limite de Concorrência Excedido',
     SupportedLanguage.ja: '同時接続数の制限を超えました',
   },
   'api_scrappable_not_found': {
@@ -486,7 +486,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Scrappable No Encontrado',
     SupportedLanguage.de: 'Scrappable nicht gefunden',
     SupportedLanguage.fr: 'Scrappable non trouve',
-    SupportedLanguage.ptBR: 'Scrappable Nao Encontrado',
+    SupportedLanguage.ptBR: 'Scrappable Não Encontrado',
     SupportedLanguage.ja: 'Scrappableが見つかりません',
   },
   'invalid_api_key_format': {
@@ -494,7 +494,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Formato de Clave API Invalido',
     SupportedLanguage.de: 'Ungultiges API-Schlussel-Format',
     SupportedLanguage.fr: 'Format de cle API invalide',
-    SupportedLanguage.ptBR: 'Formato de Chave API Invalido',
+    SupportedLanguage.ptBR: 'Formato de Chave API Inválido',
     SupportedLanguage.ja: '無効なAPIキー形式',
   },
   'openai_api_key_invalid': {
@@ -502,7 +502,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Clave API de OpenAI Invalida',
     SupportedLanguage.de: 'Ungueltiger OpenAI API-Schluessel',
     SupportedLanguage.fr: 'Cle API OpenAI invalide',
-    SupportedLanguage.ptBR: 'Chave API OpenAI Invalida',
+    SupportedLanguage.ptBR: 'Chave API OpenAI Inválida',
     SupportedLanguage.ja: '無効なOpenAI APIキー',
   },
   'openai_api_key_validation_failed': {
@@ -510,7 +510,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Error en la Validacion de la Clave API',
     SupportedLanguage.de: 'API-Schluessel-Validierung fehlgeschlagen',
     SupportedLanguage.fr: 'Echec de la validation de la cle API',
-    SupportedLanguage.ptBR: 'Falha na Validacao da Chave API',
+    SupportedLanguage.ptBR: 'Falha na Validação da Chave API',
     SupportedLanguage.ja: 'APIキーの検証に失敗しました',
   },
 
@@ -528,7 +528,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Autenticacion Requerida o Datos de Referencia No Encontrados',
     SupportedLanguage.de: 'Authentifizierung erforderlich oder Referenzdaten nicht gefunden',
     SupportedLanguage.fr: 'Authentification requise ou donnees de reference non trouvees',
-    SupportedLanguage.ptBR: 'Autenticacao Necessaria ou Dados de Referencia Nao Encontrados',
+    SupportedLanguage.ptBR: 'Autenticação Necessária ou Dados de Referência Não Encontrados',
     SupportedLanguage.ja: '認証が必要またはリファレンスデータが見つかりません',
   },
 
@@ -538,7 +538,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Scrappable No Encontrado',
     SupportedLanguage.de: 'Scrappable nicht gefunden',
     SupportedLanguage.fr: 'Scrappable non trouve',
-    SupportedLanguage.ptBR: 'Scrappable Nao Encontrado',
+    SupportedLanguage.ptBR: 'Scrappable Não Encontrado',
     SupportedLanguage.ja: 'Scrappableが見つかりません',
   },
 
@@ -548,7 +548,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Umbral Invalido',
     SupportedLanguage.de: 'Unzultiger Schwellenwert',
     SupportedLanguage.fr: 'Seuil invalide',
-    SupportedLanguage.ptBR: 'Limite Invalido',
+    SupportedLanguage.ptBR: 'Limite Inválido',
     SupportedLanguage.ja: '無効なしきい値',
   },
   'auto_fix_threshold_too_high': {
@@ -566,7 +566,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Conexion Sospechosa Detectada',
     SupportedLanguage.de: 'Verdachtige Verbindung erkannt',
     SupportedLanguage.fr: 'Connexion suspecte detectee',
-    SupportedLanguage.ptBR: 'Conexao Suspeita Detectada',
+    SupportedLanguage.ptBR: 'Conexão Suspeita Detectada',
     SupportedLanguage.ja: '不審な接続が検出されました',
   },
 
@@ -576,7 +576,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'ID de Scrappable en Cache No Encontrado',
     SupportedLanguage.de: 'Cache-Scrappable-ID nicht gefunden',
     SupportedLanguage.fr: 'ID de Scrappable en cache non trouve',
-    SupportedLanguage.ptBR: 'ID de Scrappable em Cache Nao Encontrado',
+    SupportedLanguage.ptBR: 'ID de Scrappable em Cache Não Encontrado',
     SupportedLanguage.ja: 'キャッシュされたScrappable IDが見つかりません',
   },
   'cache_test_data_not_found': {
@@ -584,7 +584,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Datos de Prueba en Cache No Encontrados',
     SupportedLanguage.de: 'Cache-Testdaten nicht gefunden',
     SupportedLanguage.fr: 'Donnees de test en cache non trouvees',
-    SupportedLanguage.ptBR: 'Dados de Teste em Cache Nao Encontrados',
+    SupportedLanguage.ptBR: 'Dados de Teste em Cache Não Encontrados',
     SupportedLanguage.ja: 'キャッシュされたテストデータが見つかりません',
   },
   'scrappable_request_not_found': {
@@ -592,7 +592,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Solicitud de Scrappable No Encontrada',
     SupportedLanguage.de: 'Scrappable-Anfrage nicht gefunden',
     SupportedLanguage.fr: 'Requete Scrappable non trouvee',
-    SupportedLanguage.ptBR: 'Solicitacao de Scrappable Nao Encontrada',
+    SupportedLanguage.ptBR: 'Solicitação de Scrappable Não Encontrada',
     SupportedLanguage.ja: 'Scrappableリクエストが見つかりません',
   },
   'reference_test_data_not_found': {
@@ -600,7 +600,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Datos de Prueba de Referencia No Encontrados',
     SupportedLanguage.de: 'Referenz-Testdaten nicht gefunden',
     SupportedLanguage.fr: 'Donnees de test de reference non trouvees',
-    SupportedLanguage.ptBR: 'Dados de Teste de Referencia Nao Encontrados',
+    SupportedLanguage.ptBR: 'Dados de Teste de Referência Não Encontrados',
     SupportedLanguage.ja: 'リファレンステストデータが見つかりません',
   },
   'target_request_not_found': {
@@ -608,7 +608,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Solicitud Objetivo No Encontrada',
     SupportedLanguage.de: 'Zielanfrage nicht gefunden',
     SupportedLanguage.fr: 'Requete cible non trouvee',
-    SupportedLanguage.ptBR: 'Solicitacao Alvo Nao Encontrada',
+    SupportedLanguage.ptBR: 'Solicitação Alvo Não Encontrada',
     SupportedLanguage.ja: 'ターゲットリクエストが見つかりません',
   },
   'openai_api_key_missing': {
@@ -634,7 +634,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Sesion Cerrada',
     SupportedLanguage.de: 'Sitzung geschlossen',
     SupportedLanguage.fr: 'Session fermee',
-    SupportedLanguage.ptBR: 'Sessao Encerrada',
+    SupportedLanguage.ptBR: 'Sessão Encerrada',
     SupportedLanguage.ja: 'セッションが閉じられました',
   },
   'chat_testing_rules': {
@@ -658,7 +658,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Validacion Fallida',
     SupportedLanguage.de: 'Validierung fehlgeschlagen',
     SupportedLanguage.fr: 'Validation echouee',
-    SupportedLanguage.ptBR: 'Validacao Falhou',
+    SupportedLanguage.ptBR: 'Validação Falhou',
     SupportedLanguage.ja: '検証に失敗しました',
   },
   'chat_request_updated': {
@@ -666,7 +666,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Solicitud Actualizada',
     SupportedLanguage.de: 'Anfrage aktualisiert',
     SupportedLanguage.fr: 'Requete mise a jour',
-    SupportedLanguage.ptBR: 'Solicitacao Atualizada',
+    SupportedLanguage.ptBR: 'Solicitação Atualizada',
     SupportedLanguage.ja: 'リクエストが更新されました',
   },
   'chat_api_key_configured': {
@@ -690,7 +690,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Creditos Agotados',
     SupportedLanguage.de: 'Guthaben aufgebraucht',
     SupportedLanguage.fr: 'Credits epuises',
-    SupportedLanguage.ptBR: 'Creditos Esgotados',
+    SupportedLanguage.ptBR: 'Créditos Esgotados',
     SupportedLanguage.ja: 'クレジットが不足しています',
   },
   'chat_quota_exceeded': {
@@ -722,7 +722,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.es: 'Error de Autenticacion',
     SupportedLanguage.de: 'Authentifizierungsfehler',
     SupportedLanguage.fr: 'Erreur d\'authentification',
-    SupportedLanguage.ptBR: 'Erro de Autenticacao',
+    SupportedLanguage.ptBR: 'Erro de Autenticação',
     SupportedLanguage.ja: '認証エラー',
   },
   'chat_rate_limit': {
@@ -746,7 +746,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'El usuario debe iniciar sesion para acceder a este recurso.',
     SupportedLanguage.de: 'Der Benutzer muss angemeldet sein, um auf diese Ressource zuzugreifen.',
     SupportedLanguage.fr: 'L\'utilisateur doit etre connecte pour acceder a cette ressource.',
-    SupportedLanguage.ptBR: 'O usuario deve estar logado para acessar este recurso.',
+    SupportedLanguage.ptBR: 'O usuário deve estar logado para acessar este recurso.',
     SupportedLanguage.ja: 'このリソースにアクセスするにはログインが必要です。',
   },
   'user_not_authenticated': {
@@ -754,7 +754,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Debes iniciar sesion para acceder a tus scrappables.',
     SupportedLanguage.de: 'Sie mussen angemeldet sein, um auf Ihre Scrappables zuzugreifen.',
     SupportedLanguage.fr: 'Vous devez etre connecte pour acceder a vos scrappables.',
-    SupportedLanguage.ptBR: 'Voce deve estar logado para acessar seus scrappables.',
+    SupportedLanguage.ptBR: 'Você deve estar logado para acessar seus scrappables.',
     SupportedLanguage.ja: 'scrappablesにアクセスするにはログインが必要です。',
   },
 
@@ -764,7 +764,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'No se pudo encontrar la informacion de la cuenta.',
     SupportedLanguage.de: 'Kontoinformationen konnten nicht gefunden werden.',
     SupportedLanguage.fr: 'Impossible de trouver les informations du compte.',
-    SupportedLanguage.ptBR: 'Nao foi possivel encontrar as informacoes da conta.',
+    SupportedLanguage.ptBR: 'Não foi possível encontrar as informações da conta.',
     SupportedLanguage.ja: 'アカウント情報が見つかりませんでした。',
   },
   'account_not_found_for_user': {
@@ -772,7 +772,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'No se encontro cuenta para el usuario autenticado.',
     SupportedLanguage.de: 'Kein Konto fur den authentifizierten Benutzer gefunden.',
     SupportedLanguage.fr: 'Aucun compte trouve pour l\'utilisateur authentifie.',
-    SupportedLanguage.ptBR: 'Nenhuma conta encontrada para o usuario autenticado.',
+    SupportedLanguage.ptBR: 'Nenhuma conta encontrada para o usuário autenticado.',
     SupportedLanguage.ja: '認証済みユーザーのアカウントが見つかりませんでした。',
   },
   'account_creation_failed': {
@@ -780,7 +780,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'No se pudo crear la nueva cuenta. Por favor, intentelo mas tarde.',
     SupportedLanguage.de: 'Neues Konto konnte nicht erstellt werden. Bitte versuchen Sie es spater erneut.',
     SupportedLanguage.fr: 'Impossible de creer un nouveau compte. Veuillez reessayer plus tard.',
-    SupportedLanguage.ptBR: 'Nao foi possivel criar uma nova conta. Por favor, tente novamente mais tarde.',
+    SupportedLanguage.ptBR: 'Não foi possível criar uma nova conta. Por favor, tente novamente mais tarde.',
     SupportedLanguage.ja: '新しいアカウントを作成できませんでした。後でもう一度お試しください。',
   },
   'account_creation_internal_error': {
@@ -788,7 +788,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Este es un error interno. Por favor, intentelo mas tarde.',
     SupportedLanguage.de: 'Dies ist ein interner Fehler. Bitte versuchen Sie es spater erneut.',
     SupportedLanguage.fr: 'Ceci est une erreur interne. Veuillez reessayer plus tard.',
-    SupportedLanguage.ptBR: 'Este e um erro interno. Por favor, tente novamente mais tarde.',
+    SupportedLanguage.ptBR: 'Este é um erro interno. Por favor, tente novamente mais tarde.',
     SupportedLanguage.ja: 'これは内部エラーです。後でもう一度お試しください。',
   },
   'database_error': {
@@ -796,7 +796,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Error al recuperar la informacion de la cuenta. Por favor, intentelo mas tarde.',
     SupportedLanguage.de: 'Kontoinformationen konnten nicht abgerufen werden. Bitte versuchen Sie es spater erneut.',
     SupportedLanguage.fr: 'Echec de la recuperation des informations du compte. Veuillez reessayer plus tard.',
-    SupportedLanguage.ptBR: 'Falha ao recuperar as informacoes da conta. Por favor, tente novamente mais tarde.',
+    SupportedLanguage.ptBR: 'Falha ao recuperar as informações da conta. Por favor, tente novamente mais tarde.',
     SupportedLanguage.ja: 'アカウント情報の取得に失敗しました。後でもう一度お試しください。',
   },
 
@@ -806,7 +806,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'El scrappable solicitado no existe.',
     SupportedLanguage.de: 'Das angeforderte Scrappable existiert nicht.',
     SupportedLanguage.fr: 'Le scrappable demande n\'existe pas.',
-    SupportedLanguage.ptBR: 'O scrappable solicitado nao existe.',
+    SupportedLanguage.ptBR: 'O scrappable solicitado não existe.',
     SupportedLanguage.ja: 'リクエストされたscrappableは存在しません。',
   },
   'scrappable_not_found_attach': {
@@ -814,7 +814,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'El scrappable que intentas vincular no existe.',
     SupportedLanguage.de: 'Das Scrappable, das Sie anhangen mochten, existiert nicht.',
     SupportedLanguage.fr: 'Le scrappable que vous essayez d\'attacher n\'existe pas.',
-    SupportedLanguage.ptBR: 'O scrappable que voce esta tentando vincular nao existe.',
+    SupportedLanguage.ptBR: 'O scrappable que você está tentando vincular não existe.',
     SupportedLanguage.ja: '関連付けようとしているscrappableは存在しません。',
   },
   'scrappable_not_found_clone': {
@@ -822,7 +822,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'El scrappable que intentas clonar no existe.',
     SupportedLanguage.de: 'Das Scrappable, das Sie klonen mochten, existiert nicht.',
     SupportedLanguage.fr: 'Le scrappable que vous essayez de cloner n\'existe pas.',
-    SupportedLanguage.ptBR: 'O scrappable que voce esta tentando clonar nao existe.',
+    SupportedLanguage.ptBR: 'O scrappable que você está tentando clonar não existe.',
     SupportedLanguage.ja: '複製しようとしているscrappableは存在しません。',
   },
   'scrappable_not_found_or_no_access': {
@@ -830,7 +830,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'El scrappable solicitado no se encontro o no tienes acceso a el.',
     SupportedLanguage.de: 'Das angeforderte Scrappable wurde nicht gefunden oder Sie haben keinen Zugriff darauf.',
     SupportedLanguage.fr: 'Le scrappable demande n\'a pas ete trouve ou vous n\'y avez pas acces.',
-    SupportedLanguage.ptBR: 'O scrappable solicitado nao foi encontrado ou voce nao tem acesso a ele.',
+    SupportedLanguage.ptBR: 'O scrappable solicitado não foi encontrado ou você não tem acesso a ele.',
     SupportedLanguage.ja: 'リクエストされたscrappableが見つからないか、アクセス権限がありません。',
   },
   'scrappable_already_attached': {
@@ -838,7 +838,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'El scrappable que intentas vincular ya esta vinculado a otra cuenta.',
     SupportedLanguage.de: 'Das Scrappable, das Sie anhangen mochten, ist bereits mit einem anderen Konto verknupft.',
     SupportedLanguage.fr: 'Le scrappable que vous essayez d\'attacher est deja lie a un autre compte.',
-    SupportedLanguage.ptBR: 'O scrappable que voce esta tentando vincular ja esta vinculado a outra conta.',
+    SupportedLanguage.ptBR: 'O scrappable que você está tentando vincular já está vinculado a outra conta.',
     SupportedLanguage.ja: '関連付けようとしているscrappableは既に別のアカウントにリンクされています。',
   },
   'endpoint_limit_reached': {
@@ -846,7 +846,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Has alcanzado el numero maximo de endpoints ({maxAllowed}) para tu plan {planName}. Por favor, actualiza tu plan para vincular mas endpoints.',
     SupportedLanguage.de: 'Sie haben die maximale Anzahl von Endpunkten ({maxAllowed}) fur Ihren {planName}-Plan erreicht. Bitte aktualisieren Sie Ihren Plan, um weitere Endpunkte anzuhangen.',
     SupportedLanguage.fr: 'Vous avez atteint le nombre maximum d\'endpoints ({maxAllowed}) pour votre plan {planName}. Veuillez mettre a niveau votre plan pour attacher plus d\'endpoints.',
-    SupportedLanguage.ptBR: 'Voce atingiu o numero maximo de endpoints ({maxAllowed}) para seu plano {planName}. Por favor, atualize seu plano para vincular mais endpoints.',
+    SupportedLanguage.ptBR: 'Você atingiu o número máximo de endpoints ({maxAllowed}) para seu plano {planName}. Por favor, atualize seu plano para vincular mais endpoints.',
     SupportedLanguage.ja: '{planName}プランのエンドポイント数の上限({maxAllowed})に達しました。より多くのエンドポイントを追加するにはプランをアップグレードしてください。',
   },
   'banned_domain': {
@@ -854,7 +854,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'El dominio "{domain}" no es compatible para scraping. Este sitio web tiene fuertes medidas anti-scraping que impiden la extraccion confiable de datos.',
     SupportedLanguage.de: 'Die Domain "{domain}" wird nicht fur Scraping unterstutzt. Diese Website hat starke Anti-Scraping-Massnahmen, die eine zuverlassige Datenextraktion verhindern.',
     SupportedLanguage.fr: 'Le domaine "{domain}" n\'est pas pris en charge pour le scraping. Ce site web a de fortes mesures anti-scraping qui empechent l\'extraction fiable de donnees.',
-    SupportedLanguage.ptBR: 'O dominio "{domain}" nao e suportado para scraping. Este site possui fortes medidas anti-scraping que impedem a extracao confiavel de dados.',
+    SupportedLanguage.ptBR: 'O domínio "{domain}" não é suportado para scraping. Este site possui fortes medidas anti-scraping que impedem a extração confiável de dados.',
     SupportedLanguage.ja: 'ドメイン「{domain}」はスクレイピングに対応していません。このウェブサイトには強力なアンチスクレイピング対策があり、信頼性の高いデータ抽出ができません。',
   },
   'scrappable_private_cannot_clone': {
@@ -862,7 +862,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Este scrappable es privado y no se puede clonar.',
     SupportedLanguage.de: 'Dieses Scrappable ist privat und kann nicht geklont werden.',
     SupportedLanguage.fr: 'Ce scrappable est prive et ne peut pas etre clone.',
-    SupportedLanguage.ptBR: 'Este scrappable e privado e nao pode ser clonado.',
+    SupportedLanguage.ptBR: 'Este scrappable é privado e não pode ser clonado.',
     SupportedLanguage.ja: 'このscrappableはプライベートであり、複製できません。',
   },
 
@@ -872,7 +872,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'La clave API especificada no se encontro o no pertenece a tu cuenta.',
     SupportedLanguage.de: 'Der angegebene API-Schlussel wurde nicht gefunden oder gehort nicht zu Ihrem Konto.',
     SupportedLanguage.fr: 'La cle API specifiee n\'a pas ete trouvee ou n\'appartient pas a votre compte.',
-    SupportedLanguage.ptBR: 'A chave API especificada nao foi encontrada ou nao pertence a sua conta.',
+    SupportedLanguage.ptBR: 'A chave API especificada não foi encontrada ou não pertence a sua conta.',
     SupportedLanguage.ja: '指定されたAPIキーが見つからないか、アカウントに属していません。',
   },
   'cannot_deactivate_api_key': {
@@ -880,7 +880,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Debes tener al menos una clave API activa.',
     SupportedLanguage.de: 'Sie mussen mindestens einen aktiven API-Schlussel haben.',
     SupportedLanguage.fr: 'Vous devez avoir au moins une cle API active.',
-    SupportedLanguage.ptBR: 'Voce deve ter pelo menos uma chave API ativa.',
+    SupportedLanguage.ptBR: 'Você deve ter pelo menos uma chave API ativa.',
     SupportedLanguage.ja: '少なくとも1つのアクティブなAPIキーが必要です。',
   },
 
@@ -890,7 +890,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Los paquetes de creditos solo estan disponibles para suscriptores del plan Ultra. Por favor, actualiza a Ultra para comprar creditos adicionales.',
     SupportedLanguage.de: 'Kreditpakete sind nur fur Ultra-Plan-Abonnenten verfugbar. Bitte aktualisieren Sie auf Ultra, um zusatzliche Credits zu erwerben.',
     SupportedLanguage.fr: 'Les packs de credits sont disponibles uniquement pour les abonnes au plan Ultra. Veuillez passer a Ultra pour acheter des credits supplementaires.',
-    SupportedLanguage.ptBR: 'Os pacotes de creditos estao disponiveis apenas para assinantes do plano Ultra. Por favor, atualize para Ultra para comprar creditos adicionais.',
+    SupportedLanguage.ptBR: 'Os pacotes de créditos estão disponíveis apenas para assinantes do plano Ultra. Por favor, atualize para Ultra para comprar créditos adicionais.',
     SupportedLanguage.ja: 'クレジットパッケージはUltraプランの購読者のみ利用可能です。追加クレジットを購入するにはUltraにアップグレードしてください。',
   },
   'upgrade_required_clone': {
@@ -906,7 +906,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Error al crear la sesion de checkout.',
     SupportedLanguage.de: 'Checkout-Sitzung konnte nicht erstellt werden.',
     SupportedLanguage.fr: 'Echec de la creation de la session de paiement.',
-    SupportedLanguage.ptBR: 'Falha ao criar sessao de checkout.',
+    SupportedLanguage.ptBR: 'Falha ao criar sessão de checkout.',
     SupportedLanguage.ja: 'チェックアウトセッションの作成に失敗しました。',
   },
   'no_active_subscription': {
@@ -922,7 +922,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'El usuario ya tiene una suscripcion activa.',
     SupportedLanguage.de: 'Benutzer hat bereits ein aktives Abonnement.',
     SupportedLanguage.fr: 'L\'utilisateur a deja un abonnement actif.',
-    SupportedLanguage.ptBR: 'O usuario ja possui uma assinatura ativa.',
+    SupportedLanguage.ptBR: 'O usuário já possui uma assinatura ativa.',
     SupportedLanguage.ja: 'ユーザーは既にアクティブなサブスクリプションを持っています。',
   },
   'subscription_cancel_failed': {
@@ -938,7 +938,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Error al crear la sesion de checkout. Por favor, intentelo mas tarde.',
     SupportedLanguage.de: 'Checkout-Sitzung konnte nicht erstellt werden. Bitte versuchen Sie es spater erneut.',
     SupportedLanguage.fr: 'Echec de la creation de la session de paiement. Veuillez reessayer plus tard.',
-    SupportedLanguage.ptBR: 'Falha ao criar sessao de checkout. Por favor, tente novamente mais tarde.',
+    SupportedLanguage.ptBR: 'Falha ao criar sessão de checkout. Por favor, tente novamente mais tarde.',
     SupportedLanguage.ja: 'チェックアウトセッションの作成に失敗しました。後でもう一度お試しください。',
   },
   'customer_portal_failed': {
@@ -946,7 +946,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Error al crear la sesion del portal del cliente. Por favor, intentelo mas tarde.',
     SupportedLanguage.de: 'Kundenportalsitzung konnte nicht erstellt werden. Bitte versuchen Sie es spater erneut.',
     SupportedLanguage.fr: 'Echec de la creation de la session du portail client. Veuillez reessayer plus tard.',
-    SupportedLanguage.ptBR: 'Falha ao criar sessao do portal do cliente. Por favor, tente novamente mais tarde.',
+    SupportedLanguage.ptBR: 'Falha ao criar sessão do portal do cliente. Por favor, tente novamente mais tarde.',
     SupportedLanguage.ja: 'カスタマーポータルセッションの作成に失敗しました。後でもう一度お試しください。',
   },
   'no_stripe_customer': {
@@ -962,7 +962,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Correo electronico del usuario no encontrado.',
     SupportedLanguage.de: 'Benutzer-E-Mail nicht gefunden.',
     SupportedLanguage.fr: 'Email de l\'utilisateur non trouve.',
-    SupportedLanguage.ptBR: 'Email do usuario nao encontrado.',
+    SupportedLanguage.ptBR: 'Email do usuário não encontrado.',
     SupportedLanguage.ja: 'ユーザーのメールアドレスが見つかりません。',
   },
   'sync_subscription_failed': {
@@ -980,7 +980,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'No tienes permiso para acceder a este scrappable.',
     SupportedLanguage.de: 'Sie haben keine Berechtigung, auf dieses Scrappable zuzugreifen.',
     SupportedLanguage.fr: 'Vous n\'avez pas la permission d\'acceder a ce scrappable.',
-    SupportedLanguage.ptBR: 'Voce nao tem permissao para acessar este scrappable.',
+    SupportedLanguage.ptBR: 'Você não tem permissão para acessar este scrappable.',
     SupportedLanguage.ja: 'このscrappableにアクセスする権限がありません。',
   },
   'permission_denied_delete': {
@@ -988,7 +988,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'No tienes permiso para eliminar este scrappable.',
     SupportedLanguage.de: 'Sie haben keine Berechtigung, dieses Scrappable zu loschen.',
     SupportedLanguage.fr: 'Vous n\'avez pas la permission de supprimer ce scrappable.',
-    SupportedLanguage.ptBR: 'Voce nao tem permissao para excluir este scrappable.',
+    SupportedLanguage.ptBR: 'Você não tem permissão para excluir este scrappable.',
     SupportedLanguage.ja: 'このscrappableを削除する権限がありません。',
   },
   'permission_denied_edit': {
@@ -996,7 +996,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'No tienes permiso para editar este scrappable.',
     SupportedLanguage.de: 'Sie haben keine Berechtigung, dieses Scrappable zu bearbeiten.',
     SupportedLanguage.fr: 'Vous n\'avez pas la permission de modifier ce scrappable.',
-    SupportedLanguage.ptBR: 'Voce nao tem permissao para editar este scrappable.',
+    SupportedLanguage.ptBR: 'Você não tem permissão para editar este scrappable.',
     SupportedLanguage.ja: 'このscrappableを編集する権限がありません。',
   },
 
@@ -1006,7 +1006,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Has alcanzado el limite de gasto para tu direccion IP (\${limit}). Este limite se restablece en {timeStr}, o puedes crear una cuenta para obtener creditos de IA mensuales.',
     SupportedLanguage.de: 'Sie haben das Ausgabenlimit fur Ihre IP-Adresse erreicht (\${limit}). Dieses Limit wird in {timeStr} zuruckgesetzt, oder Sie konnen ein Konto erstellen, um monatliche KI-Guthaben zu erhalten.',
     SupportedLanguage.fr: 'Vous avez atteint la limite de depenses pour votre adresse IP (\${limit}). Cette limite sera reinitialise dans {timeStr}, ou vous pouvez creer un compte pour obtenir des credits IA mensuels.',
-    SupportedLanguage.ptBR: 'Voce atingiu o limite de gastos para seu endereco IP (\${limit}). Este limite sera redefinido em {timeStr}, ou voce pode criar uma conta para obter creditos de IA mensais.',
+    SupportedLanguage.ptBR: 'Você atingiu o limite de gastos para seu endereço IP (\${limit}). Este limite será redefinido em {timeStr}, ou você pode criar uma conta para obter créditos de IA mensais.',
     SupportedLanguage.ja: 'IPアドレスの使用制限に達しました（\${limit}）。この制限は{timeStr}でリセットされます。月次AIクレジットを取得するにはアカウントを作成してください。',
   },
   'ai_credits_exhausted': {
@@ -1014,7 +1014,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Has usado todos tus creditos de IA para este mes (limite de \${limit}). Los creditos se restablecera el proximo mes, o puedes agregar tu propia clave API de OpenAI en la configuracion de tu cuenta para continuar sin limites.',
     SupportedLanguage.de: 'Sie haben alle Ihre KI-Guthaben fur diesen Monat aufgebraucht (Limit: \${limit}). Die Guthaben werden nachsten Monat zuruckgesetzt, oder Sie konnen Ihren eigenen OpenAI API-Schlussel in den Kontoeinstellungen hinzufugen, um ohne Limits fortzufahren.',
     SupportedLanguage.fr: 'Vous avez utilise tous vos credits IA pour ce mois (limite de \${limit}). Les credits seront reinitialises le mois prochain, ou vous pouvez ajouter votre propre cle API OpenAI dans les parametres du compte pour continuer sans limites.',
-    SupportedLanguage.ptBR: 'Voce usou todos os seus creditos de IA para este mes (limite de \${limit}). Os creditos serao redefinidos no proximo mes, ou voce pode adicionar sua propria chave API do OpenAI nas configuracoes da conta para continuar sem limites.',
+    SupportedLanguage.ptBR: 'Você usou todos os seus créditos de IA para este mês (limite de \${limit}). Os créditos serão redefinidos no próximo mês, ou você pode adicionar sua própria chave API do OpenAI nas configurações da conta para continuar sem limites.',
     SupportedLanguage.ja: '今月のAIクレジットをすべて使い切りました（\${limit}の制限）。クレジットは来月リセットされます。制限なく続けるにはアカウント設定でOpenAI APIキーを追加してください。',
   },
 
@@ -1024,7 +1024,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Tu conexion ha sido marcada como sospechosa ({reason}). Para proteger nuestro servicio del abuso, no podemos procesar solicitudes de VPNs, proxies, Tor o IPs maliciosas conocidas. Por favor, desactiva tu VPN/proxy o crea una cuenta para continuar.',
     SupportedLanguage.de: 'Ihre Verbindung wurde als verdachtig eingestuft ({reason}). Zum Schutz unseres Dienstes vor Missbrauch konnen wir keine Anfragen von VPNs, Proxys, Tor oder bekannten bosartigen IPs verarbeiten. Bitte deaktivieren Sie Ihr VPN/Proxy oder erstellen Sie ein Konto, um fortzufahren.',
     SupportedLanguage.fr: 'Votre connexion a ete signalee comme suspecte ({reason}). Pour proteger notre service contre les abus, nous ne pouvons pas traiter les requetes provenant de VPN, proxys, Tor ou d\'IPs malveillantes connues. Veuillez desactiver votre VPN/proxy ou creer un compte pour continuer.',
-    SupportedLanguage.ptBR: 'Sua conexao foi marcada como suspeita ({reason}). Para proteger nosso servico contra abusos, nao podemos processar solicitacoes de VPNs, proxies, Tor ou IPs maliciosos conhecidos. Por favor, desative seu VPN/proxy ou crie uma conta para continuar.',
+    SupportedLanguage.ptBR: 'Sua conexão foi marcada como suspeita ({reason}). Para proteger nosso serviço contra abusos, não podemos processar solicitações de VPNs, proxies, Tor ou IPs maliciosos conhecidos. Por favor, desative seu VPN/proxy ou crie uma conta para continuar.',
     SupportedLanguage.ja: 'お使いの接続が不審としてフラグ付けされました（{reason}）。サービスの悪用を防ぐため、VPN、プロキシ、Tor、または既知の悪意あるIPからのリクエストは処理できません。VPN/プロキシを無効にするか、アカウントを作成して続行してください。',
   },
 
@@ -1034,7 +1034,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Este scrappable ya ha sido eliminado.',
     SupportedLanguage.de: 'Dieses Scrappable wurde bereits geloscht.',
     SupportedLanguage.fr: 'Ce scrappable a deja ete supprime.',
-    SupportedLanguage.ptBR: 'Este scrappable ja foi excluido.',
+    SupportedLanguage.ptBR: 'Este scrappable já foi excluído.',
     SupportedLanguage.ja: 'このscrappableは既に削除されています。',
   },
   'delete_failed': {
@@ -1060,7 +1060,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'El nombre del scrappable no puede estar vacio.',
     SupportedLanguage.de: 'Der Scrappable-Name darf nicht leer sein.',
     SupportedLanguage.fr: 'Le nom du scrappable ne peut pas etre vide.',
-    SupportedLanguage.ptBR: 'O nome do scrappable nao pode estar vazio.',
+    SupportedLanguage.ptBR: 'O nome do scrappable não pode estar vazio.',
     SupportedLanguage.ja: 'scrappableの名前を空にすることはできません。',
   },
   'name_too_long': {
@@ -1076,7 +1076,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'La descripcion del scrappable no puede estar vacia.',
     SupportedLanguage.de: 'Die Scrappable-Beschreibung darf nicht leer sein.',
     SupportedLanguage.fr: 'La description du scrappable ne peut pas etre vide.',
-    SupportedLanguage.ptBR: 'A descricao do scrappable nao pode estar vazia.',
+    SupportedLanguage.ptBR: 'A descrição do scrappable não pode estar vazia.',
     SupportedLanguage.ja: 'scrappableの説明を空にすることはできません。',
   },
   'description_too_long': {
@@ -1084,7 +1084,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'La descripcion del scrappable debe tener {maxLength} caracteres o menos.',
     SupportedLanguage.de: 'Die Scrappable-Beschreibung darf hochstens {maxLength} Zeichen lang sein.',
     SupportedLanguage.fr: 'La description du scrappable doit contenir {maxLength} caracteres ou moins.',
-    SupportedLanguage.ptBR: 'A descricao do scrappable deve ter {maxLength} caracteres ou menos.',
+    SupportedLanguage.ptBR: 'A descrição do scrappable deve ter {maxLength} caracteres ou menos.',
     SupportedLanguage.ja: 'scrappableの説明は{maxLength}文字以下にしてください。',
   },
   'invalid_api_key': {
@@ -1092,7 +1092,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Por favor, proporciona una clave API de OpenAI valida.',
     SupportedLanguage.de: 'Bitte geben Sie einen gultigen OpenAI API-Schlussel an.',
     SupportedLanguage.fr: 'Veuillez fournir une cle API OpenAI valide.',
-    SupportedLanguage.ptBR: 'Por favor, forneca uma chave API do OpenAI valida.',
+    SupportedLanguage.ptBR: 'Por favor, forneça uma chave API do OpenAI válida.',
     SupportedLanguage.ja: '有効なOpenAI APIキーを入力してください。',
   },
 
@@ -1102,7 +1102,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'El scrappable solicitado no esta disponible.',
     SupportedLanguage.de: 'Das angeforderte Scrappable ist nicht verfugbar.',
     SupportedLanguage.fr: 'Le scrappable demande n\'est pas disponible.',
-    SupportedLanguage.ptBR: 'O scrappable solicitado nao esta disponivel.',
+    SupportedLanguage.ptBR: 'O scrappable solicitado não está disponível.',
     SupportedLanguage.ja: 'リクエストされたscrappableは利用できません。',
   },
   'scrappable_not_found_by_id': {
@@ -1110,7 +1110,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'El scrappable con el ID proporcionado no existe.',
     SupportedLanguage.de: 'Das Scrappable mit der angegebenen ID existiert nicht.',
     SupportedLanguage.fr: 'Le scrappable avec l\'ID fourni n\'existe pas.',
-    SupportedLanguage.ptBR: 'O scrappable com o ID fornecido nao existe.',
+    SupportedLanguage.ptBR: 'O scrappable com o ID fornecido não existe.',
     SupportedLanguage.ja: '指定されたIDのscrappableは存在しません。',
   },
 
@@ -1120,7 +1120,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'No se encontro ninguna sesion activa con el ID proporcionado.',
     SupportedLanguage.de: 'Keine aktive Sitzung mit der angegebenen ID gefunden.',
     SupportedLanguage.fr: 'Aucune session active trouvee avec l\'ID fourni.',
-    SupportedLanguage.ptBR: 'Nenhuma sessao ativa encontrada com o ID fornecido.',
+    SupportedLanguage.ptBR: 'Nenhuma sessão ativa encontrada com o ID fornecido.',
     SupportedLanguage.ja: '指定されたIDのアクティブなセッションが見つかりません。',
   },
   'session_already_opened': {
@@ -1128,7 +1128,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Ya hay una sesion abierta para este scrappable. Por favor, cierra la sesion existente antes de crear una nueva.',
     SupportedLanguage.de: 'Es gibt bereits eine geoffnete Sitzung fur dieses Scrappable. Bitte schliessen Sie die bestehende Sitzung, bevor Sie eine neue erstellen.',
     SupportedLanguage.fr: 'Il existe deja une session ouverte pour ce scrappable. Veuillez fermer la session existante avant d\'en creer une nouvelle.',
-    SupportedLanguage.ptBR: 'Ja existe uma sessao aberta para este scrappable. Por favor, feche a sessao existente antes de criar uma nova.',
+    SupportedLanguage.ptBR: 'Já existe uma sessão aberta para este scrappable. Por favor, feche a sessão existente antes de criar uma nova.',
     SupportedLanguage.ja: 'このscrappableには既にセッションが開いています。新しいセッションを作成する前に既存のセッションを閉じてください。',
   },
   'ai_usage_record_not_found': {
@@ -1136,7 +1136,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'No se pudo encontrar tu registro de uso de IA.',
     SupportedLanguage.de: 'Ihr KI-Nutzungsdatensatz konnte nicht gefunden werden.',
     SupportedLanguage.fr: 'Impossible de trouver votre enregistrement d\'utilisation IA.',
-    SupportedLanguage.ptBR: 'Nao foi possivel encontrar seu registro de uso de IA.',
+    SupportedLanguage.ptBR: 'Não foi possível encontrar seu registro de uso de IA.',
     SupportedLanguage.ja: 'AI使用記録が見つかりませんでした。',
   },
   'failed_to_save_api_key': {
@@ -1144,7 +1144,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'No se pudo guardar tu clave API. Por favor, intentelo de nuevo.',
     SupportedLanguage.de: 'Ihr API-Schlussel konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.',
     SupportedLanguage.fr: 'Impossible d\'enregistrer votre cle API. Veuillez reessayer.',
-    SupportedLanguage.ptBR: 'Nao foi possivel salvar sua chave API. Por favor, tente novamente.',
+    SupportedLanguage.ptBR: 'Não foi possível salvar sua chave API. Por favor, tente novamente.',
     SupportedLanguage.ja: 'APIキーを保存できませんでした。もう一度お試しください。',
   },
 
@@ -1154,7 +1154,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Debes iniciar sesion para eliminar este scrappable.',
     SupportedLanguage.de: 'Sie mussen angemeldet sein, um dieses Scrappable zu loschen.',
     SupportedLanguage.fr: 'Vous devez etre connecte pour supprimer ce scrappable.',
-    SupportedLanguage.ptBR: 'Voce deve estar logado para excluir este scrappable.',
+    SupportedLanguage.ptBR: 'Você deve estar logado para excluir este scrappable.',
     SupportedLanguage.ja: 'このscrappableを削除するにはログインが必要です。',
   },
   'authentication_required_edit': {
@@ -1162,7 +1162,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Debes iniciar sesion para editar este scrappable.',
     SupportedLanguage.de: 'Sie mussen angemeldet sein, um dieses Scrappable zu bearbeiten.',
     SupportedLanguage.fr: 'Vous devez etre connecte pour modifier ce scrappable.',
-    SupportedLanguage.ptBR: 'Voce deve estar logado para editar este scrappable.',
+    SupportedLanguage.ptBR: 'Você deve estar logado para editar este scrappable.',
     SupportedLanguage.ja: 'このscrappableを編集するにはログインが必要です。',
   },
   'authentication_required_marketplace': {
@@ -1170,7 +1170,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Debes iniciar sesion para ocultar scrappables del marketplace.',
     SupportedLanguage.de: 'Sie mussen angemeldet sein, um Scrappables vom Marketplace zu verstecken.',
     SupportedLanguage.fr: 'Vous devez etre connecte pour masquer les scrappables du marketplace.',
-    SupportedLanguage.ptBR: 'Voce deve estar logado para ocultar scrappables do marketplace.',
+    SupportedLanguage.ptBR: 'Você deve estar logado para ocultar scrappables do marketplace.',
     SupportedLanguage.ja: 'マーケットプレイスからscrappableを非表示にするにはログインが必要です。',
   },
   'authentication_required_api_key': {
@@ -1178,7 +1178,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Debes iniciar sesion para agregar una clave API.',
     SupportedLanguage.de: 'Sie mussen angemeldet sein, um einen API-Schlussel hinzuzufugen.',
     SupportedLanguage.fr: 'Vous devez etre connecte pour ajouter une cle API.',
-    SupportedLanguage.ptBR: 'Voce deve estar logado para adicionar uma chave API.',
+    SupportedLanguage.ptBR: 'Você deve estar logado para adicionar uma chave API.',
     SupportedLanguage.ja: 'APIキーを追加するにはログインが必要です。',
   },
   'authentication_required_session': {
@@ -1186,7 +1186,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Debes ser el propietario de este scrappable para crear una sesion para el.',
     SupportedLanguage.de: 'Sie mussen der Besitzer dieses Scrappables sein, um eine Sitzung dafur zu erstellen.',
     SupportedLanguage.fr: 'Vous devez etre le proprietaire de ce scrappable pour creer une session.',
-    SupportedLanguage.ptBR: 'Voce deve ser o proprietario deste scrappable para criar uma sessao para ele.',
+    SupportedLanguage.ptBR: 'Você deve ser o proprietário deste scrappable para criar uma sessão para ele.',
     SupportedLanguage.ja: 'セッションを作成するにはこのscrappableの所有者である必要があります。',
   },
   'authentication_required_ai_model': {
@@ -1194,7 +1194,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Debes iniciar sesion para usar este modelo de IA.',
     SupportedLanguage.de: 'Sie mussen angemeldet sein, um dieses KI-Modell zu verwenden.',
     SupportedLanguage.fr: 'Vous devez etre connecte pour utiliser ce modele IA.',
-    SupportedLanguage.ptBR: 'Voce deve estar logado para usar este modelo de IA.',
+    SupportedLanguage.ptBR: 'Você deve estar logado para usar este modelo de IA.',
     SupportedLanguage.ja: 'このAIモデルを使用するにはログインが必要です。',
   },
 
@@ -1214,7 +1214,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Ocultar scrappables del marketplace solo esta disponible para usuarios del plan Ultra.',
     SupportedLanguage.de: 'Das Verstecken von Scrappables vom Marketplace ist nur fur Ultra-Plan-Benutzer verfugbar.',
     SupportedLanguage.fr: 'Masquer les scrappables du marketplace est disponible uniquement pour les utilisateurs du plan Ultra.',
-    SupportedLanguage.ptBR: 'Ocultar scrappables do marketplace esta disponivel apenas para usuarios do plano Ultra.',
+    SupportedLanguage.ptBR: 'Ocultar scrappables do marketplace está disponível apenas para usuários do plano Ultra.',
     SupportedLanguage.ja: 'マーケットプレイスからscrappableを非表示にするにはUltraプランが必要です。',
   },
 
@@ -1224,7 +1224,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Necesitas al menos un plan Pro para usar este modelo de IA. Actualiza tu plan para acceder a modelos de IA avanzados.',
     SupportedLanguage.de: 'Sie benotigen mindestens einen Pro-Plan, um dieses KI-Modell zu verwenden. Aktualisieren Sie Ihren Plan, um auf erweiterte KI-Modelle zuzugreifen.',
     SupportedLanguage.fr: 'Vous avez besoin d\'au moins un plan Pro pour utiliser ce modele IA. Mettez a niveau votre plan pour acceder aux modeles IA avances.',
-    SupportedLanguage.ptBR: 'Voce precisa de pelo menos um plano Pro para usar este modelo de IA. Atualize seu plano para acessar modelos de IA avancados.',
+    SupportedLanguage.ptBR: 'Você precisa de pelo menos um plano Pro para usar este modelo de IA. Atualize seu plano para acessar modelos de IA avançados.',
     SupportedLanguage.ja: 'このAIモデルを使用するにはProプラン以上が必要です。高度なAIモデルにアクセスするにはプランをアップグレードしてください。',
   },
 
@@ -1234,7 +1234,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'El parametro de ruta requerido "{pathParam}" no fue proporcionado en el payload.',
     SupportedLanguage.de: 'Der erforderliche Pfadparameter "{pathParam}" wurde nicht in der Nutzlast bereitgestellt.',
     SupportedLanguage.fr: 'Le parametre de chemin requis "{pathParam}" n\'a pas ete fourni dans la charge utile.',
-    SupportedLanguage.ptBR: 'O parametro de caminho obrigatorio "{pathParam}" nao foi fornecido no payload.',
+    SupportedLanguage.ptBR: 'O parâmetro de caminho obrigatório "{pathParam}" não foi fornecido no payload.',
     SupportedLanguage.ja: '必須のパスパラメータ "{pathParam}" がペイロードに含まれていません。',
   },
   'unexpected_error': {
@@ -1250,7 +1250,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'No se encontraron datos de prueba de referencia para esta sesion de scrappable.',
     SupportedLanguage.de: 'Keine Referenztestdaten fur diese Scrappable-Sitzung gefunden.',
     SupportedLanguage.fr: 'Aucune donnee de test de reference trouvee pour cette session scrappable.',
-    SupportedLanguage.ptBR: 'Nenhum dado de teste de referencia encontrado para esta sessao de scrappable.',
+    SupportedLanguage.ptBR: 'Nenhum dado de teste de referência encontrado para esta sessão de scrappable.',
     SupportedLanguage.ja: 'このscrappableセッションのリファレンステストデータが見つかりません。',
   },
   'no_credit_usage_model': {
@@ -1258,7 +1258,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'No se encontro modelo de uso de creditos para la clave API proporcionada: {apiKey}. Puede que la cuenta haya sido eliminada o no tenga un plan asignado - verifica en la pestana de claves API en el sitio de ZenScrap.',
     SupportedLanguage.de: 'Kein Kreditnutzungsmodell fur den angegebenen API-Schlussel gefunden: {apiKey}. Moglicherweise wurde das Konto geloscht oder es ist kein Plan zugewiesen - prufen Sie dies im API-Schlussel-Tab auf der ZenScrap-Website.',
     SupportedLanguage.fr: 'Aucun modele d\'utilisation de credits trouve pour la cle API fournie : {apiKey}. Il est possible que le compte ait ete supprime ou qu\'aucun plan ne soit attribue - verifiez dans l\'onglet des cles API sur le site ZenScrap.',
-    SupportedLanguage.ptBR: 'Nenhum modelo de uso de creditos encontrado para a chave API fornecida: {apiKey}. Pode ser que a conta tenha sido excluida ou nao tenha um plano atribuido - verifique na aba de chaves API no site do ZenScrap.',
+    SupportedLanguage.ptBR: 'Nenhum modelo de uso de créditos encontrado para a chave API fornecida: {apiKey}. Pode ser que a conta tenha sido excluída ou não tenha um plano atribuído - verifique na aba de chaves API no site do ZenScrap.',
     SupportedLanguage.ja: '指定されたAPIキー: {apiKey} のクレジット使用モデルが見つかりません。アカウントが削除されたか、プランが割り当てられていない可能性があります - ZenScrapサイトのAPIキータブで確認してください。',
   },
   'api_key_not_found_active': {
@@ -1266,7 +1266,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'No hay ninguna clave API activa que coincida con el valor proporcionado: {apiKey}. Puede que la clave haya sido eliminada o desactivada - verifica en la pestana de claves API en el sitio de ZenScrap.',
     SupportedLanguage.de: 'Es gibt keinen aktiven API-Schlussel, der dem angegebenen Wert entspricht: {apiKey}. Moglicherweise wurde der Schlussel geloscht oder deaktiviert - prufen Sie dies im API-Schlussel-Tab auf der ZenScrap-Website.',
     SupportedLanguage.fr: 'Il n\'y a pas de cle API active correspondant a la valeur fournie : {apiKey}. La cle a peut-etre ete supprimee ou desactivee - verifiez dans l\'onglet des cles API sur le site ZenScrap.',
-    SupportedLanguage.ptBR: 'Nao ha chave API ativa correspondente ao valor fornecido: {apiKey}. Pode ser que a chave tenha sido excluida ou desativada - verifique na aba de chaves API no site do ZenScrap.',
+    SupportedLanguage.ptBR: 'Não há chave API ativa correspondente ao valor fornecido: {apiKey}. Pode ser que a chave tenha sido excluída ou desativada - verifique na aba de chaves API no site do ZenScrap.',
     SupportedLanguage.ja: '指定された値: {apiKey} に一致するアクティブなAPIキーがありません。キーが削除または無効化された可能性があります - ZenScrapサイトのAPIキータブで確認してください。',
   },
   'no_active_test_session': {
@@ -1274,7 +1274,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'No se encontro ninguna sesion de prueba activa para el scrappable proporcionado.',
     SupportedLanguage.de: 'Fur das angegebene Scrappable wurde keine aktive Testsitzung gefunden.',
     SupportedLanguage.fr: 'Aucune session de test active trouvee pour le scrappable fourni.',
-    SupportedLanguage.ptBR: 'Nenhuma sessao de teste ativa encontrada para o scrappable fornecido.',
+    SupportedLanguage.ptBR: 'Nenhuma sessão de teste ativa encontrada para o scrappable fornecido.',
     SupportedLanguage.ja: '指定されたscrappableのアクティブなテストセッションが見つかりません。',
   },
   'test_period_expired': {
@@ -1282,7 +1282,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'El periodo de prueba para este scrappable ha expirado. Puedes: Iniciar una nueva sesion de prueba que comenzara un nuevo periodo de prueba, o llamar al endpoint de produccion con una clave API valida si tienes una cuenta.',
     SupportedLanguage.de: 'Der Testzeitraum fur dieses Scrappable ist abgelaufen. Sie konnen: Eine neue Testsitzung starten, die einen neuen Testzeitraum beginnt, oder den Produktionsendpunkt mit einem gultigen API-Schlussel aufrufen, wenn Sie ein Konto haben.',
     SupportedLanguage.fr: 'La periode de test pour ce scrappable a expire. Vous pouvez : Demarrer une nouvelle session de test qui commencera une nouvelle periode de test, ou appeler l\'endpoint de production avec une cle API valide si vous avez un compte.',
-    SupportedLanguage.ptBR: 'O periodo de teste para este scrappable expirou. Voce pode: Iniciar uma nova sessao de teste que iniciara um novo periodo de teste, ou chamar o endpoint de producao com uma chave API valida se voce tiver uma conta.',
+    SupportedLanguage.ptBR: 'O período de teste para este scrappable expirou. Você pode: Iniciar uma nova sessão de teste que iniciará um novo período de teste, ou chamar o endpoint de produção com uma chave API válida se você tiver uma conta.',
     SupportedLanguage.ja: 'このscrappableのテスト期間が終了しました。新しいテスト期間を開始する新しいテストセッションを開始するか、アカウントをお持ちの場合は有効なAPIキーで本番エンドポイントを呼び出すことができます。',
   },
   'api_key_database_not_found': {
@@ -1290,7 +1290,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Ninguna clave API de cuenta coincidio con el valor proporcionado (clave no encontrada en la base de datos).',
     SupportedLanguage.de: 'Kein Konto-API-Schlussel stimmte mit dem angegebenen Wert uberein (Schlussel nicht in der Datenbank gefunden).',
     SupportedLanguage.fr: 'Aucune cle API de compte ne correspond a la valeur fournie (cle non trouvee dans la base de donnees).',
-    SupportedLanguage.ptBR: 'Nenhuma chave API de conta correspondeu ao valor fornecido (chave nao encontrada no banco de dados).',
+    SupportedLanguage.ptBR: 'Nenhuma chave API de conta correspondeu ao valor fornecido (chave não encontrada no banco de dados).',
     SupportedLanguage.ja: 'アカウントAPIキーが指定された値と一致しませんでした（データベースにキーが見つかりません）。',
   },
   'insufficient_credits': {
@@ -1298,7 +1298,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Tu cuenta no tiene creditos restantes. Compra o asigna mas creditos para continuar haciendo solicitudes.',
     SupportedLanguage.de: 'Ihr Konto hat keine verbleibenden Guthaben. Kaufen oder weisen Sie mehr Guthaben zu, um weiterhin Anfragen stellen zu konnen.',
     SupportedLanguage.fr: 'Votre compte n\'a plus de credits. Achetez ou allouez plus de credits pour continuer a faire des demandes.',
-    SupportedLanguage.ptBR: 'Sua conta nao tem creditos restantes. Compre ou aloque mais creditos para continuar fazendo solicitacoes.',
+    SupportedLanguage.ptBR: 'Sua conta não tem créditos restantes. Compre ou aloque mais créditos para continuar fazendo solicitações.',
     SupportedLanguage.ja: 'アカウントにクレジットが残っていません。リクエストを続けるにはクレジットを購入または割り当ててください。',
   },
   'missing_extract_rules': {
@@ -1306,7 +1306,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'No hay reglas de extraccion definidas para este scrappable. Por favor, define las reglas de extraccion antes de invocar este endpoint.',
     SupportedLanguage.de: 'Fur dieses Scrappable sind keine Extraktionsregeln definiert. Bitte definieren Sie Extraktionsregeln, bevor Sie diesen Endpunkt aufrufen.',
     SupportedLanguage.fr: 'Aucune regle d\'extraction n\'est definie pour ce scrappable. Veuillez definir les regles d\'extraction avant d\'invoquer cet endpoint.',
-    SupportedLanguage.ptBR: 'Nenhuma regra de extracao esta definida para este scrappable. Por favor, defina as regras de extracao antes de invocar este endpoint.',
+    SupportedLanguage.ptBR: 'Nenhuma regra de extração está definida para este scrappable. Por favor, defina as regras de extração antes de invocar este endpoint.',
     SupportedLanguage.ja: 'このscrappableには抽出ルールが定義されていません。このエンドポイントを呼び出す前に抽出ルールを定義してください。',
   },
   'invalid_api_key_account': {
@@ -1314,7 +1314,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'La clave API proporcionada no tiene una cuenta de usuario.',
     SupportedLanguage.de: 'Der angegebene API-Schlussel hat kein Benutzerkonto.',
     SupportedLanguage.fr: 'La cle API fournie n\'a pas de compte utilisateur.',
-    SupportedLanguage.ptBR: 'A chave API fornecida nao possui uma conta de usuario.',
+    SupportedLanguage.ptBR: 'A chave API fornecida não possui uma conta de usuário.',
     SupportedLanguage.ja: '指定されたAPIキーにはユーザーアカウントがありません。',
   },
   'concurrency_limit_exceeded': {
@@ -1322,7 +1322,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Has alcanzado el numero maximo de solicitudes concurrentes permitidas para tu nivel de plan. (Maximo de solicitudes concurrentes permitidas: {maxConcurrentRequests})',
     SupportedLanguage.de: 'Sie haben die maximale Anzahl gleichzeitiger Anfragen fur Ihre Planstufe erreicht. (Maximal erlaubte gleichzeitige Anfragen: {maxConcurrentRequests})',
     SupportedLanguage.fr: 'Vous avez atteint le nombre maximum de requetes simultanees autorisees pour votre niveau de plan. (Requetes simultanees maximum autorisees : {maxConcurrentRequests})',
-    SupportedLanguage.ptBR: 'Voce atingiu o numero maximo de solicitacoes simultaneas permitidas para seu nivel de plano. (Maximo de solicitacoes simultaneas permitidas: {maxConcurrentRequests})',
+    SupportedLanguage.ptBR: 'Você atingiu o número máximo de solicitações simultâneas permitidas para seu nível de plano. (Máximo de solicitações simultâneas permitidas: {maxConcurrentRequests})',
     SupportedLanguage.ja: 'プラン階層で許可されている同時リクエストの最大数に達しました。（最大同時リクエスト数: {maxConcurrentRequests}）',
   },
   'api_scrappable_not_found': {
@@ -1330,7 +1330,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'El recurso scrappable con id {scrappableId} no existe o no tiene una solicitud de destino configurada.',
     SupportedLanguage.de: 'Die Scrappable-Ressource mit der ID {scrappableId} existiert nicht oder hat keine Zielanfrage konfiguriert.',
     SupportedLanguage.fr: 'La ressource scrappable avec l\'id {scrappableId} n\'existe pas ou n\'a pas de requete cible configuree.',
-    SupportedLanguage.ptBR: 'O recurso scrappable com id {scrappableId} nao existe ou nao tem uma solicitacao de destino configurada.',
+    SupportedLanguage.ptBR: 'O recurso scrappable com id {scrappableId} não existe ou não tem uma solicitação de destino configurada.',
     SupportedLanguage.ja: 'ID {scrappableId} のscrappableリソースが存在しないか、ターゲットリクエストが設定されていません。',
   },
   'invalid_api_key_format': {
@@ -1346,7 +1346,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'La clave API de OpenAI que proporcionaste es invalida. Por favor, verifica tu clave e intenta de nuevo.',
     SupportedLanguage.de: 'Der von Ihnen angegebene OpenAI API-Schluessel ist ungueltig. Bitte ueberpruefen Sie Ihren Schluessel und versuchen Sie es erneut.',
     SupportedLanguage.fr: 'La cle API OpenAI que vous avez fournie est invalide. Veuillez verifier votre cle et reessayer.',
-    SupportedLanguage.ptBR: 'A chave API OpenAI que voce forneceu e invalida. Por favor, verifique sua chave e tente novamente.',
+    SupportedLanguage.ptBR: 'A chave API OpenAI que você forneceu é inválida. Por favor, verifique sua chave e tente novamente.',
     SupportedLanguage.ja: '入力されたOpenAI APIキーは無効です。キーを確認して再度お試しください。',
   },
   'openai_api_key_validation_failed': {
@@ -1354,7 +1354,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'No se pudo validar la clave API de OpenAI. Por favor, verifica tu conexion a internet e intenta de nuevo.',
     SupportedLanguage.de: 'Der OpenAI API-Schluessel konnte nicht validiert werden. Bitte ueberpruefen Sie Ihre Internetverbindung und versuchen Sie es erneut.',
     SupportedLanguage.fr: 'Impossible de valider la cle API OpenAI. Veuillez verifier votre connexion internet et reessayer.',
-    SupportedLanguage.ptBR: 'Nao foi possivel validar a chave API OpenAI. Por favor, verifique sua conexao com a internet e tente novamente.',
+    SupportedLanguage.ptBR: 'Não foi possível validar a chave API OpenAI. Por favor, verifique sua conexão com a internet e tente novamente.',
     SupportedLanguage.ja: 'OpenAI APIキーを検証できませんでした。インターネット接続を確認して再度お試しください。',
   },
 
@@ -1364,7 +1364,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'No puedes desplegar datos de prueba de referencia que aun no tienen datos de bytes.',
     SupportedLanguage.de: 'Sie konnen keine Referenztestdaten bereitstellen, die noch keine Byte-Daten haben.',
     SupportedLanguage.fr: 'Vous ne pouvez pas deployer des donnees de test de reference qui n\'ont pas encore de donnees d\'octets.',
-    SupportedLanguage.ptBR: 'Voce nao pode implantar dados de teste de referencia que ainda nao possuem dados de bytes.',
+    SupportedLanguage.ptBR: 'Você não pode implantar dados de teste de referência que ainda não possuem dados de bytes.',
     SupportedLanguage.ja: 'バイトデータがないリファレンステストデータはデプロイできません。',
   },
   'authentication_or_reference_data': {
@@ -1372,7 +1372,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Probablemente debes estar autenticado para modificar estos datos de prueba de referencia - o escribiste mal el id.',
     SupportedLanguage.de: 'Sie mussen wahrscheinlich authentifiziert sein, um diese Referenztestdaten zu andern - oder Sie haben die ID falsch eingegeben.',
     SupportedLanguage.fr: 'Vous devez probablement etre authentifie pour modifier ces donnees de test de reference - ou vous avez mal saisi l\'id.',
-    SupportedLanguage.ptBR: 'Voce provavelmente deve estar autenticado para modificar estes dados de teste de referencia - ou voce digitou errado o id.',
+    SupportedLanguage.ptBR: 'Você provavelmente deve estar autenticado para modificar estes dados de teste de referência - ou você digitou errado o id.',
     SupportedLanguage.ja: 'このリファレンステストデータを変更するには認証が必要か、IDを入力ミスした可能性があります。',
   },
 
@@ -1400,7 +1400,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'El umbral de errores de auto-fix no puede superar 5000.',
     SupportedLanguage.de: 'Der Auto-Fix-Fehlerschwellenwert darf 5000 nicht uberschreiten.',
     SupportedLanguage.fr: 'Le seuil d\'erreurs auto-fix ne peut pas depasser 5000.',
-    SupportedLanguage.ptBR: 'O limite de erros do auto-fix nao pode exceder 5000.',
+    SupportedLanguage.ptBR: 'O limite de erros do auto-fix não pode exceder 5000.',
     SupportedLanguage.ja: '自動修正のエラーしきい値は5000を超えることはできません。',
   },
 
@@ -1410,7 +1410,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'No se encontro ID de scrappable en cache para esta sesion. La sesion puede haber expirado o sido cerrada.',
     SupportedLanguage.de: 'Keine zwischengespeicherte Scrappable-ID fur diese Sitzung gefunden. Die Sitzung ist moglicherweise abgelaufen oder wurde geschlossen.',
     SupportedLanguage.fr: 'Aucun ID de scrappable en cache trouve pour cette session. La session a peut-etre expire ou ete fermee.',
-    SupportedLanguage.ptBR: 'Nenhum ID de scrappable em cache encontrado para esta sessao. A sessao pode ter expirado ou sido fechada.',
+    SupportedLanguage.ptBR: 'Nenhum ID de scrappable em cache encontrado para esta sessão. A sessão pode ter expirado ou sido fechada.',
     SupportedLanguage.ja: 'このセッションのキャッシュされたScrappable IDが見つかりません。セッションが期限切れまたは閉じられた可能性があります。',
   },
   'cache_test_data_not_found': {
@@ -1418,7 +1418,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'No se encontraron datos de prueba en cache para esta sesion. La sesion puede haber expirado o sido cerrada.',
     SupportedLanguage.de: 'Keine zwischengespeicherten Testdaten fur diese Sitzung gefunden. Die Sitzung ist moglicherweise abgelaufen oder wurde geschlossen.',
     SupportedLanguage.fr: 'Aucune donnee de test en cache trouvee pour cette session. La session a peut-etre expire ou ete fermee.',
-    SupportedLanguage.ptBR: 'Nenhum dado de teste em cache encontrado para esta sessao. A sessao pode ter expirado ou sido fechada.',
+    SupportedLanguage.ptBR: 'Nenhum dado de teste em cache encontrado para esta sessão. A sessão pode ter expirado ou sido fechada.',
     SupportedLanguage.ja: 'このセッションのキャッシュされたテストデータが見つかりません。セッションが期限切れまたは閉じられた可能性があります。',
   },
   'scrappable_request_not_found': {
@@ -1426,7 +1426,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'No se encontro configuracion de solicitud de scrappable para esta sesion.',
     SupportedLanguage.de: 'Keine Scrappable-Anfragekonfiguration fur diese Sitzung gefunden.',
     SupportedLanguage.fr: 'Aucune configuration de requete scrappable trouvee pour cette session.',
-    SupportedLanguage.ptBR: 'Nenhuma configuracao de solicitacao de scrappable encontrada para esta sessao.',
+    SupportedLanguage.ptBR: 'Nenhuma configuração de solicitação de scrappable encontrada para esta sessão.',
     SupportedLanguage.ja: 'このセッションのScrappableリクエスト設定が見つかりません。',
   },
   'reference_test_data_not_found': {
@@ -1434,7 +1434,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'No se encontraron datos de prueba de referencia para este scrappable. Asegurese de que el scrappable este correctamente configurado.',
     SupportedLanguage.de: 'Keine Referenz-Testdaten fur dieses Scrappable gefunden. Stellen Sie sicher, dass das Scrappable korrekt konfiguriert ist.',
     SupportedLanguage.fr: 'Aucune donnee de test de reference trouvee pour ce scrappable. Assurez-vous que le scrappable est correctement configure.',
-    SupportedLanguage.ptBR: 'Nenhum dado de teste de referencia encontrado para este scrappable. Certifique-se de que o scrappable esteja configurado corretamente.',
+    SupportedLanguage.ptBR: 'Nenhum dado de teste de referência encontrado para este scrappable. Certifique-se de que o scrappable esteja configurado corretamente.',
     SupportedLanguage.ja: 'このScrappableのリファレンステストデータが見つかりません。Scrappableが正しく設定されていることを確認してください。',
   },
   'target_request_not_found': {
@@ -1442,7 +1442,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'No se encontro configuracion de solicitud objetivo para este scrappable. Asegurese de que el scrappable este correctamente configurado.',
     SupportedLanguage.de: 'Keine Zielanfragekonfiguration fur dieses Scrappable gefunden. Stellen Sie sicher, dass das Scrappable korrekt konfiguriert ist.',
     SupportedLanguage.fr: 'Aucune configuration de requete cible trouvee pour ce scrappable. Assurez-vous que le scrappable est correctement configure.',
-    SupportedLanguage.ptBR: 'Nenhuma configuracao de solicitacao alvo encontrada para este scrappable. Certifique-se de que o scrappable esteja configurado corretamente.',
+    SupportedLanguage.ptBR: 'Nenhuma configuração de solicitação alvo encontrada para este scrappable. Certifique-se de que o scrappable esteja configurado corretamente.',
     SupportedLanguage.ja: 'このScrappableのターゲットリクエスト設定が見つかりません。Scrappableが正しく設定されていることを確認してください。',
   },
   'openai_api_key_missing': {
@@ -1450,7 +1450,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'El servidor no esta configurado con una clave API de OpenAI. Por favor, contacte con soporte.',
     SupportedLanguage.de: 'Der Server ist nicht mit einem OpenAI API-Schlussel konfiguriert. Bitte kontaktieren Sie den Support.',
     SupportedLanguage.fr: 'Le serveur n\'est pas configure avec une cle API OpenAI. Veuillez contacter le support.',
-    SupportedLanguage.ptBR: 'O servidor nao esta configurado com uma chave API do OpenAI. Por favor, entre em contato com o suporte.',
+    SupportedLanguage.ptBR: 'O servidor não está configurado com uma chave API do OpenAI. Por favor, entre em contato com o suporte.',
     SupportedLanguage.ja: 'サーバーにOpenAI APIキーが設定されていません。サポートにお問い合わせください。',
   },
   'gemini_api_key_missing': {
@@ -1458,7 +1458,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'El servidor no esta configurado con una clave API de Gemini. Por favor, contacte con soporte.',
     SupportedLanguage.de: 'Der Server ist nicht mit einem Gemini API-Schlussel konfiguriert. Bitte kontaktieren Sie den Support.',
     SupportedLanguage.fr: 'Le serveur n\'est pas configure avec une cle API Gemini. Veuillez contacter le support.',
-    SupportedLanguage.ptBR: 'O servidor nao esta configurado com uma chave API do Gemini. Por favor, entre em contato com o suporte.',
+    SupportedLanguage.ptBR: 'O servidor não está configurado com uma chave API do Gemini. Por favor, entre em contato com o suporte.',
     SupportedLanguage.ja: 'サーバーにGemini APIキーが設定されていません。サポートにお問い合わせください。',
   },
 
@@ -1468,7 +1468,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Sesion no encontrada o ha sido cerrada.',
     SupportedLanguage.de: 'Sitzung nicht gefunden oder wurde geschlossen.',
     SupportedLanguage.fr: 'Session non trouvee ou a ete fermee.',
-    SupportedLanguage.ptBR: 'Sessao nao encontrada ou foi encerrada.',
+    SupportedLanguage.ptBR: 'Sessão não encontrada ou foi encerrada.',
     SupportedLanguage.ja: 'セッションが見つからないか、閉じられました。',
   },
   'chat_session_data_closed': {
@@ -1476,7 +1476,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Datos de prueba de sesion no encontrados o ha sido cerrada.',
     SupportedLanguage.de: 'Sitzungstestdaten nicht gefunden oder wurde geschlossen.',
     SupportedLanguage.fr: 'Donnees de test de session non trouvees ou a ete fermee.',
-    SupportedLanguage.ptBR: 'Dados de teste da sessao nao encontrados ou foi encerrada.',
+    SupportedLanguage.ptBR: 'Dados de teste da sessão não encontrados ou foi encerrada.',
     SupportedLanguage.ja: 'セッションテストデータが見つからないか、閉じられました。',
   },
   'chat_testing_rules': {
@@ -1484,7 +1484,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Genial, ahora probare las reglas de extraccion que creaste para ver si funcionan con el enlace de referencia que estamos usando para las pruebas. Por favor, espera un momento...',
     SupportedLanguage.de: 'Grossartig, ich werde jetzt die von Ihnen erstellten Extraktionsregeln testen, um zu sehen, ob sie mit dem Referenzlink funktionieren, den wir zum Testen verwenden. Bitte warten Sie einen Moment...',
     SupportedLanguage.fr: 'Super, je vais maintenant tester les regles d\'extraction que vous avez creees pour voir si elles fonctionnent avec le lien de reference que nous utilisons pour les tests. Veuillez patienter un instant...',
-    SupportedLanguage.ptBR: 'Otimo, agora vou testar as regras de extracao que voce criou para ver se funcionam com o link de referencia que estamos usando para testes. Por favor, aguarde um momento...',
+    SupportedLanguage.ptBR: 'Ótimo, agora vou testar as regras de extração que você criou para ver se funcionam com o link de referência que estamos usando para testes. Por favor, aguarde um momento...',
     SupportedLanguage.ja: '素晴らしい、作成した抽出ルールがテスト用のリファレンスリンクで機能するかどうかをテストします。少々お待ちください...',
   },
   'chat_rules_success': {
@@ -1492,7 +1492,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Las nuevas reglas fueron probadas y no presentaron errores! Actualizare el endpoint de prueba...',
     SupportedLanguage.de: 'Neue Regeln wurden getestet und zeigten keine Fehler! Ich werde den Test-Endpunkt aktualisieren...',
     SupportedLanguage.fr: 'Les nouvelles regles ont ete testees et n\'ont presente aucune erreur ! Je vais mettre a jour l\'endpoint de test...',
-    SupportedLanguage.ptBR: 'As novas regras foram testadas e nao apresentaram erros! Vou atualizar o endpoint de teste...',
+    SupportedLanguage.ptBR: 'As novas regras foram testadas e não apresentaram erros! Vou atualizar o endpoint de teste...',
     SupportedLanguage.ja: '新しいルールがテストされ、エラーはありませんでした！テストエンドポイントを更新します...',
   },
   'chat_rules_success_final': {
@@ -1500,7 +1500,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Las nuevas reglas fueron probadas y no presentaron errores',
     SupportedLanguage.de: 'Neue Regeln wurden getestet und zeigten keine Fehler',
     SupportedLanguage.fr: 'Les nouvelles regles ont ete testees et n\'ont presente aucune erreur',
-    SupportedLanguage.ptBR: 'As novas regras foram testadas e nao apresentaram erros',
+    SupportedLanguage.ptBR: 'As novas regras foram testadas e não apresentaram erros',
     SupportedLanguage.ja: '新しいルールがテストされ、エラーはありませんでした',
   },
   'chat_rules_failed': {
@@ -1508,7 +1508,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Las reglas de extraccion fallaron en mi validacion de prueba de control de calidad. Le pedire a la IA que corrija los selectores e intente de nuevo.',
     SupportedLanguage.de: 'Die Extraktionsregeln sind bei meiner Qualitatssicherungs-Testvalidierung fehlgeschlagen. Ich werde die KI bitten, die Selektoren zu korrigieren und es erneut zu versuchen.',
     SupportedLanguage.fr: 'Les regles d\'extraction ont echoue lors de ma validation de test d\'assurance qualite. Je vais demander a l\'IA de corriger les selecteurs et de reessayer.',
-    SupportedLanguage.ptBR: 'As regras de extracao falharam na minha validacao de teste de garantia de qualidade. Vou pedir a IA para corrigir os seletores e tentar novamente.',
+    SupportedLanguage.ptBR: 'As regras de extração falharam na minha validação de teste de garantia de qualidade. Vou pedir a IA para corrigir os seletores e tentar novamente.',
     SupportedLanguage.ja: '抽出ルールが品質保証テストの検証に失敗しました。AIにセレクターを修正して再試行するよう依頼します。',
   },
   'chat_request_updated': {
@@ -1516,7 +1516,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Estructura de solicitud actualizada exitosamente.',
     SupportedLanguage.de: 'Anfragestruktur erfolgreich aktualisiert.',
     SupportedLanguage.fr: 'Structure de requete mise a jour avec succes.',
-    SupportedLanguage.ptBR: 'Estrutura de solicitacao atualizada com sucesso.',
+    SupportedLanguage.ptBR: 'Estrutura de solicitação atualizada com sucesso.',
     SupportedLanguage.ja: 'リクエスト構造が正常に更新されました。',
   },
   'chat_scrappable_request_updated': {
@@ -1524,7 +1524,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Configuracion de solicitud de scrappable actualizada exitosamente',
     SupportedLanguage.de: 'Scrappable-Anfragekonfiguration erfolgreich aktualisiert',
     SupportedLanguage.fr: 'Configuration de requete scrappable mise a jour avec succes',
-    SupportedLanguage.ptBR: 'Configuracao de solicitacao de scrappable atualizada com sucesso',
+    SupportedLanguage.ptBR: 'Configuração de solicitação de scrappable atualizada com sucesso',
     SupportedLanguage.ja: 'Scrappableリクエスト設定が正常に更新されました',
   },
   'chat_api_key_configured': {
@@ -1532,7 +1532,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Tu clave API de OpenAI ha sido configurada exitosamente. Ahora puedes continuar chateando sin usar creditos de la plataforma. Tu clave API esta almacenada de forma segura y se usara para todos los mensajes futuros.',
     SupportedLanguage.de: 'Ihr OpenAI API-Schlussel wurde erfolgreich konfiguriert. Sie konnen jetzt ohne Plattform-Guthaben weiterchatten. Ihr API-Schlussel wird sicher gespeichert und fur alle zukunftigen Nachrichten verwendet.',
     SupportedLanguage.fr: 'Votre cle API OpenAI a ete configuree avec succes. Vous pouvez maintenant continuer a discuter sans utiliser les credits de la plateforme. Votre cle API est stockee en toute securite et sera utilisee pour tous les futurs messages.',
-    SupportedLanguage.ptBR: 'Sua chave API do OpenAI foi configurada com sucesso. Agora voce pode continuar conversando sem usar creditos da plataforma. Sua chave API esta armazenada com seguranca e sera usada para todas as mensagens futuras.',
+    SupportedLanguage.ptBR: 'Sua chave API do OpenAI foi configurada com sucesso. Agora você pode continuar conversando sem usar créditos da plataforma. Sua chave API está armazenada com segurança e será usada para todas as mensagens futuras.',
     SupportedLanguage.ja: 'OpenAI APIキーが正常に設定されました。プラットフォームのクレジットを使用せずにチャットを続けることができます。APIキーは安全に保存され、今後のすべてのメッセージに使用されます。',
   },
   'chat_ip_limit': {
@@ -1540,7 +1540,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Has alcanzado el limite de gasto para tu direccion IP ({limit}). Este limite se restablece despues de 7 dias, o puedes crear una cuenta para obtener creditos mensuales.',
     SupportedLanguage.de: 'Sie haben das Ausgabenlimit fur Ihre IP-Adresse erreicht ({limit}). Dieses Limit wird nach 7 Tagen zuruckgesetzt, oder Sie konnen ein Konto erstellen, um monatliche Guthaben zu erhalten.',
     SupportedLanguage.fr: 'Vous avez atteint la limite de depenses pour votre adresse IP ({limit}). Cette limite est reinitialise apres 7 jours, ou vous pouvez creer un compte pour obtenir des credits mensuels.',
-    SupportedLanguage.ptBR: 'Voce atingiu o limite de gastos para seu endereco IP ({limit}). Este limite e redefinido apos 7 dias, ou voce pode criar uma conta para obter creditos mensais.',
+    SupportedLanguage.ptBR: 'Você atingiu o limite de gastos para seu endereço IP ({limit}). Este limite é redefinido após 7 dias, ou você pode criar uma conta para obter créditos mensais.',
     SupportedLanguage.ja: 'IPアドレスの支出制限に達しました（{limit}）。この制限は7日後にリセットされます。月額クレジットを取得するにはアカウントを作成してください。',
   },
   'chat_credits_exhausted_logged_in': {
@@ -1548,7 +1548,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Has agotado tus creditos de IA para este mes. Tus creditos se restablecera al principio del proximo mes, o puedes agregar tu propia clave API de OpenAI en la configuracion de tu cuenta para continuar sin limites.',
     SupportedLanguage.de: 'Sie haben Ihre KI-Guthaben fur diesen Monat aufgebraucht. Ihre Guthaben werden zu Beginn des nachsten Monats zuruckgesetzt, oder Sie konnen Ihren eigenen OpenAI API-Schlussel in den Kontoeinstellungen hinzufugen, um ohne Limits fortzufahren.',
     SupportedLanguage.fr: 'Vous avez epuise vos credits IA pour ce mois. Vos credits seront reinitialises au debut du mois prochain, ou vous pouvez ajouter votre propre cle API OpenAI dans les parametres du compte pour continuer sans limites.',
-    SupportedLanguage.ptBR: 'Voce esgotou seus creditos de IA para este mes. Seus creditos serao redefinidos no inicio do proximo mes, ou voce pode adicionar sua propria chave API do OpenAI nas configuracoes da conta para continuar sem limites.',
+    SupportedLanguage.ptBR: 'Você esgotou seus créditos de IA para este mês. Seus créditos serão redefinidos no início do próximo mês, ou você pode adicionar sua própria chave API do OpenAI nas configurações da conta para continuar sem limites.',
     SupportedLanguage.ja: '今月のAIクレジットを使い切りました。クレジットは来月の初めにリセットされます。制限なく続けるにはアカウント設定でOpenAI APIキーを追加してください。',
   },
   'chat_credits_exhausted_anonymous': {
@@ -1556,7 +1556,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Has alcanzado el limite de gasto para esta sesion anonima ({limit}). Por favor, crea una cuenta para continuar usando el asistente de IA con creditos mensuales.',
     SupportedLanguage.de: 'Sie haben das Ausgabenlimit fur diese anonyme Sitzung erreicht ({limit}). Bitte erstellen Sie ein Konto, um den KI-Assistenten mit monatlichem Guthaben weiter zu nutzen.',
     SupportedLanguage.fr: 'Vous avez atteint la limite de depenses pour cette session anonyme ({limit}). Veuillez creer un compte pour continuer a utiliser l\'assistant IA avec des credits mensuels.',
-    SupportedLanguage.ptBR: 'Voce atingiu o limite de gastos para esta sessao anonima ({limit}). Por favor, crie uma conta para continuar usando o assistente de IA com creditos mensais.',
+    SupportedLanguage.ptBR: 'Você atingiu o limite de gastos para esta sessão anônima ({limit}). Por favor, crie uma conta para continuar usando o assistente de IA com créditos mensais.',
     SupportedLanguage.ja: 'この匿名セッションの支出制限に達しました（{limit}）。月額クレジットでAIアシスタントを引き続き使用するにはアカウントを作成してください。',
   },
   'chat_user_api_key_quota': {
@@ -1564,7 +1564,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Tu clave API de OpenAI se ha quedado sin creditos. Por favor, agrega creditos a tu cuenta de OpenAI en platform.openai.com, o elimina tu clave API de la configuracion de tu cuenta para usar los creditos de la plataforma en su lugar.',
     SupportedLanguage.de: 'Ihr OpenAI API-Schlussel hat keine Guthaben mehr. Bitte fugen Sie Guthaben zu Ihrem OpenAI-Konto auf platform.openai.com hinzu, oder entfernen Sie Ihren API-Schlussel aus den Kontoeinstellungen, um stattdessen Plattform-Guthaben zu verwenden.',
     SupportedLanguage.fr: 'Votre cle API OpenAI n\'a plus de credits. Veuillez ajouter des credits a votre compte OpenAI sur platform.openai.com, ou supprimez votre cle API des parametres du compte pour utiliser les credits de la plateforme a la place.',
-    SupportedLanguage.ptBR: 'Sua chave API do OpenAI ficou sem creditos. Por favor, adicione creditos a sua conta OpenAI em platform.openai.com, ou remova sua chave API das configuracoes da conta para usar os creditos da plataforma.',
+    SupportedLanguage.ptBR: 'Sua chave API do OpenAI ficou sem créditos. Por favor, adicione créditos a sua conta OpenAI em platform.openai.com, ou remova sua chave API das configurações da conta para usar os créditos da plataforma.',
     SupportedLanguage.ja: 'OpenAI APIキーのクレジットがなくなりました。platform.openai.comでOpenAIアカウントにクレジットを追加するか、アカウント設定からAPIキーを削除してプラットフォームクレジットを使用してください。',
   },
   'chat_openai_quota_error': {
@@ -1588,7 +1588,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'El modelo de IA devolvio un formato de respuesta inesperado. Esto puede ocurrir cuando el modelo procesa solicitudes complejas con multiples llamadas de herramientas. Por favor, intenta de nuevo con una solicitud mas simple, o contacta con soporte si el problema persiste.',
     SupportedLanguage.de: 'Das KI-Modell hat ein unerwartetes Antwortformat zuruckgegeben. Dies kann passieren, wenn das Modell komplexe Anfragen mit mehreren Tool-Aufrufen verarbeitet. Bitte versuchen Sie es mit einer einfacheren Anfrage erneut, oder kontaktieren Sie den Support, wenn das Problem weiterhin besteht.',
     SupportedLanguage.fr: 'Le modele IA a renvoye un format de reponse inattendu. Cela peut se produire lorsque le modele traite des requetes complexes avec plusieurs appels d\'outils. Veuillez reessayer avec une requete plus simple, ou contactez le support si le probleme persiste.',
-    SupportedLanguage.ptBR: 'O modelo de IA retornou um formato de resposta inesperado. Isso pode acontecer quando o modelo processa solicitacoes complexas com multiplas chamadas de ferramentas. Por favor, tente novamente com uma solicitacao mais simples, ou entre em contato com o suporte se o problema persistir.',
+    SupportedLanguage.ptBR: 'O modelo de IA retornou um formato de resposta inesperado. Isso pode acontecer quando o modelo processa solicitações complexas com múltiplas chamadas de ferramentas. Por favor, tente novamente com uma solicitação mais simples, ou entre em contato com o suporte se o problema persistir.',
     SupportedLanguage.ja: 'AIモデルが予期しないレスポンス形式を返しました。これは、モデルが複数のツール呼び出しを含む複雑なリクエストを処理しているときに発生することがあります。より簡単なリクエストでもう一度お試しください。問題が解決しない場合はサポートにお問い合わせください。',
   },
   'chat_auth_error': {
@@ -1596,7 +1596,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Error de autenticacion con la API de OpenAI. Por favor, verifica la configuracion de la clave API.',
     SupportedLanguage.de: 'Authentifizierungsfehler mit der OpenAI API. Bitte uberprufen Sie die API-Schlussel-Konfiguration.',
     SupportedLanguage.fr: 'Erreur d\'authentification avec l\'API OpenAI. Veuillez verifier la configuration de la cle API.',
-    SupportedLanguage.ptBR: 'Erro de autenticacao com a API do OpenAI. Por favor, verifique a configuracao da chave API.',
+    SupportedLanguage.ptBR: 'Erro de autenticação com a API do OpenAI. Por favor, verifique a configuração da chave API.',
     SupportedLanguage.ja: 'OpenAI APIの認証エラー。APIキーの設定を確認してください。',
   },
   'chat_rate_limit': {
@@ -1612,7 +1612,7 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.es: 'Solicitud invalida a la API de OpenAI. Esto podria ser un problema de configuracion. Por favor, intenta de nuevo o contacta con soporte.',
     SupportedLanguage.de: 'Ungultige Anfrage an die OpenAI API. Dies konnte ein Konfigurationsproblem sein. Bitte versuchen Sie es erneut oder kontaktieren Sie den Support.',
     SupportedLanguage.fr: 'Requete invalide a l\'API OpenAI. Cela pourrait etre un probleme de configuration. Veuillez reessayer ou contacter le support.',
-    SupportedLanguage.ptBR: 'Solicitacao invalida para a API do OpenAI. Isso pode ser um problema de configuracao. Por favor, tente novamente ou entre em contato com o suporte.',
+    SupportedLanguage.ptBR: 'Solicitação inválida para a API do OpenAI. Isso pode ser um problema de configuração. Por favor, tente novamente ou entre em contato com o suporte.',
     SupportedLanguage.ja: 'OpenAI APIへの無効なリクエスト。これは設定の問題かもしれません。再試行するか、サポートにお問い合わせください。',
   },
 };
