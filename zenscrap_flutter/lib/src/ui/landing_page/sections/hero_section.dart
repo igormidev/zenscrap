@@ -6,6 +6,7 @@ import 'package:form_validator/form_validator.dart';
 import 'package:lottie/lottie.dart';
 import 'package:seo/seo.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
+import 'package:zenscrap_flutter/src/core/banned_domains.dart';
 import 'package:zenscrap_flutter/src/core/mixins/create_scrappable_mixin.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
@@ -434,20 +435,38 @@ class _HeroFormState extends State<_HeroForm> {
                         hintText: l10n.landing_hero_target_url_hint,
                         onSubmitted: (_) => widget.onSubmit(),
                         maxLines: 1,
-                        validator: (s) =>
-                            ValidationBuilder()
-                                .url(l10n.landing_hero_url_validation_invalid)
-                                .minLength(
-                                  10,
-                                  l10n.landing_hero_url_validation_min_length,
-                                )
-                                .maxLength(
-                                  500,
-                                  l10n.landing_hero_url_validation_max_length,
-                                )
-                                .build()(
-                              s?.startsWith('http') == true ? s : 'http://$s',
-                            ),
+                        validator: (s) {
+                          final normalizedUrl =
+                              s?.startsWith('http') == true ? s : 'http://$s';
+
+                          // First check standard URL validation
+                          final standardValidation = ValidationBuilder()
+                              .url(l10n.landing_hero_url_validation_invalid)
+                              .minLength(
+                                10,
+                                l10n.landing_hero_url_validation_min_length,
+                              )
+                              .maxLength(
+                                500,
+                                l10n.landing_hero_url_validation_max_length,
+                              )
+                              .build()(normalizedUrl);
+
+                          if (standardValidation != null) {
+                            return standardValidation;
+                          }
+
+                          // Then check if the domain is banned
+                          final bannedDomain =
+                              getBannedDomainFromUrl(normalizedUrl ?? '');
+                          if (bannedDomain != null) {
+                            return l10n.landing_hero_url_validation_banned_domain(
+                              bannedDomain,
+                            );
+                          }
+
+                          return null;
+                        },
                       )
                       .animate()
                       .fadeIn(duration: 500.ms, delay: 600.ms)

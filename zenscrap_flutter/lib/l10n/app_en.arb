@@ -70,6 +70,16 @@
   "@landing_hero_url_validation_max_length": {
     "description": "Validation error for URL maximum length"
   },
+  "landing_hero_url_validation_banned_domain": "This website ({domain}) is not supported for scraping",
+  "@landing_hero_url_validation_banned_domain": {
+    "description": "Validation error for banned domains",
+    "placeholders": {
+      "domain": {
+        "type": "String",
+        "example": "instagram.com"
+      }
+    }
+  },
   "landing_hero_prompt_label": "What do you want to extract?",
   "@landing_hero_prompt_label": {
     "description": "Label for prompt input field"

@@ -3,6 +3,7 @@ import 'package:serverpod_auth_idp_server/core.dart';
 import 'package:collection/collection.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:serverpod/serverpod.dart';
+import 'package:zenscrap_server/src/core/banned_domains.dart';
 import 'package:zenscrap_server/src/core/consts.dart';
 import 'package:zenscrap_server/src/core/default_classes.dart';
 import 'package:zenscrap_server/src/core/ip_validation/ip_validation.dart';
@@ -338,6 +339,16 @@ class ScrappableChatSession extends Endpoint {
     required Map<String, String?> queryParams,
     required SupportedLanguage language,
   }) async {
+    // Validate against banned domains
+    final bannedDomain = getBannedDomainFromUrl(url);
+    if (bannedDomain != null) {
+      throw createTranslatedException(
+        'banned_domain',
+        language,
+        params: {'domain': bannedDomain},
+      );
+    }
+
     final sessionId = _scrappableOpenedSessionsIds[scrappableId];
     if (sessionId == null) {
       throw createTranslatedException('session_not_found', language);

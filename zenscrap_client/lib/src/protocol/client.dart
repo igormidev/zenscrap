@@ -642,6 +642,39 @@ class EndpointPrivateUserScrappables extends _i2.EndpointRef {
   );
 }
 
+/// Endpoint that exposes the list of banned domains to clients.
+///
+/// This allows the client to validate URLs before attempting to create
+/// a scrappable, providing immediate feedback to users.
+/// {@category Endpoint}
+class EndpointBannedDomains extends _i2.EndpointRef {
+  EndpointBannedDomains(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'bannedDomains';
+
+  /// Returns the list of banned domains.
+  ///
+  /// These domains cannot be used for creating scrappables due to
+  /// technical limitations or anti-scraping measures.
+  _i3.Future<List<String>> getBannedDomains() =>
+      caller.callServerEndpoint<List<String>>(
+        'bannedDomains',
+        'getBannedDomains',
+        {},
+      );
+
+  /// Checks if a URL is from a banned domain.
+  ///
+  /// Returns the banned domain if found, or null if the URL is allowed.
+  _i3.Future<String?> checkUrl(String url) =>
+      caller.callServerEndpoint<String?>(
+        'bannedDomains',
+        'checkUrl',
+        {'url': url},
+      );
+}
+
 /// {@category Endpoint}
 class EndpointCreateScrappable extends _i2.EndpointRef {
   EndpointCreateScrappable(_i2.EndpointCaller caller) : super(caller);
@@ -970,6 +1003,7 @@ class Client extends _i2.ServerpodClientShared {
     privateScrappableAnalytics = EndpointPrivateScrappableAnalytics(this);
     privateSubscription = EndpointPrivateSubscription(this);
     privateUserScrappables = EndpointPrivateUserScrappables(this);
+    bannedDomains = EndpointBannedDomains(this);
     createScrappable = EndpointCreateScrappable(this);
     deleteScrappable = EndpointDeleteScrappable(this);
     editScrappable = EndpointEditScrappable(this);
@@ -1002,6 +1036,8 @@ class Client extends _i2.ServerpodClientShared {
 
   late final EndpointPrivateUserScrappables privateUserScrappables;
 
+  late final EndpointBannedDomains bannedDomains;
+
   late final EndpointCreateScrappable createScrappable;
 
   late final EndpointDeleteScrappable deleteScrappable;
@@ -1031,6 +1067,7 @@ class Client extends _i2.ServerpodClientShared {
     'privateScrappableAnalytics': privateScrappableAnalytics,
     'privateSubscription': privateSubscription,
     'privateUserScrappables': privateUserScrappables,
+    'bannedDomains': bannedDomains,
     'createScrappable': createScrappable,
     'deleteScrappable': deleteScrappable,
     'editScrappable': editScrappable,

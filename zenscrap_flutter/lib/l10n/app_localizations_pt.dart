@@ -64,6 +64,11 @@ class AppLocalizationsPt extends AppLocalizations {
       'URL must be less than 500 characters';
 
   @override
+  String landing_hero_url_validation_banned_domain(String domain) {
+    return 'This website ($domain) is not supported for scraping';
+  }
+
+  @override
   String get landing_hero_prompt_label => 'What do you want to extract?';
 
   @override
@@ -2257,6 +2262,11 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   @override
   String get landing_hero_url_validation_max_length =>
       'A URL deve ter menos de 500 caracteres';
+
+  @override
+  String landing_hero_url_validation_banned_domain(String domain) {
+    return 'Este site ($domain) nao e suportado para scraping';
+  }
 
   @override
   String get landing_hero_prompt_label => 'O que voce quer extrair?';

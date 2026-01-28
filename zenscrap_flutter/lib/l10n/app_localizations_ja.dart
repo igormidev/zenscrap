@@ -61,6 +61,11 @@ class AppLocalizationsJa extends AppLocalizations {
   String get landing_hero_url_validation_max_length => 'URLは500文字以下である必要があります';
 
   @override
+  String landing_hero_url_validation_banned_domain(String domain) {
+    return 'このウェブサイト（$domain）はスクレイピングに対応していません';
+  }
+
+  @override
   String get landing_hero_prompt_label => '何を抽出しますか？';
 
   @override

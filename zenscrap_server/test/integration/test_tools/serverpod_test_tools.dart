@@ -200,6 +200,8 @@ class TestEndpoints {
 
   late final _PrivateUserScrappablesEndpoint privateUserScrappables;
 
+  late final _BannedDomainsEndpoint bannedDomains;
+
   late final _CreateScrappableEndpoint createScrappable;
 
   late final _DeleteScrappableEndpoint deleteScrappable;
@@ -263,6 +265,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     privateUserScrappables = _PrivateUserScrappablesEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    bannedDomains = _BannedDomainsEndpoint(
       endpoints,
       serializationManager,
     );
@@ -1568,6 +1574,78 @@ class _PrivateUserScrappablesEndpoint {
                   _localCallContext.arguments,
                 )
                 as _i3.Future<_i17.Scrappable>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _BannedDomainsEndpoint {
+  _BannedDomainsEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<List<String>> getBannedDomains(
+    _i1.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'bannedDomains',
+            method: 'getBannedDomains',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'bannedDomains',
+          methodName: 'getBannedDomains',
+          parameters: _i1.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<List<String>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<String?> checkUrl(
+    _i1.TestSessionBuilder sessionBuilder,
+    String url,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'bannedDomains',
+            method: 'checkUrl',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'bannedDomains',
+          methodName: 'checkUrl',
+          parameters: _i1.testObjectToJson({'url': url}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<String?>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

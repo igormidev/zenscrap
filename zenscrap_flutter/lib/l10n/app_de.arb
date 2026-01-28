@@ -19,6 +19,7 @@
   "landing_hero_url_validation_invalid": "Bitte geben Sie eine gueltige URL ein",
   "landing_hero_url_validation_min_length": "URL muss mindestens 10 Zeichen haben",
   "landing_hero_url_validation_max_length": "URL darf maximal 500 Zeichen haben",
+  "landing_hero_url_validation_banned_domain": "Diese Website ({domain}) wird nicht zum Scraping unterstutzt",
   "landing_hero_prompt_label": "Was moechten Sie extrahieren?",
   "landing_hero_prompt_hint": "Z.B. Produktname, Preis und Bilder extrahieren",
   "landing_hero_prompt_validation_min_length": "Prompt muss mindestens 10 Zeichen haben",

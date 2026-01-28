@@ -43,6 +43,9 @@ privateSubscription:
 privateUserScrappables:
   - call:
   - getScrappableById:
+bannedDomains:
+  - getBannedDomains:
+  - checkUrl:
 createScrappable:
   - call:
 deleteScrappable:

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:serverpod_auth_idp_server/core.dart';
 import 'package:serverpod/serverpod.dart';
+import 'package:zenscrap_server/src/core/banned_domains.dart';
 import 'package:zenscrap_server/src/core/consts.dart';
 import 'package:zenscrap_server/src/core/docs/scrappable_request_structure_guide.dart';
 import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';
@@ -16,6 +17,19 @@ class CreateScrappableEndpoint extends Endpoint {
     required SupportedLanguage language,
   }) async* {
     final userId = session.authenticated?.authUserId;
+
+    // =========================================================================
+    // Banned Domain Validation
+    // =========================================================================
+    // Check if the URL belongs to a domain that cannot be scraped
+    final bannedDomain = getBannedDomainFromUrl(referenceLink);
+    if (bannedDomain != null) {
+      throw createTranslatedException(
+        'banned_domain',
+        language,
+        params: {'domain': bannedDomain},
+      );
+    }
 
     // =========================================================================
     // IP Validation for Anonymous Users

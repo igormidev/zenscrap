@@ -208,6 +208,12 @@ abstract class AppLocalizations {
   /// **'URL must be less than 500 characters'**
   String get landing_hero_url_validation_max_length;
 
+  /// Validation error for banned domains
+  ///
+  /// In en, this message translates to:
+  /// **'This website ({domain}) is not supported for scraping'**
+  String landing_hero_url_validation_banned_domain(String domain);
+
   /// Label for prompt input field
   ///
   /// In en, this message translates to:

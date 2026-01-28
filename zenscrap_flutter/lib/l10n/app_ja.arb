@@ -19,6 +19,7 @@
   "landing_hero_url_validation_invalid": "有効なURLを入力してください",
   "landing_hero_url_validation_min_length": "URLは10文字以上である必要があります",
   "landing_hero_url_validation_max_length": "URLは500文字以下である必要があります",
+  "landing_hero_url_validation_banned_domain": "このウェブサイト（{domain}）はスクレイピングに対応していません",
   "landing_hero_prompt_label": "何を抽出しますか？",
   "landing_hero_prompt_hint": "例：商品名、価格、画像を抽出",
   "landing_hero_prompt_validation_min_length": "プロンプトは10文字以上である必要があります",

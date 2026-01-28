@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_validator/form_validator.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
+import 'package:zenscrap_flutter/src/core/banned_domains.dart';
 import 'package:zenscrap_flutter/src/core/mixins/create_scrappable_mixin.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
@@ -101,11 +102,24 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
         ? value
         : 'http://$value';
 
-    return ValidationBuilder()
+    // First check standard URL validation
+    final standardValidation = ValidationBuilder()
         .url(l10n.landing_hero_url_validation_invalid)
         .minLength(10, l10n.landing_hero_url_validation_min_length)
         .maxLength(500, l10n.landing_hero_url_validation_max_length)
         .build()(normalizedUrl);
+
+    if (standardValidation != null) {
+      return standardValidation;
+    }
+
+    // Then check if the domain is banned
+    final bannedDomain = getBannedDomainFromUrl(normalizedUrl ?? '');
+    if (bannedDomain != null) {
+      return l10n.landing_hero_url_validation_banned_domain(bannedDomain);
+    }
+
+    return null;
   }
 
   String? _validatePrompt(String? value) {

@@ -123,6 +123,14 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.ptBR: 'Limite de Endpoints Atingido',
     SupportedLanguage.ja: 'エンドポイントの制限に達しました',
   },
+  'banned_domain': {
+    SupportedLanguage.en: 'Domain Not Supported',
+    SupportedLanguage.es: 'Dominio No Soportado',
+    SupportedLanguage.de: 'Domain nicht unterstutzt',
+    SupportedLanguage.fr: 'Domaine non pris en charge',
+    SupportedLanguage.ptBR: 'Dominio Nao Suportado',
+    SupportedLanguage.ja: 'サポートされていないドメイン',
+  },
 
   // API Key errors
   'api_key_not_found': {
@@ -840,6 +848,14 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.fr: 'Vous avez atteint le nombre maximum d\'endpoints ({maxAllowed}) pour votre plan {planName}. Veuillez mettre a niveau votre plan pour attacher plus d\'endpoints.',
     SupportedLanguage.ptBR: 'Voce atingiu o numero maximo de endpoints ({maxAllowed}) para seu plano {planName}. Por favor, atualize seu plano para vincular mais endpoints.',
     SupportedLanguage.ja: '{planName}プランのエンドポイント数の上限({maxAllowed})に達しました。より多くのエンドポイントを追加するにはプランをアップグレードしてください。',
+  },
+  'banned_domain': {
+    SupportedLanguage.en: 'The domain "{domain}" is not supported for scraping. This website has strong anti-scraping measures that prevent reliable data extraction.',
+    SupportedLanguage.es: 'El dominio "{domain}" no es compatible para scraping. Este sitio web tiene fuertes medidas anti-scraping que impiden la extraccion confiable de datos.',
+    SupportedLanguage.de: 'Die Domain "{domain}" wird nicht fur Scraping unterstutzt. Diese Website hat starke Anti-Scraping-Massnahmen, die eine zuverlassige Datenextraktion verhindern.',
+    SupportedLanguage.fr: 'Le domaine "{domain}" n\'est pas pris en charge pour le scraping. Ce site web a de fortes mesures anti-scraping qui empechent l\'extraction fiable de donnees.',
+    SupportedLanguage.ptBR: 'O dominio "{domain}" nao e suportado para scraping. Este site possui fortes medidas anti-scraping que impedem a extracao confiavel de dados.',
+    SupportedLanguage.ja: 'ドメイン「{domain}」はスクレイピングに対応していません。このウェブサイトには強力なアンチスクレイピング対策があり、信頼性の高いデータ抽出ができません。',
   },
   'scrappable_private_cannot_clone': {
     SupportedLanguage.en: 'This scrappable is private and cannot be cloned.',

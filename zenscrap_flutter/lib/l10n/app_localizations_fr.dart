@@ -65,6 +65,11 @@ class AppLocalizationsFr extends AppLocalizations {
       'L\'URL doit contenir moins de 500 caracteres';
 
   @override
+  String landing_hero_url_validation_banned_domain(String domain) {
+    return 'Ce site web ($domain) n\'est pas pris en charge pour le scraping';
+  }
+
+  @override
   String get landing_hero_prompt_label => 'Que voulez-vous extraire ?';
 
   @override
