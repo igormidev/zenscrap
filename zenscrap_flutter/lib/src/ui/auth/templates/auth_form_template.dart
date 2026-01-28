@@ -40,6 +40,7 @@ class _AuthFormTemplateState<T> extends ConsumerState<AuthFormTemplate<T>> {
   final _formKey = GlobalKey<FormState>();
   final List<TextEditingController> _controllers = [];
   final List<ValueNotifier<bool?>?> _isObscureText = [];
+  final ValueNotifier<bool> _isFormFilled = ValueNotifier(false);
 
   /// Flattens [AuthFormElement] list to get all individual [AuthFormItem]s
   /// Maintains order for correct controller indexing (important for cross-field validation)
@@ -53,7 +54,9 @@ class _AuthFormTemplateState<T> extends ConsumerState<AuthFormTemplate<T>> {
   @override
   void initState() {
     for (final item in _flatItems) {
-      _controllers.add(TextEditingController());
+      final controller = TextEditingController();
+      controller.addListener(_updateFormFilled);
+      _controllers.add(controller);
       if (item.obscureText) {
         _isObscureText.add(ValueNotifier(false));
       } else {
@@ -63,14 +66,21 @@ class _AuthFormTemplateState<T> extends ConsumerState<AuthFormTemplate<T>> {
     super.initState();
   }
 
+  void _updateFormFilled() {
+    final allFilled = _controllers.every((c) => c.text.isNotEmpty);
+    _isFormFilled.value = allFilled;
+  }
+
   @override
   void dispose() {
     for (final controller in _controllers) {
+      controller.removeListener(_updateFormFilled);
       controller.dispose();
     }
     for (final isObscureText in _isObscureText) {
       isObscureText?.dispose();
     }
+    _isFormFilled.dispose();
     super.dispose();
   }
 
@@ -104,6 +114,7 @@ class _AuthFormTemplateState<T> extends ConsumerState<AuthFormTemplate<T>> {
             _SubmitButton(
               submitText: widget.submitText,
               onPressed: _validateForms,
+              isFormFilled: _isFormFilled,
             ),
             ...widget.belowChildren,
             SizedBox(height: itemSpacing),
@@ -327,39 +338,50 @@ class _AuthFormField extends StatelessWidget {
 class _SubmitButton extends ConsumerWidget {
   final String submitText;
   final VoidCallback onPressed;
+  final ValueNotifier<bool> isFormFilled;
 
-  const _SubmitButton({required this.submitText, required this.onPressed});
+  const _SubmitButton({
+    required this.submitText,
+    required this.onPressed,
+    required this.isFormFilled,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return GlobalLoadingBuilder(
       builder: (context, isGlobalLoadingActive) {
-        return SizedBox(
-          width: double.infinity,
-          // Minimum 48px height for mobile touch target, larger on desktop
-          height: context.responsiveValue(compact: 52.0, expanded: 48.0),
-          child: FilledButton(
-            onPressed: isGlobalLoadingActive ? null : onPressed,
-            style: FilledButton.styleFrom(
-              // Ensure proper padding for touch target
-              padding: context.responsiveValue(
-                compact: const EdgeInsets.symmetric(vertical: 14),
-                expanded: const EdgeInsets.symmetric(vertical: 12),
-              ),
-            ),
-            child: isGlobalLoadingActive
-                ? const AdaptiveProgressIndicator()
-                : Text(
-                    submitText,
-                    style: context.responsiveValue(
-                      compact: Theme.of(context).textTheme.titleMedium
-                          ?.copyWith(
-                            color: Theme.of(context).colorScheme.onPrimary,
-                          ),
-                      expanded: null, // Use default button text style
-                    ),
+        return ValueListenableBuilder<bool>(
+          valueListenable: isFormFilled,
+          builder: (context, formFilled, child) {
+            final isEnabled = formFilled && !isGlobalLoadingActive;
+            return SizedBox(
+              width: double.infinity,
+              // Minimum 48px height for mobile touch target, larger on desktop
+              height: context.responsiveValue(compact: 52.0, expanded: 48.0),
+              child: FilledButton(
+                onPressed: isEnabled ? onPressed : null,
+                style: FilledButton.styleFrom(
+                  // Ensure proper padding for touch target
+                  padding: context.responsiveValue(
+                    compact: const EdgeInsets.symmetric(vertical: 14),
+                    expanded: const EdgeInsets.symmetric(vertical: 12),
                   ),
-          ),
+                ),
+                child: isGlobalLoadingActive
+                    ? const AdaptiveProgressIndicator()
+                    : Text(
+                        submitText,
+                        style: context.responsiveValue(
+                          compact: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.onPrimary,
+                              ),
+                          expanded: null, // Use default button text style
+                        ),
+                      ),
+              ),
+            );
+          },
         );
       },
     );
