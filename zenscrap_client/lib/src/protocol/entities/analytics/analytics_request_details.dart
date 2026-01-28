@@ -40,9 +40,9 @@ abstract class AnalyticsRequestDetails implements _i1.SerializableModel {
   ) {
     return AnalyticsRequestDetails(
       id: jsonSerialization['id'] as int?,
-      timeStamp: _i1.DateTimeJsonExtension.fromJson(
-        jsonSerialization['timeStamp'],
-      ),
+      timeStamp: jsonSerialization['timeStamp'] == null
+          ? null
+          : _i1.DateTimeJsonExtension.fromJson(jsonSerialization['timeStamp']),
       title: jsonSerialization['title'] as String?,
       description: jsonSerialization['description'] as String?,
       errorObjectAsString: jsonSerialization['errorObjectAsString'] as String?,

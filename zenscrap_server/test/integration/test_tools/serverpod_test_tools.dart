@@ -8,7 +8,6 @@
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
 // ignore_for_file: invalid_use_of_internal_member
-
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
@@ -69,6 +68,7 @@ import 'package:zenscrap_server/src/generated/entities/redraft_scrappable_sessio
     as _i30;
 import 'package:zenscrap_server/src/generated/entities/redraft_scrappable_session/chat_response.dart'
     as _i31;
+import 'package:zenscrap_server/src/generated/future_calls.dart' as _i32;
 import 'package:zenscrap_server/src/generated/protocol.dart';
 import 'package:zenscrap_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -176,6 +176,8 @@ void withServerpod(
 }
 
 class TestEndpoints {
+  late final futureCalls = _FutureCalls();
+
   late final _EmailIdpEndpoint emailIdp;
 
   late final _GoogleIdpEndpoint googleIdp;
@@ -293,6 +295,16 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
   }
+}
+
+class _FutureCalls {
+  late final periodicAutoFixBrokenScrappables =
+      _PeriodicAutoFixBrokenScrappablesFutureCall();
+
+  late final periodicCacheCleanup = _PeriodicCacheCleanupFutureCall();
+
+  late final periodicCleanupOldAnalyticsDetails =
+      _PeriodicCleanupOldAnalyticsDetailsFutureCall();
 }
 
 class _EmailIdpEndpoint {
@@ -2169,5 +2181,59 @@ class _ScrappableChatSession {
       _localTestStreamManager.outputStreamController,
     );
     return _localTestStreamManager.outputStreamController.stream;
+  }
+}
+
+class _PeriodicAutoFixBrokenScrappablesFutureCall {
+  Future<void> invoke(
+    _i1.TestSessionBuilder sessionBuilder,
+    _i2.SerializableModel? _,
+  ) async {
+    var _localUniqueSession = (sessionBuilder as _i1.InternalTestSessionBuilder)
+        .internalBuild();
+    try {
+      await _i32.PeriodicAutoFixBrokenScrappablesInvokeFutureCall().invoke(
+        _localUniqueSession,
+        _,
+      );
+    } finally {
+      await _localUniqueSession.close();
+    }
+  }
+}
+
+class _PeriodicCacheCleanupFutureCall {
+  Future<void> invoke(
+    _i1.TestSessionBuilder sessionBuilder,
+    _i2.SerializableModel? _,
+  ) async {
+    var _localUniqueSession = (sessionBuilder as _i1.InternalTestSessionBuilder)
+        .internalBuild();
+    try {
+      await _i32.PeriodicCacheCleanupInvokeFutureCall().invoke(
+        _localUniqueSession,
+        _,
+      );
+    } finally {
+      await _localUniqueSession.close();
+    }
+  }
+}
+
+class _PeriodicCleanupOldAnalyticsDetailsFutureCall {
+  Future<void> invoke(
+    _i1.TestSessionBuilder sessionBuilder,
+    _i2.SerializableModel? _,
+  ) async {
+    var _localUniqueSession = (sessionBuilder as _i1.InternalTestSessionBuilder)
+        .internalBuild();
+    try {
+      await _i32.PeriodicCleanupOldAnalyticsDetailsInvokeFutureCall().invoke(
+        _localUniqueSession,
+        _,
+      );
+    } finally {
+      await _localUniqueSession.close();
+    }
   }
 }

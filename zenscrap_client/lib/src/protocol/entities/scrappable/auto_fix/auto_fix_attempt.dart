@@ -72,10 +72,12 @@ abstract class AutoFixAttempt implements _i1.SerializableModel {
               jsonSerialization['completedAt'],
             ),
       attemptNumber: jsonSerialization['attemptNumber'] as int,
-      succeeded: jsonSerialization['succeeded'] as bool,
-      status: _i2.AutoFixAttemptStatus.fromJson(
-        (jsonSerialization['status'] as String),
-      ),
+      succeeded: jsonSerialization['succeeded'] as bool?,
+      status: jsonSerialization['status'] == null
+          ? null
+          : _i2.AutoFixAttemptStatus.fromJson(
+              (jsonSerialization['status'] as String),
+            ),
       errorMessage: jsonSerialization['errorMessage'] as String?,
       aiThinkingLog: jsonSerialization['aiThinkingLog'] as String?,
       generatedExtractRules:
@@ -83,10 +85,10 @@ abstract class AutoFixAttempt implements _i1.SerializableModel {
       generatedJsScenario: jsonSerialization['generatedJsScenario'] as String?,
       validationPassed: jsonSerialization['validationPassed'] as bool?,
       validationError: jsonSerialization['validationError'] as String?,
-      costUsd: (jsonSerialization['costUsd'] as num).toDouble(),
-      inputTokens: jsonSerialization['inputTokens'] as int,
-      outputTokens: jsonSerialization['outputTokens'] as int,
-      reasoningTokens: jsonSerialization['reasoningTokens'] as int,
+      costUsd: (jsonSerialization['costUsd'] as num?)?.toDouble(),
+      inputTokens: jsonSerialization['inputTokens'] as int?,
+      outputTokens: jsonSerialization['outputTokens'] as int?,
+      reasoningTokens: jsonSerialization['reasoningTokens'] as int?,
       sessionId: jsonSerialization['sessionId'] as int,
     );
   }

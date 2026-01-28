@@ -8,7 +8,6 @@
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
 // ignore_for_file: invalid_use_of_internal_member
-
 // ignore_for_file: unnecessary_null_comparison
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
@@ -72,20 +71,22 @@ abstract class AutoFixSession
           : _i1.DateTimeJsonExtension.fromJson(
               jsonSerialization['completedAt'],
             ),
-      status: _i2.AutoFixSessionStatus.fromJson(
-        (jsonSerialization['status'] as String),
-      ),
+      status: jsonSerialization['status'] == null
+          ? null
+          : _i2.AutoFixSessionStatus.fromJson(
+              (jsonSerialization['status'] as String),
+            ),
       triggeredAtErrorCount: jsonSerialization['triggeredAtErrorCount'] as int,
       configuredThreshold: jsonSerialization['configuredThreshold'] as int,
       usedAiModel: _i3.AiModel.fromJson(
         (jsonSerialization['usedAiModel'] as String),
       ),
-      usedUserApiKey: jsonSerialization['usedUserApiKey'] as bool,
+      usedUserApiKey: jsonSerialization['usedUserApiKey'] as bool?,
       successSummary: jsonSerialization['successSummary'] as String?,
       failureReason: jsonSerialization['failureReason'] as String?,
-      totalCostUsd: (jsonSerialization['totalCostUsd'] as num).toDouble(),
-      totalInputTokens: jsonSerialization['totalInputTokens'] as int,
-      totalOutputTokens: jsonSerialization['totalOutputTokens'] as int,
+      totalCostUsd: (jsonSerialization['totalCostUsd'] as num?)?.toDouble(),
+      totalInputTokens: jsonSerialization['totalInputTokens'] as int?,
+      totalOutputTokens: jsonSerialization['totalOutputTokens'] as int?,
       scrappableId: jsonSerialization['scrappableId'] as int,
       attempts: jsonSerialization['attempts'] == null
           ? null

@@ -46,18 +46,18 @@ abstract class AutoFixConfig
   factory AutoFixConfig.fromJson(Map<String, dynamic> jsonSerialization) {
     return AutoFixConfig(
       id: jsonSerialization['id'] as int?,
-      enabled: jsonSerialization['enabled'] as bool,
+      enabled: jsonSerialization['enabled'] as bool?,
       consecutiveErrorThreshold:
-          jsonSerialization['consecutiveErrorThreshold'] as int,
+          jsonSerialization['consecutiveErrorThreshold'] as int?,
       currentConsecutiveErrors:
-          jsonSerialization['currentConsecutiveErrors'] as int,
+          jsonSerialization['currentConsecutiveErrors'] as int?,
       lastAttemptAt: jsonSerialization['lastAttemptAt'] == null
           ? null
           : _i1.DateTimeJsonExtension.fromJson(
               jsonSerialization['lastAttemptAt'],
             ),
-      inProgress: jsonSerialization['inProgress'] as bool,
-      attemptCount: jsonSerialization['attemptCount'] as int,
+      inProgress: jsonSerialization['inProgress'] as bool?,
+      attemptCount: jsonSerialization['attemptCount'] as int?,
       preferredAiModel: jsonSerialization['preferredAiModel'] == null
           ? null
           : _i2.AiModel.fromJson(

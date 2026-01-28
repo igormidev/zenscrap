@@ -47,6 +47,8 @@ import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _i27;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _i28;
+import 'package:zenscrap_server/src/generated/future_calls.dart' as _i29;
+export 'future_calls.dart' show ServerpodFutureCallsGetter;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -661,7 +663,10 @@ class Endpoints extends _i1.EndpointDispatch {
                         session,
                         language: params['language'],
                       )
-                      .then((container) => _i21.mapContainerToJson(container)),
+                      .then(
+                        (container) =>
+                            _i21.Protocol().mapContainerToJson(container),
+                      ),
         ),
         'getApiUsageInfo': _i1.MethodConnector(
           name: 'getApiUsageInfo',
@@ -1585,5 +1590,10 @@ class Endpoints extends _i1.EndpointDispatch {
       ..initializeEndpoints(server);
     modules['serverpod_auth_core'] = _i28.Endpoints()
       ..initializeEndpoints(server);
+  }
+
+  @override
+  _i1.FutureCallDispatch? get futureCalls {
+    return _i29.FutureCalls();
   }
 }

@@ -69,20 +69,22 @@ abstract class AutoFixSession implements _i1.SerializableModel {
           : _i1.DateTimeJsonExtension.fromJson(
               jsonSerialization['completedAt'],
             ),
-      status: _i2.AutoFixSessionStatus.fromJson(
-        (jsonSerialization['status'] as String),
-      ),
+      status: jsonSerialization['status'] == null
+          ? null
+          : _i2.AutoFixSessionStatus.fromJson(
+              (jsonSerialization['status'] as String),
+            ),
       triggeredAtErrorCount: jsonSerialization['triggeredAtErrorCount'] as int,
       configuredThreshold: jsonSerialization['configuredThreshold'] as int,
       usedAiModel: _i3.AiModel.fromJson(
         (jsonSerialization['usedAiModel'] as String),
       ),
-      usedUserApiKey: jsonSerialization['usedUserApiKey'] as bool,
+      usedUserApiKey: jsonSerialization['usedUserApiKey'] as bool?,
       successSummary: jsonSerialization['successSummary'] as String?,
       failureReason: jsonSerialization['failureReason'] as String?,
-      totalCostUsd: (jsonSerialization['totalCostUsd'] as num).toDouble(),
-      totalInputTokens: jsonSerialization['totalInputTokens'] as int,
-      totalOutputTokens: jsonSerialization['totalOutputTokens'] as int,
+      totalCostUsd: (jsonSerialization['totalCostUsd'] as num?)?.toDouble(),
+      totalInputTokens: jsonSerialization['totalInputTokens'] as int?,
+      totalOutputTokens: jsonSerialization['totalOutputTokens'] as int?,
       scrappableId: jsonSerialization['scrappableId'] as int,
       attempts: jsonSerialization['attempts'] == null
           ? null
