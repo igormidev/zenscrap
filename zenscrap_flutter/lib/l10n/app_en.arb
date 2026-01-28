@@ -1209,7 +1209,7 @@
     "description": "Error message shown when loading more analytics fails"
   },
 
-  "api_usage_page_title": "Api Credits & Keys",
+  "api_usage_page_title": "API Credits & Keys",
   "@api_usage_page_title": {
     "description": "Main title for API usage page"
   },
