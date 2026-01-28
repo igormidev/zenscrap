@@ -2,13 +2,29 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Flutter Web WASM (Debug)",
+      "name": "Flutter Web WASM (DEBUG-LOCAL)",
       "type": "dart",
       "request": "launch",
       "program": "zenscrap_flutter/lib/main.dart",
       "args": [
         "--wasm",
         "--dart-define=GOOGLE_SERVER_CLIENT_ID=602145347765-dafncgl6jkbmnc3mf62qk1o0oeic5861.apps.googleusercontent.com",
+        "--web-browser-flag=--disable-web-security"
+      ],
+      "deviceId": "chrome",
+      "env": {
+        "CHROME_EXECUTABLE": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+      }
+    },
+    {
+      "name": "Flutter Web WASM (DEBUG-PROD)",
+      "type": "dart",
+      "request": "launch",
+      "program": "zenscrap_flutter/lib/main.dart",
+      "args": [
+        "--wasm",
+        "--dart-define=GOOGLE_SERVER_CLIENT_ID=602145347765-dafncgl6jkbmnc3mf62qk1o0oeic5861.apps.googleusercontent.com",
+        "--dart-define=SERVER_URL=https://api.zenscrap.com/",
         "--web-browser-flag=--disable-web-security"
       ],
       "deviceId": "chrome",
@@ -32,13 +48,25 @@
       }
     },
     {
-      "name": "Flutter macOS (Debug)",
+      "name": "Flutter macOS (DEBUG-LOCAL)",
       "type": "dart",
       "request": "launch",
       "program": "zenscrap_flutter/lib/main.dart",
       "args": [
         "--dart-define=GOOGLE_SERVER_CLIENT_ID=602145347765-dafncgl6jkbmnc3mf62qk1o0oeic5861.apps.googleusercontent.com",
         "--dart-define=GOOGLE_CLIENT_ID=602145347765-c40u505mg0ct5pqo9pqpiugj3hn82k3i.apps.googleusercontent.com"
+      ],
+      "deviceId": "macos"
+    },
+    {
+      "name": "Flutter macOS (DEBUG-PROD)",
+      "type": "dart",
+      "request": "launch",
+      "program": "zenscrap_flutter/lib/main.dart",
+      "args": [
+        "--dart-define=GOOGLE_SERVER_CLIENT_ID=602145347765-dafncgl6jkbmnc3mf62qk1o0oeic5861.apps.googleusercontent.com",
+        "--dart-define=GOOGLE_CLIENT_ID=602145347765-c40u505mg0ct5pqo9pqpiugj3hn82k3i.apps.googleusercontent.com",
+        "--dart-define=SERVER_URL=https://api.zenscrap.com/"
       ],
       "deviceId": "macos"
     },
@@ -55,12 +83,23 @@
       "flutterMode": "release"
     },
     {
-      "name": "Flutter iOS Simulator (Debug)",
+      "name": "Flutter iOS Simulator (DEBUG-LOCAL)",
       "type": "dart",
       "request": "launch",
       "program": "zenscrap_flutter/lib/main.dart",
       "args": [
         "--dart-define=GOOGLE_SERVER_CLIENT_ID=602145347765-dafncgl6jkbmnc3mf62qk1o0oeic5861.apps.googleusercontent.com"
+      ],
+      "deviceId": "iPhone"
+    },
+    {
+      "name": "Flutter iOS Simulator (DEBUG-PROD)",
+      "type": "dart",
+      "request": "launch",
+      "program": "zenscrap_flutter/lib/main.dart",
+      "args": [
+        "--dart-define=GOOGLE_SERVER_CLIENT_ID=602145347765-dafncgl6jkbmnc3mf62qk1o0oeic5861.apps.googleusercontent.com",
+        "--dart-define=SERVER_URL=https://api.zenscrap.com/"
       ],
       "deviceId": "iPhone"
     },
@@ -76,12 +115,23 @@
       "flutterMode": "release"
     },
     {
-      "name": "Flutter Physical iPhone (Debug)",
+      "name": "Flutter Physical iPhone (DEBUG-LOCAL)",
       "type": "dart",
       "request": "launch",
       "program": "zenscrap_flutter/lib/main.dart",
       "args": [
         "--dart-define=GOOGLE_SERVER_CLIENT_ID=602145347765-dafncgl6jkbmnc3mf62qk1o0oeic5861.apps.googleusercontent.com"
+      ],
+      "deviceId": "00008130-00120CC134EA001C"
+    },
+    {
+      "name": "Flutter Physical iPhone (DEBUG-PROD)",
+      "type": "dart",
+      "request": "launch",
+      "program": "zenscrap_flutter/lib/main.dart",
+      "args": [
+        "--dart-define=GOOGLE_SERVER_CLIENT_ID=602145347765-dafncgl6jkbmnc3mf62qk1o0oeic5861.apps.googleusercontent.com",
+        "--dart-define=SERVER_URL=https://api.zenscrap.com/"
       ],
       "deviceId": "00008130-00120CC134EA001C"
     },
