@@ -8,9 +8,13 @@
       "program": "zenscrap_flutter/lib/main.dart",
       "args": [
         "--wasm",
-        "--dart-define=GOOGLE_SERVER_CLIENT_ID=602145347765-dafncgl6jkbmnc3mf62qk1o0oeic5861.apps.googleusercontent.com"
+        "--dart-define=GOOGLE_SERVER_CLIENT_ID=602145347765-dafncgl6jkbmnc3mf62qk1o0oeic5861.apps.googleusercontent.com",
+        "--web-browser-flag=--disable-web-security"
       ],
-      "deviceId": "chrome"
+      "deviceId": "chrome",
+      "env": {
+        "CHROME_EXECUTABLE": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+      }
     },
     {
       "name": "Flutter Web WASM (Release)",
@@ -22,7 +26,10 @@
         "--dart-define=GOOGLE_SERVER_CLIENT_ID=602145347765-dafncgl6jkbmnc3mf62qk1o0oeic5861.apps.googleusercontent.com"
       ],
       "deviceId": "chrome",
-      "flutterMode": "release"
+      "flutterMode": "release",
+      "env": {
+        "CHROME_EXECUTABLE": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+      }
     },
     {
       "name": "Flutter macOS (Debug)",

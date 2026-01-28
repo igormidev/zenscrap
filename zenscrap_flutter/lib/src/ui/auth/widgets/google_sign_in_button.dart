@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
-import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
@@ -15,6 +14,10 @@ import 'package:zenscrap_flutter/src/ui/auth/widgets/auth_error_dialog.dart';
 /// Google Sign-In button that handles both login and account creation.
 /// If the user has an account, it logs them in. If not, it creates an account.
 /// This provides a unified authentication flow with Google.
+///
+/// Uses Serverpod's GoogleSignInWidget which properly handles:
+/// - Native platforms (iOS, Android, macOS): uses GoogleSignInNativeButton
+/// - Web platform: uses GoogleSignInWebButton (Google's iframe-based button)
 class ZenScrapGoogleSignInButton extends ConsumerStatefulWidget {
   const ZenScrapGoogleSignInButton({super.key});
 
@@ -25,24 +28,90 @@ class ZenScrapGoogleSignInButton extends ConsumerStatefulWidget {
 
 class _ZenScrapGoogleSignInButtonState
     extends ConsumerState<ZenScrapGoogleSignInButton> {
-  bool _isLoading = false;
   GoogleAuthController? _googleAuthController;
 
   // Server Client ID from Google Cloud Console (Web application credentials)
   // This should match the client_id in google_client_secret.json on the server
   // Configure via environment variable: --dart-define=GOOGLE_SERVER_CLIENT_ID=your-client-id
+  // For web, the client ID is also set in web/index.html meta tag
   static const String _googleServerClientId = String.fromEnvironment(
     'GOOGLE_SERVER_CLIENT_ID',
     defaultValue: '',
   );
 
   // Check if Google Sign-In is configured
-  bool get _isConfigured => _googleServerClientId.isNotEmpty;
+  // On web, configuration comes from index.html meta tag, so we always show
+  // On native, we need the environment variable
+  bool get _isConfigured => kIsWeb || _googleServerClientId.isNotEmpty;
 
   @override
   void dispose() {
     _googleAuthController?.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleAuthenticationSuccess() async {
+    final client = ref.read(clientProvider);
+    final analytics = ref.read(analyticsServiceProvider);
+
+    try {
+      // Fetch real user profile from the server
+      final userProfileResponse = await client.userProfile
+          .getCurrentUserProfile();
+
+      // Track successful Google sign-in with real user info
+      await analytics.trackEvent(
+        eventName: 'auth_google_success',
+        properties: {
+          'email': userProfileResponse.email ?? 'unknown',
+          'user_name':
+              userProfileResponse.userName ??
+              userProfileResponse.fullName ??
+              'Google User',
+        },
+      );
+
+      // Update session state with real user profile
+      if (mounted) {
+        ref
+            .read(sessionProvider.notifier)
+            .setState(
+              SessionState.logged(
+                user: UserModel(
+                  email: userProfileResponse.email ?? 'google_user@google.com',
+                  userName:
+                      userProfileResponse.userName ??
+                      userProfileResponse.fullName ??
+                      'Google User',
+                  imageUrl: userProfileResponse.imageUrl,
+                ),
+              ),
+            );
+      }
+    } catch (e) {
+      debugPrint('[GoogleSignIn] Error fetching user profile: $e');
+      // Even if profile fetch fails, user is authenticated
+      // The session sync provider will handle this
+    }
+  }
+
+  Future<void> _handleAuthenticationError(Object error) async {
+    final analytics = ref.read(analyticsServiceProvider);
+
+    // Track Google sign-in failure
+    await analytics.trackEvent(
+      eventName: 'auth_google_failure',
+      properties: {'error': error.toString()},
+    );
+
+    if (mounted) {
+      // Map the exception and show beautiful error dialog
+      final authError = AuthErrorMapper.mapError(
+        error,
+        context: AuthContext.googleSignIn,
+      );
+      await showAuthErrorDialog(context: context, error: authError);
+    }
   }
 
   @override
@@ -67,8 +136,20 @@ class _ZenScrapGoogleSignInButtonState
     }
 
     final client = ref.watch(clientProvider);
-    final analytics = ref.read(analyticsServiceProvider);
     final l10n = AppLocalizations.of(context)!;
+
+    // Initialize controller once
+    _googleAuthController ??= GoogleAuthController(
+      client: client,
+      onAuthenticated: _handleAuthenticationSuccess,
+      onError: _handleAuthenticationError,
+      // Attempt lightweight sign-in (FedCM on web, One Tap on Android)
+      attemptLightweightSignIn: true,
+      scopes: const [
+        'https://www.googleapis.com/auth/userinfo.email',
+        'https://www.googleapis.com/auth/userinfo.profile',
+      ],
+    );
 
     return Column(
       children: [
@@ -89,195 +170,22 @@ class _ZenScrapGoogleSignInButtonState
           ],
         ),
         const SizedBox(height: 10),
-        // Google Sign-In Button
-        SizedBox(
-          width: double.infinity,
-          // Minimum 48px height for mobile touch target
-          height: context.responsiveValue(compact: 52.0, expanded: 48.0),
-          child: OutlinedButton.icon(
-            onPressed: _isLoading
-                ? null
-                : () async {
-                    setState(() => _isLoading = true);
-
-                    try {
-                      // Track Google sign-in attempt
-                      await analytics.trackEvent(
-                        eventName: 'auth_google_attempt',
-                      );
-
-                      // Create GoogleAuthController for the new IDP system
-                      _googleAuthController?.dispose();
-                      _googleAuthController = GoogleAuthController(
-                        client: client,
-                        onAuthenticated: () {
-                          // Authentication successful - handle in the callback
-                        },
-                        onError: (error) {
-                          // Error handled below
-                        },
-                        attemptLightweightSignIn: true,
-                        scopes: const [
-                          'https://www.googleapis.com/auth/userinfo.email',
-                          'https://www.googleapis.com/auth/userinfo.profile',
-                        ],
-                      );
-
-                      // Attempt Google sign-in
-                      await _googleAuthController!.signIn();
-
-                      // Small delay to allow the async state update to propagate
-                      // The GoogleAuthController updates state asynchronously after signIn()
-                      await Future.delayed(const Duration(milliseconds: 100));
-
-                      // Check if widget is still mounted after async operation
-                      if (!mounted) return;
-
-                      // Check the controller's isAuthenticated property (not client.auth.isAuthenticated)
-                      // This is updated by the GoogleAuthController after signIn() completes
-                      final isAuthenticated =
-                          _googleAuthController!.isAuthenticated;
-
-                      if (!isAuthenticated) {
-                        // Reset loading state immediately when not authenticated
-                        // This handles the case where user cancelled or an error occurred
-                        setState(() => _isLoading = false);
-
-                        // Check if there was an error or if user cancelled
-                        final errorMsg = _googleAuthController!.errorMessage;
-                        if (errorMsg != null) {
-                          // Track Google sign-in failure with error message
-                          await analytics.trackEvent(
-                            eventName: 'auth_google_failure',
-                            properties: {'error': errorMsg},
-                          );
-
-                          if (context.mounted) {
-                            // Map the error and show beautiful error dialog
-                            final authError = AuthErrorMapper.mapError(
-                              errorMsg,
-                              context: AuthContext.googleSignIn,
-                            );
-                            await showAuthErrorDialog(
-                              context: context,
-                              error: authError,
-                            );
-                          }
-                        } else {
-                          // User likely cancelled the sign-in flow
-                          await analytics.trackEvent(
-                            eventName: 'auth_google_cancelled',
-                          );
-                          // Don't show dialog for cancelled sign-in, it's a user choice
-                        }
-
-                        // Dispose and nullify the controller to reset its state
-                        _googleAuthController?.dispose();
-                        _googleAuthController = null;
-                        return;
-                      }
-
-                      // Fetch real user profile from the server
-                      final userProfileResponse = await client.userProfile
-                          .getCurrentUserProfile();
-
-                      // Track successful Google sign-in with real user info
-                      await analytics.trackEvent(
-                        eventName: 'auth_google_success',
-                        properties: {
-                          'email': userProfileResponse.email ?? 'unknown',
-                          'user_name':
-                              userProfileResponse.userName ??
-                              userProfileResponse.fullName ??
-                              'Google User',
-                        },
-                      );
-
-                      // Update session state with real user profile
-                      if (context.mounted) {
-                        ref
-                            .read(sessionProvider.notifier)
-                            .setState(
-                              SessionState.logged(
-                                user: UserModel(
-                                  email:
-                                      userProfileResponse.email ??
-                                      'google_user@google.com',
-                                  userName:
-                                      userProfileResponse.userName ??
-                                      userProfileResponse.fullName ??
-                                      'Google User',
-                                  imageUrl: userProfileResponse.imageUrl,
-                                ),
-                              ),
-                            );
-                      }
-                    } catch (e) {
-                      // Track Google sign-in failure
-                      await analytics.trackEvent(
-                        eventName: 'auth_google_failure',
-                        properties: {'error': e.toString()},
-                      );
-
-                      if (context.mounted) {
-                        // Map the exception and show beautiful error dialog
-                        final authError = AuthErrorMapper.mapError(
-                          e,
-                          context: AuthContext.googleSignIn,
-                        );
-                        await showAuthErrorDialog(
-                          context: context,
-                          error: authError,
-                        );
-                      }
-                    } finally {
-                      if (mounted) {
-                        setState(() => _isLoading = false);
-                      }
-                    }
-                  },
-            icon: _isLoading
-                ? SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  )
-                : Image.network(
-                    'https://www.google.com/favicon.ico',
-                    width: 20,
-                    height: 20,
-                    errorBuilder: (context, error, stackTrace) =>
-                        const Icon(Icons.g_mobiledata, size: 20),
-                  ),
-            label: Text(
-              _isLoading
-                  ? l10n.auth_signing_in
-                  : l10n.auth_continue_with_google,
-              style: context.responsiveValue(
-                compact: Theme.of(context).textTheme.titleSmall,
-                expanded: null, // Use default
-              ),
-            ),
-            style: OutlinedButton.styleFrom(
-              // Responsive padding for proper touch target
-              padding: context.responsiveValue(
-                compact: const EdgeInsets.symmetric(
-                  vertical: 14,
-                  horizontal: 16,
-                ),
-                expanded: const EdgeInsets.symmetric(
-                  vertical: 12,
-                  horizontal: 16,
-                ),
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-          ),
+        // Google Sign-In Widget from Serverpod
+        // This widget properly handles web vs native platforms:
+        // - On web: renders Google's iframe-based button (GoogleSignInWebButton)
+        // - On native: renders a custom button that calls authenticate()
+        // Google Sign-In Widget from Serverpod
+        // Uses default wrapper which handles both web (iframe) and native properly
+        GoogleSignInWidget(
+          controller: _googleAuthController,
+          // Button styling
+          type: GSIButtonType.standard,
+          theme: GSIButtonTheme.outline,
+          size: GSIButtonSize.large,
+          text: GSIButtonText.continueWith,
+          shape: GSIButtonShape.pill,
+          logoAlignment: GSIButtonLogoAlignment.left,
+          minimumWidth: 280,
         ),
         const SizedBox(height: 8),
         Text(
