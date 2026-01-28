@@ -151,6 +151,19 @@
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "ZenScrap",
+    "url": "https://zenscrap.com",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://zenscrap.com/search?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
     "@type": "WebPage",
     "name": "ZenScrap - AI-Powered Web Scrapers That Fix Themselves",
     "description": "Create self-healing web scrapers with AI. Describe what you want to extract and get a ready-to-use API endpoint.",
@@ -362,6 +375,38 @@
       50% {
         opacity: 0.4;
       }
+    }
+
+    /* ============================================
+       Footer Links - Required for Google OAuth verification
+       ============================================ */
+    .splash-footer {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: spinnerFadeIn 0.6s ease-out 0.8s forwards;
+      opacity: 0;
+    }
+
+    .splash-footer-link {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.6);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .splash-footer-link:hover {
+      color: rgba(255, 255, 255, 0.9);
+      text-decoration: underline;
+    }
+
+    .splash-footer-separator {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.4);
     }
 
     /* ============================================
@@ -650,6 +695,13 @@
 
     <!-- Loading status text -->
     <div class="loading-text">Loading...</div>
+
+    <!-- Footer links for SEO - Google OAuth verification requires visible links -->
+    <div class="splash-footer">
+      <a href="https://www.zenscrap.com/privacy-policy" class="splash-footer-link">Privacy Policy</a>
+      <span class="splash-footer-separator">•</span>
+      <a href="https://www.zenscrap.com/terms-of-service" class="splash-footer-link">Terms of Service</a>
+    </div>
   </div>
   <script src="flutter_bootstrap.js" async=""></script>
 
