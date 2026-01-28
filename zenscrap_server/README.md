@@ -12,6 +12,14 @@ The Zenscrap Server is built with Serverpod and provides:
 - **Database persistence for scraping configurations**
 - **Subscription and API credit management with Stripe**
 
+## 📦 Shared Core Package
+
+Logic that needs to be consistent between the server and Flutter client is placed in the **`zenscrap_core`** package (located at `../zenscrap_core`).
+
+When adding new functionality that must work identically on both client and server (e.g., validation rules, constants, utilities), add it to `zenscrap_core` instead of duplicating code.
+
+See [`zenscrap_core/README.md`](../zenscrap_core/README.md) for more details.
+
 ## 🏗️ Architecture
 
 ```

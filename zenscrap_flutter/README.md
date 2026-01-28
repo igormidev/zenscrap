@@ -11,6 +11,14 @@ Zenscrap Flutter is a modern, responsive Flutter application that provides:
 - Scraping history and management
 - Multi-platform support (Web, iOS, Android)
 
+## 📦 Shared Core Package
+
+Logic that needs to be consistent between the Flutter client and server is placed in the **`zenscrap_core`** package (located at `../zenscrap_core`).
+
+When adding new functionality that must work identically on both client and server (e.g., validation rules, constants, utilities), add it to `zenscrap_core` instead of duplicating code.
+
+See [`zenscrap_core/README.md`](../zenscrap_core/README.md) for more details.
+
 ## 🏗️ Architecture
 
 The application follows clean architecture principles with:

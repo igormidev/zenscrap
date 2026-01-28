@@ -3,7 +3,7 @@ import 'package:serverpod_auth_idp_server/core.dart';
 import 'package:collection/collection.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:serverpod/serverpod.dart';
-import 'package:zenscrap_server/src/core/banned_domains.dart';
+import 'package:zenscrap_core/zenscrap_core.dart';
 import 'package:zenscrap_server/src/core/consts.dart';
 import 'package:zenscrap_server/src/core/default_classes.dart';
 import 'package:zenscrap_server/src/core/ip_validation/ip_validation.dart';

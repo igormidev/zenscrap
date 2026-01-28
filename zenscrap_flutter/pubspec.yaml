@@ -30,6 +30,8 @@ dependencies:
   seo: ^0.0.10
   zenscrap_client:
     path: ../zenscrap_client
+  zenscrap_core:
+    path: ../zenscrap_core
   dio: ^5.9.0
   collection: ^1.19.1
   dart_debouncer: ^1.1.1

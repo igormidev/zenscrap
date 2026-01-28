@@ -6,7 +6,7 @@ import 'package:form_validator/form_validator.dart';
 import 'package:lottie/lottie.dart';
 import 'package:seo/seo.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
-import 'package:zenscrap_flutter/src/core/banned_domains.dart';
+import 'package:zenscrap_core/zenscrap_core.dart';
 import 'package:zenscrap_flutter/src/core/mixins/create_scrappable_mixin.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';

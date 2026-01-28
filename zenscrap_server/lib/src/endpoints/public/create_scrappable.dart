@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:serverpod_auth_idp_server/core.dart';
 import 'package:serverpod/serverpod.dart';
-import 'package:zenscrap_server/src/core/banned_domains.dart';
+import 'package:zenscrap_core/zenscrap_core.dart';
 import 'package:zenscrap_server/src/core/consts.dart';
 import 'package:zenscrap_server/src/core/docs/scrappable_request_structure_guide.dart';
 import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';

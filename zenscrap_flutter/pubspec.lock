@@ -1633,6 +1633,13 @@ packages:
       relative: true
     source: path
     version: "1.0.0"
+  zenscrap_core:
+    dependency: "direct main"
+    description:
+      path: "../zenscrap_core"
+      relative: true
+    source: path
+    version: "1.0.0"
 sdks:
   dart: ">=3.9.2 <4.0.0"
   flutter: ">=3.35.0"
