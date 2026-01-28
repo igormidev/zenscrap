@@ -136,10 +136,10 @@ class _PeriodicAutoFixBrokenScrappablesFutureCallDispatcher {
 
   final _InvokeFutureCall _invokeFutureCall;
 
-  Future<void> invoke(_i1.SerializableModel? _) {
+  Future<void> invoke(_i1.SerializableModel? object) {
     return _invokeFutureCall(
       'PeriodicAutoFixBrokenScrappablesInvokeFutureCall',
-      _,
+      object,
     );
   }
 }
@@ -149,10 +149,10 @@ class _PeriodicCacheCleanupFutureCallDispatcher {
 
   final _InvokeFutureCall _invokeFutureCall;
 
-  Future<void> invoke(_i1.SerializableModel? _) {
+  Future<void> invoke(_i1.SerializableModel? object) {
     return _invokeFutureCall(
       'PeriodicCacheCleanupInvokeFutureCall',
-      _,
+      object,
     );
   }
 }
@@ -164,10 +164,10 @@ class _PeriodicCleanupOldAnalyticsDetailsFutureCallDispatcher {
 
   final _InvokeFutureCall _invokeFutureCall;
 
-  Future<void> invoke(_i1.SerializableModel? _) {
+  Future<void> invoke(_i1.SerializableModel? object) {
     return _invokeFutureCall(
       'PeriodicCleanupOldAnalyticsDetailsInvokeFutureCall',
-      _,
+      object,
     );
   }
 }
@@ -177,11 +177,11 @@ class PeriodicAutoFixBrokenScrappablesInvokeFutureCall
   @override
   _i2.Future<void> invoke(
     _i1.Session session,
-    _i1.SerializableModel? _,
+    _i1.SerializableModel? object,
   ) async {
     await _i3.PeriodicAutoFixBrokenScrappables().invoke(
       session,
-      _,
+      object,
     );
   }
 }
@@ -191,11 +191,11 @@ class PeriodicCacheCleanupInvokeFutureCall
   @override
   _i2.Future<void> invoke(
     _i1.Session session,
-    _i1.SerializableModel? _,
+    _i1.SerializableModel? object,
   ) async {
     await _i4.PeriodicCacheCleanup().invoke(
       session,
-      _,
+      object,
     );
   }
 }
@@ -205,11 +205,11 @@ class PeriodicCleanupOldAnalyticsDetailsInvokeFutureCall
   @override
   _i2.Future<void> invoke(
     _i1.Session session,
-    _i1.SerializableModel? _,
+    _i1.SerializableModel? object,
   ) async {
     await _i4.PeriodicCleanupOldAnalyticsDetails().invoke(
       session,
-      _,
+      object,
     );
   }
 }

@@ -55,7 +55,7 @@ class PeriodicAutoFixBrokenScrappables extends FutureCall {
   static const String callName = 'periodicAutoFixBrokenScrappables';
 
   @override
-  Future<void> invoke(Session session, SerializableModel? _) async {
+  Future<void> invoke(Session session, SerializableModel? object) async {
     try {
       session.log(
         'Starting periodic auto-fix check...',

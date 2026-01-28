@@ -2187,14 +2187,14 @@ class _ScrappableChatSession {
 class _PeriodicAutoFixBrokenScrappablesFutureCall {
   Future<void> invoke(
     _i1.TestSessionBuilder sessionBuilder,
-    _i2.SerializableModel? _,
+    _i2.SerializableModel? object,
   ) async {
     var _localUniqueSession = (sessionBuilder as _i1.InternalTestSessionBuilder)
         .internalBuild();
     try {
       await _i32.PeriodicAutoFixBrokenScrappablesInvokeFutureCall().invoke(
         _localUniqueSession,
-        _,
+        object,
       );
     } finally {
       await _localUniqueSession.close();
@@ -2205,14 +2205,14 @@ class _PeriodicAutoFixBrokenScrappablesFutureCall {
 class _PeriodicCacheCleanupFutureCall {
   Future<void> invoke(
     _i1.TestSessionBuilder sessionBuilder,
-    _i2.SerializableModel? _,
+    _i2.SerializableModel? object,
   ) async {
     var _localUniqueSession = (sessionBuilder as _i1.InternalTestSessionBuilder)
         .internalBuild();
     try {
       await _i32.PeriodicCacheCleanupInvokeFutureCall().invoke(
         _localUniqueSession,
-        _,
+        object,
       );
     } finally {
       await _localUniqueSession.close();
@@ -2223,14 +2223,14 @@ class _PeriodicCacheCleanupFutureCall {
 class _PeriodicCleanupOldAnalyticsDetailsFutureCall {
   Future<void> invoke(
     _i1.TestSessionBuilder sessionBuilder,
-    _i2.SerializableModel? _,
+    _i2.SerializableModel? object,
   ) async {
     var _localUniqueSession = (sessionBuilder as _i1.InternalTestSessionBuilder)
         .internalBuild();
     try {
       await _i32.PeriodicCleanupOldAnalyticsDetailsInvokeFutureCall().invoke(
         _localUniqueSession,
-        _,
+        object,
       );
     } finally {
       await _localUniqueSession.close();

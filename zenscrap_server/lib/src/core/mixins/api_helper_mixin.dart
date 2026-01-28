@@ -1201,7 +1201,7 @@ class PeriodicSetRequestsAnalytics extends FutureCall {
 /// This FutureCall runs at [ApiHelperConfig.cacheCleanupInterval] and evicts expired cache entries.
 class PeriodicCacheCleanup extends FutureCall {
   @override
-  Future<void> invoke(Session session, SerializableModel? _) async {
+  Future<void> invoke(Session session, SerializableModel? object) async {
     try {
       // Log cache sizes before cleanup for monitoring
       final beforeSizes = _getCacheSizes();
@@ -1256,7 +1256,7 @@ class PeriodicCleanupOldAnalyticsDetails extends FutureCall {
   static const String callName = 'periodicCleanupOldAnalyticsDetails';
 
   @override
-  Future<void> invoke(Session session, SerializableModel? _) async {
+  Future<void> invoke(Session session, SerializableModel? object) async {
     try {
       final now = DateTime.now();
       final retentionCutoff = now.subtract(ApiHelperConfig.analyticsRetentionPeriod);
