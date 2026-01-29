@@ -22,31 +22,64 @@ echo "=== ZenScrap Web Deployment Script ==="
 echo "Project root: $PROJECT_ROOT"
 echo ""
 
+# Cleanup function to restore original state after deployment
+cleanup() {
+    echo ""
+    echo "Cleaning up deployment files..."
+    # Remove the copied zenscrap_core from server directory
+    rm -rf "$PROJECT_ROOT/zenscrap_server/packages/zenscrap_core"
+    # Restore original pubspec.yaml
+    if [ -f "$PROJECT_ROOT/zenscrap_server/pubspec.yaml.bak" ]; then
+        mv "$PROJECT_ROOT/zenscrap_server/pubspec.yaml.bak" "$PROJECT_ROOT/zenscrap_server/pubspec.yaml"
+    fi
+    echo "Cleanup complete."
+}
+
+# Set up trap to ensure cleanup runs on exit (success or failure)
+trap cleanup EXIT
+
 # Step 1: Generate Serverpod code
-echo "[1/8] Generating Serverpod code..."
+echo "[1/10] Generating Serverpod code..."
 cd "$PROJECT_ROOT/zenscrap_server"
 serverpod generate
 
-# Step 2: Navigate to Flutter directory
+# Step 2: Prepare zenscrap_core for deployment
+# Serverpod Cloud only uploads the server directory, so we need to include
+# the shared package inside the server directory for the Docker build
+echo ""
+echo "[2/10] Preparing zenscrap_core for deployment..."
+mkdir -p "$PROJECT_ROOT/zenscrap_server/packages"
+rm -rf "$PROJECT_ROOT/zenscrap_server/packages/zenscrap_core"
+cp -r "$PROJECT_ROOT/zenscrap_core" "$PROJECT_ROOT/zenscrap_server/packages/zenscrap_core"
+echo "      Copied zenscrap_core to: zenscrap_server/packages/zenscrap_core"
+
+# Step 3: Update pubspec.yaml to use local path for deployment
+echo ""
+echo "[3/10] Updating pubspec.yaml for deployment..."
+cp "$PROJECT_ROOT/zenscrap_server/pubspec.yaml" "$PROJECT_ROOT/zenscrap_server/pubspec.yaml.bak"
+sed -i '' 's|path: \.\./zenscrap_core|path: packages/zenscrap_core|g' "$PROJECT_ROOT/zenscrap_server/pubspec.yaml"
+echo "      Updated path dependency for zenscrap_core"
+
+# Step 4: Navigate to Flutter directory
 echo ""
 cd "$PROJECT_ROOT/zenscrap_flutter"
-echo "[2/8] Working in: $(pwd)"
+echo "[4/10] Working in: $(pwd)"
 
-# Step 3: Get dependencies
+# Step 5: Get dependencies
 echo ""
-echo "[3/8] Getting dependencies..."
+echo "[5/10] Getting dependencies..."
 flutter pub get
 
-# Step 4: Analyze code
+# Step 6: Analyze code
 echo ""
-echo "[4/8] Running static analysis..."
+echo "[6/10] Running static analysis..."
 flutter analyze --no-fatal-infos || {
     echo "WARNING: Static analysis found issues (non-fatal)"
 }
 
-# Step 5: Build with all optimizations
+# Step 7: Build with all optimizations
 echo ""
-echo "[5/8] Building with WASM, release mode, and tree-shaking..."
+echo "[7/10] Building with WASM, release mode, and tree-shaking..."
 echo "      This may take a few minutes..."
 echo "      Google Client ID: $GOOGLE_SERVER_CLIENT_ID"
 flutter build web --wasm --release --tree-shake-icons \
@@ -57,23 +90,23 @@ echo ""
 echo "Build size summary:"
 du -sh "$PROJECT_ROOT/zenscrap_flutter/build/web" 2>/dev/null || true
 
-# Step 6: Copy build to server web directory
+# Step 8: Copy build to server web directory
 echo ""
-echo "[6/8] Copying build to server..."
+echo "[8/10] Copying build to server..."
 cd "$PROJECT_ROOT"
 rm -rf zenscrap_server/web/app
 cp -r zenscrap_flutter/build/web zenscrap_server/web/app
 echo "      Copied to: zenscrap_server/web/app"
 
-# Step 7: Create migrations
+# Step 9: Create migrations
 echo ""
-echo "[7/8] Creating migrations..."
+echo "[9/10] Creating migrations..."
 cd "$PROJECT_ROOT/zenscrap_server"
 serverpod create-migration --force
 
-# Step 8: Deploy to Serverpod Cloud
+# Step 10: Deploy to Serverpod Cloud
 echo ""
-echo "[8/8] Deploying to Serverpod Cloud..."
+echo "[10/10] Deploying to Serverpod Cloud..."
 scloud deploy
 
 echo ""

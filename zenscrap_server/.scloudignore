@@ -37,3 +37,6 @@ config/test.yaml
 
 # Opting out of ignoring the .scloud directory.
 !.scloud/**
+
+# Opting out of ignoring packages directory (for shared packages like zenscrap_core).
+!packages/**
