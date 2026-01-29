@@ -116,6 +116,12 @@ const List<String> kBannedDomains = [
   'amzn.to',
   'a.co',
   'z.cn',
+
+  // LinkedIn
+  'linkedin.com',
+  'linkedin.cn',
+  'licdn.com',
+  'lnkd.in',
 ];
 
 /// Pre-compiled regex pattern for matching banned domains.
