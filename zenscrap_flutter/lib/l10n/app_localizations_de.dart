@@ -43,7 +43,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get landing_hero_subtitle =>
-      'Beschreiben Sie, was Sie extrahieren moechten. Unsere KI erstellt, testet und wartet Ihren Scraper automatisch. Kein Code. Keine CSS-Selektoren. Keine defekten Endpunkte.';
+      'Beschreiben Sie, was Sie extrahieren möchten. Unsere KI erstellt, testet und wartet Ihren Scraper automatisch. Kein Code. Keine CSS-Selektoren. Keine defekten Endpunkte.';
 
   @override
   String get landing_hero_target_url_label => 'Ziel-URL';
@@ -54,7 +54,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get landing_hero_url_validation_invalid =>
-      'Bitte geben Sie eine gueltige URL ein';
+      'Bitte geben Sie eine gültige URL ein';
 
   @override
   String get landing_hero_url_validation_min_length =>
@@ -66,11 +66,11 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String landing_hero_url_validation_banned_domain(String domain) {
-    return 'Diese Website ($domain) wird nicht zum Scraping unterstutzt';
+    return 'Diese Website ($domain) wird nicht zum Scraping unterstützt';
   }
 
   @override
-  String get landing_hero_prompt_label => 'Was moechten Sie extrahieren?';
+  String get landing_hero_prompt_label => 'Was möchten Sie extrahieren?';
 
   @override
   String get landing_hero_prompt_hint =>
@@ -94,7 +94,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get landing_trust_no_credit_card => 'Keine Kreditkarte erforderlich';
 
   @override
-  String get landing_trust_no_signup => 'Kein Konto zum Testen noetig';
+  String get landing_trust_no_signup => 'Kein Konto zum Testen nötig';
 
   @override
   String get landing_trust_ready_in_minutes => 'In unter 2 Minuten bereit';
@@ -107,32 +107,32 @@ class AppLocalizationsDe extends AppLocalizations {
       'Stunden verloren an CSS-Selektoren. Scraper, die jede Woche kaputtgehen. Anti-Bot-Systeme, die Ihre Anfragen blockieren. Kommt Ihnen das bekannt vor?';
 
   @override
-  String get landing_problem_css_title => 'CSS-Selektor-Hoelle';
+  String get landing_problem_css_title => 'CSS-Selektor-Hölle';
 
   @override
   String get landing_problem_css_description =>
-      'Durch HTML suchen, um die richtigen Selektoren zu finden, nur um sie beim naechsten Site-Update kaputt zu sehen.';
+      'Durch HTML suchen, um die richtigen Selektoren zu finden, nur um sie beim nächsten Site-Update kaputt zu sehen.';
 
   @override
-  String get landing_problem_maintenance_title => 'Staendige Wartung';
+  String get landing_problem_maintenance_title => 'Ständige Wartung';
 
   @override
   String get landing_problem_maintenance_description =>
-      'Websites aendern staendig ihre Struktur. Ihr Scraper funktionierte gestern - heute liefert er leere Daten.';
+      'Websites ändern ständig ihre Struktur. Ihr Scraper funktionierte gestern - heute liefert er leere Daten.';
 
   @override
-  String get landing_problem_antibot_title => 'Anti-Bot-Albtraeume';
+  String get landing_problem_antibot_title => 'Anti-Bot-Albträume';
 
   @override
   String get landing_problem_antibot_description =>
-      'CAPTCHAs, Rate-Limits, IP-Sperren. Anti-Bot-Systeme zu bekaempfen ist ein Vollzeitjob.';
+      'CAPTCHAs, Rate-Limits, IP-Sperren. Anti-Bot-Systeme zu bekämpfen ist ein Vollzeitjob.';
 
   @override
-  String get landing_problem_productivity_title => 'Verlorene Produktivitaet';
+  String get landing_problem_productivity_title => 'Verlorene Produktivität';
 
   @override
   String get landing_problem_productivity_description =>
-      'Jede Stunde beim Debuggen von Scrapern ist eine Stunde, die Sie nicht fuer Ihr eigentliches Geschaeft nutzen.';
+      'Jede Stunde beim Debuggen von Scrapern ist eine Stunde, die Sie nicht für Ihr eigentliches Geschäft nutzen.';
 
   @override
   String get landing_how_title => 'Drei Schritte zu automatisierten Daten';
@@ -142,25 +142,25 @@ class AppLocalizationsDe extends AppLocalizations {
       'Kein Code. Keine Konfiguration. Beschreiben Sie einfach, was Sie brauchen.';
 
   @override
-  String get landing_how_step1_title => 'URL einfuegen';
+  String get landing_how_step1_title => 'URL einfügen';
 
   @override
   String get landing_how_step1_description =>
-      'Fuegen Sie den Link zur Seite ein, von der Sie Daten extrahieren moechten. Jede Website, jede Komplexitaet.';
+      'Fügen Sie den Link zur Seite ein, von der Sie Daten extrahieren möchten. Jede Website, jede Komplexität.';
 
   @override
   String get landing_how_step2_title => 'Beschreiben Sie Ihren Bedarf';
 
   @override
   String get landing_how_step2_description =>
-      'Sagen Sie unserer KI in einfacher Sprache, welche Daten Sie benoetigen. Produktpreise, Artikelinhalte, Benutzerprofile - alles.';
+      'Sagen Sie unserer KI in einfacher Sprache, welche Daten Sie benötigen. Produktpreise, Artikelinhalte, Benutzerprofile - alles.';
 
   @override
   String get landing_how_step3_title => 'Ihre selbstheilende API erhalten';
 
   @override
   String get landing_how_step3_description =>
-      'Erhalten Sie einen einsatzbereiten API-Endpunkt, der sich automatisch anpasst, wenn sich die Zielseite aendert.';
+      'Erhalten Sie einen einsatzbereiten API-Endpunkt, der sich automatisch anpasst, wenn sich die Zielseite ändert.';
 
   @override
   String get landing_how_ai_note =>
@@ -174,14 +174,14 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get landing_autofix_subtitle =>
-      'Websites aendern sich. Ihre Scraper muessen nicht kaputtgehen. Unsere KI erkennt automatisch, wenn eine Zielseite aktualisiert wird, und korrigiert Ihre Extraktionsregeln - bevor Sie es bemerken.';
+      'Websites ändern sich. Ihre Scraper müssen nicht kaputtgehen. Unsere KI erkennt automatisch, wenn eine Zielseite aktualisiert wird, und korrigiert Ihre Extraktionsregeln - bevor Sie es bemerken.';
 
   @override
-  String get landing_autofix_step1_title => 'Aenderungen erkannt';
+  String get landing_autofix_step1_title => 'Änderungen erkannt';
 
   @override
   String get landing_autofix_step1_description =>
-      'Unser System ueberwacht Ihre Scraper und erkennt, wenn Extraktionsregeln zu versagen beginnen.';
+      'Unser System überwacht Ihre Scraper und erkennt, wenn Extraktionsregeln zu versagen beginnen.';
 
   @override
   String get landing_autofix_step2_title => 'KI analysiert & passt an';
@@ -203,7 +203,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get landing_autofix_notifications_description =>
-      'Werden Sie benachrichtigt, wenn sich eine Website aendert und Ihr Scraper automatisch repariert wird.';
+      'Werden Sie benachrichtigt, wenn sich eine Website ändert und Ihr Scraper automatisch repariert wird.';
 
   @override
   String get landing_autofix_without_title => 'Ohne ZenScrap';
@@ -219,7 +219,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get landing_autofix_without_item3 => 'Verlorene Daten und Umsatz';
 
   @override
-  String get landing_autofix_without_item4 => 'Staendige Wartungslast';
+  String get landing_autofix_without_item4 => 'Ständige Wartungslast';
 
   @override
   String get landing_autofix_with_title => 'Mit ZenScrap';
@@ -238,53 +238,53 @@ class AppLocalizationsDe extends AppLocalizations {
   String get landing_autofix_with_item4 => 'Einrichten und vergessen';
 
   @override
-  String get landing_features_title => 'Fuer das moderne Web gebaut';
+  String get landing_features_title => 'Für das moderne Web gebaut';
 
   @override
   String get landing_features_subtitle =>
-      'Enterprise-Infrastruktur in einer einfachen Oberflaeche.';
+      'Enterprise-Infrastruktur in einer einfachen Oberfläche.';
 
   @override
   String get landing_features_cost_title => 'Intelligente Kostenoptimierung';
 
   @override
   String get landing_features_cost_description =>
-      'KI testet automatisch Konfigurationen und findet die guenstigste Option, die funktioniert. Keine verschwendeten Credits.';
+      'KI testet automatisch Konfigurationen und findet die günstigste Option, die funktioniert. Keine verschwendeten Credits.';
 
   @override
   String get landing_features_antibot_title => 'Anti-Bot gehandhabt';
 
   @override
   String get landing_features_antibot_description =>
-      'CAPTCHAs, Rate-Limits, Fingerprinting - wir kuemmern uns um alles, damit Sie es nicht muessen.';
+      'CAPTCHAs, Rate-Limits, Fingerprinting - wir kümmern uns um alles, damit Sie es nicht müssen.';
 
   @override
   String get landing_features_geo_title => 'Globales Geo-Targeting';
 
   @override
   String get landing_features_geo_description =>
-      'Greifen Sie auf regionsbeschraenkte Inhalte zu mit automatischer Proxy-Auswahl basierend auf dem Zielstandort.';
+      'Greifen Sie auf regionsbeschränkte Inhalte zu mit automatischer Proxy-Auswahl basierend auf dem Zielstandort.';
 
   @override
   String get landing_features_testing_title => 'Plattform-integrierte Tests';
 
   @override
   String get landing_features_testing_description =>
-      'Testen Sie jeden Scraper sofort, ohne die Plattform zu verlassen. Kein Postman noetig.';
+      'Testen Sie jeden Scraper sofort, ohne die Plattform zu verlassen. Kein Postman nötig.';
 
   @override
   String get landing_features_analytics_title => 'Tiefgehende Analytik';
 
   @override
   String get landing_features_analytics_description =>
-      'Verfolgen Sie jede Anfrage, identifizieren Sie Probleme sofort und ueberwachen Sie die Nutzung ueber verschiedene Zeitraeume.';
+      'Verfolgen Sie jede Anfrage, identifizieren Sie Probleme sofort und überwachen Sie die Nutzung über verschiedene Zeiträume.';
 
   @override
   String get landing_features_js_title => 'JavaScript-Rendering';
 
   @override
   String get landing_features_js_description =>
-      'Vollstaendige Headless-Browser-Unterstuetzung fuer SPAs, dynamische Inhalte und Seiten mit unendlichem Scrollen.';
+      'Vollständige Headless-Browser-Unterstützung für SPAs, dynamische Inhalte und Seiten mit unendlichem Scrollen.';
 
   @override
   String get landing_marketplace_badge => 'COMMUNITY';
@@ -295,7 +295,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get landing_marketplace_subtitle =>
-      'Durchsuchen Sie unseren Marktplatz mit vorgefertigten Scrapern fuer beliebte Websites. Nutzen Sie sie sofort oder lernen Sie, wie andere aehnliche Herausforderungen geloest haben.';
+      'Durchsuchen Sie unseren Marktplatz mit vorgefertigten Scrapern für beliebte Websites. Nutzen Sie sie sofort oder lernen Sie, wie andere ähnliche Herausforderungen gelöst haben.';
 
   @override
   String get landing_marketplace_prebuilt_title => 'Vorgefertigte Scraper';
@@ -309,7 +309,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get landing_marketplace_stats_description =>
-      'Sehen Sie, welche Scraper am beliebtesten und zuverlaessigsten sind, basierend auf echten Community-Nutzungsdaten.';
+      'Sehen Sie, welche Scraper am beliebtesten und zuverlässigsten sind, basierend auf echten Community-Nutzungsdaten.';
 
   @override
   String get landing_marketplace_testing_title => 'Sofortiges Testen';
@@ -347,7 +347,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get landing_pricing_subtitle =>
-      'Waehlen Sie den Plan, der zu Ihren Beduerfnissen passt. Skalieren Sie mit Ihrem Wachstum.';
+      'Wählen Sie den Plan, der zu Ihren Bedürfnissen passt. Skalieren Sie mit Ihrem Wachstum.';
 
   @override
   String get landing_cta_title =>
@@ -355,7 +355,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get landing_cta_subtitle =>
-      'Schliessen Sie sich Entwicklern an, die ihre Zeit zurueckgewonnen haben. Einmal bauen, KI fuer immer warten lassen.';
+      'Schließen Sie sich Entwicklern an, die ihre Zeit zurückgewonnen haben. Einmal bauen, KI für immer warten lassen.';
 
   @override
   String get landing_cta_create_button => 'Ersten Scraper erstellen';
@@ -409,7 +409,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get account_display_mode_subtitle =>
-      'Waehlen Sie zwischen hellem und dunklem Design';
+      'Wählen Sie zwischen hellem und dunklem Design';
 
   @override
   String get account_accent_color_title => 'Akzentfarbe';
@@ -422,7 +422,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get account_loading => 'Laden...';
 
   @override
-  String get account_change_image_tooltip => 'Bild aendern';
+  String get account_change_image_tooltip => 'Bild ändern';
 
   @override
   String get account_brightness_light => 'Hell';
@@ -438,7 +438,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get account_dark_mode_beta_warning =>
-      'Einige UI-Elemente werden moeglicherweise nicht perfekt angezeigt. Wir arbeiten aktiv an Verbesserungen.';
+      'Einige UI-Elemente werden möglicherweise nicht perfekt angezeigt. Wir arbeiten aktiv an Verbesserungen.';
 
   @override
   String get ai_usage_title => 'KI-Nutzung';
@@ -480,7 +480,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get ai_usage_unknown_transaction => 'Unbekannte Transaktion';
 
   @override
-  String get ai_usage_credits_overview => 'KI-Guthaben Uebersicht';
+  String get ai_usage_credits_overview => 'KI-Guthaben Übersicht';
 
   @override
   String get ai_usage_remaining_credits => 'Verbleibendes Guthaben';
@@ -495,7 +495,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get ai_usage_using_own_api_key =>
-      'Eigener OpenAI API-Schluessel wird verwendet';
+      'Eigener OpenAI API-Schlüssel wird verwendet';
 
   @override
   String get ai_usage_autofix_sessions => 'Auto-Reparatur Sitzungen';
@@ -537,13 +537,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get ai_usage_status_failed => 'Fehlgeschlagen';
 
   @override
-  String get ai_usage_status_exhausted => 'Erschoepft';
+  String get ai_usage_status_exhausted => 'Erschöpft';
 
   @override
   String get ai_usage_status_cancelled => 'Abgebrochen';
 
   @override
-  String get ai_usage_triggered_at => 'Ausgeloest bei';
+  String get ai_usage_triggered_at => 'Ausgelöst bei';
 
   @override
   String ai_usage_consecutive_errors(int count, int threshold) {
@@ -551,13 +551,13 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get ai_usage_api_key_label => 'API-Schluessel';
+  String get ai_usage_api_key_label => 'API-Schlüssel';
 
   @override
-  String get ai_usage_your_own_key => 'Ihr eigener Schluessel';
+  String get ai_usage_your_own_key => 'Ihr eigener Schlüssel';
 
   @override
-  String get ai_usage_platform_key => 'Plattform-Schluessel';
+  String get ai_usage_platform_key => 'Plattform-Schlüssel';
 
   @override
   String get ai_usage_tokens_used => 'Verwendete Token';
@@ -599,21 +599,21 @@ class AppLocalizationsDe extends AppLocalizations {
   String get ai_usage_load_more => 'Mehr laden';
 
   @override
-  String get ai_usage_api_key_section_title => 'OpenAI API-Schluessel';
+  String get ai_usage_api_key_section_title => 'OpenAI API-Schlüssel';
 
   @override
   String get ai_usage_api_key_description =>
-      'Verwenden Sie Ihren eigenen OpenAI API-Schluessel, um monatliche Kreditlimits zu umgehen. Ihr Schluessel wird sicher gespeichert.';
+      'Verwenden Sie Ihren eigenen OpenAI API-Schlüssel, um monatliche Kreditlimits zu umgehen. Ihr Schlüssel wird sicher gespeichert.';
 
   @override
-  String get ai_usage_api_key_configured => 'API-Schluessel konfiguriert';
+  String get ai_usage_api_key_configured => 'API-Schlüssel konfiguriert';
 
   @override
   String get ai_usage_api_key_not_configured =>
-      'Kein API-Schluessel konfiguriert';
+      'Kein API-Schlüssel konfiguriert';
 
   @override
-  String get ai_usage_api_key_add => 'API-Schluessel hinzufuegen';
+  String get ai_usage_api_key_add => 'API-Schlüssel hinzufügen';
 
   @override
   String get ai_usage_api_key_edit => 'Bearbeiten';
@@ -622,20 +622,20 @@ class AppLocalizationsDe extends AppLocalizations {
   String get ai_usage_api_key_remove => 'Entfernen';
 
   @override
-  String get ai_usage_api_key_dialog_title => 'OpenAI API-Schluessel';
+  String get ai_usage_api_key_dialog_title => 'OpenAI API-Schlüssel';
 
   @override
   String get ai_usage_api_key_dialog_hint => 'sk-...';
 
   @override
   String get ai_usage_api_key_dialog_description =>
-      'Geben Sie Ihren OpenAI API-Schluessel ein. Der Schluessel wird vor dem Speichern validiert.';
+      'Geben Sie Ihren OpenAI API-Schlüssel ein. Der Schlüssel wird vor dem Speichern validiert.';
 
   @override
-  String get ai_usage_api_key_show => 'API-Schluessel anzeigen';
+  String get ai_usage_api_key_show => 'API-Schlüssel anzeigen';
 
   @override
-  String get ai_usage_api_key_hide => 'API-Schluessel verbergen';
+  String get ai_usage_api_key_hide => 'API-Schlüssel verbergen';
 
   @override
   String get ai_usage_api_key_save => 'Speichern';
@@ -645,22 +645,22 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get ai_usage_api_key_remove_confirm_title =>
-      'API-Schluessel entfernen?';
+      'API-Schlüssel entfernen?';
 
   @override
   String get ai_usage_api_key_remove_confirm_message =>
-      'Sind Sie sicher, dass Sie Ihren OpenAI API-Schluessel entfernen moechten? Sie werden stattdessen die monatlichen Plattform-Guthaben verwenden.';
+      'Sind Sie sicher, dass Sie Ihren OpenAI API-Schlüssel entfernen möchten? Sie werden stattdessen die monatlichen Plattform-Guthaben verwenden.';
 
   @override
   String get ai_usage_api_key_updated =>
-      'API-Schluessel erfolgreich aktualisiert';
+      'API-Schlüssel erfolgreich aktualisiert';
 
   @override
-  String get ai_usage_api_key_removed => 'API-Schluessel erfolgreich entfernt';
+  String get ai_usage_api_key_removed => 'API-Schlüssel erfolgreich entfernt';
 
   @override
   String get ai_usage_api_key_error =>
-      'API-Schluessel konnte nicht aktualisiert werden';
+      'API-Schlüssel konnte nicht aktualisiert werden';
 
   @override
   String get api_analytics_title => 'API-Analytik';
@@ -676,11 +676,11 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get api_analytics_no_scrappable_selected =>
-      'Kein Scrappable ausgewaehlt';
+      'Kein Scrappable ausgewählt';
 
   @override
   String get api_analytics_select_scrappable_hint =>
-      'Waehlen Sie ein Scrappable aus der Liste, um detaillierte Analytik anzuzeigen';
+      'Wählen Sie ein Scrappable aus der Liste, um detaillierte Analytik anzuzeigen';
 
   @override
   String get api_analytics_no_more_to_load =>
@@ -709,11 +709,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get api_analytics_status_server_error => 'Server-Fehler';
 
   @override
-  String get api_analytics_status_insufficient_credits =>
-      'Ungenuegend Guthaben';
+  String get api_analytics_status_insufficient_credits => 'Ungenügend Guthaben';
 
   @override
-  String get api_analytics_status_max_concurrency => 'Max. Parallelitaet';
+  String get api_analytics_status_max_concurrency => 'Max. Parallelität';
 
   @override
   String get api_analytics_status_extract_rules_error =>
@@ -741,7 +740,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get api_analytics_tooltip_client_error =>
-      'Client-Fehler - ungueltige Anfrageparameter oder fehlende Daten';
+      'Client-Fehler - ungültige Anfrageparameter oder fehlende Daten';
 
   @override
   String get api_analytics_tooltip_server_error =>
@@ -757,7 +756,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get api_analytics_tooltip_max_concurrency =>
-      'Anfragen aufgrund des Parallelitaetslimits abgelehnt';
+      'Anfragen aufgrund des Parallelitätslimits abgelehnt';
 
   @override
   String get api_analytics_scope_last_hour => 'Letzte Stunde';
@@ -796,10 +795,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get api_analytics_max_concurrency_exceeded =>
-      'Maximale Parallelitaet ueberschritten';
+      'Maximale Parallelität überschritten';
 
   @override
-  String get api_analytics_insufficient_credits_chip => 'Ungenuegend Guthaben';
+  String get api_analytics_insufficient_credits_chip => 'Ungenügend Guthaben';
 
   @override
   String get api_analytics_last_12_hours => 'Letzte 12 Stunden';
@@ -842,7 +841,7 @@ class AppLocalizationsDe extends AppLocalizations {
     int count,
     String percentage,
   ) {
-    return 'Max. Parallelitaet: $count ($percentage%)';
+    return 'Max. Parallelität: $count ($percentage%)';
   }
 
   @override
@@ -934,7 +933,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Fehler beim Laden weiterer Daten. Tippen Sie zum Wiederholen.';
 
   @override
-  String get api_usage_page_title => 'API-Guthaben & Schluessel';
+  String get api_usage_page_title => 'API-Guthaben & Schlüssel';
 
   @override
   String get api_usage_refresh => 'Aktualisieren';
@@ -943,40 +942,40 @@ class AppLocalizationsDe extends AppLocalizations {
   String get api_usage_retry => 'Erneut versuchen';
 
   @override
-  String get api_usage_overview => 'Uebersicht';
+  String get api_usage_overview => 'Übersicht';
 
   @override
-  String get api_usage_api_keys => 'API-Schluessel';
+  String get api_usage_api_keys => 'API-Schlüssel';
 
   @override
   String get api_usage_history => 'Verlauf';
 
   @override
-  String get api_usage_overview_title => 'API-Nutzungsuebersicht';
+  String get api_usage_overview_title => 'API-Nutzungsübersicht';
 
   @override
   String get api_usage_credit_history => 'Guthaben-Verlauf';
 
   @override
-  String get api_usage_new_api_key_created => 'Neuer API-Schluessel erstellt';
+  String get api_usage_new_api_key_created => 'Neuer API-Schlüssel erstellt';
 
   @override
   String get api_usage_copy_api_key_warning =>
-      'Bitte kopieren und speichern Sie diesen API-Schluessel. Sie werden ihn nicht wieder sehen koennen!';
+      'Bitte kopieren und speichern Sie diesen API-Schlüssel. Sie werden ihn nicht wieder sehen können!';
 
   @override
   String get api_usage_api_key_copied =>
-      'API-Schluessel in Zwischenablage kopiert';
+      'API-Schlüssel in Zwischenablage kopiert';
 
   @override
   String get api_usage_done => 'Fertig';
 
   @override
-  String get api_usage_deactivate_api_key => 'API-Schluessel deaktivieren';
+  String get api_usage_deactivate_api_key => 'API-Schlüssel deaktivieren';
 
   @override
   String get api_usage_deactivate_confirmation =>
-      'Sind Sie sicher, dass Sie diesen API-Schluessel deaktivieren moechten? Diese Aktion kann nicht rueckgaengig gemacht werden.';
+      'Sind Sie sicher, dass Sie diesen API-Schlüssel deaktivieren möchten? Diese Aktion kann nicht rückgängig gemacht werden.';
 
   @override
   String get api_usage_cancel => 'Abbrechen';
@@ -985,10 +984,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get api_usage_deactivate => 'Deaktivieren';
 
   @override
-  String get api_usage_create_key => 'Schluessel erstellen';
+  String get api_usage_create_key => 'Schlüssel erstellen';
 
   @override
-  String get api_usage_no_api_keys => 'Noch keine API-Schluessel';
+  String get api_usage_no_api_keys => 'Noch keine API-Schlüssel';
 
   @override
   String get api_usage_purchase_credits => 'API-Guthaben kaufen';
@@ -1001,11 +1000,11 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get api_usage_credits_never_expire =>
-      'Guthaben laeuft nie ab • Sofortige Aktivierung';
+      'Guthaben läuft nie ab • Sofortige Aktivierung';
 
   @override
   String api_usage_unit_price(String unitPrice) {
-    return 'Stueckpreis: $unitPrice';
+    return 'Stückpreis: $unitPrice';
   }
 
   @override
@@ -1013,57 +1012,57 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get api_usage_ultra_exclusive_benefit =>
-      'Guthaben-Pakete sind ein exklusiver Vorteil fuer Ultra-Plan-Abonnenten.';
+      'Guthaben-Pakete sind ein exklusiver Vorteil für Ultra-Plan-Abonnenten.';
 
   @override
   String get api_usage_credits_never_expire_benefit =>
-      'Guthaben, das nie verfaellt';
+      'Guthaben, das nie verfällt';
 
   @override
   String get api_usage_perfect_for_traffic_spikes =>
-      'Perfekt fuer Traffic-Spitzen';
+      'Perfekt für Traffic-Spitzen';
 
   @override
-  String get api_usage_maybe_later => 'Vielleicht spaeter';
+  String get api_usage_maybe_later => 'Vielleicht später';
 
   @override
   String get api_usage_upgrade_to_ultra => 'Auf Ultra upgraden';
 
   @override
   String get api_usage_unlock_credits_message =>
-      'Schalten Sie die Moeglichkeit frei, zusaetzliches Guthaben zu kaufen, das nie verfaellt. Perfekt fuer Traffic-Spitzen und saisonale Anforderungen.';
+      'Schalten Sie die Möglichkeit frei, zusätzliches Guthaben zu kaufen, das nie verfällt. Perfekt für Traffic-Spitzen und saisonale Anforderungen.';
 
   @override
   String get api_usage_get_credits_title =>
-      'Holen Sie sich Guthaben, das nie verfaellt';
+      'Holen Sie sich Guthaben, das nie verfällt';
 
   @override
   String get api_usage_traffic_spikes_subtitle =>
-      'Perfekt fuer Traffic-Spitzen & langfristige Planung';
+      'Perfekt für Traffic-Spitzen & langfristige Planung';
 
   @override
-  String get api_usage_credits_never_expire_title => 'Guthaben verfaellt nie';
+  String get api_usage_credits_never_expire_title => 'Guthaben verfällt nie';
 
   @override
   String get api_usage_credits_never_expire_description =>
-      'Im Gegensatz zu Abonnement-Guthaben, das monatlich zurueckgesetzt wird, bleibt gekauftes Guthaben fuer immer in Ihrem Konto, solange Ihr Ultra-Plan aktiv ist.';
+      'Im Gegensatz zu Abonnement-Guthaben, das monatlich zurückgesetzt wird, bleibt gekauftes Guthaben für immer in Ihrem Konto, solange Ihr Ultra-Plan aktiv ist.';
 
   @override
   String get api_usage_instant_activation_title => 'Sofortige Aktivierung';
 
   @override
   String get api_usage_instant_activation_description =>
-      'Guthaben wird Ihrem Konto sofort nach Zahlung gutgeschrieben - kein Warten, keine Verzoegerungen.';
+      'Guthaben wird Ihrem Konto sofort nach Zahlung gutgeschrieben - kein Warten, keine Verzögerungen.';
 
   @override
   String get api_usage_scale_without_limits_title => 'Skalieren ohne Grenzen';
 
   @override
   String get api_usage_scale_without_limits_description =>
-      'Bewaeltigen Sie Traffic-Spitzen, saisonale Anforderungen oder Sonderprojekte ohne Upgrade Ihres monatlichen Plans.';
+      'Bewältigen Sie Traffic-Spitzen, saisonale Anforderungen oder Sonderprojekte ohne Upgrade Ihres monatlichen Plans.';
 
   @override
-  String get api_usage_choose_package => 'Waehlen Sie Ihr Paket';
+  String get api_usage_choose_package => 'Wählen Sie Ihr Paket';
 
   @override
   String get api_usage_100k_credits => '100.000 Guthaben';
@@ -1076,15 +1075,15 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get api_usage_small_package_description =>
-      'Ideal zum Testen und fuer kleine Projekte';
+      'Ideal zum Testen und für kleine Projekte';
 
   @override
   String get api_usage_medium_package_description =>
-      'Bester Wert fuer wachsende Anwendungen';
+      'Bester Wert für wachsende Anwendungen';
 
   @override
   String get api_usage_large_package_description =>
-      'Maximale Ersparnis fuer Unternehmensanforderungen';
+      'Maximale Ersparnis für Unternehmensanforderungen';
 
   @override
   String get api_usage_most_popular => 'AM BELIEBTESTEN';
@@ -1115,7 +1114,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get api_usage_redirect_to_stripe =>
-      'Sie werden in Kuerze zu Stripe weitergeleitet';
+      'Sie werden in Kürze zu Stripe weitergeleitet';
 
   @override
   String get api_usage_checkout_failed => 'Checkout fehlgeschlagen';
@@ -1125,24 +1124,24 @@ class AppLocalizationsDe extends AppLocalizations {
       'Ein unerwarteter Fehler ist aufgetreten';
 
   @override
-  String get api_usage_close => 'Schliessen';
+  String get api_usage_close => 'Schließen';
 
   @override
-  String get api_usage_complete_purchase => 'Kauf abschliessen';
+  String get api_usage_complete_purchase => 'Kauf abschließen';
 
   @override
-  String get api_usage_checkout_opened => 'Checkout in neuem Tab geoeffnet';
+  String get api_usage_checkout_opened => 'Checkout in neuem Tab geöffnet';
 
   @override
   String get api_usage_complete_in_stripe =>
-      'Schliessen Sie Ihren Kauf auf der Stripe-Checkout-Seite ab und aktualisieren Sie dann diese Seite, um Ihr neues Guthaben zu sehen.';
+      'Schließen Sie Ihren Kauf auf der Stripe-Checkout-Seite ab und aktualisieren Sie dann diese Seite, um Ihr neues Guthaben zu sehen.';
 
   @override
   String get api_usage_secure_payment_powered_by_stripe =>
       'Sichere Zahlung powered by Stripe';
 
   @override
-  String get api_usage_refresh_and_close => 'Aktualisieren & Schliessen';
+  String get api_usage_refresh_and_close => 'Aktualisieren & Schließen';
 
   @override
   String get api_usage_unable_to_verify_account =>
@@ -1152,10 +1151,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get api_usage_account_refreshed => 'Konto aktualisiert';
 
   @override
-  String get api_usage_credits_overview => 'API-Guthaben Uebersicht';
+  String get api_usage_credits_overview => 'API-Guthaben Übersicht';
 
   @override
-  String get api_usage_total_available => 'Gesamt verfuegbar';
+  String get api_usage_total_available => 'Gesamt verfügbar';
 
   @override
   String get api_usage_credits_combined_description =>
@@ -1178,11 +1177,11 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get api_usage_purchased_description =>
-      'Einmalig gekauftes Guthaben, das nie verfaellt';
+      'Einmalig gekauftes Guthaben, das nie verfällt';
 
   @override
   String get api_usage_credits_info =>
-      'Sie koennen zusaetzliches Guthaben kaufen • Abonnement-Guthaben wird monatlich erneuert';
+      'Sie können zusätzliches Guthaben kaufen • Abonnement-Guthaben wird monatlich erneuert';
 
   @override
   String get api_usage_inactive => 'INAKTIV';
@@ -1201,10 +1200,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get api_usage_last_30_days => 'Letzte 30 Tage';
 
   @override
-  String get api_usage_api_key_label => 'API-Schluessel';
+  String get api_usage_api_key_label => 'API-Schlüssel';
 
   @override
-  String get api_usage_copy_api_key => 'API-Schluessel kopieren';
+  String get api_usage_copy_api_key => 'API-Schlüssel kopieren';
 
   @override
   String get api_usage_account_id => 'Konto-ID';
@@ -1217,14 +1216,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Konto-ID in Zwischenablage kopiert';
 
   @override
-  String get api_usage_create_new_api_key => 'Neuen API-Schluessel erstellen';
+  String get api_usage_create_new_api_key => 'Neuen API-Schlüssel erstellen';
 
   @override
   String get api_usage_api_key_name_description =>
-      'Geben Sie Ihrem API-Schluessel einen beschreibenden Namen, um ihn spaeter zu identifizieren.';
+      'Geben Sie Ihrem API-Schlüssel einen beschreibenden Namen, um ihn später zu identifizieren.';
 
   @override
-  String get api_usage_api_key_name => 'API-Schluessel-Name';
+  String get api_usage_api_key_name => 'API-Schlüssel-Name';
 
   @override
   String get api_usage_api_key_name_hint =>
@@ -1232,7 +1231,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get api_usage_name_required =>
-      'Bitte geben Sie einen Namen fuer den API-Schluessel ein';
+      'Bitte geben Sie einen Namen für den API-Schlüssel ein';
 
   @override
   String get api_usage_name_min_length =>
@@ -1244,13 +1243,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get api_usage_api_key_security_warning =>
-      'Wer Zugriff auf diesen API-Schluessel hat, hat die gleichen Berechtigungen wie Ihr Konto. Bewahren Sie ihn sicher auf und teilen Sie ihn nicht oeffentlich.';
+      'Wer Zugriff auf diesen API-Schlüssel hat, hat die gleichen Berechtigungen wie Ihr Konto. Bewahren Sie ihn sicher auf und teilen Sie ihn nicht öffentlich.';
 
   @override
   String get api_usage_creating => 'Wird erstellt...';
 
   @override
-  String get api_usage_create_api_key => 'API-Schluessel erstellen';
+  String get api_usage_create_api_key => 'API-Schlüssel erstellen';
 
   @override
   String get api_usage_no_credit_history => 'Noch kein Guthaben-Verlauf';
@@ -1295,7 +1294,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get auth_sign_up_tab => 'Registrieren';
 
   @override
-  String get auth_password_reset_tab => 'Passwort zuruecksetzen';
+  String get auth_password_reset_tab => 'Passwort zurücksetzen';
 
   @override
   String get auth_log_in_button => 'Anmelden';
@@ -1320,7 +1319,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get auth_password_hint => 'Geben Sie Ihr Passwort ein';
 
   @override
-  String get auth_confirm_password_label => 'Passwort bestaetigen';
+  String get auth_confirm_password_label => 'Passwort bestätigen';
 
   @override
   String get auth_confirm_password_hint => 'Geben Sie Ihr Passwort erneut ein';
@@ -1343,44 +1342,44 @@ class AppLocalizationsDe extends AppLocalizations {
       'Geben Sie Ihr neues Passwort erneut ein';
 
   @override
-  String get auth_validation_code_label => 'Bestaetigungscode';
+  String get auth_validation_code_label => 'Bestätigungscode';
 
   @override
   String get auth_validation_code_hint =>
-      'Pruefen Sie Ihre E-Mail auf den Bestaetigungscode';
+      'Prüfen Sie Ihre E-Mail auf den Bestätigungscode';
 
   @override
-  String get auth_confirm_email_button => 'E-Mail bestaetigen';
+  String get auth_confirm_email_button => 'E-Mail bestätigen';
 
   @override
   String auth_check_email(String email) {
-    return 'Pruefen Sie Ihre \"$email\"';
+    return 'Prüfen Sie Ihre \"$email\"';
   }
 
   @override
-  String get auth_send_verification_code => 'Bestaetigungscode senden';
+  String get auth_send_verification_code => 'Bestätigungscode senden';
 
   @override
   String get auth_verification_code_info =>
-      'Ein Bestaetigungscode wird an Ihre E-Mail gesendet';
+      'Ein Bestätigungscode wird an Ihre E-Mail gesendet';
 
   @override
   String get auth_validate_code_button => 'Code aus E-Mail validieren';
 
   @override
   String get auth_password_reset_success_title =>
-      'Passwort erfolgreich zurueckgesetzt!';
+      'Passwort erfolgreich zurückgesetzt!';
 
   @override
   String get auth_password_reset_success_message =>
-      'Sie koennen sich jetzt mit dem neuen Passwort anmelden';
+      'Sie können sich jetzt mit dem neuen Passwort anmelden';
 
   @override
-  String get auth_email_confirmed_title => 'E-Mail bestaetigt!';
+  String get auth_email_confirmed_title => 'E-Mail bestätigt!';
 
   @override
   String get auth_email_confirmed_message =>
-      'Sie koennen sich jetzt mit Ihrer E-Mail und Ihrem Passwort anmelden.';
+      'Sie können sich jetzt mit Ihrer E-Mail und Ihrem Passwort anmelden.';
 
   @override
   String get auth_ok_button => 'OK';
@@ -1392,7 +1391,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get auth_continue_with_google => 'Mit Google fortfahren';
 
   @override
-  String get auth_signing_in => 'Anmeldung laeuft...';
+  String get auth_signing_in => 'Anmeldung läuft...';
 
   @override
   String get auth_google_sign_in_description =>
@@ -1444,7 +1443,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get dashboard_nav_marketplace => 'Marktplatz';
 
   @override
-  String get dashboard_nav_credits_keys => 'Guthaben & Schluessel';
+  String get dashboard_nav_credits_keys => 'Guthaben & Schlüssel';
 
   @override
   String get dashboard_nav_api_analytics => 'API-Analytik';
@@ -1488,13 +1487,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get pricing_plan_basic => 'BASIC';
 
   @override
-  String get pricing_plan_basic_subtitle => 'FUER NEBENPROJEKTE';
+  String get pricing_plan_basic_subtitle => 'FÜR NEBENPROJEKTE';
 
   @override
   String get pricing_plan_pro => 'PRO';
 
   @override
-  String get pricing_plan_pro_subtitle => 'FUER STARTUPS';
+  String get pricing_plan_pro_subtitle => 'FÜR STARTUPS';
 
   @override
   String get pricing_plan_pro_emphasis => 'AM BELIEBTESTEN';
@@ -1524,7 +1523,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get pricing_feature_best_ai_model => 'Zugang zum besten KI-Modell';
 
   @override
-  String get pricing_feature_priority_support => 'Prioritaets-Support';
+  String get pricing_feature_priority_support => 'Prioritäts-Support';
 
   @override
   String get pricing_feature_hide_endpoints =>
@@ -1536,7 +1535,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get pricing_feature_addon_credits =>
-      'Moeglichkeit, einmalige API-Zusatzguthaben zu kaufen';
+      'Möglichkeit, einmalige API-Zusatzguthaben zu kaufen';
 
   @override
   String get pricing_sign_in_required =>
@@ -1544,7 +1543,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get pricing_checkout_error =>
-      'Checkout-Seite konnte nicht geoeffnet werden';
+      'Checkout-Seite konnte nicht geöffnet werden';
 
   @override
   String pricing_error_message(String error) {
@@ -1555,7 +1554,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get marketplace_title => 'Marktplatz';
 
   @override
-  String get marketplace_public_scrappables => 'Oeffentliche Scrappables';
+  String get marketplace_public_scrappables => 'Öffentliche Scrappables';
 
   @override
   String get marketplace_refresh_page => 'Seite aktualisieren';
@@ -1572,7 +1571,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get marketplace_no_scrappables_available =>
-      'Keine Scrappables verfuegbar';
+      'Keine Scrappables verfügbar';
 
   @override
   String marketplace_no_scrappables_match(String searchQuery) {
@@ -1581,10 +1580,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get marketplace_empty_message =>
-      'Der Marktplatz ist derzeit leer. Schauen Sie spaeter nach neuen Scrappables.';
+      'Der Marktplatz ist derzeit leer. Schauen Sie später nach neuen Scrappables.';
 
   @override
-  String get marketplace_clear_search => 'Suche loeschen';
+  String get marketplace_clear_search => 'Suche löschen';
 
   @override
   String marketplace_pagination_range(
@@ -1617,7 +1616,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get marketplace_metrics_total => 'Gesamt';
 
   @override
-  String get marketplace_select_api_key => 'API-Schluessel auswaehlen';
+  String get marketplace_select_api_key => 'API-Schlüssel auswählen';
 
   @override
   String marketplace_api_key_created(String date) {
@@ -1633,12 +1632,12 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String marketplace_clone_success_message(String name) {
-    return '\"$name\" wurde zu Ihren Endpunkten hinzugefuegt';
+    return '\"$name\" wurde zu Ihren Endpunkten hinzugefügt';
   }
 
   @override
   String get marketplace_clone_private_notice =>
-      'Das geklonte Scrappable ist standardmaessig privat. Sie koennen es im Bearbeitungsbildschirm oeffentlich machen.';
+      'Das geklonte Scrappable ist standardmäßig privat. Sie können es im Bearbeitungsbildschirm öffentlich machen.';
 
   @override
   String get marketplace_go_to_endpoints => 'Zu Endpunkten gehen';
@@ -1647,7 +1646,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get marketplace_edit_scrappable => 'Scrappable bearbeiten';
 
   @override
-  String get marketplace_close => 'Schliessen';
+  String get marketplace_close => 'Schließen';
 
   @override
   String get marketplace_example_response => 'Beispielantwort';
@@ -1662,32 +1661,32 @@ class AppLocalizationsDe extends AppLocalizations {
   String get marketplace_tab_screenshot => 'Screenshot';
 
   @override
-  String get marketplace_reference_url => 'Referenz-URL fuer Beispiel:';
+  String get marketplace_reference_url => 'Referenz-URL für Beispiel:';
 
   @override
-  String get marketplace_open_url => 'URL oeffnen';
+  String get marketplace_open_url => 'URL öffnen';
 
   @override
   String get marketplace_copy_url => 'URL kopieren';
 
   @override
   String get marketplace_no_example_response =>
-      'Keine Beispielantwort verfuegbar';
+      'Keine Beispielantwort verfügbar';
 
   @override
   String get marketplace_copy => 'Kopieren';
 
   @override
-  String get marketplace_increase_font_size => 'Schriftgroesse erhoehen';
+  String get marketplace_increase_font_size => 'Schriftgröße erhöhen';
 
   @override
-  String get marketplace_decrease_font_size => 'Schriftgroesse verringern';
+  String get marketplace_decrease_font_size => 'Schriftgröße verringern';
 
   @override
-  String get marketplace_no_html_content => 'Kein HTML-Inhalt verfuegbar';
+  String get marketplace_no_html_content => 'Kein HTML-Inhalt verfügbar';
 
   @override
-  String get marketplace_no_screenshot => 'Kein Screenshot verfuegbar';
+  String get marketplace_no_screenshot => 'Kein Screenshot verfügbar';
 
   @override
   String get marketplace_result_copied => 'Ergebnis in Zwischenablage kopiert';
@@ -1706,7 +1705,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get marketplace_target_url => 'Ziel-URL:';
 
   @override
-  String get marketplace_change => 'Aendern';
+  String get marketplace_change => 'Ändern';
 
   @override
   String get marketplace_curl_command => 'Curl-Befehl';
@@ -1727,7 +1726,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String marketplace_last_logic_modification(String date) {
-    return 'Letzte Logik-Aenderung: $date';
+    return 'Letzte Logik-Änderung: $date';
   }
 
   @override
@@ -1739,14 +1738,14 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get marketplace_no_api_keys =>
-      'Keine API-Schluessel gefunden. Bitte erstellen Sie zuerst einen API-Schluessel, um dieses Scrappable zu verwenden.';
+      'Keine API-Schlüssel gefunden. Bitte erstellen Sie zuerst einen API-Schlüssel, um dieses Scrappable zu verwenden.';
 
   @override
   String get marketplace_upgrade_required_title => 'Upgrade erforderlich';
 
   @override
   String get marketplace_clone_feature_pro =>
-      'Das Klonen von Scrappables aus dem Marktplatz ist in den Pro- und Ultra-Plaenen verfuegbar.';
+      'Das Klonen von Scrappables aus dem Marktplatz ist in den Pro- und Ultra-Plänen verfügbar.';
 
   @override
   String get marketplace_upgrade_benefits_title => 'Upgrade zum Freischalten:';
@@ -1758,16 +1757,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get marketplace_benefit_more_credits => 'Mehr API-Guthaben';
 
   @override
-  String get marketplace_benefit_concurrent => 'Hoehere gleichzeitige Anfragen';
+  String get marketplace_benefit_concurrent => 'Höhere gleichzeitige Anfragen';
 
   @override
   String get marketplace_benefit_endpoints => 'Mehr aktive Endpunkte';
 
   @override
-  String get marketplace_maybe_later => 'Vielleicht spaeter';
+  String get marketplace_maybe_later => 'Vielleicht später';
 
   @override
-  String get marketplace_view_plans => 'Plaene anzeigen';
+  String get marketplace_view_plans => 'Pläne anzeigen';
 
   @override
   String get scrap_session_copied_to_clipboard => 'In Zwischenablage kopiert';
@@ -1782,22 +1781,22 @@ class AppLocalizationsDe extends AppLocalizations {
   String get scrap_session_tab_screenshot => 'Screenshot';
 
   @override
-  String get scrap_session_no_json_response => 'Keine JSON-Antwort verfuegbar';
+  String get scrap_session_no_json_response => 'Keine JSON-Antwort verfügbar';
 
   @override
-  String get scrap_session_no_html_content => 'Kein HTML-Inhalt verfuegbar';
+  String get scrap_session_no_html_content => 'Kein HTML-Inhalt verfügbar';
 
   @override
-  String get scrap_session_no_screenshot => 'Kein Screenshot verfuegbar';
+  String get scrap_session_no_screenshot => 'Kein Screenshot verfügbar';
 
   @override
   String get scrap_session_copy => 'Kopieren';
 
   @override
-  String get scrap_session_increase_font_size => 'Schriftgroesse erhoehen';
+  String get scrap_session_increase_font_size => 'Schriftgröße erhöhen';
 
   @override
-  String get scrap_session_decrease_font_size => 'Schriftgroesse verringern';
+  String get scrap_session_decrease_font_size => 'Schriftgröße verringern';
 
   @override
   String get scrap_session_test_suite => 'Test-Suite';
@@ -1807,7 +1806,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get scrap_session_powerful_model_upgrade =>
-      'Schalten Sie den Zugang zum leistungsstarken KI-Modell frei fuer ueberlegene Extraktionsgenauigkeit und besseres Verstaendnis komplexer Webseiten. Perfekt fuer fortgeschrittene Scraping-Anforderungen.';
+      'Schalten Sie den Zugang zum leistungsstarken KI-Modell frei für überlegene Extraktionsgenauigkeit und besseres Verständnis komplexer Webseiten. Perfekt für fortgeschrittene Scraping-Anforderungen.';
 
   @override
   String get scrap_session_sign_in_required => 'Anmeldung Erforderlich';
@@ -1845,14 +1844,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Erstellen und verwalten Sie mehrere Scraping-Endpoints';
 
   @override
-  String get scrap_session_maybe_later => 'Vielleicht spaeter';
+  String get scrap_session_maybe_later => 'Vielleicht später';
 
   @override
   String get scrap_session_sign_in => 'Anmelden';
 
   @override
   String scrap_session_model_changed(String modelName) {
-    return 'Scrap-KI-Modell wurde auf $modelName geaendert';
+    return 'Scrap-KI-Modell wurde auf $modelName geändert';
   }
 
   @override
@@ -1866,16 +1865,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get scrap_session_deploy_endpoint => 'ENDPOINT BEREITSTELLEN';
 
   @override
-  String get scrap_session_discard_changes => 'Aenderungen verwerfen';
+  String get scrap_session_discard_changes => 'Änderungen verwerfen';
 
   @override
-  String get scrap_session_go_back => 'Zurueck';
+  String get scrap_session_go_back => 'Zurück';
 
   @override
   String get scrap_session_edit_request => 'Scrappable-Anfrage bearbeiten';
 
   @override
-  String get scrap_session_no_test_data => 'Keine Testdaten verfuegbar';
+  String get scrap_session_no_test_data => 'Keine Testdaten verfügbar';
 
   @override
   String get scrap_session_chat_loading => 'Chat wird geladen...';
@@ -1918,11 +1917,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get scrap_session_add_api_key =>
-      'API-Schluessel hinzufuegen um fortzufahren...';
+      'API-Schlüssel hinzufügen um fortzufahren...';
 
   @override
-  String get scrap_session_ask_modification =>
-      'Beliebige Aenderung anfragen...';
+  String get scrap_session_ask_modification => 'Beliebige Änderung anfragen...';
 
   @override
   String get scrap_session_message_min_length =>
@@ -1942,16 +1940,16 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String scrap_session_path_params_hint(Object postId, Object userId) {
-    return 'Pfadparameter sollten in geschweiften Klammern wie $userId oder $postId eingeschlossen werden. Sie stellen dynamische Segmente in der URL dar, die durch tatsaechliche Werte ersetzt werden.';
+    return 'Pfadparameter sollten in geschweiften Klammern wie $userId oder $postId eingeschlossen werden. Sie stellen dynamische Segmente in der URL dar, die durch tatsächliche Werte ersetzt werden.';
   }
 
   @override
   String scrap_session_use_param_name(Object paramName) {
-    return '$paramName fuer Pfadparameter verwenden';
+    return '$paramName für Pfadparameter verwenden';
   }
 
   @override
-  String get scrap_session_save_changes => 'Aenderungen speichern';
+  String get scrap_session_save_changes => 'Änderungen speichern';
 
   @override
   String get scrap_session_duplicate_param => 'Doppelter Parameter';
@@ -1976,15 +1974,15 @@ class AppLocalizationsDe extends AppLocalizations {
       'Scrappable-Anfrage erfolgreich aktualisiert!';
 
   @override
-  String get scrap_session_close => 'Schliessen';
+  String get scrap_session_close => 'Schließen';
 
   @override
   String get scrap_session_chat_loading_disabled_tooltip =>
-      'Deaktiviert wahrend die KI verarbeitet';
+      'Deaktiviert während die KI verarbeitet';
 
   @override
   String get scrap_session_chat_loading_test_notice =>
-      'Die KI verarbeitet eine Anfrage. Bitte warten Sie, bevor Sie Tests ausfuhren.';
+      'Die KI verarbeitet eine Anfrage. Bitte warten Sie, bevor Sie Tests ausführen.';
 
   @override
   String get scrap_session_session_expired_tooltip =>
@@ -2017,13 +2015,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get scrappables_try_different_categories =>
-      'Versuchen Sie andere Kategorien auszuwaehlen oder setzen Sie Ihre Filter zurueck.';
+      'Versuchen Sie andere Kategorien auszuwählen oder setzen Sie Ihre Filter zurück.';
 
   @override
-  String get scrappables_selected_category => 'die ausgewaehlte Kategorie';
+  String get scrappables_selected_category => 'die ausgewählte Kategorie';
 
   @override
-  String get scrappables_selected_categories => 'die ausgewaehlten Kategorien';
+  String get scrappables_selected_categories => 'die ausgewählten Kategorien';
 
   @override
   String get scrappables_your_endpoints => 'Ihre Endpoints';

@@ -916,7 +916,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Failed to load more data. Tap to retry.';
 
   @override
-  String get api_usage_page_title => 'Api Credits & Keys';
+  String get api_usage_page_title => 'API Credits & Keys';
 
   @override
   String get api_usage_refresh => 'Refresh';

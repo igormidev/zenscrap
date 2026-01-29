@@ -733,6 +733,16 @@ const Map<String, Map<SupportedLanguage, String>> _errorTitles = {
     SupportedLanguage.ptBR: 'Límite de Taxa',
     SupportedLanguage.ja: 'レート制限',
   },
+
+  // Country code errors
+  'invalid_country_code': {
+    SupportedLanguage.en: 'Invalid Country Code',
+    SupportedLanguage.es: 'Código de País Inválido',
+    SupportedLanguage.de: 'Ungültiger Ländercode',
+    SupportedLanguage.fr: 'Code pays invalide',
+    SupportedLanguage.ptBR: 'Código de País Inválido',
+    SupportedLanguage.ja: '無効な国コード',
+  },
 };
 
 // ============================================================================
@@ -1614,5 +1624,15 @@ const Map<String, Map<SupportedLanguage, String>> _errorDescriptions = {
     SupportedLanguage.fr: 'Requete invalide a l\'API OpenAI. Cela pourrait etre un probleme de configuration. Veuillez reessayer ou contacter le support.',
     SupportedLanguage.ptBR: 'Solicitação inválida para a API do OpenAI. Isso pode ser um problema de configuração. Por favor, tente novamente ou entre em contato com o suporte.',
     SupportedLanguage.ja: 'OpenAI APIへの無効なリクエスト。これは設定の問題かもしれません。再試行するか、サポートにお問い合わせください。',
+  },
+
+  // Country code errors
+  'invalid_country_code': {
+    SupportedLanguage.en: 'The country code "{countryCode}" is not supported. Please use a valid ISO 3166-1 alpha-2 code (e.g., "us", "gb", "de").',
+    SupportedLanguage.es: 'El código de país "{countryCode}" no es válido. Por favor, utilice un código ISO 3166-1 alfa-2 válido (ej: "us", "gb", "de").',
+    SupportedLanguage.de: 'Der Ländercode "{countryCode}" wird nicht unterstützt. Bitte verwenden Sie einen gültigen ISO 3166-1 Alpha-2 Code (z.B. "us", "gb", "de").',
+    SupportedLanguage.fr: 'Le code pays "{countryCode}" n\'est pas pris en charge. Veuillez utiliser un code ISO 3166-1 alpha-2 valide (ex: "us", "gb", "de").',
+    SupportedLanguage.ptBR: 'O código de país "{countryCode}" não é suportado. Por favor, use um código ISO 3166-1 alfa-2 válido (ex: "us", "gb", "de").',
+    SupportedLanguage.ja: '国コード「{countryCode}」はサポートされていません。有効なISO 3166-1 alpha-2コード（例：「us」、「gb」、「de」）を使用してください。',
   },
 };

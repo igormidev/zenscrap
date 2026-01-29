@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:result_dart/result_dart.dart';
 import 'package:serverpod/serverpod.dart' hide Result;
+import 'package:zenscrap_core/zenscrap_core.dart';
 import 'package:zenscrap_server/src/core/extension/duration_list_extension.dart';
 import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';
 import 'package:zenscrap_server/src/core/extension/scrapping_bee_extract_logic_extension.dart';
@@ -163,13 +164,23 @@ String replacePlaceholders(String? input, Map<String, dynamic> payload) {
 }
 
 /// Creates a copy of ScrappingBeeExtractLogic with all placeholders replaced
+/// and optionally overrides the countryCode if provided in the payload.
+///
+/// The `countryCode` can be overridden by including it in the payload.
+/// If the payload contains a `countryCode` key, it will be used instead of
+/// the one stored in the extractLogic.
 ScrappingBeeExtractLogic replaceExtractLogicPlaceholders(
   ScrappingBeeExtractLogic extractLogic,
   Map<String, dynamic> payload,
 ) {
+  // Check if countryCode override is in the payload
+  final String? countryCodeOverride = payload['countryCode'] as String?;
+
   return extractLogic.copyWith(
     extractRules: replacePlaceholders(extractLogic.extractRules, payload),
     jsScenario: replacePlaceholders(extractLogic.jsScenario, payload),
+    // Only override countryCode if explicitly provided in payload
+    countryCode: countryCodeOverride ?? extractLogic.countryCode,
   );
 }
 
@@ -771,6 +782,22 @@ mixin ApiHelperMixin {
     required Map<String, dynamic> payload,
   }) async {
     final String stringifiedPayload = jsonEncode(payload);
+
+    // Validate country code if provided in payload
+    final String? countryCodeOverride = payload['countryCode'] as String?;
+    if (countryCodeOverride != null &&
+        countryCodeOverride.isNotEmpty &&
+        !isValidScrapingBeeCountryCode(countryCodeOverride)) {
+      return ApiError(
+        RequestStatus.clientError,
+        createTranslatedException(
+          'invalid_country_code',
+          SupportedLanguage.en,
+          params: {'countryCode': countryCodeOverride},
+        ),
+      ).toFailure();
+    }
+
     try {
       return await wrapAnalytics(session, scrappableId, apiKey, payload,
           (nanoId, scrappable, stopwatch) async {

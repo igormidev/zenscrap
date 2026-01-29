@@ -623,11 +623,11 @@ class AppLocalizationsJa extends AppLocalizations {
   String get ai_usage_api_key_cancel => 'キャンセル';
 
   @override
-  String get ai_usage_api_key_remove_confirm_title => 'APIキーを削除しますか?';
+  String get ai_usage_api_key_remove_confirm_title => 'APIキーを削除しますか？';
 
   @override
   String get ai_usage_api_key_remove_confirm_message =>
-      'OpenAI APIキーを削除してもよろしいですか? 代わりにプラットフォームの月間クレジットを使用することになります。';
+      'OpenAI APIキーを削除してもよろしいですか？ 代わりにプラットフォームの月間クレジットを使用することになります。';
 
   @override
   String get ai_usage_api_key_updated => 'APIキーが正常に更新されました';

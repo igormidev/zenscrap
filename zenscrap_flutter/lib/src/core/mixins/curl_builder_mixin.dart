@@ -30,6 +30,7 @@ mixin CurlBuilderMixin {
     Map<String, String>? additionalHeaders,
     Map<String, String?>? queryParams,
     Map<String, String?>? queryParamsNotRelatedToUrl,
+    String? countryCode,
   }) {
     // Convert API host to web server host for webServer routes
     final webBaseUrl = _apiHostToWebHost(baseUrl);
@@ -61,6 +62,11 @@ mixin CurlBuilderMixin {
         mergedPayload[key] = value;
       }
     });
+
+    // Add countryCode to payload if provided (for proxy geolocation)
+    if (countryCode != null && countryCode.isNotEmpty) {
+      mergedPayload['countryCode'] = countryCode;
+    }
 
     // Build the request payload
     final Map<String, dynamic> payload = {

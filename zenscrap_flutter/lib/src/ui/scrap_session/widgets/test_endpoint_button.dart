@@ -19,6 +19,9 @@ class TestEndpointButton extends StatelessWidget {
   /// Required when [isTestMode] is false. The API key for production calls.
   final String? apiKey;
 
+  /// The default country code from ScrappingBeeExtractLogic (can be null).
+  final String? defaultCountryCode;
+
   const TestEndpointButton({
     super.key,
     required this.scrappableId,
@@ -27,6 +30,7 @@ class TestEndpointButton extends StatelessWidget {
     this.targetTime,
     this.isTestMode = true,
     this.apiKey,
+    this.defaultCountryCode,
   });
 
   /// Check if the session is expired (only applies to test mode)
@@ -63,6 +67,7 @@ class TestEndpointButton extends StatelessWidget {
             isTestMode: isTestMode,
             targetTime: targetTime,
             apiKey: apiKey,
+            defaultCountryCode: defaultCountryCode,
           ),
         );
       },

@@ -5,3 +5,4 @@
 library zenscrap_core;
 
 export 'src/banned_domains.dart';
+export 'src/scraping_bee_country_codes.dart';

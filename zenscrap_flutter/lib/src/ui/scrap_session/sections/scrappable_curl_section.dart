@@ -64,6 +64,7 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection>
         examplePayload: examplePayload,
         queryParams: targetQueryParams,
         queryParamsNotRelatedToUrl: targetQueryParamsNotRelatedToUrl,
+        countryCode: widget.scrappingBeeExtractLogic?.countryCode,
       );
       copiableCurlCommand = buildSimpleCurl(
         isDisplayCurl: false,
@@ -73,6 +74,7 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection>
         examplePayload: examplePayload,
         queryParams: targetQueryParams,
         queryParamsNotRelatedToUrl: targetQueryParamsNotRelatedToUrl,
+        countryCode: widget.scrappingBeeExtractLogic?.countryCode,
       );
     }
   }
@@ -98,6 +100,7 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection>
                 scrappableRequest: widget.scrappableRequest,
                 testData: widget.testData,
                 targetTime: widget.targetTime,
+                defaultCountryCode: widget.scrappingBeeExtractLogic?.countryCode,
               ),
               RemainingTimeIndicator(widget.targetTime),
             ],
@@ -130,6 +133,7 @@ class _ScrappableCurlSectionState extends ConsumerState<ScrappableCurlSection>
           scrappableRequest: widget.scrappableRequest,
           testData: widget.testData,
           targetTime: widget.targetTime,
+          defaultCountryCode: widget.scrappingBeeExtractLogic?.countryCode,
         ),
       ],
       trailingWidgets: [
