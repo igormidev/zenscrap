@@ -2164,6 +2164,34 @@ class AnalyticsService {
   }
 
   // ========================================
+  // Banned Domain Events
+  // ========================================
+
+  /// Track when user attempts to use a banned domain.
+  ///
+  /// This helps understand which blocked platforms users are trying to scrape,
+  /// which can inform decisions about expanding support or improving messaging.
+  ///
+  /// [bannedDomain] - The specific domain that was blocked (e.g., "instagram.com")
+  /// [fullUrl] - The full URL the user entered
+  /// [source] - Where the attempt occurred ("hero_section" or "create_dialog")
+  Future<void> trackBannedDomainAttempt({
+    required String bannedDomain,
+    required String fullUrl,
+    required String source,
+  }) async {
+    await _safeCapture(
+      eventName: 'scrappable:banned_domain_attempt',
+      properties: {
+        'banned_domain': bannedDomain,
+        'full_url': fullUrl,
+        'source': source,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  // ========================================
   // General Utility Methods
   // ========================================
 
