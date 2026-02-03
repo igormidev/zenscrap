@@ -8,8 +8,7 @@
         "client_secret": "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",
         "redirect_uris": [
             "http://localhost:8082/auth/google/callback",
-            "https://zenscrap.com/auth/google/callback",
-            "https://www.zenscrap.com/auth/google/callback"
+            "https://api.zenscrap.com/auth/google/callback"
         ],
         "javascript_origins": [
             "http://localhost:8082",

@@ -128,14 +128,26 @@ void run(List<String> args) async {
   // Register payment success page (shown after successful Stripe checkout)
   pod.webServer.addRoute(PaymentSuccessRoute(), '/success');
 
-  // Setup Flutter web app using Serverpod 3.0 FlutterRoute (catch-all for remaining routes)
-  // FlutterRoute is designed for Flutter WASM apps and automatically:
-  // - Handles SPA-style routing (falls back to index.html)
-  // - Adds WASM multi-threading headers (Cross-Origin-Opener-Policy, Cross-Origin-Embedder-Policy)
-  // Note: FlutterRoute internally handles all routing via injectIn, so we add it at '/' only
+  // Setup Flutter web app using SpaRoute (catch-all for remaining routes)
+  //
+  // IMPORTANT: We use SpaRoute instead of FlutterRoute because:
+  // - FlutterRoute adds COOP/COEP headers for multi-threaded WASM
+  // - These headers (Cross-Origin-Opener-Policy: same-origin) break Google Sign-In popup
+  //   by making window.opener null, causing "Cannot read properties of null (reading 'postMessage')"
+  // - SpaRoute serves the Flutter app without these headers
+  // - Flutter WASM still works in single-threaded mode (which is still faster than JS)
+  //
+  // See: https://github.com/firebase/flutterfire/issues/12819
+  // See: https://web.dev/articles/coop-coep
   final flutterAppDir = Directory('web/app');
   if (flutterAppDir.existsSync()) {
-    pod.webServer.addRoute(FlutterRoute(flutterAppDir), '/');
+    pod.webServer.addRoute(
+      SpaRoute(
+        flutterAppDir,
+        fallback: File('web/app/index.html'),
+      ),
+      '/',
+    );
   } else {
     // ignore: avoid_print
     print(
