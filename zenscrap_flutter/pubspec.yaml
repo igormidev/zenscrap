@@ -53,7 +53,7 @@ dependencies:
   synchronized: ^3.4.0
   string_similarity: ^2.1.1
   fl_chart: ^1.1.1
-  posthog_flutter: ^5.6.0
+  posthog_flutter: ^5.13.0
 
   talker: ^5.1.5
   talker_flutter: ^5.1.5

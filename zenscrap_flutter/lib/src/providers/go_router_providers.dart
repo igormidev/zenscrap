@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:posthog_flutter/posthog_flutter.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
@@ -40,6 +41,9 @@ class RouterNotifier extends Notifier<GoRouter> {
     return GoRouter(
       navigatorKey: _rootNavigatorKey,
       observers: <NavigatorObserver>[
+        // PosthogObserver tracks screen views automatically
+        // Routes must have names for proper tracking
+        PosthogObserver(),
         if (kDebugMode) TalkerRouteObserver(talker),
       ],
       redirect: (context, state) {
@@ -81,12 +85,14 @@ class RouterNotifier extends Notifier<GoRouter> {
       routes: [
         GoRoute(
           path: '/splash',
+          name: 'Splash',
           builder: (context, state) {
             return const SplashView();
           },
         ),
         GoRoute(
           path: '/scrappable-form',
+          name: 'Scrappable Form',
           builder: (context, state) {
             final scrappableIdStr = state.uri.queryParameters['id'];
             final int? scrappableId = scrappableIdStr != null
@@ -105,30 +111,37 @@ class RouterNotifier extends Notifier<GoRouter> {
           routes: [
             GoRoute(
               path: DashboardNavigationType.userEndpoints.routeOnClick!,
+              name: 'User Endpoints',
               builder: (context, state) => const UserScrappablesListageView(),
             ),
             GoRoute(
               path: DashboardNavigationType.marketPlace.routeOnClick!,
+              name: 'Marketplace',
               builder: (context, state) => MarketplaceView(),
             ),
             GoRoute(
               path: DashboardNavigationType.usage.routeOnClick!,
+              name: 'API Usage',
               builder: (context, state) => ApiUsageView(),
             ),
             GoRoute(
               path: DashboardNavigationType.analytics.routeOnClick!,
+              name: 'API Analytics',
               builder: (context, state) => ApiAnalyticsView(),
             ),
             GoRoute(
               path: DashboardNavigationType.aiUsage.routeOnClick!,
+              name: 'AI Usage',
               builder: (context, state) => const AiUsageView(),
             ),
             GoRoute(
               path: DashboardNavigationType.account.routeOnClick!,
+              name: 'Account',
               builder: (context, state) => AccountView(),
             ),
             GoRoute(
               path: DashboardNavigationType.pricingPage.routeOnClick!,
+              name: 'Pricing',
               builder: (context, state) => ZenScrapPricingPage(),
             ),
           ],
@@ -138,6 +151,7 @@ class RouterNotifier extends Notifier<GoRouter> {
         ),
         GoRoute(
           path: '/auth',
+          name: 'Auth',
           builder: (context, state) {
             return const AuthView();
           },

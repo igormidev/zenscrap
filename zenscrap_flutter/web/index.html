@@ -676,6 +676,24 @@
     posthog.init('phc_ctZsxdHMUJjuLPTyjASz0vVzbbPvx3ov0VdqoY7D0vh', {
       api_host: 'https://us.i.posthog.com',
       person_profiles: 'identified_only',
+      // Session replay configuration for Flutter Web
+      // Canvas capture must also be enabled in PostHog Project Settings
+      // Flutter renders using a browser canvas element, so this is required
+      session_recording: {
+        // Capture canvas elements (required for Flutter Web)
+        recordCanvas: true,
+        // Canvas recording options
+        canvasFps: 4, // 4 frames per second (default when canvas recording is enabled)
+        canvasQuality: '0.6', // Quality between 0 and 1 (default is 0.4)
+        // Mask text inputs for privacy
+        maskAllInputs: true,
+        maskInputOptions: {
+          password: true,
+        },
+      },
+      // Capture page views and page leaves
+      capture_pageview: true,
+      capture_pageleave: true,
     })
   </script>
 </head>
