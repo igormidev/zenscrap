@@ -28,6 +28,36 @@ import 'src/generated/endpoints.dart';
 // only need to make additions to this file if you add future calls,  are
 // configuring Relic (Serverpod's web-server), or need custom setup work.
 
+/// Middleware to add Cross-Origin-Opener-Policy header for Google Sign-In compatibility.
+///
+/// Google Sign-In popups require `same-origin-allow-popups` to communicate back
+/// to the opener window via postMessage. Without this header, window.opener is null
+/// and the auth flow fails with a blank popup.
+///
+/// See: https://developers.google.com/identity/gsi/web/guides/get-google-api-clientid#cross_origin_opener_policy
+class GoogleSignInCoopMiddleware extends MiddlewareObject {
+  const GoogleSignInCoopMiddleware();
+
+  @override
+  Handler call(Handler next) {
+    return (Request req) async {
+      final result = await next(req);
+
+      // Only modify Response objects
+      if (result is Response) {
+        return result.copyWith(
+          headers: result.headers.transform((mh) {
+            mh.crossOriginOpenerPolicy =
+                CrossOriginOpenerPolicyHeader.sameOriginAllowPopups;
+          }),
+        );
+      }
+
+      return result;
+    };
+  }
+}
+
 void run(List<String> args) async {
   // Initialize Serverpod and connect it with your generated code.
   final pod = Serverpod(args, Protocol(), Endpoints());
@@ -101,6 +131,11 @@ void run(List<String> args) async {
     ],
   );
 
+  // Apply COOP middleware to all web routes for Google Sign-In popup compatibility.
+  // This sets Cross-Origin-Opener-Policy: same-origin-allow-popups which allows
+  // Google's popup to call window.opener.postMessage() after authentication.
+  pod.webServer.addMiddleware(const GoogleSignInCoopMiddleware(), '/');
+
   // Register API routes FIRST (before catch-all routes)
   pod.webServer.addRoute(StripeWebhookRoute(), '/stripe/webhook');
 
@@ -130,15 +165,14 @@ void run(List<String> args) async {
 
   // Setup Flutter web app using SpaRoute (catch-all for remaining routes)
   //
-  // IMPORTANT: We use SpaRoute instead of FlutterRoute because:
-  // - FlutterRoute adds COOP/COEP headers for multi-threaded WASM
-  // - These headers (Cross-Origin-Opener-Policy: same-origin) break Google Sign-In popup
-  //   by making window.opener null, causing "Cannot read properties of null (reading 'postMessage')"
-  // - SpaRoute serves the Flutter app without these headers
+  // NOTE: We use SpaRoute instead of FlutterRoute because:
+  // - FlutterRoute adds Cross-Origin-Opener-Policy: same-origin which breaks Google Sign-In
+  // - We need Cross-Origin-Opener-Policy: same-origin-allow-popups for Google Sign-In popup
+  //   to call window.opener.postMessage() after authentication
+  // - The googleSignInCoopMiddleware() above adds the correct COOP header
   // - Flutter WASM still works in single-threaded mode (which is still faster than JS)
   //
-  // See: https://github.com/firebase/flutterfire/issues/12819
-  // See: https://web.dev/articles/coop-coep
+  // See: https://developers.google.com/identity/gsi/web/guides/get-google-api-clientid#cross_origin_opener_policy
   final flutterAppDir = Directory('web/app');
   if (flutterAppDir.existsSync()) {
     pod.webServer.addRoute(

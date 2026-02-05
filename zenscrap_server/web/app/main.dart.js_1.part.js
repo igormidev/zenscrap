@@ -3,9 +3,9 @@ $__dart_deferred_initializers__.current=function(a,b,c,$){var B,A={
 c1Q(d){B.mS(d)
 return new A.vE()},
 c1R(){B.mS("pt_BR")
-return new A.zZ()},
+return new A.A_()},
 vE:function vE(){},
-zZ:function zZ(){}},C
+A_:function A_(){}},C
 B=c[0]
 A=a.updateHolder(c[3],A)
 C=c[9]
@@ -604,7 +604,7 @@ gHw(){return"An unexpected error occurred. Please try again. If the problem cont
 gH_(){return"Try Again"},
 gH0(){return"Try Later"},
 gGZ(){return"OK"}}
-A.zZ.prototype={
+A.A_.prototype={
 gD7(){return"Criar Scrappable"},
 gD9(){return"Como Funciona"},
 gD6(){return"Auto-Reparo"},
@@ -1140,6 +1140,6 @@ gBS(){return"Mostrar original"},
 gBT(){return"Mostrar tradu\xe7\xe3o"}}
 var z=a.updateTypes([]);(function inheritance(){var y=a.inherit
 y(A.vE,C.fg)
-y(A.zZ,A.vE)})()
-B.Nw(b.typeUniverse,JSON.parse('{"vE":{"fg":[]},"zZ":{"fg":[]}}'))};
-(a=>{a["gadMVUn67RDPJumHk5i7KEM5rMU="]=a.current})($__dart_deferred_initializers__);
+y(A.A_,A.vE)})()
+B.Nw(b.typeUniverse,JSON.parse('{"vE":{"fg":[]},"A_":{"fg":[]}}'))};
+(a=>{a["6OrmvgpaADZg/57wf7RVm27op+A="]=a.current})($__dart_deferred_initializers__);
