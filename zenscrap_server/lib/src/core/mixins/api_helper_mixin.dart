@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:result_dart/result_dart.dart';
 import 'package:serverpod/serverpod.dart' hide Result;
+import 'package:zenscrap_core/zenscrap_core.dart';
 import 'package:zenscrap_server/src/core/extension/duration_list_extension.dart';
 import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';
 import 'package:zenscrap_server/src/core/extension/scrapping_bee_extract_logic_extension.dart';
@@ -68,7 +69,7 @@ class ApiHelperConfig {
   /// Analytics are collected in-memory and written to the database in batches
   /// to reduce write frequency. Lower values = more frequent writes but less
   /// data loss on crash. Higher values = fewer writes but more potential data loss.
-  static const Duration analyticsBatchInterval = Duration(minutes: 5);
+  static const Duration analyticsBatchInterval = Duration(minutes: 3);
 
   /// Interval for cleaning up expired in-memory cache entries.
   ///
@@ -153,8 +154,10 @@ String replacePlaceholders(String? input, Map<String, dynamic> payload) {
   // Replace all matches
   result = result.replaceAllMapped(placeholderPattern, (match) {
     final fullMatch = match.group(0)!; // e.g., "{searchQuery}"
-    final paramName =
-        fullMatch.substring(1, fullMatch.length - 1); // Remove { and }
+    final paramName = fullMatch.substring(
+      1,
+      fullMatch.length - 1,
+    ); // Remove { and }
     final value = payload[paramName];
     return value?.toString() ?? '';
   });
@@ -163,13 +166,23 @@ String replacePlaceholders(String? input, Map<String, dynamic> payload) {
 }
 
 /// Creates a copy of ScrappingBeeExtractLogic with all placeholders replaced
+/// and optionally overrides the countryCode if provided in the payload.
+///
+/// The `countryCode` can be overridden by including it in the payload.
+/// If the payload contains a `countryCode` key, it will be used instead of
+/// the one stored in the extractLogic.
 ScrappingBeeExtractLogic replaceExtractLogicPlaceholders(
   ScrappingBeeExtractLogic extractLogic,
   Map<String, dynamic> payload,
 ) {
+  // Check if countryCode override is in the payload
+  final String? countryCodeOverride = payload['countryCode'] as String?;
+
   return extractLogic.copyWith(
     extractRules: replacePlaceholders(extractLogic.extractRules, payload),
     jsScenario: replacePlaceholders(extractLogic.jsScenario, payload),
+    // Only override countryCode if explicitly provided in payload
+    countryCode: countryCodeOverride ?? extractLogic.countryCode,
   );
 }
 
@@ -186,14 +199,17 @@ mixin ApiHelperMixin {
   static final Map<NanoId, _CacheEntry<List<ApiKey>>> _apiKeysAttachedToNanoId =
       {};
   static final Map<NanoId, _CacheEntry<List<ScrappableId>>>
-      _allowedScrappableIdsToUse = {};
+  _allowedScrappableIdsToUse = {};
 
   // Scrappable cache with TTL tracking
   static final Map<ScrappableId, _CacheEntry<Scrappable>> _scrappables = {};
 
   // Pending analytics - cleared by PeriodicSetRequestsAnalytics FutureCall
-  static final Map<ScrappableId,
-      Map<NanoId, Map<ApiKey, List<AnalyticsPayload>>>> _pendingAnalytics = {};
+  static final Map<
+    ScrappableId,
+    Map<NanoId, Map<ApiKey, List<AnalyticsPayload>>>
+  >
+  _pendingAnalytics = {};
 
   /// Cleans up expired cache entries. Called periodically by PeriodicCacheCleanup.
   static void cleanupExpiredCacheEntries() {
@@ -201,18 +217,24 @@ mixin ApiHelperMixin {
     final scrappableMaxAge = ApiHelperConfig.scrappableCacheMaxAge;
 
     // Cleanup nanoId-keyed caches
-    _currentAccountPlanTierCache
-        .removeWhere((_, entry) => entry.isExpired(nanoIdMaxAge));
-    _currentCreditUsage
-        .removeWhere((_, entry) => entry.isExpired(nanoIdMaxAge));
-    _remainingSubscriptionCredits
-        .removeWhere((_, entry) => entry.isExpired(nanoIdMaxAge));
-    _remainingPurchasedCredits
-        .removeWhere((_, entry) => entry.isExpired(nanoIdMaxAge));
-    _apiKeysAttachedToNanoId
-        .removeWhere((_, entry) => entry.isExpired(nanoIdMaxAge));
-    _allowedScrappableIdsToUse
-        .removeWhere((_, entry) => entry.isExpired(nanoIdMaxAge));
+    _currentAccountPlanTierCache.removeWhere(
+      (_, entry) => entry.isExpired(nanoIdMaxAge),
+    );
+    _currentCreditUsage.removeWhere(
+      (_, entry) => entry.isExpired(nanoIdMaxAge),
+    );
+    _remainingSubscriptionCredits.removeWhere(
+      (_, entry) => entry.isExpired(nanoIdMaxAge),
+    );
+    _remainingPurchasedCredits.removeWhere(
+      (_, entry) => entry.isExpired(nanoIdMaxAge),
+    );
+    _apiKeysAttachedToNanoId.removeWhere(
+      (_, entry) => entry.isExpired(nanoIdMaxAge),
+    );
+    _allowedScrappableIdsToUse.removeWhere(
+      (_, entry) => entry.isExpired(nanoIdMaxAge),
+    );
 
     // Cleanup scrappable cache
     _scrappables.removeWhere((_, entry) => entry.isExpired(scrappableMaxAge));
@@ -225,7 +247,8 @@ mixin ApiHelperMixin {
   /// Enforces maximum cache sizes by evicting oldest entries.
   /// Called when adding new entries to prevent unbounded growth.
   static void _enforceNanoIdCacheSize(NanoId newNanoId) {
-    if (_currentAccountPlanTierCache.length >= ApiHelperConfig.maxNanoIdCacheSize) {
+    if (_currentAccountPlanTierCache.length >=
+        ApiHelperConfig.maxNanoIdCacheSize) {
       // Find and remove the oldest entry (excluding the new one being added)
       _evictOldestEntry(_currentAccountPlanTierCache, exclude: newNanoId);
     }
@@ -239,8 +262,10 @@ mixin ApiHelperMixin {
   }
 
   /// Evicts the oldest entry from a cache map.
-  static void _evictOldestEntry<K, V>(Map<K, _CacheEntry<V>> cache,
-      {K? exclude}) {
+  static void _evictOldestEntry<K, V>(
+    Map<K, _CacheEntry<V>> cache, {
+    K? exclude,
+  }) {
     if (cache.isEmpty) return;
 
     K? oldestKey;
@@ -270,7 +295,7 @@ mixin ApiHelperMixin {
   }
 
   Future<({NanoId? nanoId, Scrappable scrappable, PlanTier? planTier})>
-      setAllDependencies(
+  setAllDependencies(
     Session session,
     ScrappableId scrappableId,
     ApiKey? apiKey,
@@ -278,9 +303,12 @@ mixin ApiHelperMixin {
     // Get cached scrappable value (if not expired)
     final scrappableCacheEntry = _scrappables[scrappableId];
     final Scrappable? cacheScrappable =
-        scrappableCacheEntry?.isExpired(ApiHelperConfig.scrappableCacheMaxAge) == false
-            ? scrappableCacheEntry?.value
-            : null;
+        scrappableCacheEntry?.isExpired(
+              ApiHelperConfig.scrappableCacheMaxAge,
+            ) ==
+            false
+        ? scrappableCacheEntry?.value
+        : null;
 
     String? nanoId;
     if (apiKey != null) {
@@ -290,12 +318,14 @@ mixin ApiHelperMixin {
     }
 
     // Get cached plan tier (if not expired)
-    final planTierCacheEntry =
-        nanoId == null ? null : _currentAccountPlanTierCache[nanoId];
+    final planTierCacheEntry = nanoId == null
+        ? null
+        : _currentAccountPlanTierCache[nanoId];
     PlanTier? cachePlanTier =
-        planTierCacheEntry?.isExpired(ApiHelperConfig.nanoIdCacheMaxAge) == false
-            ? planTierCacheEntry?.value
-            : null;
+        planTierCacheEntry?.isExpired(ApiHelperConfig.nanoIdCacheMaxAge) ==
+            false
+        ? planTierCacheEntry?.value
+        : null;
 
     if (apiKey == null && cacheScrappable != null) {
       return (
@@ -311,12 +341,15 @@ mixin ApiHelperMixin {
       final allowedScrappablesEntry = _allowedScrappableIdsToUse[nanoId];
 
       final creditUsageValid =
-          creditUsageEntry?.isExpired(ApiHelperConfig.nanoIdCacheMaxAge) == false;
+          creditUsageEntry?.isExpired(ApiHelperConfig.nanoIdCacheMaxAge) ==
+          false;
       final apiKeysValid =
           apiKeysEntry?.isExpired(ApiHelperConfig.nanoIdCacheMaxAge) == false;
       final allowedScrappablesValid =
-          allowedScrappablesEntry?.isExpired(ApiHelperConfig.nanoIdCacheMaxAge) ==
-              false;
+          allowedScrappablesEntry?.isExpired(
+            ApiHelperConfig.nanoIdCacheMaxAge,
+          ) ==
+          false;
 
       if (cachePlanTier != null &&
           creditUsageValid &&
@@ -329,7 +362,7 @@ mixin ApiHelperMixin {
         return (
           nanoId: nanoId,
           scrappable: cacheScrappable,
-          planTier: cachePlanTier
+          planTier: cachePlanTier,
         );
       }
 
@@ -338,7 +371,8 @@ mixin ApiHelperMixin {
         where: (p0) =>
             p0.accountApiUsage.nanoId.equals(nanoId) &
             p0.accountApiUsage.apiKeys.any(
-                (key) => key.apiKey.equals(apiKey) & key.isActive.equals(true)),
+              (key) => key.apiKey.equals(apiKey) & key.isActive.equals(true),
+            ),
         include: AccountInfo.include(
           accountApiUsage: AccountApiUsage.include(
             creditUsage: CreditUsage.include(),
@@ -364,10 +398,8 @@ mixin ApiHelperMixin {
       where: (t) =>
           t.id.equals(scrappableId) &
           (t.apiUsageOwnerNanoId.equals(null) |
-
               // If not private, allow all
               t.willHideFromMarketplace.equals(false) |
-
               // If private, allow only if the nanoId matches
               (t.willHideFromMarketplace.equals(true) &
                   t.apiUsageOwnerNanoId.notEquals(null) &
@@ -452,7 +484,9 @@ mixin ApiHelperMixin {
   }
 
   void throwErrorIfIsATestRequestAndTestTimeExpired(
-      ApiKey? apiKey, Scrappable scrappable) {
+    ApiKey? apiKey,
+    Scrappable scrappable,
+  ) {
     final isTest = apiKey == null;
 
     if (isTest) {
@@ -464,7 +498,9 @@ mixin ApiHelperMixin {
   }
 
   String composeUrl(
-      Map<String, dynamic> payload, ScrappableRequest scrappableRequest) {
+    Map<String, dynamic> payload,
+    ScrappableRequest scrappableRequest,
+  ) {
     String targetUrl = scrappableRequest.url;
 
     // First, add the path parameters
@@ -513,31 +549,31 @@ mixin ApiHelperMixin {
 
     final subscriptionCredits =
         subscriptionEntry?.isExpired(ApiHelperConfig.nanoIdCacheMaxAge) == false
-            ? subscriptionEntry?.value
-            : null;
+        ? subscriptionEntry?.value
+        : null;
     final purchasedCredits =
         purchasedEntry?.isExpired(ApiHelperConfig.nanoIdCacheMaxAge) == false
-            ? purchasedEntry?.value
-            : null;
+        ? purchasedEntry?.value
+        : null;
 
     if (subscriptionCredits == null || purchasedCredits == null) {
       // Let's get the most updated value from data base
       final accountApiUsage = await AccountApiUsage.db.findFirstRow(
         session,
         where: (p0) => p0.nanoId.equals(nanoId),
-        include: AccountApiUsage.include(
-          creditUsage: CreditUsage.include(),
-        ),
+        include: AccountApiUsage.include(creditUsage: CreditUsage.include()),
       );
       if (accountApiUsage == null || accountApiUsage.creditUsage == null) {
         throw _noApiFound();
       }
 
       _currentCreditUsage[nanoId] = _CacheEntry(accountApiUsage.creditUsage!);
-      _remainingPurchasedCredits[nanoId] =
-          _CacheEntry(accountApiUsage.creditUsage!.purchasedCredits);
-      _remainingSubscriptionCredits[nanoId] =
-          _CacheEntry(accountApiUsage.creditUsage!.subscriptionCredits);
+      _remainingPurchasedCredits[nanoId] = _CacheEntry(
+        accountApiUsage.creditUsage!.purchasedCredits,
+      );
+      _remainingSubscriptionCredits[nanoId] = _CacheEntry(
+        accountApiUsage.creditUsage!.subscriptionCredits,
+      );
       return discountApiTokens(session, nanoId: nanoId, creditCost: creditCost);
     }
 
@@ -551,8 +587,9 @@ mixin ApiHelperMixin {
     if (subscriptionCredits >= creditCost) {
       final currentEntry = _remainingSubscriptionCredits[nanoId];
       final currentValue = currentEntry?.value ?? subscriptionCredits;
-      _remainingSubscriptionCredits[nanoId] =
-          _CacheEntry(currentValue - creditCost);
+      _remainingSubscriptionCredits[nanoId] = _CacheEntry(
+        currentValue - creditCost,
+      );
       return;
     }
 
@@ -563,8 +600,9 @@ mixin ApiHelperMixin {
       final currentPurchasedEntry = _remainingPurchasedCredits[nanoId];
       final currentPurchasedValue =
           currentPurchasedEntry?.value ?? purchasedCredits;
-      _remainingPurchasedCredits[nanoId] =
-          _CacheEntry(currentPurchasedValue - remainingCost);
+      _remainingPurchasedCredits[nanoId] = _CacheEntry(
+        currentPurchasedValue - remainingCost,
+      );
       return;
     }
 
@@ -572,15 +610,20 @@ mixin ApiHelperMixin {
     if (purchasedCredits >= creditCost) {
       final currentEntry = _remainingPurchasedCredits[nanoId];
       final currentValue = currentEntry?.value ?? purchasedCredits;
-      _remainingPurchasedCredits[nanoId] = _CacheEntry(currentValue - creditCost);
+      _remainingPurchasedCredits[nanoId] = _CacheEntry(
+        currentValue - creditCost,
+      );
       return;
     }
 
     throw _insufficientCredits();
   }
 
-  Future<ScrappingBeeExtractLogic> _getExtractRules(Session session,
-      Scrappable scrappable, String? accountApiKeyString) async {
+  Future<ScrappingBeeExtractLogic> _getExtractRules(
+    Session session,
+    Scrappable scrappable,
+    String? accountApiKeyString,
+  ) async {
     final isTest = accountApiKeyString == null;
     if (isTest) {
       final testSessionExtractRule = getTestExtractRules(scrappable.id!);
@@ -608,7 +651,10 @@ mixin ApiHelperMixin {
   }
 
   Future<void> guaranteeApiKeyExists(
-      Session session, NanoId? nanoId, ApiKey? apiKey) async {
+    Session session,
+    NanoId? nanoId,
+    ApiKey? apiKey,
+  ) async {
     final isTest = nanoId == null || apiKey == null;
     if (isTest) return;
 
@@ -617,7 +663,8 @@ mixin ApiHelperMixin {
       where: (p0) =>
           p0.nanoId.equals(nanoId) &
           p0.apiKeys.any(
-              (key) => key.apiKey.equals(apiKey) & key.isActive.equals(true)),
+            (key) => key.apiKey.equals(apiKey) & key.isActive.equals(true),
+          ),
     );
 
     if (accountApiUsage == null) {
@@ -638,7 +685,12 @@ mixin ApiHelperMixin {
     ScrappableId scrappableId,
     ApiKey? apiKey,
     Map<String, dynamic> payload,
-    Future<T> Function(NanoId? nanoId, Scrappable scrappable, Stopwatch stopwatch) call,
+    Future<T> Function(
+      NanoId? nanoId,
+      Scrappable scrappable,
+      Stopwatch stopwatch,
+    )
+    call,
   ) async {
     // Start stopwatch at the EARLIEST point to capture full request duration
     final stopwatch = Stopwatch()..start();
@@ -650,10 +702,7 @@ mixin ApiHelperMixin {
       final result = await setAllDependencies(session, scrappableId, apiKey);
       nanoId = result.nanoId;
       scrappable = result.scrappable;
-      increaseConcurrency(
-        nanoId,
-        result.planTier,
-      );
+      increaseConcurrency(nanoId, result.planTier);
       final doesApiKeyExists = checkIdApiKeyExists(nanoId, apiKey);
       // Will throw if not exists and cache result if exist so new calls to db are not needed each time
       if (!doesApiKeyExists) {
@@ -730,7 +779,10 @@ mixin ApiHelperMixin {
             status: RequestStatus.serverError,
             stringifiedPayload: stringifiedPayload,
             title: getErrorTitle('unexpected_error', SupportedLanguage.en),
-            description: getErrorDescription('unexpected_error', SupportedLanguage.en),
+            description: getErrorDescription(
+              'unexpected_error',
+              SupportedLanguage.en,
+            ),
             errorObjectAsString: error.toString(),
             errorStackTraceAsString: stackTrace.toString(),
             duration: requestDuration,
@@ -771,9 +823,28 @@ mixin ApiHelperMixin {
     required Map<String, dynamic> payload,
   }) async {
     final String stringifiedPayload = jsonEncode(payload);
+
+    // Validate country code if provided in payload
+    final String? countryCodeOverride = payload['countryCode'] as String?;
+    if (countryCodeOverride != null &&
+        countryCodeOverride.isNotEmpty &&
+        !isValidScrapingBeeCountryCode(countryCodeOverride)) {
+      return ApiError(
+        RequestStatus.clientError,
+        createTranslatedException(
+          'invalid_country_code',
+          SupportedLanguage.en,
+          params: {'countryCode': countryCodeOverride},
+        ),
+      ).toFailure();
+    }
+
     try {
-      return await wrapAnalytics(session, scrappableId, apiKey, payload,
-          (nanoId, scrappable, stopwatch) async {
+      return await wrapAnalytics(session, scrappableId, apiKey, payload, (
+        nanoId,
+        scrappable,
+        stopwatch,
+      ) async {
         // final (Scrappable scrappable, ScrappableRequest targetRequest) =
         //     await getScrappableById(session, scrappableId, nanoId);
         // setScrappableCallback(scrappable);
@@ -781,20 +852,26 @@ mixin ApiHelperMixin {
 
         final isTestRequest = apiKey == null;
 
-        final ScrappingBeeExtractLogic extractRules =
-            await _getExtractRules(session, scrappable, apiKey);
+        final ScrappingBeeExtractLogic extractRules = await _getExtractRules(
+          session,
+          scrappable,
+          apiKey,
+        );
 
         // Calculate the actual credit cost for this extraction using the totalCreditCost getter
         final creditCost = extractRules.totalCreditCost;
 
         // Discount the actual cost from the account
-        await discountApiTokens(session,
-            nanoId: nanoId, creditCost: creditCost);
+        await discountApiTokens(
+          session,
+          nanoId: nanoId,
+          creditCost: creditCost,
+        );
 
         // Get the scrappable request - use cached version for test requests
         final ScrappableRequest scrappableRequest = isTestRequest
             ? (getScrappableRequest(scrappable.id!) ??
-                scrappable.targetRequest!)
+                  scrappable.targetRequest!)
             : scrappable.targetRequest!;
 
         final String targetUrl = composeUrl(payload, scrappableRequest);
@@ -803,8 +880,9 @@ mixin ApiHelperMixin {
         // For production requests, use extractByRulesWithLogic (lighter, no screenshot)
         if (isTestRequest) {
           // Get the current reference test data from cache
-          final ReferenceTestData? currentTestData =
-              getReferenceTestData(scrappable.id!);
+          final ReferenceTestData? currentTestData = getReferenceTestData(
+            scrappable.id!,
+          );
 
           if (currentTestData == null) {
             // Stop stopwatch before returning error
@@ -812,7 +890,9 @@ mixin ApiHelperMixin {
             return ApiError(
               RequestStatus.serverError,
               createTranslatedException(
-                  'test_data_not_found', SupportedLanguage.en),
+                'test_data_not_found',
+                SupportedLanguage.en,
+              ),
             ).toFailure();
           }
 
@@ -821,112 +901,123 @@ mixin ApiHelperMixin {
               replaceExtractLogicPlaceholders(extractRules, payload);
 
           // ScrapingBee API call - stopwatch already running from wrapAnalytics
-          final ExtractFullDataByRule extractResponse =
-              await scrappingBee.fetchHtmlAndScreenshotWithLogic(
-            targetUrl: targetUrl,
-            scrappingBeeExtractLogic: extractLogicWithReplacedPlaceholders,
-          );
+          final ExtractFullDataByRule extractResponse = await scrappingBee
+              .fetchHtmlAndScreenshotWithLogic(
+                targetUrl: targetUrl,
+                scrappingBeeExtractLogic: extractLogicWithReplacedPlaceholders,
+              );
           // Stop stopwatch after ScrapingBee call completes (success or error)
           stopwatch.stop();
           final requestDuration = stopwatch.elapsed;
 
           return extractResponse.when(
-              withData: (scrapedData, html, pageFullscreenScreenshot) async {
-            final responseJson = jsonEncode(scrapedData);
-            // Track success analytics
-            if (_pendingAnalytics[scrappableId]?[nanoId]?.containsKey(apiKey) ==
-                true) {
-              _pendingAnalytics[scrappableId]![nanoId]![apiKey]!.add(
-                AnalyticsPayload(
-                  time: DateTime.now(),
-                  status: RequestStatus.success,
-                  stringifiedPayload: stringifiedPayload,
-                  stringifiedResponse: responseJson,
-                  duration: requestDuration,
-                ),
-              );
-            }
-
-            // Create ByteTestData with the new HTML and screenshot
-            final Uint8List htmlBytes = utf8.encode(html);
-            final ByteData htmlByteData = ByteData.view(htmlBytes.buffer);
-            final ByteData screenshotByteData =
-                ByteData.view(pageFullscreenScreenshot.buffer);
-
-            ByteTestData byteTestData = currentTestData.byteData?.copyWith(
-                  referenceHtmlPage: htmlByteData,
-                  referenceSiteScreenshot: screenshotByteData,
-                ) ??
-                ByteTestData(
-                  referenceHtmlPage: htmlByteData,
-                  referenceSiteScreenshot: screenshotByteData,
+            withData: (scrapedData, html, pageFullscreenScreenshot) async {
+              final responseJson = jsonEncode(scrapedData);
+              // Track success analytics
+              if (_pendingAnalytics[scrappableId]?[nanoId]?.containsKey(
+                    apiKey,
+                  ) ==
+                  true) {
+                _pendingAnalytics[scrappableId]![nanoId]![apiKey]!.add(
+                  AnalyticsPayload(
+                    time: DateTime.now(),
+                    status: RequestStatus.success,
+                    stringifiedPayload: stringifiedPayload,
+                    stringifiedResponse: responseJson,
+                    duration: requestDuration,
+                  ),
                 );
+              }
 
-            // Create new ReferenceTestData with updated data
-            ReferenceTestData newReferenceTestData = currentTestData.copyWith(
-              scrapResultJson: jsonEncode(scrapedData),
-              byteData: byteTestData,
-              referenceLinkUsed: targetUrl,
-            );
+              // Create ByteTestData with the new HTML and screenshot
+              final Uint8List htmlBytes = utf8.encode(html);
+              final ByteData htmlByteData = ByteData.view(htmlBytes.buffer);
+              final ByteData screenshotByteData = ByteData.view(
+                pageFullscreenScreenshot.buffer,
+              );
 
-            // Update the cache with new reference test data
-            updateTestReferenceData(scrappable.id!, newReferenceTestData);
+              ByteTestData byteTestData =
+                  currentTestData.byteData?.copyWith(
+                    referenceHtmlPage: htmlByteData,
+                    referenceSiteScreenshot: screenshotByteData,
+                  ) ??
+                  ByteTestData(
+                    referenceHtmlPage: htmlByteData,
+                    referenceSiteScreenshot: screenshotByteData,
+                  );
 
-            // Send success notification to chat session with updated test data
-            sendSystemMessageToScrappableSession(
-              scrappableId: scrappable.id!,
-              response: TestEndpointCalledSuccessResponse(
-                role: PromptRole.system,
-                expectsFollowUp: false, // Test result notification, no follow-up
-                inputPayload: stringifiedPayload,
-                responseData: jsonEncode(scrapedData),
-                timestamp: DateTime.now(),
-                referenceTestData: newReferenceTestData,
-              ),
-            );
+              // Create new ReferenceTestData with updated data
+              ReferenceTestData newReferenceTestData = currentTestData.copyWith(
+                scrapResultJson: jsonEncode(scrapedData),
+                byteData: byteTestData,
+                referenceLinkUsed: targetUrl,
+              );
 
-            // Create response with scraped data and credit information
-            final response = <String, dynamic>{
-              'credits': _getCreditInfo(nanoId, creditCost),
-              'data': scrapedData,
-            };
-            return response.toSuccess();
-          }, error: (errorMessage) {
-            // Track ScrapingBee errors separately
-            if (_pendingAnalytics[scrappableId]?[nanoId]?.containsKey(apiKey) ==
-                true) {
-              _pendingAnalytics[scrappableId]![nanoId]![apiKey]!.add(
-                AnalyticsPayload(
-                  time: DateTime.now(),
-                  status: RequestStatus.failedAtScrappingBee,
-                  stringifiedPayload: stringifiedPayload,
-                  title: 'Scraping Error',
-                  description: errorMessage,
-                  duration: requestDuration,
+              // Update the cache with new reference test data
+              updateTestReferenceData(scrappable.id!, newReferenceTestData);
+
+              // Send success notification to chat session with updated test data
+              sendSystemMessageToScrappableSession(
+                scrappableId: scrappable.id!,
+                response: TestEndpointCalledSuccessResponse(
+                  role: PromptRole.system,
+                  expectsFollowUp:
+                      false, // Test result notification, no follow-up
+                  inputPayload: stringifiedPayload,
+                  responseData: jsonEncode(scrapedData),
+                  timestamp: DateTime.now(),
+                  referenceTestData: newReferenceTestData,
                 ),
               );
-            }
 
-            // Send error notification to chat session
-            sendSystemMessageToScrappableSession(
-              scrappableId: scrappable.id!,
-              response: TestEndpointCalledErrorResponse(
-                role: PromptRole.system,
-                expectsFollowUp: false, // Test error notification, no follow-up
-                errorTitle: 'Scraping Error',
-                errorDescription: errorMessage,
-                inputPayload: stringifiedPayload,
-                timestamp: DateTime.now(),
-              ),
-            );
+              // Create response with scraped data and credit information
+              final response = <String, dynamic>{
+                'credits': _getCreditInfo(nanoId, creditCost),
+                'data': scrapedData,
+              };
+              return response.toSuccess();
+            },
+            error: (errorMessage) {
+              // Track ScrapingBee errors separately
+              if (_pendingAnalytics[scrappableId]?[nanoId]?.containsKey(
+                    apiKey,
+                  ) ==
+                  true) {
+                _pendingAnalytics[scrappableId]![nanoId]![apiKey]!.add(
+                  AnalyticsPayload(
+                    time: DateTime.now(),
+                    status: RequestStatus.failedAtScrappingBee,
+                    stringifiedPayload: stringifiedPayload,
+                    title: 'Scraping Error',
+                    description: errorMessage,
+                    duration: requestDuration,
+                  ),
+                );
+              }
 
-            return ApiError(
+              // Send error notification to chat session
+              sendSystemMessageToScrappableSession(
+                scrappableId: scrappable.id!,
+                response: TestEndpointCalledErrorResponse(
+                  role: PromptRole.system,
+                  expectsFollowUp:
+                      false, // Test error notification, no follow-up
+                  errorTitle: 'Scraping Error',
+                  errorDescription: errorMessage,
+                  inputPayload: stringifiedPayload,
+                  timestamp: DateTime.now(),
+                ),
+              );
+
+              return ApiError(
                 RequestStatus.failedAtScrappingBee,
                 ZenScrapException(
                   title: 'Scraping Error',
                   description: errorMessage,
-                )).toFailure();
-          });
+                ),
+              ).toFailure();
+            },
+          );
         } else {
           // Production request - use lighter extraction without screenshot
           // Replace placeholders in extract logic before calling ScrapingBee
@@ -934,67 +1025,72 @@ mixin ApiHelperMixin {
               replaceExtractLogicPlaceholders(extractRules, payload);
 
           // ScrapingBee API call - stopwatch already running from wrapAnalytics
-          final ExtractDataByRule extractResponse =
-              await scrappingBee.extractByRulesWithLogic(
-            targetUrl: targetUrl,
-            scrappingBeeExtractLogic: extractLogicWithReplacedPlaceholders,
-          );
+          final ExtractDataByRule extractResponse = await scrappingBee
+              .extractByRulesWithLogic(
+                targetUrl: targetUrl,
+                scrappingBeeExtractLogic: extractLogicWithReplacedPlaceholders,
+              );
           // Stop stopwatch after ScrapingBee call completes (success or error)
           stopwatch.stop();
           final requestDuration = stopwatch.elapsed;
 
-          return extractResponse.when(withData: (scrapedData) {
-            final responseJson = jsonEncode(scrapedData);
-            // Track success analytics
-            if (_pendingAnalytics[scrappableId]?[nanoId]?.containsKey(apiKey) ==
-                true) {
-              _pendingAnalytics[scrappableId]![nanoId]![apiKey]!.add(
-                AnalyticsPayload(
-                  time: DateTime.now(),
-                  status: RequestStatus.success,
-                  stringifiedPayload: stringifiedPayload,
-                  stringifiedResponse: responseJson,
-                  duration: requestDuration,
-                ),
-              );
-            }
+          return extractResponse.when(
+            withData: (scrapedData) {
+              final responseJson = jsonEncode(scrapedData);
+              // Track success analytics
+              if (_pendingAnalytics[scrappableId]?[nanoId]?.containsKey(
+                    apiKey,
+                  ) ==
+                  true) {
+                _pendingAnalytics[scrappableId]![nanoId]![apiKey]!.add(
+                  AnalyticsPayload(
+                    time: DateTime.now(),
+                    status: RequestStatus.success,
+                    stringifiedPayload: stringifiedPayload,
+                    stringifiedResponse: responseJson,
+                    duration: requestDuration,
+                  ),
+                );
+              }
 
-            // Create response with scraped data and credit information
-            final response = <String, dynamic>{
-              'credits': _getCreditInfo(nanoId, creditCost),
-              'data': scrapedData,
-            };
-            return response.toSuccess();
-          }, error: (errorMessage) {
-            // Track ScrapingBee errors separately
-            if (_pendingAnalytics[scrappableId]?[nanoId]?.containsKey(apiKey) ==
-                true) {
-              _pendingAnalytics[scrappableId]![nanoId]![apiKey]!.add(
-                AnalyticsPayload(
-                  time: DateTime.now(),
-                  status: RequestStatus.failedAtScrappingBee,
-                  stringifiedPayload: stringifiedPayload,
-                  title: 'Scraping Error',
-                  description: errorMessage,
-                  duration: requestDuration,
-                ),
-              );
-            }
+              // Create response with scraped data and credit information
+              final response = <String, dynamic>{
+                'credits': _getCreditInfo(nanoId, creditCost),
+                'data': scrapedData,
+              };
+              return response.toSuccess();
+            },
+            error: (errorMessage) {
+              // Track ScrapingBee errors separately
+              if (_pendingAnalytics[scrappableId]?[nanoId]?.containsKey(
+                    apiKey,
+                  ) ==
+                  true) {
+                _pendingAnalytics[scrappableId]![nanoId]![apiKey]!.add(
+                  AnalyticsPayload(
+                    time: DateTime.now(),
+                    status: RequestStatus.failedAtScrappingBee,
+                    stringifiedPayload: stringifiedPayload,
+                    title: 'Scraping Error',
+                    description: errorMessage,
+                    duration: requestDuration,
+                  ),
+                );
+              }
 
-            return ApiError(
+              return ApiError(
                 RequestStatus.failedAtScrappingBee,
                 ZenScrapException(
                   title: 'Scraping Error',
                   description: errorMessage,
-                )).toFailure();
-          });
+                ),
+              ).toFailure();
+            },
+          );
         }
       });
     } on ZenScrapException catch (error) {
-      return ApiError(
-        RequestStatus.serverError,
-        error,
-      ).toFailure();
+      return ApiError(RequestStatus.serverError, error).toFailure();
     } on ApiError catch (error) {
       return error.toFailure();
     } catch (error, stackTrace) {
@@ -1015,35 +1111,32 @@ mixin ApiHelperMixin {
 ApiError _noCreditUsageModelFound(
   ApiKey apiKey, [
   SupportedLanguage lang = SupportedLanguage.en,
-]) =>
-    ApiError(
-      RequestStatus.clientError,
-      createTranslatedException(
-        'no_credit_usage_model',
-        lang,
-        params: {'apiKey': apiKey},
-      ),
-    );
+]) => ApiError(
+  RequestStatus.clientError,
+  createTranslatedException(
+    'no_credit_usage_model',
+    lang,
+    params: {'apiKey': apiKey},
+  ),
+);
 
 ApiError _apiKeyNotFound(
   ApiKey apiKey, [
   SupportedLanguage lang = SupportedLanguage.en,
-]) =>
-    ApiError(
-      RequestStatus.clientError,
-      createTranslatedException(
-        'api_key_not_found_active',
-        lang,
-        params: {'apiKey': apiKey},
-      ),
-    );
+]) => ApiError(
+  RequestStatus.clientError,
+  createTranslatedException(
+    'api_key_not_found_active',
+    lang,
+    params: {'apiKey': apiKey},
+  ),
+);
 ApiError _noActiveTestSessionFinded([
   SupportedLanguage lang = SupportedLanguage.en,
-]) =>
-    ApiError(
-      RequestStatus.clientError,
-      createTranslatedException('no_active_test_session', lang),
-    );
+]) => ApiError(
+  RequestStatus.clientError,
+  createTranslatedException('no_active_test_session', lang),
+);
 
 ApiError _testPeriodExpired([SupportedLanguage lang = SupportedLanguage.en]) =>
     ApiError(
@@ -1067,19 +1160,17 @@ ApiError _noApiFound([SupportedLanguage lang = SupportedLanguage.en]) =>
 
 ApiError _insufficientCredits([
   SupportedLanguage lang = SupportedLanguage.en,
-]) =>
-    ApiError(
-      RequestStatus.insufficientCredits,
-      createTranslatedException('insufficient_credits', lang),
-    );
+]) => ApiError(
+  RequestStatus.insufficientCredits,
+  createTranslatedException('insufficient_credits', lang),
+);
 
 ApiError _missingExtractRules([
   SupportedLanguage lang = SupportedLanguage.en,
-]) =>
-    ApiError(
-      RequestStatus.clientError,
-      createTranslatedException('missing_extract_rules', lang),
-    );
+]) => ApiError(
+  RequestStatus.clientError,
+  createTranslatedException('missing_extract_rules', lang),
+);
 
 ApiError _invalidApiKey([SupportedLanguage lang = SupportedLanguage.en]) =>
     ApiError(
@@ -1090,36 +1181,33 @@ ApiError _invalidApiKey([SupportedLanguage lang = SupportedLanguage.en]) =>
 ApiError _maxConcurrencyReached(
   int maxQuantityOfParallelRequests, [
   SupportedLanguage lang = SupportedLanguage.en,
-]) =>
-    ApiError(
-      RequestStatus.maxConcurrencyExceeded,
-      createTranslatedException(
-        'concurrency_limit_exceeded',
-        lang,
-        params: {'maxConcurrentRequests': maxQuantityOfParallelRequests.toString()},
-      ),
-    );
+]) => ApiError(
+  RequestStatus.maxConcurrencyExceeded,
+  createTranslatedException(
+    'concurrency_limit_exceeded',
+    lang,
+    params: {'maxConcurrentRequests': maxQuantityOfParallelRequests.toString()},
+  ),
+);
 
 ApiError _noScrappableFound(
   String scrappableId, [
   SupportedLanguage lang = SupportedLanguage.en,
-]) =>
-    ApiError(
-      RequestStatus.clientError,
-      createTranslatedException(
-        'api_scrappable_not_found',
-        lang,
-        params: {'scrappableId': scrappableId},
-      ),
-    );
+]) => ApiError(
+  RequestStatus.clientError,
+  createTranslatedException(
+    'api_scrappable_not_found',
+    lang,
+    params: {'scrappableId': scrappableId},
+  ),
+);
 
 ApiError _invalidApiKeyFormat([
   SupportedLanguage lang = SupportedLanguage.en,
-]) =>
-    ApiError(
-      RequestStatus.clientError,
-      createTranslatedException('invalid_api_key_format', lang),
-    );
+]) => ApiError(
+  RequestStatus.clientError,
+  createTranslatedException('invalid_api_key_format', lang),
+);
 
 class ApiError {
   final RequestStatus status;
@@ -1162,7 +1250,7 @@ class PeriodicSetRequestsAnalytics extends FutureCall {
   @override
   Future<void> invoke(Session session, SerializableModel? _) async {
     Map<ScrappableId, Map<NanoId, Map<ApiKey, List<AnalyticsPayload>>>>
-        pendingAnalytics = {...ApiHelperMixin._pendingAnalytics};
+    pendingAnalytics = {...ApiHelperMixin._pendingAnalytics};
     ApiHelperMixin._pendingAnalytics.clear();
 
     for (final entry in pendingAnalytics.entries) {
@@ -1244,7 +1332,8 @@ class PeriodicCacheCleanup extends FutureCall {
       'creditUsage': ApiHelperMixin._currentCreditUsage.length,
       'scrappables': ApiHelperMixin._scrappables.length,
       'apiKeys': ApiHelperMixin._apiKeysAttachedToNanoId.length,
-      'subscriptionCredits': ApiHelperMixin._remainingSubscriptionCredits.length,
+      'subscriptionCredits':
+          ApiHelperMixin._remainingSubscriptionCredits.length,
       'purchasedCredits': ApiHelperMixin._remainingPurchasedCredits.length,
       'allowedScrappables': ApiHelperMixin._allowedScrappableIdsToUse.length,
       'concurrency': ApiHelperMixin._currentConcurrencyRequests.length,
@@ -1259,7 +1348,9 @@ class PeriodicCleanupOldAnalyticsDetails extends FutureCall {
   Future<void> invoke(Session session, SerializableModel? object) async {
     try {
       final now = DateTime.now();
-      final retentionCutoff = now.subtract(ApiHelperConfig.analyticsRetentionPeriod);
+      final retentionCutoff = now.subtract(
+        ApiHelperConfig.analyticsRetentionPeriod,
+      );
 
       // STEP 1: Calculate and update average durations BEFORE deleting old analytics
       await _updateAverageDurationsForAllScrappables(session);
@@ -1447,7 +1538,8 @@ class PeriodicCleanupOldAnalyticsDetails extends FutureCall {
     // Update required if:
     // - No existing record (first time calculation)
     // - Latest analytics timestamp is after the last update (new data exists)
-    if (existing != null && !latestAnalyticsTimestamp.isAfter(existing.updatedAt)) {
+    if (existing != null &&
+        !latestAnalyticsTimestamp.isAfter(existing.updatedAt)) {
       // No new data since last calculation - SKIP
       session.log(
         'Skipping average duration update for scrappable $scrappableId - no new data since ${existing.updatedAt}',
@@ -1493,8 +1585,10 @@ class PeriodicCleanupOldAnalyticsDetails extends FutureCall {
         updatedAt: DateTime.now(),
         averageDuration: avgDuration,
       );
-      final inserted =
-          await ScrappableAverageDuration.db.insertRow(session, avgInfo);
+      final inserted = await ScrappableAverageDuration.db.insertRow(
+        session,
+        avgInfo,
+      );
 
       // Update scrappable to link to the new average duration info
       await Scrappable.db.updateRow(
@@ -1542,7 +1636,9 @@ class PeriodicCleanupOldAnalyticsDetails extends FutureCall {
 
       // Find all ScrappableAverageDuration records that are older than the threshold
       // to avoid race conditions with newly created records
-      final orphanThreshold = DateTime.now().subtract(ApiHelperConfig.orphanedRecordThreshold);
+      final orphanThreshold = DateTime.now().subtract(
+        ApiHelperConfig.orphanedRecordThreshold,
+      );
 
       final allAverageDurations = await ScrappableAverageDuration.db.find(
         session,
@@ -1613,8 +1709,11 @@ Future<void> _setScrappableAnalytics(
         purchasedCredits:
             ApiHelperMixin._remainingPurchasedCredits[nanoId]?.value,
       );
-      await CreditUsage.db
-          .updateRow(session, newCredit, transaction: transaction);
+      await CreditUsage.db.updateRow(
+        session,
+        newCredit,
+        transaction: transaction,
+      );
 
       // First, create all AnalyticsRequestDetails
       final detailsList = await AnalyticsRequestDetails.db.insert(
@@ -1635,21 +1734,22 @@ Future<void> _setScrappableAnalytics(
 
       // Then create ScrappableAnalytics with detailsId and apiKeyId set
       final analytics = await ScrappableAnalytics.db.insert(
-          session,
-          List.generate(items.length, (i) {
-            return ScrappableAnalytics(
-              requestStatus: items[i].status,
-              scrappableId: scrappable.id!,
-              scrappable: scrappable,
-              requestedAt: items[i].time,
-              attachedApiKey: apiKey,
-              attachedNanoId: nanoId,
-              detailsId: detailsList[i].id,
-              apiKeyId: accountApiKey?.id,
-              duration: items[i].duration,
-            );
-          }),
-          transaction: transaction);
+        session,
+        List.generate(items.length, (i) {
+          return ScrappableAnalytics(
+            requestStatus: items[i].status,
+            scrappableId: scrappable.id!,
+            scrappable: scrappable,
+            requestedAt: items[i].time,
+            attachedApiKey: apiKey,
+            attachedNanoId: nanoId,
+            detailsId: detailsList[i].id,
+            apiKeyId: accountApiKey?.id,
+            duration: items[i].duration,
+          );
+        }),
+        transaction: transaction,
+      );
 
       await Scrappable.db.attach.scrappableAnalytics(
         session,
@@ -1690,7 +1790,8 @@ Future<void> _setScrappableAnalytics(
           await AutoFixConfig.db.updateRow(
             session,
             autoFixConfig.copyWith(
-                currentConsecutiveErrors: newConsecutiveErrors),
+              currentConsecutiveErrors: newConsecutiveErrors,
+            ),
             columns: (t) => [t.currentConsecutiveErrors],
             transaction: transaction,
           );
@@ -1699,18 +1800,19 @@ Future<void> _setScrappableAnalytics(
           // Only notify when we cross the threshold (previous count was below, new count is at/above)
           final justReachedThreshold =
               autoFixConfig.currentConsecutiveErrors <
-                      autoFixConfig.consecutiveErrorThreshold &&
-                  newConsecutiveErrors >=
-                      autoFixConfig.consecutiveErrorThreshold;
+                  autoFixConfig.consecutiveErrorThreshold &&
+              newConsecutiveErrors >= autoFixConfig.consecutiveErrorThreshold;
 
           if (justReachedThreshold && !autoFixConfig.enabled) {
             // Send notification outside transaction to avoid blocking
             // Use unawaited to not block the transaction
-            unawaited(AutoFixNotificationService.notifyScraperBroken(
-              session: session,
-              scrappable: scrappable,
-              errorCount: newConsecutiveErrors,
-            ));
+            unawaited(
+              AutoFixNotificationService.notifyScraperBroken(
+                session: session,
+                scrappable: scrappable,
+                errorCount: newConsecutiveErrors,
+              ),
+            );
           }
         }
       }

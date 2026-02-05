@@ -3,3 +3,4 @@ environment:
   sdk: "^3.6.0"
 workspace:
   - "zenscrap_server"
+  - "zenscrap_core"

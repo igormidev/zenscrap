@@ -7,12 +7,13 @@
         "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
         "client_secret": "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",
         "redirect_uris": [
-            "http://localhost:8082/googlesignin",
-            "https://zenscrap.com/googlesignin"
+            "http://localhost:8082/auth/google/callback",
+            "https://api.zenscrap.com/auth/google/callback"
         ],
         "javascript_origins": [
             "http://localhost:8082",
-            "https://zenscrap.com"
+            "https://zenscrap.com",
+            "https://www.zenscrap.com"
         ]
     }
 }

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
+import 'package:zenscrap_core/zenscrap_core.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:zenscrap_flutter/src/design_system/extensions/color_extensions.dart';
 import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
@@ -27,6 +28,10 @@ class TestEndpointDialog extends ConsumerStatefulWidget {
   /// Required when [isTestMode] is false. The API key for production calls.
   final String? apiKey;
 
+  /// The default country code from ScrappingBeeExtractLogic (can be null).
+  /// This is the initial value for the country selector dropdown.
+  final String? defaultCountryCode;
+
   const TestEndpointDialog({
     super.key,
     required this.scrappableId,
@@ -35,6 +40,7 @@ class TestEndpointDialog extends ConsumerStatefulWidget {
     this.isTestMode = true,
     this.targetTime,
     this.apiKey,
+    this.defaultCountryCode,
   }) : assert(
          isTestMode ? targetTime != null : apiKey != null,
          isTestMode
@@ -50,6 +56,9 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
   final Map<String, TextEditingController> _pathParamControllers = {};
   final Map<String, TextEditingController> _queryParamControllers = {};
   final Map<String, TextEditingController> _clientSideParamControllers = {};
+
+  /// Selected country code for proxy geolocation (null = use default/no override)
+  String? _selectedCountryCode;
 
   /// Converts the Serverpod API host to the web server host.
   ///
@@ -86,6 +95,7 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
   @override
   void initState() {
     super.initState();
+    _selectedCountryCode = widget.defaultCountryCode;
     _initializeControllers();
     _initializeExpirationTracking();
   }
@@ -211,6 +221,11 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
           payload[key] = controller.text;
         }
       });
+
+      // Add country code if selected (for proxy geolocation)
+      if (_selectedCountryCode != null && _selectedCountryCode!.isNotEmpty) {
+        payload['countryCode'] = _selectedCountryCode;
+      }
 
       // Get base URL from client and convert to web server host
       final client = ref.read(clientProvider);
@@ -395,6 +410,8 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
                         elapsedMsNotifier: _elapsedMs,
                         isChatLoading: isChatLoading,
                         isExpired: isExpired,
+                        selectedCountryCode: _selectedCountryCode,
+                        onCountryCodeChanged: (value) => setState(() => _selectedCountryCode = value),
                       ),
                       expanded: (context, constraints) => _ExpandedDialogLayout(
                         pathParamControllers: _pathParamControllers,
@@ -410,6 +427,8 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
                         elapsedMsNotifier: _elapsedMs,
                         isChatLoading: isChatLoading,
                         isExpired: isExpired,
+                        selectedCountryCode: _selectedCountryCode,
+                        onCountryCodeChanged: (value) => setState(() => _selectedCountryCode = value),
                       ),
                     );
                   },
@@ -567,6 +586,8 @@ class _ParametersPanel extends StatelessWidget {
   final VoidCallback onTest;
   final bool isChatLoading;
   final bool isExpired;
+  final String? selectedCountryCode;
+  final ValueChanged<String?> onCountryCodeChanged;
 
   const _ParametersPanel({
     required this.pathParamControllers,
@@ -574,6 +595,8 @@ class _ParametersPanel extends StatelessWidget {
     required this.clientSideParamControllers,
     required this.isLoading,
     required this.onTest,
+    required this.selectedCountryCode,
+    required this.onCountryCodeChanged,
     this.isChatLoading = false,
     this.isExpired = false,
   });
@@ -628,12 +651,19 @@ class _ParametersPanel extends StatelessWidget {
                     if (clientSideParamControllers.isNotEmpty)
                       const SizedBox(height: 20),
                   ],
-                  if (clientSideParamControllers.isNotEmpty)
+                  if (clientSideParamControllers.isNotEmpty) ...[
                     _ParameterSection(
                       title: 'Dynamic Parameters',
                       subtitle: 'Used in extraction rules (not added to URL)',
                       controllers: clientSideParamControllers,
                     ),
+                    const SizedBox(height: 20),
+                  ],
+                  // Country Code Selector
+                  _CountryCodeSelector(
+                    selectedCountryCode: selectedCountryCode,
+                    onChanged: onCountryCodeChanged,
+                  ),
                   if (pathParamControllers.isEmpty &&
                       queryParamControllers.isEmpty &&
                       clientSideParamControllers.isEmpty)
@@ -819,6 +849,126 @@ class _ParameterSection extends StatelessWidget {
             ),
           );
         }),
+      ],
+    );
+  }
+}
+
+class _CountryCodeSelector extends StatelessWidget {
+  final String? selectedCountryCode;
+  final ValueChanged<String?> onChanged;
+
+  const _CountryCodeSelector({
+    required this.selectedCountryCode,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // Build sorted list of country entries for the dropdown
+    final sortedCountries = kScrapingBeeCountryCodes.entries.toList()
+      ..sort((a, b) => a.value.name.compareTo(b.value.name));
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Proxy Country',
+          style: context.t.labelLarge?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: context.c.onSurface,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          'Override the proxy geolocation (optional)',
+          style: context.t.bodySmall?.copyWith(
+            color: context.c.onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(height: 12),
+        DropdownButtonFormField<String?>(
+          value: selectedCountryCode,
+          isExpanded: true,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: context.c.surface,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: context.c.outline.withAlpha(80),
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: context.c.outline.withAlpha(80),
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: context.c.primary, width: 1.5),
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 14,
+            ),
+            isDense: true,
+          ),
+          hint: Text(
+            'Default (no override)',
+            style: context.t.bodyMedium?.copyWith(
+              color: context.c.onSurfaceVariant,
+            ),
+          ),
+          items: [
+            // Add "Default" option first
+            DropdownMenuItem<String?>(
+              value: null,
+              child: Text(
+                'Default (no override)',
+                style: context.t.bodyMedium?.copyWith(
+                  color: context.c.onSurfaceVariant,
+                ),
+              ),
+            ),
+            // Add all countries
+            ...sortedCountries.map((entry) {
+              final code = entry.key;
+              final info = entry.value;
+              return DropdownMenuItem<String?>(
+                value: code,
+                child: Text(
+                  '${info.flag} ${info.name} ($code)',
+                  style: context.t.bodyMedium,
+                ),
+              );
+            }),
+          ],
+          onChanged: onChanged,
+          selectedItemBuilder: (context) {
+            return [
+              // Builder for "Default" option
+              Text(
+                'Default (no override)',
+                style: context.t.bodyMedium?.copyWith(
+                  color: context.c.onSurfaceVariant,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+              // Builders for country options
+              ...sortedCountries.map((entry) {
+                final code = entry.key;
+                final info = entry.value;
+                return Text(
+                  '${info.flag} ${info.name} ($code)',
+                  style: context.t.bodyMedium,
+                  overflow: TextOverflow.ellipsis,
+                );
+              }),
+            ];
+          },
+        ),
       ],
     );
   }
@@ -1353,6 +1503,8 @@ class _CompactDialogLayout extends StatefulWidget {
   final ValueNotifier<int> elapsedMsNotifier;
   final bool isChatLoading;
   final bool isExpired;
+  final String? selectedCountryCode;
+  final ValueChanged<String?> onCountryCodeChanged;
 
   const _CompactDialogLayout({
     required this.pathParamControllers,
@@ -1366,6 +1518,8 @@ class _CompactDialogLayout extends StatefulWidget {
     required this.statusCode,
     required this.responseTimeMs,
     required this.elapsedMsNotifier,
+    required this.selectedCountryCode,
+    required this.onCountryCodeChanged,
     this.isChatLoading = false,
     this.isExpired = false,
   });
@@ -1418,6 +1572,8 @@ class _CompactDialogLayoutState extends State<_CompactDialogLayout>
                 },
                 isChatLoading: widget.isChatLoading,
                 isExpired: widget.isExpired,
+                selectedCountryCode: widget.selectedCountryCode,
+                onCountryCodeChanged: widget.onCountryCodeChanged,
               ),
               _ResponsePanel(
                 isLoading: widget.isLoading,
@@ -1451,6 +1607,8 @@ class _ExpandedDialogLayout extends StatelessWidget {
   final ValueNotifier<int> elapsedMsNotifier;
   final bool isChatLoading;
   final bool isExpired;
+  final String? selectedCountryCode;
+  final ValueChanged<String?> onCountryCodeChanged;
 
   const _ExpandedDialogLayout({
     required this.pathParamControllers,
@@ -1464,6 +1622,8 @@ class _ExpandedDialogLayout extends StatelessWidget {
     required this.statusCode,
     required this.responseTimeMs,
     required this.elapsedMsNotifier,
+    required this.selectedCountryCode,
+    required this.onCountryCodeChanged,
     this.isChatLoading = false,
     this.isExpired = false,
   });
@@ -1491,6 +1651,8 @@ class _ExpandedDialogLayout extends StatelessWidget {
                 onTest: onTest,
                 isChatLoading: isChatLoading,
                 isExpired: isExpired,
+                selectedCountryCode: selectedCountryCode,
+                onCountryCodeChanged: onCountryCodeChanged,
               ),
             ),
         const SizedBox(width: 24),

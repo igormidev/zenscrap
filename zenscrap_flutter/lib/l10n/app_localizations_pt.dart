@@ -916,7 +916,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Failed to load more data. Tap to retry.';
 
   @override
-  String get api_usage_page_title => 'Api Credits & Keys';
+  String get api_usage_page_title => 'API Credits & Keys';
 
   @override
   String get api_usage_refresh => 'Refresh';
@@ -2022,7 +2022,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get common_show_original => 'Mostrar original';
 
   @override
-  String get common_show_translated => 'Mostrar traducao';
+  String get common_show_translated => 'Mostrar tradução';
 
   @override
   String common_auto_translated(String language) {
@@ -2223,7 +2223,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get landing_nav_marketplace => 'Marketplace';
 
   @override
-  String get landing_nav_pricing => 'Precos';
+  String get landing_nav_pricing => 'Preços';
 
   @override
   String get landing_sign_in => 'Entrar';
@@ -2242,7 +2242,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get landing_hero_subtitle =>
-      'Descreva o que voce quer extrair. Nossa IA constroi, testa e mantem seu scraper automaticamente. Sem codigo. Sem seletores CSS. Sem endpoints quebrados.';
+      'Descreva o que você quer extrair. Nossa IA constrói, testa e mantém seu scraper automaticamente. Sem código. Sem seletores CSS. Sem endpoints quebrados.';
 
   @override
   String get landing_hero_target_url_label => 'URL de Destino';
@@ -2253,7 +2253,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get landing_hero_url_validation_invalid =>
-      'Por favor, insira uma URL valida';
+      'Por favor, insira uma URL válida';
 
   @override
   String get landing_hero_url_validation_min_length =>
@@ -2265,15 +2265,15 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String landing_hero_url_validation_banned_domain(String domain) {
-    return 'Este site ($domain) nao e suportado para scraping';
+    return 'Este site ($domain) não é suportado para scraping';
   }
 
   @override
-  String get landing_hero_prompt_label => 'O que voce quer extrair?';
+  String get landing_hero_prompt_label => 'O que você quer extrair?';
 
   @override
   String get landing_hero_prompt_hint =>
-      'Ex. Extrair nome do produto, preco e imagens';
+      'Ex. Extrair nome do produto, preço e imagens';
 
   @override
   String get landing_hero_prompt_validation_min_length =>
@@ -2287,10 +2287,10 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get landing_hero_cta_button => 'Crie seu Primeiro Scraper';
 
   @override
-  String get landing_hero_free_label => 'Gratis';
+  String get landing_hero_free_label => 'Grátis';
 
   @override
-  String get landing_trust_no_credit_card => 'Sem cartao de credito';
+  String get landing_trust_no_credit_card => 'Sem cartão de crédito';
 
   @override
   String get landing_trust_no_signup => 'Sem cadastro para testar';
@@ -2300,21 +2300,21 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get landing_problem_title =>
-      'O Web Scraping Tradicional Esta Quebrado';
+      'O Web Scraping Tradicional Está Quebrado';
 
   @override
   String get landing_problem_subtitle =>
-      'Horas perdidas com seletores CSS. Scrapers que quebram toda semana. Sistemas anti-bot que bloqueiam suas requisicoes. Soa familiar?';
+      'Horas perdidas com seletores CSS. Scrapers que quebram toda semana. Sistemas anti-bot que bloqueiam suas requisições. Soa familiar?';
 
   @override
   String get landing_problem_css_title => 'Inferno dos Seletores CSS';
 
   @override
   String get landing_problem_css_description =>
-      'Vasculhando HTML para encontrar os seletores certos, so para eles quebrarem quando o site atualiza.';
+      'Vasculhando HTML para encontrar os seletores certos, só para eles quebrarem quando o site atualiza.';
 
   @override
-  String get landing_problem_maintenance_title => 'Manutencao Constante';
+  String get landing_problem_maintenance_title => 'Manutenção Constante';
 
   @override
   String get landing_problem_maintenance_description =>
@@ -2325,38 +2325,38 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get landing_problem_antibot_description =>
-      'CAPTCHAs, limites de requisicao, bloqueios de IP. Lutar contra sistemas anti-bot e um trabalho em tempo integral.';
+      'CAPTCHAs, limites de requisição, bloqueios de IP. Lutar contra sistemas anti-bot é um trabalho em tempo integral.';
 
   @override
   String get landing_problem_productivity_title => 'Produtividade Perdida';
 
   @override
   String get landing_problem_productivity_description =>
-      'Cada hora debugando scrapers e uma hora que voce nao gasta no seu negocio real.';
+      'Cada hora debugando scrapers é uma hora que você não gasta no seu negócio real.';
 
   @override
-  String get landing_how_title => 'Tres Passos para Dados Automatizados';
+  String get landing_how_title => 'Três Passos para Dados Automatizados';
 
   @override
   String get landing_how_subtitle =>
-      'Sem codigo. Sem configuracao. Apenas descreva o que voce precisa.';
+      'Sem código. Sem configuração. Apenas descreva o que você precisa.';
 
   @override
   String get landing_how_step1_title => 'Cole sua URL';
 
   @override
   String get landing_how_step1_description =>
-      'Coloque o link da pagina da qual voce quer extrair dados. Qualquer site, qualquer complexidade.';
+      'Coloque o link da página da qual você quer extrair dados. Qualquer site, qualquer complexidade.';
 
   @override
-  String get landing_how_step2_title => 'Descreva o que Voce Quer';
+  String get landing_how_step2_title => 'Descreva o que Você Quer';
 
   @override
   String get landing_how_step2_description =>
-      'Diga a nossa IA em linguagem simples quais dados voce precisa. Precos de produtos, conteudo de artigos, perfis de usuarios, qualquer coisa.';
+      'Diga à nossa IA em linguagem simples quais dados você precisa. Preços de produtos, conteúdo de artigos, perfis de usuários, qualquer coisa.';
 
   @override
-  String get landing_how_step3_title => 'Receba sua API Auto-Reparavel';
+  String get landing_how_step3_title => 'Receba sua API Auto-Reparável';
 
   @override
   String get landing_how_step3_description =>
@@ -2364,45 +2364,45 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get landing_how_ai_note =>
-      'A IA gera automaticamente nome, descricao, categoria e padroes de URL';
+      'A IA gera automaticamente nome, descrição, categoria e padrões de URL';
 
   @override
-  String get landing_autofix_badge => 'PRIMEIRO NA INDUSTRIA';
+  String get landing_autofix_badge => 'PRIMEIRO NA INDÚSTRIA';
 
   @override
-  String get landing_autofix_title => 'O Web Scraper Auto-Reparavel';
+  String get landing_autofix_title => 'O Web Scraper Auto-Reparável';
 
   @override
   String get landing_autofix_subtitle =>
-      'Sites mudam. Seus scrapers nao precisam quebrar. Nossa IA detecta automaticamente quando um site de destino atualiza e corrige suas regras de extracao, antes mesmo de voce perceber.';
+      'Sites mudam. Seus scrapers não precisam quebrar. Nossa IA detecta automaticamente quando um site de destino atualiza e corrige suas regras de extração, antes mesmo de você perceber.';
 
   @override
-  String get landing_autofix_step1_title => 'Mudancas Detectadas';
+  String get landing_autofix_step1_title => 'Mudanças Detectadas';
 
   @override
   String get landing_autofix_step1_description =>
-      'Nosso sistema monitora seus scrapers e detecta quando as regras de extracao comecam a falhar.';
+      'Nosso sistema monitora seus scrapers e detecta quando as regras de extração começam a falhar.';
 
   @override
   String get landing_autofix_step2_title => 'IA Analisa e Adapta';
 
   @override
   String get landing_autofix_step2_description =>
-      'A IA examina a nova estrutura da pagina e gera regras de extracao atualizadas.';
+      'A IA examina a nova estrutura da página e gera regras de extração atualizadas.';
 
   @override
   String get landing_autofix_step3_title => 'Scraper Reparado';
 
   @override
   String get landing_autofix_step3_description =>
-      'Seu endpoint continua funcionando perfeitamente. Voce recebe uma notificacao por email.';
+      'Seu endpoint continua funcionando perfeitamente. Você recebe uma notificação por email.';
 
   @override
-  String get landing_autofix_notifications_title => 'Notificacoes Proativas';
+  String get landing_autofix_notifications_title => 'Notificações Proativas';
 
   @override
   String get landing_autofix_notifications_description =>
-      'Seja notificado quando um site muda e seu scraper esta sendo auto-reparado.';
+      'Seja notificado quando um site muda e seu scraper está sendo auto-reparado.';
 
   @override
   String get landing_autofix_without_title => 'Sem ZenScrap';
@@ -2417,7 +2417,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get landing_autofix_without_item3 => 'Dados e receita perdidos';
 
   @override
-  String get landing_autofix_without_item4 => 'Carga de manutencao constante';
+  String get landing_autofix_without_item4 => 'Carga de manutenção constante';
 
   @override
   String get landing_autofix_with_title => 'Com ZenScrap';
@@ -2427,41 +2427,41 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
       'IA detecta problemas instantaneamente';
 
   @override
-  String get landing_autofix_with_item2 => 'Correcoes automaticas em minutos';
+  String get landing_autofix_with_item2 => 'Correções automáticas em minutos';
 
   @override
   String get landing_autofix_with_item3 => 'Zero perda de dados';
 
   @override
-  String get landing_autofix_with_item4 => 'Configure e esqueca';
+  String get landing_autofix_with_item4 => 'Configure e esqueça';
 
   @override
-  String get landing_features_title => 'Construido para a Web Moderna';
+  String get landing_features_title => 'Construído para a Web Moderna';
 
   @override
   String get landing_features_subtitle =>
-      'Infraestrutura de nivel empresarial em uma interface simples.';
+      'Infraestrutura de nível empresarial em uma interface simples.';
 
   @override
-  String get landing_features_cost_title => 'Otimizacao Inteligente de Custos';
+  String get landing_features_cost_title => 'Otimização Inteligente de Custos';
 
   @override
   String get landing_features_cost_description =>
-      'A IA testa configuracoes automaticamente e encontra a opcao mais barata que funciona. Sem creditos desperdicados.';
+      'A IA testa configurações automaticamente e encontra a opção mais barata que funciona. Sem créditos desperdiçados.';
 
   @override
   String get landing_features_antibot_title => 'Anti-Bot Resolvido';
 
   @override
   String get landing_features_antibot_description =>
-      'CAPTCHAs, limites de requisicao, fingerprinting, nos cuidamos de tudo para que voce nao precise.';
+      'CAPTCHAs, limites de requisição, fingerprinting, nós cuidamos de tudo para que você não precise.';
 
   @override
   String get landing_features_geo_title => 'Geo-Targeting Global';
 
   @override
   String get landing_features_geo_description =>
-      'Acesse conteudo bloqueado por regiao com selecao automatica de proxy baseada na localizacao de destino.';
+      'Acesse conteúdo bloqueado por região com seleção automática de proxy baseada na localização de destino.';
 
   @override
   String get landing_features_testing_title => 'Testes na Plataforma';
@@ -2475,51 +2475,51 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get landing_features_analytics_description =>
-      'Rastreie cada requisicao, identifique problemas instantaneamente e monitore o uso em diferentes periodos.';
+      'Rastreie cada requisição, identifique problemas instantaneamente e monitore o uso em diferentes períodos.';
 
   @override
-  String get landing_features_js_title => 'Renderizacao JavaScript';
+  String get landing_features_js_title => 'Renderização JavaScript';
 
   @override
   String get landing_features_js_description =>
-      'Suporte completo a navegador headless para SPAs, conteudo dinamico e paginas de scroll infinito.';
+      'Suporte completo a navegador headless para SPAs, conteúdo dinâmico e páginas de scroll infinito.';
 
   @override
   String get landing_marketplace_badge => 'COMUNIDADE';
 
   @override
-  String get landing_marketplace_title => 'Nao Construa o que Ja Existe';
+  String get landing_marketplace_title => 'Não Construa o que Já Existe';
 
   @override
   String get landing_marketplace_subtitle =>
-      'Navegue pelo nosso marketplace de scrapers pre-construidos para sites populares. Use-os instantaneamente ou aprenda como outros resolveram desafios similares.';
+      'Navegue pelo nosso marketplace de scrapers pré-construídos para sites populares. Use-os instantaneamente ou aprenda como outros resolveram desafios similares.';
 
   @override
-  String get landing_marketplace_prebuilt_title => 'Scrapers Pre-Construidos';
+  String get landing_marketplace_prebuilt_title => 'Scrapers Pré-Construídos';
 
   @override
   String get landing_marketplace_prebuilt_description =>
-      'Amazon, eBay, LinkedIn, sites de noticias, sites populares ja tem scrapers funcionando prontos para usar.';
+      'Amazon, eBay, LinkedIn, sites de notícias, sites populares já tem scrapers funcionando prontos para usar.';
 
   @override
-  String get landing_marketplace_stats_title => 'Estatisticas de Uso';
+  String get landing_marketplace_stats_title => 'Estatísticas de Uso';
 
   @override
   String get landing_marketplace_stats_description =>
-      'Veja quais scrapers sao mais populares e confiaveis baseado em dados reais de uso da comunidade.';
+      'Veja quais scrapers são mais populares e confiáveis baseado em dados reais de uso da comunidade.';
 
   @override
-  String get landing_marketplace_testing_title => 'Testes Instantaneos';
+  String get landing_marketplace_testing_title => 'Testes Instantâneos';
 
   @override
   String get landing_marketplace_testing_description =>
-      'Teste qualquer scraper do marketplace antes de usa-lo. Teste com seus proprios parametros para verificar resultados.';
+      'Teste qualquer scraper do marketplace antes de usá-lo. Teste com seus próprios parâmetros para verificar resultados.';
 
   @override
   String get landing_marketplace_category_ecommerce => 'E-Commerce';
 
   @override
-  String get landing_marketplace_category_news => 'Noticias e Midia';
+  String get landing_marketplace_category_news => 'Notícias e Mídia';
 
   @override
   String get landing_marketplace_category_jobs => 'Vagas de Emprego';
@@ -2528,10 +2528,10 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get landing_marketplace_category_social => 'Redes Sociais';
 
   @override
-  String get landing_marketplace_category_realestate => 'Imoveis';
+  String get landing_marketplace_category_realestate => 'Imóveis';
 
   @override
-  String get landing_marketplace_category_finance => 'Financas';
+  String get landing_marketplace_category_finance => 'Finanças';
 
   @override
   String get landing_marketplace_category_sports => 'Esportes';
@@ -2540,11 +2540,11 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get landing_marketplace_category_more => '+ 25 mais';
 
   @override
-  String get landing_pricing_title => 'Precos Simples e Transparentes';
+  String get landing_pricing_title => 'Preços Simples e Transparentes';
 
   @override
   String get landing_pricing_subtitle =>
-      'Escolha o plano que se adapta as suas necessidades. Escale conforme voce cresce.';
+      'Escolha o plano que se adapta às suas necessidades. Escale conforme você cresce.';
 
   @override
   String get landing_cta_title =>
@@ -2577,10 +2577,10 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get account_title => 'Conta';
 
   @override
-  String get account_information_title => 'Informacoes da conta';
+  String get account_information_title => 'Informações da conta';
 
   @override
-  String get account_user_name_label => 'Nome de usuario';
+  String get account_user_name_label => 'Nome de usuário';
 
   @override
   String get account_email_label => 'E-mail';
@@ -2599,10 +2599,10 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
       'Assinatura sincronizada com sucesso';
 
   @override
-  String get account_appearance_title => 'Aparencia';
+  String get account_appearance_title => 'Aparência';
 
   @override
-  String get account_display_mode_title => 'Modo de exibicao';
+  String get account_display_mode_title => 'Modo de exibição';
 
   @override
   String get account_display_mode_subtitle =>
@@ -2635,7 +2635,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get account_dark_mode_beta_warning =>
-      'Alguns elementos da interface podem nao ser exibidos perfeitamente. Estamos melhorando ativamente.';
+      'Alguns elementos da interface podem não ser exibidos perfeitamente. Estamos melhorando ativamente.';
 
   @override
   String get ai_usage_title => 'Uso de IA';
@@ -2647,26 +2647,26 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get ai_usage_retry => 'Tentar novamente';
 
   @override
-  String get ai_usage_credit_history => 'Historico de Creditos';
+  String get ai_usage_credit_history => 'Histórico de Créditos';
 
   @override
-  String get ai_usage_no_credit_history => 'Sem historico de creditos ainda';
+  String get ai_usage_no_credit_history => 'Sem histórico de créditos ainda';
 
   @override
   String get ai_usage_credit_history_empty_description =>
-      'Suas transacoes de creditos de IA aparecerao aqui';
+      'Suas transações de créditos de IA aparecerão aqui';
 
   @override
-  String get ai_usage_monthly_ai_credits => 'Creditos de IA Mensais';
+  String get ai_usage_monthly_ai_credits => 'Créditos de IA Mensais';
 
   @override
-  String get ai_usage_initial_credit => 'Credito Inicial';
+  String get ai_usage_initial_credit => 'Crédito Inicial';
 
   @override
-  String get ai_usage_welcome_bonus => 'Bonus de boas-vindas';
+  String get ai_usage_welcome_bonus => 'Bônus de boas-vindas';
 
   @override
-  String get ai_usage_plan_name_free => 'Gratis';
+  String get ai_usage_plan_name_free => 'Grátis';
 
   @override
   String ai_usage_plan_subtitle(String planName) {
@@ -2674,35 +2674,35 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   }
 
   @override
-  String get ai_usage_unknown_transaction => 'Transacao Desconhecida';
+  String get ai_usage_unknown_transaction => 'Transação Desconhecida';
 
   @override
-  String get ai_usage_credits_overview => 'Visao Geral dos Creditos de IA';
+  String get ai_usage_credits_overview => 'Visão Geral dos Créditos de IA';
 
   @override
-  String get ai_usage_remaining_credits => 'Creditos Restantes';
+  String get ai_usage_remaining_credits => 'Créditos Restantes';
 
   @override
   String get ai_usage_monthly_limit => 'Limite Mensal';
 
   @override
   String ai_usage_percentage_used(String percentage) {
-    return '$percentage% usado este mes';
+    return '$percentage% usado este mês';
   }
 
   @override
   String get ai_usage_using_own_api_key =>
-      'Usando sua propria chave API da OpenAI';
+      'Usando sua própria chave API da OpenAI';
 
   @override
-  String get ai_usage_autofix_sessions => 'Sessoes de Auto-Reparo';
+  String get ai_usage_autofix_sessions => 'Sessões de Auto-Reparo';
 
   @override
-  String get ai_usage_no_autofix_sessions => 'Sem sessoes de auto-reparo ainda';
+  String get ai_usage_no_autofix_sessions => 'Sem sessões de auto-reparo ainda';
 
   @override
   String get ai_usage_autofix_empty_description =>
-      'Quando seus scrappables quebrarem, nossa IA tentara automaticamente repara-los. Essas sessoes aparecerao aqui.';
+      'Quando seus scrappables quebrarem, nossa IA tentará automaticamente repará-los. Essas sessões aparecerão aqui.';
 
   @override
   String get ai_usage_powerful_model => 'Modelo Potente';
@@ -2750,7 +2750,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get ai_usage_api_key_label => 'Chave API';
 
   @override
-  String get ai_usage_your_own_key => 'Sua propria chave';
+  String get ai_usage_your_own_key => 'Sua própria chave';
 
   @override
   String get ai_usage_platform_key => 'Chave da plataforma';
@@ -2785,7 +2785,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get ai_usage_attempt_status_api_error => 'Erro de API';
 
   @override
-  String get ai_usage_attempt_status_validation_failed => 'Validacao Falhou';
+  String get ai_usage_attempt_status_validation_failed => 'Validação Falhou';
 
   @override
   String get ai_usage_tokens_short => 'tok';
@@ -2798,7 +2798,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get ai_usage_api_key_description =>
-      'Use sua propria chave API OpenAI para ignorar os limites de creditos mensais. Sua chave e armazenada com seguranca.';
+      'Use sua própria chave API OpenAI para ignorar os limites de créditos mensais. Sua chave é armazenada com segurança.';
 
   @override
   String get ai_usage_api_key_configured => 'Chave API configurada';
@@ -2823,7 +2823,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get ai_usage_api_key_dialog_description =>
-      'Digite sua chave API OpenAI. A chave sera validada antes de salvar.';
+      'Digite sua chave API OpenAI. A chave será validada antes de salvar.';
 
   @override
   String get ai_usage_api_key_show => 'Mostrar chave API';
@@ -2842,7 +2842,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get ai_usage_api_key_remove_confirm_message =>
-      'Tem certeza de que deseja remover sua chave API OpenAI? Voce usara os creditos mensais da plataforma em vez disso.';
+      'Tem certeza de que deseja remover sua chave API OpenAI? Você usará os créditos mensais da plataforma em vez disso.';
 
   @override
   String get ai_usage_api_key_updated => 'Chave API atualizada com sucesso';
@@ -2875,7 +2875,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get api_analytics_no_more_to_load =>
-      'Nao ha mais analytics para carregar';
+      'Não há mais analytics para carregar';
 
   @override
   String get api_analytics_error_loading => 'Erro ao Carregar Analytics';
@@ -2901,14 +2901,14 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get api_analytics_status_insufficient_credits =>
-      'Creditos Insuficientes';
+      'Créditos Insuficientes';
 
   @override
-  String get api_analytics_status_max_concurrency => 'Concorrencia Maxima';
+  String get api_analytics_status_max_concurrency => 'Concorrência Máxima';
 
   @override
   String get api_analytics_status_extract_rules_error =>
-      'Erro nas Regras de Extracao';
+      'Erro nas Regras de Extração';
 
   @override
   String get api_analytics_status_4xx => '4xx';
@@ -2920,19 +2920,19 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get api_analytics_status_2xx => '2xx';
 
   @override
-  String get api_analytics_stat_no_credits => 'Sem Creditos';
+  String get api_analytics_stat_no_credits => 'Sem Créditos';
 
   @override
   String get api_analytics_stat_extract_rules_errors =>
-      'Erros nas regras de extracao';
+      'Erros nas regras de extração';
 
   @override
   String get api_analytics_tooltip_success =>
-      'Requisicoes completadas com sucesso';
+      'Requisições completadas com sucesso';
 
   @override
   String get api_analytics_tooltip_client_error =>
-      'Erros do cliente - parametros de requisicao invalidos ou dados ausentes';
+      'Erros do cliente - parâmetros de requisição inválidos ou dados ausentes';
 
   @override
   String get api_analytics_tooltip_server_error =>
@@ -2940,30 +2940,30 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get api_analytics_tooltip_extract_rules_error =>
-      'As regras de extracao geradas pela IA nao conseguiram analisar a resposta';
+      'As regras de extração geradas pela IA não conseguiram analisar a resposta';
 
   @override
   String get api_analytics_tooltip_insufficient_credits =>
-      'Requisicoes falharam devido a creditos insuficientes';
+      'Requisições falharam devido a créditos insuficientes';
 
   @override
   String get api_analytics_tooltip_max_concurrency =>
-      'Requisicoes rejeitadas devido ao limite de concorrencia';
+      'Requisições rejeitadas devido ao limite de concorrência';
 
   @override
-  String get api_analytics_scope_last_hour => 'Ultima Hora';
+  String get api_analytics_scope_last_hour => 'Última Hora';
 
   @override
-  String get api_analytics_scope_last_12_hours => 'Ultimas 12 Horas';
+  String get api_analytics_scope_last_12_hours => 'Últimas 12 Horas';
 
   @override
-  String get api_analytics_scope_last_24_hours => 'Ultimas 24 Horas';
+  String get api_analytics_scope_last_24_hours => 'Últimas 24 Horas';
 
   @override
-  String get api_analytics_scope_last_7_days => 'Ultimos 7 Dias';
+  String get api_analytics_scope_last_7_days => 'Últimos 7 Dias';
 
   @override
-  String get api_analytics_scope_last_30_days => 'Ultimos 30 Dias';
+  String get api_analytics_scope_last_30_days => 'Últimos 30 Dias';
 
   @override
   String get api_analytics_column_5_minutes =>
@@ -2980,25 +2980,25 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get api_analytics_request_delay_warning =>
-      'Uma requisicao pode levar ate 10 minutos para aparecer aqui';
+      'Uma requisição pode levar até 10 minutos para aparecer aqui';
 
   @override
-  String get api_analytics_no_requests => 'Sem requisicoes';
+  String get api_analytics_no_requests => 'Sem requisições';
 
   @override
   String get api_analytics_max_concurrency_exceeded =>
-      'Concorrencia maxima excedida';
+      'Concorrência máxima excedida';
 
   @override
   String get api_analytics_insufficient_credits_chip =>
-      'Creditos insuficientes';
+      'Créditos insuficientes';
 
   @override
-  String get api_analytics_last_12_hours => 'Ultimas 12 horas';
+  String get api_analytics_last_12_hours => 'Últimas 12 horas';
 
   @override
   String api_analytics_total_requests(int count) {
-    return 'Total: $count requisicoes';
+    return 'Total: $count requisições';
   }
 
   @override
@@ -3026,7 +3026,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String api_analytics_tooltip_no_credits_count(int count, String percentage) {
-    return 'Sem Creditos: $count ($percentage%)';
+    return 'Sem Créditos: $count ($percentage%)';
   }
 
   @override
@@ -3034,7 +3034,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
     int count,
     String percentage,
   ) {
-    return 'Concorrencia Maxima: $count ($percentage%)';
+    return 'Concorrência Máxima: $count ($percentage%)';
   }
 
   @override
@@ -3044,10 +3044,10 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get api_analytics_show_details => 'Mostrar detalhes';
 
   @override
-  String get api_analytics_detail_title => 'Titulo';
+  String get api_analytics_detail_title => 'Título';
 
   @override
-  String get api_analytics_detail_description => 'Descricao';
+  String get api_analytics_detail_description => 'Descrição';
 
   @override
   String get api_analytics_detail_error_object => 'Objeto de Erro';
@@ -3056,7 +3056,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get api_analytics_detail_stack_trace => 'Rastreamento de Pilha';
 
   @override
-  String get api_analytics_detail_request_payload => 'Payload da Requisicao';
+  String get api_analytics_detail_request_payload => 'Payload da Requisição';
 
   @override
   String get api_analytics_detail_response_data => 'Dados da Resposta';
@@ -3072,7 +3072,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String api_analytics_copied_to_clipboard(String label) {
-    return '$label copiado para a area de transferencia';
+    return '$label copiado para a área de transferência';
   }
 
   @override
@@ -3090,7 +3090,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
       'Falha ao carregar mais dados. Toque para tentar novamente.';
 
   @override
-  String get api_usage_page_title => 'Creditos e Chaves API';
+  String get api_usage_page_title => 'Créditos e Chaves API';
 
   @override
   String get api_usage_refresh => 'Atualizar';
@@ -3099,40 +3099,40 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get api_usage_retry => 'Tentar novamente';
 
   @override
-  String get api_usage_overview => 'Visao Geral';
+  String get api_usage_overview => 'Visão Geral';
 
   @override
   String get api_usage_api_keys => 'Chaves API';
 
   @override
-  String get api_usage_history => 'Historico';
+  String get api_usage_history => 'Histórico';
 
   @override
-  String get api_usage_overview_title => 'Visao Geral do Uso da API';
+  String get api_usage_overview_title => 'Visão Geral do Uso da API';
 
   @override
-  String get api_usage_credit_history => 'Historico de Creditos';
+  String get api_usage_credit_history => 'Histórico de Créditos';
 
   @override
   String get api_usage_new_api_key_created => 'Nova Chave API Criada';
 
   @override
   String get api_usage_copy_api_key_warning =>
-      'Por favor, copie e salve esta chave API. Voce nao podera ve-la novamente!';
+      'Por favor, copie e salve esta chave API. Você não poderá vê-la novamente!';
 
   @override
   String get api_usage_api_key_copied =>
-      'Chave API copiada para a area de transferencia';
+      'Chave API copiada para a área de transferência';
 
   @override
-  String get api_usage_done => 'Concluido';
+  String get api_usage_done => 'Concluído';
 
   @override
   String get api_usage_deactivate_api_key => 'Desativar Chave API';
 
   @override
   String get api_usage_deactivate_confirmation =>
-      'Tem certeza de que deseja desativar esta chave API? Esta acao nao pode ser desfeita.';
+      'Tem certeza de que deseja desativar esta chave API? Esta ação não pode ser desfeita.';
 
   @override
   String get api_usage_cancel => 'Cancelar';
@@ -3147,7 +3147,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get api_usage_no_api_keys => 'Nenhuma chave API ainda';
 
   @override
-  String get api_usage_purchase_credits => 'Comprar Creditos API';
+  String get api_usage_purchase_credits => 'Comprar Créditos API';
 
   @override
   String get api_usage_best_value => 'MELHOR VALOR';
@@ -3157,27 +3157,27 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get api_usage_credits_never_expire =>
-      'Os creditos nunca expiram • Ativacao instantanea';
+      'Os créditos nunca expiram • Ativação instantânea';
 
   @override
   String api_usage_unit_price(String unitPrice) {
-    return 'Preco unitario: $unitPrice';
+    return 'Preço unitário: $unitPrice';
   }
 
   @override
-  String get api_usage_ultra_plan_required => 'Plano Ultra Necessario';
+  String get api_usage_ultra_plan_required => 'Plano Ultra Necessário';
 
   @override
   String get api_usage_ultra_exclusive_benefit =>
-      'Os pacotes de creditos sao um beneficio exclusivo para assinantes do plano Ultra.';
+      'Os pacotes de créditos são um benefício exclusivo para assinantes do plano Ultra.';
 
   @override
   String get api_usage_credits_never_expire_benefit =>
-      'Creditos que nunca expiram';
+      'Créditos que nunca expiram';
 
   @override
   String get api_usage_perfect_for_traffic_spikes =>
-      'Perfeito para picos de trafego';
+      'Perfeito para picos de tráfego';
 
   @override
   String get api_usage_maybe_later => 'Talvez Depois';
@@ -3187,61 +3187,61 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get api_usage_unlock_credits_message =>
-      'Desbloqueie a capacidade de comprar creditos adicionais que nunca expiram. Perfeito para lidar com picos de trafego e demandas sazonais.';
+      'Desbloqueie a capacidade de comprar créditos adicionais que nunca expiram. Perfeito para lidar com picos de tráfego e demandas sazonais.';
 
   @override
   String get api_usage_get_credits_title =>
-      'Obtenha Creditos Que Nunca Expiram';
+      'Obtenha Créditos Que Nunca Expiram';
 
   @override
   String get api_usage_traffic_spikes_subtitle =>
-      'Perfeito para picos de trafego e planejamento de longo prazo';
+      'Perfeito para picos de tráfego e planejamento de longo prazo';
 
   @override
   String get api_usage_credits_never_expire_title =>
-      'Os Creditos Nunca Expiram';
+      'Os Créditos Nunca Expiram';
 
   @override
   String get api_usage_credits_never_expire_description =>
-      'Diferente dos creditos de assinatura que sao reiniciados mensalmente, os creditos comprados permanecem na sua conta para sempre enquanto seu plano Ultra estiver ativo.';
+      'Diferente dos créditos de assinatura que são reiniciados mensalmente, os créditos comprados permanecem na sua conta para sempre enquanto seu plano Ultra estiver ativo.';
 
   @override
-  String get api_usage_instant_activation_title => 'Ativacao Instantanea';
+  String get api_usage_instant_activation_title => 'Ativação Instantânea';
 
   @override
   String get api_usage_instant_activation_description =>
-      'Os creditos sao adicionados a sua conta imediatamente apos o pagamento - sem espera, sem atrasos.';
+      'Os créditos são adicionados à sua conta imediatamente após o pagamento - sem espera, sem atrasos.';
 
   @override
   String get api_usage_scale_without_limits_title => 'Escale Sem Limites';
 
   @override
   String get api_usage_scale_without_limits_description =>
-      'Lide com picos de trafego, demandas sazonais ou projetos especiais sem fazer upgrade do seu plano mensal.';
+      'Lide com picos de tráfego, demandas sazonais ou projetos especiais sem fazer upgrade do seu plano mensal.';
 
   @override
   String get api_usage_choose_package => 'Escolha Seu Pacote';
 
   @override
-  String get api_usage_100k_credits => '100.000 creditos';
+  String get api_usage_100k_credits => '100.000 créditos';
 
   @override
-  String get api_usage_1m_credits => '1.000.000 creditos';
+  String get api_usage_1m_credits => '1.000.000 créditos';
 
   @override
-  String get api_usage_2_5m_credits => '2.500.000 creditos';
+  String get api_usage_2_5m_credits => '2.500.000 créditos';
 
   @override
   String get api_usage_small_package_description =>
-      'Otimo para testes e projetos pequenos';
+      'Ótimo para testes e projetos pequenos';
 
   @override
   String get api_usage_medium_package_description =>
-      'Melhor valor para aplicacoes em crescimento';
+      'Melhor valor para aplicações em crescimento';
 
   @override
   String get api_usage_large_package_description =>
-      'Economia maxima para necessidades empresariais';
+      'Economia máxima para necessidades empresariais';
 
   @override
   String get api_usage_most_popular => 'MAIS POPULAR';
@@ -3253,26 +3253,26 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get api_usage_secure_payment_stripe => 'Pagamento seguro via Stripe';
 
   @override
-  String get api_usage_instant_delivery => 'Entrega instantanea';
+  String get api_usage_instant_delivery => 'Entrega instantânea';
 
   @override
-  String get api_usage_not_now => 'Agora Nao';
+  String get api_usage_not_now => 'Agora Não';
 
   @override
-  String get api_usage_get_100k_credits => 'Obter 100K Creditos';
+  String get api_usage_get_100k_credits => 'Obter 100K Créditos';
 
   @override
-  String get api_usage_get_1m_credits => 'Obter 1M Creditos';
+  String get api_usage_get_1m_credits => 'Obter 1M Créditos';
 
   @override
-  String get api_usage_get_2_5m_credits => 'Obter 2,5M Creditos';
+  String get api_usage_get_2_5m_credits => 'Obter 2,5M Créditos';
 
   @override
   String get api_usage_preparing_checkout => 'Preparando pagamento...';
 
   @override
   String get api_usage_redirect_to_stripe =>
-      'Voce sera redirecionado para o Stripe em instantes';
+      'Você será redirecionado para o Stripe em instantes';
 
   @override
   String get api_usage_checkout_failed => 'Falha no Pagamento';
@@ -3291,7 +3291,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get api_usage_complete_in_stripe =>
-      'Complete sua compra na pagina de pagamento do Stripe, depois atualize esta pagina para ver seus novos creditos.';
+      'Complete sua compra na página de pagamento do Stripe, depois atualize esta página para ver seus novos créditos.';
 
   @override
   String get api_usage_secure_payment_powered_by_stripe =>
@@ -3302,20 +3302,20 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get api_usage_unable_to_verify_account =>
-      'Nao foi possivel verificar o status da conta. Por favor, tente novamente.';
+      'Não foi possível verificar o status da conta. Por favor, tente novamente.';
 
   @override
   String get api_usage_account_refreshed => 'Conta atualizada';
 
   @override
-  String get api_usage_credits_overview => 'Visao Geral dos Creditos API';
+  String get api_usage_credits_overview => 'Visão Geral dos Créditos API';
 
   @override
-  String get api_usage_total_available => 'Total Disponivel';
+  String get api_usage_total_available => 'Total Disponível';
 
   @override
   String get api_usage_credits_combined_description =>
-      'Creditos de compra e assinatura combinados';
+      'Créditos de compra e assinatura combinados';
 
   @override
   String get api_usage_subscription => 'Assinatura';
@@ -3326,7 +3326,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String api_usage_will_renew_monthly(int credits) {
-    return 'Sera renovado mensalmente $credits';
+    return 'Será renovado mensalmente $credits';
   }
 
   @override
@@ -3334,11 +3334,11 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get api_usage_purchased_description =>
-      'Creditos de compra unica que nunca expiram';
+      'Créditos de compra única que nunca expiram';
 
   @override
   String get api_usage_credits_info =>
-      'Voce pode comprar creditos adicionais • Os creditos de assinatura sao renovados mensalmente';
+      'Você pode comprar créditos adicionais • Os créditos de assinatura são renovados mensalmente';
 
   @override
   String get api_usage_inactive => 'INATIVO';
@@ -3350,11 +3350,11 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String api_usage_requests_count(int count) {
-    return '$count requisicoes';
+    return '$count requisições';
   }
 
   @override
-  String get api_usage_last_30_days => 'Ultimos 30 dias';
+  String get api_usage_last_30_days => 'Últimos 30 dias';
 
   @override
   String get api_usage_api_key_label => 'Chave API';
@@ -3370,21 +3370,21 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get api_usage_account_id_copied =>
-      'ID da conta copiado para a area de transferencia';
+      'ID da conta copiado para a área de transferência';
 
   @override
   String get api_usage_create_new_api_key => 'Criar Nova Chave API';
 
   @override
   String get api_usage_api_key_name_description =>
-      'De a sua chave API um nome descritivo para ajuda-lo a identifica-la depois.';
+      'Dê à sua chave API um nome descritivo para ajudá-lo a identificá-la depois.';
 
   @override
   String get api_usage_api_key_name => 'Nome da Chave API';
 
   @override
   String get api_usage_api_key_name_hint =>
-      'ex., Servidor de Producao, App Mobile, Testes';
+      'ex., Servidor de Produção, App Mobile, Testes';
 
   @override
   String get api_usage_name_required =>
@@ -3400,7 +3400,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get api_usage_api_key_security_warning =>
-      'Quem tiver acesso a esta chave API tera as mesmas permissoes que sua conta. Mantenha-a segura e nao a compartilhe publicamente.';
+      'Quem tiver acesso a esta chave API terá as mesmas permissões que sua conta. Mantenha-a segura e não a compartilhe publicamente.';
 
   @override
   String get api_usage_creating => 'Criando...';
@@ -3410,11 +3410,11 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get api_usage_no_credit_history =>
-      'Nenhum historico de creditos ainda';
+      'Nenhum histórico de créditos ainda';
 
   @override
   String get api_usage_credit_transactions_appear_here =>
-      'Suas transacoes de creditos aparecerao aqui';
+      'Suas transações de créditos aparecerão aqui';
 
   @override
   String get api_usage_load_more => 'Carregar Mais';
@@ -3423,10 +3423,10 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get api_usage_monthly_subscription => 'Assinatura Mensal';
 
   @override
-  String get api_usage_initial_credit => 'Credito Inicial';
+  String get api_usage_initial_credit => 'Crédito Inicial';
 
   @override
-  String get api_usage_welcome_bonus => 'Bonus de boas-vindas';
+  String get api_usage_welcome_bonus => 'Bônus de boas-vindas';
 
   @override
   String api_usage_plan_date_subtitle(String planName, String date) {
@@ -3434,13 +3434,13 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   }
 
   @override
-  String get api_usage_credit_purchase => 'Compra de Creditos';
+  String get api_usage_credit_purchase => 'Compra de Créditos';
 
   @override
-  String get api_usage_unknown_transaction => 'Transacao Desconhecida';
+  String get api_usage_unknown_transaction => 'Transação Desconhecida';
 
   @override
-  String get api_usage_plan_free => 'Gratis';
+  String get api_usage_plan_free => 'Grátis';
 
   @override
   String get auth_welcome => 'Bem-vindo';
@@ -3468,7 +3468,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get auth_email_registered_hint =>
-      'O e-mail com o qual voce se cadastrou';
+      'O e-mail com o qual você se cadastrou';
 
   @override
   String get auth_password_label => 'Senha';
@@ -3484,10 +3484,10 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get auth_user_name_label =>
-      'Nome de exibicao (Geralmente o nome da empresa)';
+      'Nome de exibição (Geralmente o nome da empresa)';
 
   @override
-  String get auth_user_name_hint => 'Nome de usuario (ou nome da empresa)';
+  String get auth_user_name_hint => 'Nome de usuário (ou nome da empresa)';
 
   @override
   String get auth_new_password_label => 'Nova senha';
@@ -3500,11 +3500,11 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
       'Digite novamente sua nova senha';
 
   @override
-  String get auth_validation_code_label => 'Codigo de validacao';
+  String get auth_validation_code_label => 'Código de validação';
 
   @override
   String get auth_validation_code_hint =>
-      'Verifique seu e-mail para o codigo de validacao';
+      'Verifique seu e-mail para o código de validação';
 
   @override
   String get auth_confirm_email_button => 'Confirmar seu e-mail';
@@ -3515,14 +3515,14 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   }
 
   @override
-  String get auth_send_verification_code => 'Enviar codigo de verificacao';
+  String get auth_send_verification_code => 'Enviar código de verificação';
 
   @override
   String get auth_verification_code_info =>
-      'Um codigo de verificacao sera enviado para seu e-mail';
+      'Um código de verificação será enviado para seu e-mail';
 
   @override
-  String get auth_validate_code_button => 'Validar o codigo enviado por e-mail';
+  String get auth_validate_code_button => 'Validar o código enviado por e-mail';
 
   @override
   String get auth_password_reset_success_title =>
@@ -3530,14 +3530,14 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get auth_password_reset_success_message =>
-      'Agora voce pode entrar com sua nova senha';
+      'Agora você pode entrar com sua nova senha';
 
   @override
   String get auth_email_confirmed_title => 'E-mail confirmado!';
 
   @override
   String get auth_email_confirmed_message =>
-      'Agora voce pode entrar com seu e-mail e senha.';
+      'Agora você pode entrar com seu e-mail e senha.';
 
   @override
   String get auth_ok_button => 'OK';
@@ -3601,7 +3601,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get dashboard_nav_marketplace => 'Marketplace';
 
   @override
-  String get dashboard_nav_credits_keys => 'Creditos e Chaves';
+  String get dashboard_nav_credits_keys => 'Créditos e Chaves';
 
   @override
   String get dashboard_nav_api_analytics => 'Analytics de API';
@@ -3623,7 +3623,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String dashboard_app_version(String version) {
-    return 'Versao do app: $version';
+    return 'Versão do app: $version';
   }
 
   @override
@@ -3632,17 +3632,17 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   }
 
   @override
-  String get pricing_per_month => 'Por mes';
+  String get pricing_per_month => 'Por mês';
 
   @override
   String get pricing_per_year => 'Por ano';
 
   @override
   String get pricing_subtitle =>
-      'Temos voce coberto, seja voce uma pessoa unica executando\num projeto pessoal, uma startup ou ate mesmo uma empresa.';
+      'Temos você coberto, seja você uma pessoa única executando\num projeto pessoal, uma startup ou até mesmo uma empresa.';
 
   @override
-  String get pricing_plan_basic => 'BASICO';
+  String get pricing_plan_basic => 'BÁSICO';
 
   @override
   String get pricing_plan_basic_subtitle => 'PARA PROJETOS PESSOAIS';
@@ -3664,12 +3664,12 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String pricing_feature_api_credits(String count) {
-    return '$count creditos de API';
+    return '$count créditos de API';
   }
 
   @override
   String pricing_feature_concurrent_requests(String count) {
-    return '$count requisicoes simultaneas';
+    return '$count requisições simultâneas';
   }
 
   @override
@@ -3681,7 +3681,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get pricing_feature_best_ai_model => 'Acesso ao melhor modelo de IA';
 
   @override
-  String get pricing_feature_priority_support => 'Suporte Prioritario';
+  String get pricing_feature_priority_support => 'Suporte Prioritário';
 
   @override
   String get pricing_feature_hide_endpoints =>
@@ -3693,14 +3693,14 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get pricing_feature_addon_credits =>
-      'Possibilidade de comprar creditos de API adicionais';
+      'Possibilidade de comprar créditos de API adicionais';
 
   @override
-  String get pricing_sign_in_required => 'Por favor, faca login para assinar';
+  String get pricing_sign_in_required => 'Por favor, faça login para assinar';
 
   @override
   String get pricing_checkout_error =>
-      'Nao foi possivel abrir a pagina de pagamento';
+      'Não foi possível abrir a página de pagamento';
 
   @override
   String pricing_error_message(String error) {
@@ -3711,14 +3711,14 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get marketplace_title => 'Marketplace';
 
   @override
-  String get marketplace_public_scrappables => 'Scrappables Publicos';
+  String get marketplace_public_scrappables => 'Scrappables Públicos';
 
   @override
-  String get marketplace_refresh_page => 'Atualizar pagina';
+  String get marketplace_refresh_page => 'Atualizar página';
 
   @override
   String get marketplace_search_hint =>
-      'Buscar scrappables por nome ou descricao...';
+      'Buscar scrappables por nome ou descrição...';
 
   @override
   String get marketplace_error_loading => 'Erro ao carregar o marketplace';
@@ -3728,7 +3728,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get marketplace_no_scrappables_available =>
-      'Nenhum scrappable disponivel';
+      'Nenhum scrappable disponível';
 
   @override
   String marketplace_no_scrappables_match(String searchQuery) {
@@ -3737,7 +3737,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get marketplace_empty_message =>
-      'O marketplace esta vazio no momento. Volte mais tarde para ver novos scrappables.';
+      'O marketplace está vazio no momento. Volte mais tarde para ver novos scrappables.';
 
   @override
   String get marketplace_clear_search => 'Limpar Busca';
@@ -3753,14 +3753,14 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get marketplace_usage_metrics_title =>
-      'Metricas de uso (ultimos 30 dias)';
+      'Métricas de uso (últimos 30 dias)';
 
   @override
-  String get marketplace_failed_to_load_metrics => 'Falha ao carregar metricas';
+  String get marketplace_failed_to_load_metrics => 'Falha ao carregar métricas';
 
   @override
   String get marketplace_no_requests_last_30_days =>
-      'Sem requisicoes nos ultimos 30 dias';
+      'Sem requisições nos últimos 30 dias';
 
   @override
   String get marketplace_metrics_success => 'Sucesso';
@@ -3793,7 +3793,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get marketplace_clone_private_notice =>
-      'O scrappable clonado e privado por padrao. Voce pode torna-lo publico na tela de edicao.';
+      'O scrappable clonado é privado por padrão. Você pode torná-lo público na tela de edição.';
 
   @override
   String get marketplace_go_to_endpoints => 'Ir para Endpoints';
@@ -3818,7 +3818,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get marketplace_reference_url =>
-      'URL de referencia usada para o exemplo:';
+      'URL de referência usada para o exemplo:';
 
   @override
   String get marketplace_open_url => 'Abrir URL';
@@ -3828,7 +3828,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get marketplace_no_example_response =>
-      'Nenhuma resposta de exemplo disponivel';
+      'Nenhuma resposta de exemplo disponível';
 
   @override
   String get marketplace_copy => 'Copiar';
@@ -3840,18 +3840,18 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get marketplace_decrease_font_size => 'Diminuir tamanho da fonte';
 
   @override
-  String get marketplace_no_html_content => 'Nenhum conteudo HTML disponivel';
+  String get marketplace_no_html_content => 'Nenhum conteúdo HTML disponível';
 
   @override
-  String get marketplace_no_screenshot => 'Nenhuma captura de tela disponivel';
+  String get marketplace_no_screenshot => 'Nenhuma captura de tela disponível';
 
   @override
   String get marketplace_result_copied =>
-      'Resultado copiado para a area de transferencia';
+      'Resultado copiado para a área de transferência';
 
   @override
   String get marketplace_html_copied =>
-      'HTML copiado para a area de transferencia';
+      'HTML copiado para a área de transferência';
 
   @override
   String get marketplace_screenshot_info_copied => 'Info da captura copiada';
@@ -3872,7 +3872,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get marketplace_copy_curl_command => 'Copiar o comando cURL de teste';
 
   @override
-  String get marketplace_api_configuration => 'Configuracao API e Custos';
+  String get marketplace_api_configuration => 'Configuração API e Custos';
 
   @override
   String marketplace_created_date(String date) {
@@ -3881,7 +3881,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String marketplace_last_logic_modification(String date) {
-    return 'Ultima modificacao de logica: $date';
+    return 'Última modificação de lógica: $date';
   }
 
   @override
@@ -3889,32 +3889,32 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get marketplace_login_required =>
-      'Por favor, faca login para usar este scrappable.';
+      'Por favor, faça login para usar este scrappable.';
 
   @override
   String get marketplace_no_api_keys =>
       'Nenhuma chave API encontrada. Por favor, crie uma chave API primeiro para usar este scrappable.';
 
   @override
-  String get marketplace_upgrade_required_title => 'Upgrade Necessario';
+  String get marketplace_upgrade_required_title => 'Upgrade Necessário';
 
   @override
   String get marketplace_clone_feature_pro =>
-      'Clonar scrappables do marketplace esta disponivel nos planos Pro e Ultra.';
+      'Clonar scrappables do marketplace está disponível nos planos Pro e Ultra.';
 
   @override
   String get marketplace_upgrade_benefits_title =>
-      'Faca upgrade para desbloquear:';
+      'Faça upgrade para desbloquear:';
 
   @override
   String get marketplace_benefit_clone =>
       'Clonar qualquer scrappable do marketplace';
 
   @override
-  String get marketplace_benefit_more_credits => 'Mais creditos de API';
+  String get marketplace_benefit_more_credits => 'Mais créditos de API';
 
   @override
-  String get marketplace_benefit_concurrent => 'Mais requisicoes simultaneas';
+  String get marketplace_benefit_concurrent => 'Mais requisições simultâneas';
 
   @override
   String get marketplace_benefit_endpoints => 'Mais endpoints ativos';
@@ -3927,7 +3927,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get scrap_session_copied_to_clipboard =>
-      'Copiado para a area de transferencia';
+      'Copiado para a área de transferência';
 
   @override
   String get scrap_session_tab_result => 'RESULTADO';
@@ -3940,14 +3940,14 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get scrap_session_no_json_response =>
-      'Nenhuma resposta JSON disponivel';
+      'Nenhuma resposta JSON disponível';
 
   @override
-  String get scrap_session_no_html_content => 'Nenhum conteudo HTML disponivel';
+  String get scrap_session_no_html_content => 'Nenhum conteúdo HTML disponível';
 
   @override
   String get scrap_session_no_screenshot =>
-      'Nenhuma captura de tela disponivel';
+      'Nenhuma captura de tela disponível';
 
   @override
   String get scrap_session_copy => 'Copiar';
@@ -3966,17 +3966,17 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get scrap_session_powerful_model_upgrade =>
-      'Desbloqueie o acesso ao modelo de IA Potente para precisao de extracao superior e melhor compreensao de paginas web complexas. Perfeito para necessidades avancadas de scraping.';
+      'Desbloqueie o acesso ao modelo de IA Potente para precisão de extração superior e melhor compreensão de páginas web complexas. Perfeito para necessidades avançadas de scraping.';
 
   @override
-  String get scrap_session_sign_in_required => 'Login Necessario';
+  String get scrap_session_sign_in_required => 'Login Necessário';
 
   @override
   String get scrap_session_sign_in_unlock_features =>
-      'Faca login para desbloquear recursos poderosos:';
+      'Faça login para desbloquear recursos poderosos:';
 
   @override
-  String get scrap_session_advanced_ai_models => 'Modelos de IA Avancados';
+  String get scrap_session_advanced_ai_models => 'Modelos de IA Avançados';
 
   @override
   String get scrap_session_advanced_ai_models_desc =>
@@ -3990,18 +3990,18 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
       'Endpoints nunca expiram com uma assinatura';
 
   @override
-  String get scrap_session_more_api_credits => 'Mais Creditos de API';
+  String get scrap_session_more_api_credits => 'Mais Créditos de API';
 
   @override
   String get scrap_session_more_api_credits_desc =>
-      'Obtenha milhares de creditos de API por mes';
+      'Obtenha milhares de créditos de API por mês';
 
   @override
-  String get scrap_session_multiple_endpoints => 'Multiplos Endpoints';
+  String get scrap_session_multiple_endpoints => 'Múltiplos Endpoints';
 
   @override
   String get scrap_session_multiple_endpoints_desc =>
-      'Crie e gerencie multiplos endpoints de scraping';
+      'Crie e gerencie múltiplos endpoints de scraping';
 
   @override
   String get scrap_session_maybe_later => 'Talvez Depois';
@@ -4025,16 +4025,16 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get scrap_session_deploy_endpoint => 'IMPLANTAR ENDPOINT';
 
   @override
-  String get scrap_session_discard_changes => 'Descartar alteracoes';
+  String get scrap_session_discard_changes => 'Descartar alterações';
 
   @override
   String get scrap_session_go_back => 'Voltar';
 
   @override
-  String get scrap_session_edit_request => 'Editar requisicao do scrappable';
+  String get scrap_session_edit_request => 'Editar requisição do scrappable';
 
   @override
-  String get scrap_session_no_test_data => 'Nenhum dado de teste disponivel';
+  String get scrap_session_no_test_data => 'Nenhum dado de teste disponível';
 
   @override
   String get scrap_session_chat_loading => 'Carregando chat...';
@@ -4051,13 +4051,13 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   }
 
   @override
-  String get scrap_session_ai_thinking => 'A IA esta pensando...';
+  String get scrap_session_ai_thinking => 'A IA está pensando...';
 
   @override
-  String get scrap_session_initializing_ai => 'Inicializando analise de IA...';
+  String get scrap_session_initializing_ai => 'Inicializando análise de IA...';
 
   @override
-  String get scrap_session_web_search_grounding => 'Fundamentacao de Busca Web';
+  String get scrap_session_web_search_grounding => 'Fundamentação de Busca Web';
 
   @override
   String scrap_session_sources_referenced(int count) {
@@ -4066,20 +4066,20 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get scrap_session_ai_analyzing_pattern =>
-      'Gemini 3 Pro esta analisando seu padrao de URL...';
+      'Gemini 3 Pro está analisando seu padrão de URL...';
 
   @override
   String get scrap_session_test_endpoint => 'Testar endpoint';
 
   @override
-  String get scrap_session_creating_session => 'Criando sessao...';
+  String get scrap_session_creating_session => 'Criando sessão...';
 
   @override
   String get scrap_session_add_api_key =>
       'Adicione chave API para continuar...';
 
   @override
-  String get scrap_session_ask_modification => 'Peca qualquer modificacao...';
+  String get scrap_session_ask_modification => 'Peça qualquer modificação...';
 
   @override
   String get scrap_session_message_min_length =>
@@ -4091,77 +4091,77 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get scrap_session_edit_request_title =>
-      'Editar Requisicao do Scrappable';
+      'Editar Requisição do Scrappable';
 
   @override
   String get scrap_session_edit_request_subtitle =>
-      'Personalize o modelo de URL, parametros de caminho e parametros de consulta';
+      'Personalize o modelo de URL, parâmetros de caminho e parâmetros de consulta';
 
   @override
   String scrap_session_path_params_hint(Object postId, Object userId) {
-    return 'Os parametros de caminho devem estar entre chaves como $userId ou $postId. Eles representam segmentos dinamicos na URL que serao substituidos por valores reais.';
+    return 'Os parâmetros de caminho devem estar entre chaves como $userId ou $postId. Eles representam segmentos dinâmicos na URL que serão substituídos por valores reais.';
   }
 
   @override
   String scrap_session_use_param_name(Object paramName) {
-    return 'Use $paramName para parametros de caminho';
+    return 'Use $paramName para parâmetros de caminho';
   }
 
   @override
-  String get scrap_session_save_changes => 'Salvar Alteracoes';
+  String get scrap_session_save_changes => 'Salvar Alterações';
 
   @override
-  String get scrap_session_duplicate_param => 'Parametro Duplicado';
+  String get scrap_session_duplicate_param => 'Parâmetro Duplicado';
 
   @override
   String get scrap_session_duplicate_path_param =>
-      'Este parametro de caminho ja existe.';
+      'Este parâmetro de caminho já existe.';
 
   @override
   String get scrap_session_duplicate_query_param =>
-      'Este parametro de consulta ja existe.';
+      'Este parâmetro de consulta já existe.';
 
   @override
   String get scrap_session_missing_path_params =>
-      'Parametros de Caminho Faltando';
+      'Parâmetros de Caminho Faltando';
 
   @override
   String get scrap_session_unused_path_params =>
-      'Parametros de Caminho Nao Usados';
+      'Parâmetros de Caminho Não Usados';
 
   @override
   String get scrap_session_request_updated =>
-      'Requisicao do scrappable atualizada com sucesso!';
+      'Requisição do scrappable atualizada com sucesso!';
 
   @override
   String get scrap_session_close => 'Fechar';
 
   @override
   String get scrap_session_chat_loading_disabled_tooltip =>
-      'Desabilitado enquanto a IA esta processando';
+      'Desabilitado enquanto a IA está processando';
 
   @override
   String get scrap_session_chat_loading_test_notice =>
-      'A IA esta processando uma solicitacao. Por favor aguarde antes de executar testes.';
+      'A IA está processando uma solicitação. Por favor aguarde antes de executar testes.';
 
   @override
   String get scrap_session_session_expired_tooltip =>
-      'Sessao expirada - implante para continuar';
+      'Sessão expirada - implante para continuar';
 
   @override
   String get scrap_session_session_expired_test_notice =>
-      'Sua sessao de teste expirou. Implante o endpoint para continuar usando-o.';
+      'Sua sessão de teste expirou. Implante o endpoint para continuar usando-o.';
 
   @override
   String get scrappables_empty_title =>
-      'Voce ainda nao criou nenhum scrappable.';
+      'Você ainda não criou nenhum scrappable.';
 
   @override
   String get scrappables_create_first => 'Crie seu primeiro scrappable';
 
   @override
   String get scrappables_search_hint =>
-      'Pesquise seus endpoints por nome ou descricao...';
+      'Pesquise seus endpoints por nome ou descrição...';
 
   @override
   String get scrappables_error_loading => 'Erro ao carregar endpoints';

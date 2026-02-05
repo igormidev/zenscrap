@@ -537,6 +537,7 @@ class _ScrappableInfoDialogState extends ConsumerState<ScrappableInfoDialog>
         testData: widget.scrappable.referenceTestData,
         isTestMode: false,
         apiKey: selectedApiKey!.apiKey,
+        defaultCountryCode: widget.scrappable.scrappingBeeExtractRules?.countryCode,
       ),
     );
   }

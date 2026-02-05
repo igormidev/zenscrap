@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
+import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
@@ -38,15 +39,37 @@ class _SplashViewState extends ConsumerState<SplashView> {
         context.go('/scrappable-form');
       }
     } else {
-      // User is authenticated - we don't have user profile info from AuthSuccess
-      // so we use placeholder values that will be updated when account info is fetched
-      ref.read(sessionProvider.notifier).setState(SessionState.logged(
-        user: UserModel(
-          email: 'user@zenscrap.com',
-          userName: 'User',
-          imageUrl: null,
-        ),
-      ));
+      // User is authenticated - fetch real user profile from Serverpod auth module
+      try {
+        final userProfile = await client.modules.auth_core.userProfileInfo
+            .get();
+        ref
+            .read(sessionProvider.notifier)
+            .setState(
+              SessionState.logged(
+                user: UserModel(
+                  email: userProfile.email ?? 'unknown@zenscrap.com',
+                  userName:
+                      userProfile.fullName ?? userProfile.userName ?? 'User',
+                  imageUrl: userProfile.imageUrl?.toString(),
+                ),
+              ),
+            );
+      } catch (e, s) {
+        talker.error('Did not finded user', e, s);
+        // Fallback if profile fetch fails - user is still authenticated
+        ref
+            .read(sessionProvider.notifier)
+            .setState(
+              SessionState.logged(
+                user: UserModel(
+                  email: 'user@zenscrap.com',
+                  userName: 'User',
+                  imageUrl: null,
+                ),
+              ),
+            );
+      }
       // Redirect to dashboard for authenticated users
       if (mounted) {
         context.go(DashboardNavigationType.userEndpoints.routeOnClick!);

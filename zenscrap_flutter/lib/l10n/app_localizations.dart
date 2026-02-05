@@ -1720,7 +1720,7 @@ abstract class AppLocalizations {
   /// Main title for API usage page
   ///
   /// In en, this message translates to:
-  /// **'Api Credits & Keys'**
+  /// **'API Credits & Keys'**
   String get api_usage_page_title;
 
   /// Refresh button label

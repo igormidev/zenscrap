@@ -6,6 +6,73 @@ This document explains how server-side translations work in the ZenScrap backend
 
 The server uses a centralized translation system for error messages and API responses. This ensures users receive error messages in their preferred language when API calls fail.
 
+---
+
+## CRITICAL: Proper Diacritics and Accents
+
+> **THIS IS EXTREMELY IMPORTANT - READ CAREFULLY**
+
+When adding or modifying translations, you **MUST** use proper diacritics, accents, and special characters for each language. **NEVER** use ASCII approximations or omit accents.
+
+### Why This Matters
+
+Incorrect diacritics make translations look unprofessional and can change the meaning of words. Users will immediately notice missing accents, and it reflects poorly on the quality of the application.
+
+### Common Mistakes to AVOID
+
+| Language | WRONG | CORRECT |
+|----------|-------|---------|
+| Portuguese | `Nao`, `Autenticacao`, `Voce` | `Não`, `Autenticação`, `Você` |
+| Spanish | `Autenticacion`, `Numero`, `Codigo` | `Autenticación`, `Número`, `Código` |
+| French | `Echec`, `Cle`, `Deja`, `creation` | `Échec`, `Clé`, `Déjà`, `création` |
+| German | `Schlussel`, `fur`, `uber`, `offnen` | `Schlüssel`, `für`, `über`, `öffnen` |
+| Japanese | Half-width `?` | Full-width `？` |
+
+### Required Special Characters by Language
+
+**Portuguese (ptBR):**
+- Acute: á, é, í, ó, ú
+- Circumflex: â, ê, ô
+- Tilde: ã, õ
+- Cedilla: ç
+
+**Spanish (es):**
+- Acute: á, é, í, ó, ú
+- Tilde: ñ
+- Diaeresis: ü
+- Opening punctuation: ¿, ¡
+
+**French (fr):**
+- Acute: é
+- Grave: à, è, ù
+- Circumflex: â, ê, î, ô, û
+- Cedilla: ç
+- Diaeresis: ë, ï, ü, ÿ
+- Ligatures: æ, œ
+
+**German (de):**
+- Umlauts: ä, ö, ü
+- Eszett: ß
+
+**Japanese (ja):**
+- Use full-width punctuation: `。` `、` `？` `！`
+- Never use half-width ASCII punctuation with Japanese text
+
+### Verification Checklist
+
+Before committing any translation changes:
+
+1. **Check every word** for missing diacritics
+2. **Never copy from ASCII sources** - always type with proper characters or verify after copying
+3. **Use a spell checker** configured for the target language
+4. **Review the diff** carefully before committing
+
+### If Using AI/LLM for Translations
+
+AI models sometimes omit diacritics. **ALWAYS** verify AI-generated translations have proper accents before using them.
+
+---
+
 ## Key Components
 
 | File | Purpose |

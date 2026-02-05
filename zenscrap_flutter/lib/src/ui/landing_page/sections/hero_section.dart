@@ -76,9 +76,22 @@ class _HeroSectionState extends ConsumerState<HeroSection>
   }
 
   Future<void> _submitForm() async {
-    if (!(_formKey.currentState?.validate() ?? false)) return;
-
     final analytics = ref.read(analyticsServiceProvider);
+    final targetUrl = _referenceLinkEC.text.trim();
+
+    // Check and track banned domain attempts before validation
+    final normalizedUrl =
+        targetUrl.startsWith('http') ? targetUrl : 'http://$targetUrl';
+    final bannedDomain = getBannedDomainFromUrl(normalizedUrl);
+    if (bannedDomain != null) {
+      await analytics.trackBannedDomainAttempt(
+        bannedDomain: bannedDomain,
+        fullUrl: targetUrl,
+        source: 'hero_section',
+      );
+    }
+
+    if (!(_formKey.currentState?.validate() ?? false)) return;
 
     await createScrappableWithTracking(
       targetUrl: _referenceLinkEC.text,

@@ -9,6 +9,75 @@ ZenScrap uses Flutter's official localization system with:
 - **flutter gen-l10n** - Code generation for type-safe translations
 - **ARB files** - Application Resource Bundle format for storing translations
 
+---
+
+## CRITICAL: Proper Diacritics and Accents
+
+> **THIS IS EXTREMELY IMPORTANT - READ CAREFULLY**
+
+When adding or modifying translations, you **MUST** use proper diacritics, accents, and special characters for each language. **NEVER** use ASCII approximations or omit accents.
+
+### Why This Matters
+
+Incorrect diacritics make translations look unprofessional and can change the meaning of words. Users will immediately notice missing accents, and it reflects poorly on the quality of the application.
+
+### Common Mistakes to AVOID
+
+| Language | WRONG | CORRECT |
+|----------|-------|---------|
+| Portuguese | `Nao`, `Autenticacao`, `Voce`, `codigo` | `Não`, `Autenticação`, `Você`, `código` |
+| Spanish | `Autenticacion`, `Numero`, `Codigo`, `contrasena` | `Autenticación`, `Número`, `Código`, `contraseña` |
+| French | `Echec`, `Cle`, `Deja`, `creation`, `parametres` | `Échec`, `Clé`, `Déjà`, `création`, `paramètres` |
+| German | `Schlussel`, `fur`, `uber`, `offnen`, `andern` | `Schlüssel`, `für`, `über`, `öffnen`, `ändern` |
+| Japanese | Half-width `?` and `,` | Full-width `？` and `、` |
+
+### Required Special Characters by Language
+
+**Portuguese (pt_BR):**
+- Acute: á, é, í, ó, ú
+- Circumflex: â, ê, ô
+- Tilde: ã, õ
+- Cedilla: ç
+
+**Spanish (es):**
+- Acute: á, é, í, ó, ú
+- Tilde: ñ
+- Diaeresis: ü
+- Opening punctuation: ¿, ¡ (Spanish requires BOTH opening and closing punctuation for questions and exclamations)
+
+**French (fr):**
+- Acute: é
+- Grave: à, è, ù
+- Circumflex: â, ê, î, ô, û
+- Cedilla: ç
+- Diaeresis: ë, ï, ü, ÿ
+- Ligatures: æ, œ
+
+**German (de):**
+- Umlauts: ä, ö, ü
+- Eszett: ß
+- Note: Never use "ae", "oe", "ue" as substitutes for umlauts
+
+**Japanese (ja):**
+- Use full-width punctuation: `。` `、` `？` `！`
+- Never use half-width ASCII punctuation with Japanese text
+
+### Verification Checklist
+
+Before committing any translation changes:
+
+1. **Check every word** for missing diacritics
+2. **Never copy from ASCII sources** - always type with proper characters or verify after copying
+3. **Use a spell checker** configured for the target language
+4. **Review the diff** carefully before committing
+5. **Test in the app** to ensure characters render correctly
+
+### If Using AI/LLM for Translations
+
+AI models sometimes omit diacritics. **ALWAYS** verify AI-generated translations have proper accents before using them. This is a known issue and requires manual verification.
+
+---
+
 ## Supported Languages
 
 | Code | Language | Native Name |

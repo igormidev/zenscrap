@@ -69,13 +69,26 @@ class _CreateScrappableDialogState extends ConsumerState<CreateScrappableDialog>
   }
 
   Future<void> _handleCreate() async {
+    final analytics = ref.read(analyticsServiceProvider);
+    final targetUrl = _urlController.text.trim();
+
+    // Check and track banned domain attempts before validation
+    final normalizedUrl =
+        targetUrl.startsWith('http') ? targetUrl : 'http://$targetUrl';
+    final bannedDomain = getBannedDomainFromUrl(normalizedUrl);
+    if (bannedDomain != null) {
+      await analytics.trackBannedDomainAttempt(
+        bannedDomain: bannedDomain,
+        fullUrl: targetUrl,
+        source: 'create_dialog',
+      );
+    }
+
     if (!(_formKey.currentState?.validate() ?? false)) return;
     if (_isCreating) return;
 
     setState(() => _isCreating = true);
 
-    final analytics = ref.read(analyticsServiceProvider);
-    final targetUrl = _urlController.text.trim();
     final userPrompt = _promptController.text.trim();
 
     // Track analytics before closing
