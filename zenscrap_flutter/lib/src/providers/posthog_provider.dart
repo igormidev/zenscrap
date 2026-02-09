@@ -1,7 +1,46 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:posthog_flutter/posthog_flutter.dart';
 import 'package:zenscrap_flutter/src/core/utils/device_utils.dart';
 import 'package:zenscrap_flutter/src/core/utils/talker.dart';
+
+/// PostHog configuration constants
+class PostHogConstants {
+  /// PostHog API key
+  static const String apiKey = 'phc_ctZsxdHMUJjuLPTyjASz0vVzbbPvx3ov0VdqoY7D0vh';
+
+  /// PostHog API host
+  static const String host = 'https://us.i.posthog.com';
+}
+
+/// Initializes the PostHog Flutter SDK with proper configuration.
+///
+/// This must be called during app startup, before runApp().
+/// For session replay and surveys, the SDK must be initialized manually
+/// (AUTO_INIT disabled) to ensure proper configuration.
+///
+/// Session replay is enabled for web platform with screenshot mode.
+/// Canvas capture must also be enabled in PostHog project settings
+/// for Flutter Web session replay to work (Flutter renders using canvas).
+Future<void> initializePostHog() async {
+  final config = PostHogConfig(PostHogConstants.apiKey);
+  config.host = PostHogConstants.host;
+  config.debug = kDebugMode;
+  config.captureApplicationLifecycleEvents = true;
+
+  // Session replay configuration
+  // Only enable on web platform where the app is deployed
+  // Canvas capture must be enabled in PostHog project settings for Flutter Web
+  config.sessionReplay = DeviceUtils.isWeb;
+  config.sessionReplayConfig.maskAllTexts = true;
+  config.sessionReplayConfig.maskAllImages = false;
+  config.sessionReplayConfig.throttleDelay = const Duration(seconds: 1);
+
+  // Flutter error tracking
+  config.optOut = false;
+
+  await Posthog().setup(config);
+}
 
 /// Provider that initializes and provides access to PostHog analytics
 final posthogProvider = Provider<Posthog>((ref) {

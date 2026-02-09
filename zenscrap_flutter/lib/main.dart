@@ -1,5 +1,6 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/foundation.dart';
+import 'package:posthog_flutter/posthog_flutter.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:seo/seo.dart';
@@ -17,6 +18,7 @@ import 'package:zenscrap_flutter/src/providers/auth_state_sync_provider.dart';
 import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 import 'package:zenscrap_flutter/src/providers/go_router_providers.dart';
 import 'package:zenscrap_flutter/src/providers/language_provider.dart';
+import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
 import 'package:zenscrap_flutter/src/providers/shared_preferences_provider.dart';
 import 'package:zenscrap_flutter/src/states/session/session_providers.dart';
@@ -42,6 +44,10 @@ void main() async {
 
   // Configure URL strategy for web (removes the # from URLs)
   configureUrlStrategy();
+
+  // Initialize PostHog analytics SDK
+  // Must be done before runApp for session replay and surveys to work properly
+  await initializePostHog();
 
   // IMPORTANT: Must use const with String.fromEnvironment for Flutter web release mode
   const serverUrlFromEnv = String.fromEnvironment('SERVER_URL');
@@ -181,10 +187,14 @@ class _MyAppState extends ConsumerState<MyApp> {
     // SeoController enables SEO (meta, body tag) support on Web
     // It listens to widget tree changes and updates the HTML document tree
     // Use kIsWeb to only enable on web platform for performance
-    return SeoController(
-      enabled: kIsWeb,
-      tree: WidgetTree(context: context),
-      child: MaterialApp.router(
+    //
+    // PostHogWidget wraps the app for session replay support
+    // It must be the root with MaterialApp as child for session replay to work
+    return PostHogWidget(
+      child: SeoController(
+        enabled: kIsWeb,
+        tree: WidgetTree(context: context),
+        child: MaterialApp.router(
         title: 'ZenScrap - AI-Powered Web Scraping',
         routeInformationProvider: router.routeInformationProvider,
         routeInformationParser: router.routeInformationParser,
@@ -210,6 +220,7 @@ class _MyAppState extends ConsumerState<MyApp> {
             },
           );
         },
+        ),
       ),
     );
   }
