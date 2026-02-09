@@ -91,10 +91,26 @@ import 'entities/supported_language.dart' as _i62;
 import 'entities/user_scrappables/user_paginated_scrappable_response.dart'
     as _i63;
 import 'entities/zenscrap_exception.dart' as _i64;
-import 'package:zenscrap_server/src/generated/entities/account/account_api_key.dart'
+import 'future_calls_generated_models/cleanup_expired_ip_spending_future_call_run_model.dart'
     as _i65;
-import 'package:zenscrap_server/src/generated/entities/scrappable/scraper_category.dart'
+import 'future_calls_generated_models/cleanup_expired_ip_validation_cache_future_call_run_model.dart'
     as _i66;
+import 'future_calls_generated_models/cleanup_expired_pending_commits_future_call_run_model.dart'
+    as _i67;
+import 'future_calls_generated_models/email_idp_cleanup_future_call_run_model.dart'
+    as _i68;
+import 'future_calls_generated_models/periodic_auto_fix_broken_scrappables_run_model.dart'
+    as _i69;
+import 'future_calls_generated_models/periodic_cache_cleanup_run_model.dart'
+    as _i70;
+import 'future_calls_generated_models/periodic_cleanup_old_analytics_details_run_model.dart'
+    as _i71;
+import 'future_calls_generated_models/periodic_set_requests_analytics_run_model.dart'
+    as _i72;
+import 'package:zenscrap_server/src/generated/entities/account/account_api_key.dart'
+    as _i73;
+import 'package:zenscrap_server/src/generated/entities/scrappable/scraper_category.dart'
+    as _i74;
 export 'email_already_registered_exception.dart';
 export 'entities/account/account.dart';
 export 'entities/account/account_api_key.dart';
@@ -2445,10 +2461,7 @@ class Protocol extends _i1.SerializationManagerServer {
   }
 
   @override
-  T deserialize<T>(
-    dynamic data, [
-    Type? t,
-  ]) {
+  T deserialize<T>(dynamic data, [Type? t]) {
     t ??= T;
 
     final dataClassName = getClassNameFromObjectJson(data);
@@ -2683,6 +2696,36 @@ class Protocol extends _i1.SerializationManagerServer {
     }
     if (t == _i64.ZenScrapException) {
       return _i64.ZenScrapException.fromJson(data) as T;
+    }
+    if (t == _i65.CleanupExpiredIpSpendingFutureCallRunModel) {
+      return _i65.CleanupExpiredIpSpendingFutureCallRunModel.fromJson(data)
+          as T;
+    }
+    if (t == _i66.CleanupExpiredIpValidationCacheFutureCallRunModel) {
+      return _i66.CleanupExpiredIpValidationCacheFutureCallRunModel.fromJson(
+            data,
+          )
+          as T;
+    }
+    if (t == _i67.CleanupExpiredPendingCommitsFutureCallRunModel) {
+      return _i67.CleanupExpiredPendingCommitsFutureCallRunModel.fromJson(data)
+          as T;
+    }
+    if (t == _i68.EmailIdpCleanupFutureCallRunModel) {
+      return _i68.EmailIdpCleanupFutureCallRunModel.fromJson(data) as T;
+    }
+    if (t == _i69.PeriodicAutoFixBrokenScrappablesRunModel) {
+      return _i69.PeriodicAutoFixBrokenScrappablesRunModel.fromJson(data) as T;
+    }
+    if (t == _i70.PeriodicCacheCleanupRunModel) {
+      return _i70.PeriodicCacheCleanupRunModel.fromJson(data) as T;
+    }
+    if (t == _i71.PeriodicCleanupOldAnalyticsDetailsRunModel) {
+      return _i71.PeriodicCleanupOldAnalyticsDetailsRunModel.fromJson(data)
+          as T;
+    }
+    if (t == _i72.PeriodicSetRequestsAnalyticsRunModel) {
+      return _i72.PeriodicSetRequestsAnalyticsRunModel.fromJson(data) as T;
     }
     if (t == _i1.getType<_i5.EmailAlreadyRegisteredException?>()) {
       return (data != null
@@ -2999,6 +3042,63 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i1.getType<_i64.ZenScrapException?>()) {
       return (data != null ? _i64.ZenScrapException.fromJson(data) : null) as T;
     }
+    if (t == _i1.getType<_i65.CleanupExpiredIpSpendingFutureCallRunModel?>()) {
+      return (data != null
+              ? _i65.CleanupExpiredIpSpendingFutureCallRunModel.fromJson(data)
+              : null)
+          as T;
+    }
+    if (t ==
+        _i1
+            .getType<
+              _i66.CleanupExpiredIpValidationCacheFutureCallRunModel?
+            >()) {
+      return (data != null
+              ? _i66.CleanupExpiredIpValidationCacheFutureCallRunModel.fromJson(
+                  data,
+                )
+              : null)
+          as T;
+    }
+    if (t ==
+        _i1.getType<_i67.CleanupExpiredPendingCommitsFutureCallRunModel?>()) {
+      return (data != null
+              ? _i67.CleanupExpiredPendingCommitsFutureCallRunModel.fromJson(
+                  data,
+                )
+              : null)
+          as T;
+    }
+    if (t == _i1.getType<_i68.EmailIdpCleanupFutureCallRunModel?>()) {
+      return (data != null
+              ? _i68.EmailIdpCleanupFutureCallRunModel.fromJson(data)
+              : null)
+          as T;
+    }
+    if (t == _i1.getType<_i69.PeriodicAutoFixBrokenScrappablesRunModel?>()) {
+      return (data != null
+              ? _i69.PeriodicAutoFixBrokenScrappablesRunModel.fromJson(data)
+              : null)
+          as T;
+    }
+    if (t == _i1.getType<_i70.PeriodicCacheCleanupRunModel?>()) {
+      return (data != null
+              ? _i70.PeriodicCacheCleanupRunModel.fromJson(data)
+              : null)
+          as T;
+    }
+    if (t == _i1.getType<_i71.PeriodicCleanupOldAnalyticsDetailsRunModel?>()) {
+      return (data != null
+              ? _i71.PeriodicCleanupOldAnalyticsDetailsRunModel.fromJson(data)
+              : null)
+          as T;
+    }
+    if (t == _i1.getType<_i72.PeriodicSetRequestsAnalyticsRunModel?>()) {
+      return (data != null
+              ? _i72.PeriodicSetRequestsAnalyticsRunModel.fromJson(data)
+              : null)
+          as T;
+    }
     if (t == List<_i57.Scrappable>) {
       return (data as List).map((e) => deserialize<_i57.Scrappable>(e)).toList()
           as T;
@@ -3143,9 +3243,9 @@ class Protocol extends _i1.SerializationManagerServer {
               : null)
           as T;
     }
-    if (t == List<_i65.AccountApiKey>) {
+    if (t == List<_i73.AccountApiKey>) {
       return (data as List)
-              .map((e) => deserialize<_i65.AccountApiKey>(e))
+              .map((e) => deserialize<_i73.AccountApiKey>(e))
               .toList()
           as T;
     }
@@ -3164,16 +3264,16 @@ class Protocol extends _i1.SerializationManagerServer {
           )
           as T;
     }
-    if (t == List<_i66.ScraperCategory>) {
+    if (t == List<_i74.ScraperCategory>) {
       return (data as List)
-              .map((e) => deserialize<_i66.ScraperCategory>(e))
+              .map((e) => deserialize<_i74.ScraperCategory>(e))
               .toList()
           as T;
     }
-    if (t == _i1.getType<List<_i66.ScraperCategory>?>()) {
+    if (t == _i1.getType<List<_i74.ScraperCategory>?>()) {
       return (data != null
               ? (data as List)
-                    .map((e) => deserialize<_i66.ScraperCategory>(e))
+                    .map((e) => deserialize<_i74.ScraperCategory>(e))
                     .toList()
               : null)
           as T;
@@ -3281,6 +3381,21 @@ class Protocol extends _i1.SerializationManagerServer {
       _i62.SupportedLanguage => 'SupportedLanguage',
       _i63.UserPaginatedScrappableResponse => 'UserPaginatedScrappableResponse',
       _i64.ZenScrapException => 'ZenScrapException',
+      _i65.CleanupExpiredIpSpendingFutureCallRunModel =>
+        'CleanupExpiredIpSpendingFutureCallRunModel',
+      _i66.CleanupExpiredIpValidationCacheFutureCallRunModel =>
+        'CleanupExpiredIpValidationCacheFutureCallRunModel',
+      _i67.CleanupExpiredPendingCommitsFutureCallRunModel =>
+        'CleanupExpiredPendingCommitsFutureCallRunModel',
+      _i68.EmailIdpCleanupFutureCallRunModel =>
+        'EmailIdpCleanupFutureCallRunModel',
+      _i69.PeriodicAutoFixBrokenScrappablesRunModel =>
+        'PeriodicAutoFixBrokenScrappablesRunModel',
+      _i70.PeriodicCacheCleanupRunModel => 'PeriodicCacheCleanupRunModel',
+      _i71.PeriodicCleanupOldAnalyticsDetailsRunModel =>
+        'PeriodicCleanupOldAnalyticsDetailsRunModel',
+      _i72.PeriodicSetRequestsAnalyticsRunModel =>
+        'PeriodicSetRequestsAnalyticsRunModel',
       _ => null,
     };
   }
@@ -3441,6 +3556,22 @@ class Protocol extends _i1.SerializationManagerServer {
         return 'UserPaginatedScrappableResponse';
       case _i64.ZenScrapException():
         return 'ZenScrapException';
+      case _i65.CleanupExpiredIpSpendingFutureCallRunModel():
+        return 'CleanupExpiredIpSpendingFutureCallRunModel';
+      case _i66.CleanupExpiredIpValidationCacheFutureCallRunModel():
+        return 'CleanupExpiredIpValidationCacheFutureCallRunModel';
+      case _i67.CleanupExpiredPendingCommitsFutureCallRunModel():
+        return 'CleanupExpiredPendingCommitsFutureCallRunModel';
+      case _i68.EmailIdpCleanupFutureCallRunModel():
+        return 'EmailIdpCleanupFutureCallRunModel';
+      case _i69.PeriodicAutoFixBrokenScrappablesRunModel():
+        return 'PeriodicAutoFixBrokenScrappablesRunModel';
+      case _i70.PeriodicCacheCleanupRunModel():
+        return 'PeriodicCacheCleanupRunModel';
+      case _i71.PeriodicCleanupOldAnalyticsDetailsRunModel():
+        return 'PeriodicCleanupOldAnalyticsDetailsRunModel';
+      case _i72.PeriodicSetRequestsAnalyticsRunModel():
+        return 'PeriodicSetRequestsAnalyticsRunModel';
     }
     className = _i2.Protocol().getClassNameForObject(data);
     if (className != null) {
@@ -3686,6 +3817,42 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName == 'ZenScrapException') {
       return deserialize<_i64.ZenScrapException>(data['data']);
     }
+    if (dataClassName == 'CleanupExpiredIpSpendingFutureCallRunModel') {
+      return deserialize<_i65.CleanupExpiredIpSpendingFutureCallRunModel>(
+        data['data'],
+      );
+    }
+    if (dataClassName == 'CleanupExpiredIpValidationCacheFutureCallRunModel') {
+      return deserialize<
+        _i66.CleanupExpiredIpValidationCacheFutureCallRunModel
+      >(data['data']);
+    }
+    if (dataClassName == 'CleanupExpiredPendingCommitsFutureCallRunModel') {
+      return deserialize<_i67.CleanupExpiredPendingCommitsFutureCallRunModel>(
+        data['data'],
+      );
+    }
+    if (dataClassName == 'EmailIdpCleanupFutureCallRunModel') {
+      return deserialize<_i68.EmailIdpCleanupFutureCallRunModel>(data['data']);
+    }
+    if (dataClassName == 'PeriodicAutoFixBrokenScrappablesRunModel') {
+      return deserialize<_i69.PeriodicAutoFixBrokenScrappablesRunModel>(
+        data['data'],
+      );
+    }
+    if (dataClassName == 'PeriodicCacheCleanupRunModel') {
+      return deserialize<_i70.PeriodicCacheCleanupRunModel>(data['data']);
+    }
+    if (dataClassName == 'PeriodicCleanupOldAnalyticsDetailsRunModel') {
+      return deserialize<_i71.PeriodicCleanupOldAnalyticsDetailsRunModel>(
+        data['data'],
+      );
+    }
+    if (dataClassName == 'PeriodicSetRequestsAnalyticsRunModel') {
+      return deserialize<_i72.PeriodicSetRequestsAnalyticsRunModel>(
+        data['data'],
+      );
+    }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);
       return _i2.Protocol().deserializeByClassName(data);
@@ -3836,16 +4003,11 @@ class Protocol extends _i1.SerializationManagerServer {
       case Map():
         return [
           for (var entry in obj.entries)
-            {
-              'k': mapIfNeeded(entry.key),
-              'v': mapIfNeeded(entry.value),
-            },
+            {'k': mapIfNeeded(entry.key), 'v': mapIfNeeded(entry.value)},
         ];
 
       case Iterable():
-        return [
-          for (var e in obj) mapIfNeeded(e),
-        ];
+        return [for (var e in obj) mapIfNeeded(e)];
     }
 
     return obj;

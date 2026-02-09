@@ -1,5 +1,6 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/core/consts.dart';
+import 'package:zenscrap_server/src/generated/future_calls.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 /// FutureCall that runs hourly to clean up expired pending session commit records.
@@ -10,11 +11,12 @@ import 'package:zenscrap_server/src/generated/protocol.dart';
 class CleanupExpiredPendingCommitsFutureCall extends FutureCall {
   static const String callName = 'cleanup_expired_pending_commits';
 
-  @override
-  Future<void> invoke(Session session, SerializableModel? object) async {
+  Future<void> run(Session session, [bool? _]) async {
     try {
       // Find all pending commit records older than the max age
-      final expiryThreshold = DateTime.now().subtract(kPendingSessionCommitMaxAge);
+      final expiryThreshold = DateTime.now().subtract(
+        kPendingSessionCommitMaxAge,
+      );
 
       final expiredRecords = await PendingSessionCommit.db.find(
         session,
@@ -54,11 +56,10 @@ class CleanupExpiredPendingCommitsFutureCall extends FutureCall {
       );
     } finally {
       // Always reschedule the next cleanup, even if there was an error
-      await session.serverpod.futureCallWithDelay(
-        callName,
-        null,
-        kPendingSessionCommitCleanupInterval,
-      );
+      await session.serverpod.futureCalls
+          .callWithDelay(kPendingSessionCommitCleanupInterval)
+          .cleanupExpiredPendingCommits
+          .run();
 
       session.log(
         'Scheduled next pending commits cleanup in ${kPendingSessionCommitCleanupInterval.inMinutes} minutes',

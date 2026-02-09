@@ -130,7 +130,9 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
 
     // Initialize client-side parameter controllers (js_scenario/extract_rules placeholders)
     widget.scrappableRequest.queryParamsNotRelatedToUrl.forEach((key, value) {
-      _clientSideParamControllers[key] = TextEditingController(text: value ?? '');
+      _clientSideParamControllers[key] = TextEditingController(
+        text: value ?? '',
+      );
     });
 
     // Pre-fill with test data if available
@@ -317,7 +319,8 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
                 ? '${error['title']}: ${error['description']}'
                 : 'Server error: ${e.message}';
           } else {
-            errorMessage = 'Server error (${e.response?.statusCode}): $responseData';
+            errorMessage =
+                'Server error (${e.response?.statusCode}): $responseData';
           }
         } else {
           errorMessage = 'Network error: ${e.message}';
@@ -356,12 +359,9 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
       medium: 700.0,
       expanded: 1000.0,
     );
-    final dialogHeight = MediaQuery.sizeOf(context).height *
-        context.responsiveValue(
-          compact: 0.9,
-          medium: 0.85,
-          expanded: 0.8,
-        );
+    final dialogHeight =
+        MediaQuery.sizeOf(context).height *
+        context.responsiveValue(compact: 0.9, medium: 0.85, expanded: 0.8);
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -411,7 +411,8 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
                         isChatLoading: isChatLoading,
                         isExpired: isExpired,
                         selectedCountryCode: _selectedCountryCode,
-                        onCountryCodeChanged: (value) => setState(() => _selectedCountryCode = value),
+                        onCountryCodeChanged: (value) =>
+                            setState(() => _selectedCountryCode = value),
                       ),
                       expanded: (context, constraints) => _ExpandedDialogLayout(
                         pathParamControllers: _pathParamControllers,
@@ -428,7 +429,8 @@ class _TestEndpointDialogState extends ConsumerState<TestEndpointDialog> {
                         isChatLoading: isChatLoading,
                         isExpired: isExpired,
                         selectedCountryCode: _selectedCountryCode,
-                        onCountryCodeChanged: (value) => setState(() => _selectedCountryCode = value),
+                        onCountryCodeChanged: (value) =>
+                            setState(() => _selectedCountryCode = value),
                       ),
                     );
                   },
@@ -677,15 +679,15 @@ class _ParametersPanel extends StatelessWidget {
         // Session expired notice
         if (isExpired) ...[
           Tooltip(
-            message: AppLocalizations.of(context)!.scrap_session_session_expired_tooltip,
+            message: AppLocalizations.of(
+              context,
+            )!.scrap_session_session_expired_tooltip,
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: context.c.errorContainer.withAlpha(80),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: context.c.error.withAlpha(80),
-                ),
+                border: Border.all(color: context.c.error.withAlpha(80)),
               ),
               child: Row(
                 children: [
@@ -697,7 +699,9 @@ class _ParametersPanel extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      AppLocalizations.of(context)!.scrap_session_session_expired_test_notice,
+                      AppLocalizations.of(
+                        context,
+                      )!.scrap_session_session_expired_test_notice,
                       style: context.t.bodySmall?.copyWith(
                         color: context.c.onSurface,
                       ),
@@ -712,27 +716,25 @@ class _ParametersPanel extends StatelessWidget {
         // Chat loading notice
         if (isChatLoading && !isExpired) ...[
           Tooltip(
-            message: AppLocalizations.of(context)!.scrap_session_chat_loading_disabled_tooltip,
+            message: AppLocalizations.of(
+              context,
+            )!.scrap_session_chat_loading_disabled_tooltip,
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: context.c.tertiaryContainer.withAlpha(80),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: context.c.tertiary.withAlpha(80),
-                ),
+                border: Border.all(color: context.c.tertiary.withAlpha(80)),
               ),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.info_outline,
-                    size: 18,
-                    color: context.c.tertiary,
-                  ),
+                  Icon(Icons.info_outline, size: 18, color: context.c.tertiary),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      AppLocalizations.of(context)!.scrap_session_chat_loading_test_notice,
+                      AppLocalizations.of(
+                        context,
+                      )!.scrap_session_chat_loading_test_notice,
                       style: context.t.bodySmall?.copyWith(
                         color: context.c.onSurface,
                       ),
@@ -747,12 +749,18 @@ class _ParametersPanel extends StatelessWidget {
         // Run Test button
         Tooltip(
           message: isExpired
-              ? AppLocalizations.of(context)!.scrap_session_session_expired_tooltip
+              ? AppLocalizations.of(
+                  context,
+                )!.scrap_session_session_expired_tooltip
               : (isChatLoading
-                  ? AppLocalizations.of(context)!.scrap_session_chat_loading_disabled_tooltip
-                  : ''),
+                    ? AppLocalizations.of(
+                        context,
+                      )!.scrap_session_chat_loading_disabled_tooltip
+                    : ''),
           child: FilledButton.icon(
-            onPressed: (isLoading || isChatLoading || isExpired) ? null : onTest,
+            onPressed: (isLoading || isChatLoading || isExpired)
+                ? null
+                : onTest,
             icon: isLoading
                 ? SizedBox(
                     width: 18,
@@ -888,22 +896,18 @@ class _CountryCodeSelector extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         DropdownButtonFormField<String?>(
-          value: selectedCountryCode,
+          initialValue: selectedCountryCode,
           isExpanded: true,
           decoration: InputDecoration(
             filled: true,
             fillColor: context.c.surface,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(
-                color: context.c.outline.withAlpha(80),
-              ),
+              borderSide: BorderSide(color: context.c.outline.withAlpha(80)),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(
-                color: context.c.outline.withAlpha(80),
-              ),
+              borderSide: BorderSide(color: context.c.outline.withAlpha(80)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
@@ -1064,7 +1068,10 @@ class _ResponsePanel extends StatelessWidget {
                   return const SizedBox.shrink();
                 }
                 return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
                   decoration: BoxDecoration(
                     color: isLoading
                         ? context.c.primary.withAlpha(20)
@@ -1137,17 +1144,11 @@ class _ResponseContent extends StatelessWidget {
     }
 
     if (errorMessage != null) {
-      return _ErrorState(
-        errorMessage: errorMessage!,
-        statusCode: statusCode,
-      );
+      return _ErrorState(errorMessage: errorMessage!, statusCode: statusCode);
     }
 
     if (responseJson != null) {
-      return _SuccessState(
-        responseJson: responseJson!,
-        statusCode: statusCode,
-      );
+      return _SuccessState(responseJson: responseJson!, statusCode: statusCode);
     }
 
     return _EmptyState(hasTestedOnce: hasTestedOnce);
@@ -1199,10 +1200,7 @@ class _ErrorState extends StatelessWidget {
   final String errorMessage;
   final int? statusCode;
 
-  const _ErrorState({
-    required this.errorMessage,
-    this.statusCode,
-  });
+  const _ErrorState({required this.errorMessage, this.statusCode});
 
   @override
   Widget build(BuildContext context) {
@@ -1297,10 +1295,7 @@ class _SuccessState extends StatelessWidget {
   final String responseJson;
   final int? statusCode;
 
-  const _SuccessState({
-    required this.responseJson,
-    this.statusCode,
-  });
+  const _SuccessState({required this.responseJson, this.statusCode});
 
   @override
   Widget build(BuildContext context) {
@@ -1367,7 +1362,10 @@ class _SuccessState extends StatelessWidget {
                 if (statusCode != null) ...[
                   const SizedBox(width: 12),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: context.c.tertiary.withAlpha(20),
                       borderRadius: BorderRadius.circular(12),
@@ -1655,19 +1653,19 @@ class _ExpandedDialogLayout extends StatelessWidget {
                 onCountryCodeChanged: onCountryCodeChanged,
               ),
             ),
-        const SizedBox(width: 24),
-        // Response Panel
-        Expanded(
-          child: _ResponsePanel(
-            isLoading: isLoading,
-            responseJson: responseJson,
-            errorMessage: errorMessage,
-            hasTestedOnce: hasTestedOnce,
-            statusCode: statusCode,
-            responseTimeMs: responseTimeMs,
-            elapsedMsNotifier: elapsedMsNotifier,
-          ),
-        ),
+            const SizedBox(width: 24),
+            // Response Panel
+            Expanded(
+              child: _ResponsePanel(
+                isLoading: isLoading,
+                responseJson: responseJson,
+                errorMessage: errorMessage,
+                hasTestedOnce: hasTestedOnce,
+                statusCode: statusCode,
+                responseTimeMs: responseTimeMs,
+                elapsedMsNotifier: elapsedMsNotifier,
+              ),
+            ),
           ],
         );
       },

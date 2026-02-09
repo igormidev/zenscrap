@@ -65,6 +65,48 @@ The AI uses two external MCP servers (hosted on Railway):
 - **Purpose**: Testing extraction rules directly against ScrapingBee API
 - **Tools**: `test_extract_rules`, `get_page_html`, `get_screenshot`
 
+## ⏱️ Future Calls (Serverpod 3.2+)
+
+This project uses the **generated** future-call API (recommended in modern Serverpod versions), not direct `futureCallWithDelay` / `cancelFutureCall`.
+
+### 1. Define future-call methods
+
+Create classes extending `FutureCall` with typed methods.
+
+Important: each method must include `Session` as first parameter **and at least one additional serializable parameter** (it can be optional, e.g. `[bool? _]`).
+
+```dart
+class CleanupExpiredIpSpendingFutureCall extends FutureCall {
+  Future<void> run(Session session, [bool? _]) async {
+    // work...
+  }
+}
+```
+
+### 2. Generate code
+
+```bash
+serverpod generate --experimental-features=all
+```
+
+This generates `lib/src/generated/future_calls.dart` and dispatchers like:
+- `serverpod.futureCalls.callWithDelay(...).cleanupExpiredIpSpending.run()`
+
+### 3. Schedule and cancel calls
+
+```dart
+await session.serverpod.futureCalls
+    .callWithDelay(const Duration(minutes: 5), identifier: 'cleanup-ip')
+    .cleanupExpiredIpSpending
+    .run();
+
+await session.serverpod.futureCalls.cancel('cleanup-ip');
+```
+
+### 4. Why identifiers matter
+
+Use stable identifiers for periodic jobs so startup code can cancel/re-schedule them idempotently.
+
 ## 🚀 Quick Start
 
 ### Prerequisites

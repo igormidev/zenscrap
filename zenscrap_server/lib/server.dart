@@ -14,8 +14,6 @@ import 'package:zenscrap_server/src/future_calls/cleanup_expired_ip_spending_fut
 import 'package:zenscrap_server/src/future_calls/cleanup_expired_ip_validation_cache_future_call.dart';
 import 'package:zenscrap_server/src/future_calls/cleanup_expired_pending_commits_future_call.dart';
 import 'package:zenscrap_server/src/future_calls/email_idp_cleanup_future_call.dart';
-import 'package:zenscrap_server/src/future_calls/monthly_subscription_credits_future_call.dart';
-import 'package:zenscrap_server/src/endpoints/public/scrappable_chat_session.dart';
 import 'package:zenscrap_server/src/routes/scrappable_api_route.dart';
 import 'package:zenscrap_server/src/webhooks/stripe_webhook.dart';
 import 'package:zenscrap_server/src/web/routes/terms_of_service_route.dart';
@@ -104,29 +102,27 @@ void run(List<String> args) async {
         passwordResetVerificationCodeLifetime: Duration(minutes: 30),
         passwordResetVerificationCodeAllowedAttempts: 5,
         // Security monitoring callbacks
-        onAfterAccountCreated: (
-          session, {
-          required email,
-          required authUserId,
-          required emailAccountId,
-          required transaction,
-        }) async {
-          session.log(
-            'New email account created: $email '
-            '(authUserId: $authUserId, emailAccountId: $emailAccountId)',
-            level: LogLevel.info,
-          );
-        },
-        onPasswordResetCompleted: (
-          session, {
-          required emailAccountId,
-          required transaction,
-        }) {
-          session.log(
-            'Password reset completed for emailAccountId: $emailAccountId',
-            level: LogLevel.info,
-          );
-        },
+        onAfterAccountCreated:
+            (
+              session, {
+              required email,
+              required authUserId,
+              required emailAccountId,
+              required transaction,
+            }) async {
+              session.log(
+                'New email account created: $email '
+                '(authUserId: $authUserId, emailAccountId: $emailAccountId)',
+                level: LogLevel.info,
+              );
+            },
+        onPasswordResetCompleted:
+            (session, {required emailAccountId, required transaction}) {
+              session.log(
+                'Password reset completed for emailAccountId: $emailAccountId',
+                level: LogLevel.info,
+              );
+            },
       ),
     ],
   );
@@ -134,7 +130,7 @@ void run(List<String> args) async {
   // Apply COOP middleware to all web routes for Google Sign-In popup compatibility.
   // This sets Cross-Origin-Opener-Policy: same-origin-allow-popups which allows
   // Google's popup to call window.opener.postMessage() after authentication.
-  pod.webServer.addMiddleware(const GoogleSignInCoopMiddleware(), '/');
+  pod.webServer.addMiddleware(const GoogleSignInCoopMiddleware().call, '/');
 
   // Register API routes FIRST (before catch-all routes)
   pod.webServer.addRoute(StripeWebhookRoute(), '/stripe/webhook');
@@ -176,10 +172,7 @@ void run(List<String> args) async {
   final flutterAppDir = Directory('web/app');
   if (flutterAppDir.existsSync()) {
     pod.webServer.addRoute(
-      SpaRoute(
-        flutterAppDir,
-        fallback: File('web/app/index.html'),
-      ),
+      SpaRoute(flutterAppDir, fallback: File('web/app/index.html')),
       '/',
     );
   } else {
@@ -214,48 +207,6 @@ void run(List<String> args) async {
         pod.getPassword('stripeCancelUrl') ?? 'https://yourdomain.com/cancel',
   });
 
-  // // Register your future calls
-  pod.registerFutureCall(
-    TestScrappableDisposeFutureCall(),
-    TestScrappableDisposeFutureCall.callName,
-  );
-  pod.registerFutureCall(
-    MonthlySubscriptionCreditsFutureCall(),
-    MonthlySubscriptionCreditsFutureCall.callName,
-  );
-  pod.registerFutureCall(
-    SessionPromptFutureCall(),
-    SessionPromptFutureCall.callName,
-  );
-  pod.registerFutureCall(
-    PeriodicSetRequestsAnalytics(),
-    PeriodicSetRequestsAnalytics.callName,
-  );
-  pod.registerFutureCall(
-    PeriodicCleanupOldAnalyticsDetails(),
-    PeriodicCleanupOldAnalyticsDetails.callName,
-  );
-  pod.registerFutureCall(
-    PeriodicAutoFixBrokenScrappables(),
-    PeriodicAutoFixBrokenScrappables.callName,
-  );
-  pod.registerFutureCall(
-    CleanupExpiredIpSpendingFutureCall(),
-    CleanupExpiredIpSpendingFutureCall.callName,
-  );
-  pod.registerFutureCall(
-    CleanupExpiredIpValidationCacheFutureCall(),
-    CleanupExpiredIpValidationCacheFutureCall.callName,
-  );
-  pod.registerFutureCall(
-    EmailIdpCleanupFutureCall(),
-    EmailIdpCleanupFutureCall.callName,
-  );
-  pod.registerFutureCall(
-    CleanupExpiredPendingCommitsFutureCall(),
-    CleanupExpiredPendingCommitsFutureCall.callName,
-  );
-
   // Start the server.
   await pod.start();
 
@@ -279,76 +230,85 @@ void run(List<String> args) async {
     );
   }
 
-  await pod.cancelFutureCall(PeriodicSetRequestsAnalytics.callName);
-  await pod.cancelFutureCall(PeriodicCleanupOldAnalyticsDetails.callName);
-  await pod.cancelFutureCall(PeriodicAutoFixBrokenScrappables.callName);
-  await pod.cancelFutureCall(CleanupExpiredIpSpendingFutureCall.callName);
-  await pod.cancelFutureCall(CleanupExpiredIpValidationCacheFutureCall.callName);
-  await pod.cancelFutureCall(EmailIdpCleanupFutureCall.callName);
-  await pod.cancelFutureCall(CleanupExpiredPendingCommitsFutureCall.callName);
+  await pod.futureCalls.cancel(PeriodicSetRequestsAnalytics.callName);
+  await pod.futureCalls.cancel(PeriodicCleanupOldAnalyticsDetails.callName);
+  await pod.futureCalls.cancel(PeriodicAutoFixBrokenScrappables.callName);
+  await pod.futureCalls.cancel(CleanupExpiredIpSpendingFutureCall.callName);
+  await pod.futureCalls.cancel(
+    CleanupExpiredIpValidationCacheFutureCall.callName,
+  );
+  await pod.futureCalls.cancel(EmailIdpCleanupFutureCall.callName);
+  await pod.futureCalls.cancel(CleanupExpiredPendingCommitsFutureCall.callName);
 
   // Schedule future calls only if not applying migrations
   // (when applying migrations, the future call tables may not exist yet)
   // final isApplyingMigrations = args.contains('--apply-migrations');
 
   // Schedule periodic analytics batching
-  await pod.futureCallWithDelay(
-    PeriodicSetRequestsAnalytics.callName,
-    null,
-    Duration(minutes: 2),
-    identifier: PeriodicSetRequestsAnalytics.callName,
-  );
+  await pod.futureCalls
+      .callWithDelay(
+        const Duration(minutes: 2),
+        identifier: PeriodicSetRequestsAnalytics.callName,
+      )
+      .periodicSetRequestsAnalytics
+      .run();
 
-  await pod.futureCallWithDelay(
-    PeriodicCleanupOldAnalyticsDetails.callName,
-    null,
-    const Duration(hours: 1),
-    identifier: PeriodicCleanupOldAnalyticsDetails.callName,
-  );
+  await pod.futureCalls
+      .callWithDelay(
+        const Duration(hours: 1),
+        identifier: PeriodicCleanupOldAnalyticsDetails.callName,
+      )
+      .periodicCleanupOldAnalyticsDetails
+      .run();
 
   // Schedule periodic auto-fix for broken scrappables
   // Runs every 5 minutes to detect and fix scrappables with consecutive errors
-  await pod.futureCallWithDelay(
-    PeriodicAutoFixBrokenScrappables.callName,
-    null,
-    const Duration(seconds: 30), // Initial delay to let server fully initialize
-    identifier: PeriodicAutoFixBrokenScrappables.callName,
-  );
+  await pod.futureCalls
+      .callWithDelay(
+        const Duration(seconds: 30),
+        identifier: PeriodicAutoFixBrokenScrappables.callName,
+      )
+      .periodicAutoFixBrokenScrappables
+      .run();
 
   // Schedule periodic cleanup of expired anonymous IP spending records
   // Runs every hour to delete records older than 7 days
-  await pod.futureCallWithDelay(
-    CleanupExpiredIpSpendingFutureCall.callName,
-    null,
-    const Duration(minutes: 5), // Initial delay to let server fully initialize
-    identifier: CleanupExpiredIpSpendingFutureCall.callName,
-  );
+  await pod.futureCalls
+      .callWithDelay(
+        const Duration(minutes: 5),
+        identifier: CleanupExpiredIpSpendingFutureCall.callName,
+      )
+      .cleanupExpiredIpSpending
+      .run();
 
   // Schedule periodic cleanup of expired IP validation cache entries
   // Runs every 24 hours to delete entries older than 72 hours
-  await pod.futureCallWithDelay(
-    CleanupExpiredIpValidationCacheFutureCall.callName,
-    null,
-    const Duration(minutes: 10), // Initial delay to let server fully initialize
-    identifier: CleanupExpiredIpValidationCacheFutureCall.callName,
-  );
+  await pod.futureCalls
+      .callWithDelay(
+        const Duration(minutes: 10),
+        identifier: CleanupExpiredIpValidationCacheFutureCall.callName,
+      )
+      .cleanupExpiredIpValidationCache
+      .run();
 
   // Schedule periodic cleanup of expired email authentication data
   // Runs daily to delete expired account requests, password reset requests,
   // and failed login attempts older than 30 days
-  await pod.futureCallWithDelay(
-    EmailIdpCleanupFutureCall.callName,
-    null,
-    const Duration(minutes: 15), // Initial delay to let server fully initialize
-    identifier: EmailIdpCleanupFutureCall.callName,
-  );
+  await pod.futureCalls
+      .callWithDelay(
+        const Duration(minutes: 15),
+        identifier: EmailIdpCleanupFutureCall.callName,
+      )
+      .emailIdpCleanup
+      .run();
 
   // Schedule periodic cleanup of expired pending session commits
   // Runs hourly to delete pending commits older than 24 hours
-  await pod.futureCallWithDelay(
-    CleanupExpiredPendingCommitsFutureCall.callName,
-    null,
-    const Duration(minutes: 20), // Initial delay to let server fully initialize
-    identifier: CleanupExpiredPendingCommitsFutureCall.callName,
-  );
+  await pod.futureCalls
+      .callWithDelay(
+        const Duration(minutes: 20),
+        identifier: CleanupExpiredPendingCommitsFutureCall.callName,
+      )
+      .cleanupExpiredPendingCommits
+      .run();
 }

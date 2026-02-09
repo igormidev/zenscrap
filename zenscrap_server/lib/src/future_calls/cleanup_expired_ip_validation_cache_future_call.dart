@@ -1,4 +1,5 @@
 import 'package:serverpod/serverpod.dart';
+import 'package:zenscrap_server/src/generated/future_calls.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 /// FutureCall that runs every 24 hours to clean up expired IP validation cache entries.
@@ -10,8 +11,7 @@ class CleanupExpiredIpValidationCacheFutureCall extends FutureCall {
   static const Duration _cleanupInterval = Duration(hours: 24);
   static const Duration _cacheExpiry = Duration(hours: 72);
 
-  @override
-  Future<void> invoke(Session session, SerializableModel? object) async {
+  Future<void> run(Session session, [bool? _]) async {
     try {
       final expiryThreshold = DateTime.now().subtract(_cacheExpiry);
 
@@ -39,11 +39,10 @@ class CleanupExpiredIpValidationCacheFutureCall extends FutureCall {
         stackTrace: stackTrace,
       );
     } finally {
-      await session.serverpod.futureCallWithDelay(
-        callName,
-        null,
-        _cleanupInterval,
-      );
+      await session.serverpod.futureCalls
+          .callWithDelay(_cleanupInterval)
+          .cleanupExpiredIpValidationCache
+          .run();
       session.log(
         'Scheduled next IP validation cache cleanup in ${_cleanupInterval.inHours} hours',
         level: LogLevel.debug,

@@ -5,6 +5,7 @@ import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/core/mixins/api_helper_mixin.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_api.dart';
 import 'package:zenscrap_server/src/core/stripe/stripe_config.dart';
+import 'package:zenscrap_server/src/generated/future_calls.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class StripeWebhookRoute extends Route {
@@ -78,7 +79,8 @@ class StripeWebhookRoute extends Route {
       // IDEMPOTENCY CHECK: Skip if event already processed
       if (_isEventProcessed(eventId)) {
         session.log(
-            'Event already processed (idempotency check): $eventId ($eventType)');
+          'Event already processed (idempotency check): $eventId ($eventType)',
+        );
         return Response.ok(); // Return 200 so Stripe stops retrying
       }
 
@@ -90,7 +92,8 @@ class StripeWebhookRoute extends Route {
         // Double-check idempotency inside the executor (another webhook might have processed it while waiting)
         if (_isEventProcessed(eventId)) {
           session.log(
-              'Event already processed (inside executor): $eventId ($eventType)');
+            'Event already processed (inside executor): $eventId ($eventType)',
+          );
           return;
         }
 
@@ -160,7 +163,10 @@ class StripeWebhookRoute extends Route {
     // Handle credit package purchase
     if (purchaseType == 'credit_package') {
       await _handleCreditPackagePurchase(
-          session, checkoutSession, accountInfoId);
+        session,
+        checkoutSession,
+        accountInfoId,
+      );
       return;
     }
 
@@ -210,17 +216,15 @@ class StripeWebhookRoute extends Route {
       // This ensures all credit additions go through the same logic and create history entries
       // NOTE: This is the ONLY place where initial subscription credits are added.
       // The customer.subscription.created handler does NOT add credits to avoid duplicates.
-      await session.serverpod.futureCallWithDelay(
-        'monthly_subscription_credits',
-        MonthlyCreditsData(
-          accountInfoId: accountInfo.id!,
-        ),
-        Duration.zero, // Execute immediately to give user credits right away
-      );
+      await session.serverpod.futureCalls
+          .callWithDelay(Duration.zero)
+          .monthlySubscriptionCredits
+          .addCredits(MonthlyCreditsData(accountInfoId: accountInfo.id!));
     });
 
     session.log(
-        'Checkout session completed for account $accountInfoId - scheduled monthly credits');
+      'Checkout session completed for account $accountInfoId - scheduled monthly credits',
+    );
   }
 
   Future<void> _handleCreditPackagePurchase(
@@ -248,15 +252,15 @@ class StripeWebhookRoute extends Route {
     await session.db.transaction((transaction) async {
       // Check for duplicate purchase using payment intent ID
       if (paymentIntentId != null) {
-        final existingPurchase =
-            await ApiCreditPackagePurchase.db.findFirstRow(
+        final existingPurchase = await ApiCreditPackagePurchase.db.findFirstRow(
           session,
           where: (t) => t.stripePurchaseId.equals(paymentIntentId),
           transaction: transaction,
         );
         if (existingPurchase != null) {
           session.log(
-              'Credit package purchase already processed: $paymentIntentId');
+            'Credit package purchase already processed: $paymentIntentId',
+          );
           return;
         }
       }
@@ -277,16 +281,16 @@ class StripeWebhookRoute extends Route {
         session,
         accountInfo.accountApiUsageId,
         transaction: transaction,
-        include: AccountApiUsage.include(
-          creditUsage: CreditUsage.include(),
-        ),
+        include: AccountApiUsage.include(creditUsage: CreditUsage.include()),
       );
 
       if (apiUsage == null || apiUsage.creditUsage == null) {
         session.log(
-            'API usage or credit usage not found for account $accountInfoId');
+          'API usage or credit usage not found for account $accountInfoId',
+        );
         throw Exception(
-            'API usage or credit usage not found for account $accountInfoId');
+          'API usage or credit usage not found for account $accountInfoId',
+        );
       }
 
       // Add one-time purchase credits
@@ -326,8 +330,10 @@ class StripeWebhookRoute extends Route {
       ApiHelperMixin.resetNanoId(apiUsage.nanoId);
     });
 
-    session.log('Credit package purchase completed for account $accountInfoId: '
-        '$creditAmount credits added ($creditPackage package)');
+    session.log(
+      'Credit package purchase completed for account $accountInfoId: '
+      '$creditAmount credits added ($creditPackage package)',
+    );
   }
 
   Future<void> _handleSubscriptionCreated(
@@ -384,8 +390,9 @@ class StripeWebhookRoute extends Route {
       accountInfo.planTier = newPlanTier;
 
       if (currentPeriodEnd != null) {
-        accountInfo.subscriptionEndDate =
-            DateTime.fromMillisecondsSinceEpoch(currentPeriodEnd * 1000);
+        accountInfo.subscriptionEndDate = DateTime.fromMillisecondsSinceEpoch(
+          currentPeriodEnd * 1000,
+        );
       }
 
       await AccountInfo.db.updateRow(
@@ -411,7 +418,8 @@ class StripeWebhookRoute extends Route {
 
       if (status == 'active' || status == 'trialing') {
         session.log(
-            'Subscription created for account ${accountInfo.id} - credits handled by checkout.session.completed');
+          'Subscription created for account ${accountInfo.id} - credits handled by checkout.session.completed',
+        );
       }
     });
 
@@ -460,8 +468,9 @@ class StripeWebhookRoute extends Route {
       accountInfo.planTier = newPlanTier;
 
       if (currentPeriodEnd != null) {
-        accountInfo.subscriptionEndDate =
-            DateTime.fromMillisecondsSinceEpoch(currentPeriodEnd * 1000);
+        accountInfo.subscriptionEndDate = DateTime.fromMillisecondsSinceEpoch(
+          currentPeriodEnd * 1000,
+        );
       }
 
       await AccountInfo.db.updateRow(
@@ -558,7 +567,8 @@ class StripeWebhookRoute extends Route {
     // Log the invoice payment for monitoring
     // Credits are now added via the monthly future call system
     session.log(
-        'Invoice payment succeeded for account ${accountInfo.id} (reason: $billingReason)');
+      'Invoice payment succeeded for account ${accountInfo.id} (reason: $billingReason)',
+    );
   }
 
   Future<void> _handleInvoicePaymentFailed(

@@ -4,6 +4,7 @@ import 'package:serverpod_auth_idp_server/core.dart';
 import 'package:zenscrap_server/src/core/consts.dart';
 import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';
 import 'package:zenscrap_server/src/core/translations/error_translations.dart';
+import 'package:zenscrap_server/src/generated/future_calls.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class PrivateAccountEndpoint extends Endpoint {
@@ -39,7 +40,12 @@ class PrivateAccountEndpoint extends Endpoint {
     if (!isNewAccount && initialScrappableId != null) {
       return await session.db.transaction((transaction) async {
         await _attachScrappable(
-            session, transaction, accountInfo!, initialScrappableId, language);
+          session,
+          transaction,
+          accountInfo!,
+          initialScrappableId,
+          language,
+        );
         return accountInfo;
       });
     }
@@ -51,152 +57,164 @@ class PrivateAccountEndpoint extends Endpoint {
     final String nanoId = nanoid(length: 8);
     final acountApiKey = '$nanoId::${_uuid.v7()}';
     try {
-      return await session.db.transaction((transaction) async {
-        // Create CreditUsage first with 1000 initial credits for free tier
-        final creditUsage = await CreditUsage.db.insertRow(
-          session,
-          CreditUsage(
-            purchasedCredits: 0,
-            subscriptionCredits: 1000, // Free tier gets 1000 credits initially
-          ),
-          transaction: transaction,
-        );
+      return await session.db
+          .transaction((transaction) async {
+            // Create CreditUsage first with 1000 initial credits for free tier
+            final creditUsage = await CreditUsage.db.insertRow(
+              session,
+              CreditUsage(
+                purchasedCredits: 0,
+                subscriptionCredits:
+                    1000, // Free tier gets 1000 credits initially
+              ),
+              transaction: transaction,
+            );
 
-        // Create AccountApiUsage with creditUsageId
-        final accountApiUsage = await AccountApiUsage.db.insertRow(
-          session,
-          AccountApiUsage(
-            creditUsageId: creditUsage.id!,
-            nanoId: nanoId,
-          ),
-          transaction: transaction,
-        );
+            // Create AccountApiUsage with creditUsageId
+            final accountApiUsage = await AccountApiUsage.db.insertRow(
+              session,
+              AccountApiUsage(creditUsageId: creditUsage.id!, nanoId: nanoId),
+              transaction: transaction,
+            );
 
-        // Create AccountAIUsage with default credits
-        final accountAIUsage = await AccountAIUsage.db.insertRow(
-          session,
-          AccountAIUsage(
-            userOpenAiApiKey: null,
-            totalDollarsSpentFromTotalInUSD: kDefaultMonthlyAICreditsInDollars,
-          ),
-          transaction: transaction,
-        );
+            // Create AccountAIUsage with default credits
+            final accountAIUsage = await AccountAIUsage.db.insertRow(
+              session,
+              AccountAIUsage(
+                userOpenAiApiKey: null,
+                totalDollarsSpentFromTotalInUSD:
+                    kDefaultMonthlyAICreditsInDollars,
+              ),
+              transaction: transaction,
+            );
 
-        // Create monthly subscription API credit deposit record for initial credits
-        final insertedApiDeposit =
-            await MonthlySubscriptionApiCreditDeposit.db.insertRow(
-          session,
-          MonthlySubscriptionApiCreditDeposit(
-            creditsAmount: 1000, // Initial free tier credits
-            planTier: PlanTier.none, // Free tier
-          ),
-          transaction: transaction,
-        );
+            // Create monthly subscription API credit deposit record for initial credits
+            final insertedApiDeposit = await MonthlySubscriptionApiCreditDeposit
+                .db
+                .insertRow(
+                  session,
+                  MonthlySubscriptionApiCreditDeposit(
+                    creditsAmount: 1000, // Initial free tier credits
+                    planTier: PlanTier.none, // Free tier
+                  ),
+                  transaction: transaction,
+                );
 
-        // Create API credit history item for initial credits
-        await ApiCreditHistoryItem.db.insertRow(
-          session,
-          ApiCreditHistoryItem(
-            date: DateTime.now(),
-            transactionType: ApiCreditTransactionType.initialAccountCredit,
-            monthlySubscriptionApiCreditDepositId: insertedApiDeposit.id,
-            monthlySubscriptionApiCreditDeposit: insertedApiDeposit,
-            apiCreditPackagePurchaseId: null,
-            apiCreditPackagePurchase: null,
-            accountApiUsageId: accountApiUsage.id!,
-          ),
-          transaction: transaction,
-        );
+            // Create API credit history item for initial credits
+            await ApiCreditHistoryItem.db.insertRow(
+              session,
+              ApiCreditHistoryItem(
+                date: DateTime.now(),
+                transactionType: ApiCreditTransactionType.initialAccountCredit,
+                monthlySubscriptionApiCreditDepositId: insertedApiDeposit.id,
+                monthlySubscriptionApiCreditDeposit: insertedApiDeposit,
+                apiCreditPackagePurchaseId: null,
+                apiCreditPackagePurchase: null,
+                accountApiUsageId: accountApiUsage.id!,
+              ),
+              transaction: transaction,
+            );
 
-        // Create monthly subscription AI credit deposit record for initial credits
-        final insertedAiDeposit =
-            await MonthlySubscriptionAICreditDeposit.db.insertRow(
-          session,
-          MonthlySubscriptionAICreditDeposit(
-            creditsAmountInDollars: kDefaultMonthlyAICreditsInDollars,
-            planTier: PlanTier.none, // Free tier
-          ),
-          transaction: transaction,
-        );
+            // Create monthly subscription AI credit deposit record for initial credits
+            final insertedAiDeposit = await MonthlySubscriptionAICreditDeposit
+                .db
+                .insertRow(
+                  session,
+                  MonthlySubscriptionAICreditDeposit(
+                    creditsAmountInDollars: kDefaultMonthlyAICreditsInDollars,
+                    planTier: PlanTier.none, // Free tier
+                  ),
+                  transaction: transaction,
+                );
 
-        // Create AI credit history item for initial credits
-        await AICreditHistoryItem.db.insertRow(
-          session,
-          AICreditHistoryItem(
-            date: DateTime.now(),
-            transactionType: AICreditTransactionType.initialAccountCredit,
-            monthlySubscriptionAICreditDepositId: insertedAiDeposit.id,
-            monthlySubscriptionAICreditDeposit: insertedAiDeposit,
-            accountAIUsageId: accountAIUsage.id!,
-          ),
-          transaction: transaction,
-        );
-        final apiKey = await AccountApiKey.db.insertRow(
-          session,
-          AccountApiKey(
-            name: 'Default API Key',
-            apiKey: acountApiKey,
-            accountApiUsageId: accountApiUsage.id!,
-            accountApiUsage: accountApiUsage,
-            createdAt: DateTime.now(),
-          ),
-          transaction: transaction,
-        );
+            // Create AI credit history item for initial credits
+            await AICreditHistoryItem.db.insertRow(
+              session,
+              AICreditHistoryItem(
+                date: DateTime.now(),
+                transactionType: AICreditTransactionType.initialAccountCredit,
+                monthlySubscriptionAICreditDepositId: insertedAiDeposit.id,
+                monthlySubscriptionAICreditDeposit: insertedAiDeposit,
+                accountAIUsageId: accountAIUsage.id!,
+              ),
+              transaction: transaction,
+            );
+            final apiKey = await AccountApiKey.db.insertRow(
+              session,
+              AccountApiKey(
+                name: 'Default API Key',
+                apiKey: acountApiKey,
+                accountApiUsageId: accountApiUsage.id!,
+                accountApiUsage: accountApiUsage,
+                createdAt: DateTime.now(),
+              ),
+              transaction: transaction,
+            );
 
-        await AccountApiKey.db.attachRow.accountApiUsage(
-          session,
-          apiKey,
-          accountApiUsage,
-          transaction: transaction,
-        );
-        AccountInfo accountInfo = AccountInfo(
-          authUserId: userId,
-          accountApiUsageId: accountApiUsage.id!,
-          accountApiUsage: accountApiUsage,
-          planTier: PlanTier.none,
-          accountAIUsageId: accountAIUsage.id!,
-          accountAIUsage: accountAIUsage,
-        );
+            await AccountApiKey.db.attachRow.accountApiUsage(
+              session,
+              apiKey,
+              accountApiUsage,
+              transaction: transaction,
+            );
+            AccountInfo accountInfo = AccountInfo(
+              authUserId: userId,
+              accountApiUsageId: accountApiUsage.id!,
+              accountApiUsage: accountApiUsage,
+              planTier: PlanTier.none,
+              accountAIUsageId: accountAIUsage.id!,
+              accountAIUsage: accountAIUsage,
+            );
 
-        accountInfo = await AccountInfo.db
-            .insertRow(session, accountInfo, transaction: transaction);
+            accountInfo = await AccountInfo.db.insertRow(
+              session,
+              accountInfo,
+              transaction: transaction,
+            );
 
-        await AccountInfo.db.attachRow.accountApiUsage(
-            session, accountInfo, accountApiUsage,
-            transaction: transaction);
+            await AccountInfo.db.attachRow.accountApiUsage(
+              session,
+              accountInfo,
+              accountApiUsage,
+              transaction: transaction,
+            );
 
-        final accountAdded = await AccountInfo.db.findFirstRow(
-          session,
-          where: (p0) => p0.authUserId.equals(userId),
-          include: include,
-          transaction: transaction,
-        );
-        if (accountAdded == null) {
-          throw _accountCreationFailed(language);
-        }
+            final accountAdded = await AccountInfo.db.findFirstRow(
+              session,
+              where: (p0) => p0.authUserId.equals(userId),
+              include: include,
+              transaction: transaction,
+            );
+            if (accountAdded == null) {
+              throw _accountCreationFailed(language);
+            }
 
-        if (initialScrappableId != null) {
-          await _attachScrappable(
-              session, transaction, accountInfo, initialScrappableId, language);
-        }
+            if (initialScrappableId != null) {
+              await _attachScrappable(
+                session,
+                transaction,
+                accountInfo,
+                initialScrappableId,
+                language,
+              );
+            }
 
-        return accountAdded;
-      }).then((accountInfo) async {
-        // Schedule monthly credit addition for free tier users
-        // This runs outside the transaction after account creation succeeds
-        await session.serverpod.futureCallWithDelay(
-          'monthly_subscription_credits',
-          MonthlyCreditsData(
-            accountInfoId: accountInfo.id!,
-          ),
-          const Duration(days: 30), // First monthly credit in 30 days
-        );
+            return accountAdded;
+          })
+          .then((accountInfo) async {
+            // Schedule monthly credit addition for free tier users
+            // This runs outside the transaction after account creation succeeds
+            await session.serverpod.futureCalls
+                .callWithDelay(const Duration(days: 30))
+                .monthlySubscriptionCredits
+                .addCredits(MonthlyCreditsData(accountInfoId: accountInfo.id!));
 
-        session.log(
-            'Scheduled monthly credits for new free tier account ${accountInfo.id}');
+            session.log(
+              'Scheduled monthly credits for new free tier account ${accountInfo.id}',
+            );
 
-        return accountInfo;
-      });
+            return accountInfo;
+          });
     } catch (error, stackTrace) {
       session.log(
         'Error creating new account for userId $userId',
@@ -249,11 +267,13 @@ class PrivateAccountEndpoint extends Endpoint {
     // We silently skip attachment for incomplete scrappables - the user must
     // finish configuring the scrappable in the chat session before it can be
     // attached to their account.
-    final hasExtractRules = await ScrappingBeeExtractLogic.db.count(
-      session,
-      where: (t) => t.scrappableId.equals(targetAttachScrappableId),
-      transaction: transaction,
-    ) > 0;
+    final hasExtractRules =
+        await ScrappingBeeExtractLogic.db.count(
+          session,
+          where: (t) => t.scrappableId.equals(targetAttachScrappableId),
+          transaction: transaction,
+        ) >
+        0;
 
     if (!hasExtractRules) {
       session.log(
@@ -275,16 +295,26 @@ class PrivateAccountEndpoint extends Endpoint {
     final maxAllowed = accountInfo.planTier.maxScrappables;
 
     if (currentScrappablesCount >= maxAllowed) {
-      throw _endpointLimitReached(language, maxAllowed, accountInfo.planTier.name);
+      throw _endpointLimitReached(
+        language,
+        maxAllowed,
+        accountInfo.planTier.name,
+      );
     }
 
     existingScrappable = existingScrappable.copyWith(accountId: accountInfo.id);
 
-    await Scrappable.db
-        .updateRow(session, existingScrappable, transaction: transaction);
+    await Scrappable.db.updateRow(
+      session,
+      existingScrappable,
+      transaction: transaction,
+    );
     await AccountInfo.db.attachRow.scrappables(
-        session, accountInfo, existingScrappable,
-        transaction: transaction);
+      session,
+      accountInfo,
+      existingScrappable,
+      transaction: transaction,
+    );
   }
 
   final include = AccountInfo.include(
@@ -321,9 +351,11 @@ ZenScrapException _scrappableAlreadyAttached(SupportedLanguage lang) =>
     createTranslatedException('scrappable_already_attached', lang);
 
 ZenScrapException _endpointLimitReached(
-        SupportedLanguage lang, int maxAllowed, String planName) =>
-    createTranslatedException(
-      'endpoint_limit_reached',
-      lang,
-      params: {'maxAllowed': maxAllowed.toString(), 'planName': planName},
-    );
+  SupportedLanguage lang,
+  int maxAllowed,
+  String planName,
+) => createTranslatedException(
+  'endpoint_limit_reached',
+  lang,
+  params: {'maxAllowed': maxAllowed.toString(), 'planName': planName},
+);

@@ -1,5 +1,6 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/core/auto_fix/auto_fix_session_handler.dart';
+import 'package:zenscrap_server/src/generated/future_calls.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 import 'package:zenscrap_server/src/notifications/auto_fix_notification_service.dart';
 
@@ -54,13 +55,9 @@ class AutoFixConstants {
 class PeriodicAutoFixBrokenScrappables extends FutureCall {
   static const String callName = 'periodicAutoFixBrokenScrappables';
 
-  @override
-  Future<void> invoke(Session session, SerializableModel? object) async {
+  Future<void> run(Session session, [bool? _]) async {
     try {
-      session.log(
-        'Starting periodic auto-fix check...',
-        level: LogLevel.info,
-      );
+      session.log('Starting periodic auto-fix check...', level: LogLevel.info);
 
       // Find scrappables that need auto-fix via AutoFixConfig
       final candidates = await _findAutoFixCandidates(session);
@@ -111,7 +108,8 @@ class PeriodicAutoFixBrokenScrappables extends FutureCall {
   /// - Has required relations (extractRules, targetRequest, referenceTestData)
   /// - Not deleted
   Future<List<_AutoFixCandidate>> _findAutoFixCandidates(
-      Session session) async {
+    Session session,
+  ) async {
     final now = DateTime.now();
 
     // Query AutoFixConfig entries that are enabled, not in progress, with errors
@@ -122,7 +120,9 @@ class PeriodicAutoFixBrokenScrappables extends FutureCall {
           t.inProgress.equals(false) &
           (t.attemptCount < AutoFixConstants.maxAutoFixAttempts) &
           (t.currentConsecutiveErrors > 0),
-      limit: AutoFixConstants.maxScrappablesPerRun * 3, // Fetch extra for filtering
+      limit:
+          AutoFixConstants.maxScrappablesPerRun *
+          3, // Fetch extra for filtering
       orderBy: (t) => t.currentConsecutiveErrors,
       orderDescending: true, // Process most broken first
     );
@@ -157,8 +157,9 @@ class PeriodicAutoFixBrokenScrappables extends FutureCall {
 
       // Check exponential cooldown
       if (config.lastAttemptAt != null) {
-        final cooldown =
-            AutoFixConstants.calculateCooldown(config.attemptCount);
+        final cooldown = AutoFixConstants.calculateCooldown(
+          config.attemptCount,
+        );
         final cooldownCutoff = now.subtract(cooldown);
         if (config.lastAttemptAt!.isAfter(cooldownCutoff)) {
           continue; // Still in cooldown
@@ -176,10 +177,9 @@ class PeriodicAutoFixBrokenScrappables extends FutureCall {
         continue;
       }
 
-      candidates.add(_AutoFixCandidate(
-        autoFixConfig: config,
-        scrappable: scrappable,
-      ));
+      candidates.add(
+        _AutoFixCandidate(autoFixConfig: config, scrappable: scrappable),
+      );
 
       // Stop once we have enough candidates
       if (candidates.length >= AutoFixConstants.maxScrappablesPerRun) {
@@ -223,9 +223,7 @@ class PeriodicAutoFixBrokenScrappables extends FutureCall {
       final accountInfo = await AccountInfo.db.findById(
         session,
         scrappable.accountId!,
-        include: AccountInfo.include(
-          accountAIUsage: AccountAIUsage.include(),
-        ),
+        include: AccountInfo.include(accountAIUsage: AccountAIUsage.include()),
       );
 
       final userApiKey = accountInfo?.accountAIUsage?.userOpenAiApiKey;
@@ -512,7 +510,9 @@ class PeriodicAutoFixBrokenScrappables extends FutureCall {
 
   /// Resets the inProgress flag when auto-fix couldn't proceed
   Future<void> _resetInProgress(
-      Session session, AutoFixConfig autoFixConfig) async {
+    Session session,
+    AutoFixConfig autoFixConfig,
+  ) async {
     try {
       await AutoFixConfig.db.updateRow(
         session,
@@ -520,21 +520,16 @@ class PeriodicAutoFixBrokenScrappables extends FutureCall {
         columns: (t) => [t.inProgress],
       );
     } catch (e) {
-      session.log(
-        'Failed to reset inProgress flag: $e',
-        level: LogLevel.error,
-      );
+      session.log('Failed to reset inProgress flag: $e', level: LogLevel.error);
     }
   }
 
   /// Schedules the next periodic run
   Future<void> _scheduleNextRun(Session session) async {
-    await session.serverpod.futureCallWithDelay(
-      callName,
-      null,
-      AutoFixConstants.checkInterval,
-      identifier: callName,
-    );
+    await session.serverpod.futureCalls
+        .callWithDelay(AutoFixConstants.checkInterval, identifier: callName)
+        .periodicAutoFixBrokenScrappables
+        .run();
   }
 }
 
@@ -543,27 +538,19 @@ class _AutoFixCandidate {
   final AutoFixConfig autoFixConfig;
   final Scrappable scrappable;
 
-  _AutoFixCandidate({
-    required this.autoFixConfig,
-    required this.scrappable,
-  });
+  _AutoFixCandidate({required this.autoFixConfig, required this.scrappable});
 }
 
 /// Starts the periodic auto-fix check.
 /// Should be called once at server startup.
 Future<void> startPeriodicAutoFix(Serverpod serverpod) async {
-  // Register the FutureCall
-  serverpod.registerFutureCall(
-    PeriodicAutoFixBrokenScrappables(),
-    PeriodicAutoFixBrokenScrappables.callName,
-  );
-
   // Schedule the first run after a short delay
   // This gives the server time to fully initialize
-  await serverpod.futureCallWithDelay(
-    PeriodicAutoFixBrokenScrappables.callName,
-    null,
-    const Duration(seconds: 30),
-    identifier: PeriodicAutoFixBrokenScrappables.callName,
-  );
+  await serverpod.futureCalls
+      .callWithDelay(
+        const Duration(seconds: 30),
+        identifier: PeriodicAutoFixBrokenScrappables.callName,
+      )
+      .periodicAutoFixBrokenScrappables
+      .run();
 }

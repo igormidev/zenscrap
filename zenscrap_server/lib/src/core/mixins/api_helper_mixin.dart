@@ -10,6 +10,7 @@ import 'package:zenscrap_server/src/core/extension/scrapping_bee_extract_logic_e
 import 'package:zenscrap_server/src/core/scraping_bee.dart';
 import 'package:zenscrap_server/src/core/translations/error_translations.dart';
 import 'package:zenscrap_server/src/endpoints/public/scrappable_chat_session.dart';
+import 'package:zenscrap_server/src/generated/future_calls.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 import 'package:zenscrap_server/src/notifications/auto_fix_notification_service.dart';
 
@@ -1247,8 +1248,7 @@ class AnalyticsPayload {
 class PeriodicSetRequestsAnalytics extends FutureCall {
   static const String callName = 'periodicSetRequestsAnalytics';
 
-  @override
-  Future<void> invoke(Session session, SerializableModel? _) async {
+  Future<void> run(Session session, [bool? _]) async {
     Map<ScrappableId, Map<NanoId, Map<ApiKey, List<AnalyticsPayload>>>>
     pendingAnalytics = {...ApiHelperMixin._pendingAnalytics};
     ApiHelperMixin._pendingAnalytics.clear();
@@ -1276,20 +1276,20 @@ class PeriodicSetRequestsAnalytics extends FutureCall {
     }
 
     // Schedule the next execution
-    await session.serverpod.futureCallWithDelay(
-      callName,
-      null,
-      ApiHelperConfig.analyticsBatchInterval,
-      identifier: callName,
-    );
+    await session.serverpod.futureCalls
+        .callWithDelay(
+          ApiHelperConfig.analyticsBatchInterval,
+          identifier: callName,
+        )
+        .periodicSetRequestsAnalytics
+        .run();
   }
 }
 
 /// Periodic cleanup for in-memory caches to prevent memory leaks.
 /// This FutureCall runs at [ApiHelperConfig.cacheCleanupInterval] and evicts expired cache entries.
 class PeriodicCacheCleanup extends FutureCall {
-  @override
-  Future<void> invoke(Session session, SerializableModel? object) async {
+  Future<void> run(Session session, [bool? _]) async {
     try {
       // Log cache sizes before cleanup for monitoring
       final beforeSizes = _getCacheSizes();
@@ -1318,12 +1318,13 @@ class PeriodicCacheCleanup extends FutureCall {
     }
 
     // Schedule the next execution
-    await session.serverpod.futureCallWithDelay(
-      'periodicCacheCleanup',
-      null,
-      ApiHelperConfig.cacheCleanupInterval,
-      identifier: 'periodicCacheCleanup',
-    );
+    await session.serverpod.futureCalls
+        .callWithDelay(
+          ApiHelperConfig.cacheCleanupInterval,
+          identifier: 'periodicCacheCleanup',
+        )
+        .periodicCacheCleanup
+        .run();
   }
 
   Map<String, int> _getCacheSizes() {
@@ -1344,8 +1345,7 @@ class PeriodicCacheCleanup extends FutureCall {
 class PeriodicCleanupOldAnalyticsDetails extends FutureCall {
   static const String callName = 'periodicCleanupOldAnalyticsDetails';
 
-  @override
-  Future<void> invoke(Session session, SerializableModel? object) async {
+  Future<void> run(Session session, [bool? _]) async {
     try {
       final now = DateTime.now();
       final retentionCutoff = now.subtract(
@@ -1378,12 +1378,13 @@ class PeriodicCleanupOldAnalyticsDetails extends FutureCall {
     }
 
     // Schedule the next execution
-    await session.serverpod.futureCallWithDelay(
-      callName,
-      null,
-      ApiHelperConfig.analyticsCleanupInterval,
-      identifier: callName,
-    );
+    await session.serverpod.futureCalls
+        .callWithDelay(
+          ApiHelperConfig.analyticsCleanupInterval,
+          identifier: callName,
+        )
+        .periodicCleanupOldAnalyticsDetails
+        .run();
   }
 
   /// Updates average duration for all scrappables that have analytics with duration data.

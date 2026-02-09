@@ -10,6 +10,7 @@ import 'package:zenscrap_server/src/core/ip_validation/ip_validation.dart';
 import 'package:zenscrap_server/src/core/translations/error_translations.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/chat_controller_openai_sdk_impl.dart';
 import 'package:zenscrap_server/src/endpoints/public/chat_controller/i_chat_controller.dart';
+import 'package:zenscrap_server/src/generated/future_calls.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 typedef RedraftSrappableSessionId = String;
@@ -113,7 +114,10 @@ class ScrappableChatSession extends Endpoint {
       );
 
       if (pendingCommit == null) {
-        throw createTranslatedException('cache_scrappable_id_not_found', language);
+        throw createTranslatedException(
+          'cache_scrappable_id_not_found',
+          language,
+        );
       }
 
       scrappableId = pendingCommit.scrappableId;
@@ -127,12 +131,16 @@ class ScrappableChatSession extends Endpoint {
 
     // For pending commits, the data was already saved to DB in _savePendingSessionData
     // so we don't need to load from cache. For active sessions, get from cache.
-    final ReferenceTestData? testData =
-        isFromPendingCommit ? null : _cacheRefTestData[sessionUuid];
+    final ReferenceTestData? testData = isFromPendingCommit
+        ? null
+        : _cacheRefTestData[sessionUuid];
     final ScrappingBeeExtractLogic? scrappingBeeExtractLogic =
-        isFromPendingCommit ? null : _cacheScrappingBeeExtractLogic[sessionUuid];
-    final ScrappableRequest? scrappableRequest =
-        isFromPendingCommit ? null : _cacheScrappableRequest[sessionUuid];
+        isFromPendingCommit
+        ? null
+        : _cacheScrappingBeeExtractLogic[sessionUuid];
+    final ScrappableRequest? scrappableRequest = isFromPendingCommit
+        ? null
+        : _cacheScrappableRequest[sessionUuid];
 
     // Validate cache data for active sessions
     if (!isFromPendingCommit &&
@@ -400,7 +408,8 @@ class ScrappableChatSession extends Endpoint {
     // Logged-in users bypass this check as they are already authenticated.
     // Skip in development/test mode since localhost IPs are detected as bogon.
     final runMode = session.serverpod.runMode;
-    final isNonProductionMode = runMode == ServerpodRunMode.development ||
+    final isNonProductionMode =
+        runMode == ServerpodRunMode.development ||
         runMode == ServerpodRunMode.test;
     if (!isNonProductionMode && !isLoggedIn && session is MethodCallSession) {
       final clientIpAddress = session.request.connectionInfo.remote.address
@@ -560,7 +569,10 @@ class ScrappableChatSession extends Endpoint {
         'No reference test data found for scrappable with id ${scrappable.id}.',
         level: LogLevel.error,
       );
-      throw createTranslatedException('reference_test_data_not_found', language);
+      throw createTranslatedException(
+        'reference_test_data_not_found',
+        language,
+      );
     }
     if (scrapperRequest == null) {
       session.log(
@@ -630,11 +642,10 @@ class ScrappableChatSession extends Endpoint {
       sessionId: sessionUuid,
     );
     session.log('Created session $sessionUuid for scrappable ${scrappable.id}');
-    await session.serverpod.futureCallWithDelay(
-      TestScrappableDisposeFutureCall.callName,
-      response,
-      duration + Duration(minutes: 1),
-    );
+    await session.serverpod.futureCalls
+        .callWithDelay(duration + const Duration(minutes: 1))
+        .testScrappableDispose
+        .disposeSession(response);
     session.log('Scheduled dispose for session $sessionUuid');
     _cacheScrappableIds[sessionUuid] = scrappable.id!;
     await Scrappable.db.updateRow(
@@ -770,17 +781,18 @@ class ScrappableChatSession extends Endpoint {
           .toString();
     }
 
-    await session.serverpod.futureCallWithDelay(
-      SessionPromptFutureCall.callName,
-      SessionPrompt(
-        sessionId: sessionId,
-        userPrompt: userPrompt,
-        thinkingSessionId: thinkingSessionId,
-        clientIpAddress: clientIpAddress,
-        language: language,
-      ),
-      const Duration(seconds: 1),
-    );
+    await session.serverpod.futureCalls
+        .callWithDelay(const Duration(seconds: 1))
+        .sessionPrompt
+        .processPrompt(
+          SessionPrompt(
+            sessionId: sessionId,
+            userPrompt: userPrompt,
+            thinkingSessionId: thinkingSessionId,
+            clientIpAddress: clientIpAddress,
+            language: language,
+          ),
+        );
 
     await for (final data in _thinkingStream[thinkingSessionId]!.stream) {
       yield data;
@@ -956,9 +968,10 @@ class TestScrappableDisposeFutureCall
     extends FutureCall<CreateSessionResponse> {
   static const String callName = 'dispose_temporary_scrappable';
 
-  @override
-  Future<void> invoke(Session session, CreateSessionResponse? object) async {
-    if (object == null) return;
+  Future<void> disposeSession(
+    Session session,
+    CreateSessionResponse object,
+  ) async {
     await _disposeSession(sessionId: object.sessionId, dbSession: session);
   }
 }
@@ -966,9 +979,7 @@ class TestScrappableDisposeFutureCall
 class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
   static const String callName = 'session_prompt';
 
-  @override
-  Future<void> invoke(Session session, SessionPrompt? object) async {
-    if (object == null) return;
+  Future<void> processPrompt(Session session, SessionPrompt object) async {
     final ThinkingSessionId thinkingSessionId = object.thinkingSessionId;
     final String sessionId = object.sessionId;
     final String userPrompt = object.userPrompt;
@@ -1142,7 +1153,8 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
           final responseLogic = chatResponse.scrappingBeeExtractLogic;
           _cacheScrappingBeeExtractLogic[sessionId] = responseLogic.copyWith(
             id: responseLogic.id ?? existingLogic?.id,
-            scrappableId: responseLogic.scrappableId ?? existingLogic?.scrappableId,
+            scrappableId:
+                responseLogic.scrappableId ?? existingLogic?.scrappableId,
           );
         }
       } else if (chatResponse is UpdatedScrappableRequestResponse) {
@@ -1151,8 +1163,9 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
             _cacheScrappableRequest.containsKey(sessionId)) {
           // Preserve database id from existing cached object
           final existingRequest = _cacheScrappableRequest[sessionId];
-          _cacheScrappableRequest[sessionId] =
-              updatedRequest.copyWith(id: existingRequest?.id);
+          _cacheScrappableRequest[sessionId] = updatedRequest.copyWith(
+            id: existingRequest?.id,
+          );
         }
       }
     });
@@ -1287,16 +1300,10 @@ class SessionPromptFutureCall extends FutureCall<SessionPrompt> {
       // Determine the appropriate message based on whether the user is using their own key
       final String messageText;
       if (usesOwnApiKey) {
-        messageText = getErrorDescription(
-          'chat_user_api_key_quota',
-          language,
-        );
+        messageText = getErrorDescription('chat_user_api_key_quota', language);
       } else {
         // This shouldn't happen normally, but handle it gracefully
-        messageText = getErrorDescription(
-          'chat_openai_quota_error',
-          language,
-        );
+        messageText = getErrorDescription('chat_openai_quota_error', language);
       }
 
       _scrapRedraftSessions[sessionId]?.add(

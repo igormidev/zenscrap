@@ -2,19 +2,13 @@ import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/core/consts.dart';
 import 'package:zenscrap_server/src/core/mixins/api_helper_mixin.dart';
 import 'package:zenscrap_server/src/core/extension/plan_tier_extension.dart';
+import 'package:zenscrap_server/src/generated/future_calls.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 class MonthlySubscriptionCreditsFutureCall extends FutureCall {
   static const String callName = 'monthly_subscription_credits';
 
-  @override
-  Future<void> invoke(Session session, SerializableModel? object) async {
-    if (object is! MonthlyCreditsData) {
-      session
-          .log('Invalid object type for MonthlySubscriptionCreditsFutureCall');
-      return;
-    }
-
+  Future<void> addCredits(Session session, MonthlyCreditsData object) async {
     try {
       // Get account info
       final accountInfo = await AccountInfo.db.findById(
@@ -29,12 +23,14 @@ class MonthlySubscriptionCreditsFutureCall extends FutureCall {
 
       // Check if subscription is still active OR if user is on free tier
       final isFreeTier = accountInfo.planTier == PlanTier.none;
-      final hasActiveSubscription = accountInfo.subscriptionStatus == 'active' ||
+      final hasActiveSubscription =
+          accountInfo.subscriptionStatus == 'active' ||
           accountInfo.subscriptionStatus == 'trialing';
 
       if (!isFreeTier && !hasActiveSubscription) {
         session.log(
-            'Subscription not active for account ${object.accountInfoId} and not on free tier');
+          'Subscription not active for account ${object.accountInfoId} and not on free tier',
+        );
         return;
       }
 
@@ -64,9 +60,11 @@ class MonthlySubscriptionCreditsFutureCall extends FutureCall {
               creditUsage: CreditUsage.include(),
             ),
           );
-          
+
           if (currentApiUsage == null || currentApiUsage.creditUsage == null) {
-            throw Exception('API usage or credit usage not found during transaction');
+            throw Exception(
+              'API usage or credit usage not found during transaction',
+            );
           }
 
           // Add credits
@@ -78,22 +76,24 @@ class MonthlySubscriptionCreditsFutureCall extends FutureCall {
           );
 
           // Create monthly subscription API credit deposit record
-          final insertedApiDeposit =
-              await MonthlySubscriptionApiCreditDeposit.db.insertRow(
-            session,
-            MonthlySubscriptionApiCreditDeposit(
-              creditsAmount: creditsToAdd,
-              planTier: accountInfo.planTier,
-            ),
-            transaction: transaction,
-          );
+          final insertedApiDeposit = await MonthlySubscriptionApiCreditDeposit
+              .db
+              .insertRow(
+                session,
+                MonthlySubscriptionApiCreditDeposit(
+                  creditsAmount: creditsToAdd,
+                  planTier: accountInfo.planTier,
+                ),
+                transaction: transaction,
+              );
 
           // Create API credit history item
           await ApiCreditHistoryItem.db.insertRow(
             session,
             ApiCreditHistoryItem(
               date: DateTime.now(),
-              transactionType: ApiCreditTransactionType.monthlySubscriptionDeposit,
+              transactionType:
+                  ApiCreditTransactionType.monthlySubscriptionDeposit,
               monthlySubscriptionApiCreditDepositId: insertedApiDeposit.id,
               monthlySubscriptionApiCreditDeposit: insertedApiDeposit,
               apiCreditPackagePurchaseId: null,
@@ -132,22 +132,24 @@ class MonthlySubscriptionCreditsFutureCall extends FutureCall {
             );
 
             // Create monthly subscription AI credit deposit record
-            final insertedAiDeposit =
-                await MonthlySubscriptionAICreditDeposit.db.insertRow(
-              session,
-              MonthlySubscriptionAICreditDeposit(
-                creditsAmountInDollars: kDefaultMonthlyAICreditsInDollars,
-                planTier: accountInfo.planTier,
-              ),
-              transaction: transaction,
-            );
+            final insertedAiDeposit = await MonthlySubscriptionAICreditDeposit
+                .db
+                .insertRow(
+                  session,
+                  MonthlySubscriptionAICreditDeposit(
+                    creditsAmountInDollars: kDefaultMonthlyAICreditsInDollars,
+                    planTier: accountInfo.planTier,
+                  ),
+                  transaction: transaction,
+                );
 
             // Create AI credit history item
             await AICreditHistoryItem.db.insertRow(
               session,
               AICreditHistoryItem(
                 date: DateTime.now(),
-                transactionType: AICreditTransactionType.monthlySubscriptionDeposit,
+                transactionType:
+                    AICreditTransactionType.monthlySubscriptionDeposit,
                 monthlySubscriptionAICreditDepositId: insertedAiDeposit.id,
                 monthlySubscriptionAICreditDeposit: insertedAiDeposit,
                 accountAIUsageId: aiUsage.id!,
@@ -156,7 +158,8 @@ class MonthlySubscriptionCreditsFutureCall extends FutureCall {
             );
 
             session.log(
-                'Reset AI credits to \$${newCredits.toStringAsFixed(4)} for account ${accountInfo.id}');
+              'Reset AI credits to \$${newCredits.toStringAsFixed(4)} for account ${accountInfo.id}',
+            );
           }
 
           // Update the cached values in ApiHelperMixin (after transaction)
@@ -164,7 +167,8 @@ class MonthlySubscriptionCreditsFutureCall extends FutureCall {
         });
 
         session.log(
-            'Added $creditsToAdd monthly subscription credits to account ${accountInfo.id} (nanoId: ${apiUsage.nanoId})');
+          'Added $creditsToAdd monthly subscription credits to account ${accountInfo.id} (nanoId: ${apiUsage.nanoId})',
+        );
       }
     } catch (e, stackTrace) {
       session.log(
@@ -176,16 +180,14 @@ class MonthlySubscriptionCreditsFutureCall extends FutureCall {
       );
     } finally {
       // Schedule the next monthly credit addition (30 days from now)
-      await session.serverpod.futureCallWithDelay(
-        callName,
-        MonthlyCreditsData(
-          accountInfoId: object.accountInfoId,
-        ),
-        const Duration(days: 30),
-      );
+      await session.serverpod.futureCalls
+          .callWithDelay(const Duration(days: 30))
+          .monthlySubscriptionCredits
+          .addCredits(MonthlyCreditsData(accountInfoId: object.accountInfoId));
 
       session.log(
-          'Scheduled next monthly credits addition for account ${object.accountInfoId} in 30 days');
+        'Scheduled next monthly credits addition for account ${object.accountInfoId} in 30 days',
+      );
     }
   }
 }

@@ -1,5 +1,6 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:zenscrap_server/src/core/consts.dart';
+import 'package:zenscrap_server/src/generated/future_calls.dart';
 import 'package:zenscrap_server/src/generated/protocol.dart';
 
 /// FutureCall that runs hourly to clean up expired anonymous IP spending records.
@@ -12,11 +13,12 @@ class CleanupExpiredIpSpendingFutureCall extends FutureCall {
   static const String callName = 'cleanup_expired_ip_spending';
   static const Duration _cleanupInterval = Duration(hours: 1);
 
-  @override
-  Future<void> invoke(Session session, SerializableModel? object) async {
+  Future<void> run(Session session, [bool? _]) async {
     try {
       // Find all IP spending records that are older than the reset duration
-      final expiryThreshold = DateTime.now().subtract(kAnonymousIpSpendingResetDuration);
+      final expiryThreshold = DateTime.now().subtract(
+        kAnonymousIpSpendingResetDuration,
+      );
 
       final expiredRecords = await AnonymousIpSpending.db.find(
         session,
@@ -56,11 +58,10 @@ class CleanupExpiredIpSpendingFutureCall extends FutureCall {
       );
     } finally {
       // Always reschedule the next cleanup, even if there was an error
-      await session.serverpod.futureCallWithDelay(
-        callName,
-        null,
-        _cleanupInterval,
-      );
+      await session.serverpod.futureCalls
+          .callWithDelay(_cleanupInterval)
+          .cleanupExpiredIpSpending
+          .run();
 
       session.log(
         'Scheduled next IP spending cleanup in ${_cleanupInterval.inMinutes} minutes',

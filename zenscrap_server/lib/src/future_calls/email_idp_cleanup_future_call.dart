@@ -1,6 +1,7 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_idp_server/providers/email.dart';
 import 'package:serverpod_auth_idp_server/core.dart';
+import 'package:zenscrap_server/src/generated/future_calls.dart';
 
 /// Periodic cleanup of expired email authentication data.
 ///
@@ -16,8 +17,7 @@ class EmailIdpCleanupFutureCall extends FutureCall {
   static const Duration _cleanupInterval = Duration(days: 1);
   static const Duration _failedLoginAttemptsMaxAge = Duration(days: 30);
 
-  @override
-  Future<void> invoke(Session session, SerializableModel? object) async {
+  Future<void> run(Session session, [bool? _]) async {
     session.log('Starting Email IDP cleanup...');
 
     try {
@@ -57,11 +57,10 @@ class EmailIdpCleanupFutureCall extends FutureCall {
       );
     } finally {
       // Always reschedule the next cleanup, even if there was an error
-      await session.serverpod.futureCallWithDelay(
-        callName,
-        null,
-        _cleanupInterval,
-      );
+      await session.serverpod.futureCalls
+          .callWithDelay(_cleanupInterval)
+          .emailIdpCleanup
+          .run();
 
       session.log(
         'Scheduled next Email IDP cleanup in ${_cleanupInterval.inDays} day(s)',
