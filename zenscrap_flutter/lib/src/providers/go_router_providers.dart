@@ -13,7 +13,7 @@ import 'package:zenscrap_flutter/src/ui/api_analytics/view/api_analytics_view.da
 import 'package:zenscrap_flutter/src/ui/api_usage/views/api_usage_view.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
 import 'package:zenscrap_flutter/src/ui/auth/views/splash_view.dart';
-import 'package:zenscrap_flutter/src/ui/dashboard/pages/pricing_page.dart';
+import 'package:zenscrap_flutter/src/ui/pricing_page/zenscrap_pricing_page_impl.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/views/dashboard_view.dart';
 import 'package:zenscrap_flutter/src/ui/marketplace/views/marketplace_view.dart';
 import 'package:zenscrap_flutter/src/ui/landing_page/landing_page.dart';
@@ -142,7 +142,7 @@ class RouterNotifier extends Notifier<GoRouter> {
             GoRoute(
               path: DashboardNavigationType.pricingPage.routeOnClick!,
               name: 'Pricing',
-              builder: (context, state) => ZenScrapPricingPage(),
+              builder: (context, state) => ZenScrapPricingPageImpl(),
             ),
           ],
           builder: (context, state, child) {

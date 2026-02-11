@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pricing_page/pricing_page.dart';
 import 'package:zenscrap_flutter/src/ui/dashboard/widgets/raw_pricing_component.dart';
+import 'package:zenscrap_flutter/src/ui/pricing_page/pricing_background.dart';
 
-class ZenScrapPricingPage extends ConsumerWidget {
+class ZenScrapPricingPageImpl extends ConsumerWidget {
   /// When true, clicking a plan will redirect to auth page instead of Stripe.
   /// Used when embedding the pricing page in the landing page.
   final bool isInsideLandingPage;
 
-  const ZenScrapPricingPage({super.key, this.isInsideLandingPage = false});
+  const ZenScrapPricingPageImpl({super.key, this.isInsideLandingPage = false});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

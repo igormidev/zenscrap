@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zenscrap_client/zenscrap_client.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
 import 'package:lottie/lottie.dart';
-import 'package:pricing_page/pricing_page.dart';
 import 'package:zenscrap_flutter/src/core/extensions/plan_tier_extension.dart';
 import 'package:zenscrap_flutter/src/core/mixins/create_new_scrappable_mixin.dart';
 import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
@@ -12,6 +11,7 @@ import 'package:zenscrap_flutter/src/states/account/account_provider.dart';
 import 'package:zenscrap_flutter/src/states/account/account_state.dart';
 import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables_provider.dart';
 import 'package:zenscrap_flutter/src/states/scrappables/user_scrappables_state.dart';
+import 'package:zenscrap_flutter/src/ui/auth/views/auth_view.dart';
 
 class EmptyScrappableListageIndicatorPage extends ConsumerStatefulWidget {
   const EmptyScrappableListageIndicatorPage({super.key});

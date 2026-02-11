@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:pricing_page/pricing_page.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:zenscrap_flutter/l10n/app_localizations.dart';
@@ -9,6 +8,8 @@ import 'package:zenscrap_flutter/src/design_system/responsive/responsive.dart';
 import 'package:zenscrap_flutter/src/providers/global_loading_provider.dart';
 import 'package:zenscrap_flutter/src/providers/posthog_provider.dart';
 import 'package:zenscrap_flutter/src/providers/serverpod_providers.dart';
+import 'package:zenscrap_flutter/src/ui/pricing_page/prices_model.dart';
+import 'package:zenscrap_flutter/src/ui/pricing_page/pricing_page_template.dart';
 
 /// The raw pricing page component that displays the pricing plans.
 /// Used both in the pricing page (dashboard) and embedded in the landing page.
@@ -57,9 +58,12 @@ class RawPricingPageComponent extends ConsumerWidget {
           monthlyPrice: 100,
           yearlyPrice: 1050,
           advantagesListage: [
-            '<b><u><tC>250.000<tC><u><b> ${l10n.pricing_feature_api_credits('')}'.replaceFirst(' ', ''),
-            '<b><u><tC>10<tC><u><b> ${l10n.pricing_feature_concurrent_requests('')}'.replaceFirst(' ', ''),
-            '<b><u><tC>3<tC><u><b> ${l10n.pricing_feature_active_endpoints('')}'.replaceFirst(' ', ''),
+            '<b><u><tC>250.000<tC><u><b> ${l10n.pricing_feature_api_credits('')}'
+                .replaceFirst(' ', ''),
+            '<b><u><tC>10<tC><u><b> ${l10n.pricing_feature_concurrent_requests('')}'
+                .replaceFirst(' ', ''),
+            '<b><u><tC>3<tC><u><b> ${l10n.pricing_feature_active_endpoints('')}'
+                .replaceFirst(' ', ''),
           ],
           onTap: (bool isYearly) async {
             // Track plan click
@@ -95,9 +99,12 @@ class RawPricingPageComponent extends ConsumerWidget {
           monthlyPrice: 199,
           yearlyPrice: 1999,
           advantagesListage: [
-            '<b><u><tC>1.000.000<tC><u><b> ${l10n.pricing_feature_api_credits('')}'.replaceFirst(' ', ''),
-            '<b><u><tC>30<tC><u><b> ${l10n.pricing_feature_concurrent_requests('')}'.replaceFirst(' ', ''),
-            '<b><u><tC>10<tC><u><b> ${l10n.pricing_feature_active_endpoints('')}'.replaceFirst(' ', ''),
+            '<b><u><tC>1.000.000<tC><u><b> ${l10n.pricing_feature_api_credits('')}'
+                .replaceFirst(' ', ''),
+            '<b><u><tC>30<tC><u><b> ${l10n.pricing_feature_concurrent_requests('')}'
+                .replaceFirst(' ', ''),
+            '<b><u><tC>10<tC><u><b> ${l10n.pricing_feature_active_endpoints('')}'
+                .replaceFirst(' ', ''),
             l10n.pricing_feature_best_ai_model,
           ],
           onTap: (bool isYearly) async {
@@ -133,9 +140,12 @@ class RawPricingPageComponent extends ConsumerWidget {
           monthlyPrice: 500,
           yearlyPrice: 5500,
           advantagesListage: [
-            '<b><u><tC>4.000.000<tC><u><b> ${l10n.pricing_feature_api_credits('')}'.replaceFirst(' ', ''),
-            '<b><u><tC>100<tC><u><b> ${l10n.pricing_feature_concurrent_requests('')}'.replaceFirst(' ', ''),
-            '<b><u><tC>100<tC><u><b> ${l10n.pricing_feature_active_endpoints('')}'.replaceFirst(' ', ''),
+            '<b><u><tC>4.000.000<tC><u><b> ${l10n.pricing_feature_api_credits('')}'
+                .replaceFirst(' ', ''),
+            '<b><u><tC>100<tC><u><b> ${l10n.pricing_feature_concurrent_requests('')}'
+                .replaceFirst(' ', ''),
+            '<b><u><tC>100<tC><u><b> ${l10n.pricing_feature_active_endpoints('')}'
+                .replaceFirst(' ', ''),
             l10n.pricing_feature_best_ai_model,
             l10n.pricing_feature_priority_support,
             l10n.pricing_feature_hide_endpoints,
@@ -192,9 +202,9 @@ class RawPricingPageComponent extends ConsumerWidget {
           isYearly: isYearly,
         );
         if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.pricing_sign_in_required)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.pricing_sign_in_required)));
         await Future.delayed(const Duration(milliseconds: 500));
         if (!context.mounted) return;
         context.go('/auth');
@@ -206,7 +216,11 @@ class RawPricingPageComponent extends ConsumerWidget {
       final checkoutUrl = await ref
           .read(clientProvider)
           .privateSubscription
-          .createCheckoutSession(planTier: planTier, isYearly: isYearly, language: language);
+          .createCheckoutSession(
+            planTier: planTier,
+            isYearly: isYearly,
+            language: language,
+          );
 
       // Track successful checkout session creation
       if (checkoutUrl.isNotEmpty) {
@@ -259,9 +273,9 @@ class RawPricingPageComponent extends ConsumerWidget {
       );
 
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(l10n.pricing_error_message(e.toString()))));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.pricing_error_message(e.toString()))),
+        );
       }
     }
   }
