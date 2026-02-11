@@ -651,11 +651,15 @@ class _LandingPageContent extends StatelessWidget {
                               title: Seo.text(
                                 text: l10n.landing_marketplace_login_title,
                                 style: TextTagStyle.h3,
-                                child: Text(l10n.landing_marketplace_login_title),
+                                child: Text(
+                                  l10n.landing_marketplace_login_title,
+                                ),
                               ),
                               content: Seo.text(
                                 text: l10n.landing_marketplace_login_message,
-                                child: Text(l10n.landing_marketplace_login_message),
+                                child: Text(
+                                  l10n.landing_marketplace_login_message,
+                                ),
                               ),
                               actions: [
                                 FilledButton(
@@ -663,7 +667,9 @@ class _LandingPageContent extends StatelessWidget {
                                     Navigator.of(dialogContext).pop();
                                     context.push('/auth');
                                   },
-                                  child: Text(l10n.landing_marketplace_login_ok),
+                                  child: Text(
+                                    l10n.landing_marketplace_login_ok,
+                                  ),
                                 ),
                               ],
                             ),
@@ -753,10 +759,7 @@ class _PricingSection extends StatelessWidget {
           SizedBox(
             height: context.responsiveValue(compact: 32.0, expanded: 48.0),
           ),
-          SizedBox(
-            height: context.responsiveValue(compact: 1200.0, expanded: 980.0),
-            child: const RawPricingPageComponent(isInsideLandingPage: true),
-          ),
+          const RawPricingPageComponent(isInsideLandingPage: true),
         ],
       ),
     );

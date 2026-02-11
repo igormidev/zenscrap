@@ -43,6 +43,7 @@ class RawPricingPageComponent extends ConsumerWidget {
     return PricingPage(
       width: pricingWidth,
       childAspectRatio: pricingAspectRatio,
+      enableScroll: !isInsideLandingPage,
       perMonthText: l10n.pricing_per_month,
       perYearText: l10n.pricing_per_year,
       subtitle: l10n.pricing_subtitle,

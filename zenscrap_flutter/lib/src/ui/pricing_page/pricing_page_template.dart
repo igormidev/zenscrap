@@ -20,6 +20,7 @@ class PricingPage extends StatefulWidget {
   final String perMonthText;
   final String buttonName;
   final bool forceAllColumnsToHaveSameSizeInDesktop;
+  final bool enableScroll;
   const PricingPage({
     super.key,
     required this.pricesList,
@@ -35,6 +36,7 @@ class PricingPage extends StatefulWidget {
     this.childAspectRatio = 1,
     this.width = double.infinity,
     this.forceAllColumnsToHaveSameSizeInDesktop = false,
+    this.enableScroll = true,
   }) : crossAxisCount = crossAxisCount ?? pricesList.length;
 
   @override
@@ -98,205 +100,154 @@ class _PricingPageState extends State<PricingPage> {
           spacing = 20;
         }
 
-        return SingleChildScrollView(
-          child: Center(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: isMobile ? double.infinity : widget.width,
-                minHeight: isMobile ? 0 : constraints.maxHeight,
+        final content = Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: isMobile ? double.infinity : widget.width,
+              minHeight: !isMobile && constraints.hasBoundedHeight
+                  ? constraints.maxHeight
+                  : 0,
+            ),
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 20 : 0,
+                vertical: isMobile ? 40 : 0,
               ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: isMobile ? 20 : 0,
-                  vertical: isMobile ? 40 : 0,
-                ),
-                child: Column(
-                  mainAxisAlignment: isMobile
-                      ? MainAxisAlignment.start
-                      : MainAxisAlignment.center,
-                  children: [
-                    BabelText(
-                      '<b>${widget.title}<b>',
+              child: Column(
+                mainAxisAlignment: isMobile
+                    ? MainAxisAlignment.start
+                    : MainAxisAlignment.center,
+                children: [
+                  BabelText(
+                    '<b>${widget.title}<b>',
+                    style: TextStyle(
+                      fontSize: titleFontSize,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  SizedBox(height: isMobile ? 16 : 8),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isMobile ? 12 : 20,
+                    ),
+                    child: BabelText(
+                      widget.subtitle,
                       style: TextStyle(
-                        fontSize: titleFontSize,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.5,
+                        fontSize: fontSize + (isMobile ? 1 : 0),
+                        fontWeight: FontWeight.w400,
+                        color: Theme.of(context).colorScheme.outline,
+                        height: 1.6,
                       ),
+                      textAlign: TextAlign.center,
                     ),
-                    SizedBox(height: isMobile ? 16 : 8),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: isMobile ? 12 : 20,
-                      ),
-                      child: BabelText(
-                        widget.subtitle,
-                        style: TextStyle(
-                          fontSize: fontSize + (isMobile ? 1 : 0),
-                          fontWeight: FontWeight.w400,
-                          color: Theme.of(context).colorScheme.outline,
-                          height: 1.6,
+                  ),
+                  SizedBox(height: isMobile ? 32 : spacing),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.surfaceContainerHighest.withAlpha(100),
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isMobile ? 8 : 12,
+                      vertical: isMobile ? 4 : 6,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        BabelText(
+                          widget.payMonthly,
+                          style: TextStyle(
+                            fontSize: toggleFontSize,
+                            fontWeight: !isYearly
+                                ? FontWeight.w600
+                                : FontWeight.w400,
+                          ),
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    SizedBox(height: isMobile ? 32 : spacing),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.surfaceContainerHighest.withAlpha(100),
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: isMobile ? 8 : 12,
-                        vertical: isMobile ? 4 : 6,
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          BabelText(
-                            widget.payMonthly,
-                            style: TextStyle(
-                              fontSize: toggleFontSize,
-                              fontWeight: !isYearly
-                                  ? FontWeight.w600
-                                  : FontWeight.w400,
-                            ),
-                          ),
-                          Switch(
-                            value: isYearly,
-                            onChanged: (value) {
+                        Switch(
+                          value: isYearly,
+                          onChanged: (value) {
+                            setState(() {
+                              isYearly = value;
+                            });
+                            _timer?.cancel();
+                            _timer = Timer(Duration(milliseconds: 700), () {
                               setState(() {
-                                isYearly = value;
+                                didSwitchAnimation = !didSwitchAnimation;
                               });
-                              _timer?.cancel();
-                              _timer = Timer(Duration(milliseconds: 700), () {
-                                setState(() {
-                                  didSwitchAnimation = !didSwitchAnimation;
-                                });
-                              });
-                            },
+                            });
+                          },
+                        ),
+                        BabelText(
+                          widget.payYearly,
+                          style: TextStyle(
+                            fontSize: toggleFontSize,
+                            fontWeight: isYearly
+                                ? FontWeight.w600
+                                : FontWeight.w400,
                           ),
-                          BabelText(
-                            widget.payYearly,
-                            style: TextStyle(
-                              fontSize: toggleFontSize,
-                              fontWeight: isYearly
-                                  ? FontWeight.w600
-                                  : FontWeight.w400,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    SizedBox(height: isMobile ? 40 : spacing * 1.8),
-                    if (isMobile)
-                      Column(
-                        children: widget.pricesList.asMap().entries.map((
-                          entry,
-                        ) {
-                          final index = entry.key;
-                          final price = entry.value;
-                          final tileDec =
-                              price.decoration ??
-                              decoration.copyWith(
-                                border: price.emphasisText != null
-                                    ? Border.all(
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.primary,
-                                        width: 3,
-                                      )
-                                    : null,
-                              );
-                          return Padding(
-                            padding: EdgeInsets.only(bottom: 28),
-                            child: _buildPricingCard(
-                              context,
-                              index,
-                              price,
-                              tileDec,
-                              isMobile,
-                              fontSize,
-                              priceFontSize,
-                            ),
-                          );
-                        }).toList(),
-                      )
-                    else
-                      Stack(
-                        children: [
-                          Center(
-                            child: Padding(
-                              padding: EdgeInsets.only(top: 300),
-                              child: Transform.scale(
-                                scale: 1.14,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  spacing: 4,
-                                  children: List.generate(8, (index) => _row),
-                                ),
+                  ),
+                  SizedBox(height: isMobile ? 40 : spacing * 1.8),
+                  if (isMobile)
+                    Column(
+                      children: widget.pricesList.asMap().entries.map((entry) {
+                        final index = entry.key;
+                        final price = entry.value;
+                        final tileDec =
+                            price.decoration ??
+                            decoration.copyWith(
+                              border: price.emphasisText != null
+                                  ? Border.all(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
+                                      width: 3,
+                                    )
+                                  : null,
+                            );
+                        return Padding(
+                          padding: EdgeInsets.only(bottom: 28),
+                          child: _buildPricingCard(
+                            context,
+                            index,
+                            price,
+                            tileDec,
+                            isMobile,
+                            fontSize,
+                            priceFontSize,
+                          ),
+                        );
+                      }).toList(),
+                    )
+                  else
+                    Stack(
+                      children: [
+                        Center(
+                          child: Padding(
+                            padding: EdgeInsets.only(top: 300),
+                            child: Transform.scale(
+                              scale: 1.14,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                spacing: 4,
+                                children: List.generate(8, (index) => _row),
                               ),
                             ),
                           ),
-                          LayoutBuilder(
-                            builder: (context, constraints) {
-                              if (widget
-                                  .forceAllColumnsToHaveSameSizeInDesktop) {
-                                return IntrinsicHeight(
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
-                                    children: widget.pricesList
-                                        .asMap()
-                                        .entries
-                                        .map((entry) {
-                                          final index = entry.key;
-                                          final price = entry.value;
-                                          final tileDec =
-                                              price.decoration ??
-                                              decoration.copyWith(
-                                                border:
-                                                    price.emphasisText != null
-                                                    ? Border.all(
-                                                        color: Theme.of(
-                                                          context,
-                                                        ).colorScheme.primary,
-                                                        width: 5,
-                                                      )
-                                                    : null,
-                                              );
-                                          return Expanded(
-                                            child: Padding(
-                                              padding: EdgeInsets.only(
-                                                right:
-                                                    index <
-                                                        widget
-                                                                .pricesList
-                                                                .length -
-                                                            1
-                                                    ? spacing * 0.8
-                                                    : 0,
-                                              ),
-                                              child: _buildPricingCard(
-                                                context,
-                                                index,
-                                                price,
-                                                tileDec,
-                                                false,
-                                                fontSize,
-                                                priceFontSize,
-                                              ),
-                                            ),
-                                          );
-                                        })
-                                        .toList(),
-                                  ),
-                                );
-                              } else {
-                                return Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                        ),
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            if (widget.forceAllColumnsToHaveSameSizeInDesktop) {
+                              return IntrinsicHeight(
+                                child: Row(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
                                   children: widget.pricesList
                                       .asMap()
                                       .entries
@@ -338,18 +289,66 @@ class _PricingPageState extends State<PricingPage> {
                                         );
                                       })
                                       .toList(),
-                                );
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                  ],
-                ),
+                                ),
+                              );
+                            } else {
+                              return Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: widget.pricesList.asMap().entries.map(
+                                  (entry) {
+                                    final index = entry.key;
+                                    final price = entry.value;
+                                    final tileDec =
+                                        price.decoration ??
+                                        decoration.copyWith(
+                                          border: price.emphasisText != null
+                                              ? Border.all(
+                                                  color: Theme.of(
+                                                    context,
+                                                  ).colorScheme.primary,
+                                                  width: 5,
+                                                )
+                                              : null,
+                                        );
+                                    return Expanded(
+                                      child: Padding(
+                                        padding: EdgeInsets.only(
+                                          right:
+                                              index <
+                                                  widget.pricesList.length - 1
+                                              ? spacing * 0.8
+                                              : 0,
+                                        ),
+                                        child: _buildPricingCard(
+                                          context,
+                                          index,
+                                          price,
+                                          tileDec,
+                                          false,
+                                          fontSize,
+                                          priceFontSize,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ).toList(),
+                              );
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                ],
               ),
             ),
           ),
         );
+
+        if (!widget.enableScroll) {
+          return content;
+        }
+
+        return SingleChildScrollView(child: content);
       },
     );
   }
