@@ -330,6 +330,16 @@ class Endpoints extends _i1.EndpointDispatch {
                     newPassword: params['newPassword'],
                   ),
         ),
+        'hasAccount': _i1.MethodConnector(
+          name: 'hasAccount',
+          params: {},
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['emailIdp'] as _i2.EmailIdpEndpoint)
+                  .hasAccount(session),
+        ),
       },
     );
     connectors['googleIdp'] = _i1.EndpointConnector(
@@ -360,6 +370,16 @@ class Endpoints extends _i1.EndpointDispatch {
                     idToken: params['idToken'],
                     accessToken: params['accessToken'],
                   ),
+        ),
+        'hasAccount': _i1.MethodConnector(
+          name: 'hasAccount',
+          params: {},
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['googleIdp'] as _i3.GoogleIdpEndpoint)
+                  .hasAccount(session),
         ),
       },
     );

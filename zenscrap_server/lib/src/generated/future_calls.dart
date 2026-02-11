@@ -82,7 +82,10 @@ class FutureCalls extends _i1.FutureCallDispatch<_FutureCallRef> {
   }
 
   @override
-  void initialize(_i1.FutureCallManager futureCallManager, String serverId) {
+  void initialize(
+    _i1.FutureCallManager futureCallManager,
+    String serverId,
+  ) {
     var registeredFutureCalls = <String, _i1.FutureCall>{
       'PeriodicAutoFixBrokenScrappablesRunFutureCall':
           PeriodicAutoFixBrokenScrappablesRunFutureCall(),
@@ -113,29 +116,39 @@ class FutureCalls extends _i1.FutureCallDispatch<_FutureCallRef> {
   }
 
   @override
-  _FutureCallRef callAtTime(DateTime time, {String? identifier}) {
-    return _FutureCallRef((name, object) {
-      return _effectiveFutureCallManager.scheduleFutureCall(
-        name,
-        object,
-        time,
-        _effectiveServerId,
-        identifier,
-      );
-    });
+  _FutureCallRef callAtTime(
+    DateTime time, {
+    String? identifier,
+  }) {
+    return _FutureCallRef(
+      (name, object) {
+        return _effectiveFutureCallManager.scheduleFutureCall(
+          name,
+          object,
+          time,
+          _effectiveServerId,
+          identifier,
+        );
+      },
+    );
   }
 
   @override
-  _FutureCallRef callWithDelay(Duration delay, {String? identifier}) {
-    return _FutureCallRef((name, object) {
-      return _effectiveFutureCallManager.scheduleFutureCall(
-        name,
-        object,
-        DateTime.now().toUtc().add(delay),
-        _effectiveServerId,
-        identifier,
-      );
-    });
+  _FutureCallRef callWithDelay(
+    Duration delay, {
+    String? identifier,
+  }) {
+    return _FutureCallRef(
+      (name, object) {
+        return _effectiveFutureCallManager.scheduleFutureCall(
+          name,
+          object,
+          DateTime.now().toUtc().add(delay),
+          _effectiveServerId,
+          identifier,
+        );
+      },
+    );
   }
 
   @override
@@ -224,7 +237,10 @@ class _PeriodicCacheCleanupFutureCallDispatcher {
 
   Future<void> run([bool? _]) {
     var object = _i4.PeriodicCacheCleanupRunModel(_: _);
-    return _invokeFutureCall('PeriodicCacheCleanupRunFutureCall', object);
+    return _invokeFutureCall(
+      'PeriodicCacheCleanupRunFutureCall',
+      object,
+    );
   }
 }
 
@@ -263,7 +279,10 @@ class _SessionPromptFutureCallDispatcher {
   final _InvokeFutureCall _invokeFutureCall;
 
   Future<void> processPrompt(_i7.SessionPrompt object) {
-    return _invokeFutureCall('SessionPromptProcessPromptFutureCall', object);
+    return _invokeFutureCall(
+      'SessionPromptProcessPromptFutureCall',
+      object,
+    );
   }
 }
 
@@ -274,7 +293,10 @@ class _CleanupExpiredIpSpendingFutureCallDispatcher {
 
   Future<void> run([bool? _]) {
     var object = _i8.CleanupExpiredIpSpendingFutureCallRunModel(_: _);
-    return _invokeFutureCall('CleanupExpiredIpSpendingRunFutureCall', object);
+    return _invokeFutureCall(
+      'CleanupExpiredIpSpendingRunFutureCall',
+      object,
+    );
   }
 }
 
@@ -313,7 +335,10 @@ class _EmailIdpCleanupFutureCallDispatcher {
 
   Future<void> run([bool? _]) {
     var object = _i11.EmailIdpCleanupFutureCallRunModel(_: _);
-    return _invokeFutureCall('EmailIdpCleanupRunFutureCall', object);
+    return _invokeFutureCall(
+      'EmailIdpCleanupRunFutureCall',
+      object,
+    );
   }
 }
 
@@ -338,7 +363,10 @@ class PeriodicAutoFixBrokenScrappablesRunFutureCall
     _i2.PeriodicAutoFixBrokenScrappablesRunModel? object,
   ) async {
     if (object != null) {
-      await _i14.PeriodicAutoFixBrokenScrappables().run(session, object._);
+      await _i14.PeriodicAutoFixBrokenScrappables().run(
+        session,
+        object._,
+      );
     }
   }
 }
@@ -351,7 +379,10 @@ class PeriodicSetRequestsAnalyticsRunFutureCall
     _i3.PeriodicSetRequestsAnalyticsRunModel? object,
   ) async {
     if (object != null) {
-      await _i15.PeriodicSetRequestsAnalytics().run(session, object._);
+      await _i15.PeriodicSetRequestsAnalytics().run(
+        session,
+        object._,
+      );
     }
   }
 }
@@ -364,7 +395,10 @@ class PeriodicCacheCleanupRunFutureCall
     _i4.PeriodicCacheCleanupRunModel? object,
   ) async {
     if (object != null) {
-      await _i15.PeriodicCacheCleanup().run(session, object._);
+      await _i15.PeriodicCacheCleanup().run(
+        session,
+        object._,
+      );
     }
   }
 }
@@ -377,7 +411,10 @@ class PeriodicCleanupOldAnalyticsDetailsRunFutureCall
     _i5.PeriodicCleanupOldAnalyticsDetailsRunModel? object,
   ) async {
     if (object != null) {
-      await _i15.PeriodicCleanupOldAnalyticsDetails().run(session, object._);
+      await _i15.PeriodicCleanupOldAnalyticsDetails().run(
+        session,
+        object._,
+      );
     }
   }
 }
@@ -403,7 +440,10 @@ class SessionPromptProcessPromptFutureCall
     _i1.Session session,
     _i7.SessionPrompt? object,
   ) async {
-    await _i16.SessionPromptFutureCall().processPrompt(session, object!);
+    await _i16.SessionPromptFutureCall().processPrompt(
+      session,
+      object!,
+    );
   }
 }
 
@@ -415,7 +455,10 @@ class CleanupExpiredIpSpendingRunFutureCall
     _i8.CleanupExpiredIpSpendingFutureCallRunModel? object,
   ) async {
     if (object != null) {
-      await _i17.CleanupExpiredIpSpendingFutureCall().run(session, object._);
+      await _i17.CleanupExpiredIpSpendingFutureCall().run(
+        session,
+        object._,
+      );
     }
   }
 }
@@ -462,7 +505,10 @@ class EmailIdpCleanupRunFutureCall
     _i11.EmailIdpCleanupFutureCallRunModel? object,
   ) async {
     if (object != null) {
-      await _i20.EmailIdpCleanupFutureCall().run(session, object._);
+      await _i20.EmailIdpCleanupFutureCall().run(
+        session,
+        object._,
+      );
     }
   }
 }

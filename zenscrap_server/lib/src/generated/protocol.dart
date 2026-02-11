@@ -2461,7 +2461,10 @@ class Protocol extends _i1.SerializationManagerServer {
   }
 
   @override
-  T deserialize<T>(dynamic data, [Type? t]) {
+  T deserialize<T>(
+    dynamic data, [
+    Type? t,
+  ]) {
     t ??= T;
 
     final dataClassName = getClassNameFromObjectJson(data);
@@ -4003,11 +4006,16 @@ class Protocol extends _i1.SerializationManagerServer {
       case Map():
         return [
           for (var entry in obj.entries)
-            {'k': mapIfNeeded(entry.key), 'v': mapIfNeeded(entry.value)},
+            {
+              'k': mapIfNeeded(entry.key),
+              'v': mapIfNeeded(entry.value),
+            },
         ];
 
       case Iterable():
-        return [for (var e in obj) mapIfNeeded(e)];
+        return [
+          for (var e in obj) mapIfNeeded(e),
+        ];
     }
 
     return obj;

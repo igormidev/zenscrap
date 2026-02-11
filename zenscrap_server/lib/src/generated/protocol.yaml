@@ -6,8 +6,10 @@ emailIdp:
   - startPasswordReset:
   - verifyPasswordResetCode:
   - finishPasswordReset:
+  - hasAccount:
 googleIdp:
   - login:
+  - hasAccount:
 refreshJwtTokens:
   - refreshAccessToken:
 userProfile:
