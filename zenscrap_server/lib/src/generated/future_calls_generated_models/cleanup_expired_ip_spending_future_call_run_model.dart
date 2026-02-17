@@ -14,30 +14,31 @@ import 'package:serverpod/serverpod.dart' as _i1;
 
 abstract class CleanupExpiredIpSpendingFutureCallRunModel
     implements _i1.SerializableModel, _i1.ProtocolSerialization {
-  CleanupExpiredIpSpendingFutureCallRunModel._({required this._});
+  CleanupExpiredIpSpendingFutureCallRunModel._({required this.placeholder});
 
-  factory CleanupExpiredIpSpendingFutureCallRunModel({required bool? _}) =
-      _CleanupExpiredIpSpendingFutureCallRunModelImpl;
+  factory CleanupExpiredIpSpendingFutureCallRunModel({
+    required bool? placeholder,
+  }) = _CleanupExpiredIpSpendingFutureCallRunModelImpl;
 
   factory CleanupExpiredIpSpendingFutureCallRunModel.fromJson(
     Map<String, dynamic> jsonSerialization,
   ) {
     return CleanupExpiredIpSpendingFutureCallRunModel(
-      _: jsonSerialization['_'] as bool?,
+      placeholder: jsonSerialization['placeholder'] as bool?,
     );
   }
 
-  bool? _;
+  bool? placeholder;
 
   /// Returns a shallow copy of this [CleanupExpiredIpSpendingFutureCallRunModel]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
-  CleanupExpiredIpSpendingFutureCallRunModel copyWith({bool? _});
+  CleanupExpiredIpSpendingFutureCallRunModel copyWith({bool? placeholder});
   @override
   Map<String, dynamic> toJson() {
     return {
       '__className__': 'CleanupExpiredIpSpendingFutureCallRunModel',
-      if (_ != null) '_': _,
+      if (placeholder != null) 'placeholder': placeholder,
     };
   }
 
@@ -56,18 +57,18 @@ class _Undefined {}
 
 class _CleanupExpiredIpSpendingFutureCallRunModelImpl
     extends CleanupExpiredIpSpendingFutureCallRunModel {
-  _CleanupExpiredIpSpendingFutureCallRunModelImpl({required bool? _})
-    : super._(_: _);
+  _CleanupExpiredIpSpendingFutureCallRunModelImpl({required bool? placeholder})
+    : super._(placeholder: placeholder);
 
   /// Returns a shallow copy of this [CleanupExpiredIpSpendingFutureCallRunModel]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   @override
   CleanupExpiredIpSpendingFutureCallRunModel copyWith({
-    Object? _ = _Undefined,
+    Object? placeholder = _Undefined,
   }) {
     return CleanupExpiredIpSpendingFutureCallRunModel(
-      _: _ is bool? ? _ : this._,
+      placeholder: placeholder is bool? ? placeholder : this.placeholder,
     );
   }
 }

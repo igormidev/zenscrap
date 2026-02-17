@@ -7,7 +7,8 @@ import 'package:zenscrap_flutter/src/core/utils/talker.dart';
 /// PostHog configuration constants
 class PostHogConstants {
   /// PostHog API key
-  static const String apiKey = 'phc_ctZsxdHMUJjuLPTyjASz0vVzbbPvx3ov0VdqoY7D0vh';
+  static const String apiKey =
+      'phc_ctZsxdHMUJjuLPTyjASz0vVzbbPvx3ov0VdqoY7D0vh';
 
   /// PostHog API host
   static const String host = 'https://us.i.posthog.com';
@@ -87,10 +88,7 @@ class AnalyticsService {
   }) async {
     if (!_shouldLog) return;
     try {
-      await _posthog.capture(
-        eventName: eventName,
-        properties: properties,
-      );
+      await _posthog.capture(eventName: eventName, properties: properties);
     } catch (e, stackTrace) {
       // Log analytics error but don't throw - analytics should never break the app
       logError(
@@ -112,10 +110,7 @@ class AnalyticsService {
   }) async {
     if (!_shouldLog) return;
     try {
-      await _posthog.identify(
-        userId: userId,
-        userProperties: userProperties,
-      );
+      await _posthog.identify(userId: userId, userProperties: userProperties);
     } catch (e, stackTrace) {
       // Log analytics error but don't throw - analytics should never break the app
       logError(
@@ -137,11 +132,7 @@ class AnalyticsService {
       await _posthog.reset();
     } catch (e, stackTrace) {
       // Log analytics error but don't throw - analytics should never break the app
-      logError(
-        e,
-        stackTrace,
-        'Analytics reset failed',
-      );
+      logError(e, stackTrace, 'Analytics reset failed');
     }
   }
 
@@ -156,11 +147,7 @@ class AnalyticsService {
       await _posthog.flush();
     } catch (e, stackTrace) {
       // Log analytics error but don't throw - analytics should never break the app
-      logError(
-        e,
-        stackTrace,
-        'Analytics flush failed',
-      );
+      logError(e, stackTrace, 'Analytics flush failed');
     }
   }
 
@@ -172,16 +159,12 @@ class AnalyticsService {
   Future<void> trackAuthLoginViewed() async {
     await _safeCapture(
       eventName: 'auth:login_form_view',
-      properties: {
-        'timestamp': DateTime.now().toIso8601String(),
-      },
+      properties: {'timestamp': DateTime.now().toIso8601String()},
     );
   }
 
   /// Track when user attempts to log in
-  Future<void> trackAuthLoginAttempt({
-    required String email,
-  }) async {
+  Future<void> trackAuthLoginAttempt({required String email}) async {
     await _safeCapture(
       eventName: 'auth:login_form_submit',
       properties: {
@@ -235,9 +218,7 @@ class AnalyticsService {
   Future<void> trackAuthSignUpViewed() async {
     await _safeCapture(
       eventName: 'auth:signup_form_view',
-      properties: {
-        'timestamp': DateTime.now().toIso8601String(),
-      },
+      properties: {'timestamp': DateTime.now().toIso8601String()},
     );
   }
 
@@ -290,16 +271,12 @@ class AnalyticsService {
   Future<void> trackAuthPasswordResetViewed() async {
     await _safeCapture(
       eventName: 'auth:password_reset_form_view',
-      properties: {
-        'timestamp': DateTime.now().toIso8601String(),
-      },
+      properties: {'timestamp': DateTime.now().toIso8601String()},
     );
   }
 
   /// Track when user initiates password reset
-  Future<void> trackAuthPasswordResetInitiate({
-    required String email,
-  }) async {
+  Future<void> trackAuthPasswordResetInitiate({required String email}) async {
     await _safeCapture(
       eventName: 'auth:password_reset_initiate',
       properties: {
@@ -310,9 +287,7 @@ class AnalyticsService {
   }
 
   /// Track successful password reset code sent
-  Future<void> trackAuthPasswordResetCodeSent({
-    required String email,
-  }) async {
+  Future<void> trackAuthPasswordResetCodeSent({required String email}) async {
     await _safeCapture(
       eventName: 'auth:password_reset_code_sent',
       properties: {
@@ -351,9 +326,7 @@ class AnalyticsService {
   }
 
   /// Track successful password reset completion
-  Future<void> trackAuthPasswordResetComplete({
-    required String email,
-  }) async {
+  Future<void> trackAuthPasswordResetComplete({required String email}) async {
     await _safeCapture(
       eventName: 'auth:password_reset_complete',
       properties: {
@@ -364,9 +337,7 @@ class AnalyticsService {
   }
 
   /// Track email confirmation view
-  Future<void> trackAuthEmailConfirmationViewed({
-    required String email,
-  }) async {
+  Future<void> trackAuthEmailConfirmationViewed({required String email}) async {
     await _safeCapture(
       eventName: 'auth:email_confirmation_view',
       properties: {
@@ -390,9 +361,7 @@ class AnalyticsService {
   }
 
   /// Track when user logs out
-  Future<void> trackAuthLogout({
-    required String email,
-  }) async {
+  Future<void> trackAuthLogout({required String email}) async {
     await _safeCapture(
       eventName: 'auth:logout',
       properties: {
@@ -413,9 +382,7 @@ class AnalyticsService {
   Future<void> trackPricingPageView() async {
     await _safeCapture(
       eventName: 'pricing:page_view',
-      properties: {
-        'timestamp': DateTime.now().toIso8601String(),
-      },
+      properties: {'timestamp': DateTime.now().toIso8601String()},
     );
   }
 
@@ -525,9 +492,7 @@ class AnalyticsService {
   Future<void> trackAccountProfileImageChangeClick() async {
     await _safeCapture(
       eventName: 'account:profile_image_change_click',
-      properties: {
-        'timestamp': DateTime.now().toIso8601String(),
-      },
+      properties: {'timestamp': DateTime.now().toIso8601String()},
     );
   }
 
@@ -535,9 +500,7 @@ class AnalyticsService {
   Future<void> trackAccountProfileImageChangeSuccess() async {
     await _safeCapture(
       eventName: 'account:profile_image_change_success',
-      properties: {
-        'timestamp': DateTime.now().toIso8601String(),
-      },
+      properties: {'timestamp': DateTime.now().toIso8601String()},
     );
   }
 
@@ -573,9 +536,7 @@ class AnalyticsService {
   Future<void> trackAccountContactSupportClick() async {
     await _safeCapture(
       eventName: 'account:contact_support_click',
-      properties: {
-        'timestamp': DateTime.now().toIso8601String(),
-      },
+      properties: {'timestamp': DateTime.now().toIso8601String()},
     );
   }
 
@@ -615,9 +576,7 @@ class AnalyticsService {
   Future<void> trackScrappableUrlInputStart() async {
     await _safeCapture(
       eventName: 'scrappable:url_input_start',
-      properties: {
-        'timestamp': DateTime.now().toIso8601String(),
-      },
+      properties: {'timestamp': DateTime.now().toIso8601String()},
     );
   }
 
@@ -625,9 +584,7 @@ class AnalyticsService {
   Future<void> trackScrappablePromptInputStart() async {
     await _safeCapture(
       eventName: 'scrappable:prompt_input_start',
-      properties: {
-        'timestamp': DateTime.now().toIso8601String(),
-      },
+      properties: {'timestamp': DateTime.now().toIso8601String()},
     );
   }
 
@@ -680,9 +637,7 @@ class AnalyticsService {
   Future<void> trackScrappableCreationLoginClick() async {
     await _safeCapture(
       eventName: 'scrappable:creation_login_click',
-      properties: {
-        'timestamp': DateTime.now().toIso8601String(),
-      },
+      properties: {'timestamp': DateTime.now().toIso8601String()},
     );
   }
 
@@ -759,9 +714,7 @@ class AnalyticsService {
   }
 
   /// Track when user copies CURL command
-  Future<void> trackScrappableCurlCopy({
-    required int scrappableId,
-  }) async {
+  Future<void> trackScrappableCurlCopy({required int scrappableId}) async {
     await _safeCapture(
       eventName: 'scrappable:curl_copy',
       properties: {
@@ -862,9 +815,7 @@ class AnalyticsService {
   }
 
   /// Track when user navigates back
-  Future<void> trackScrappableGoBack({
-    required int scrappableId,
-  }) async {
+  Future<void> trackScrappableGoBack({required int scrappableId}) async {
     await _safeCapture(
       eventName: 'scrappable:go_back',
       properties: {
@@ -912,9 +863,7 @@ class AnalyticsService {
   Future<void> trackUserScrappablesCreateNewClick() async {
     await _safeCapture(
       eventName: 'user_scrappables:create_new_click',
-      properties: {
-        'timestamp': DateTime.now().toIso8601String(),
-      },
+      properties: {'timestamp': DateTime.now().toIso8601String()},
     );
   }
 
@@ -952,9 +901,7 @@ class AnalyticsService {
   Future<void> trackUserScrappablesSearchClear() async {
     await _safeCapture(
       eventName: 'user_scrappables:search_clear',
-      properties: {
-        'timestamp': DateTime.now().toIso8601String(),
-      },
+      properties: {'timestamp': DateTime.now().toIso8601String()},
     );
   }
 
@@ -1028,9 +975,7 @@ class AnalyticsService {
   Future<void> trackMarketplaceRefreshClick() async {
     await _safeCapture(
       eventName: 'marketplace:refresh_click',
-      properties: {
-        'timestamp': DateTime.now().toIso8601String(),
-      },
+      properties: {'timestamp': DateTime.now().toIso8601String()},
     );
   }
 
@@ -1053,9 +998,7 @@ class AnalyticsService {
   Future<void> trackMarketplaceSearchClear() async {
     await _safeCapture(
       eventName: 'marketplace:search_clear',
-      properties: {
-        'timestamp': DateTime.now().toIso8601String(),
-      },
+      properties: {'timestamp': DateTime.now().toIso8601String()},
     );
   }
 
@@ -1148,9 +1091,7 @@ class AnalyticsService {
   Future<void> trackApiUsageRefreshClick() async {
     await _safeCapture(
       eventName: 'api_usage:refresh_click',
-      properties: {
-        'timestamp': DateTime.now().toIso8601String(),
-      },
+      properties: {'timestamp': DateTime.now().toIso8601String()},
     );
   }
 
@@ -1173,9 +1114,7 @@ class AnalyticsService {
   Future<void> trackApiUsageCreateApiKeyClick() async {
     await _safeCapture(
       eventName: 'api_usage:create_api_key_click',
-      properties: {
-        'timestamp': DateTime.now().toIso8601String(),
-      },
+      properties: {'timestamp': DateTime.now().toIso8601String()},
     );
   }
 
@@ -1209,9 +1148,7 @@ class AnalyticsService {
   }
 
   /// Track when user copies API key from success dialog
-  Future<void> trackApiUsageCopyApiKeyDialog({
-    required int keyId,
-  }) async {
+  Future<void> trackApiUsageCopyApiKeyDialog({required int keyId}) async {
     await _safeCapture(
       eventName: 'api_usage:copy_api_key_dialog',
       properties: {
@@ -1267,9 +1204,7 @@ class AnalyticsService {
   }
 
   /// Track when user cancels API key deactivation
-  Future<void> trackApiUsageDeactivateApiKeyCancel({
-    required int keyId,
-  }) async {
+  Future<void> trackApiUsageDeactivateApiKeyCancel({required int keyId}) async {
     await _safeCapture(
       eventName: 'api_usage:deactivate_api_key_cancel',
       properties: {
@@ -1295,9 +1230,7 @@ class AnalyticsService {
   }
 
   /// Track when user copies account ID
-  Future<void> trackApiUsageCopyAccountId({
-    required String accountId,
-  }) async {
+  Future<void> trackApiUsageCopyAccountId({required String accountId}) async {
     await _safeCapture(
       eventName: 'api_usage:copy_account_id',
       properties: {
@@ -1778,13 +1711,11 @@ class AnalyticsService {
   Future<void> trackCreateScrappableIpLimitTryAgainClick() async {
     await _safeCapture(
       eventName: 'create_scrappable:ip_limit_try_again_click',
-      properties: {
-        'timestamp': DateTime.now().toIso8601String(),
-      },
+      properties: {'timestamp': DateTime.now().toIso8601String()},
     );
   }
 
-// ========================================
+  // ========================================
   // Suspicious IP Block Events
   // ========================================
 
@@ -1820,9 +1751,7 @@ class AnalyticsService {
   Future<void> trackSuspiciousIpTryAgainClick() async {
     await _safeCapture(
       eventName: 'suspicious_ip:try_again_click',
-      properties: {
-        'timestamp': DateTime.now().toIso8601String(),
-      },
+      properties: {'timestamp': DateTime.now().toIso8601String()},
     );
   }
 
@@ -1943,7 +1872,10 @@ class AnalyticsService {
     required int scrappableId,
     required String errorType,
     required int messageCount,
+    required int attemptNumber,
     required bool isFirstResponse,
+    required bool hasReceivedExtractRule,
+    required String errorReasonCode,
     String? errorMessage,
     String? errorTitle,
     String? errorDescription,
@@ -1954,7 +1886,10 @@ class AnalyticsService {
         'scrappable_id': scrappableId,
         'error_type': errorType,
         'message_count': messageCount,
+        'attempt_number': attemptNumber,
         'is_first_response': isFirstResponse,
+        'has_received_extract_rule': hasReceivedExtractRule,
+        'error_reason_code': errorReasonCode,
         if (errorMessage != null) 'error_message': errorMessage,
         if (errorTitle != null) 'error_title': errorTitle,
         if (errorDescription != null) 'error_description': errorDescription,
@@ -1993,6 +1928,9 @@ class AnalyticsService {
     required int scrappableId,
     required String errorType,
     required int messageCount,
+    required int attemptNumber,
+    required bool hasReceivedExtractRule,
+    required String errorReasonCode,
     String? errorMessage,
     String? errorTitle,
     String? errorDescription,
@@ -2003,6 +1941,9 @@ class AnalyticsService {
         'scrappable_id': scrappableId,
         'error_type': errorType,
         'message_count': messageCount,
+        'attempt_number': attemptNumber,
+        'has_received_extract_rule': hasReceivedExtractRule,
+        'error_reason_code': errorReasonCode,
         if (errorMessage != null) 'error_message': errorMessage,
         if (errorTitle != null) 'error_title': errorTitle,
         if (errorDescription != null) 'error_description': errorDescription,
@@ -2051,9 +1992,7 @@ class AnalyticsService {
   Future<void> trackLandingPageView() async {
     await _safeCapture(
       eventName: 'landing:page_view',
-      properties: {
-        'timestamp': DateTime.now().toIso8601String(),
-      },
+      properties: {'timestamp': DateTime.now().toIso8601String()},
     );
   }
 
@@ -2243,10 +2182,7 @@ class AnalyticsService {
       if (properties != null) ...properties,
       'timestamp': DateTime.now().toIso8601String(),
     };
-    await _safeCapture(
-      eventName: eventName,
-      properties: eventProps,
-    );
+    await _safeCapture(eventName: eventName, properties: eventProps);
   }
 
   /// Identify a user in PostHog
@@ -2254,10 +2190,7 @@ class AnalyticsService {
     required String userId,
     Map<String, Object>? userProperties,
   }) async {
-    await _safeIdentify(
-      userId: userId,
-      userProperties: userProperties,
-    );
+    await _safeIdentify(userId: userId, userProperties: userProperties);
   }
 
   /// Reset user identification (call on logout)

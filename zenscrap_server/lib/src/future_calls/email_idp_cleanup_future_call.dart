@@ -17,7 +17,7 @@ class EmailIdpCleanupFutureCall extends FutureCall {
   static const Duration _cleanupInterval = Duration(days: 1);
   static const Duration _failedLoginAttemptsMaxAge = Duration(days: 30);
 
-  Future<void> run(Session session, [bool? _]) async {
+  Future<void> run(Session session, [bool? placeholder]) async {
     session.log('Starting Email IDP cleanup...');
 
     try {

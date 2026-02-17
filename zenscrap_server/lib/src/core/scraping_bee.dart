@@ -70,19 +70,24 @@ class ExtractFullDataByRule {
 
 /// Low-level client that wraps the ScrapingBee REST API.
 class ScrapingBeeClient {
-  ScrapingBeeClient({required this.apiKey, Dio? dio})
-    : _dio =
-          dio ??
-          Dio(
-            BaseOptions(
-              baseUrl: _baseUrl,
-              connectTimeout: const Duration(seconds: 30),
-              receiveTimeout: const Duration(seconds: 60),
-            ),
-          );
+  ScrapingBeeClient({
+    required this.apiKey,
+    Dio? dio,
+    int defaultRequestTimeoutMs = 140000,
+  }) : _defaultRequestTimeoutMs = defaultRequestTimeoutMs,
+       _dio =
+           dio ??
+           Dio(
+             BaseOptions(
+               baseUrl: _baseUrl,
+               connectTimeout: const Duration(seconds: 30),
+               receiveTimeout: const Duration(seconds: 180),
+             ),
+           );
 
   final String apiKey;
   final Dio _dio;
+  final int _defaultRequestTimeoutMs;
 
   static const String _baseUrl = 'https://app.scrapingbee.com/api/v1/';
 
@@ -172,6 +177,7 @@ class ScrapingBeeClient {
     required String? country_code,
     required String? session_id,
     required bool? custom_google,
+    int? timeout,
     bool jsonResponse = true,
     bool includeScreenshot = false,
   }) {
@@ -181,6 +187,7 @@ class ScrapingBeeClient {
       'extract_rules': extract_rules,
       'json_response': jsonResponse ? 'true' : 'false',
       'render_js': render_js ? 'true' : 'false',
+      'timeout': (timeout ?? _defaultRequestTimeoutMs).toString(),
     };
 
     if (includeScreenshot) {
@@ -290,7 +297,7 @@ class ScrapingBeeClient {
       }
     } on DioException catch (e) {
       return ExtractDataByRule.error(
-        errorMessage: 'ScrapingBee network error: ${e.message}',
+        errorMessage: _mapDioExceptionToScrapingBeeError(e),
       );
     }
   }
@@ -382,8 +389,25 @@ class ScrapingBeeClient {
       }
     } on DioException catch (e) {
       return ExtractFullDataByRule.error(
-        errorMessage: 'ScrapingBee network error: ${e.message}',
+        errorMessage: _mapDioExceptionToScrapingBeeError(e),
       );
+    }
+  }
+
+  String _mapDioExceptionToScrapingBeeError(DioException e) {
+    final message = e.message ?? 'Unknown network error';
+    switch (e.type) {
+      case DioExceptionType.connectionTimeout:
+      case DioExceptionType.sendTimeout:
+      case DioExceptionType.receiveTimeout:
+        return 'ScrapingBee timeout error: $message';
+      case DioExceptionType.connectionError:
+      case DioExceptionType.badCertificate:
+      case DioExceptionType.cancel:
+      case DioExceptionType.unknown:
+        return 'ScrapingBee network error: $message';
+      case DioExceptionType.badResponse:
+        return 'ScrapingBee API response error: $message';
     }
   }
 
@@ -393,17 +417,30 @@ class ScrapingBeeClient {
   ) {
     try {
       final data = response.data;
+      final statusCode = response.statusCode;
+      final isTimeoutLike = statusCode == 408 || statusCode == 504;
+
       if (data is String) {
-        return onError(
-          'ScrapingBee API error: $data (Status: ${response.statusCode})',
-        );
+        if (isTimeoutLike) {
+          return onError(
+            'ScrapingBee timeout error: $data (Status: $statusCode)',
+          );
+        }
+        return onError('ScrapingBee API error: $data (Status: $statusCode)');
       }
       if (data is Map<String, dynamic>) {
-        return onError(
-          'ScrapingBee API error: ${data['message'] ?? data} (Status: ${response.statusCode})',
-        );
+        final message = data['message'] ?? data;
+        if (isTimeoutLike) {
+          return onError(
+            'ScrapingBee timeout error: $message (Status: $statusCode)',
+          );
+        }
+        return onError('ScrapingBee API error: $message (Status: $statusCode)');
       }
-      return onError('ScrapingBee API error (Status: ${response.statusCode})');
+      if (isTimeoutLike) {
+        return onError('ScrapingBee timeout error (Status: $statusCode)');
+      }
+      return onError('ScrapingBee API error (Status: $statusCode)');
     } catch (_) {
       return onError('ScrapingBee API error (Status: ${response.statusCode})');
     }

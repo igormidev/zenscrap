@@ -207,8 +207,10 @@ class _PeriodicAutoFixBrokenScrappablesFutureCallDispatcher {
 
   final _InvokeFutureCall _invokeFutureCall;
 
-  Future<void> run([bool? _]) {
-    var object = _i2.PeriodicAutoFixBrokenScrappablesRunModel(_: _);
+  Future<void> run([bool? placeholder]) {
+    var object = _i2.PeriodicAutoFixBrokenScrappablesRunModel(
+      placeholder: placeholder,
+    );
     return _invokeFutureCall(
       'PeriodicAutoFixBrokenScrappablesRunFutureCall',
       object,
@@ -221,8 +223,10 @@ class _PeriodicSetRequestsAnalyticsFutureCallDispatcher {
 
   final _InvokeFutureCall _invokeFutureCall;
 
-  Future<void> run([bool? _]) {
-    var object = _i3.PeriodicSetRequestsAnalyticsRunModel(_: _);
+  Future<void> run([bool? placeholder]) {
+    var object = _i3.PeriodicSetRequestsAnalyticsRunModel(
+      placeholder: placeholder,
+    );
     return _invokeFutureCall(
       'PeriodicSetRequestsAnalyticsRunFutureCall',
       object,
@@ -235,8 +239,8 @@ class _PeriodicCacheCleanupFutureCallDispatcher {
 
   final _InvokeFutureCall _invokeFutureCall;
 
-  Future<void> run([bool? _]) {
-    var object = _i4.PeriodicCacheCleanupRunModel(_: _);
+  Future<void> run([bool? placeholder]) {
+    var object = _i4.PeriodicCacheCleanupRunModel(placeholder: placeholder);
     return _invokeFutureCall(
       'PeriodicCacheCleanupRunFutureCall',
       object,
@@ -251,8 +255,10 @@ class _PeriodicCleanupOldAnalyticsDetailsFutureCallDispatcher {
 
   final _InvokeFutureCall _invokeFutureCall;
 
-  Future<void> run([bool? _]) {
-    var object = _i5.PeriodicCleanupOldAnalyticsDetailsRunModel(_: _);
+  Future<void> run([bool? placeholder]) {
+    var object = _i5.PeriodicCleanupOldAnalyticsDetailsRunModel(
+      placeholder: placeholder,
+    );
     return _invokeFutureCall(
       'PeriodicCleanupOldAnalyticsDetailsRunFutureCall',
       object,
@@ -291,8 +297,10 @@ class _CleanupExpiredIpSpendingFutureCallDispatcher {
 
   final _InvokeFutureCall _invokeFutureCall;
 
-  Future<void> run([bool? _]) {
-    var object = _i8.CleanupExpiredIpSpendingFutureCallRunModel(_: _);
+  Future<void> run([bool? placeholder]) {
+    var object = _i8.CleanupExpiredIpSpendingFutureCallRunModel(
+      placeholder: placeholder,
+    );
     return _invokeFutureCall(
       'CleanupExpiredIpSpendingRunFutureCall',
       object,
@@ -305,8 +313,10 @@ class _CleanupExpiredIpValidationCacheFutureCallDispatcher {
 
   final _InvokeFutureCall _invokeFutureCall;
 
-  Future<void> run([bool? _]) {
-    var object = _i9.CleanupExpiredIpValidationCacheFutureCallRunModel(_: _);
+  Future<void> run([bool? placeholder]) {
+    var object = _i9.CleanupExpiredIpValidationCacheFutureCallRunModel(
+      placeholder: placeholder,
+    );
     return _invokeFutureCall(
       'CleanupExpiredIpValidationCacheRunFutureCall',
       object,
@@ -319,8 +329,10 @@ class _CleanupExpiredPendingCommitsFutureCallDispatcher {
 
   final _InvokeFutureCall _invokeFutureCall;
 
-  Future<void> run([bool? _]) {
-    var object = _i10.CleanupExpiredPendingCommitsFutureCallRunModel(_: _);
+  Future<void> run([bool? placeholder]) {
+    var object = _i10.CleanupExpiredPendingCommitsFutureCallRunModel(
+      placeholder: placeholder,
+    );
     return _invokeFutureCall(
       'CleanupExpiredPendingCommitsRunFutureCall',
       object,
@@ -333,8 +345,10 @@ class _EmailIdpCleanupFutureCallDispatcher {
 
   final _InvokeFutureCall _invokeFutureCall;
 
-  Future<void> run([bool? _]) {
-    var object = _i11.EmailIdpCleanupFutureCallRunModel(_: _);
+  Future<void> run([bool? placeholder]) {
+    var object = _i11.EmailIdpCleanupFutureCallRunModel(
+      placeholder: placeholder,
+    );
     return _invokeFutureCall(
       'EmailIdpCleanupRunFutureCall',
       object,
@@ -365,7 +379,7 @@ class PeriodicAutoFixBrokenScrappablesRunFutureCall
     if (object != null) {
       await _i14.PeriodicAutoFixBrokenScrappables().run(
         session,
-        object._,
+        object.placeholder,
       );
     }
   }
@@ -381,7 +395,7 @@ class PeriodicSetRequestsAnalyticsRunFutureCall
     if (object != null) {
       await _i15.PeriodicSetRequestsAnalytics().run(
         session,
-        object._,
+        object.placeholder,
       );
     }
   }
@@ -397,7 +411,7 @@ class PeriodicCacheCleanupRunFutureCall
     if (object != null) {
       await _i15.PeriodicCacheCleanup().run(
         session,
-        object._,
+        object.placeholder,
       );
     }
   }
@@ -413,7 +427,7 @@ class PeriodicCleanupOldAnalyticsDetailsRunFutureCall
     if (object != null) {
       await _i15.PeriodicCleanupOldAnalyticsDetails().run(
         session,
-        object._,
+        object.placeholder,
       );
     }
   }
@@ -457,7 +471,7 @@ class CleanupExpiredIpSpendingRunFutureCall
     if (object != null) {
       await _i17.CleanupExpiredIpSpendingFutureCall().run(
         session,
-        object._,
+        object.placeholder,
       );
     }
   }
@@ -474,7 +488,7 @@ class CleanupExpiredIpValidationCacheRunFutureCall
     if (object != null) {
       await _i18.CleanupExpiredIpValidationCacheFutureCall().run(
         session,
-        object._,
+        object.placeholder,
       );
     }
   }
@@ -491,7 +505,7 @@ class CleanupExpiredPendingCommitsRunFutureCall
     if (object != null) {
       await _i19.CleanupExpiredPendingCommitsFutureCall().run(
         session,
-        object._,
+        object.placeholder,
       );
     }
   }
@@ -507,7 +521,7 @@ class EmailIdpCleanupRunFutureCall
     if (object != null) {
       await _i20.EmailIdpCleanupFutureCall().run(
         session,
-        object._,
+        object.placeholder,
       );
     }
   }

@@ -13,7 +13,7 @@ class CleanupExpiredIpSpendingFutureCall extends FutureCall {
   static const String callName = 'cleanup_expired_ip_spending';
   static const Duration _cleanupInterval = Duration(hours: 1);
 
-  Future<void> run(Session session, [bool? _]) async {
+  Future<void> run(Session session, [bool? placeholder]) async {
     try {
       // Find all IP spending records that are older than the reset duration
       final expiryThreshold = DateTime.now().subtract(

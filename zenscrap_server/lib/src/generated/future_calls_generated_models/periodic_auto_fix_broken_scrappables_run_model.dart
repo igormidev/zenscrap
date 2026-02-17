@@ -14,30 +14,31 @@ import 'package:serverpod/serverpod.dart' as _i1;
 
 abstract class PeriodicAutoFixBrokenScrappablesRunModel
     implements _i1.SerializableModel, _i1.ProtocolSerialization {
-  PeriodicAutoFixBrokenScrappablesRunModel._({required this._});
+  PeriodicAutoFixBrokenScrappablesRunModel._({required this.placeholder});
 
-  factory PeriodicAutoFixBrokenScrappablesRunModel({required bool? _}) =
-      _PeriodicAutoFixBrokenScrappablesRunModelImpl;
+  factory PeriodicAutoFixBrokenScrappablesRunModel({
+    required bool? placeholder,
+  }) = _PeriodicAutoFixBrokenScrappablesRunModelImpl;
 
   factory PeriodicAutoFixBrokenScrappablesRunModel.fromJson(
     Map<String, dynamic> jsonSerialization,
   ) {
     return PeriodicAutoFixBrokenScrappablesRunModel(
-      _: jsonSerialization['_'] as bool?,
+      placeholder: jsonSerialization['placeholder'] as bool?,
     );
   }
 
-  bool? _;
+  bool? placeholder;
 
   /// Returns a shallow copy of this [PeriodicAutoFixBrokenScrappablesRunModel]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
-  PeriodicAutoFixBrokenScrappablesRunModel copyWith({bool? _});
+  PeriodicAutoFixBrokenScrappablesRunModel copyWith({bool? placeholder});
   @override
   Map<String, dynamic> toJson() {
     return {
       '__className__': 'PeriodicAutoFixBrokenScrappablesRunModel',
-      if (_ != null) '_': _,
+      if (placeholder != null) 'placeholder': placeholder,
     };
   }
 
@@ -56,14 +57,18 @@ class _Undefined {}
 
 class _PeriodicAutoFixBrokenScrappablesRunModelImpl
     extends PeriodicAutoFixBrokenScrappablesRunModel {
-  _PeriodicAutoFixBrokenScrappablesRunModelImpl({required bool? _})
-    : super._(_: _);
+  _PeriodicAutoFixBrokenScrappablesRunModelImpl({required bool? placeholder})
+    : super._(placeholder: placeholder);
 
   /// Returns a shallow copy of this [PeriodicAutoFixBrokenScrappablesRunModel]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   @override
-  PeriodicAutoFixBrokenScrappablesRunModel copyWith({Object? _ = _Undefined}) {
-    return PeriodicAutoFixBrokenScrappablesRunModel(_: _ is bool? ? _ : this._);
+  PeriodicAutoFixBrokenScrappablesRunModel copyWith({
+    Object? placeholder = _Undefined,
+  }) {
+    return PeriodicAutoFixBrokenScrappablesRunModel(
+      placeholder: placeholder is bool? ? placeholder : this.placeholder,
+    );
   }
 }

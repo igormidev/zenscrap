@@ -16,6 +16,10 @@ const _openAiResponsesUrl = 'https://api.openai.com/v1/responses';
 const _openAiFilesUrl = 'https://api.openai.com/v1/files';
 const _openAiVectorStoresUrl = 'https://api.openai.com/v1/vector_stores';
 
+const _maxSendMessageAttempts = 3;
+const _historyNormalTokenBudget = 70000;
+const _historyAggressiveTokenBudget = 30000;
+
 /// Exception thrown when the OpenAI API returns an `insufficient_quota` error.
 /// This means the API key being used has run out of credits on OpenAI's side.
 ///
@@ -366,7 +370,10 @@ class ChatControllerOpenAiSdkImpl extends IChatController
     required StreamController<String> thinkingStream,
     required SupportedLanguage language,
   }) async {
+    final originalUserPrompt = userPrompt;
     var attemptPrompt = userPrompt;
+    var attempt = 1;
+    var didContextOverflowRecovery = false;
 
     // Track total cost across all retry attempts
     var totalInputTokens = 0;
@@ -374,7 +381,7 @@ class ChatControllerOpenAiSdkImpl extends IChatController
     var totalReasoningTokens = 0;
     var totalCostUsd = 0.0;
 
-    for (var attempt = 1; attempt <= 3; attempt++) {
+    while (attempt <= _maxSendMessageAttempts) {
       try {
         final result = await _streamOpenAiResponse(
           session: session,
@@ -388,11 +395,52 @@ class ChatControllerOpenAiSdkImpl extends IChatController
         totalReasoningTokens += result.usage.reasoningTokens;
         totalCostUsd += _calculateCostUsd(result.usage);
 
-        _history.add(OpenAiMessage(role: 'user', content: attemptPrompt));
-        final rawJson = result.rawJson ?? _serializeStructured(result.response);
-        _history.add(
-          OpenAiMessage(role: 'assistant', content: jsonEncode(rawJson)),
-        );
+        if (result.validationReason != null) {
+          final reason = result.validationReason!;
+          final reasonCode = reason.code;
+          final rawValidationError = result.validationErrorDescription ?? 'n/a';
+
+          session.log(
+            'Structured response validation failed on attempt $attempt/$_maxSendMessageAttempts: '
+            'reason=$reasonCode, detail="$rawValidationError"',
+            level: LogLevel.warning,
+          );
+
+          if (attempt < _maxSendMessageAttempts) {
+            attemptPrompt = buildSchemaRepairRetryPrompt(
+              reason: reason,
+              invalidResponse: result.rawJson,
+              originalUserPrompt: originalUserPrompt,
+              attemptNumber: attempt + 1,
+            );
+
+            thinkingStream.add(
+              '\n[System] Retrying due to invalid response format ($reasonCode)...\n',
+            );
+            attempt++;
+            continue;
+          }
+
+          session.log(
+            'Structured response validation retries exhausted: reason=$reasonCode',
+            level: LogLevel.error,
+          );
+
+          chatSeason.add(
+            ErrorTextResponse(
+              role: PromptRole.system,
+              expectsFollowUp: false,
+              errorMessage: getErrorDescription('chat_parse_error', language),
+            ),
+          );
+
+          return SendMessageResult(
+            costInUsd: totalCostUsd,
+            inputTokens: totalInputTokens,
+            outputTokens: totalOutputTokens,
+            reasoningTokens: totalReasoningTokens,
+          );
+        }
 
         final retryContent = await handleSendMessage(
           session: session,
@@ -407,6 +455,12 @@ class ChatControllerOpenAiSdkImpl extends IChatController
         );
 
         if (retryContent == null) {
+          _appendStableTurnToHistory(
+            originalUserPrompt: originalUserPrompt,
+            response: result.response,
+            rawJson: result.rawJson,
+          );
+
           // Success - return accumulated cost
           session.log(
             'Message completed. Total cost: \$$totalCostUsd (input: $totalInputTokens, output: $totalOutputTokens, reasoning: $totalReasoningTokens)',
@@ -421,7 +475,32 @@ class ChatControllerOpenAiSdkImpl extends IChatController
         }
 
         attemptPrompt = retryContent;
+        attempt++;
       } catch (error, stackTrace) {
+        if (_isContextLengthExceededError(error) &&
+            !didContextOverflowRecovery) {
+          didContextOverflowRecovery = true;
+          final trimResult = _trimHistoryForBudget(
+            session: session,
+            pendingUserPrompt: attemptPrompt,
+            aggressive: true,
+            reason: 'context_length_exceeded',
+          );
+          session.log(
+            'OpenAI context overflow detected. '
+            'Retrying once after aggressive trim. '
+            'droppedTurns=${trimResult.droppedTurns}, '
+            'droppedMessages=${trimResult.droppedMessages}, '
+            'estimatedTokensBefore=${trimResult.estimatedTokensBefore}, '
+            'estimatedTokensAfter=${trimResult.estimatedTokensAfter}',
+            level: LogLevel.warning,
+          );
+          thinkingStream.add(
+            '\n[System] Context was trimmed after overflow. Retrying...\n',
+          );
+          continue;
+        }
+
         session.log(
           'OpenAI streaming failed (attempt $attempt)',
           exception: error,
@@ -462,6 +541,108 @@ class ChatControllerOpenAiSdkImpl extends IChatController
     );
   }
 
+  void _appendStableTurnToHistory({
+    required String originalUserPrompt,
+    required WebScrapperChatAIResponse response,
+    required Map<String, dynamic>? rawJson,
+  }) {
+    _history.add(OpenAiMessage(role: 'user', content: originalUserPrompt));
+    final serialized = rawJson ?? _serializeStructured(response);
+    _history.add(
+      OpenAiMessage(role: 'assistant', content: jsonEncode(serialized)),
+    );
+  }
+
+  bool _isContextLengthExceededError(Object error) {
+    final lower = error.toString().toLowerCase();
+    return lower.contains('context_length_exceeded') ||
+        (lower.contains('context') && lower.contains('length'));
+  }
+
+  _HistoryTrimResult _trimHistoryForBudget({
+    required Session session,
+    required String pendingUserPrompt,
+    required String reason,
+    bool aggressive = false,
+  }) {
+    final budget = aggressive
+        ? _historyAggressiveTokenBudget
+        : _historyNormalTokenBudget;
+    final before = _estimateTokensForMessages([
+      ..._baseMessages,
+      ..._history,
+      OpenAiMessage(role: 'user', content: pendingUserPrompt),
+    ]);
+
+    if (before <= budget || _history.isEmpty) {
+      return _HistoryTrimResult(
+        droppedMessages: 0,
+        droppedTurns: 0,
+        estimatedTokensBefore: before,
+        estimatedTokensAfter: before,
+      );
+    }
+
+    var droppedMessages = 0;
+    var droppedTurns = 0;
+    var estimated = before;
+
+    while (estimated > budget && _history.isNotEmpty) {
+      final canDropTurn =
+          _history.length >= 2 &&
+          _history.first.role == 'user' &&
+          _history[1].role == 'assistant';
+      if (canDropTurn) {
+        _history.removeAt(0);
+        _history.removeAt(0);
+        droppedMessages += 2;
+        droppedTurns++;
+      } else {
+        _history.removeAt(0);
+        droppedMessages++;
+      }
+
+      estimated = _estimateTokensForMessages([
+        ..._baseMessages,
+        ..._history,
+        OpenAiMessage(role: 'user', content: pendingUserPrompt),
+      ]);
+    }
+
+    final after = estimated;
+    session.log(
+      'Trimmed chat history for $reason. '
+      'droppedTurns=$droppedTurns, '
+      'droppedMessages=$droppedMessages, '
+      'estimatedTokensBefore=$before, '
+      'estimatedTokensAfter=$after, '
+      'estimatedReduction=${before - after}',
+      level: LogLevel.info,
+    );
+
+    return _HistoryTrimResult(
+      droppedMessages: droppedMessages,
+      droppedTurns: droppedTurns,
+      estimatedTokensBefore: before,
+      estimatedTokensAfter: after,
+    );
+  }
+
+  int _estimateTokensForMessages(List<OpenAiMessage> messages) {
+    var total = 0;
+    for (final message in messages) {
+      total += 8; // per-message framing overhead
+      total += _estimateTokensForContent(message.role);
+      total += _estimateTokensForContent(message.content);
+    }
+    return total;
+  }
+
+  int _estimateTokensForContent(String content) {
+    if (content.isEmpty) return 0;
+    return (content.length / 4).ceil();
+  }
+
   /// Calculates the cost in USD for a given token usage based on the current model
   double _calculateCostUsd(_TokenUsage usage) {
     final double inputPricePerMillion;
@@ -497,6 +678,12 @@ class ChatControllerOpenAiSdkImpl extends IChatController
     required String userPrompt,
     required StreamController<String> thinkingStream,
   }) async {
+    _trimHistoryForBudget(
+      session: session,
+      pendingUserPrompt: userPrompt,
+      reason: 'pre_request',
+    );
+
     final messages = [
       ..._baseMessages,
       ..._history,
@@ -581,150 +768,150 @@ class ChatControllerOpenAiSdkImpl extends IChatController
 
     try {
       final request = http.Request('POST', Uri.parse(_openAiResponsesUrl))
-      ..headers.addAll({
-        'Authorization': 'Bearer $_openAiApiKey',
-        'Content-Type': 'application/json',
-      })
-      ..body = jsonEncode(requestBody);
+        ..headers.addAll({
+          'Authorization': 'Bearer $_openAiApiKey',
+          'Content-Type': 'application/json',
+        })
+        ..body = jsonEncode(requestBody);
 
-    final streamedResponse = await client.send(request);
-    if (streamedResponse.statusCode != 200) {
-      final body = await streamedResponse.stream.bytesToString();
+      final streamedResponse = await client.send(request);
+      if (streamedResponse.statusCode != 200) {
+        final body = await streamedResponse.stream.bytesToString();
 
-      // Check for insufficient_quota error (HTTP 429 with specific error code)
-      if (streamedResponse.statusCode == 429) {
+        // Check for insufficient_quota error (HTTP 429 with specific error code)
+        if (streamedResponse.statusCode == 429) {
+          try {
+            final errorJson = jsonDecode(body) as Map<String, dynamic>;
+            final error = errorJson['error'] as Map<String, dynamic>?;
+            final errorCode = error?['code'] as String?;
+            final errorMessage =
+                error?['message'] as String? ?? 'Unknown quota error';
+
+            if (errorCode == 'insufficient_quota') {
+              throw OpenAiQuotaExceededException(
+                openAiErrorMessage: errorMessage,
+                statusCode: streamedResponse.statusCode,
+              );
+            }
+          } catch (e) {
+            if (e is OpenAiQuotaExceededException) rethrow;
+            // If parsing fails, check for quota-related keywords in the body
+            if (body.contains('insufficient_quota') ||
+                body.contains('exceeded your current quota')) {
+              throw OpenAiQuotaExceededException(
+                openAiErrorMessage: body,
+                statusCode: streamedResponse.statusCode,
+              );
+            }
+          }
+        }
+
+        throw Exception('OpenAI error ${streamedResponse.statusCode}: $body');
+      }
+
+      final lines = streamedResponse.stream
+          .transform(utf8.decoder)
+          .transform(const LineSplitter());
+
+      await for (final line in lines) {
+        if (line.isEmpty || !line.startsWith('data:')) continue;
+        final data = line.substring(5).trim();
+        if (data == '[DONE]') break;
+
+        final Map<String, dynamic> event;
         try {
-          final errorJson = jsonDecode(body) as Map<String, dynamic>;
-          final error = errorJson['error'] as Map<String, dynamic>?;
-          final errorCode = error?['code'] as String?;
-          final errorMessage =
-              error?['message'] as String? ?? 'Unknown quota error';
-
-          if (errorCode == 'insufficient_quota') {
-            throw OpenAiQuotaExceededException(
-              openAiErrorMessage: errorMessage,
-              statusCode: streamedResponse.statusCode,
-            );
-          }
+          event = jsonDecode(data) as Map<String, dynamic>;
         } catch (e) {
-          if (e is OpenAiQuotaExceededException) rethrow;
-          // If parsing fails, check for quota-related keywords in the body
-          if (body.contains('insufficient_quota') ||
-              body.contains('exceeded your current quota')) {
-            throw OpenAiQuotaExceededException(
-              openAiErrorMessage: body,
-              statusCode: streamedResponse.statusCode,
+          session.log(
+            'Failed to parse SSE event: $e, data: $data',
+            level: LogLevel.warning,
+          );
+          continue;
+        }
+
+        final type = event['type'] as String?;
+        if (type != null && !receivedEventTypes.contains(type)) {
+          receivedEventTypes.add(type);
+          session.log('Received event type: $type', level: LogLevel.debug);
+        }
+
+        if (type == 'response.output_text.delta') {
+          final delta = event['delta'];
+          if (delta is String) {
+            thinkingBuffer.write(delta);
+            thinkingStream.add(delta);
+          }
+        } else if (type == 'response.output_json.delta') {
+          final delta = event['delta'];
+          if (delta is String) {
+            jsonBuffer.write(delta);
+          }
+        } else if (type == 'response.completed') {
+          final response = event['response'];
+          if (response is Map<String, dynamic>) {
+            parsedFromCompletion = _extractParsedResponse(response, session);
+            // Extract usage information from the completed response
+            final usage = response['usage'] as Map<String, dynamic>?;
+            tokenUsage = _TokenUsage.fromJson(usage);
+            session.log(
+              'Token usage - input: ${tokenUsage.inputTokens}, output: ${tokenUsage.outputTokens}, reasoning: ${tokenUsage.reasoningTokens}',
+              level: LogLevel.info,
             );
           }
-        }
-      }
-
-      throw Exception('OpenAI error ${streamedResponse.statusCode}: $body');
-    }
-
-    final lines = streamedResponse.stream
-        .transform(utf8.decoder)
-        .transform(const LineSplitter());
-
-    await for (final line in lines) {
-      if (line.isEmpty || !line.startsWith('data:')) continue;
-      final data = line.substring(5).trim();
-      if (data == '[DONE]') break;
-
-      final Map<String, dynamic> event;
-      try {
-        event = jsonDecode(data) as Map<String, dynamic>;
-      } catch (e) {
-        session.log(
-          'Failed to parse SSE event: $e, data: $data',
-          level: LogLevel.warning,
-        );
-        continue;
-      }
-
-      final type = event['type'] as String?;
-      if (type != null && !receivedEventTypes.contains(type)) {
-        receivedEventTypes.add(type);
-        session.log('Received event type: $type', level: LogLevel.debug);
-      }
-
-      if (type == 'response.output_text.delta') {
-        final delta = event['delta'];
-        if (delta is String) {
-          thinkingBuffer.write(delta);
-          thinkingStream.add(delta);
-        }
-      } else if (type == 'response.output_json.delta') {
-        final delta = event['delta'];
-        if (delta is String) {
-          jsonBuffer.write(delta);
-        }
-      } else if (type == 'response.completed') {
-        final response = event['response'];
-        if (response is Map<String, dynamic>) {
-          parsedFromCompletion = _extractParsedResponse(response, session);
-          // Extract usage information from the completed response
-          final usage = response['usage'] as Map<String, dynamic>?;
-          tokenUsage = _TokenUsage.fromJson(usage);
+        } else if (type == 'error' || type == 'response.failed') {
+          final errorData = event['error'] ?? event['message'] ?? event;
           session.log(
-            'Token usage - input: ${tokenUsage.inputTokens}, output: ${tokenUsage.outputTokens}, reasoning: ${tokenUsage.reasoningTokens}',
-            level: LogLevel.info,
+            'OpenAI API error event: $errorData',
+            level: LogLevel.error,
           );
-        }
-      } else if (type == 'error' || type == 'response.failed') {
-        final errorData = event['error'] ?? event['message'] ?? event;
-        session.log(
-          'OpenAI API error event: $errorData',
-          level: LogLevel.error,
-        );
 
-        // Check for insufficient_quota error in streaming events
-        if (errorData is Map<String, dynamic>) {
-          final errorCode = errorData['code'] as String?;
-          final errorMessage =
-              errorData['message'] as String? ?? 'Unknown quota error';
-          if (errorCode == 'insufficient_quota') {
+          // Check for insufficient_quota error in streaming events
+          if (errorData is Map<String, dynamic>) {
+            final errorCode = errorData['code'] as String?;
+            final errorMessage =
+                errorData['message'] as String? ?? 'Unknown quota error';
+            if (errorCode == 'insufficient_quota') {
+              throw OpenAiQuotaExceededException(
+                openAiErrorMessage: errorMessage,
+                statusCode: 429,
+              );
+            }
+          } else if (errorData.toString().contains('insufficient_quota') ||
+              errorData.toString().contains('exceeded your current quota')) {
             throw OpenAiQuotaExceededException(
-              openAiErrorMessage: errorMessage,
+              openAiErrorMessage: errorData.toString(),
               statusCode: 429,
             );
           }
-        } else if (errorData.toString().contains('insufficient_quota') ||
-            errorData.toString().contains('exceeded your current quota')) {
-          throw OpenAiQuotaExceededException(
-            openAiErrorMessage: errorData.toString(),
-            statusCode: 429,
-          );
-        }
 
-        throw Exception('OpenAI streaming error: $errorData');
-      } else if (type != null && type.contains('mcp')) {
-        // Handle MCP-related events - stream them as thinking progress
-        final mcpInfo = _extractMcpEventInfo(event, type);
-        if (mcpInfo.isNotEmpty) {
-          thinkingStream.add('\n[MCP] $mcpInfo\n');
-          thinkingBuffer.writeln('[MCP] $mcpInfo');
-        }
-      } else if (type == 'response.reasoning_summary_text.delta') {
-        // Stream reasoning summary for thinking models
-        final delta = event['delta'];
-        if (delta is String) {
-          thinkingBuffer.write(delta);
-          thinkingStream.add(delta);
-        }
-      } else if (type == 'response.reasoning_summary_text.done') {
-        // Reasoning summary completed
-        thinkingStream.add('\n');
-        thinkingBuffer.writeln();
-      } else if (type != null && type.contains('web_search')) {
-        // Handle web_search events - stream them as thinking progress
-        final webSearchInfo = _extractWebSearchEventInfo(event, type);
-        if (webSearchInfo.isNotEmpty) {
-          thinkingStream.add('\n[Web Search] $webSearchInfo\n');
-          thinkingBuffer.writeln('[Web Search] $webSearchInfo');
+          throw Exception('OpenAI streaming error: $errorData');
+        } else if (type != null && type.contains('mcp')) {
+          // Handle MCP-related events - stream them as thinking progress
+          final mcpInfo = _extractMcpEventInfo(event, type);
+          if (mcpInfo.isNotEmpty) {
+            thinkingStream.add('\n[MCP] $mcpInfo\n');
+            thinkingBuffer.writeln('[MCP] $mcpInfo');
+          }
+        } else if (type == 'response.reasoning_summary_text.delta') {
+          // Stream reasoning summary for thinking models
+          final delta = event['delta'];
+          if (delta is String) {
+            thinkingBuffer.write(delta);
+            thinkingStream.add(delta);
+          }
+        } else if (type == 'response.reasoning_summary_text.done') {
+          // Reasoning summary completed
+          thinkingStream.add('\n');
+          thinkingBuffer.writeln();
+        } else if (type != null && type.contains('web_search')) {
+          // Handle web_search events - stream them as thinking progress
+          final webSearchInfo = _extractWebSearchEventInfo(event, type);
+          if (webSearchInfo.isNotEmpty) {
+            thinkingStream.add('\n[Web Search] $webSearchInfo\n');
+            thinkingBuffer.writeln('[Web Search] $webSearchInfo');
+          }
         }
       }
-    }
     } finally {
       client.close();
     }
@@ -767,14 +954,21 @@ Thinking Buffer (${thinkingContent.length} chars): ${thinkingContent.isEmpty ? "
       );
     }
 
-    final structured = parseStructuredResponse(parsedJson);
+    final parseResult = parseStructuredResponseWithValidation(parsedJson);
+    final validationErrorDescription =
+        parseResult.response is WebScrapperChatAIResponseErrorMessage
+        ? (parseResult.response as WebScrapperChatAIResponseErrorMessage)
+              .errorDescription
+        : null;
     final thinkingSentences = _splitThinking(thinkingBuffer.toString());
 
     return _OpenAiStreamResult(
-      response: structured,
+      response: parseResult.response,
       rawJson: parsedJson,
       thinkingSentences: thinkingSentences,
       usage: tokenUsage,
+      validationReason: parseResult.validationReason,
+      validationErrorDescription: validationErrorDescription,
     );
   }
 
@@ -1073,13 +1267,15 @@ Thinking Buffer (${thinkingContent.length} chars): ${thinkingContent.isEmpty ? "
   String _formatErrorForUser(Object error, SupportedLanguage language) {
     final errorStr = error.toString();
 
+    if (_isContextLengthExceededError(error)) {
+      return getErrorDescription('chat_parse_error', language);
+    }
+
     // Check for common error patterns and provide helpful messages
     if (errorStr.contains('Failed to parse structured response')) {
-      return getErrorDescriptionWithParams(
-        'chat_parse_error',
-        language,
-        {'error': errorStr},
-      );
+      return getErrorDescriptionWithParams('chat_parse_error', language, {
+        'error': errorStr,
+      });
     }
 
     if (errorStr.contains('OpenAI error 4')) {
@@ -1091,17 +1287,13 @@ Thinking Buffer (${thinkingContent.length} chars): ${thinkingContent.isEmpty ? "
         return getErrorDescription('chat_rate_limit', language);
       }
       if (errorStr.contains('400')) {
-        return getErrorDescriptionWithParams(
-          'chat_invalid_request',
-          language,
-          {'error': errorStr},
-        );
+        return getErrorDescriptionWithParams('chat_invalid_request', language, {
+          'error': errorStr,
+        });
       }
-      return getErrorDescriptionWithParams(
-        'chat_message_error',
-        language,
-        {'error': errorStr},
-      );
+      return getErrorDescriptionWithParams('chat_message_error', language, {
+        'error': errorStr,
+      });
     }
 
     if (errorStr.contains('OpenAI error 5')) {
@@ -1110,11 +1302,9 @@ Thinking Buffer (${thinkingContent.length} chars): ${thinkingContent.isEmpty ? "
     }
 
     if (errorStr.contains('OpenAI streaming error')) {
-      return getErrorDescriptionWithParams(
-        'chat_message_error',
-        language,
-        {'error': errorStr},
-      );
+      return getErrorDescriptionWithParams('chat_message_error', language, {
+        'error': errorStr,
+      });
     }
 
     if (errorStr.contains('SocketException') ||
@@ -1123,11 +1313,9 @@ Thinking Buffer (${thinkingContent.length} chars): ${thinkingContent.isEmpty ? "
     }
 
     // Default error message
-    return getErrorDescriptionWithParams(
-      'chat_message_error',
-      language,
-      {'error': errorStr},
-    );
+    return getErrorDescriptionWithParams('chat_message_error', language, {
+      'error': errorStr,
+    });
   }
 }
 
@@ -1144,6 +1332,8 @@ class _OpenAiStreamResult {
   final WebScrapperChatAIResponse response;
   final Map<String, dynamic>? rawJson;
   final List<String> thinkingSentences;
+  final StructuredResponseValidationReason? validationReason;
+  final String? validationErrorDescription;
 
   /// Token usage from the API response
   final _TokenUsage usage;
@@ -1153,6 +1343,22 @@ class _OpenAiStreamResult {
     required this.rawJson,
     required this.thinkingSentences,
     required this.usage,
+    required this.validationReason,
+    required this.validationErrorDescription,
+  });
+}
+
+class _HistoryTrimResult {
+  final int droppedMessages;
+  final int droppedTurns;
+  final int estimatedTokensBefore;
+  final int estimatedTokensAfter;
+
+  const _HistoryTrimResult({
+    required this.droppedMessages,
+    required this.droppedTurns,
+    required this.estimatedTokensBefore,
+    required this.estimatedTokensAfter,
   });
 }
 

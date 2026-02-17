@@ -55,7 +55,7 @@ class AutoFixConstants {
 class PeriodicAutoFixBrokenScrappables extends FutureCall {
   static const String callName = 'periodicAutoFixBrokenScrappables';
 
-  Future<void> run(Session session, [bool? _]) async {
+  Future<void> run(Session session, [bool? placeholder]) async {
     try {
       session.log('Starting periodic auto-fix check...', level: LogLevel.info);
 

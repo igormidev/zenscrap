@@ -14,30 +14,31 @@ import 'package:serverpod/serverpod.dart' as _i1;
 
 abstract class PeriodicCleanupOldAnalyticsDetailsRunModel
     implements _i1.SerializableModel, _i1.ProtocolSerialization {
-  PeriodicCleanupOldAnalyticsDetailsRunModel._({required this._});
+  PeriodicCleanupOldAnalyticsDetailsRunModel._({required this.placeholder});
 
-  factory PeriodicCleanupOldAnalyticsDetailsRunModel({required bool? _}) =
-      _PeriodicCleanupOldAnalyticsDetailsRunModelImpl;
+  factory PeriodicCleanupOldAnalyticsDetailsRunModel({
+    required bool? placeholder,
+  }) = _PeriodicCleanupOldAnalyticsDetailsRunModelImpl;
 
   factory PeriodicCleanupOldAnalyticsDetailsRunModel.fromJson(
     Map<String, dynamic> jsonSerialization,
   ) {
     return PeriodicCleanupOldAnalyticsDetailsRunModel(
-      _: jsonSerialization['_'] as bool?,
+      placeholder: jsonSerialization['placeholder'] as bool?,
     );
   }
 
-  bool? _;
+  bool? placeholder;
 
   /// Returns a shallow copy of this [PeriodicCleanupOldAnalyticsDetailsRunModel]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
-  PeriodicCleanupOldAnalyticsDetailsRunModel copyWith({bool? _});
+  PeriodicCleanupOldAnalyticsDetailsRunModel copyWith({bool? placeholder});
   @override
   Map<String, dynamic> toJson() {
     return {
       '__className__': 'PeriodicCleanupOldAnalyticsDetailsRunModel',
-      if (_ != null) '_': _,
+      if (placeholder != null) 'placeholder': placeholder,
     };
   }
 
@@ -56,18 +57,18 @@ class _Undefined {}
 
 class _PeriodicCleanupOldAnalyticsDetailsRunModelImpl
     extends PeriodicCleanupOldAnalyticsDetailsRunModel {
-  _PeriodicCleanupOldAnalyticsDetailsRunModelImpl({required bool? _})
-    : super._(_: _);
+  _PeriodicCleanupOldAnalyticsDetailsRunModelImpl({required bool? placeholder})
+    : super._(placeholder: placeholder);
 
   /// Returns a shallow copy of this [PeriodicCleanupOldAnalyticsDetailsRunModel]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   @override
   PeriodicCleanupOldAnalyticsDetailsRunModel copyWith({
-    Object? _ = _Undefined,
+    Object? placeholder = _Undefined,
   }) {
     return PeriodicCleanupOldAnalyticsDetailsRunModel(
-      _: _ is bool? ? _ : this._,
+      placeholder: placeholder is bool? ? placeholder : this.placeholder,
     );
   }
 }

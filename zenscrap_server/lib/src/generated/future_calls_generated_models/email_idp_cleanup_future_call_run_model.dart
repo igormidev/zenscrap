@@ -14,30 +14,30 @@ import 'package:serverpod/serverpod.dart' as _i1;
 
 abstract class EmailIdpCleanupFutureCallRunModel
     implements _i1.SerializableModel, _i1.ProtocolSerialization {
-  EmailIdpCleanupFutureCallRunModel._({required this._});
+  EmailIdpCleanupFutureCallRunModel._({required this.placeholder});
 
-  factory EmailIdpCleanupFutureCallRunModel({required bool? _}) =
+  factory EmailIdpCleanupFutureCallRunModel({required bool? placeholder}) =
       _EmailIdpCleanupFutureCallRunModelImpl;
 
   factory EmailIdpCleanupFutureCallRunModel.fromJson(
     Map<String, dynamic> jsonSerialization,
   ) {
     return EmailIdpCleanupFutureCallRunModel(
-      _: jsonSerialization['_'] as bool?,
+      placeholder: jsonSerialization['placeholder'] as bool?,
     );
   }
 
-  bool? _;
+  bool? placeholder;
 
   /// Returns a shallow copy of this [EmailIdpCleanupFutureCallRunModel]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
-  EmailIdpCleanupFutureCallRunModel copyWith({bool? _});
+  EmailIdpCleanupFutureCallRunModel copyWith({bool? placeholder});
   @override
   Map<String, dynamic> toJson() {
     return {
       '__className__': 'EmailIdpCleanupFutureCallRunModel',
-      if (_ != null) '_': _,
+      if (placeholder != null) 'placeholder': placeholder,
     };
   }
 
@@ -56,13 +56,18 @@ class _Undefined {}
 
 class _EmailIdpCleanupFutureCallRunModelImpl
     extends EmailIdpCleanupFutureCallRunModel {
-  _EmailIdpCleanupFutureCallRunModelImpl({required bool? _}) : super._(_: _);
+  _EmailIdpCleanupFutureCallRunModelImpl({required bool? placeholder})
+    : super._(placeholder: placeholder);
 
   /// Returns a shallow copy of this [EmailIdpCleanupFutureCallRunModel]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   @override
-  EmailIdpCleanupFutureCallRunModel copyWith({Object? _ = _Undefined}) {
-    return EmailIdpCleanupFutureCallRunModel(_: _ is bool? ? _ : this._);
+  EmailIdpCleanupFutureCallRunModel copyWith({
+    Object? placeholder = _Undefined,
+  }) {
+    return EmailIdpCleanupFutureCallRunModel(
+      placeholder: placeholder is bool? ? placeholder : this.placeholder,
+    );
   }
 }

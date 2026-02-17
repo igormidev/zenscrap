@@ -14,31 +14,35 @@ import 'package:serverpod/serverpod.dart' as _i1;
 
 abstract class CleanupExpiredIpValidationCacheFutureCallRunModel
     implements _i1.SerializableModel, _i1.ProtocolSerialization {
-  CleanupExpiredIpValidationCacheFutureCallRunModel._({required this._});
+  CleanupExpiredIpValidationCacheFutureCallRunModel._({
+    required this.placeholder,
+  });
 
   factory CleanupExpiredIpValidationCacheFutureCallRunModel({
-    required bool? _,
+    required bool? placeholder,
   }) = _CleanupExpiredIpValidationCacheFutureCallRunModelImpl;
 
   factory CleanupExpiredIpValidationCacheFutureCallRunModel.fromJson(
     Map<String, dynamic> jsonSerialization,
   ) {
     return CleanupExpiredIpValidationCacheFutureCallRunModel(
-      _: jsonSerialization['_'] as bool?,
+      placeholder: jsonSerialization['placeholder'] as bool?,
     );
   }
 
-  bool? _;
+  bool? placeholder;
 
   /// Returns a shallow copy of this [CleanupExpiredIpValidationCacheFutureCallRunModel]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
-  CleanupExpiredIpValidationCacheFutureCallRunModel copyWith({bool? _});
+  CleanupExpiredIpValidationCacheFutureCallRunModel copyWith({
+    bool? placeholder,
+  });
   @override
   Map<String, dynamic> toJson() {
     return {
       '__className__': 'CleanupExpiredIpValidationCacheFutureCallRunModel',
-      if (_ != null) '_': _,
+      if (placeholder != null) 'placeholder': placeholder,
     };
   }
 
@@ -57,18 +61,19 @@ class _Undefined {}
 
 class _CleanupExpiredIpValidationCacheFutureCallRunModelImpl
     extends CleanupExpiredIpValidationCacheFutureCallRunModel {
-  _CleanupExpiredIpValidationCacheFutureCallRunModelImpl({required bool? _})
-    : super._(_: _);
+  _CleanupExpiredIpValidationCacheFutureCallRunModelImpl({
+    required bool? placeholder,
+  }) : super._(placeholder: placeholder);
 
   /// Returns a shallow copy of this [CleanupExpiredIpValidationCacheFutureCallRunModel]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   @override
   CleanupExpiredIpValidationCacheFutureCallRunModel copyWith({
-    Object? _ = _Undefined,
+    Object? placeholder = _Undefined,
   }) {
     return CleanupExpiredIpValidationCacheFutureCallRunModel(
-      _: _ is bool? ? _ : this._,
+      placeholder: placeholder is bool? ? placeholder : this.placeholder,
     );
   }
 }

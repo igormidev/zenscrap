@@ -14,28 +14,30 @@ import 'package:serverpod/serverpod.dart' as _i1;
 
 abstract class PeriodicCacheCleanupRunModel
     implements _i1.SerializableModel, _i1.ProtocolSerialization {
-  PeriodicCacheCleanupRunModel._({required this._});
+  PeriodicCacheCleanupRunModel._({required this.placeholder});
 
-  factory PeriodicCacheCleanupRunModel({required bool? _}) =
+  factory PeriodicCacheCleanupRunModel({required bool? placeholder}) =
       _PeriodicCacheCleanupRunModelImpl;
 
   factory PeriodicCacheCleanupRunModel.fromJson(
     Map<String, dynamic> jsonSerialization,
   ) {
-    return PeriodicCacheCleanupRunModel(_: jsonSerialization['_'] as bool?);
+    return PeriodicCacheCleanupRunModel(
+      placeholder: jsonSerialization['placeholder'] as bool?,
+    );
   }
 
-  bool? _;
+  bool? placeholder;
 
   /// Returns a shallow copy of this [PeriodicCacheCleanupRunModel]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
-  PeriodicCacheCleanupRunModel copyWith({bool? _});
+  PeriodicCacheCleanupRunModel copyWith({bool? placeholder});
   @override
   Map<String, dynamic> toJson() {
     return {
       '__className__': 'PeriodicCacheCleanupRunModel',
-      if (_ != null) '_': _,
+      if (placeholder != null) 'placeholder': placeholder,
     };
   }
 
@@ -53,13 +55,16 @@ abstract class PeriodicCacheCleanupRunModel
 class _Undefined {}
 
 class _PeriodicCacheCleanupRunModelImpl extends PeriodicCacheCleanupRunModel {
-  _PeriodicCacheCleanupRunModelImpl({required bool? _}) : super._(_: _);
+  _PeriodicCacheCleanupRunModelImpl({required bool? placeholder})
+    : super._(placeholder: placeholder);
 
   /// Returns a shallow copy of this [PeriodicCacheCleanupRunModel]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   @override
-  PeriodicCacheCleanupRunModel copyWith({Object? _ = _Undefined}) {
-    return PeriodicCacheCleanupRunModel(_: _ is bool? ? _ : this._);
+  PeriodicCacheCleanupRunModel copyWith({Object? placeholder = _Undefined}) {
+    return PeriodicCacheCleanupRunModel(
+      placeholder: placeholder is bool? ? placeholder : this.placeholder,
+    );
   }
 }

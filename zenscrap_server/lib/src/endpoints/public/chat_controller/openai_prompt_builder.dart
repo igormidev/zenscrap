@@ -34,7 +34,8 @@ class OpenAiFileManager {
   /// File IDs (primarily for reference/debugging)
   static String? get costOptimizationFileId => _costOptimizationFileId;
   static String? get howToEditRequestFileId => _howToEditRequestFileId;
-  static String? get requestStructureGuideFileId => _requestStructureGuideFileId;
+  static String? get requestStructureGuideFileId =>
+      _requestStructureGuideFileId;
 
   /// Sets the Vector Store ID and file IDs after initialization
   static void setVectorStoreData({
@@ -63,7 +64,8 @@ class OpenAiFileManager {
 // ============================================================================
 
 /// Cost Optimization Strategy - uploaded once and reused
-const String costOptimizationGuide = '''# Cost Optimization Strategy for ScrapingBee
+const String costOptimizationGuide =
+    '''# Cost Optimization Strategy for ScrapingBee
 
 ## Credit Costs
 
@@ -177,7 +179,8 @@ Remember: Your goal is to find the CHEAPEST configuration that works reliably!
 ''';
 
 /// How to Edit Scrappable Request - uploaded once and reused
-const String howToEditScrappableRequest = '''# How to Edit Scrappable Request Structure
+const String howToEditScrappableRequest =
+    '''# How to Edit Scrappable Request Structure
 
 This guide explains how to modify the scrappable request configuration to add/remove parameters and set default values.
 
@@ -274,7 +277,8 @@ The parameter name in `queryParamsNotRelatedToUrl` must match the placeholder:
 ''';
 
 /// Scrappable Request Structure Guide - uploaded once and reused
-const String scrappableRequestStructureGuide = '''# Scrappable Request Structure Guide
+const String scrappableRequestStructureGuide =
+    '''# Scrappable Request Structure Guide
 
 This guide explains the structure of a `ScrappableRequest` and how to properly configure URL patterns, query parameters, and path parameters for web scraping.
 
@@ -378,16 +382,21 @@ An array of parameter names that were replaced in the URL with `{paramName}` pla
 /// This is uploaded per-session because it contains dynamic parameter information.
 String buildExtractionRulesGuide(WebScrapperRequest webScrapperRequest) {
   // Build dynamic parameter lists
-  final queryParamsList = webScrapperRequest.queryParam.entries.map((e) {
-    final hasDefault = e.value != null;
-    return '  - **${e.key}**: ${hasDefault ? '"${e.value}" (default)' : 'null (REQUIRED)'}';
-  }).join('\n');
+  final queryParamsList = webScrapperRequest.queryParam.entries
+      .map((e) {
+        final hasDefault = e.value != null;
+        return '  - **${e.key}**: ${hasDefault ? '"${e.value}" (default)' : 'null (REQUIRED)'}';
+      })
+      .join('\n');
 
-  final queryParamsNotRelatedToUrlList =
-      webScrapperRequest.queryParamsNotRelatedToUrl.entries.map((e) {
-    final hasDefault = e.value != null;
-    return '  - **${e.key}**: ${hasDefault ? '"${e.value}" (default)' : 'null (REQUIRED)'} → Use as `{${e.key}}` in js_scenario';
-  }).join('\n');
+  final queryParamsNotRelatedToUrlList = webScrapperRequest
+      .queryParamsNotRelatedToUrl
+      .entries
+      .map((e) {
+        final hasDefault = e.value != null;
+        return '  - **${e.key}**: ${hasDefault ? '"${e.value}" (default)' : 'null (REQUIRED)'} → Use as `{${e.key}}` in js_scenario';
+      })
+      .join('\n');
 
   final hasQueryParams = webScrapperRequest.queryParam.isNotEmpty;
   final hasQueryParamsNotRelatedToUrl =
@@ -723,6 +732,16 @@ Required fields:
 - `scrappingBeeFetchSettings`: The tested configuration
 - Optional `scrappableRequest`: If you modified parameters
 
+### Rule 5: Structured Output Shape Is Strict
+- `scrappingBeeFetchSettings.extract_rules` MUST be either:
+  - a JSON object, or
+  - a JSON string whose root is an object
+- NEVER return `extract_rules` as a root array.
+- If you return `scrappableRequest`:
+  - `queryParam` MUST be an object (use `{}` when empty, NEVER null)
+  - `queryParamsNotRelatedToUrl` MUST be an object (use `{}` when empty, NEVER null)
+  - `pathParams` MUST be an array (use `[]` when empty, NEVER null)
+
 ---
 
 ## EXTRACT_RULES FORMAT (MEMORIZE THIS)
@@ -774,6 +793,20 @@ Required fields:
 ```
 
 **If no actions needed: Set js_scenario to null or omit it entirely.**
+
+---
+
+## STRUCTURED RESPONSE SHAPE (CRITICAL)
+
+- `scrappingBeeFetchSettings.extract_rules` MUST be:
+  - object, OR
+  - stringified JSON object
+- NEVER return `extract_rules` as a root array.
+- If returning `scrappableRequest`:
+  - `queryParam` must be an object (use `{}` when empty)
+  - `queryParamsNotRelatedToUrl` must be an object (use `{}` when empty)
+  - `pathParams` must be an array (use `[]` when empty)
+- Never set those `scrappableRequest` containers to `null`.
 
 ---
 
@@ -903,6 +936,68 @@ Before returning `responseType: "data"`:
 ''';
 }
 
+/// Builds a targeted retry prompt when OpenAI returns invalid structured output.
+///
+/// This is used as an automatic "schema repair" retry to avoid surfacing raw
+/// parser errors to end users on first failure.
+String buildSchemaRepairRetryPrompt({
+  required StructuredResponseValidationReason reason,
+  required Map<String, dynamic>? invalidResponse,
+  required String originalUserPrompt,
+  required int attemptNumber,
+}) {
+  final encoder = const JsonEncoder.withIndent('  ');
+  final invalidResponseJson = invalidResponse == null
+      ? '(empty response)'
+      : encoder.convert(invalidResponse);
+
+  final reasonInstructions = switch (reason) {
+    StructuredResponseValidationReason.extractRulesTypeInvalid =>
+      '''
+Your last response used an invalid `extract_rules` shape.
+Fix it by returning `extract_rules` as either:
+- object, OR
+- stringified JSON object
+Never return `extract_rules` as a root array.''',
+    StructuredResponseValidationReason.scrappableRequestInvalid =>
+      '''
+Your last response used an invalid `scrappableRequest` shape.
+If `scrappableRequest` is present:
+- `queryParam` must be an object (use `{}` when empty)
+- `queryParamsNotRelatedToUrl` must be an object (use `{}` when empty)
+- `pathParams` must be an array (use `[]` when empty)
+Never use `null` for these fields.''',
+    StructuredResponseValidationReason.missingRequiredData =>
+      '''
+Your last response missed required fields.
+Return a complete schema-compliant object with:
+- valid `responseType`
+- required fields for that response type
+- consistent nested object shapes''',
+  };
+
+  return '''# Structured Output Repair (Attempt $attemptNumber)
+
+The previous response could not be parsed by the server.
+
+Original user request:
+$originalUserPrompt
+
+Validation issue:
+${reason.code}
+
+$reasonInstructions
+
+Previous invalid response (for reference):
+```json
+$invalidResponseJson
+```
+
+Return only a new schema-compliant JSON response for the same user request.
+Do not add prose outside the JSON response.
+''';
+}
+
 // ============================================================================
 // Context Prompt Builder (Session-Specific Context)
 // ============================================================================
@@ -919,15 +1014,18 @@ String buildContextPrompt({
     ..writeln('')
     ..writeln('### Current Scrappable Configuration')
     ..writeln('- **Reference URL**: ${referenceTestData.referenceLinkUsed}')
+    ..writeln('- **URL Template**: ${scrapperRequest.url}')
     ..writeln(
-        '- **URL Template**: ${scrapperRequest.url}')
-    ..writeln('- **Path Parameters**: ${scrapperRequest.pathParams.isEmpty ? "(none)" : scrapperRequest.pathParams.join(", ")}')
+      '- **Path Parameters**: ${scrapperRequest.pathParams.isEmpty ? "(none)" : scrapperRequest.pathParams.join(", ")}',
+    )
     ..writeln(
-        '- **Query Parameters**: ${jsonEncode(scrapperRequest.queryParams)}');
+      '- **Query Parameters**: ${jsonEncode(scrapperRequest.queryParams)}',
+    );
 
   if (scrapperRequest.queryParamsNotRelatedToUrl.isNotEmpty) {
     buffer.writeln(
-        '- **Client-Side Parameters**: ${jsonEncode(scrapperRequest.queryParamsNotRelatedToUrl)}');
+      '- **Client-Side Parameters**: ${jsonEncode(scrapperRequest.queryParamsNotRelatedToUrl)}',
+    );
   }
 
   final scrapResultJson = referenceTestData.scrapResultJson;
@@ -947,7 +1045,9 @@ String buildContextPrompt({
     buffer
       ..writeln('')
       ..writeln('### Existing ScrapingBee Configuration')
-      ..writeln('This scrappable already has working extraction rules. Modify only what the user requests.')
+      ..writeln(
+        'This scrappable already has working extraction rules. Modify only what the user requests.',
+      )
       ..writeln('')
       ..writeln('**Current Settings:**')
       ..writeln('- render_js: ${scrappingBeeLogic.renderJs}')
@@ -969,7 +1069,8 @@ String buildContextPrompt({
       ..writeln(truncatedRules)
       ..writeln('```');
 
-    if (scrappingBeeLogic.jsScenario != null && scrappingBeeLogic.jsScenario!.isNotEmpty) {
+    if (scrappingBeeLogic.jsScenario != null &&
+        scrappingBeeLogic.jsScenario!.isNotEmpty) {
       final jsScenario = scrappingBeeLogic.jsScenario!;
       final truncatedJs = jsScenario.length > 800
           ? '${jsScenario.substring(0, 800)}... [truncated]'
@@ -985,13 +1086,17 @@ String buildContextPrompt({
     buffer
       ..writeln('')
       ..writeln('### Status')
-      ..writeln('No existing extraction rules. You are creating them from scratch.');
+      ..writeln(
+        'No existing extraction rules. You are creating them from scratch.',
+      );
   }
 
   buffer
     ..writeln('')
     ..writeln('---')
-    ..writeln('Remember: Keep placeholders in final response. Use mock values only during MCP testing.');
+    ..writeln(
+      'Remember: Keep placeholders in final response. Use mock values only during MCP testing.',
+    );
 
   return buffer.toString();
 }

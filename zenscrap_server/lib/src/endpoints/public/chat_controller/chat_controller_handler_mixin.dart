@@ -10,6 +10,21 @@ import 'package:zenscrap_server/src/generated/protocol.dart';
 
 typedef RetryText = String;
 
+enum ScrapingBeeValidationFailureType {
+  timeoutOrNetwork,
+  selectorOrSyntax,
+  unknown,
+}
+
+extension ScrapingBeeValidationFailureTypeExt
+    on ScrapingBeeValidationFailureType {
+  String get code => switch (this) {
+    ScrapingBeeValidationFailureType.timeoutOrNetwork => 'timeout_or_network',
+    ScrapingBeeValidationFailureType.selectorOrSyntax => 'selector_or_syntax',
+    ScrapingBeeValidationFailureType.unknown => 'unknown',
+  };
+}
+
 /// Mixin that provides shared functionality for chat controller implementations
 mixin ChatControllerHandlerMixin {
   int get scrappableId;
@@ -241,8 +256,19 @@ mixin ChatControllerHandlerMixin {
         return null;
       },
       error: (String errorMessage) {
+        final failureType = _classifyValidationFailure(errorMessage);
+
+        if (failureType == ScrapingBeeValidationFailureType.timeoutOrNetwork) {
+          session.log(
+            'ScrapingBee timeout/network validation failure detected '
+            '(attempt $attemptNumber): $errorMessage',
+            level: LogLevel.warning,
+          );
+        }
+
         session.log(
-          '#$attemptNumber retrying due to error: $errorMessage',
+          '#$attemptNumber retrying due to error '
+          '(type=${failureType.code}): $errorMessage',
           level: LogLevel.warning,
         );
         chatSeason.add(
@@ -255,6 +281,7 @@ mixin ChatControllerHandlerMixin {
         return buildRetryMessage(
           attemptNumber: attemptNumber,
           errorMessage: errorMessage,
+          failureType: failureType,
         );
       },
     );
@@ -264,6 +291,7 @@ mixin ChatControllerHandlerMixin {
   String buildRetryMessage({
     required int attemptNumber,
     required String errorMessage,
+    required ScrapingBeeValidationFailureType failureType,
   }) {
     final String attempt = attemptNumber > 1
         ? '# Attempt $attemptNumber\n'
@@ -276,12 +304,33 @@ mixin ChatControllerHandlerMixin {
 
 Please try again. Try to deeply understand how the scrapping bee rules creation works, see the documentation in https://www.scrapingbee.com/documentation/data-extraction/#basic-usage if needed.
 
-${_getCriticalAnalysisText()}''';
+${_getCriticalAnalysisText(failureType)}''';
   }
 
   /// Returns the critical analysis requirements text
-  String _getCriticalAnalysisText() {
-    return '''**CRITICAL ANALYSIS REQUIRED:**
+  String _getCriticalAnalysisText(
+    ScrapingBeeValidationFailureType failureType,
+  ) {
+    return switch (failureType) {
+      ScrapingBeeValidationFailureType.timeoutOrNetwork =>
+        '''**CRITICAL ANALYSIS REQUIRED (TIMEOUT/NETWORK FAILURE):**
+1. Treat this as an infrastructure/runtime issue first, not a selector issue
+2. Keep the extraction logic stable unless clearly broken
+3. Reduce expensive runtime operations in js_scenario
+4. Prefer `wait_for` selectors over long fixed waits when possible
+5. Ensure render/proxy settings are truly needed (avoid over-expensive config)
+6. Keep selectors simple and deterministic to minimize retries
+7. Return a complete config that can pass full validation with HTML + screenshot
+
+**Common timeout causes to check:**
+- Too much JS work in `js_scenario`
+- Overly long waits or unnecessary multi-step interactions
+- Proxy/render combinations that are heavier than needed
+- Waiting for selectors that never appear
+
+Please generate a revised configuration focused on reliability under full validation.''',
+      ScrapingBeeValidationFailureType.selectorOrSyntax =>
+        '''**CRITICAL ANALYSIS REQUIRED:**
 1. The selectors you provided are likely incorrect or don't match actual elements in the HTML
 2. Please carefully re-examine the HTML structure provided
 3. Verify that each selector path actually exists in the HTML document
@@ -298,7 +347,53 @@ ${_getCriticalAnalysisText()}''';
 
 Please generate new extraction rules with extreme attention to detail. Take your time to think through each selector carefully. The HTML content and screenshot remain the same as provided initially.
 
-**ULTRA THINK:** Analyze the HTML structure methodically, verify each selector component exists, and ensure the extraction rules will successfully capture the requested data.''';
+**ULTRA THINK:** Analyze the HTML structure methodically, verify each selector component exists, and ensure the extraction rules will successfully capture the requested data.''',
+      ScrapingBeeValidationFailureType.unknown =>
+        '''**CRITICAL ANALYSIS REQUIRED:**
+1. Analyze the exact ScrapingBee error and classify root cause first
+2. If timeout/network related, simplify runtime behavior and waits
+3. If selector/syntax related, re-check selectors and extract_rules shape
+4. Keep only changes that are necessary and testable
+5. Return complete, schema-valid settings ready for full validation
+
+Please provide a revised configuration that addresses the most likely root cause and can pass full validation.''',
+    };
+  }
+
+  ScrapingBeeValidationFailureType _classifyValidationFailure(
+    String errorMessage,
+  ) {
+    final lower = errorMessage.toLowerCase();
+
+    final timeoutIndicators = <String>[
+      'timeout',
+      'timed out',
+      'network error',
+      'socket',
+      'connection',
+      'econn',
+      'receive timeout',
+      'connect timeout',
+    ];
+    if (timeoutIndicators.any(lower.contains)) {
+      return ScrapingBeeValidationFailureType.timeoutOrNetwork;
+    }
+
+    final selectorOrSyntaxIndicators = <String>[
+      'selector',
+      'css',
+      'extract_rules',
+      'invalid',
+      'syntax',
+      'json',
+      'parse',
+      'wait_for',
+    ];
+    if (selectorOrSyntaxIndicators.any(lower.contains)) {
+      return ScrapingBeeValidationFailureType.selectorOrSyntax;
+    }
+
+    return ScrapingBeeValidationFailureType.unknown;
   }
 }
 
