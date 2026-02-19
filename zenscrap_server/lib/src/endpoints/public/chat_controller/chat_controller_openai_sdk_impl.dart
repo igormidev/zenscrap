@@ -347,6 +347,17 @@ class ChatControllerOpenAiSdkImpl extends IChatController
     }
   }
 
+  /// Returns reasoning effort for the current model.
+  /// Powerful tier gets xhigh, normal tier stays high.
+  String get _reasoningEffort {
+    switch (_model) {
+      case 'gpt-5.2-pro':
+        return 'xhigh';
+      default:
+        return 'high';
+    }
+  }
+
   @override
   Future<void> changeModel(AiModel aiModel) async {
     _model = _mapModel(aiModel);
@@ -508,8 +519,12 @@ class ChatControllerOpenAiSdkImpl extends IChatController
           stackTrace: stackTrace,
         );
 
-        // Stream a detailed error message to the user
-        final errorMessage = _formatErrorForUser(error, language);
+        // Stream a typed error message to the user
+        final errorMessage = _formatErrorForUser(
+          error: error,
+          language: language,
+          session: session,
+        );
         chatSeason.add(
           ErrorTextResponse(
             role: PromptRole.system,
@@ -650,6 +665,14 @@ class ChatControllerOpenAiSdkImpl extends IChatController
 
     // Get pricing based on model
     switch (_model) {
+      case 'gpt-5.2':
+        inputPricePerMillion = kGpt52InputPricePerMillionTokens;
+        outputPricePerMillion = kGpt52OutputPricePerMillionTokens;
+        break;
+      case 'gpt-5.2-pro':
+        inputPricePerMillion = kGpt52ProInputPricePerMillionTokens;
+        outputPricePerMillion = kGpt52ProOutputPricePerMillionTokens;
+        break;
       case 'gpt-5-mini':
         inputPricePerMillion = kGpt5MiniInputPricePerMillionTokens;
         outputPricePerMillion = kGpt5MiniOutputPricePerMillionTokens;
@@ -658,11 +681,10 @@ class ChatControllerOpenAiSdkImpl extends IChatController
         inputPricePerMillion = kGpt51InputPricePerMillionTokens;
         outputPricePerMillion = kGpt51OutputPricePerMillionTokens;
         break;
-      case 'gpt-5':
       default:
-        // Default to GPT-5 pricing (same as GPT-5.1)
-        inputPricePerMillion = kGpt5InputPricePerMillionTokens;
-        outputPricePerMillion = kGpt5OutputPricePerMillionTokens;
+        // Default to GPT-5.2 pricing.
+        inputPricePerMillion = kGpt52InputPricePerMillionTokens;
+        outputPricePerMillion = kGpt52OutputPricePerMillionTokens;
         break;
     }
 
@@ -749,15 +771,19 @@ class ChatControllerOpenAiSdkImpl extends IChatController
     final requestBody = {
       'model': _model,
       'stream': true,
-      'reasoning': {
-        'effort': 'high', // Maximize reasoning depth for web scraping accuracy
-      },
+      'reasoning': {'effort': _reasoningEffort},
       'tools': tools,
       'text': {'format': responseFormat},
       'input': input,
       // Set max_output_tokens for mini models to prevent truncation
       if (_maxOutputTokens != null) 'max_output_tokens': _maxOutputTokens,
     };
+
+    session.log(
+      'OpenAI request config: model=$_model, reasoningEffort=$_reasoningEffort, '
+      'maxOutputTokens=${_maxOutputTokens ?? "default"}',
+      level: LogLevel.debug,
+    );
 
     final client = http.Client();
     final jsonBuffer = StringBuffer();
@@ -777,6 +803,13 @@ class ChatControllerOpenAiSdkImpl extends IChatController
       final streamedResponse = await client.send(request);
       if (streamedResponse.statusCode != 200) {
         final body = await streamedResponse.stream.bytesToString();
+        final bodyPreview = body.length > 1200
+            ? '${body.substring(0, 1200)}...[truncated]'
+            : body;
+        session.log(
+          'OpenAI non-200 response: status=${streamedResponse.statusCode}, body=$bodyPreview',
+          level: LogLevel.error,
+        );
 
         // Check for insufficient_quota error (HTTP 429 with specific error code)
         if (streamedResponse.statusCode == 429) {
@@ -1263,60 +1296,113 @@ Thinking Buffer (${thinkingContent.length} chars): ${thinkingContent.isEmpty ? "
         .toList();
   }
 
-  /// Formats an error into a user-friendly message
-  String _formatErrorForUser(Object error, SupportedLanguage language) {
+  /// Formats an error into a user-friendly message using typed classification.
+  String _formatErrorForUser({
+    required Object error,
+    required SupportedLanguage language,
+    required Session session,
+  }) {
+    final classification = _classifyChatError(error);
+    session.log(
+      'Classified chat error: reasonCode=${classification.reasonCode}, '
+      'translationKey=${classification.translationKey}, rawError="$error"',
+      level: LogLevel.warning,
+    );
+    return getErrorDescription(classification.translationKey, language);
+  }
+
+  _ChatErrorClassification _classifyChatError(Object error) {
     final errorStr = error.toString();
+    final lower = errorStr.toLowerCase();
 
     if (_isContextLengthExceededError(error)) {
-      return getErrorDescription('chat_parse_error', language);
+      return const _ChatErrorClassification(
+        reasonCode: 'context_length_exceeded',
+        translationKey: 'chat_context_length_exceeded',
+      );
     }
 
-    // Check for common error patterns and provide helpful messages
-    if (errorStr.contains('Failed to parse structured response')) {
-      return getErrorDescriptionWithParams('chat_parse_error', language, {
-        'error': errorStr,
-      });
+    if (lower.contains('failed to parse structured response')) {
+      return const _ChatErrorClassification(
+        reasonCode: 'structured_response_parse_error',
+        translationKey: 'chat_parse_error',
+      );
     }
 
-    if (errorStr.contains('OpenAI error 4')) {
-      // 4xx errors
-      if (errorStr.contains('401')) {
-        return getErrorDescription('chat_auth_error', language);
-      }
-      if (errorStr.contains('429')) {
-        return getErrorDescription('chat_rate_limit', language);
-      }
-      if (errorStr.contains('400')) {
-        return getErrorDescriptionWithParams('chat_invalid_request', language, {
-          'error': errorStr,
-        });
-      }
-      return getErrorDescriptionWithParams('chat_message_error', language, {
-        'error': errorStr,
-      });
+    if (lower.contains('openaiquotaexceededexception') ||
+        lower.contains('insufficient_quota') ||
+        lower.contains('exceeded your current quota')) {
+      return const _ChatErrorClassification(
+        reasonCode: 'openai_insufficient_quota',
+        translationKey: 'chat_openai_quota_error',
+      );
     }
 
-    if (errorStr.contains('OpenAI error 5')) {
-      // 5xx errors - use a generic message for service unavailable
-      return getErrorDescription('chat_rate_limit', language);
+    if (lower.contains('openai error 401') ||
+        lower.contains('openai error 403')) {
+      return const _ChatErrorClassification(
+        reasonCode: 'openai_auth_error',
+        translationKey: 'chat_auth_error',
+      );
     }
 
-    if (errorStr.contains('OpenAI streaming error')) {
-      return getErrorDescriptionWithParams('chat_message_error', language, {
-        'error': errorStr,
-      });
+    if (lower.contains('openai error 429') ||
+        lower.contains('too many requests') ||
+        lower.contains('rate_limit_exceeded')) {
+      return const _ChatErrorClassification(
+        reasonCode: 'openai_rate_limit',
+        translationKey: 'chat_rate_limit',
+      );
     }
 
-    if (errorStr.contains('SocketException') ||
-        errorStr.contains('Connection')) {
-      return getErrorDescription('chat_rate_limit', language);
+    if (lower.contains('openai error 400')) {
+      return const _ChatErrorClassification(
+        reasonCode: 'openai_invalid_request',
+        translationKey: 'chat_invalid_request',
+      );
     }
 
-    // Default error message
-    return getErrorDescriptionWithParams('chat_message_error', language, {
-      'error': errorStr,
-    });
+    if (lower.contains('openai error 5')) {
+      return const _ChatErrorClassification(
+        reasonCode: 'openai_service_unavailable',
+        translationKey: 'chat_service_unavailable',
+      );
+    }
+
+    if (lower.contains('socketexception') ||
+        lower.contains('connection closed while receiving data') ||
+        lower.contains('connection reset') ||
+        lower.contains('connection aborted') ||
+        lower.contains('network is unreachable') ||
+        lower.contains('clientexception: connection')) {
+      return const _ChatErrorClassification(
+        reasonCode: 'network_connection_error',
+        translationKey: 'chat_network_error',
+      );
+    }
+
+    if (lower.contains('openai streaming error')) {
+      return const _ChatErrorClassification(
+        reasonCode: 'openai_streaming_error',
+        translationKey: 'chat_service_unavailable',
+      );
+    }
+
+    return const _ChatErrorClassification(
+      reasonCode: 'unknown_error',
+      translationKey: 'chat_message_error',
+    );
   }
+}
+
+class _ChatErrorClassification {
+  final String reasonCode;
+  final String translationKey;
+
+  const _ChatErrorClassification({
+    required this.reasonCode,
+    required this.translationKey,
+  });
 }
 
 class OpenAiMessage {

@@ -41,9 +41,16 @@ class AutoFixFailure extends AutoFixResult {
 /// Maps AiModel enum to OpenAI model name
 String getModelName(AiModel model) {
   return switch (model) {
-    AiModel.normal => 'gpt-5-mini',
-    // AiModel.normal => 'gpt-5.1',
-    AiModel.powerful => 'gpt-5.2',
+    AiModel.normal => 'gpt-5.2',
+    AiModel.powerful => 'gpt-5.2-pro',
+  };
+}
+
+/// Maps AiModel enum to OpenAI reasoning effort.
+String getReasoningEffort(AiModel model) {
+  return switch (model) {
+    AiModel.normal => 'high',
+    AiModel.powerful => 'xhigh',
   };
 }
 
@@ -482,13 +489,16 @@ class AutoFixSessionHandler {
 
     // Use the resolved AI model
     final modelName = getModelName(_aiModel);
+    final reasoningEffort = getReasoningEffort(_aiModel);
+    _session.log(
+      'Auto-fix OpenAI request config: model=$modelName, reasoningEffort=$reasoningEffort',
+      level: LogLevel.debug,
+    );
 
     final requestBody = {
       'model': modelName,
       'stream': true,
-      'reasoning': {
-        'effort': 'high', // Always use high thinking effort for auto-fix
-      },
+      'reasoning': {'effort': reasoningEffort},
       'tools': tools,
       'text': {'format': responseFormat},
       'input': messages,
