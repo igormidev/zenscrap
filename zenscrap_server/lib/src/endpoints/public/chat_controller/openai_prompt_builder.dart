@@ -426,9 +426,9 @@ $queryParamsNotRelatedToUrlList
 **RULES:**
 1. If you can deduce the parameter's purpose → Use it appropriately
 2. If unclear → Return `responseType: "message"` and ASK the user
-3. Use ALL defined parameters OR remove unused ones from scrappableRequest
+3. **If a parameter is NOT used as {paramName} in your extract_rules or js_scenario, REMOVE it** by returning an updated `scrappableRequest` with that parameter deleted from queryParamsNotRelatedToUrl. Do not keep unused parameters.
 ''' : '''
-No queryParamsNotRelatedToUrl defined. Add them if user needs client-side interactions (search boxes, button pagination, filters) that don't modify the URL.
+No queryParamsNotRelatedToUrl defined. Only add them if the user explicitly asks for client-side interactions (search boxes, button pagination, filters). Do NOT add them speculatively.
 '''}
 
 ### Parameter Values
@@ -893,9 +893,9 @@ Placeholders for js_scenario/extract_rules (NOT added to URL):
 - For: search boxes, button pagination, form inputs
 
 ### Rules:
-- Remove unused parameters
-- Add new ones when needed
-- Ask user if purpose is unclear
+- **You MUST use every parameter in queryParamsNotRelatedToUrl as a `{paramName}` placeholder in your extract_rules or js_scenario.** If you cannot find a use for a parameter, you MUST remove it by returning an updated `scrappableRequest` in your response with that parameter deleted.
+- Add new parameters when the user asks for them or when you identify they are needed for the extraction
+- Ask user if a parameter's purpose is unclear
 
 ---
 
@@ -924,6 +924,7 @@ Before returning `responseType: "data"`:
 ☑️ Optimized wait time
 ☑️ Final config is the CHEAPEST that works
 ☑️ Placeholders preserved in final output
+☑️ **Every param in queryParamsNotRelatedToUrl is actually used as {paramName} in extract_rules or js_scenario** - if not, return updated scrappableRequest with unused params removed
 
 ---
 
