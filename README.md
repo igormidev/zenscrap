@@ -5,7 +5,7 @@
 <h1 align="center">ZenScrap</h1>
 
 <p align="center">
-  <strong>AI-assisted web scraping infrastructure built with Dart.</strong>
+  <strong>Self-healing AI-assisted web scraping infrastructure built with Dart.</strong>
 </p>
 
 <p align="center">
@@ -14,7 +14,8 @@
 
 <p align="center">
   ZenScrap turns a target URL and a plain-language request into a tested ScrapingBee-backed scraper,
-  a reusable API contract, and a dashboard for managing usage, analytics, and repairs.
+  a reusable API contract, and a self-healing runtime that can detect breakage, repair extraction rules,
+  and bring a scraper back online automatically.
 </p>
 
 <p align="center">
@@ -41,9 +42,10 @@
 ## Table of Contents
 
 - [What Is ZenScrap?](#what-is-zenscrap)
+- [Why self-healing matters](#why-self-healing-matters)
 - [Repository Map](#repository-map)
 - [Core Stack](#core-stack)
-- [How a scraper is created and maintained](#how-a-scraper-is-created-and-maintained)
+- [How a scraper is created, monitored, and self-healed](#how-a-scraper-is-created-monitored-and-self-healed)
 - [AI prompt architecture](#ai-prompt-architecture)
 - [Architecture at a glance](#architecture-at-a-glance)
 - [Server architecture](#server-architecture)
@@ -60,17 +62,42 @@ The product experience is intentionally simple:
 2. Describe, in natural language, what data should be extracted.
 3. Let the platform generate a request contract, build and test ScrapingBee extraction rules, expose a callable API, and keep monitoring the scraper over time.
 
+What makes ZenScrap different from most scraper builders is that it is designed around the full lifecycle, not only the first successful run. The product thesis is that a scraper is not finished when it first works. The hard part starts later, when the target site's HTML changes, selectors drift, or interaction steps stop matching the page. ZenScrap treats that as a first-class product problem and includes an automated repair loop for it.
+
 Under the hood, ZenScrap is not a single prompt wrapped in a UI. It is a multi-service system built in Dart:
 
 - A **Serverpod backend** orchestrates AI generation, chat-based refinement, persistence, billing, analytics, and public scraper execution routes.
 - A **Flutter client** provides the landing page, authenticated dashboard, chat workflow, analytics screens, and marketplace UI.
 - **AI orchestration** is split between an initial URL analysis flow and a deeper repair/refinement flow with tool access.
+- A **self-healing loop** watches for repeated failures, triggers an automated fix flow, re-tests the scraper, and restores service with minimal downtime.
 - **ScrapingBee** is the execution layer used to test and run extract rules.
 - **PostHog** is used for product analytics.
 
 The live SaaS is available at [zenscrap.com](https://www.zenscrap.com/).
 
 > In the codebase, the central domain object is a **Scrappable**: a persisted scraper definition that combines a request template, reference data, extraction logic, analytics, and auto-fix settings.
+
+## Why self-healing matters
+
+Most scraping tools help you generate a scraper once. ZenScrap was built to solve the next problem too: **what happens when the target page changes after the scraper is already in production**.
+
+If the HTML changes, the usual outcome in this industry is straightforward:
+
+1. selectors stop matching
+2. the scraper starts failing
+3. someone has to notice
+4. someone has to debug the DOM manually
+5. the endpoint stays offline until the rule set is repaired
+
+ZenScrap's strongest differentiator is that it shortens that failure window. When a saved scraper starts failing repeatedly, the backend can trigger an auto-fix flow that:
+
+1. detects the breakage from request analytics and failure history
+2. revisits the page with Playwright tooling
+3. regenerates the broken ScrapingBee logic against the current DOM
+4. validates the fix before saving it back
+5. brings the scraper back online without requiring a human to rebuild it from scratch
+
+The value to the user is practical: instead of a scraper staying broken until someone manually intervenes, the platform is built to keep downtime short and recover quickly. That is why the landing page leads with **"Web Scrapers That Fix Themselves"** and why the self-healing system is not just a feature add-on, but a core architectural decision in this repository.
 
 ## Repository Map
 
@@ -109,7 +136,7 @@ These are the main architectural technologies and services that shape the projec
 | **Talker** | `zenscrap_flutter` | Logging and error visibility during UI development |
 | **seo** | `zenscrap_flutter` | Search-engine-friendly metadata for the web build |
 
-## How a scraper is created and maintained
+## How a scraper is created, monitored, and self-healed
 
 The runtime workflow is split into two AI stages plus an operations loop:
 
@@ -117,7 +144,10 @@ The runtime workflow is split into two AI stages plus an operations loop:
 2. **Interactive refinement**: a chat session uses OpenAI plus MCP tools to inspect the page, write ScrapingBee `extract_rules`, test them, optimize cost, and persist the working configuration.
 3. **Execution**: the public API routes run the saved extractor against user payloads and return structured JSON.
 4. **Observation**: analytics, usage counters, and request histories are stored for both product reporting and failure diagnosis.
-5. **Self-healing**: when a scraper degrades over time, background jobs can trigger an automatic repair flow that revisits the page, updates selectors, and re-tests the configuration.
+5. **Breakage detection**: when the target site's HTML changes and selectors stop matching, repeated failures accumulate instead of disappearing into logs.
+6. **Self-healing**: background jobs can trigger an automatic repair flow that revisits the page, updates selectors or interaction steps, re-tests the configuration, and restores the scraper.
+
+This repair path is a major product differentiator. ZenScrap is not only trying to generate a scraper faster; it is trying to reduce the amount of time a production scraper stays broken after a site change.
 
 ## AI Prompt Architecture
 
@@ -166,6 +196,7 @@ flowchart LR
 - persisting scrappables, request contracts, reference data, analytics, and billing state
 - exposing public scraper execution routes for test and production use
 - scheduling background jobs for cleanup, analytics aggregation, and auto-fix
+- detecting repeated scraper failures and triggering a repair loop
 - receiving Stripe webhooks and keeping account state in sync
 - serving the Flutter web build and legal/static pages from the same backend
 
@@ -246,7 +277,7 @@ flowchart TD
     L --> N["Analytics + usage tracking"]
     M --> N
 
-    O["Future calls"] --> P["Auto-fix session handler"]
+    O["Future calls + failure monitoring"] --> P["Auto-fix session handler"]
     P --> F
 
     D --> Q[("PostgreSQL")]
@@ -262,7 +293,7 @@ flowchart TD
 - The chat editing flow is session-based. `scrappable_chat_session.dart` keeps in-memory caches for live editing, thinking streams, and delayed commit behavior.
 - The OpenAI refinement flow is schema-driven. `openai_prompt_builder.dart` and `web_scraper_ai_models.dart` enforce structured outputs rather than free-form assistant text.
 - The public execution path is intentionally separated into `/api/scrappable/test` and `/api/scrappable/prod`, handled by `scrappable_api_route.dart`.
-- Auto-fix is not just a marketing idea. It is implemented as a real background capability through `FutureCall` jobs and a dedicated prompt builder.
+- Auto-fix is the clearest product differentiator in the codebase. It is implemented as a real background capability through `FutureCall` jobs, failure tracking, a dedicated prompt builder, and the same MCP-backed repair tooling used in the manual editing flow.
 
 ## Flutter Architecture
 
@@ -427,4 +458,4 @@ serverpod migrate --experimental-features=all
 
 ---
 
-ZenScrap is now public as an open codebase for an AI-first scraping product that combines Dart on both sides of the stack, Serverpod on the backend, Flutter on the frontend, and ScrapingBee-backed extraction workflows under a chat-driven UX.
+ZenScrap is now public as an open codebase for an AI-first, self-healing scraping product that combines Dart on both sides of the stack, Serverpod on the backend, Flutter on the frontend, and ScrapingBee-backed extraction workflows under a chat-driven UX.
