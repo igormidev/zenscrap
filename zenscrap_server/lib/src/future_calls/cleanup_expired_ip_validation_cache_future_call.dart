@@ -11,7 +11,7 @@ class CleanupExpiredIpValidationCacheFutureCall extends FutureCall {
   static const Duration _cleanupInterval = Duration(hours: 24);
   static const Duration _cacheExpiry = Duration(hours: 72);
 
-  Future<void> run(Session session, [bool? _]) async {
+  Future<void> run(Session session, [bool? placeholder]) async {
     try {
       final expiryThreshold = DateTime.now().subtract(_cacheExpiry);
 

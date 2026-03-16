@@ -11,7 +11,7 @@ import 'package:zenscrap_server/src/generated/protocol.dart';
 class CleanupExpiredPendingCommitsFutureCall extends FutureCall {
   static const String callName = 'cleanup_expired_pending_commits';
 
-  Future<void> run(Session session, [bool? _]) async {
+  Future<void> run(Session session, [bool? placeholder]) async {
     try {
       // Find all pending commit records older than the max age
       final expiryThreshold = DateTime.now().subtract(

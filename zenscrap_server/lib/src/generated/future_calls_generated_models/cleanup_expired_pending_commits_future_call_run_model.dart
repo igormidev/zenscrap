@@ -14,30 +14,31 @@ import 'package:serverpod/serverpod.dart' as _i1;
 
 abstract class CleanupExpiredPendingCommitsFutureCallRunModel
     implements _i1.SerializableModel, _i1.ProtocolSerialization {
-  CleanupExpiredPendingCommitsFutureCallRunModel._({required this._});
+  CleanupExpiredPendingCommitsFutureCallRunModel._({required this.placeholder});
 
-  factory CleanupExpiredPendingCommitsFutureCallRunModel({required bool? _}) =
-      _CleanupExpiredPendingCommitsFutureCallRunModelImpl;
+  factory CleanupExpiredPendingCommitsFutureCallRunModel({
+    required bool? placeholder,
+  }) = _CleanupExpiredPendingCommitsFutureCallRunModelImpl;
 
   factory CleanupExpiredPendingCommitsFutureCallRunModel.fromJson(
     Map<String, dynamic> jsonSerialization,
   ) {
     return CleanupExpiredPendingCommitsFutureCallRunModel(
-      _: jsonSerialization['_'] as bool?,
+      placeholder: jsonSerialization['placeholder'] as bool?,
     );
   }
 
-  bool? _;
+  bool? placeholder;
 
   /// Returns a shallow copy of this [CleanupExpiredPendingCommitsFutureCallRunModel]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
-  CleanupExpiredPendingCommitsFutureCallRunModel copyWith({bool? _});
+  CleanupExpiredPendingCommitsFutureCallRunModel copyWith({bool? placeholder});
   @override
   Map<String, dynamic> toJson() {
     return {
       '__className__': 'CleanupExpiredPendingCommitsFutureCallRunModel',
-      if (_ != null) '_': _,
+      if (placeholder != null) 'placeholder': placeholder,
     };
   }
 
@@ -56,18 +57,19 @@ class _Undefined {}
 
 class _CleanupExpiredPendingCommitsFutureCallRunModelImpl
     extends CleanupExpiredPendingCommitsFutureCallRunModel {
-  _CleanupExpiredPendingCommitsFutureCallRunModelImpl({required bool? _})
-    : super._(_: _);
+  _CleanupExpiredPendingCommitsFutureCallRunModelImpl({
+    required bool? placeholder,
+  }) : super._(placeholder: placeholder);
 
   /// Returns a shallow copy of this [CleanupExpiredPendingCommitsFutureCallRunModel]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   @override
   CleanupExpiredPendingCommitsFutureCallRunModel copyWith({
-    Object? _ = _Undefined,
+    Object? placeholder = _Undefined,
   }) {
     return CleanupExpiredPendingCommitsFutureCallRunModel(
-      _: _ is bool? ? _ : this._,
+      placeholder: placeholder is bool? ? placeholder : this.placeholder,
     );
   }
 }

@@ -22,10 +22,22 @@ const Duration kPendingSessionCommitMaxAge = Duration(hours: 24);
 const Duration kPendingSessionCommitCleanupInterval = Duration(hours: 1);
 
 // =============================================================================
-// OpenAI GPT-5 Family Pricing (as of December 2025)
+// OpenAI GPT-5.2 Family Pricing (as of February 2026)
 // Prices per million tokens
-// Source: https://pricepertoken.com/pricing-page/model/openai-gpt-5
+// Source: https://openai.com/api/pricing/
 // =============================================================================
+
+/// GPT-5.2 input token price per million tokens ($1.75)
+const double kGpt52InputPricePerMillionTokens = 1.75;
+
+/// GPT-5.2 output token price per million tokens ($14.00)
+const double kGpt52OutputPricePerMillionTokens = 14.00;
+
+/// GPT-5.2 Pro input token price per million tokens ($21.00)
+const double kGpt52ProInputPricePerMillionTokens = 21.00;
+
+/// GPT-5.2 Pro output token price per million tokens ($168.00)
+const double kGpt52ProOutputPricePerMillionTokens = 168.00;
 
 /// GPT-5 Mini input token price per million tokens ($0.25)
 const double kGpt5MiniInputPricePerMillionTokens = 0.25;

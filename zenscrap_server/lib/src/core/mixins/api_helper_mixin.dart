@@ -1248,7 +1248,7 @@ class AnalyticsPayload {
 class PeriodicSetRequestsAnalytics extends FutureCall {
   static const String callName = 'periodicSetRequestsAnalytics';
 
-  Future<void> run(Session session, [bool? _]) async {
+  Future<void> run(Session session, [bool? placeholder]) async {
     Map<ScrappableId, Map<NanoId, Map<ApiKey, List<AnalyticsPayload>>>>
     pendingAnalytics = {...ApiHelperMixin._pendingAnalytics};
     ApiHelperMixin._pendingAnalytics.clear();
@@ -1289,7 +1289,7 @@ class PeriodicSetRequestsAnalytics extends FutureCall {
 /// Periodic cleanup for in-memory caches to prevent memory leaks.
 /// This FutureCall runs at [ApiHelperConfig.cacheCleanupInterval] and evicts expired cache entries.
 class PeriodicCacheCleanup extends FutureCall {
-  Future<void> run(Session session, [bool? _]) async {
+  Future<void> run(Session session, [bool? placeholder]) async {
     try {
       // Log cache sizes before cleanup for monitoring
       final beforeSizes = _getCacheSizes();
@@ -1345,7 +1345,7 @@ class PeriodicCacheCleanup extends FutureCall {
 class PeriodicCleanupOldAnalyticsDetails extends FutureCall {
   static const String callName = 'periodicCleanupOldAnalyticsDetails';
 
-  Future<void> run(Session session, [bool? _]) async {
+  Future<void> run(Session session, [bool? placeholder]) async {
     try {
       final now = DateTime.now();
       final retentionCutoff = now.subtract(

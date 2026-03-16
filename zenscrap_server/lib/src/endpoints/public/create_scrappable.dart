@@ -544,17 +544,27 @@ Output:
   }
 }
 
+**CRITICAL - queryParamsNotRelatedToUrl MUST BE EMPTY BY DEFAULT:**
+DO NOT add searchQuery, pageNumber, pageIndex, or ANY parameters to queryParamsNotRelatedToUrl unless:
+1. The user EXPLICITLY asks for search, pagination, or filter functionality in their context message, OR
+2. You used web search (grounding) to research the site and CONFIRMED it fundamentally relies on client-side search/pagination to display its main content (e.g., the site is entirely a search engine or a paginated listing where data cannot be accessed without interacting with those controls)
+3. If the URL itself contains search/pagination query parameters, those go in queryParams, NOT queryParamsNotRelatedToUrl
+
+queryParamsNotRelatedToUrl should be `{}` (empty) for the vast majority of URLs. A site merely having a search bar or pagination buttons is NOT enough reason to add parameters — most sites display their main content without requiring these interactions.
+
+**If in doubt, leave queryParamsNotRelatedToUrl empty.** The user can always add parameters later in the chat session.
+
 EXAMPLE 5 - E-commerce with Client-Side Search and Pagination (queryParamsNotRelatedToUrl):
 Input URL: https://shop.example.com/products
 User Context: "I want to search for products and add pagination index"
 
 Analysis:
 - The URL doesn't have search or pagination params
-- But the site has a search box and page navigation buttons (client-side only)
-- User explicitly asked for "pagination index" → Create a `pageIndex` parameter
-- Create parameters in queryParamsNotRelatedToUrl for search and pagination
+- The user EXPLICITLY asked for "search for products" and "pagination index"
+- Because the user asked → Create searchQuery and pageIndex parameters
 - These will be used as {searchQuery} and {pageIndex} placeholders in js_scenario
 - They will NOT be added to the URL
+- If the user had NOT mentioned search/pagination, queryParamsNotRelatedToUrl would be {} unless web research confirmed the site fundamentally requires these interactions
 
 Output:
 {
@@ -575,10 +585,10 @@ Output:
   "referenceLinkPathParameters": {}
 }
 
-Note: The searchQuery and pageIndex parameters will be used as {searchQuery} and {pageIndex} placeholders in the extraction rules that the AI will create later. They will be replaced at runtime with values from the user's API payload.
+Note: The searchQuery and pageIndex parameters were added ONLY because the user explicitly requested search and pagination functionality. Without user context, queryParamsNotRelatedToUrl would be {}.
 
-**IMPORTANT - Pagination Parameter Naming:**
-When user mentions pagination, ALWAYS add a pagination-related parameter:
+**Pagination Parameter Naming (only when pagination is confirmed needed):**
+When the user requests pagination or web research confirms the site requires it, use these naming conventions:
 - "pagination index" / "index of pagination" → Add `pageIndex` (0-based index)
 - "page number" → Add `pageNumber` (1-based number)
 - "pagination" / "navigate pages" → Add `pageIndex` or `currentPage`
@@ -590,8 +600,8 @@ User Context: "I want to filter by location, price range, and number of bedrooms
 
 Analysis:
 - Site has dropdown filters but they don't update the URL (client-side only)
-- Create parameters in queryParamsNotRelatedToUrl for each filter option
-- Users can control these in their API payloads
+- The user explicitly asked for location, price range, and bedrooms filters
+- Because the user asked → Create parameters for each filter
 - These will be used as {location}, {minPrice}, etc. in js_scenario
 
 Output:
@@ -615,6 +625,33 @@ Output:
   "referenceLinkPathParameters": {}
 }
 
+EXAMPLE 7 - Site with No Special Interactions Needed (MOST COMMON CASE):
+Input URL: https://example-dashboard.com/stats
+No User Context provided.
+
+Analysis:
+- The URL has no search or pagination query parameters
+- The user did not request search, pagination, or filters
+- Web research does not indicate the site requires client-side interactions to display its main content
+- Therefore queryParamsNotRelatedToUrl is empty ({})
+- Even if the site has a search bar or pagination somewhere, we do NOT add parameters unless they are needed for the user's scraping goal
+
+Output:
+{
+  "name": "Dashboard Statistics",
+  "nameLanguage": "enUS",
+  "description": "View statistics and metrics from the dashboard.",
+  "descriptionLanguage": "enUS",
+  "category": "general",
+  "scrappableRequest": {
+    "url": "https://example-dashboard.com/stats",
+    "queryParams": {},
+    "queryParamsNotRelatedToUrl": {},
+    "pathParams": []
+  },
+  "referenceLinkPathParameters": {}
+}
+
 IMPORTANT RULES:
 1. Return a structured JSON object with the nested structure shown above
 2. The top level must have: name, nameLanguage, description, descriptionLanguage, category, scrappableRequest, and referenceLinkPathParameters
@@ -623,6 +660,7 @@ IMPORTANT RULES:
 5. **CRITICAL**: Think carefully about queryParams vs queryParamsNotRelatedToUrl:
    - Does this parameter appear in the URL? → Put in scrappableRequest.queryParams
    - Is this for client-side interaction only (URL never changes)? → Put in scrappableRequest.queryParamsNotRelatedToUrl
+   - **DEFAULT: queryParamsNotRelatedToUrl should be {} (empty)**. Only add parameters when the user explicitly asks for them or web research confirms the site fundamentally requires client-side interactions to access its content.
    - See the detailed guide above for examples and decision trees
 6. For dynamic parameters, set their value to null (not the actual value)
 7. The pathParams array must contain the exact same parameter names used in the url placeholders
@@ -706,14 +744,14 @@ This context may give you clues about:
 
 Use this information to better identify dynamic parameters!
 
-**CRITICAL - Parse User Context for Parameters:**
-If the user mentions ANY of these, you MUST add the corresponding parameter in queryParamsNotRelatedToUrl:
-- "pagination", "page", "index", "navigate pages" → Add `pageIndex: null`
-- "search", "query", "filter by text" → Add `searchQuery: null`
-- "filter by X" → Add a parameter for X (e.g., "filter by category" → `category: null`)
-- "sort", "order by" → Add `sortBy: null` or `sortOrder: null`
+**Parse User Context for Parameters:**
+If the user requests any of the following features, add the corresponding parameter in queryParamsNotRelatedToUrl:
+- User asks for pagination → Add `pageIndex: null` or `pageNumber: null`
+- User asks for search functionality → Add `searchQuery: null`
+- User asks to filter by X → Add a parameter for X (e.g., "filter by category" → `category: null`)
+- User asks for sorting → Add `sortBy: null` or `sortOrder: null`
 
-Example: User says "add pagination index" → You MUST add `"pageIndex": null` in queryParamsNotRelatedToUrl
+**DO NOT add these parameters speculatively.** Only add them when the user asks for the functionality or when web research confirms the site fundamentally requires these interactions to display its main content.
 ''' : ''}
 
 Return only raw json, without anything more (not even md notations like "```" in the begining... just the raw json).

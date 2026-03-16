@@ -59,9 +59,9 @@ dependencies:
   talker_flutter: ^5.1.5
   talker_riverpod_logger: ^5.1.5
 
-  serverpod_flutter: 3.3.0
-  serverpod_auth_idp_client: 3.3.0
-  serverpod_auth_idp_flutter: 3.3.0
+  serverpod_flutter: 3.3.1
+  serverpod_auth_idp_client: 3.3.1
+  serverpod_auth_idp_flutter: 3.3.1
 
   translator: ^1.0.4+1
   executor: ^2.2.5
@@ -79,7 +79,7 @@ dev_dependencies:
   freezed: ^3.2.3
   json_serializable: ^6.10.0
   flutter_launcher_icons: ^0.14.4
-  analyzer: ^7.0.0
+  analyzer: ^8.4.1
   path: ^1.9.0
 
 # Flutter Launcher Icons configuration

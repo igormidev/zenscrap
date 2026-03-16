@@ -21,6 +21,7 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
   /// Tracks whether we've received a successful extract rule in this session.
   /// Used to determine if errors occur before the first successful result.
   bool _hasReceivedExtractRule = false;
+  String? _lastChatErrorReasonCode;
 
   @override
   ScrapChatSessionState build() {
@@ -43,6 +44,7 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
     _chatResponseSubscription = null;
     _aiCurrentThinkingSubscription = null;
     _hasReceivedExtractRule = false;
+    _lastChatErrorReasonCode = null;
   }
 
   Future<void> createScrappable({
@@ -194,6 +196,8 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
   }
 
   void onChange(ChatResponse chatResponse) {
+    final rawResponse = chatResponse;
+
     // Get scrappable ID and message count for analytics
     final scrappableId = state.mapOrNull(standard: (value) => value.data.id);
     final currentMessages = ref.read(chatMessagesProvider);
@@ -203,19 +207,24 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
     );
 
     // Track the response for analytics
-    _trackChatResponse(chatResponse, scrappableId, messageCount);
+    _trackChatResponse(rawResponse, scrappableId, messageCount);
 
-    if (chatResponse is UpdatedScrappableRequestResponse) {
+    // Improve technical parser errors into actionable user-facing messages.
+    final displayResponse = rawResponse is ErrorTextResponse
+        ? _toUserFriendlyErrorResponse(rawResponse)
+        : rawResponse;
+
+    if (displayResponse is UpdatedScrappableRequestResponse) {
       state.mapOrNull(
         standard: (value) {
           // Use the full ScrappableRequest if available (from AI-driven updates),
           // otherwise fall back to individual fields (for manual endpoint updates)
           final updatedRequest =
-              chatResponse.scrappableRequest ??
+              displayResponse.scrappableRequest ??
               value.data.targetRequest?.copyWith(
-                url: chatResponse.url,
-                pathParams: chatResponse.pathParams,
-                queryParams: chatResponse.queryParams,
+                url: displayResponse.url,
+                pathParams: displayResponse.pathParams,
+                queryParams: displayResponse.queryParams,
               );
           state = value.copyWith(
             data: value.data.copyWith(targetRequest: updatedRequest),
@@ -224,26 +233,28 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
       );
       return;
     }
-    if (chatResponse is TestEndpointCalledSuccessResponse) {
+    if (displayResponse is TestEndpointCalledSuccessResponse) {
       state.mapOrNull(
         standard: (value) {
           state = value.copyWith(
             data: value.data.copyWith(
-              referenceTestData: chatResponse.referenceTestData,
+              referenceTestData: displayResponse.referenceTestData,
             ),
           );
         },
       );
       // Don't return here - we want to add the message to the chat
     }
-    if (chatResponse is NewExtractRuleResponse) {
+    if (displayResponse is NewExtractRuleResponse) {
+      _lastChatErrorReasonCode = null;
       state.mapOrNull(
         standard: (value) {
           state = value.copyWith(
             data: value.data.copyWith(
-              referenceTestData: chatResponse.referenceTestData,
-              scrappingBeeExtractRules: chatResponse.scrappingBeeExtractLogic,
-              targetRequest: chatResponse.scrapperRequest,
+              referenceTestData: displayResponse.referenceTestData,
+              scrappingBeeExtractRules:
+                  displayResponse.scrappingBeeExtractLogic,
+              targetRequest: displayResponse.scrapperRequest,
             ),
           );
         },
@@ -253,8 +264,8 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
         .read(chatMessagesProvider.notifier)
         .setMessages(
           currentMessages.maybeMap(
-            data: (data) => AsyncValue.data([...data.value, chatResponse]),
-            orElse: () => AsyncValue.data([chatResponse]),
+            data: (data) => AsyncValue.data([...data.value, displayResponse]),
+            orElse: () => AsyncValue.data([displayResponse]),
           ),
         );
   }
@@ -271,6 +282,7 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
     final analytics = ref.read(analyticsServiceProvider);
     final responseType = _getResponseType(chatResponse);
     final isFirstResponse = messageCount == 0;
+    final attemptNumber = messageCount + 1;
 
     // Track every response received
     analytics.trackChatResponseReceived(
@@ -286,6 +298,7 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
         chatResponse,
         scrappableId,
         messageCount,
+        attemptNumber,
         isFirstResponse,
         analytics,
       );
@@ -295,6 +308,7 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
     // Track first successful extract rule
     if (chatResponse is NewExtractRuleResponse && !_hasReceivedExtractRule) {
       _hasReceivedExtractRule = true;
+      _lastChatErrorReasonCode = null;
       analytics.trackChatFirstExtractRuleSuccess(
         scrappableId: scrappableId,
         messageCount: messageCount,
@@ -337,6 +351,7 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
     ChatResponse chatResponse,
     int scrappableId,
     int messageCount,
+    int attemptNumber,
     bool isFirstResponse,
     AnalyticsService analytics,
   ) {
@@ -359,12 +374,23 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
       errorTitle = 'User API Key Quota Exceeded';
     }
 
+    final errorReasonCode = _normalizeErrorReasonCode(
+      errorType: errorType,
+      errorMessage: errorMessage,
+      errorTitle: errorTitle,
+      errorDescription: errorDescription,
+    );
+    _lastChatErrorReasonCode = errorReasonCode;
+
     // Track the error
     analytics.trackChatResponseError(
       scrappableId: scrappableId,
       errorType: errorType,
       messageCount: messageCount,
+      attemptNumber: attemptNumber,
       isFirstResponse: isFirstResponse,
+      hasReceivedExtractRule: _hasReceivedExtractRule,
+      errorReasonCode: errorReasonCode,
       errorMessage: errorMessage,
       errorTitle: errorTitle,
       errorDescription: errorDescription,
@@ -376,11 +402,125 @@ class ScrapChatSessionNotifier extends Notifier<ScrapChatSessionState> {
         scrappableId: scrappableId,
         errorType: errorType,
         messageCount: messageCount,
+        attemptNumber: attemptNumber,
+        hasReceivedExtractRule: _hasReceivedExtractRule,
+        errorReasonCode: errorReasonCode,
         errorMessage: errorMessage,
         errorTitle: errorTitle,
         errorDescription: errorDescription,
       );
     }
+  }
+
+  Future<void> retryIncompleteSetup() async {
+    if (state.mapOrNull(standard: (value) => value.sessionUuid) == null) {
+      return;
+    }
+
+    final data = state.mapOrNull(standard: (value) => value.data);
+    if (data == null) return;
+    if (data.scrappingBeeExtractRules != null) return;
+
+    final reasonCode = _lastChatErrorReasonCode ?? 'unknown';
+    final analytics = ref.read(analyticsServiceProvider);
+    analytics.trackApiAnalyticsErrorRetryClick(errorType: reasonCode);
+
+    final guidedRecoveryPrompt =
+        '''
+Recovery mode: continue from the existing context and fix the setup response format.
+Last error reason code: $reasonCode.
+
+Hard requirements:
+- Return schema-valid JSON.
+- `extract_rules` must be a JSON object (or stringified JSON object), never an array.
+- If `scrappableRequest` is present: `queryParam` and `queryParamsNotRelatedToUrl` must be objects (`{}` when empty), and `pathParams` must be an array (`[]` when empty). Never use null for these containers.
+
+Do not ask me to restate context unless absolutely required.
+''';
+
+    await sendMessage(guidedRecoveryPrompt);
+  }
+
+  ErrorTextResponse _toUserFriendlyErrorResponse(ErrorTextResponse response) {
+    final reasonCode = _normalizeErrorReasonCode(
+      errorType: 'error_text',
+      errorMessage: response.errorMessage,
+      errorTitle: null,
+      errorDescription: null,
+    );
+
+    final friendlyMessage = switch (reasonCode) {
+      'extract_rules_type_invalid' =>
+        'Setup failed because the AI returned an invalid extract-rules format. '
+            'Use "Retry setup" to automatically regenerate it.',
+      'scrappable_request_invalid' =>
+        'Setup failed because request parameters came in an invalid format. '
+            'Use "Retry setup" to regenerate the configuration.',
+      'missing_required_data' =>
+        'Setup could not be completed because required configuration fields were missing. '
+            'Use "Retry setup" to continue from the current context.',
+      _ => response.errorMessage,
+    };
+
+    return ErrorTextResponse(
+      role: response.role,
+      expectsFollowUp: response.expectsFollowUp,
+      errorMessage: friendlyMessage,
+    );
+  }
+
+  String _normalizeErrorReasonCode({
+    required String errorType,
+    required String? errorMessage,
+    required String? errorTitle,
+    required String? errorDescription,
+  }) {
+    final details = [
+      errorType,
+      errorMessage ?? '',
+      errorTitle ?? '',
+      errorDescription ?? '',
+    ].join(' ').toLowerCase();
+
+    if (details.contains('extract_rules must be a string or object') ||
+        details.contains('extract_rules_type_invalid')) {
+      return 'extract_rules_type_invalid';
+    }
+    if (details.contains('could not parse scrappablerequest') ||
+        details.contains('scrappablerequest.queryparam') ||
+        details.contains('scrappablerequest.pathparams') ||
+        details.contains('scrappable_request_invalid')) {
+      return 'scrappable_request_invalid';
+    }
+    if (details.contains('missing responsetype') ||
+        details.contains('missing resumeactionmessage') ||
+        details.contains('must include either scrappingbeefetchsettings') ||
+        details.contains('missing_required_data')) {
+      return 'missing_required_data';
+    }
+    if (details.contains('context_length_exceeded') ||
+        (details.contains('context') && details.contains('length'))) {
+      return 'context_length_exceeded';
+    }
+    if (details.contains('timeout')) {
+      return 'timeout';
+    }
+    if (details.contains('network error') ||
+        details.contains('socket') ||
+        details.contains('connection')) {
+      return 'network_error';
+    }
+    if (details.contains('credit_limit_reached')) {
+      return 'credit_limit_reached';
+    }
+    if (details.contains('ip_limit_reached')) {
+      return 'ip_limit_reached';
+    }
+    if (details.contains('user_api_key_quota_exceeded')) {
+      return 'user_api_key_quota_exceeded';
+    }
+
+    return 'unknown';
   }
 
   void updateScrappableDetails({

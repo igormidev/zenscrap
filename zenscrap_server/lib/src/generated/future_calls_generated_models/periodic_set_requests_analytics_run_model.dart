@@ -14,30 +14,30 @@ import 'package:serverpod/serverpod.dart' as _i1;
 
 abstract class PeriodicSetRequestsAnalyticsRunModel
     implements _i1.SerializableModel, _i1.ProtocolSerialization {
-  PeriodicSetRequestsAnalyticsRunModel._({required this._});
+  PeriodicSetRequestsAnalyticsRunModel._({required this.placeholder});
 
-  factory PeriodicSetRequestsAnalyticsRunModel({required bool? _}) =
+  factory PeriodicSetRequestsAnalyticsRunModel({required bool? placeholder}) =
       _PeriodicSetRequestsAnalyticsRunModelImpl;
 
   factory PeriodicSetRequestsAnalyticsRunModel.fromJson(
     Map<String, dynamic> jsonSerialization,
   ) {
     return PeriodicSetRequestsAnalyticsRunModel(
-      _: jsonSerialization['_'] as bool?,
+      placeholder: jsonSerialization['placeholder'] as bool?,
     );
   }
 
-  bool? _;
+  bool? placeholder;
 
   /// Returns a shallow copy of this [PeriodicSetRequestsAnalyticsRunModel]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
-  PeriodicSetRequestsAnalyticsRunModel copyWith({bool? _});
+  PeriodicSetRequestsAnalyticsRunModel copyWith({bool? placeholder});
   @override
   Map<String, dynamic> toJson() {
     return {
       '__className__': 'PeriodicSetRequestsAnalyticsRunModel',
-      if (_ != null) '_': _,
+      if (placeholder != null) 'placeholder': placeholder,
     };
   }
 
@@ -56,13 +56,18 @@ class _Undefined {}
 
 class _PeriodicSetRequestsAnalyticsRunModelImpl
     extends PeriodicSetRequestsAnalyticsRunModel {
-  _PeriodicSetRequestsAnalyticsRunModelImpl({required bool? _}) : super._(_: _);
+  _PeriodicSetRequestsAnalyticsRunModelImpl({required bool? placeholder})
+    : super._(placeholder: placeholder);
 
   /// Returns a shallow copy of this [PeriodicSetRequestsAnalyticsRunModel]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   @override
-  PeriodicSetRequestsAnalyticsRunModel copyWith({Object? _ = _Undefined}) {
-    return PeriodicSetRequestsAnalyticsRunModel(_: _ is bool? ? _ : this._);
+  PeriodicSetRequestsAnalyticsRunModel copyWith({
+    Object? placeholder = _Undefined,
+  }) {
+    return PeriodicSetRequestsAnalyticsRunModel(
+      placeholder: placeholder is bool? ? placeholder : this.placeholder,
+    );
   }
 }

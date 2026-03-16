@@ -9,6 +9,36 @@ sealed class WebScrapperChatAIResponse {
   const WebScrapperChatAIResponse();
 }
 
+enum StructuredResponseValidationReason {
+  extractRulesTypeInvalid,
+  scrappableRequestInvalid,
+  missingRequiredData,
+}
+
+extension StructuredResponseValidationReasonExt
+    on StructuredResponseValidationReason {
+  String get code => switch (this) {
+    StructuredResponseValidationReason.extractRulesTypeInvalid =>
+      'extract_rules_type_invalid',
+    StructuredResponseValidationReason.scrappableRequestInvalid =>
+      'scrappable_request_invalid',
+    StructuredResponseValidationReason.missingRequiredData =>
+      'missing_required_data',
+  };
+}
+
+class StructuredResponseParseResult {
+  final WebScrapperChatAIResponse response;
+  final StructuredResponseValidationReason? validationReason;
+
+  const StructuredResponseParseResult({
+    required this.response,
+    required this.validationReason,
+  });
+
+  bool get isRetryableValidationFailure => validationReason != null;
+}
+
 final class WebScrapperChatAIResponseJustMessage
     extends WebScrapperChatAIResponse {
   final String message;
@@ -88,11 +118,11 @@ class WebScrapperRequest {
   });
 
   Map<String, dynamic> toMap() => <String, dynamic>{
-        'url': url,
-        'queryParam': queryParam,
-        'queryParamsNotRelatedToUrl': queryParamsNotRelatedToUrl,
-        'pathParams': pathParams,
-      };
+    'url': url,
+    'queryParam': queryParam,
+    'queryParamsNotRelatedToUrl': queryParamsNotRelatedToUrl,
+    'pathParams': pathParams,
+  };
 
   @override
   String toString() =>
@@ -199,7 +229,7 @@ const Map<String, dynamic> webScraperResponseJsonSchema = {
     'properties': {
       'responseType': {
         'type': 'string',
-        'enum': ['message', 'error', 'data']
+        'enum': ['message', 'error', 'data'],
       },
       'message': {'type': 'string'},
       'errorMessage': {'type': 'string'},
@@ -212,25 +242,25 @@ const Map<String, dynamic> webScraperResponseJsonSchema = {
           'queryParam': {
             'type': 'object',
             'additionalProperties': {
-              'type': ['string', 'null']
-            }
+              'type': ['string', 'null'],
+            },
           },
           'queryParamsNotRelatedToUrl': {
             'type': 'object',
             'additionalProperties': {
-              'type': ['string', 'null']
-            }
+              'type': ['string', 'null'],
+            },
           },
           'pathParams': {
             'type': 'array',
-            'items': {'type': 'string'}
+            'items': {'type': 'string'},
           },
         },
         'required': [
           'url',
           'queryParam',
           'queryParamsNotRelatedToUrl',
-          'pathParams'
+          'pathParams',
         ],
       },
       'scrappingBeeFetchSettings': {
@@ -240,7 +270,7 @@ const Map<String, dynamic> webScraperResponseJsonSchema = {
           'url': {'type': 'string'},
           'extract_rules': {'type': 'string'},
           'js_scenario': {
-            'type': ['string', 'null']
+            'type': ['string', 'null'],
           },
           'render_js': {'type': 'boolean'},
           'wait': {
@@ -249,21 +279,21 @@ const Map<String, dynamic> webScraperResponseJsonSchema = {
             'maximum': 35000,
           },
           'wait_for': {
-            'type': ['string', 'null']
+            'type': ['string', 'null'],
           },
           'wait_browser': {
-            'type': ['string', 'null']
+            'type': ['string', 'null'],
           },
           'premium_proxy': {'type': 'boolean'},
           'stealth_proxy': {'type': 'boolean'},
           'country_code': {
-            'type': ['string', 'null']
+            'type': ['string', 'null'],
           },
           'session_id': {
-            'type': ['string', 'null']
+            'type': ['string', 'null'],
           },
           'custom_google': {
-            'type': ['boolean', 'null']
+            'type': ['boolean', 'null'],
           },
         },
         'required': [
@@ -279,14 +309,17 @@ const Map<String, dynamic> webScraperResponseJsonSchema = {
   },
 };
 
-WebScrapperChatAIResponse parseStructuredResponse(
+StructuredResponseParseResult parseStructuredResponseWithValidation(
   Map<String, dynamic> data,
 ) {
   final responseType = data['responseType'] as String?;
 
   if (responseType == null) {
-    return const WebScrapperChatAIResponseErrorMessage(
-      'Invalid response: missing responseType field',
+    return const StructuredResponseParseResult(
+      response: WebScrapperChatAIResponseErrorMessage(
+        'Invalid response: missing responseType field',
+      ),
+      validationReason: StructuredResponseValidationReason.missingRequiredData,
     );
   }
 
@@ -294,38 +327,62 @@ WebScrapperChatAIResponse parseStructuredResponse(
     case 'message':
       final message = data['message'] as String?;
       if (message == null || message.isEmpty) {
-        return const WebScrapperChatAIResponseErrorMessage(
-          'Invalid response: message type but no message content',
+        return const StructuredResponseParseResult(
+          response: WebScrapperChatAIResponseErrorMessage(
+            'Invalid response: message type but no message content',
+          ),
+          validationReason:
+              StructuredResponseValidationReason.missingRequiredData,
         );
       }
-      return WebScrapperChatAIResponseJustMessage(message);
+      return StructuredResponseParseResult(
+        response: WebScrapperChatAIResponseJustMessage(message),
+        validationReason: null,
+      );
 
     case 'error':
       final errorMessage = data['errorMessage'] as String?;
       if (errorMessage == null || errorMessage.isEmpty) {
-        return const WebScrapperChatAIResponseErrorMessage(
-          'Invalid response: error type but no error message',
+        return const StructuredResponseParseResult(
+          response: WebScrapperChatAIResponseErrorMessage(
+            'Invalid response: error type but no error message',
+          ),
+          validationReason:
+              StructuredResponseValidationReason.missingRequiredData,
         );
       }
-      return WebScrapperChatAIResponseErrorMessage(errorMessage);
+      return StructuredResponseParseResult(
+        response: WebScrapperChatAIResponseErrorMessage(errorMessage),
+        validationReason: null,
+      );
 
     case 'data':
       final resumeActionMessage = data['resumeActionMessage'] as String?;
-      final scrappingBeeFetchSettingsData =
-          data['scrappingBeeFetchSettings'] as Map<String, dynamic>?;
-      final scrappableRequestData =
-          data['scrappableRequest'] as Map<String, dynamic>?;
+      final scrappingBeeFetchSettingsData = _asStringDynamicMap(
+        data['scrappingBeeFetchSettings'],
+      );
+      final scrappableRequestData = _asStringDynamicMap(
+        data['scrappableRequest'],
+      );
 
       if (resumeActionMessage == null) {
-        return const WebScrapperChatAIResponseErrorMessage(
-          'Invalid response: data type but missing resumeActionMessage',
+        return const StructuredResponseParseResult(
+          response: WebScrapperChatAIResponseErrorMessage(
+            'Invalid response: data type but missing resumeActionMessage',
+          ),
+          validationReason:
+              StructuredResponseValidationReason.missingRequiredData,
         );
       }
 
       if (scrappingBeeFetchSettingsData == null &&
           scrappableRequestData == null) {
-        return const WebScrapperChatAIResponseErrorMessage(
-          'Invalid response: data type must include either scrappingBeeFetchSettings, scrappableRequest, or both',
+        return const StructuredResponseParseResult(
+          response: WebScrapperChatAIResponseErrorMessage(
+            'Invalid response: data type must include either scrappingBeeFetchSettings, scrappableRequest, or both',
+          ),
+          validationReason:
+              StructuredResponseValidationReason.missingRequiredData,
         );
       }
 
@@ -341,8 +398,23 @@ WebScrapperChatAIResponse parseStructuredResponse(
           } else if (extractRulesRaw is Map) {
             extractRules = jsonEncode(extractRulesRaw);
           } else {
-            return const WebScrapperChatAIResponseErrorMessage(
-              'Invalid response: extract_rules must be a string or object',
+            return const StructuredResponseParseResult(
+              response: WebScrapperChatAIResponseErrorMessage(
+                'Invalid response: extract_rules must be a string or object',
+              ),
+              validationReason:
+                  StructuredResponseValidationReason.extractRulesTypeInvalid,
+            );
+          }
+
+          final fetchUrl = scrappingBeeFetchSettingsData['url'] as String?;
+          if (fetchUrl == null || fetchUrl.isEmpty) {
+            return const StructuredResponseParseResult(
+              response: WebScrapperChatAIResponseErrorMessage(
+                'Invalid response: scrappingBeeFetchSettings.url is required',
+              ),
+              validationReason:
+                  StructuredResponseValidationReason.missingRequiredData,
             );
           }
 
@@ -376,7 +448,7 @@ WebScrapperChatAIResponse parseStructuredResponse(
               scrappingBeeFetchSettingsData['stealth_proxy'] as bool? ?? false;
 
           fetchSettings = ScrappingBeeFetchSettings(
-            url: scrappingBeeFetchSettingsData['url'] as String,
+            url: fetchUrl,
             extract_rules: extractRules,
             js_scenario: jsScenario,
             render_js: renderJs,
@@ -389,14 +461,17 @@ WebScrapperChatAIResponse parseStructuredResponse(
             country_code:
                 scrappingBeeFetchSettingsData['country_code'] as String?,
             // session_id can come as int or string from AI, so convert to string
-            session_id:
-                scrappingBeeFetchSettingsData['session_id']?.toString(),
+            session_id: scrappingBeeFetchSettingsData['session_id']?.toString(),
             custom_google:
                 scrappingBeeFetchSettingsData['custom_google'] as bool?,
           );
         } catch (e) {
-          return WebScrapperChatAIResponseErrorMessage(
-            'Invalid response: could not parse scrappingBeeFetchSettings ($e)',
+          return StructuredResponseParseResult(
+            response: WebScrapperChatAIResponseErrorMessage(
+              'Invalid response: could not parse scrappingBeeFetchSettings ($e)',
+            ),
+            validationReason:
+                StructuredResponseValidationReason.missingRequiredData,
           );
         }
       }
@@ -404,61 +479,153 @@ WebScrapperChatAIResponse parseStructuredResponse(
       WebScrapperRequest? scrappableRequest;
       if (scrappableRequestData != null) {
         try {
+          final requestUrl = scrappableRequestData['url'] as String?;
+          if (requestUrl == null || requestUrl.isEmpty) {
+            return const StructuredResponseParseResult(
+              response: WebScrapperChatAIResponseErrorMessage(
+                'Invalid response: scrappableRequest.url is required',
+              ),
+              validationReason:
+                  StructuredResponseValidationReason.missingRequiredData,
+            );
+          }
+
+          final queryParam = _parseNullableStringMap(
+            scrappableRequestData['queryParam'],
+          );
+          if (queryParam == null) {
+            return const StructuredResponseParseResult(
+              response: WebScrapperChatAIResponseErrorMessage(
+                'Invalid response: scrappableRequest.queryParam must be an object or null',
+              ),
+              validationReason:
+                  StructuredResponseValidationReason.scrappableRequestInvalid,
+            );
+          }
+
+          final queryParamsNotRelatedToUrl = _parseNullableStringMap(
+            scrappableRequestData['queryParamsNotRelatedToUrl'],
+          );
+          if (queryParamsNotRelatedToUrl == null) {
+            return const StructuredResponseParseResult(
+              response: WebScrapperChatAIResponseErrorMessage(
+                'Invalid response: scrappableRequest.queryParamsNotRelatedToUrl must be an object or null',
+              ),
+              validationReason:
+                  StructuredResponseValidationReason.scrappableRequestInvalid,
+            );
+          }
+
+          final pathParams = _parseStringList(
+            scrappableRequestData['pathParams'],
+          );
+          if (pathParams == null) {
+            return const StructuredResponseParseResult(
+              response: WebScrapperChatAIResponseErrorMessage(
+                'Invalid response: scrappableRequest.pathParams must be an array or null',
+              ),
+              validationReason:
+                  StructuredResponseValidationReason.scrappableRequestInvalid,
+            );
+          }
+
           scrappableRequest = WebScrapperRequest(
-            url: scrappableRequestData['url'] as String,
-            queryParam:
-                (scrappableRequestData['queryParam'] as Map<String, dynamic>)
-                    .map(
-              (k, v) => MapEntry(k, v as String?),
-            ),
-            queryParamsNotRelatedToUrl:
-                (scrappableRequestData['queryParamsNotRelatedToUrl']
-                            as Map<String, dynamic>?)
-                        ?.map((k, v) => MapEntry(k, v as String?)) ??
-                    {},
-            pathParams: (scrappableRequestData['pathParams'] as List)
-                .map((e) => e as String)
-                .toList(),
+            url: requestUrl,
+            queryParam: queryParam,
+            queryParamsNotRelatedToUrl: queryParamsNotRelatedToUrl,
+            pathParams: pathParams,
           );
         } catch (e) {
-          return WebScrapperChatAIResponseErrorMessage(
-            'Invalid response: could not parse scrappableRequest ($e)',
+          return StructuredResponseParseResult(
+            response: WebScrapperChatAIResponseErrorMessage(
+              'Invalid response: could not parse scrappableRequest ($e)',
+            ),
+            validationReason:
+                StructuredResponseValidationReason.scrappableRequestInvalid,
           );
         }
       }
 
-      final parsedResponse =
-          [fetchSettings, scrappableRequest].nonNulls.length; // 1 or 2
+      final parsedResponse = [
+        fetchSettings,
+        scrappableRequest,
+      ].nonNulls.length; // 1 or 2
 
-      if (parsedResponse == 2 && fetchSettings != null && scrappableRequest != null) {
-        return WebScrapperChatAIResponseBothModified(
-          resumeActionMessage: resumeActionMessage,
-          fetchSettings: fetchSettings,
-          scrappableRequest: scrappableRequest,
+      if (parsedResponse == 2 &&
+          fetchSettings != null &&
+          scrappableRequest != null) {
+        return StructuredResponseParseResult(
+          response: WebScrapperChatAIResponseBothModified(
+            resumeActionMessage: resumeActionMessage,
+            fetchSettings: fetchSettings,
+            scrappableRequest: scrappableRequest,
+          ),
+          validationReason: null,
         );
       }
 
       if (fetchSettings != null) {
-        return WebScrapperChatAIResponseOnlyExtractRulesModified(
-          fetchSettings: fetchSettings,
-          resumeActionMessage: resumeActionMessage,
+        return StructuredResponseParseResult(
+          response: WebScrapperChatAIResponseOnlyExtractRulesModified(
+            fetchSettings: fetchSettings,
+            resumeActionMessage: resumeActionMessage,
+          ),
+          validationReason: null,
         );
       }
 
       if (scrappableRequest != null) {
-        return WebScrapperChatAIResponseOnlyRequestModified(
-          scrappableRequest: scrappableRequest,
-          resumeActionMessage: resumeActionMessage,
+        return StructuredResponseParseResult(
+          response: WebScrapperChatAIResponseOnlyRequestModified(
+            scrappableRequest: scrappableRequest,
+            resumeActionMessage: resumeActionMessage,
+          ),
+          validationReason: null,
         );
       }
 
-      return const WebScrapperChatAIResponseErrorMessage(
-        'Invalid response: unexpected state in data parsing',
+      return const StructuredResponseParseResult(
+        response: WebScrapperChatAIResponseErrorMessage(
+          'Invalid response: unexpected state in data parsing',
+        ),
+        validationReason:
+            StructuredResponseValidationReason.missingRequiredData,
       );
 
     default:
-      return WebScrapperChatAIResponseErrorMessage(
-        'Invalid response type: $responseType',
+      return StructuredResponseParseResult(
+        response: WebScrapperChatAIResponseErrorMessage(
+          'Invalid response type: $responseType',
+        ),
+        validationReason:
+            StructuredResponseValidationReason.missingRequiredData,
       );
   }
+}
+
+WebScrapperChatAIResponse parseStructuredResponse(Map<String, dynamic> data) {
+  return parseStructuredResponseWithValidation(data).response;
+}
+
+Map<String, dynamic>? _asStringDynamicMap(dynamic value) {
+  if (value is Map<String, dynamic>) return value;
+  if (value is Map) {
+    return value.map((k, v) => MapEntry(k.toString(), v));
+  }
+  return null;
+}
+
+Map<String, String?>? _parseNullableStringMap(dynamic value) {
+  if (value == null) return <String, String?>{};
+  if (value is! Map) return null;
+
+  return value.map(
+    (key, mapValue) => MapEntry(key.toString(), mapValue?.toString()),
+  );
+}
+
+List<String>? _parseStringList(dynamic value) {
+  if (value == null) return <String>[];
+  if (value is! List) return null;
+  return value.map((e) => e.toString()).toList();
 }

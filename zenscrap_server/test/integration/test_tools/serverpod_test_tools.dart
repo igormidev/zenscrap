@@ -2283,9 +2283,11 @@ class _ScrappableChatSession {
 class _PeriodicAutoFixBrokenScrappablesFutureCall {
   Future<void> run(
     _i1.TestSessionBuilder sessionBuilder, [
-    bool? _,
+    bool? placeholder,
   ]) async {
-    var object = _i32.PeriodicAutoFixBrokenScrappablesRunModel(_: _);
+    var object = _i32.PeriodicAutoFixBrokenScrappablesRunModel(
+      placeholder: placeholder,
+    );
     var _localUniqueSession = (sessionBuilder as _i1.InternalTestSessionBuilder)
         .internalBuild();
     try {
@@ -2302,9 +2304,11 @@ class _PeriodicAutoFixBrokenScrappablesFutureCall {
 class _PeriodicSetRequestsAnalyticsFutureCall {
   Future<void> run(
     _i1.TestSessionBuilder sessionBuilder, [
-    bool? _,
+    bool? placeholder,
   ]) async {
-    var object = _i34.PeriodicSetRequestsAnalyticsRunModel(_: _);
+    var object = _i34.PeriodicSetRequestsAnalyticsRunModel(
+      placeholder: placeholder,
+    );
     var _localUniqueSession = (sessionBuilder as _i1.InternalTestSessionBuilder)
         .internalBuild();
     try {
@@ -2321,9 +2325,9 @@ class _PeriodicSetRequestsAnalyticsFutureCall {
 class _PeriodicCacheCleanupFutureCall {
   Future<void> run(
     _i1.TestSessionBuilder sessionBuilder, [
-    bool? _,
+    bool? placeholder,
   ]) async {
-    var object = _i35.PeriodicCacheCleanupRunModel(_: _);
+    var object = _i35.PeriodicCacheCleanupRunModel(placeholder: placeholder);
     var _localUniqueSession = (sessionBuilder as _i1.InternalTestSessionBuilder)
         .internalBuild();
     try {
@@ -2340,9 +2344,11 @@ class _PeriodicCacheCleanupFutureCall {
 class _PeriodicCleanupOldAnalyticsDetailsFutureCall {
   Future<void> run(
     _i1.TestSessionBuilder sessionBuilder, [
-    bool? _,
+    bool? placeholder,
   ]) async {
-    var object = _i36.PeriodicCleanupOldAnalyticsDetailsRunModel(_: _);
+    var object = _i36.PeriodicCleanupOldAnalyticsDetailsRunModel(
+      placeholder: placeholder,
+    );
     var _localUniqueSession = (sessionBuilder as _i1.InternalTestSessionBuilder)
         .internalBuild();
     try {
@@ -2395,9 +2401,11 @@ class _SessionPromptFutureCall {
 class _CleanupExpiredIpSpendingFutureCall {
   Future<void> run(
     _i1.TestSessionBuilder sessionBuilder, [
-    bool? _,
+    bool? placeholder,
   ]) async {
-    var object = _i38.CleanupExpiredIpSpendingFutureCallRunModel(_: _);
+    var object = _i38.CleanupExpiredIpSpendingFutureCallRunModel(
+      placeholder: placeholder,
+    );
     var _localUniqueSession = (sessionBuilder as _i1.InternalTestSessionBuilder)
         .internalBuild();
     try {
@@ -2414,9 +2422,11 @@ class _CleanupExpiredIpSpendingFutureCall {
 class _CleanupExpiredIpValidationCacheFutureCall {
   Future<void> run(
     _i1.TestSessionBuilder sessionBuilder, [
-    bool? _,
+    bool? placeholder,
   ]) async {
-    var object = _i39.CleanupExpiredIpValidationCacheFutureCallRunModel(_: _);
+    var object = _i39.CleanupExpiredIpValidationCacheFutureCallRunModel(
+      placeholder: placeholder,
+    );
     var _localUniqueSession = (sessionBuilder as _i1.InternalTestSessionBuilder)
         .internalBuild();
     try {
@@ -2433,9 +2443,11 @@ class _CleanupExpiredIpValidationCacheFutureCall {
 class _CleanupExpiredPendingCommitsFutureCall {
   Future<void> run(
     _i1.TestSessionBuilder sessionBuilder, [
-    bool? _,
+    bool? placeholder,
   ]) async {
-    var object = _i40.CleanupExpiredPendingCommitsFutureCallRunModel(_: _);
+    var object = _i40.CleanupExpiredPendingCommitsFutureCallRunModel(
+      placeholder: placeholder,
+    );
     var _localUniqueSession = (sessionBuilder as _i1.InternalTestSessionBuilder)
         .internalBuild();
     try {
@@ -2452,9 +2464,11 @@ class _CleanupExpiredPendingCommitsFutureCall {
 class _EmailIdpCleanupFutureCall {
   Future<void> run(
     _i1.TestSessionBuilder sessionBuilder, [
-    bool? _,
+    bool? placeholder,
   ]) async {
-    var object = _i41.EmailIdpCleanupFutureCallRunModel(_: _);
+    var object = _i41.EmailIdpCleanupFutureCallRunModel(
+      placeholder: placeholder,
+    );
     var _localUniqueSession = (sessionBuilder as _i1.InternalTestSessionBuilder)
         .internalBuild();
     try {
